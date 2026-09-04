@@ -62,3 +62,61 @@ cd .\finailinear1
 ```
 
 The repository must remain the source of truth. Linear defines scope and acceptance; GitHub stores implementation and review evidence.
+
+## Repository foundation
+
+```text
+apps/web              unified Next.js operator environment
+services/api          FastAPI and deterministic domain/application logic
+packages/contracts    shared JSON Schema and TypeScript contracts
+docs/architecture     architectural decisions and authority invariants
+scripts               D:-only bootstrap, guard, and verification
+```
+
+The first implemented vertical slice is the generic Enterprise Hydration / Source
+Authority compiler. It accepts a versioned source authority contract with exact
+tenant, legal-entity, period, and currency scope, then emits a deterministic,
+content-addressed construction receipt. Each requested field is classified as:
+
+- `OBSERVED` — directly supported by retained evidence;
+- `DERIVED` — deterministically produced by a versioned rule over observed inputs;
+- `INFERRED` — reviewable and explicitly non-authoritative;
+- `UNAVAILABLE` — not supported by the current evidence.
+
+Compiler output is always `CANDIDATE_ONLY`. Canonical promotion will be a separate,
+governed operation requiring validation, reconciliation, policy, approval, and
+persistence receipts.
+
+## Develop and verify
+
+From the canonical Windows checkout:
+
+```powershell
+.\scripts\bootstrap-local.ps1
+.\scripts\verify-local.ps1
+```
+
+Run the services directly:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn finai_api.main:app --app-dir services\api\src --reload
+pnpm --filter @finai/web dev
+```
+
+Or run the container topology after bootstrap has created the D:-local data root:
+
+```powershell
+docker compose up --build
+```
+
+- Operator environment: `http://127.0.0.1:3000`
+- API documentation: `http://127.0.0.1:8000/docs`
+- API health: `http://127.0.0.1:8000/health`
+
+## Acceptance boundary
+
+This foundation proves local structure, exact-scope authority classification,
+deterministic receipts, shared frontend contracts, an operator shell, automated
+tests, and production builds. It does not yet prove source parsing, immutable object
+storage, database persistence, canonical promotion, reconciliation, approval,
+external-system delivery, authentic-source acceptance, scale, or production release.
