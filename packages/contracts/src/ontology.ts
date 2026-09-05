@@ -22,6 +22,8 @@ export interface ResourceProposalDetail {
   proposal: ResourceProposal; submitted_by: string; created_at: string; decision: string | null;
   reviewed_by: string | null; review_rationale: string | null; recorded_at: string | null;
   validation: { impact: Array<{ resource_id: string; name: string; operation: string; fields_changed: string[] }>;
+    downstream_impact?: { status: "COMPLETE" | "RESTRICTED"; selection: "CURRENT_ACCEPTED_HEADS_AND_PROPOSED"; max_depth: number; max_resources: number;
+      affected: Array<{root_resource_id: string; resource_id: string; version_id: string; object_type: string; display_name: string; depth: number; state: "CURRENT" | "PROPOSED"}> };
     dependency_heads: Record<string,string>; compatibility: string; identity_cycles: string };
 }
 export interface ProposalSummary {

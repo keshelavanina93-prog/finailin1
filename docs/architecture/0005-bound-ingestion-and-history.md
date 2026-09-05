@@ -16,4 +16,4 @@ NIN-27 identity resolution accepts independent `valid_at` and `known_at` timesta
 - Mounted runtime exposes source preparation/account choices and both temporal query parameters. G8 login was inspected in the browser; authenticated browser acceptance remains open.
 - Synthetic fixtures prove local behavior only. NIN-26/NIN-27 and full-system acceptance remain open.
 
-Run persistent checks with the existing D-only environment loaded and `G8_BINDING_DB_TEST=1`; use `test_ingest_binding_persistence.py` and `test_identity_history.py`. These create isolated synthetic tenant records in the local PostgreSQL store.
+Run persistent checks with the existing D-only environment loaded and `G8_BINDING_DB_TEST=1`; use `test_ingest_binding_persistence.py` and `test_identity_history.py`. These create isolated synthetic resources and entity scopes in the local PostgreSQL store.

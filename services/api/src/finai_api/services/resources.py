@@ -20,6 +20,7 @@ from finai_api.domain.resources import (
     ResourceReview,
 )
 from finai_api.domain.review import Principal
+from finai_api.services.dependency_impact import downstream_impact, impact_fingerprint
 from finai_api.services.workspace import WorkspaceError
 from finai_api.storage import connection
 
@@ -538,6 +539,7 @@ def _validate(
             current = redirects[current]
     return {
         "impact": impact,
+        "downstream_impact": downstream_impact(conn, principal, proposal, dependencies),
         "dependency_heads": external_heads,
         "dependencies": dependencies,
         "schema_versions": schema_versions,
@@ -562,6 +564,14 @@ def propose(principal: Principal, proposal: ResourceProposal) -> ProposalDetail:
         if row:
             return proposal_detail(principal, proposal.proposal_id)
         validation = _validate(conn, principal, proposal)
+        snapshot = validation["downstream_impact"]
+        restricted = snapshot["requires_tenant_steward"]
+        fingerprint = impact_fingerprint(snapshot)
+        validation["downstream_impact"] = {
+            **snapshot,
+            "fingerprint": fingerprint,
+            **({"status": "RESTRICTED", "affected": []} if restricted else {}),
+        }
         conn.execute(
             (
                 "INSERT INTO resource_proposals "
@@ -580,6 +590,17 @@ def propose(principal: Principal, proposal: ResourceProposal) -> ProposalDetail:
                 Jsonb({"request": proposal.model_dump(mode="json"), "validation": validation}),
             ),
         )
+        conn.execute(
+            "INSERT INTO proposal_impact_snapshots "
+            "(tenant_id,proposal_id,access_entity,snapshot,fingerprint) VALUES (%s,%s,%s,%s,%s)",
+            (
+                principal.scope.tenant_id,
+                proposal.proposal_id,
+                "__TENANT_RESTRICTED__" if restricted else proposal.access_entity,
+                Jsonb(snapshot),
+                fingerprint,
+            ),
+        )
     return proposal_detail(principal, proposal.proposal_id)
 
 
@@ -596,6 +617,21 @@ def proposal_detail(principal: Principal, proposal_id: UUID) -> ProposalDetail:
         ).fetchone()
         if not row:
             raise WorkspaceError(404, "Resource proposal not found in authorized context")
+        validation = row["payload"]["validation"]
+        if "ontology_admin" in principal.permissions:
+            snapshot = cursor.execute(
+                "SELECT snapshot,fingerprint FROM proposal_impact_snapshots "
+                "WHERE tenant_id=%s AND proposal_id=%s",
+                (principal.scope.tenant_id, proposal_id),
+            ).fetchone()
+            if snapshot:
+                validation = {
+                    **validation,
+                    "downstream_impact": {
+                        **snapshot["snapshot"],
+                        "fingerprint": snapshot["fingerprint"],
+                    },
+                }
         return ProposalDetail(
             proposal=ResourceProposal.model_validate(row["payload"]["request"]),
             submitted_by=row["submitted_by"],
@@ -604,7 +640,7 @@ def proposal_detail(principal: Principal, proposal_id: UUID) -> ProposalDetail:
             reviewed_by=row["reviewed_by"],
             review_rationale=row["review_rationale"],
             recorded_at=row["recorded_at"],
-            validation=row["payload"]["validation"],
+            validation=validation,
         )
 
 
@@ -658,6 +694,12 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
                 ):
                     raise WorkspaceError(
                         409, "A reviewed dependency changed; submit a refreshed proposal"
+                    )
+                if impact_fingerprint(validation["downstream_impact"]) != row["payload"][
+                    "validation"
+                ].get("downstream_impact", {}).get("fingerprint"):
+                    raise WorkspaceError(
+                        409, "Downstream dependency impact changed; submit a refreshed proposal"
                     )
             conn.execute(
                 (
@@ -747,7 +789,9 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
 
 
 def resolve_identity(
-    principal: Principal, resource_id: UUID, known_at: datetime | None = None,
+    principal: Principal,
+    resource_id: UUID,
+    known_at: datetime | None = None,
     valid_at: datetime | None = None,
 ) -> dict[str, Any]:
     chain: list[str] = []

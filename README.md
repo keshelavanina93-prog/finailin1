@@ -1,10 +1,26 @@
-# FinAI / NYX Core
+# G8 by NYXCore
 
-FinAI / NYX Core is an evidence-native Financial and Industrial Decision Intelligence Operating System.
+G8 is an evidence-native Financial and Industrial Decision Intelligence Operating System. FinAI remains an internal package and migration name.
 
 This repository is the implementation repository for the Linear program **FinAI / NYX Core — Platform Reconstruction & Authority**.
 
 ## Current operator application
+
+The local package now supervises its API and web services from one command, with
+health checks and persistent process ownership, logs and state on D:.
+
+```powershell
+.\scripts\g8-runtime.ps1 start
+.\scripts\g8-runtime.ps1 status
+.\scripts\g8-runtime.ps1 stop
+```
+
+See `docs/development/local-runtime.md` for setup and ownership rules. This local
+supervisor does not yet provide the full release/deployment control plane.
+
+Intake can pin accepted canonical account/context versions through review,
+objects and evidence export. Historical identity resolution separates business
+time from knowledge time. See `docs/architecture/0005-bound-ingestion-and-history.md`.
 
 The workspace now connects evidence intake, construction review, independent
 approval/rejection, accepted object versions, source-row lineage, history, and
