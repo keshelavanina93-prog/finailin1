@@ -13,7 +13,7 @@ from finai_api.services.report_inputs import ReportInputRequest
 from finai_api.services.workspace import WorkspaceError, detail
 from finai_api.storage import connection
 
-VERSION = "report-source-process/2"
+VERSION = "report-source-process/3"
 DEFINITION = {
     "version": VERSION,
     "nodes": [
@@ -21,6 +21,7 @@ DEFINITION = {
         {"id": "coverage", "function": "mr-source-coverage/1", "depends_on": ["hierarchy"]},
         {"id": "review", "function": "human-review/1", "depends_on": ["coverage"]},
     ],
+    "outputs": {"hierarchy": "source-hierarchy/1", "coverage": "source-assessment/1"},
 }
 
 

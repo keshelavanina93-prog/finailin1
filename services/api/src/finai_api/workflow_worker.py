@@ -11,6 +11,7 @@ from temporalio.worker import Worker
 from finai_api.config import get_settings
 from finai_api.report_workflow import ReportSourceWorkflow
 from finai_api.security import require_permission
+from finai_api.services import execution_publication as publication
 from finai_api.services import report_workflows as records
 from finai_api.services.report_inputs import ReportInputRequest, retain_assessment
 from finai_api.services.tb_frontier import analyze
@@ -23,7 +24,8 @@ def hierarchy(context: dict[str, Any]) -> dict[str, Any]:
     require_permission(principal, "read")
     require_permission(principal, "ingest")
     identity = context["workflow_id"]
-    request = records.read(principal, identity)["request"]["report"]
+    record = records.read(principal, identity)
+    request = record["request"]["report"]
     attempt = f"hierarchy:{context['generation']}:{activity.info().attempt}"
     records.event(
         principal, identity, attempt + ":started", {"node": "hierarchy", "state": "RUNNING"}
@@ -50,6 +52,15 @@ def hierarchy(context: dict[str, Any]) -> dict[str, Any]:
             attempt + ":completed",
             {"node": "hierarchy", "state": "COMPLETED", "proofs": proofs},
         )
+        if record["definition"].get("outputs"):
+            publication.stage(
+                principal,
+                identity,
+                context["generation"],
+                "hierarchy",
+                "source-hierarchy/1",
+                {"proofs": proofs},
+            )
         return {"event_id": attempt + ":completed", "sources_checked": len(proofs)}
     except Exception:
         records.event(
@@ -83,6 +94,15 @@ def coverage(context: dict[str, Any]) -> dict[str, Any]:
             attempt + ":completed",
             {"node": "coverage", "state": "COMPLETED", "output": output},
         )
+        if record["definition"].get("outputs"):
+            publication.stage(
+                principal,
+                identity,
+                context["generation"],
+                "coverage",
+                "source-assessment/1",
+                output,
+            )
         return output
     except Exception:
         records.event(
@@ -98,6 +118,14 @@ def coverage(context: dict[str, Any]) -> dict[str, Any]:
         raise
 
 
+@activity.defn(name="execution_publish")
+def publish_outputs(context: dict[str, Any]) -> dict[str, Any]:
+    principal = records.current_principal(context["actor_id"], context["scope"])
+    manifest = publication.publish(principal, context["workflow_id"], context["generation"])
+    # Only a small immutable reference crosses into Temporal history.
+    return {"publication_id": manifest["publication_id"], "generation": manifest["generation"]}
+
+
 async def main() -> None:
     settings = get_settings()
     client = await Client.connect(settings.temporal_address, namespace=settings.temporal_namespace)
@@ -106,7 +134,7 @@ async def main() -> None:
             client,
             task_queue="g8-report-source-v1",
             workflows=[ReportSourceWorkflow],
-            activities=[coverage, hierarchy],
+            activities=[coverage, hierarchy, publish_outputs],
             activity_executor=executor,
         )
         await worker.run()

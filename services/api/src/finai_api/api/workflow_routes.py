@@ -15,6 +15,7 @@ from finai_api.config import get_settings
 from finai_api.domain.review import Principal
 from finai_api.report_workflow import ReportSourceWorkflow
 from finai_api.security import authenticated_principal, require_permission
+from finai_api.services import execution_publication as publication
 from finai_api.services import report_workflows as records
 from finai_api.services.workspace import WorkspaceError
 
@@ -76,6 +77,7 @@ def listing(principal: User) -> list[dict[str, Any]]:
 async def read(identity: str, principal: User) -> dict[str, Any]:
     require_permission(principal, "read")
     result = await asyncio.to_thread(records.read, principal, identity)
+    result["publications"] = publication.published(result)
     try:
         runtime = await client()
         handle = runtime.get_workflow_handle(identity)

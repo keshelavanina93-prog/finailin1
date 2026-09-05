@@ -6,6 +6,7 @@ type Run = {
   workflow_id: string; runtime_status: string;
   execution?: { state: string; result: { assessment_id?: string } };
   definition: { nodes: Array<{ id: string; function: string; depends_on: string[] }> };
+  publications?: Array<{ publication_id: string; generation: number; authority: string; outputs: Array<{slot: string; artifact_type: string; sha256: string}> }>;
   events: Array<{ event_id: string; created_at: string; node: string; state?: string; command?: string; reason?: string }>;
 };
 
@@ -48,7 +49,10 @@ export default function ReportWorkflow({ token, report }: { token: string; repor
       <label>Reason for process action<input value={reason} onChange={event => setReason(event.target.value)} minLength={10} maxLength={2000} /></label>
       <div className="upload-strip">{(state === "PAUSED" ? ["resume", "cancel"] : state === "WAITING_REVIEW" ? ["pause", "retry", "complete", "cancel"] : state === "FAILED" ? ["retry", "cancel"] : []).map(command => <button key={command} disabled={busy || reason.trim().length < 10} onClick={() => void action(command)}>{command === "complete" ? "Acknowledge review" : command}</button>)}</div>
       <div className="data-scroll"><table><thead><tr><th>Step</th><th>Event</th><th>Recorded at</th></tr></thead><tbody>{run.events.map(event => <tr key={event.event_id}><td>{event.node}</td><td>{event.state ?? event.command}</td><td>{new Date(event.created_at).toLocaleString()}</td></tr>)}</tbody></table></div>
-      {run.execution?.result.assessment_id && <p>Saved output: {run.execution.result.assessment_id}</p>}
+      <h5>Published output sets</h5>
+      <p>Complete processing results retained together. Approval and financial certification remain separate.</p>
+      {!run.publications?.length && <p>No complete output set published.</p>}
+      {run.publications?.map(publication => <details key={publication.publication_id}><summary>Output set {publication.generation + 1} · {publication.outputs.length} outputs · execution only</summary><code>{publication.publication_id}</code><ul>{publication.outputs.map(output => <li key={output.slot}>{output.slot} · {output.artifact_type}<br/><code>{output.sha256}</code></li>)}</ul></details>)}
     </>}
   </section>;
 }

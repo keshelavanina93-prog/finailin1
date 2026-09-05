@@ -32,7 +32,10 @@ class ReportSourceWorkflow:
         while True:
             self.state = "RUNNING"
             try:
-                if context.get("definition_version") == "report-source-process/2":
+                if context.get("definition_version") in (
+                    "report-source-process/2",
+                    "report-source-process/3",
+                ):
                     self.result["hierarchy"] = await workflow.execute_activity(
                         "report_source_hierarchy",
                         {**context, "generation": generation},
@@ -50,6 +53,13 @@ class ReportSourceWorkflow:
                     ),
                 )
                 self.result.update(coverage)
+                if context.get("definition_version") == "report-source-process/3":
+                    self.result["publication"] = await workflow.execute_activity(
+                        "execution_publish",
+                        {**context, "generation": generation},
+                        start_to_close_timeout=timedelta(minutes=1),
+                        retry_policy=RetryPolicy(maximum_attempts=3),
+                    )
                 self.state = "WAITING_REVIEW"
             except ActivityError:
                 self.state = "FAILED"
