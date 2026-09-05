@@ -2,6 +2,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('start', 'status', 'stop')][string]$Action = 'status',
+    [ValidateSet('all', 'api', 'web', 'minio')][string]$Service = 'all',
     [ValidateRange(1024, 65535)][int]$ApiPort = 8061,
     [ValidateRange(1024, 65535)][int]$WebPort = 3061,
     [ValidateRange(5, 120)][int]$HealthTimeoutSeconds = 30
@@ -75,7 +76,7 @@ try {
         $script:records = @($saved.services)
     }
     if ($Action -eq 'stop') {
-        foreach ($record in @($script:records)) {
+        foreach ($record in @($script:records | Where-Object { $Service -eq 'all' -or $_.service -eq $Service } | Sort-Object { switch ($_.service) { 'web' { 0 }; 'api' { 1 }; 'minio' { 2 } } })) {
             if (Test-Owned $record) { Stop-Owned $record }
             elseif ($null -ne (Get-ProcessIdentity $record.processId)) { throw "Ownership changed for $($record.service); refusing to stop it." }
             $script:records = @($script:records | Where-Object { $_.service -ne $record.service })
@@ -89,14 +90,26 @@ try {
         & "$PSScriptRoot\assert-d-drive.ps1" -RepositoryRoot $repositoryRoot
         $python = Join-Path $env:VIRTUAL_ENV 'Scripts\python.exe'
         $server = Join-Path $repositoryRoot 'apps\web\.next\standalone\apps\web\server.js'
-        foreach ($required in @($python, $server)) {
+        $requiredFiles = @()
+        if ($Service -in @('all', 'api')) { $requiredFiles += $python }
+        if ($Service -in @('all', 'web')) { $requiredFiles += $server }
+        foreach ($required in $requiredFiles) {
             if (-not (Test-Path -LiteralPath $required)) { throw 'Runtime dependencies/build missing; run bootstrap-local.ps1 and pnpm build first.' }
         }
         $node = (Get-Command node.exe -ErrorAction Stop).Source
         $specs = @(
-            @{ name = 'api'; port = $ApiPort; url = "http://127.0.0.1:$ApiPort/health"; executable = $python; arguments = "-m uvicorn finai_api.main:app --host 127.0.0.1 --port $ApiPort" },
+            @{ name = 'api'; port = $ApiPort; url = "http://127.0.0.1:$ApiPort/ready"; executable = $python; arguments = "-m uvicorn finai_api.main:app --host 127.0.0.1 --port $ApiPort" },
             @{ name = 'web'; port = $WebPort; url = "http://127.0.0.1:$WebPort"; executable = $node; arguments = ('"' + $server + '"') }
         )
+        if ($env:FINAI_S3_ENDPOINT -eq 'http://127.0.0.1:9061' -or $Service -eq 'minio') {
+            $minioBinary = Join-Path $env:FINAI_RUNTIME_ROOT 'tools\minio\minio.exe'
+            $minioData = Join-Path $env:FINAI_DATA_DIR 'minio'
+            if (-not (Test-Path -LiteralPath $minioBinary)) { throw 'Run install-local-minio.ps1 first.' }
+            New-Item -ItemType Directory -Force -Path $minioData | Out-Null
+            if ((Get-Item -Force -LiteralPath $minioData).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'MinIO data cannot use a reparse point.' }
+            $specs = @(@{ name = 'minio'; port = 9061; url = 'http://127.0.0.1:9061/minio/health/live'; executable = $minioBinary; arguments = ('server --quiet --address 127.0.0.1:9061 --console-address 127.0.0.1:9062 "' + $minioData + '"') }) + $specs
+        }
+        $specs = @($specs | Where-Object { $Service -eq 'all' -or $_.name -eq $Service })
         foreach ($spec in $specs) {
             $existing = @($script:records | Where-Object { $_.service -eq $spec.name })
             if ($existing.Count -gt 1) { throw 'Duplicate runtime service records.' }
@@ -108,6 +121,7 @@ try {
             if (Get-NetTCPConnection -State Listen -LocalPort $spec.port -ErrorAction SilentlyContinue) {
                 throw "Port $($spec.port) is already occupied by an unmanaged service. It has been preserved; use alternate ports."
             }
+            if ($spec.name -eq 'minio' -and (Get-NetTCPConnection -State Listen -LocalPort 9062 -ErrorAction SilentlyContinue)) { throw 'MinIO console port 9062 is occupied; existing process was preserved.' }
         }
         $newRecords = @()
         try {
@@ -125,7 +139,18 @@ try {
                 $runId = [guid]::NewGuid().ToString('N')
                 $stdout = Join-Path $controlRoot "$($spec.name)-$runId.stdout.log"
                 $stderr = Join-Path $controlRoot "$($spec.name)-$runId.stderr.log"
-                $process = Start-Process -FilePath $spec.executable -ArgumentList $spec.arguments -WorkingDirectory $repositoryRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+                try {
+                    if ($spec.name -eq 'minio') {
+                        $admin = Get-Content -Raw -LiteralPath (Join-Path $env:FINAI_RUNTIME_ROOT 'minio-admin.json') | ConvertFrom-Json
+                        $env:MINIO_ROOT_USER = $admin.accessKey
+                        $env:MINIO_ROOT_PASSWORD = $admin.secretKey
+                        $env:MINIO_BROWSER = 'off'
+                        $env:MINIO_UPDATE = 'off'
+                    }
+                    $process = Start-Process -FilePath $spec.executable -ArgumentList $spec.arguments -WorkingDirectory $repositoryRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+                } finally {
+                    if ($spec.name -eq 'minio') { Remove-Item Env:MINIO_ROOT_USER,Env:MINIO_ROOT_PASSWORD -ErrorAction SilentlyContinue }
+                }
                 $identity = Get-ProcessIdentity $process.Id
                 if ($null -eq $identity) { throw "$($spec.name) exited during launch; inspect logs in $controlRoot." }
                 $record = [pscustomobject]@{ service = $spec.name; processId = $identity.ProcessId; createdAt = $identity.CreationDate.ToUniversalTime().ToString('o'); executable = $identity.ExecutablePath; commandLine = $identity.CommandLine; port = $spec.port; healthUrl = $spec.url; stdout = $stdout; stderr = $stderr }
@@ -145,14 +170,14 @@ try {
             throw
         }
     }
-    foreach ($service in @('api', 'web')) {
-        $record = $script:records | Where-Object { $_.service -eq $service } | Select-Object -First 1
+    foreach ($serviceName in @('minio', 'api', 'web') | Where-Object { $Service -eq 'all' -or $_ -eq $Service }) {
+        $record = $script:records | Where-Object { $_.service -eq $serviceName } | Select-Object -First 1
         if ($record) {
             $owned = Test-Owned $record
-            [pscustomobject]@{ service = $service; managed = $owned; healthy = ($owned -and (Test-Health $record.healthUrl)); port = $record.port; stdout = $record.stdout; stderr = $record.stderr }
+            [pscustomobject]@{ service = $serviceName; managed = $owned; healthy = ($owned -and (Test-Health $record.healthUrl)); port = $record.port; stdout = $record.stdout; stderr = $record.stderr }
         } else {
-            $port = if ($service -eq 'api') { $ApiPort } else { $WebPort }
-            [pscustomobject]@{ service = $service; managed = $false; port = $port; occupied = [bool](Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) }
+            $port = switch ($serviceName) { 'minio' { 9061 }; 'api' { $ApiPort }; 'web' { $WebPort } }
+            [pscustomobject]@{ service = $serviceName; managed = $false; port = $port; occupied = [bool](Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) }
         }
     }
 } finally { $runtimeLock.Dispose() }

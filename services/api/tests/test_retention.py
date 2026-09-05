@@ -88,9 +88,13 @@ def test_postgres_retention_replay_reconnect_and_scope_denial(
             "SELECT set_config('finai.tenant_id', %s, true)", (data["scope"]["tenant_id"],)
         )
         row = conn.execute(
-            "SELECT source_bytes FROM hydration_runs WHERE receipt_id=%s", (receipt_id,)
+            "SELECT source_bytes, source_storage, request FROM hydration_runs WHERE receipt_id=%s",
+            (receipt_id,),
         ).fetchone()
-        assert bytes(row[0]) == data["csv_text"].encode()
+        assert row[0] is None
+        assert row[1]["sha256"] == first.json()["source_sha256"]
+        assert row[1]["byte_length"] == len(data["csv_text"].encode())
+        assert "csv_text" not in row[2]
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
             conn.execute("DELETE FROM hydration_runs WHERE receipt_id=%s", (receipt_id,))
 

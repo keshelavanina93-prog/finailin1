@@ -7,7 +7,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.authority import canonical_sha256
-from finai_api.domain.ingest import IngestReceipt, IngestRequest
+from finai_api.domain.ingest import IngestReceipt
 from finai_api.domain.review import (
     IntakeItem,
     ObjectDetail,
@@ -20,7 +20,7 @@ from finai_api.domain.review import (
     approval_blockers,
     workspace_object,
 )
-from finai_api.storage import connection
+from finai_api.storage import connection, retained_request, retained_source
 
 
 class WorkspaceError(Exception):
@@ -185,12 +185,13 @@ def decide(principal: Principal, receipt_id: str, request: ReviewRequest) -> Rev
                 )
             head = _head(conn, principal, receipt.source_class)
             if request.decision == "APPROVED":
+                source_request = retained_request(principal.scope, run)
                 if receipt.context_version_id:
                     from finai_api.services.ingest_binding import bind_receipt
 
                     validated = bind_receipt(
                         principal,
-                        IngestRequest.model_validate(run["request"]),
+                        source_request,
                         receipt,
                         existing_connection=conn,
                     )
@@ -298,7 +299,9 @@ def object_detail(principal: Principal, object_id: str) -> ObjectDetail:
         obj = WorkspaceObject.model_validate(row[0])
         run = _run(conn, principal, obj.receipt_id)
         reader = csv.DictReader(
-            io.StringIO(bytes(run["source_bytes"]).decode("utf-8").removeprefix("\ufeff"))
+            io.StringIO(
+                retained_source(principal.scope, run).decode("utf-8").removeprefix("\ufeff")
+            )
         )
         source_row = next(
             (values for index, values in enumerate(reader, 2) if index == obj.source_row), {}
@@ -350,4 +353,4 @@ def summary(principal: Principal) -> WorkspaceSummary:
 
 def source_bytes(principal: Principal, receipt_id: str) -> bytes:
     with connection(principal.scope) as conn:
-        return bytes(_run(conn, principal, receipt_id)["source_bytes"])
+        return retained_source(principal.scope, _run(conn, principal, receipt_id))

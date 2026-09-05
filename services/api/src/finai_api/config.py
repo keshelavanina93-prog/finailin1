@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     service_name: str = "finai-api"
     api_version: str = "0.1.0"
     database_url: SecretStr = SecretStr("")
+    s3_endpoint: str = ""
+    s3_access_key: SecretStr = SecretStr("")
+    s3_secret_key: SecretStr = SecretStr("")
+    s3_bucket: str = "g8-evidence"
+    s3_region: str = "us-east-1"
     access_tokens: SecretStr = SecretStr("{}")
 
 

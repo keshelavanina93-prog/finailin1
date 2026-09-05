@@ -13,6 +13,7 @@ dependencies = [
   "pydantic-settings>=2.7,<3",
   "uvicorn[standard]>=0.34,<1",
   "psycopg[binary]>=3.2,<4",
+  "boto3>=1.40,<2",
 ]
 
 [project.optional-dependencies]
@@ -46,3 +47,7 @@ plugins = ["pydantic.mypy"]
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = ["boto3", "botocore.*"]
+ignore_missing_imports = true

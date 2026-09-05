@@ -2,12 +2,13 @@ import csv
 from typing import Annotated
 
 import psycopg
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 
 from finai_api.config import get_settings
 from finai_api.domain.authority import CompileHydrationRequest, ConstructionReceipt, ExactScope
 from finai_api.domain.ingest import IngestReceipt, IngestRequest
 from finai_api.domain.review import Principal
+from finai_api.evidence_objects import EvidenceStoreUnavailable, check_ready
 from finai_api.security import authenticated_principal, authorized_scope, require_permission
 from finai_api.services.authority_compiler import AuthorityCompiler
 from finai_api.services.ingest_binding import bind_receipt
@@ -27,6 +28,27 @@ def health() -> dict[str, str]:
         "version": settings.api_version,
         "environment": settings.environment,
     }
+
+
+@router.get("/ready", tags=["operations"])
+def readiness(response: Response) -> dict[str, str]:
+    status = {"database": "unavailable", "evidence_store": "unavailable"}
+    dsn = get_settings().database_url.get_secret_value()
+    if dsn:
+        try:
+            with psycopg.connect(dsn, connect_timeout=3) as conn:
+                conn.execute("SELECT source_storage FROM hydration_runs LIMIT 0")
+            status["database"] = "ready"
+        except psycopg.Error:
+            pass
+    try:
+        check_ready()
+        status["evidence_store"] = "ready"
+    except EvidenceStoreUnavailable:
+        pass
+    ready = all(value == "ready" for value in status.values())
+    response.status_code = 200 if ready else 503
+    return {"status": "ready" if ready else "unavailable", **status}
 
 
 @router.post(

@@ -134,11 +134,15 @@ export default function OperatorWorkspace() {
       const response = await fetch(`/api/workspace/constructions/${detail.receipt.receipt_id}/${format}`, { headers: { Authorization: `Bearer ${token}` } });
       if (!response.ok) throw new Error(await decodeError(response));
       const blob = await response.blob();
+      const expectedHash = format === "source" ? detail.receipt.source_sha256 : response.headers.get("X-Content-SHA256");
+      const digest = await crypto.subtle.digest("SHA-256", await blob.arrayBuffer());
+      const actualHash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+      if (!expectedHash || actualHash !== expectedHash) throw new Error("Evidence integrity could not be verified. Download was withheld.");
       if (active !== generation.current) return;
       const link = document.createElement("a"); const url = URL.createObjectURL(blob);
       link.href = url; link.download = format === "source" ? "retained-source.csv" : "g8-evidence-bundle.json";
       link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setNotice("Evidence export prepared with its source hash and authority context.");
+      setNotice("Evidence download verified against its retained hash.");
     } catch (failure) { setError(failure instanceof Error ? failure.message : "Export failed"); }
   }
 

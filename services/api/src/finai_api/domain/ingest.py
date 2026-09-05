@@ -33,7 +33,18 @@ class Candidate(BaseModel):
     authority_state: Literal["MAPPED_CANDIDATE"] = "MAPPED_CANDIDATE"
 
 
+class SourceStorage(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    backend: Literal["S3"] = "S3"
+    bucket: str = Field(min_length=1, max_length=255)
+    object_key: str = Field(min_length=1, max_length=1024)
+    sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    byte_length: int = Field(ge=1, le=4_000_000)
+    version_id: str | None = Field(default=None, max_length=1024)
+
+
 class IngestReceipt(BaseModel):
+    source_storage: SourceStorage | None = None
     receipt_id: str
     request_sha256: str
     context_version_id: UUID | None = None

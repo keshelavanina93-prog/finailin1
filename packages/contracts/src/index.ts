@@ -14,6 +14,14 @@ export interface IngestReceipt {
   receipt_id: string;
   request_sha256: string;
   source_sha256: string;
+  source_storage?: {
+    backend: "S3";
+    bucket: string;
+    object_key: string;
+    sha256: string;
+    byte_length: number;
+    version_id?: string | null;
+  } | null;
   scope: ExactScope;
   source_class: "TRIAL_BALANCE" | "UNFAMILIAR_TABULAR";
   authority_state: "MAPPED_CANDIDATE";
