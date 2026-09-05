@@ -50,6 +50,11 @@ export interface IngestReceipt {
   scope: ExactScope;
   source_class: "TRIAL_BALANCE" | "UNFAMILIAR_TABULAR" | "WORKBOOK_PACKAGE";
   source_profile?: {
+    account_catalogs?: Array<{ sheet: string; account_count: number; company_binding: string; policy: string;
+      findings: Array<{ code: string; coordinates: string[] }>;
+      accounts: Array<{ account_code: string; source_name: string; coordinate: string;
+        balance_behavior_source: string; currency_tracking_source: string; quantity_tracking_source: string;
+        analytics: Array<{ position: number; source_label: string; coordinate: string }> }> }>;
     source_use?: string;
     sheets?: Array<{ sheet: string; source_type: string; grain: string; source_rows: number; formula_count: number; periods: string[]; company_labels: string[]; content_sha256: string }>;
     findings?: Array<{ code: string; sheet: string; message: string; coordinates: string[]; occurrences?: number }>;

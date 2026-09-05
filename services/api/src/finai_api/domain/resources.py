@@ -65,6 +65,7 @@ class ResourceProposal(BaseModel):
     mutations: list[ResourceMutation] = Field(min_length=1, max_length=100)
     expectations: list[ProposalExpectation] = Field(default_factory=list, max_length=100)
     restores_versions: dict[UUID, UUID] = Field(default_factory=dict, max_length=100)
+    source_versions: dict[UUID, dict[UUID, UUID]] = Field(default_factory=dict, max_length=100)
 
     @model_serializer(mode="wrap")
     def preserve_legacy_proposal(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
@@ -73,6 +74,8 @@ class ResourceProposal(BaseModel):
             payload.pop("expectations", None)
         if not self.restores_versions:
             payload.pop("restores_versions", None)
+        if not self.source_versions:
+            payload.pop("source_versions", None)
         return payload
 
     @model_validator(mode="after")
@@ -80,6 +83,10 @@ class ResourceProposal(BaseModel):
         if len({item.resource_id for item in self.mutations}) != len(self.mutations):
             raise ValueError("A change set may contain only one version per canonical identity")
         mutation_ids = {item.resource_id for item in self.mutations}
+        if not set(self.source_versions).issubset(mutation_ids):
+            raise ValueError("Source lineage must identify a proposed resource")
+        if any(len(versions) > 100 for versions in self.source_versions.values()):
+            raise ValueError("At most 100 source versions per proposed resource")
         if any(check.resource_id not in mutation_ids for check in self.expectations):
             raise ValueError("Expectations must bind to a resource in this proposal")
         return self

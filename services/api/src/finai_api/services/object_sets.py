@@ -10,7 +10,7 @@ from finai_api.domain.review import Principal
 from finai_api.services.resources import resource_connection
 
 
-def query_objects(principal: Principal, request: ObjectSetQuery) -> ObjectSetResult:
+def query_objects(principal: Principal, request: ObjectSetQuery, types: list[str] | None = None) -> ObjectSetResult:
     now = datetime.now(UTC)
     request = request.model_copy(
         update={
@@ -25,7 +25,7 @@ def query_objects(principal: Principal, request: ObjectSetQuery) -> ObjectSetRes
         request.known_at,
         request.valid_at,
         request.valid_at,
-        request.object_type,
+        types if types is not None else [request.object_type],
     ]
     ctes = [
         "versions AS MATERIALIZED (SELECT v.*,i.identity_key FROM resource_versions v "
@@ -36,7 +36,7 @@ def query_objects(principal: Principal, request: ObjectSetQuery) -> ObjectSetRes
         "ORDER BY resource_id,system_from DESC,version_id)",
         "current_objects AS (SELECT * FROM effective WHERE authority_state='APPROVED')",
     ]
-    predicate = "object_type=%s"
+    predicate = "object_type=ANY(%s::text[])"
     if request.resource_ids is not None:
         predicate += " AND resource_id=ANY(%s::uuid[])"
         args.append(request.resource_ids)

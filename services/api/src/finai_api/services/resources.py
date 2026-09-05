@@ -144,6 +144,11 @@ def get_resource(principal: Principal, resource_id: UUID) -> dict[str, Any]:
 
 
 def _check_scalar(kind: str, value: Any) -> bool:
+    if kind == "definition":
+        try:
+            return isinstance(value, dict) and len(json.dumps(value, allow_nan=False)) <= 100000
+        except (ValueError, TypeError, RecursionError):
+            return False
     if kind in ("geometry", "geojson"):
         from finai_api.domain.spatial import validate_geojson, validate_geometry
 
@@ -248,9 +253,27 @@ def _validate(
 
     with conn.cursor(row_factory=dict_row) as cursor:
         schemas = cursor.execute(
-            HEAD_SELECT + "WHERE h.tenant_id=%s AND v.object_type='SchemaDefinition'", (tenant,)
+            HEAD_SELECT
+            + "WHERE h.tenant_id=%s AND v.object_type IN ('SchemaDefinition','LinkType')",
+            (tenant,),
         ).fetchall()
-    schema_by_name = {row["identity_key"]: str(row["resource_id"]) for row in schemas}
+    schema_by_name = {
+        row["identity_key"]: str(row["resource_id"])
+        for row in schemas
+        if row["object_type"] == "SchemaDefinition"
+    }
+    link_by_name = {
+        row["identity_key"]: str(row["resource_id"])
+        for row in schemas
+        if row["object_type"] == "LinkType"
+    }
+    link_by_name.update(
+        {
+            item.identity_key: str(item.resource_id)
+            for item in proposal.mutations
+            if item.object_type == "LinkType"
+        }
+    )
     schema_by_name.update(
         {
             item.identity_key: str(item.resource_id)
@@ -303,6 +326,7 @@ def _validate(
                     raise WorkspaceError(422, f"Field {name} does not match its semantic contract")
         elif item.object_type == "SemanticContract":
             if item.attributes.get("kind") not in (
+                "definition",
                 "text",
                 "identifier",
                 "integer",
@@ -356,6 +380,15 @@ def _validate(
                     currency = target(value["currency_id"], identifier, f"MONEY:{name}")
                     if currency["object_type"] != "Currency":
                         raise WorkspaceError(422, "Money requires a canonical Currency")
+            from finai_api.services.ontology_definition_validation import validate_definition
+
+            validate_definition(item, schema_by_name, link_by_name, target)
+            for source_id, source_version in proposal.source_versions.get(
+                item.resource_id, {}
+            ).items():
+                bound = target(str(source_id), identifier, "BOUND_SOURCE:" + str(source_id))
+                if str(bound["version_id"]) != str(source_version):
+                    raise WorkspaceError(409, "Bound source version changed; rebuild the proposal")
             if (
                 item.object_type == "FiscalPeriod"
                 and item.attributes["ends_on"] < item.attributes["starts_on"]

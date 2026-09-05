@@ -11,6 +11,7 @@ def canonical_id(tenant: UUID, kind: str, key: str) -> UUID:
 
 
 SEMANTICS = {
+    "OntologyDefinition": "definition",
     "SpatialGeometry": "geometry",
     "GeoJSONDocument": "geojson",
     "Name": "text",
@@ -32,6 +33,23 @@ SEMANTICS = {
 
 # required field -> semantic kind or a canonical target type. Optional fields carry '?'.
 TYPE_FIELDS: dict[str, dict[str, str]] = {
+    "SourceAccountDefinition": {
+        "account_code": "AccountCode", "source_record_id": "@SourceRecord",
+        "source_name": "Text", "definition": "OntologyDefinition",
+    },
+    "FactContract": {"schema_id": "@SchemaDefinition", "definition": "OntologyDefinition"},
+    "ObjectSetDefinition": {"definition": "OntologyDefinition"},
+    "ObjectInterface": {"definition": "OntologyDefinition"},
+    "ObjectTypeImplementation": {
+        "interface_id": "@ObjectInterface", "schema_id": "@SchemaDefinition",
+        "definition": "OntologyDefinition",
+    },
+    "ObjectTypeGroup": {"definition": "OntologyDefinition"},
+    "DerivedProperty": {"schema_id": "@SchemaDefinition", "definition": "OntologyDefinition"},
+    "ObjectBinding": {
+        "source_schema_id": "@SchemaDefinition", "target_schema_id": "@SchemaDefinition",
+        "definition": "OntologyDefinition",
+    },
     "EnterpriseGroup": {"code": "Identifier"},
     "BusinessDomain": {"code": "Identifier", "domain_pack?": "@DomainPack"},
     "LegalEntity": {"registration_code?": "Identifier", "jurisdiction?": "Text"},

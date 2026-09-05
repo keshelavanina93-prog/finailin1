@@ -1,0 +1,122 @@
+from datetime import date, datetime
+from typing import Annotated, Any
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel, ConfigDict, Field
+
+from finai_api.domain.object_sets import ObjectSetQuery
+from finai_api.domain.ontology_definitions import DefinitionWrite
+from finai_api.domain.resources import ResourceReview
+from finai_api.domain.review import Principal
+from finai_api.security import authenticated_principal
+from finai_api.services import ontology_definitions as definitions
+from finai_api.services import resources
+from finai_api.services.account_ontology import inspect_accounts, propose_accounts
+from finai_api.services.fact_aggregation import aggregate_facts
+from finai_api.services.object_sets import query_objects
+
+router = APIRouter(prefix="/v1/ontology/model", tags=["ontology model and execution"])
+User = Annotated[Principal, Depends(authenticated_principal)]
+
+
+class AccountPublication(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    offset: int = Field(default=0, ge=0, le=100000)
+    limit: int = Field(default=40, ge=1, le=40)
+
+
+@router.get("/sources/{receipt_id}/accounts")
+def source_accounts(principal: User, receipt_id: str) -> dict[str, Any]:
+    return inspect_accounts(principal, receipt_id)
+
+
+@router.post("/sources/{receipt_id}/accounts/proposal")
+def source_account_proposal(principal: User, receipt_id: str, request: AccountPublication) -> Any:
+    return propose_accounts(principal, receipt_id, request.offset, request.limit)
+
+
+class BindingRun(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    query: ObjectSetQuery
+    rationale: str = Field(min_length=10, max_length=2000)
+
+
+class DerivedRun(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    query: ObjectSetQuery
+    definitions: list[UUID] = Field(min_length=1, max_length=20)
+
+
+class AggregateRun(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    query: ObjectSetQuery
+    group_by: list[str] = Field(default_factory=list, max_length=20)
+    as_of: date | None = None
+
+
+@router.post("/facts/{identity}/aggregate")
+def aggregate(principal: User, identity: UUID, request: AggregateRun) -> dict[str, Any]:
+    return aggregate_facts(principal, identity, request.query, request.group_by, request.as_of)
+
+
+@router.get("/definitions")
+def list_definitions(principal: User) -> list[dict[str, Any]]:
+    return definitions.definitions(principal)
+
+
+@router.post("/definitions")
+def propose_definition(principal: User, request: DefinitionWrite) -> Any:
+    return definitions.propose_definition(principal, request)
+
+
+@router.get("/definitions/{identity}")
+def get_definition(principal: User, identity: UUID, version: UUID | None = None) -> dict[str, Any]:
+    return definitions.definition(principal, identity, version)
+
+
+@router.post("/proposals/{identity}/decision")
+def decide(principal: User, identity: UUID, request: ResourceReview) -> Any:
+    return resources.review(principal, identity, request)
+
+
+@router.get("/sets/{identity}/objects")
+def run_set(
+    principal: User,
+    identity: UUID,
+    version: UUID | None = None,
+    offset: Annotated[int, Query(ge=0, le=1000000)] = 0,
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    valid_at: datetime | None = None,
+    known_at: datetime | None = None,
+) -> dict[str, Any]:
+    return definitions.run_set(principal, identity, version, offset, limit, valid_at, known_at)
+
+
+@router.get("/groups/{identity}/objects")
+def run_group(
+    principal: User,
+    identity: UUID,
+    offset: Annotated[int, Query(ge=0, le=1000000)] = 0,
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    version: UUID | None = None,
+    valid_at: datetime | None = None,
+    known_at: datetime | None = None,
+) -> dict[str, Any]:
+    return definitions.run_group(principal, identity, offset, limit, version, valid_at, known_at)
+
+
+@router.post("/bindings/{identity}/proposal")
+def bind(principal: User, identity: UUID, request: BindingRun) -> Any:
+    return definitions.run_binding(principal, identity, request.query, request.rationale)
+
+
+@router.post("/derived/query")
+def derive(principal: User, request: DerivedRun) -> dict[str, Any]:
+    result = query_objects(principal, request.query)
+    return {
+        **result.model_dump(mode="json"),
+        "derived_values": definitions.derived_values(
+            principal, result.objects, request.definitions
+        ),
+    }

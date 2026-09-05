@@ -120,6 +120,9 @@ def read_workbook(content: bytes) -> dict[str, Any]:
 
 
 def profile_workbook(book: dict[str, Any]) -> dict[str, Any]:
+    from finai_api.services.account_source import profile_accounts
+
+    account_catalogs = []
     findings: list[dict[str, Any]] = []
     summaries = []
     edges: Counter[tuple[str, str]] = Counter()
@@ -144,7 +147,11 @@ def profile_workbook(book: dict[str, Any]) -> dict[str, Any]:
         header_values = set(headers.values())
         source_type = "OTHER_TABULAR"
         grain = "SOURCE_CELL"
-        if {"Period", "Recorder", "Account Dr", "Account Cr"} <= header_values:
+        account_catalog = profile_accounts(sheet)
+        if account_catalog:
+            account_catalogs.append(account_catalog)
+            source_type, grain = "CHART_OF_ACCOUNTS", "SOURCE_CHART_ACCOUNT"
+        elif {"Period", "Recorder", "Account Dr", "Account Cr"} <= header_values:
             source_type, grain = "GL_OR_JOURNAL", "RECORDER_LINE"
         elif {"Product", "Net Revenue", "VAT"} <= header_values:
             source_type, grain = "PRODUCT_REVENUE", "PRODUCT_PERIOD"
@@ -357,6 +364,7 @@ def profile_workbook(book: dict[str, Any]) -> dict[str, Any]:
         }
     return {
         "version": "workbook-source-profile/1",
+        "account_catalogs": account_catalogs,
         "sheets": summaries,
         "report_context": report_context,
         "findings": findings,

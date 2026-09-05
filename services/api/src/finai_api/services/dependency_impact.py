@@ -65,18 +65,23 @@ def downstream_impact(
                 )
         elif identifier not in mutations or mutations[identifier].expected_version_id is not None:
             raise WorkspaceError(409, "Complete dependency impact is unavailable in this context")
-        with conn.cursor(row_factory=dict_row) as cursor:
-            rows = cursor.execute(
-                "SELECT DISTINCT v.resource_id,v.version_id,v.object_type,"
-                "v.display_name,v.access_entity "
-                "FROM resource_dependencies d JOIN resource_heads h "
-                "ON h.tenant_id=d.tenant_id AND h.version_id=d.version_id "
-                "JOIN resource_versions v ON v.tenant_id=h.tenant_id AND v.version_id=h.version_id "
-                "WHERE d.tenant_id=%s AND d.target_resource_id=%s "
-                "AND v.authority_state='APPROVED' "
-                "ORDER BY v.resource_id,v.version_id LIMIT %s",
-                (principal.scope.tenant_id, UUID(identifier), MAX_RESOURCES + 1),
-            ).fetchall()
+        # A new identity has no accepted version for any current resource to reference.
+        # Traverse its proposed dependents below without scanning persisted dependencies.
+        rows = []
+        if visible:
+            with conn.cursor(row_factory=dict_row) as cursor:
+                rows = cursor.execute(
+                    "SELECT DISTINCT v.resource_id,v.version_id,v.object_type,"
+                    "v.display_name,v.access_entity "
+                    "FROM resource_dependencies d JOIN resource_heads h "
+                    "ON h.tenant_id=d.tenant_id AND h.version_id=d.version_id "
+                    "JOIN resource_versions v ON v.tenant_id=h.tenant_id "
+                    "AND v.version_id=h.version_id "
+                    "WHERE d.tenant_id=%s AND d.target_resource_id=%s "
+                    "AND v.authority_state='APPROVED' "
+                    "ORDER BY v.resource_id,v.version_id LIMIT %s",
+                    (principal.scope.tenant_id, UUID(identifier), MAX_RESOURCES + 1),
+                ).fetchall()
         if len(rows) > MAX_RESOURCES:
             raise WorkspaceError(
                 409, "Dependency impact exceeds the resource bound; narrow the change"

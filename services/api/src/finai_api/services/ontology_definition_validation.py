@@ -1,0 +1,206 @@
+"""Definition validation shares the registry's dependency resolver and publication lock."""
+
+from collections.abc import Callable
+from decimal import Decimal, InvalidOperation
+from typing import Any
+
+from pydantic import ValidationError
+
+from finai_api.domain.ontology_definitions import (
+    DEFINITION_MODELS,
+    DerivedDefinition,
+    Expression,
+    FactContract,
+)
+from finai_api.domain.resources import ResourceMutation
+from finai_api.services.workspace import WorkspaceError
+
+
+def validate_definition(
+    item: ResourceMutation,
+    schemas: dict[str, str],
+    links: dict[str, str],
+    target: Callable[[str, str, str], dict[str, Any]],
+) -> None:
+    model = DEFINITION_MODELS.get(item.object_type)
+    if model is None:
+        return
+    try:
+        definition = model.model_validate(item.attributes["definition"])
+    except (ValidationError, KeyError) as exc:
+        raise WorkspaceError(422, f"Invalid {item.object_type} definition: {exc}") from exc
+    source = str(item.resource_id)
+
+    def schema(name: str) -> dict[str, Any]:
+        if name not in schemas:
+            raise WorkspaceError(422, f"Unknown ontology type: {name}")
+        return target(schemas[name], source, "DEFINITION_TYPE:" + name)
+
+    if item.object_type == "ObjectSetDefinition":
+        payload = definition.model_dump(mode="json")
+        root = schema(payload["object_type"])
+        fields = root["attributes"]["fields"]
+        for condition in payload["filters"]:
+            if condition["field"] not in fields:
+                raise WorkspaceError(422, "Object Set filter references an undeclared property")
+        # Traversal definitions bind the link type and endpoint schemas, not UI labels.
+        current_types = {payload["object_type"]}
+        for step in payload["traversal"]:
+            if step["kind"] == "link":
+                if step["name"] not in links:
+                    raise WorkspaceError(422, "Saved traversal references an unknown link type")
+                link = target(links[step["name"]], source, "DEFINITION_LINK:" + step["name"])
+                outgoing = step["direction"] == "outgoing"
+                inputs = set(link["attributes"]["sources" if outgoing else "targets"])
+                outputs = set(link["attributes"]["targets" if outgoing else "sources"])
+                if "*" not in inputs and not current_types.intersection(inputs):
+                    raise WorkspaceError(
+                        422, "Link cannot originate from the current traversal types"
+                    )
+                if "*" in outputs:
+                    raise WorkspaceError(
+                        422, "Saved traversal requires explicitly typed link endpoints"
+                    )
+                current_types = outputs
+            elif step["direction"] == "outgoing":
+                outputs = set()
+                for name in current_types:
+                    spec = schema(name)["attributes"]["fields"].get(step["name"], {})
+                    if spec.get("kind") != "reference" or spec.get("target_type") in {None, "*"}:
+                        raise WorkspaceError(
+                            422, "Saved traversal requires a declared typed reference"
+                        )
+                    outputs.add(spec["target_type"])
+                current_types = outputs
+            else:
+                outputs = set()
+                for name, identifier in schemas.items():
+                    candidate = target(identifier, source, "TRAVERSAL_CANDIDATE:" + name)
+                    spec = candidate["attributes"]["fields"].get(step["name"], {})
+                    if spec.get("kind") == "reference" and spec.get("target_type") in current_types:
+                        outputs.add(name)
+                if not outputs:
+                    raise WorkspaceError(
+                        422, "No declared incoming reference matches the traversal"
+                    )
+                current_types = outputs
+            for name in current_types:
+                schema(name)
+        for identifier in payload.get("resource_ids") or []:
+            selected = target(identifier, source, "SET_ROOT:" + identifier)
+            if selected["object_type"] != payload["object_type"]:
+                raise WorkspaceError(422, "Object Set root identity has a different object type")
+    elif item.object_type == "ObjectTypeGroup":
+        for name in definition.model_dump()["types"]:
+            schema(name)
+    elif item.object_type == "ObjectTypeImplementation":
+        interface = target(item.attributes["interface_id"], source, "IMPLEMENTS")
+        contract = target(item.attributes["schema_id"], source, "IMPLEMENTATION_SCHEMA")
+        required = interface["attributes"]["definition"]["fields"]
+        mapping = definition.model_dump()["fields"]
+        fields = contract["attributes"]["fields"]
+        if set(mapping) != set(required):
+            raise WorkspaceError(422, "Implementation must map every declared interface property")
+        for name, field in mapping.items():
+            spec = fields.get(field)
+            if not spec or spec["kind"] != required[name]["kind"]:
+                raise WorkspaceError(422, f"Interface property {name} has an incompatible mapping")
+            if required[name]["required"] and not spec["required"]:
+                raise WorkspaceError(
+                    422, f"Interface property {name} requires a required source field"
+                )
+    elif item.object_type == "DerivedProperty":
+        assert isinstance(definition, DerivedDefinition)
+        contract = target(item.attributes["schema_id"], source, "DERIVED_SCHEMA")
+        fields = contract["attributes"]["fields"]
+        if definition.name in fields:
+            raise WorkspaceError(422, "Derived property cannot overwrite a stored property")
+        budget = [100]
+
+        def check(expression: Expression, depth: int = 0) -> str:
+            budget[0] -= 1
+            if budget[0] < 0 or depth > 10:
+                raise WorkspaceError(422, "Derived expression exceeds its complexity limit")
+            if expression.op == "field":
+                spec = fields.get(expression.field)
+                if not spec or spec["kind"] not in {"integer", "decimal", "text", "identifier"}:
+                    raise WorkspaceError(422, "Derived input must be a declared scalar property")
+                return "decimal" if spec["kind"] in {"integer", "decimal"} else "text"
+            if expression.op == "literal":
+                assert expression.value is not None
+                try:
+                    return "decimal" if Decimal(expression.value).is_finite() else "text"
+                except (InvalidOperation, TypeError):
+                    return "text"
+            kinds = [check(arg, depth + 1) for arg in expression.args]
+            if expression.op == "concat":
+                return "text"
+            if expression.op == "coalesce":
+                if len(set(kinds)) != 1:
+                    raise WorkspaceError(422, "Coalesce operands must have the same kind")
+                return kinds[0]
+            if any(kind != "decimal" for kind in kinds):
+                raise WorkspaceError(
+                    422,
+                    "Arithmetic requires numeric inputs; money needs explicit currency semantics",
+                )
+            return "decimal"
+
+        if check(definition.expression) != definition.result_kind:
+            raise WorkspaceError(422, "Derived expression does not match its declared result kind")
+    elif item.object_type == "FactContract":
+        assert isinstance(definition, FactContract)
+        contract = target(item.attributes["schema_id"], source, "FACT_SCHEMA")
+        fields = contract["attributes"]["fields"]
+        family = fields.get(definition.source_family_field, {})
+        if family.get("kind") != "identifier" or not family.get("required"):
+            raise WorkspaceError(422, "Fact source family must be a required identifier field")
+        for name in definition.grain:
+            spec = fields.get(name)
+            if not spec or not spec.get("required"):
+                raise WorkspaceError(422, "Fact grain fields must be declared and required")
+            if spec["kind"] not in {
+                "identifier",
+                "reference",
+                "date",
+                "datetime",
+                "integer",
+                "text",
+            }:
+                raise WorkspaceError(422, "Fact grain fields must be scalar identities")
+        if fields[definition.time_field]["kind"] not in {"date", "datetime"}:
+            raise WorkspaceError(422, "Fact time must be a date or timestamp")
+        if fields[definition.unit_field]["kind"] not in {"identifier", "reference"}:
+            raise WorkspaceError(422, "Currency/unit must be an explicit identity")
+        measure = fields.get(definition.measure, {})
+        if measure.get("kind") not in {"decimal", "integer"} or not measure.get("required"):
+            raise WorkspaceError(422, "Fact measure must be a required numeric scalar")
+    elif item.object_type == "ObjectBinding":
+        source_schema = target(item.attributes["source_schema_id"], source, "BINDING_SOURCE")
+        destination = target(item.attributes["target_schema_id"], source, "BINDING_TARGET")
+        source_fields = source_schema["attributes"]["fields"]
+        target_fields = destination["attributes"]["fields"]
+        payload = definition.model_dump()
+        if (
+            payload["identity_field"] not in source_fields
+            or payload["display_field"] not in source_fields
+        ):
+            raise WorkspaceError(
+                422, "Binding identity and display fields must exist in the source schema"
+            )
+        mapped = set()
+        for binding in payload["fields"]:
+            a, b = (
+                source_fields.get(binding["source_field"]),
+                target_fields.get(binding["target_field"]),
+            )
+            if (
+                not a
+                or not b
+                or a["kind"] != b["kind"]
+                or a.get("target_type") != b.get("target_type")
+            ):
+                raise WorkspaceError(422, "Binding fields must have compatible canonical types")
+            mapped.add(binding["target_field"])
+        if any(spec["required"] and name not in mapped for name, spec in target_fields.items()):
+            raise WorkspaceError(422, "Binding must supply every required target property")

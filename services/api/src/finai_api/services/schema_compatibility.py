@@ -13,6 +13,7 @@ class SchemaCompatibilityError(ValueError):
 
 
 KINDS = {
+    "definition",
     "text",
     "identifier",
     "integer",
