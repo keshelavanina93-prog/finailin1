@@ -1,6 +1,6 @@
 import json
 from hashlib import sha256
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends, Query, Response
 
@@ -15,7 +15,7 @@ from finai_api.domain.review import (
     WorkspaceSummary,
 )
 from finai_api.security import authenticated_principal, require_permission
-from finai_api.services import workspace
+from finai_api.services import source_preview, workspace
 
 router = APIRouter(prefix="/v1/workspace", tags=["operator workspace"])
 
@@ -72,6 +72,20 @@ def objects(
 @router.get("/objects/{object_id}", response_model=ObjectDetail)
 def object_detail(object_id: str, principal: User) -> ObjectDetail:
     return workspace.object_detail(principal, object_id)
+
+
+@router.get("/constructions/{receipt_id}/preview")
+def preview_source(
+    receipt_id: str,
+    principal: User,
+    response: Response,
+    offset: Annotated[int, Query(ge=0, le=1000000)] = 0,
+    search: Annotated[str, Query(max_length=128)] = "",
+) -> dict[str, Any]:
+    # Browsing original cells has the same permission as downloading the original.
+    require_permission(principal, "export")
+    response.headers["Cache-Control"] = "no-store"
+    return source_preview.preview(workspace.source_bytes(principal, receipt_id), offset, search)
 
 
 @router.get("/constructions/{receipt_id}/source")
