@@ -1,14 +1,16 @@
 "use client";
 import {useState,type FormEvent} from "react";
 import {ArrowUp,ArrowRight} from "@phosphor-icons/react";
+import type {MapSelection} from "./operations-model";
 import type {WorkItem} from "./g8-model";
 
 type Reply={question:string;answer:string;references:WorkItem[];context:string};
-export default function NyxInteraction({items,work,context,blockers,availability,onInspect,onData,onWork}:{items:WorkItem[];work:WorkItem|null;context:string;blockers:string[];availability:string;onInspect:(item:WorkItem)=>void;onData:()=>void;onWork:()=>void}) {
+export default function NyxInteraction({items,work,context,blockers,availability,onInspect,onData,onWork,mapSelection}:{mapSelection?:MapSelection|null;items:WorkItem[];work:WorkItem|null;context:string;blockers:string[];availability:string;onInspect:(item:WorkItem)=>void;onData:()=>void;onWork:()=>void}) {
  const [question,setQuestion]=useState("");const [history,setHistory]=useState<Reply[]>([]);
  function ask(value:string){const q=value.trim();if(!q)return;const pending=items.filter(i=>i.state==="PENDING");let answer="";let references:WorkItem[]=[];
  if(/forecast|profit|margin|revenue|cash flow|budget/i.test(q)){answer="Financial analysis is not connected to authoritative metrics in this workspace yet. I can help inspect retained evidence and review blockers, but cannot explain or invent financial performance.";}
  else if(/attention|pending|review items/i.test(q)){references=pending.slice(0,8);answer=`${pending.length} pending items in the loaded authorized queues. Open an item to inspect its evidence and review eligibility.`;}
+ else if(mapSelection&&/map|asset|selected|connect|impact|explain/i.test(q)){const r=mapSelection.resource;answer=`${r.display_name} is a ${r.object_type}, with ${r.authority_state} authority and ${r.evidence_class} evidence. Effective snapshot: ${mapSelection.validAt}; known snapshot: ${mapSelection.knownAt}. Recorded version: ${r.version_id}. Open Operations & Maps to inspect explicit connections. Location alone does not establish flow, service disruption or financial impact; telemetry and hydraulic predictions are not connected.`;}
  else if(/why|block|explain|selected|impact|produced/i.test(q)){references=work?[work]:[];answer=work?`${work.title}: ${work.reason} ${blockers.length?blockers.join(" "):"Open context for the retained impact and current eligibility. No approval is performed here."}`:"Select a work item first so I can show its recorded reason and evidence.";}
  else {const terms=q.toLowerCase().replace(/^(find|search|show)\s+/,"");references=items.filter(i=>`${i.title} ${i.reason}`.toLowerCase().includes(terms)).slice(0,8);answer=references.length?"Matching work and retained sources in your current authorized snapshot:":"No matching item in the loaded context. Try a source filename, ‘pending reviews’ or ‘explain selected’. Financial reasoning and general AI conversation are not connected yet.";}
  setHistory(old=>[...old,{question:q,answer:availability?`${availability} ${answer}`:answer,references,context}].slice(-20));setQuestion("");

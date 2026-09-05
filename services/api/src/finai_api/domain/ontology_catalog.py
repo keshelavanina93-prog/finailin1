@@ -11,6 +11,8 @@ def canonical_id(tenant: UUID, kind: str, key: str) -> UUID:
 
 
 SEMANTICS = {
+    "SpatialGeometry": "geometry",
+    "GeoJSONDocument": "geojson",
     "Name": "text",
     "Identifier": "identifier",
     "AccountCode": "identifier",
@@ -132,7 +134,61 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
     },
 }
 
+# Spatial fields are optional extensions; accepted versions retain their original schema.
+for _kind in (
+    "Location",
+    "Facility",
+    "PipelineSegment",
+    "LicensedServiceArea",
+    "OperationalNetwork",
+    "GasDistributionSystem",
+):
+    TYPE_FIELDS[_kind].update(
+        {
+            "geometry?": "SpatialGeometry",
+            "legal_entity_id?": "@LegalEntity",
+            "spatial_import_id?": "@SpatialImport",
+        }
+    )
+TYPE_FIELDS["SpatialImport"] = {
+    "legal_entity_id": "@LegalEntity",
+    "document": "GeoJSONDocument",
+    "canonical_document_sha256": "Identifier",
+}
+for _kind in (
+    "PipelineJunction",
+    "Valve",
+    "Regulator",
+    "MeteringRegulatingStation",
+    "DeliveryPoint",
+    "CustomerConnection",
+    "GasNetworkZone",
+    "PressureZone",
+):
+    TYPE_FIELDS[_kind] = {
+        "code": "Identifier",
+        "system_id?": "@GasDistributionSystem",
+        "legal_entity_id?": "@LegalEntity",
+        "geometry?": "SpatialGeometry",
+    }
+
 LINKS: dict[str, tuple[list[str], list[str], str]] = {
+    "CONNECTS": (["PipelineSegment"], ["PipelineJunction"], "explicit directed connectivity"),
+    "FEEDS": (
+        ["DeliveryPoint", "PipelineJunction", "PipelineSegment"],
+        ["GasNetworkZone", "PipelineSegment", "PressureZone"],
+        "explicit directed feed",
+    ),
+    "SUPPLIES": (
+        ["PressureZone", "GasNetworkZone"],
+        ["CustomerConnection", "Facility"],
+        "explicit directed supply",
+    ),
+    "CONTROLS_OR_MEASURES": (
+        ["Valve", "Regulator", "MeteringRegulatingStation"],
+        ["PipelineSegment", "PressureZone"],
+        "control or measurement association",
+    ),
     "HAS_BUSINESS_DOMAIN": (["EnterpriseGroup"], ["BusinessDomain"], "domain membership"),
     "HAS_LEGAL_ENTITY": (["EnterpriseGroup"], ["LegalEntity"], "corporate membership"),
     "OPERATED_BY": (

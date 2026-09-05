@@ -142,6 +142,14 @@ def get_resource(principal: Principal, resource_id: UUID) -> dict[str, Any]:
 
 
 def _check_scalar(kind: str, value: Any) -> bool:
+    if kind in ("geometry", "geojson"):
+        from finai_api.domain.spatial import validate_geojson, validate_geometry
+
+        try:
+            (validate_geometry if kind == "geometry" else validate_geojson)(value)
+            return True
+        except (ValueError, TypeError):
+            return False
     if kind in ("text", "identifier"):
         return isinstance(value, str) and bool(value.strip()) and len(value) <= 2000
     if kind == "integer":
@@ -299,6 +307,8 @@ def _validate(
                 "decimal",
                 "money",
                 "quantity",
+                "geometry",
+                "geojson",
                 "reference",
                 "date",
                 "datetime",

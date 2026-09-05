@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+import test from "node:test";
+import ts from "typescript";
+const source=await readFile(new URL("../app/api/operations/[...path]/route.ts",import.meta.url),"utf8");
+const {GET,POST}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText).toString("base64")}`);
+const context=path=>({params:Promise.resolve({path:path.split("/")})});
+const request=(path="map",body,auth=true)=>{const url=new URL(`http://localhost/api/operations/${path}`);const result=new Request(url,{method:body?"POST":"GET",body,headers:auth?{authorization:"Bearer test-identity"}:{}});result.nextUrl=url;return result;};
+test("operations proxy rejects missing identity and unknown routes before contacting backend",async t=>{t.mock.method(globalThis,"fetch",()=>{throw new Error("must not contact backend");});assert.equal((await GET(request("map",undefined,false),context("map"))).status,401);assert.equal((await GET(request(),context("map/secrets"))).status,404);assert.equal((await POST(request("import-proposal","x".repeat(2_000_001)),context("import-proposal"))).status,413);});
+test("operations forwards exact historical and company scope and retains backend denial",async t=>{const query="map?known_at=2026-01-01T00%3A00%3A00Z&company_id=abc";t.mock.method(globalThis,"fetch",async(url,options)=>{assert.ok(url.endsWith(`/v1/operations/${query}`));assert.equal(options.headers.Authorization,"Bearer test-identity");assert.equal(options.cache,"no-store");return Response.json({detail:"Company unavailable"},{status:404});});const result=await GET(request(query),context("map"));assert.equal(result.status,404);assert.equal(result.headers.get("cache-control"),"no-store");});
+test("map service failure is an unavailable state, never an empty successful map",async t=>{t.mock.method(globalThis,"fetch",()=>{throw new Error("offline");});assert.equal((await GET(request(),context("map"))).status,503);});

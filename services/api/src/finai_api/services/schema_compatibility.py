@@ -19,6 +19,8 @@ KINDS = {
     "decimal",
     "money",
     "quantity",
+    "geometry",
+    "geojson",
     "reference",
     "date",
     "datetime",
