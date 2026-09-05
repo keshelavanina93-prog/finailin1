@@ -5,7 +5,8 @@ async function forward(request: NextRequest, context: Context) {
   const { path } = await context.params;
   const route = path.join("/");
   const lifecycle = /^lifecycle\/(?:requests(?:\/[a-fA-F0-9-]+\/review)?|versions\/[a-fA-F0-9-]+|consumptions\/[a-fA-F0-9-]+(?:\/status)?|consume)$/.test(route);
-  if (!lifecycle && !/^(catalog|context(?:\/(?:accounts|source-accounts))?|graph|aliases|reference-proposal|rollback-proposal|resources(?:\/[a-fA-F0-9-]+(?:\/graph)?)?|resolve\/[a-fA-F0-9-]+|proposals(?:\/[a-fA-F0-9-]+(?:\/(?:decision|promotion-check))?)?)$/.test(route)) {
+  const eventTime = /^event-time\/(?:events|streams\/[a-fA-F0-9-]+\/replay)$/.test(route);
+  if (!lifecycle && !eventTime && !/^(catalog|context(?:\/(?:accounts|source-accounts))?|graph|aliases|reference-proposal|rollback-proposal|resources(?:\/[a-fA-F0-9-]+(?:\/graph)?)?|resolve\/[a-fA-F0-9-]+|proposals(?:\/[a-fA-F0-9-]+(?:\/(?:decision|promotion-check))?)?)$/.test(route)) {
     return Response.json({ detail: "Ontology route not found" }, { status: 404 });
   }
   const authorization = request.headers.get("authorization");
