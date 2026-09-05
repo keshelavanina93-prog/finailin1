@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import "./styles.css";
 
 export const metadata: Metadata = {
-  title: "G8 — Internal Engineering Console",
-  description: "Temporary substrate inspection. Not the accepted G8 product shell.",
+  title: "G8 by NYXCore",
+  description: "Enterprise intelligence. Evidence, context and governed decisions.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

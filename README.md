@@ -189,3 +189,8 @@ reviewed construction/object workflow is now implemented, with production
 acceptance still outstanding. Enterprise identity, authentic 1C/SAP integrations, financial reporting,
 scale and production release acceptance also remain open. See
 `docs/architecture/0002-retained-hydration.md` for the binding issue mapping.
+
+### G8 product workspace
+
+The default authenticated experience is Home / My Work, with Companies, Data and Ontology in the shared G8 shell. The supplied NYX Core brand assets are under apps/web/public/brand. Prior intake, object, history and registry tools are available under System / Engineering. The right NYX rail exposes current evidence and impact; natural-language analysis and downstream financial/operational authorities remain unavailable. See design-qa.md for browser and acceptance evidence.
+

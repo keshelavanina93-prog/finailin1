@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { IngestReceipt, IntakeItem, ObjectDetail, Principal, ReceiptDetail, WorkspaceObject, WorkspaceSummary } from "@finai/contracts";
 import EvidenceIntake from "./evidence-intake";
 import ReceiptPanel from "./receipt-panel";
@@ -14,10 +14,11 @@ async function decodeError(response: Response): Promise<string> {
   return `Workspace request failed (${response.status})`;
 }
 
-export default function OperatorWorkspace() {
-  const [token, setToken] = useState("");
-  const [principal, setPrincipal] = useState<Principal | null>(null);
-  const [view, setView] = useState<"intake" | "objects" | "history" | "ontology">("intake");
+export type EngineeringView = "intake" | "objects" | "history" | "ontology";
+export default function OperatorWorkspace({ token, principal, initialView = "intake", receiptId }: {
+  token: string; principal: Principal; initialView?: EngineeringView; receiptId?: string;
+}) {
+  const [view, setView] = useState<EngineeringView>(initialView);
   const [summary, setSummary] = useState<WorkspaceSummary | null>(null);
   const [intake, setIntake] = useState<IntakeItem[]>([]);
   const [objects, setObjects] = useState<WorkspaceObject[]>([]);
@@ -74,24 +75,6 @@ export default function OperatorWorkspace() {
     return () => { cancelled = true; };
   }, [api, principal, view, filter, search, version, offset, revision]);
 
-  async function signIn(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setError("");
-    const key = String(new FormData(event.currentTarget).get("token") ?? "").trim();
-    try {
-      const response = await fetch("/api/workspace/session", { headers: { Authorization: `Bearer ${key}` }, cache: "no-store" });
-      if (!response.ok) throw new Error(await decodeError(response));
-      const identity: Principal = await response.json();
-      generation.current++; setToken(key); setPrincipal(identity); setNotice("");
-    } catch (failure) { setError(failure instanceof Error ? failure.message : "Sign-in failed"); }
-    finally { setBusy(false); }
-  }
-
-  function signOut() {
-    generation.current++; selection.current++; setToken(""); setPrincipal(null); setDetail(null);
-    setInspector(null); setSummary(null); setIntake([]); setObjects([]); setError(""); setNotice("");
-    setOffset(0); setFilter(""); setSearch(""); setSearchInput(""); setVersion(""); setView("intake");
-  }
-
   function navigate(next: typeof view) {
     selection.current++; setView(next); setOffset(0); setFilter(""); setSearch(""); setSearchInput("");
     setVersion(""); setDetail(null); setInspector(null); setError(""); setNotice("");
@@ -104,6 +87,14 @@ export default function OperatorWorkspace() {
     catch (failure) { if (request === selection.current) setError(failure instanceof Error ? failure.message : "Could not load construction"); }
     finally { setBusy(false); }
   }
+
+  useEffect(() => {
+    if (!receiptId) return;
+    let cancelled = false;
+    api<ReceiptDetail>(`constructions/${receiptId}`).then(result => { if (!cancelled) setDetail(result); })
+      .catch(failure => { if (!cancelled) setError(failure instanceof Error ? failure.message : "Could not load evidence"); });
+    return () => { cancelled = true; };
+  }, [api, receiptId]);
 
   async function decide(decision: "APPROVED" | "REJECTED", reason: string, key: string) {
     if (!detail) return;
@@ -146,23 +137,10 @@ export default function OperatorWorkspace() {
     } catch (failure) { setError(failure instanceof Error ? failure.message : "Export failed"); }
   }
 
-  if (!principal) return <main className="login-shell"><div className="login-story"><div className="wordmark">G8<span>by NYXCore</span></div>
-    <p className="overline">EVIDENCE-NATIVE ENTERPRISE WORKSPACE</p><h1>From source evidence<br />to reviewed enterprise state.</h1>
-    <p>Retain the original. Understand the source. Review what it can establish. Work with accepted objects and their evidence.</p>
-    <ol><li>Evidence & construction</li><li>Independent review</li><li>Versioned objects & lineage</li></ol></div>
-    <form className="login-card" onSubmit={signIn}><p className="overline">WORKSPACE ACCESS</p><h2>Open your workspace</h2>
-      <p>Your identity determines the entity, period, currency and available actions.</p>
-      <label>Workspace access key<input type="password" name="token" autoComplete="off" required autoFocus /></label>
-      <button disabled={busy}>{busy ? "Connecting…" : "Continue"}</button>{error && <p role="alert" className="error-banner">{error}</p>}
-      <small>Keys stay in memory for this session. Use a separate reviewer identity for approval.</small></form></main>;
-
   const pageSize = view === "objects" ? 100 : 50;
   const count = view === "objects" ? objects.length : intake.length;
-  return <main className="operator-shell">
-    <aside className="navigation"><div className="wordmark">G8<span>by NYXCore</span></div><p className="nav-caption">ENTERPRISE WORKSPACE</p>
-      {([ ["intake", "Evidence intake", "01"], ["objects", "Object workspace", "02"], ["history", "Construction history", "03"], ["ontology", "Enterprise & ontology", "04"] ] as const).map(([id, label, number]) => <button key={id} className={view === id ? "nav-link active" : "nav-link"} onClick={() => navigate(id)}><small>{number}</small>{label}</button>)}
-      <div className="identity-card"><strong>{principal.display_name}</strong><small>{principal.permissions.join(" · ")}</small><button className="quiet" onClick={signOut}>Switch identity / sign out</button></div></aside>
-    <div className="operator-main">
+  return <section className="engineering-workspace">
+    <nav aria-label="Engineering tools" className="ontology-tabs">{([ ["intake", "Evidence intake"], ["objects", "Object workspace"], ["history", "Construction history"], ["ontology", "Registry & review"] ] as const).map(([id, label]) => <button key={id} className={view === id ? "active" : "quiet"} onClick={() => navigate(id)}>{label}</button>)}</nav>
       <div className="operator-content">{view === "ontology" ? <OntologyWorkspace token={token} principal={principal} /> : <><div className="section-heading"><div><p className="overline">SOURCE → CONSTRUCTION → REVIEW → OBJECTS</p><h1>{view === "intake" ? "Evidence intake" : view === "objects" ? "Object workspace" : "Construction history"}</h1><p className="muted">{view === "objects" ? "Inspect accepted objects and follow every value back to source evidence." : "Review source construction without losing the evidence or earlier versions."}</p></div><button className="quiet" disabled={loading || busy} onClick={() => { setRevision(value => value + 1); if (detail) void openConstruction(detail.receipt.receipt_id); }}>Refresh</button></div>
         <div className="summary-grid"><article><span>Pending review</span><strong>{summary?.pending_count ?? "—"}</strong></article><article><span>Accepted constructions</span><strong>{summary?.approved_count ?? "—"}</strong></article><article><span>Rejected constructions</span><strong>{summary?.rejected_count ?? "—"}</strong></article><article><span>Current source versions</span><strong>{summary?.active_versions.length ?? "—"}</strong></article></div>
         {error && <div role="alert" className="error-banner">{error}</div>}{notice && <div role="status" className="success-banner">{notice}</div>}
@@ -176,6 +154,6 @@ export default function OperatorWorkspace() {
         {detail && <ReceiptPanel key={detail.receipt.receipt_id} detail={detail} principal={principal} busy={busy} onDecision={decide} onExport={format => void download(format)} onClose={() => { selection.current++; setDetail(null); }} onObjects={() => { const id = detail.receipt.receipt_id; navigate("objects"); setVersion(id); }} />}
         {inspector && <ObjectPanel detail={inspector} onClose={() => { selection.current++; setInspector(null); }} />}
         </>}<footer className="workspace-footer"><span>Scope: {principal.scope.tenant_id}</span><span>Accepted construction ≠ certified financial truth</span></footer>
-      </div></div>
-  </main>;
+      </div>
+  </section>;
 }
