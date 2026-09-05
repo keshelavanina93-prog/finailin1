@@ -76,8 +76,19 @@ def _validate(c: Any, p: Principal, r: LifecycleRequest) -> dict[str, Any]:
         if prior is None
         else (ORDER[ORDER.index(prior) + 1] if prior in ORDER[:-1] else None)
     )
-    if r.target_state != expected and not (
-        prior in ORDER and r.target_state in ("SUPERSEDED", "REVOKED")
+    amendment = (
+        event is not None
+        and prior in ORDER
+        and r.target_state == prior
+        and any(
+            getattr(r, field) != event["payload"][field]
+            for field in ("epistemic_state", "business_state", "availability_state")
+        )
+    )
+    if (
+        not amendment
+        and r.target_state != expected
+        and not (prior in ORDER and r.target_state in ("SUPERSEDED", "REVOKED"))
     ):
         raise WorkspaceError(
             409, "Unsupported lifecycle transition; certification requires a certification contract"
@@ -175,18 +186,25 @@ def review_transition(p: Principal, request_id: UUID, r: LifecycleReview) -> dic
         return dict(decision)
 
 
-def history(p: Principal, ref: VersionReference) -> dict[str, Any]:
+def history(
+    p: Principal, ref: VersionReference, known_at: datetime | None = None
+) -> dict[str, Any]:
     require_permission(p, "ontology_read")
+    if known_at is not None and known_at.tzinfo is None:
+        raise WorkspaceError(422, "Historical knowledge time must include a timezone")
+    known_at = known_at or datetime.now(UTC)
     with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
         _version(c, p, ref, False)
         rows = c.execute(
             "SELECT * FROM resource_lifecycle_events WHERE tenant_id=%s AND "
-            "version_id=%s ORDER BY recorded_at,event_id",
-            (p.scope.tenant_id, ref.version_id),
+            "version_id=%s AND recorded_at<=%s ORDER BY recorded_at,event_id",
+            (p.scope.tenant_id, ref.version_id, known_at),
         ).fetchall()
         return {
             "subject": ref.model_dump(mode="json"),
             "purpose": "HISTORICAL_LIFECYCLE",
+            "known_at": known_at,
+            "state": rows[-1]["payload"] if rows else None,
             "events": [dict(r) for r in rows],
         }
 

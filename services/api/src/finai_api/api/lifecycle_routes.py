@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, Any
 from uuid import UUID
 
@@ -30,9 +31,11 @@ def review_transition(
 
 
 @router.get("/versions/{version_id}")
-def history(principal: User, version_id: UUID, resource_id: UUID) -> dict[str, Any]:
+def history(
+    principal: User, version_id: UUID, resource_id: UUID, known_at: datetime | None = None
+) -> dict[str, Any]:
     return lifecycle.history(
-        principal, VersionReference(resource_id=resource_id, version_id=version_id)
+        principal, VersionReference(resource_id=resource_id, version_id=version_id), known_at
     )
 
 

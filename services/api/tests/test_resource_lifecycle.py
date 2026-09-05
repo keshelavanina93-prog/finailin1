@@ -103,7 +103,7 @@ def test_reviewed_authority_current_guard_and_retained_history():
         lifecycle.consume(p, request)
     event = None
 
-    def advance(state):
+    def advance(state, availability="AVAILABLE"):
         nonlocal event
         draft = LifecycleRequest(
             subject=ref,
@@ -111,7 +111,7 @@ def test_reviewed_authority_current_guard_and_retained_history():
             target_state=state,
             epistemic_state="INFERRED",
             business_state="PROVISIONAL",
-            availability_state="AVAILABLE",
+            availability_state=availability,
             reason="Explicit synthetic lifecycle rationale",
         )
         lifecycle.request_transition(p, draft)
@@ -138,6 +138,19 @@ def test_reviewed_authority_current_guard_and_retained_history():
     assert result["minimum_state"] == "AUTHORITATIVE"
     assert result["inputs"][0]["epistemic_state"] == "INFERRED"
     assert result["inputs"][0]["access_entity"] == "__PLATFORM__"
+    accepted_time = lifecycle.history(p, ref)["events"][-1]["recorded_at"]
+    advance("AUTHORITATIVE", "STALE")
+    with pytest.raises(WorkspaceError, match="required authority and availability"):
+        lifecycle.consume(p, request)
+    historical = lifecycle.history(p, ref, accepted_time)
+    assert historical["state"]["target_state"] == "AUTHORITATIVE"
+    assert historical["state"]["availability_state"] == "AVAILABLE"
+    assert lifecycle.history(p, ref)["state"]["availability_state"] == "STALE"
+    advance("AUTHORITATIVE", "AVAILABLE")
+    assert lifecycle.consume(p, request)["inputs"][0]["availability_state"] == "AVAILABLE"
+    advance("REVOKED")
+    with pytest.raises(WorkspaceError, match="required authority and availability"):
+        lifecycle.consume(p, request)
     # Terminal consumer lifecycle denies its own current use independently of its inputs.
     consumer_event = None
     for state in ("OBSERVED", "REVOKED"):
@@ -159,11 +172,12 @@ def test_reviewed_authority_current_guard_and_retained_history():
         consumer_event = lifecycle.history(p, request.consumer)["events"][-1]["event_id"]
     with pytest.raises(WorkspaceError, match="withdrawn"):
         lifecycle.consume(p, request)
-    advance("REVOKED")
     with pytest.raises(WorkspaceError, match="withdrawn"):
         lifecycle.consume(p, request)
     assert [x["payload"]["target_state"] for x in lifecycle.history(p, ref)["events"]] == [
         *lifecycle.ORDER,
+        "AUTHORITATIVE",
+        "AUTHORITATIVE",
         "REVOKED",
     ]
     other = p.model_copy(
