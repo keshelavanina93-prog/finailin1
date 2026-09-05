@@ -83,7 +83,10 @@ def list_resources(
     offset: int,
     valid_at: datetime | None = None,
     known_at: datetime | None = None,
+    limit: int = 100,
 ) -> list[CanonicalResource]:
+    if not 1 <= limit <= 1000:
+        raise WorkspaceError(422, "Resource page limit must be between 1 and 1000")
     valid_at, known_at = valid_at or datetime.now(UTC), known_at or datetime.now(UTC)
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         rows = cursor.execute(
@@ -94,7 +97,7 @@ def list_resources(
             "ORDER BY v.resource_id,v.system_from DESC,v.version_id) current "
             "WHERE authority_state<>'REVOKED' AND (%s::text IS NULL OR object_type=%s) "
             "AND position(lower(%s) in lower(display_name || ' ' || identity_key))>0 "
-            "ORDER BY display_name,resource_id LIMIT 100 OFFSET %s",
+            "ORDER BY display_name,resource_id LIMIT %s OFFSET %s",
             (
                 principal.scope.tenant_id,
                 known_at,
@@ -103,6 +106,7 @@ def list_resources(
                 object_type,
                 object_type,
                 search,
+                limit,
                 offset,
             ),
         ).fetchall()

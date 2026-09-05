@@ -48,12 +48,7 @@ def reference_proposal(principal: User) -> ProposalDetail:
 
 @router.get("/graph")
 def graph(principal: User) -> dict[str, Any]:
-    nodes: list[CanonicalResource] = []
-    for offset in range(0, 1000, 100):
-        page = resources.list_resources(principal, None, "", offset)
-        nodes.extend(page)
-        if len(page) < 100:
-            break
+    nodes = resources.list_resources(principal, None, "", 0, limit=1000)
     return {"resources": nodes, "bounded": len(nodes) == 1000, "limit": 1000}
 
 
