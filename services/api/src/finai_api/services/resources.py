@@ -649,6 +649,73 @@ def proposals(principal: Principal) -> list[dict[str, Any]]:
         ).fetchall()
 
 
+def _promotion_validation(
+    conn: psycopg.Connection[Any],
+    principal: Principal,
+    proposal: ResourceProposal,
+    retained: dict[str, Any],
+) -> dict[str, Any]:
+    """The read check and atomic promotion must use the same eligibility rules."""
+    validation = _validate(conn, principal, proposal)
+    if validation["dependency_heads"] != retained["dependency_heads"]:
+        raise WorkspaceError(409, "A reviewed dependency changed; submit a refreshed proposal")
+    if impact_fingerprint(validation["downstream_impact"]) != retained.get(
+        "downstream_impact", {}
+    ).get("fingerprint"):
+        raise WorkspaceError(
+            409, "Downstream dependency impact changed; submit a refreshed proposal"
+        )
+    return validation
+
+
+def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
+    """Read-only advisory check. Review rechecks everything under its own transaction."""
+    with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
+        tenant = principal.scope.tenant_id
+        conn.execute(
+            "SELECT pg_advisory_xact_lock(hashtextextended(%s,0))", (f"canonical:{tenant}",)
+        )
+        row = cursor.execute(
+            "SELECT p.*,d.decision FROM resource_proposals p "
+            "LEFT JOIN resource_decisions d USING(tenant_id,proposal_id) "
+            "WHERE p.tenant_id=%s AND p.proposal_id=%s",
+            (tenant, proposal_id),
+        ).fetchone()
+        if not row:
+            raise WorkspaceError(404, "Resource proposal not found in authorized context")
+        blockers: list[str] = []
+        if row["decision"]:
+            blockers.append("This proposal already has an immutable decision.")
+        if "ontology_review" not in principal.permissions:
+            blockers.append("This identity has no change-review permission.")
+        if row["submitted_by"] == principal.actor_id:
+            blockers.append("A separate identity steward must review this proposal.")
+        if row["access_entity"] != principal.scope.legal_entity_id and (
+            "ontology_admin" not in principal.permissions
+        ):
+            blockers.append("This change requires an authorized enterprise identity steward.")
+        if not blockers:
+            try:
+                _promotion_validation(
+                    conn,
+                    principal,
+                    ResourceProposal.model_validate(row["payload"]["request"]),
+                    row["payload"]["validation"],
+                )
+            except WorkspaceError as error:
+                blockers.append(error.detail)
+            except (ValueError, KeyError, TypeError):
+                blockers.append("The retained definition cannot pass current validation.")
+        return {
+            "proposal_id": str(proposal_id),
+            "status": "DECIDED" if row["decision"] else "BLOCKED" if blockers else "ELIGIBLE",
+            "checked_at": datetime.now(UTC).isoformat(),
+            "blockers": blockers,
+            "advisory": True,
+            "decision": row["decision"],
+        }
+
+
 def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> ProposalDetail:
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         tenant = principal.scope.tenant_id
@@ -684,20 +751,9 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
                 raise WorkspaceError(403, "A separate identity steward must review this proposal")
             proposal = ResourceProposal.model_validate(row["payload"]["request"])
             if request.decision == "APPROVED":
-                validation = _validate(conn, principal, proposal)
-                if (
-                    validation["dependency_heads"]
-                    != row["payload"]["validation"]["dependency_heads"]
-                ):
-                    raise WorkspaceError(
-                        409, "A reviewed dependency changed; submit a refreshed proposal"
-                    )
-                if impact_fingerprint(validation["downstream_impact"]) != row["payload"][
-                    "validation"
-                ].get("downstream_impact", {}).get("fingerprint"):
-                    raise WorkspaceError(
-                        409, "Downstream dependency impact changed; submit a refreshed proposal"
-                    )
+                validation = _promotion_validation(
+                    conn, principal, proposal, row["payload"]["validation"]
+                )
             conn.execute(
                 (
                     "INSERT INTO resource_decisions "

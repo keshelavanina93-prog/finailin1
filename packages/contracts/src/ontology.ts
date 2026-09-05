@@ -48,3 +48,8 @@ export interface HistoricalGraph {
   nodes: Array<{ resource_id: string; version_id: string; object_type: string; display_name: string; authority_state: string; valid_from: string; valid_to: string | null; system_from: string }>;
   edges: Array<{ source_version_id: string; target_version_id: string; relation: string }>;
 }
+
+export interface PromotionCheck {
+  proposal_id: string; status: "DECIDED" | "BLOCKED" | "ELIGIBLE";
+  checked_at: string; blockers: string[]; advisory: true; decision: string | null;
+}

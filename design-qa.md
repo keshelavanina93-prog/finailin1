@@ -42,3 +42,11 @@ The local operator has no accepted company/context binding, zero accepted constr
 ## Remaining acceptance limits
 
 No accepted company existed for an authenticated company-switch journey; isolation of unrelated company resources is covered by a focused check. No financial authority, operational telemetry, model inference or production release acceptance is claimed. Live external outages were not induced; readiness denial/partial-outage behavior is verified by focused tests.
+
+## NIN-28 continuation: current promotion eligibility
+
+Added a read-only advisory promotion check over the same validation function used by atomic promotion. It retains tenant/entity isolation, independent reviewer requirements, immutable decisions, current dependency checks and downstream-impact fingerprint validation. The check never records approval; the actual approval still revalidates within its serialized transaction.
+
+Browser evidence: `.finai/artifacts/design/promotion-review-final.png`. Existing operator received BLOCKED with real role/steward reasons. Existing enterprise reviewer received ELIGIBLE from the backend and followed the selected proposal directly into System / Engineering, where the same advisory result is visible above review actions. No real proposal was approved as part of browser verification. The selected review now renders before the long registry list, in the shared dark visual language.
+
+Focused retained-database checks passed: advisory reads leave decisions/versions unchanged, competing promotion invalidates eligibility, atomic approval rejects the stale proposal, tenant crossing returns 404, and existing reviewed rollback preserves history. Two backend tests passed; affected backend type/lint checks and frontend production build/lint passed. These proofs do not close all of NIN-28's multi-resource report/function acceptance.

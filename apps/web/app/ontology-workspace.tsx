@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type { CanonicalDetail, CanonicalResource, Principal, ProposalSummary, ResourceMutation, ResourceProposalDetail, SchemaField } from "@finai/contracts";
+import PromotionReadiness from "./promotion-readiness";
 import IdentityHistory from "./identity-history";
 import ProposalImpact, { SchemaChangeDetails } from "./proposal-impact";
 
@@ -10,7 +11,7 @@ const label = (value: string) => value.replaceAll("_", " ").replace(/([a-z])([A-
 const message = (error: unknown) => error instanceof Error ? error.message : "Request failed";
 type Draft = { type: string; current?: CanonicalResource; attributes: Record<string, unknown>; name: string };
 
-export default function OntologyWorkspace({ token, principal }: { token: string; principal: Principal }) {
+export default function OntologyWorkspace({ token, principal, initialProposalId }: { token: string; principal: Principal; initialProposalId?: string }) {
   const [catalog, setCatalog] = useState<CanonicalResource[]>([]);
   const [nodes, setNodes] = useState<CanonicalResource[]>([]);
   const [queue, setQueue] = useState<ProposalSummary[]>([]);
@@ -45,6 +46,14 @@ export default function OntologyWorkspace({ token, principal }: { token: string;
       .catch(error => { if (!cancelled) setError(message(error)); }).finally(() => { if (!cancelled) setBusy(false); });
     return () => { cancelled = true; selectionRef.current++; };
   }, [api, revision]);
+  useEffect(() => {
+    if (!initialProposalId) return;
+    let cancelled = false;
+    api<ResourceProposalDetail>(`proposals/${initialProposalId}`)
+      .then(result => { if (!cancelled) { setProposal(result); setTab("review"); } })
+      .catch(error => { if (!cancelled) setError(message(error)); });
+    return () => { cancelled = true; };
+  }, [api, initialProposalId]);
   const names = new Map([...catalog, ...nodes].map(node => [node.resource_id, node.display_name]));
   const schemas = catalog.filter(node => node.object_type === "SchemaDefinition");
   const fields = draft ? schemas.find(schema => schema.identity_key === draft.type)?.attributes.fields as Record<string, SchemaField> | undefined : undefined;
@@ -142,7 +151,7 @@ export default function OntologyWorkspace({ token, principal }: { token: string;
         {!draft.current && !["Alias", "IdentityResolution", "ContextBinding"].includes(draft.type) && <label>Stable business key<input name="identity_key" required maxLength={256} placeholder="A stable identifier from your resource register" /></label>}
         {fields ? Object.entries(fields).filter(([name]) => !(draft.type === "ContextBinding" && name === "source_scope_key")).map(([name, spec]) => <label key={name}>{label(name)}{spec.required ? " *" : ""}{spec.kind === "reference" ? <select name={name} required={spec.required} defaultValue={String(draft.attributes[name] ?? "")}><option value="">Choose a resource…</option>{[...catalog, ...nodes.filter(node => !metadata.has(node.object_type))].filter(node => !spec.target_type || spec.target_type === "*" || node.object_type === spec.target_type).map(node => <option key={node.resource_id} value={node.resource_id}>{node.display_name} · {label(node.object_type)}</option>)}</select> : spec.kind === "boolean" ? <select name={name} defaultValue={String(draft.attributes[name] ?? false)}><option value="false">No</option><option value="true">Yes</option></select> : <input name={name} required={spec.required} type={spec.kind === "date" ? "date" : spec.kind === "integer" ? "number" : "text"} defaultValue={draft.attributes[name] === undefined ? "" : typeof draft.attributes[name] === "object" ? JSON.stringify(draft.attributes[name]) : String(draft.attributes[name])} placeholder={spec.kind === "datetime" ? "2026-09-05T00:00:00Z" : spec.kind === "money" ? '{"amount":"0.00","currency_id":"…"}' : spec.kind === "quantity" ? '{"amount":"0","unit":"…"}' : label(spec.kind)} />}</label>) : <label>Registry definition<textarea name="attributes" rows={16} defaultValue={JSON.stringify(draft.attributes, null, 2)} required /></label>}
         <label>Effective from<input type="datetime-local" name="valid_from" required defaultValue={effectiveFrom} /></label><label>Reason and evidence<textarea name="rationale" required minLength={10} maxLength={2000} rows={3} /></label><button disabled={busy}>{busy ? "Validating…" : "Validate & submit for review"}</button></form>}
-      {proposal && <><p className="overline">CHANGE REVIEW</p><h2>{proposal.proposal.title}</h2><p>{proposal.proposal.rationale}</p><p>Submitted by {proposal.submitted_by}</p><span className="status observed">{proposal.decision ?? "PENDING"}</span><h3>Validated impact</h3>{proposal.validation.impact.map(item => <div className="impact-item" key={item.resource_id}><strong>{item.name}</strong><small>{item.operation} · {item.fields_changed.map(label).join(", ")}</small><SchemaChangeDetails item={item} /></div>)}<ProposalImpact key={proposal.proposal.proposal_id} validation={proposal.validation} /><details><summary>Proposed values</summary><pre>{JSON.stringify(proposal.proposal.mutations, null, 2)}</pre></details>
+      {proposal && <><p className="overline">CHANGE REVIEW</p><h2>{proposal.proposal.title}</h2><p>{proposal.proposal.rationale}</p><p>Submitted by {proposal.submitted_by}</p><span className="status observed">{proposal.decision ?? "PENDING"}</span><h3>Validated impact</h3>{proposal.validation.impact.map(item => <div className="impact-item" key={item.resource_id}><strong>{item.name}</strong><small>{item.operation} · {item.fields_changed.map(label).join(", ")}</small><SchemaChangeDetails item={item} /></div>)}<PromotionReadiness key={`${proposal.proposal.proposal_id}:${proposal.decision}`} token={token} proposalId={proposal.proposal.proposal_id} /><ProposalImpact key={proposal.proposal.proposal_id} validation={proposal.validation} /><details><summary>Proposed values</summary><pre>{JSON.stringify(proposal.proposal.mutations, null, 2)}</pre></details>
         {proposal.decision ? <p>Reviewed by {proposal.reviewed_by}: {proposal.review_rationale}</p> : canReview && proposal.submitted_by !== principal.actor_id ? <form className="resource-form" onSubmit={review}><label>Decision<select name="decision" defaultValue={proposal.validation.downstream_impact?.status === "COMPLETE" ? "APPROVED" : "REJECTED"}><option value="APPROVED" disabled={proposal.validation.downstream_impact?.status !== "COMPLETE"}>Approve</option><option value="REJECTED">Reject</option></select></label><label>Review rationale<textarea name="rationale" minLength={10} maxLength={2000} required /></label><button disabled={busy}>Record review</button></form> : <p className="muted">An independent reviewer identity is required.</p>}</>}
     </aside>}
     </div>

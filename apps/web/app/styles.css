@@ -305,3 +305,12 @@ button.g8-signal:hover {background:#132936;}
 .g8-analyst .pagination button {padding:5px;font-size:9px;}
 .g8-panel-intro {min-height:112px;}
 @media(max-width:1000px) and (min-width:761px) {.g8-canvas {grid-template-columns:1fr;}}
+.g8-promotion {margin:15px 0;padding:12px;border:1px solid var(--g8-border);border-radius:5px;background:var(--g8-raised);}
+.g8-promotion header {display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.g8-promotion .g8-inline-error {margin:10px 0;padding:8px;}
+.g8-promotion>small {display:block;font-size:9px;line-height:1.6;color:var(--g8-muted);}
+.g8-promotion>.g8-link {margin:12px 0 0;font-size:10px;}
+.engineering-workspace .ontology-inspector {grid-row:1;}
+.engineering-workspace .resource-form label,.engineering-workspace .resource-fields dt,.engineering-workspace .impact-item small {color:var(--g8-muted);}
+.engineering-workspace .resource-form input,.engineering-workspace .resource-form select,.engineering-workspace .resource-form textarea,.engineering-workspace .ontology-inspector pre {background:var(--g8-bg);color:var(--g8-text);border-color:var(--g8-border);}
+.engineering-workspace .ontology-inspector details,.engineering-workspace .resource-fields>div {border-color:var(--g8-border);}

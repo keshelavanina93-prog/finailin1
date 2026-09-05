@@ -117,6 +117,11 @@ def proposal(principal: User, proposal_id: UUID) -> ProposalDetail:
     return resources.proposal_detail(principal, proposal_id)
 
 
+@router.get("/proposals/{proposal_id}/promotion-check")
+def promotion_check(principal: User, proposal_id: UUID) -> dict[str, Any]:
+    return resources.promotion_check(principal, proposal_id)
+
+
 @router.post("/proposals", response_model=ProposalDetail)
 def propose(principal: User, request: ResourceProposal) -> ProposalDetail:
     require_permission(principal, "ontology_propose")

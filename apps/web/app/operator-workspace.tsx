@@ -15,8 +15,8 @@ async function decodeError(response: Response): Promise<string> {
 }
 
 export type EngineeringView = "intake" | "objects" | "history" | "ontology";
-export default function OperatorWorkspace({ token, principal, initialView = "intake", receiptId }: {
-  token: string; principal: Principal; initialView?: EngineeringView; receiptId?: string;
+export default function OperatorWorkspace({ token, principal, initialView = "intake", receiptId, proposalId }: {
+  token: string; principal: Principal; initialView?: EngineeringView; receiptId?: string; proposalId?: string;
 }) {
   const [view, setView] = useState<EngineeringView>(initialView);
   const [summary, setSummary] = useState<WorkspaceSummary | null>(null);
@@ -141,7 +141,7 @@ export default function OperatorWorkspace({ token, principal, initialView = "int
   const count = view === "objects" ? objects.length : intake.length;
   return <section className="engineering-workspace">
     <nav aria-label="Engineering tools" className="ontology-tabs">{([ ["intake", "Evidence intake"], ["objects", "Object workspace"], ["history", "Construction history"], ["ontology", "Registry & review"] ] as const).map(([id, label]) => <button key={id} className={view === id ? "active" : "quiet"} onClick={() => navigate(id)}>{label}</button>)}</nav>
-      <div className="operator-content">{view === "ontology" ? <OntologyWorkspace token={token} principal={principal} /> : <><div className="section-heading"><div><p className="overline">SOURCE → CONSTRUCTION → REVIEW → OBJECTS</p><h1>{view === "intake" ? "Evidence intake" : view === "objects" ? "Object workspace" : "Construction history"}</h1><p className="muted">{view === "objects" ? "Inspect accepted objects and follow every value back to source evidence." : "Review source construction without losing the evidence or earlier versions."}</p></div><button className="quiet" disabled={loading || busy} onClick={() => { setRevision(value => value + 1); if (detail) void openConstruction(detail.receipt.receipt_id); }}>Refresh</button></div>
+      <div className="operator-content">{view === "ontology" ? <OntologyWorkspace token={token} principal={principal} initialProposalId={proposalId} /> : <><div className="section-heading"><div><p className="overline">SOURCE → CONSTRUCTION → REVIEW → OBJECTS</p><h1>{view === "intake" ? "Evidence intake" : view === "objects" ? "Object workspace" : "Construction history"}</h1><p className="muted">{view === "objects" ? "Inspect accepted objects and follow every value back to source evidence." : "Review source construction without losing the evidence or earlier versions."}</p></div><button className="quiet" disabled={loading || busy} onClick={() => { setRevision(value => value + 1); if (detail) void openConstruction(detail.receipt.receipt_id); }}>Refresh</button></div>
         <div className="summary-grid"><article><span>Pending review</span><strong>{summary?.pending_count ?? "—"}</strong></article><article><span>Accepted constructions</span><strong>{summary?.approved_count ?? "—"}</strong></article><article><span>Rejected constructions</span><strong>{summary?.rejected_count ?? "—"}</strong></article><article><span>Current source versions</span><strong>{summary?.active_versions.length ?? "—"}</strong></article></div>
         {error && <div role="alert" className="error-banner">{error}</div>}{notice && <div role="status" className="success-banner">{notice}</div>}
         {view === "intake" && principal.permissions.includes("ingest") && <EvidenceIntake key={token} token={token} principal={principal} onRetained={async (receipt: IngestReceipt) => { setOffset(0); setRevision(value => value + 1); setNotice("Evidence retained with its reviewed identity selections."); await openConstruction(receipt.receipt_id); }} />}
