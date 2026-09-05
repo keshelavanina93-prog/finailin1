@@ -2,13 +2,22 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    SerializerFunctionWrapHandler,
+    field_validator,
+    model_serializer,
+    model_validator,
+)
 
 
 class ResourceMutation(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     resource_id: UUID = Field(default_factory=uuid4)
     expected_version_id: UUID | None = None
+    access_entity: str | None = Field(default=None, min_length=1, max_length=128)
     object_type: str = Field(pattern=r"^[A-Z][A-Za-z0-9]{1,63}$")
     identity_key: str = Field(min_length=1, max_length=256)
     display_name: str = Field(min_length=1, max_length=200)
@@ -17,6 +26,13 @@ class ResourceMutation(BaseModel):
     valid_to: datetime | None = None
     authority_state: Literal["APPROVED", "REVOKED"] = "APPROVED"
     evidence_class: Literal["USER_ASSERTED", "SOURCE_BOUND", "REFERENCE_TEMPLATE"] = "USER_ASSERTED"
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_payload(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        if self.access_entity is None:
+            payload.pop("access_entity", None)
+        return payload
 
     @field_validator("valid_from", "valid_to")
     @classmethod

@@ -10,6 +10,7 @@ export interface CanonicalResource {
   authority_state: "APPROVED" | "REVOKED"; evidence_class: string; proposal_id: string | null;
 }
 export interface ResourceMutation {
+  access_entity?: string | null;
   resource_id: string; expected_version_id?: string | null; object_type: string;
   identity_key: string; display_name: string; attributes: Record<string, unknown>;
   valid_from: string; valid_to?: string | null; authority_state?: "APPROVED" | "REVOKED";

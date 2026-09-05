@@ -183,10 +183,18 @@ def _validate(
     tenant = principal.scope.tenant_id
     if (
         proposal.access_entity != principal.scope.legal_entity_id
-        and "ontology_admin" not in principal.permissions
-    ):
+        or proposal.access_entity == "__TENANT__"
+    ) and "ontology_admin" not in principal.permissions:
         raise WorkspaceError(403, "Tenant-wide ontology administration permission required")
     mutations = {str(item.resource_id): item for item in proposal.mutations}
+    mutation_scopes = {
+        identifier: item.access_entity or proposal.access_entity
+        for identifier, item in mutations.items()
+    }
+    if proposal.access_entity != "__TENANT__" and any(
+        scope != proposal.access_entity for scope in mutation_scopes.values()
+    ):
+        raise WorkspaceError(403, "Resource policy overrides require a tenant-restricted proposal")
     resolved: dict[str, dict[str, Any]] = {}
     dependencies: dict[str, list[dict[str, str]]] = {key: [] for key in mutations}
     external_heads: dict[str, str] = {}
@@ -199,7 +207,7 @@ def _validate(
             result = {
                 **item.model_dump(mode="json"),
                 "version_id": str(uuid5(proposal.proposal_id, identifier)),
-                "access_entity": proposal.access_entity,
+                "access_entity": mutation_scopes[identifier],
             }
         else:
             if identifier not in resolved:
@@ -209,8 +217,8 @@ def _validate(
         if result["authority_state"] != "APPROVED":
             raise WorkspaceError(409, "Dependency is revoked")
         if (
-            result["access_entity"] not in (proposal.access_entity, "__PLATFORM__")
-            and proposal.access_entity != "__TENANT__"
+            result["access_entity"] not in (mutation_scopes[source], "__PLATFORM__")
+            and mutation_scopes[source] != "__TENANT__"
         ):
             raise WorkspaceError(
                 403, "A resource cannot discard a dependency's entity access boundary"
@@ -238,11 +246,12 @@ def _validate(
     )
     meta_types = {"SchemaDefinition", "SemanticContract", "LinkType"}
     for identifier, item in mutations.items():
-        if item.object_type in meta_types and proposal.access_entity != "__PLATFORM__":
+        access_entity = mutation_scopes[identifier]
+        if item.object_type in meta_types and access_entity != "__PLATFORM__":
             raise WorkspaceError(
                 403, "Schema, semantic and link definitions belong to the shared platform registry"
             )
-        if proposal.access_entity == "__PLATFORM__" and item.object_type not in meta_types:
+        if access_entity == "__PLATFORM__" and item.object_type not in meta_types:
             raise WorkspaceError(403, "Enterprise facts cannot use platform-public policy")
         with conn.cursor(row_factory=dict_row) as cursor:
             previous = cursor.execute(
@@ -257,7 +266,7 @@ def _validate(
         if previous and (
             previous["object_type"] != item.object_type
             or previous["identity_key"] != item.identity_key
-            or previous["access_entity"] != proposal.access_entity
+            or previous["access_entity"] != access_entity
         ):
             raise WorkspaceError(
                 409, "Canonical type, identity key and access boundary cannot be overwritten"
@@ -446,7 +455,7 @@ def _validate(
                             "source_sha256=%s AND exact_scope->>'legal_entity_id'=%s "
                             "LIMIT 1"
                         ),
-                        (tenant, item.attributes["sha256"], proposal.access_entity),
+                        (tenant, item.attributes["sha256"], access_entity),
                     ).fetchone()
                     if not retained:
                         raise WorkspaceError(
@@ -465,6 +474,7 @@ def _validate(
         impact.append(
             {
                 "resource_id": identifier,
+                "access_entity": access_entity,
                 **schema_impact,
                 "name": item.display_name,
                 "operation": "UPDATE" if previous else "CREATE",
@@ -514,12 +524,18 @@ def _validate(
         "dependency_heads": external_heads,
         "dependencies": dependencies,
         "schema_versions": schema_versions,
+        "resource_scopes": mutation_scopes,
         "compatibility": "PASS",
         "identity_cycles": "NONE",
     }
 
 
 def propose(principal: Principal, proposal: ResourceProposal) -> ProposalDetail:
+    if proposal.access_entity == "__TENANT__" and not {
+        "ontology_admin",
+        "ontology_propose",
+    }.issubset(principal.permissions):
+        raise WorkspaceError(403, "Tenant proposals require an authorized ontology administrator")
     with resource_connection(principal) as conn:
         conn.execute(
             "SELECT pg_advisory_xact_lock(hashtextextended(%s,0))",
@@ -642,6 +658,13 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
         ).fetchone()
         if not row:
             raise WorkspaceError(404, "Proposal not found")
+        if row["access_entity"] == "__TENANT__" and not {
+            "ontology_admin",
+            "ontology_review",
+        }.issubset(principal.permissions):
+            raise WorkspaceError(
+                403, "Tenant proposal review requires an authorized ontology administrator"
+            )
         existing = cursor.execute(
             "SELECT * FROM resource_decisions WHERE tenant_id=%s AND proposal_id=%s",
             (tenant, proposal_id),
@@ -689,6 +712,7 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
             )
             if request.decision == "APPROVED":
                 for item in proposal.mutations:
+                    access_entity = item.access_entity or proposal.access_entity
                     version_id = uuid5(proposal_id, str(item.resource_id))
                     conn.execute(
                         (
@@ -702,7 +726,7 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
                             item.resource_id,
                             item.object_type,
                             item.identity_key,
-                            proposal.access_entity,
+                            access_entity,
                         ),
                     )
                     conn.execute(
@@ -717,7 +741,7 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
                             tenant,
                             item.resource_id,
                             version_id,
-                            proposal.access_entity,
+                            access_entity,
                             item.object_type,
                             item.display_name,
                             validation["schema_versions"][str(item.resource_id)],
@@ -737,7 +761,7 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
                             "(%s,%s,%s,%s) ON CONFLICT (tenant_id,resource_id) DO UPDATE "
                             "SET version_id=EXCLUDED.version_id"
                         ),
-                        (tenant, item.resource_id, version_id, proposal.access_entity),
+                        (tenant, item.resource_id, version_id, access_entity),
                     )
                     for dep in validation["dependencies"][str(item.resource_id)]:
                         conn.execute(
@@ -753,7 +777,7 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
                                 dep["resource_id"],
                                 dep["version_id"],
                                 dep["relation"],
-                                proposal.access_entity,
+                                access_entity,
                             ),
                         )
     return proposal_detail(principal, proposal_id)
