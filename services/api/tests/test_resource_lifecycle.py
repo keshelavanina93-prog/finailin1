@@ -10,7 +10,6 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.authority import ExactScope
-from finai_api.domain.ontology_catalog import canonical_id
 from finai_api.domain.resource_lifecycle import (
     ConsumptionRequest,
     LifecycleRequest,
@@ -44,6 +43,14 @@ def test_reviewed_authority_current_guard_and_retained_history():
     # A LinkType is a canonical consumer with exact accepted schema pins. Its additional
     # attributes carry the explicit consumer minimum without inventing execution behavior.
     key = "LifecycleConsumer" + uuid4().hex[:10]
+    semantic = ResourceMutation(
+        object_type="SemanticContract",
+        identity_key="synthetic-lifecycle-meaning:" + uuid4().hex,
+        display_name="Synthetic consumer authority meaning",
+        access_entity="__PLATFORM__",
+        attributes={"kind": "identifier"},
+        valid_from=datetime(2026, 1, 1, tzinfo=UTC),
+    )
     schema = ResourceMutation(
         object_type="SchemaDefinition",
         identity_key=key,
@@ -54,9 +61,7 @@ def test_reviewed_authority_current_guard_and_retained_history():
             "fields": {
                 "minimum_authority_state": {
                     "field_id": str(uuid4()),
-                    "semantic_id": str(
-                        canonical_id(p.scope.tenant_id, "SemanticContract", "Identifier")
-                    ),
+                    "semantic_id": str(semantic.resource_id),
                     "kind": "identifier",
                     "required": True,
                 }
@@ -75,7 +80,7 @@ def test_reviewed_authority_current_guard_and_retained_history():
         title="Synthetic lifecycle definitions",
         rationale="Focused explicit authority acceptance",
         access_entity="__TENANT__",
-        mutations=[schema, consumer],
+        mutations=[semantic, schema, consumer],
     )
     resources.propose(p, proposal)
     resources.review(
@@ -141,6 +146,7 @@ def test_reviewed_authority_current_guard_and_retained_history():
     retained = lifecycle.consumption_receipt(p, request.request_id)
     assert retained["proof_hash"] == result["proof_hash"]
     assert retained["current_use_authorized"] is False
+    assert len(result["upstream_authority"]) == 2
     with resources.resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as cursor:
         with pytest.raises(psycopg.Error), conn.transaction():
             cursor.execute(
@@ -185,6 +191,30 @@ def test_reviewed_authority_current_guard_and_retained_history():
         lifecycle.consume(p, request)
     request = request.model_copy(update={"request_id": uuid4()})
     assert lifecycle.consume(p, request)["inputs"][0]["availability_state"] == "AVAILABLE"
+    ancestor = resources.get_resource(p, semantic.resource_id)["resource"]
+    ancestor_ref = VersionReference(
+        resource_id=semantic.resource_id, version_id=ancestor["version_id"]
+    )
+    ancestor_event = None
+    for state in ("OBSERVED", "REVOKED"):
+        withdrawal = LifecycleRequest(
+            subject=ancestor_ref,
+            expected_event_id=ancestor_event,
+            target_state=state,
+            epistemic_state="OBSERVED",
+            business_state="PROVISIONAL",
+            availability_state="AVAILABLE",
+            reason="Synthetic upstream semantic withdrawal",
+        )
+        lifecycle.request_transition(p, withdrawal)
+        lifecycle.review_transition(
+            reviewer,
+            withdrawal.request_id,
+            LifecycleReview(decision="APPROVED", reason="Independent upstream withdrawal review"),
+        )
+        ancestor_event = lifecycle.history(p, ancestor_ref)["events"][-1]["event_id"]
+    with pytest.raises(WorkspaceError, match="Upstream dependency authority"):
+        lifecycle.consume(p, request)
     advance("REVOKED")
     assert lifecycle.consumption_receipt(p, UUID(result["consumption_id"])) == retained
     with pytest.raises(WorkspaceError, match="required authority and availability"):

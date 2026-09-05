@@ -1,0 +1,71 @@
+"""Current-use withdrawal checks across exact retained lineage, including indirect inputs."""
+
+from datetime import UTC, datetime
+from typing import Any
+from uuid import UUID
+
+from finai_api.services.workspace import WorkspaceError
+
+
+def upstream_authority(cursor: Any, tenant: UUID, consumer: UUID) -> list[dict[str, Any]]:
+    pending = [consumer]
+    seen = {consumer}
+    proof = []
+    edges = 0
+    now = datetime.now(UTC)
+    while pending:
+        source = pending.pop()
+        dependencies = cursor.execute(
+            "SELECT DISTINCT target_resource_id,target_version_id FROM resource_dependencies "
+            "WHERE tenant_id=%s AND version_id=%s LIMIT 5001",
+            (tenant, source),
+        ).fetchall()
+        edges += len(dependencies)
+        if edges > 5000:
+            raise WorkspaceError(409, "Current-use lineage exceeds the bounded edge limit")
+        for dependency in dependencies:
+            version = dependency["target_version_id"]
+            if version in seen:
+                continue
+            seen.add(version)
+            if len(seen) > 1000:
+                raise WorkspaceError(409, "Current-use lineage exceeds the bounded resource limit")
+            row = cursor.execute(
+                "SELECT v.*,h.version_id AS head FROM resource_versions v "
+                "JOIN resource_heads h USING(tenant_id,resource_id) WHERE v.tenant_id=%s "
+                "AND v.resource_id=%s AND v.version_id=%s",
+                (tenant, dependency["target_resource_id"], version),
+            ).fetchone()
+            if (
+                row is None
+                or row["head"] != version
+                or row["authority_state"] != "APPROVED"
+                or (
+                    row["valid_from"] > now
+                    or (row["valid_to"] is not None and row["valid_to"] <= now)
+                )
+            ):
+                raise WorkspaceError(409, "Upstream dependency is unavailable for current use")
+            event = cursor.execute(
+                "SELECT event_id,payload FROM resource_lifecycle_events WHERE tenant_id=%s "
+                "AND version_id=%s ORDER BY recorded_at DESC,event_id DESC LIMIT 1",
+                (tenant, version),
+            ).fetchone()
+            if event and (
+                event["payload"]["target_state"] in ("REVOKED", "SUPERSEDED")
+                or event["payload"]["availability_state"] != "AVAILABLE"
+            ):
+                raise WorkspaceError(
+                    409, "Upstream dependency authority or availability was withdrawn"
+                )
+            proof.append(
+                {
+                    "resource_id": str(row["resource_id"]),
+                    "version_id": str(version),
+                    "content_hash": row["content_hash"],
+                    "access_entity": row["access_entity"],
+                    "event_id": str(event["event_id"]) if event else None,
+                }
+            )
+            pending.append(version)
+    return sorted(proof, key=lambda item: item["version_id"])

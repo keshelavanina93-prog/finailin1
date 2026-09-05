@@ -24,6 +24,8 @@ export interface ConsumptionRequest {
 }
 
 export interface GuardedConsumption {
+  contract_version: "guarded-consumption/2";
+  upstream_authority: Array<VersionReference & { content_hash: string; access_entity: string; event_id: string | null }>;
   consumption_id: string;
   proof_hash: string;
   consumer_content_hash: string;

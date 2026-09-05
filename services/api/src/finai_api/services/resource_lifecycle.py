@@ -19,6 +19,7 @@ from finai_api.domain.resource_lifecycle import (
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
 from finai_api.services.resources import resource_connection
+from finai_api.services.upstream_authority import upstream_authority
 from finai_api.services.workspace import WorkspaceError
 
 ORDER = [
@@ -265,6 +266,7 @@ def consume(p: Principal, r: ConsumptionRequest) -> dict[str, Any]:
                 }
             )
         proof = {
+            "contract_version": "guarded-consumption/2",
             "purpose": "GUARDED_CURRENT_CONSUMPTION",
             "consumption_id": str(r.request_id),
             "consumer": r.consumer.model_dump(mode="json"),
@@ -273,6 +275,7 @@ def consume(p: Principal, r: ConsumptionRequest) -> dict[str, Any]:
             "minimum_state": minimum,
             "access_entity": consumer["access_entity"],
             "inputs": sorted(values, key=lambda item: item["subject"]["version_id"]),
+            "upstream_authority": upstream_authority(c, p.scope.tenant_id, r.consumer.version_id),
         }
         proof_hash = _proof_hash(proof)
         previous = c.execute(
