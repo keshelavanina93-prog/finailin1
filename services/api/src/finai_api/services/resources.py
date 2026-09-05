@@ -21,6 +21,7 @@ from finai_api.domain.resources import (
 )
 from finai_api.domain.review import Principal
 from finai_api.services.dependency_impact import downstream_impact, impact_fingerprint
+from finai_api.services.schema_compatibility import SchemaCompatibilityError, schema_compatibility
 from finai_api.services.workspace import WorkspaceError
 from finai_api.storage import connection
 
@@ -262,52 +263,21 @@ def _validate(
                 409, "Canonical type, identity key and access boundary cannot be overwritten"
             )
         schema_versions[identifier] = None
+        schema_impact: dict[str, Any] = {}
         if item.object_type == "SchemaDefinition":
-            fields = item.attributes.get("fields")
-            if not isinstance(fields, dict) or not fields:
-                raise WorkspaceError(422, "Schema needs explicit stable fields")
-            field_ids = []
-            for name, spec in fields.items():
-                if not isinstance(spec, dict) or not all(
-                    key in spec for key in ("field_id", "semantic_id", "kind", "required")
-                ):
-                    raise WorkspaceError(422, f"Incomplete field definition: {name}")
-                if (
-                    type(spec["required"]) is not bool
-                    or type(spec.get("deprecated", False)) is not bool
-                ):
-                    raise WorkspaceError(422, "Field requirement and deprecation must be booleans")
-                UUID(spec["field_id"])
-                field_ids.append(spec["field_id"])
+            try:
+                schema_impact = schema_compatibility(
+                    item.identity_key, item.attributes, previous["attributes"] if previous else None
+                )
+            except SchemaCompatibilityError as exc:
+                raise WorkspaceError(exc.status, exc.detail) from exc
+            for name, spec in item.attributes["fields"].items():
                 semantic = target(spec["semantic_id"], identifier, f"SEMANTIC:{name}")
                 if (
                     semantic["object_type"] != "SemanticContract"
                     or semantic["attributes"]["kind"] != spec["kind"]
                 ):
                     raise WorkspaceError(422, f"Field {name} does not match its semantic contract")
-            if len(field_ids) != len(set(field_ids)):
-                raise WorkspaceError(422, "Field identities must be unique within a schema")
-            if previous:
-                old = previous["attributes"]["fields"]
-                breaking = [
-                    name
-                    for name, spec in old.items()
-                    if name not in fields
-                    or any(
-                        fields[name].get(k) != spec.get(k)
-                        for k in ("field_id", "semantic_id", "kind", "target_type")
-                    )
-                    or (not spec["required"] and fields[name]["required"])
-                ]
-                breaking += [
-                    name for name, spec in fields.items() if name not in old and spec["required"]
-                ]
-                if breaking:
-                    raise WorkspaceError(
-                        409,
-                        "Incompatible schema evolution requires an explicit migration change set: "
-                        + ", ".join(breaking),
-                    )
         elif item.object_type == "SemanticContract":
             if item.attributes.get("kind") not in (
                 "text",
@@ -495,6 +465,7 @@ def _validate(
         impact.append(
             {
                 "resource_id": identifier,
+                **schema_impact,
                 "name": item.display_name,
                 "operation": "UPDATE" if previous else "CREATE",
                 "fields_changed": sorted(

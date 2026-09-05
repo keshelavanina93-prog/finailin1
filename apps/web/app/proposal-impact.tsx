@@ -2,6 +2,15 @@
 import { useState } from "react";
 import type { ResourceProposalDetail } from "@finai/contracts";
 
+export function SchemaChangeDetails({ item }: { item: ResourceProposalDetail["validation"]["impact"][number] }) {
+  if (!item.compatibility) return null;
+  return <details><summary>{item.compatibility === "INITIAL" ? "Initial schema" : "Backward-compatible schema change"} · {item.semantic_changes?.length ?? 0} field changes</summary>
+    {item.semantic_changes?.map((change, index) => <div key={`${change.field_id}:${change.change}:${index}`}><strong>{change.field_name}</strong><p>{change.change.toLowerCase().replaceAll("_", " ")}</p>
+      <details><summary>Before and after</summary><p>Before</p><pre>{JSON.stringify(change.before, null, 2)}</pre><p>After</p><pre>{JSON.stringify(change.after, null, 2)}</pre>{change.field_id && <code className="full-hash">Field identity {change.field_id}</code>}</details>
+    </div>)}
+  </details>;
+}
+
 export default function ProposalImpact({ validation }: { validation: ResourceProposalDetail["validation"] }) {
   const [page, setPage] = useState(0);
   const impact = validation.downstream_impact;
