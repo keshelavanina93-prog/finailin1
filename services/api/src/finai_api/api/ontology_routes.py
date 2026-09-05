@@ -1,9 +1,11 @@
+import csv
 from datetime import datetime
 from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 
+from finai_api.domain.ingest import IngestRequest
 from finai_api.domain.resources import (
     CanonicalResource,
     ProposalDetail,
@@ -14,6 +16,8 @@ from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import resources
 from finai_api.services.enterprise_reference import socar_reference
+from finai_api.services.ingest_binding import context_accounts
+from finai_api.services.ingestion import SourceAuthorityDenied, compile_source
 from finai_api.services.workspace import WorkspaceError
 
 router = APIRouter(prefix="/v1/ontology", tags=["shared ontology and identity"])
@@ -70,10 +74,15 @@ def resource(principal: User, resource_id: UUID) -> dict[str, Any]:
 
 
 @router.get("/resolve/{resource_id}")
-def resolve(principal: User, resource_id: UUID, known_at: datetime | None = None) -> dict[str, Any]:
-    if known_at and known_at.tzinfo is None:
+def resolve(
+    principal: User,
+    resource_id: UUID,
+    known_at: datetime | None = None,
+    valid_at: datetime | None = None,
+) -> dict[str, Any]:
+    if any(value and value.tzinfo is None for value in (known_at, valid_at)):
         raise WorkspaceError(422, "Historical timestamps must include a timezone")
-    return resources.resolve_identity(principal, resource_id, known_at)
+    return resources.resolve_identity(principal, resource_id, known_at, valid_at)
 
 
 @router.get("/aliases")
@@ -116,3 +125,37 @@ def review(principal: User, proposal_id: UUID, request: ResourceReview) -> Propo
         return resources.review(principal, proposal_id, request)
     except (ValueError, KeyError, TypeError) as exc:
         raise WorkspaceError(422, "Invalid resource/schema definition: " + str(exc)) from exc
+
+
+@router.get("/context/accounts")
+def account_choices(
+    principal: User,
+    context_version_id: UUID,
+    offset: Annotated[int, Query(ge=0, le=1000000)] = 0,
+) -> dict[str, Any]:
+    return context_accounts(principal, context_version_id, offset)
+
+
+@router.post("/context/source-accounts")
+def source_accounts(principal: User, request: IngestRequest) -> dict[str, Any]:
+    require_permission(principal, "ingest")
+    if request.scope != principal.scope:
+        raise WorkspaceError(403, "Exact scope does not match credential")
+    if request.context_version_id is not None:
+        context_accounts(principal, request.context_version_id)
+    try:
+        receipt = compile_source(request)
+    except SourceAuthorityDenied as exc:
+        raise WorkspaceError(403, str(exc)) from exc
+    except (ValueError, csv.Error) as exc:
+        raise WorkspaceError(422, str(exc)) from exc
+    return {
+        "source_class": receipt.source_class,
+        "account_codes": sorted(
+            {
+                candidate.values["account_code"]
+                for candidate in receipt.candidates
+                if candidate.object_type == "Account"
+            }
+        ),
+    }

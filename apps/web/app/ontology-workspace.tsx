@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type { CanonicalDetail, CanonicalResource, Principal, ProposalSummary, ResourceMutation, ResourceProposalDetail, SchemaField } from "@finai/contracts";
+import IdentityHistory from "./identity-history";
 
 const metadata = new Set(["SchemaDefinition", "SemanticContract", "LinkType"]);
 const label = (value: string) => value.replaceAll("_", " ").replace(/([a-z])([A-Z])/g, "$1 $2");
@@ -131,6 +132,7 @@ export default function OntologyWorkspace({ token, principal }: { token: string;
     </div>
     {(detail || proposal || draft) && <aside className="ontology-inspector data-panel"><button className="quiet close-inspector" onClick={() => { selection.current++; setDetail(null); setProposal(null); setDraft(null); }}>Close</button>
       {detail && <><p className="overline">{label(detail.resource.object_type)}</p><h2>{detail.resource.display_name}</h2><span className="status observed">{label(detail.resource.evidence_class)}</span><dl className="resource-fields">{Object.entries(detail.resource.attributes).map(([key, value]) => <div key={key}><dt>{label(key)}</dt><dd>{typeof value === "string" && names.has(value) ? <button className="text-link" onClick={() => void inspect(value)}>{names.get(value)}</button> : renderValue(value)}</dd></div>)}</dl>
+        <IdentityHistory key={detail.resource.resource_id} resourceId={detail.resource.resource_id} token={token} />
         {canPropose && (!metadata.has(detail.resource.object_type) || admin) && <button onClick={() => edit(detail.resource)}>Propose a new version</button>}
         <h3>Version history</h3>{detail.versions.map(version => <details key={version.version_id}><summary>{new Date(version.system_from).toLocaleString()} · {version.authority_state}</summary><p>Effective {new Date(version.valid_from).toLocaleString()}</p><pre>{JSON.stringify(version.attributes, null, 2)}</pre>{canPropose && (!metadata.has(detail.resource.object_type) || admin) && <button className="quiet" onClick={() => edit(detail.resource, version.attributes)}>Propose restoring these values</button>}</details>)}
         <h3>Dependent versions</h3>{detail.dependents.length ? detail.dependents.map((row, i) => <p key={`${row.version_id}:${row.relation}:${i}`}><button className="text-link" onClick={() => void inspect(row.resource_id)}>{row.display_name}</button><small> · {row.relation}</small></p>) : <p className="muted">No recorded dependent versions.</p>}

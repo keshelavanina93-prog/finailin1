@@ -69,6 +69,7 @@ small { color:var(--muted); }
 .toolbar h2 { margin:0 auto 0 0; font-size:15px; }
 .compact-label { grid-template-columns:auto auto; align-items:center; font-size:10px; }
 .compact-label select { width:auto; padding:8px; font-size:12px; }
+.binding-review { padding:24px; }.binding-review>button { margin:16px 12px 0 0; }.binding-review select { max-width:100%; min-width:240px; }.source-only-choice { grid-column:1/-1; display:flex; align-items:center; gap:10px; }.source-only-choice input { width:auto; }.canonical-trace { margin:16px 0; font-size:12px; }.canonical-trace dd small { display:block; margin-top:6px; color:var(--muted); font-size:9px; }
 .search-form { display:flex; gap:6px; }
 .search-form input { width:230px; font-size:12px; }
 .search-form button { padding:8px 10px; font-size:12px; }

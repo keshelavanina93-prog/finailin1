@@ -10,8 +10,8 @@ from finai_api.domain.ingest import IngestReceipt, IngestRequest
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal, authorized_scope, require_permission
 from finai_api.services.authority_compiler import AuthorityCompiler
+from finai_api.services.ingest_binding import bind_receipt
 from finai_api.services.ingestion import SourceAuthorityDenied, compile_source
-from finai_api.services.resources import context_binding
 from finai_api.storage import retain, retrieve
 
 router = APIRouter()
@@ -52,21 +52,8 @@ def ingest(
     scope = principal.scope
     if request.scope != scope:
         raise HTTPException(403, "Exact scope does not match credential")
-    context = context_binding(principal) if request.context_version_id else None
-    if context and (
-        not context["binding"]
-        or context["binding"]["version_id"] != str(request.context_version_id)
-    ):
-        raise HTTPException(409, "Canonical accounting context changed; refresh before ingestion")
     try:
-        receipt = compile_source(request)
-        if context:
-            receipt = receipt.model_copy(
-                update={
-                    "context_version_id": request.context_version_id,
-                    "canonical_references": context["canonical_references"],
-                }
-            )
+        receipt = bind_receipt(principal, request, compile_source(request))
     except SourceAuthorityDenied as exc:
         raise HTTPException(403, str(exc)) from exc
     except (ValueError, csv.Error) as exc:

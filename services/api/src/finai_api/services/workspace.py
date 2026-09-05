@@ -7,7 +7,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.authority import canonical_sha256
-from finai_api.domain.ingest import IngestReceipt
+from finai_api.domain.ingest import IngestReceipt, IngestRequest
 from finai_api.domain.review import (
     IntakeItem,
     ObjectDetail,
@@ -72,13 +72,19 @@ def detail(principal: Principal, receipt_id: str) -> ReceiptDetail:
             else None
         )
 
-        def indexed(value: IngestReceipt | None) -> dict[str, dict[str, str]]:
+        def indexed(value: IngestReceipt | None) -> dict[str, dict[str, Any]]:
             return (
                 {
                     (
                         f"{item.object_type}:"
                         f"{item.values.get('account_code', str(item.source_row))}"
-                    ): item.values
+                    ): {
+                        "values": item.values,
+                        "canonical_references": {
+                            key: ref.model_dump(mode="json")
+                            for key, ref in item.canonical_references.items()
+                        },
+                    }
                     for item in value.candidates
                 }
                 if value
@@ -134,6 +140,20 @@ def list_intake(principal: Principal, offset: int, state: str | None) -> list[In
 
 def decide(principal: Principal, receipt_id: str, request: ReviewRequest) -> ReviewDecision:
     with connection(principal.scope) as conn:
+        if request.decision == "APPROVED":
+            # Registry before scope lock; acceptance retains the same immutable dependency snapshot.
+            conn.execute(
+                "SELECT set_config('finai.entity_id',%s,true),"
+                "set_config('finai.tenant_access',%s,true)",
+                (
+                    principal.scope.legal_entity_id,
+                    "true" if "ontology_admin" in principal.permissions else "false",
+                ),
+            )
+            conn.execute(
+                "SELECT pg_advisory_xact_lock(hashtextextended(%s,0))",
+                (f"canonical:{principal.scope.tenant_id}",),
+            )
         # One writer per exact scope; serializes competing approvals without mutating source rows.
         lock_id = f"{principal.scope.tenant_id}:{canonical_sha256(principal.scope)}"
         conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (lock_id,))
@@ -165,6 +185,19 @@ def decide(principal: Principal, receipt_id: str, request: ReviewRequest) -> Rev
                 )
             head = _head(conn, principal, receipt.source_class)
             if request.decision == "APPROVED":
+                if receipt.context_version_id:
+                    from finai_api.services.ingest_binding import bind_receipt
+
+                    validated = bind_receipt(
+                        principal,
+                        IngestRequest.model_validate(run["request"]),
+                        receipt,
+                        existing_connection=conn,
+                    )
+                    if validated != receipt:
+                        raise WorkspaceError(
+                            409, "Canonical bindings changed; re-ingest and review"
+                        )
                 blockers = approval_blockers(receipt, run["submitted_by"], principal)
                 if blockers:
                     raise WorkspaceError(409, " ".join(blockers))

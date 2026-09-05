@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import "./styles.css";
 
 export const metadata: Metadata = {
-  title: "FinAI / NYX Core",
+  title: "G8 by NYXCore",
   description: "Evidence-native financial and industrial decision intelligence",
 };
 

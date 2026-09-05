@@ -14,9 +14,17 @@ class IngestRequest(BaseModel):
     csv_text: str = Field(min_length=1, max_length=1_000_000)
     requested_objects: tuple[str, ...] = ()
     context_version_id: UUID | None = None
+    account_version_ids: dict[str, UUID] = Field(default_factory=dict, max_length=10000)
+
+
+class CanonicalReference(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    resource_id: UUID
+    version_id: UUID
 
 
 class Candidate(BaseModel):
+    canonical_references: dict[str, CanonicalReference] = Field(default_factory=dict)
     object_type: str
     source_row: int
     epistemic_state: Literal["OBSERVED", "DERIVED"]
@@ -29,7 +37,8 @@ class IngestReceipt(BaseModel):
     receipt_id: str
     request_sha256: str
     context_version_id: UUID | None = None
-    canonical_references: dict[str, dict[str, str]] = Field(default_factory=dict)
+    canonical_references: dict[str, CanonicalReference] = Field(default_factory=dict)
+    binding_state: Literal["SOURCE_ONLY", "CANONICAL_BOUND"] = "SOURCE_ONLY"
     source_sha256: str
     scope: ExactScope
     source_class: Literal["TRIAL_BALANCE", "UNFAMILIAR_TABULAR"]

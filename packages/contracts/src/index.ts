@@ -8,6 +8,7 @@ export const epistemicStates = [
 export type { SchemaField, CanonicalResource, ResourceMutation, ResourceProposal, ResourceProposalDetail, ProposalSummary, CanonicalDetail } from "./ontology.js";
 
 export interface IngestReceipt {
+  binding_state: "SOURCE_ONLY" | "CANONICAL_BOUND";
   context_version_id: string | null;
   canonical_references: Record<string, { resource_id: string; version_id: string }>;
   receipt_id: string;
@@ -23,6 +24,7 @@ export interface IngestReceipt {
     epistemic_state: "OBSERVED" | "DERIVED";
     authority_state: "MAPPED_CANDIDATE";
     values: Record<string, string>;
+    canonical_references: Record<string, { resource_id: string; version_id: string }>;
   }>;
   rejects: string[];
   warnings: string[];
@@ -77,6 +79,7 @@ export interface ReceiptDetail {
 }
 
 export interface WorkspaceObject {
+  canonical_references: Record<string, { resource_id: string; version_id: string }>;
   object_id: string;
   receipt_id: string;
   object_index: number;

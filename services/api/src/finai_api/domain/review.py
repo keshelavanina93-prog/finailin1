@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from finai_api.domain.authority import ExactScope
-from finai_api.domain.ingest import Candidate, IngestReceipt
+from finai_api.domain.ingest import Candidate, CanonicalReference, IngestReceipt
 
 
 class Principal(BaseModel):
@@ -80,6 +80,7 @@ class ReceiptDetail(BaseModel):
 
 
 class WorkspaceObject(BaseModel):
+    canonical_references: dict[str, CanonicalReference] = Field(default_factory=dict)
     object_id: str
     receipt_id: str
     object_index: int
@@ -120,6 +121,15 @@ def approval_blockers(
         )
     elif submitted_by == principal.actor_id:
         blockers.append("A different reviewer must approve this construction.")
+    if receipt.context_version_id and receipt.source_class == "TRIAL_BALANCE":
+        required = {"legal_entity_id", "ledger_id", "period_id", "currency_id", "account_id"}
+        if receipt.binding_state != "CANONICAL_BOUND" or any(
+            not required.issubset(candidate.canonical_references)
+            for candidate in receipt.candidates
+        ):
+            blockers.append(
+                "Canonical accounting bindings are incomplete; re-ingest with accounts."
+            )
     if receipt.rejects:
         blockers.append("Rejected rows must be resolved in a new source version.")
     if not receipt.candidates:

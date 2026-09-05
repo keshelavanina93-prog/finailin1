@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { Principal, ReceiptDetail } from "@finai/contracts";
+import CanonicalTrace from "./canonical-trace";
 
 type Props = {
   detail: ReceiptDetail;
@@ -34,6 +35,8 @@ export default function ReceiptPanel({ detail, principal, busy, onDecision, onEx
       <div>
         <div className="identity-line"><span className={`status ${decision?.decision.toLowerCase() ?? "pending"}`}>{decision?.decision ?? "PENDING REVIEW"}</span>
           <span>{receipt.source_class.replaceAll("_", " ")}</span><span>{receipt.candidates.length} proposed objects</span></div>
+        <p className="muted">{receipt.binding_state === "CANONICAL_BOUND" ? "Shared identity bound · financial certification remains separate" : "Source-only construction · canonical accounting identity unavailable"}</p>
+        <CanonicalTrace references={receipt.canonical_references} />
         <nav className="pipeline-nav" aria-label="Compilation stages">
           {receipt.plan.map((name, index) => <button aria-pressed={stage === name} className={stage === name ? "selected" : ""}
             onClick={() => setStage(name)} key={name}><small>{String(index + 1).padStart(2, "0")}</small>{name}</button>)}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type { IngestReceipt, IntakeItem, ObjectDetail, Principal, ReceiptDetail, WorkspaceObject, WorkspaceSummary } from "@finai/contracts";
+import EvidenceIntake from "./evidence-intake";
 import ReceiptPanel from "./receipt-panel";
 import ObjectPanel from "./object-panel";
 import OntologyWorkspace from "./ontology-workspace";
@@ -104,32 +105,6 @@ export default function OperatorWorkspace() {
     finally { setBusy(false); }
   }
 
-  async function upload(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); if (!principal) return;
-    const form = event.currentTarget;
-    const file = new FormData(form).get("source") as File;
-    const active = generation.current;
-    setBusy(true); setError(""); setNotice("");
-    try {
-      if (!file.size || file.size > 1_000_000) throw new Error("Choose a nonempty UTF-8 CSV smaller than 1 MB.");
-      const text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(await file.arrayBuffer());
-      const contextResponse = await fetch("/api/ontology/context", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
-      if (!contextResponse.ok) throw new Error(await decodeError(contextResponse));
-      const context = await contextResponse.json();
-      const response = await fetch("/api/hydration", { method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ scope: principal.scope, filename: file.name, csv_text: text, context_version_id: context.binding?.version_id ?? null }),
-      });
-      if (!response.ok) throw new Error(await decodeError(response));
-      const receipt: IngestReceipt = await response.json();
-      if (active !== generation.current) return;
-      form.reset(); setOffset(0); setRevision(value => value + 1);
-      setNotice("Evidence retained. Construction is ready for review.");
-      await openConstruction(receipt.receipt_id);
-    } catch (failure) { if (active === generation.current) setError(failure instanceof Error ? failure.message : "Ingestion failed"); }
-    finally { setBusy(false); }
-  }
-
   async function decide(decision: "APPROVED" | "REJECTED", reason: string, key: string) {
     if (!detail) return;
     setBusy(true); setError("");
@@ -161,13 +136,13 @@ export default function OperatorWorkspace() {
       const blob = await response.blob();
       if (active !== generation.current) return;
       const link = document.createElement("a"); const url = URL.createObjectURL(blob);
-      link.href = url; link.download = format === "source" ? "retained-source.csv" : "finai-evidence-bundle.json";
+      link.href = url; link.download = format === "source" ? "retained-source.csv" : "g8-evidence-bundle.json";
       link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
       setNotice("Evidence export prepared with its source hash and authority context.");
     } catch (failure) { setError(failure instanceof Error ? failure.message : "Export failed"); }
   }
 
-  if (!principal) return <main className="login-shell"><div className="login-story"><div className="wordmark">F<span>FinAI / NYX CORE</span></div>
+  if (!principal) return <main className="login-shell"><div className="login-story"><div className="wordmark">G8<span>by NYXCore</span></div>
     <p className="overline">EVIDENCE-NATIVE ENTERPRISE WORKSPACE</p><h1>From source evidence<br />to reviewed enterprise state.</h1>
     <p>Retain the original. Understand the source. Review what it can establish. Work with accepted objects and their evidence.</p>
     <ol><li>Evidence & construction</li><li>Independent review</li><li>Versioned objects & lineage</li></ol></div>
@@ -180,14 +155,14 @@ export default function OperatorWorkspace() {
   const pageSize = view === "objects" ? 100 : 50;
   const count = view === "objects" ? objects.length : intake.length;
   return <main className="operator-shell">
-    <aside className="navigation"><div className="wordmark">F<span>FinAI<small>NYX CORE</small></span></div><p className="nav-caption">ENTERPRISE WORKSPACE</p>
+    <aside className="navigation"><div className="wordmark">G8<span>by NYXCore</span></div><p className="nav-caption">ENTERPRISE WORKSPACE</p>
       {([ ["intake", "Evidence intake", "01"], ["objects", "Object workspace", "02"], ["history", "Construction history", "03"], ["ontology", "Enterprise & ontology", "04"] ] as const).map(([id, label, number]) => <button key={id} className={view === id ? "nav-link active" : "nav-link"} onClick={() => navigate(id)}><small>{number}</small>{label}</button>)}
       <div className="identity-card"><strong>{principal.display_name}</strong><small>{principal.permissions.join(" · ")}</small><button className="quiet" onClick={signOut}>Switch identity / sign out</button></div></aside>
-    <div className="operator-main"><header className="scope-bar"><div><small>LEGAL ENTITY</small><strong>{principal.scope.legal_entity_id}</strong></div><div><small>PERIOD</small><strong>{principal.scope.period}</strong></div><div><small>CURRENCY</small><strong>{principal.scope.currency}</strong></div><span className="scope-lock">Exact scope · identity bound</span></header>
+    <div className="operator-main">
       <div className="operator-content">{view === "ontology" ? <OntologyWorkspace token={token} principal={principal} /> : <><div className="section-heading"><div><p className="overline">SOURCE → CONSTRUCTION → REVIEW → OBJECTS</p><h1>{view === "intake" ? "Evidence intake" : view === "objects" ? "Object workspace" : "Construction history"}</h1><p className="muted">{view === "objects" ? "Inspect accepted objects and follow every value back to source evidence." : "Review source construction without losing the evidence or earlier versions."}</p></div><button className="quiet" disabled={loading || busy} onClick={() => { setRevision(value => value + 1); if (detail) void openConstruction(detail.receipt.receipt_id); }}>Refresh</button></div>
         <div className="summary-grid"><article><span>Pending review</span><strong>{summary?.pending_count ?? "—"}</strong></article><article><span>Accepted constructions</span><strong>{summary?.approved_count ?? "—"}</strong></article><article><span>Rejected constructions</span><strong>{summary?.rejected_count ?? "—"}</strong></article><article><span>Current source versions</span><strong>{summary?.active_versions.length ?? "—"}</strong></article></div>
         {error && <div role="alert" className="error-banner">{error}</div>}{notice && <div role="status" className="success-banner">{notice}</div>}
-        {view === "intake" && principal.permissions.includes("ingest") && <form className="upload-strip" onSubmit={upload}><div><h3>Ingest a source</h3><p>UTF-8 CSV · TB headers: account_code, debit, credit · unfamiliar schemas retain raw records</p></div><label className="file-label">Source CSV<input type="file" accept=".csv,text/csv" name="source" required /></label><button disabled={busy}>{busy ? "Working…" : "Retain & construct"}</button></form>}
+        {view === "intake" && principal.permissions.includes("ingest") && <EvidenceIntake key={token} token={token} principal={principal} onRetained={async (receipt: IngestReceipt) => { setOffset(0); setRevision(value => value + 1); setNotice("Evidence retained with its reviewed identity selections."); await openConstruction(receipt.receipt_id); }} />}
         {!detail && <section className="data-panel"><div className="toolbar"><h2>{view === "objects" ? (version ? "Pinned construction version" : "Current accepted versions") : view === "intake" ? "Review queue" : "All constructions"}</h2>
           {view !== "intake" && <label className="compact-label">{view === "objects" ? "Object type" : "Decision"}<select value={filter} onChange={event => { setFilter(event.target.value); setOffset(0); }}>{(view === "objects" ? ["", "Account", "PeriodBalance", "SourceRecord"] : ["", "PENDING", "APPROVED", "REJECTED"]).map(value => <option key={value} value={value}>{value || "All"}</option>)}</select></label>}
           {view === "objects" && <form className="search-form" onSubmit={event => { event.preventDefault(); setSearch(searchInput); setOffset(0); }}><input aria-label="Search object values" value={searchInput} onChange={event => setSearchInput(event.target.value)} placeholder="Find an account or source value" maxLength={128} /><button className="quiet">Search</button></form>}

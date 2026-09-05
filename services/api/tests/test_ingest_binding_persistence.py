@@ -1,0 +1,225 @@
+"""Opt-in PostgreSQL acceptance with isolated, explicitly synthetic enterprise resources."""
+
+import json
+import os
+from datetime import UTC, datetime
+from uuid import UUID, uuid4, uuid5
+
+import pytest
+from fastapi.testclient import TestClient
+
+from finai_api.config import get_settings
+from finai_api.domain.authority import ExactScope, canonical_sha256
+from finai_api.domain.resources import ResourceMutation, ResourceProposal, ResourceReview
+from finai_api.domain.review import Principal
+from finai_api.main import app
+from finai_api.services import resources
+
+
+@pytest.mark.skipif(
+    os.environ.get("G8_BINDING_DB_TEST") != "1", reason="Opt-in retained DB acceptance"
+)
+def test_persistent_binding_review_export_and_revocation(monkeypatch: pytest.MonkeyPatch) -> None:
+    scope = ExactScope(
+        tenant_id=UUID("805d8a32-d12b-4268-a236-b0b16e59da9f"),
+        legal_entity_id="synthetic-binding-" + uuid4().hex,
+        period="2026-08",
+        currency="GEL",
+    )
+    permissions = (
+        "read",
+        "ingest",
+        "review",
+        "export",
+        "ontology_read",
+        "ontology_admin",
+        "ontology_propose",
+        "ontology_review",
+    )
+    operator = Principal(
+        actor_id="synthetic-operator",
+        display_name="Synthetic operator",
+        scope=scope,
+        permissions=permissions,
+    )
+    reviewer = operator.model_copy(update={"actor_id": "synthetic-reviewer"})
+    ids = {
+        key: uuid4()
+        for key in (
+            "entity",
+            "calendar",
+            "period",
+            "currency",
+            "chart",
+            "ledger",
+            "001",
+            "002",
+            "context",
+        )
+    }
+    attrs = {
+        "entity": ("LegalEntity", {}),
+        "calendar": ("FiscalCalendar", {"code": "SYNTHETIC"}),
+        "period": (
+            "FiscalPeriod",
+            {
+                "calendar_id": str(ids["calendar"]),
+                "starts_on": "2026-08-01",
+                "ends_on": "2026-08-31",
+            },
+        ),
+        "currency": ("Currency", {"code": "GEL"}),
+        "chart": (
+            "LocalChartOfAccounts",
+            {"legal_entity_id": str(ids["entity"]), "code": "SYNTHETIC"},
+        ),
+        "ledger": (
+            "Ledger",
+            {
+                "legal_entity_id": str(ids["entity"]),
+                "chart_id": str(ids["chart"]),
+                "currency_id": str(ids["currency"]),
+                "calendar_id": str(ids["calendar"]),
+            },
+        ),
+        "context": (
+            "ContextBinding",
+            {
+                "legal_entity_id": str(ids["entity"]),
+                "ledger_id": str(ids["ledger"]),
+                "currency_id": str(ids["currency"]),
+                "period_id": str(ids["period"]),
+                "source_scope_key": canonical_sha256(scope),
+            },
+        ),
+        **{
+            code: ("LocalAccount", {"chart_id": str(ids["chart"]), "account_code": code})
+            for code in ("001", "002")
+        },
+    }
+    mutations = [
+        ResourceMutation(
+            resource_id=ids[key],
+            object_type=kind,
+            identity_key="context:" + canonical_sha256(scope)
+            if key == "context"
+            else "synthetic:" + str(ids[key]),
+            display_name="SYNTHETIC binding acceptance " + key,
+            attributes=attributes,
+            valid_from=datetime(2026, 1, 1, tzinfo=UTC),
+            evidence_class="REFERENCE_TEMPLATE",
+        )
+        for key, (kind, attributes) in attrs.items()
+    ]
+    proposal = ResourceProposal(
+        title="SYNTHETIC canonical binding acceptance",
+        rationale="Isolated non-authentic acceptance resources",
+        access_entity=scope.legal_entity_id,
+        mutations=mutations,
+    )
+    resources.propose(operator, proposal)
+    resources.review(
+        reviewer,
+        proposal.proposal_id,
+        ResourceReview(decision="APPROVED", rationale="Independent synthetic acceptance review"),
+    )
+    versions = {
+        key: str(uuid5(proposal.proposal_id, str(identifier))) for key, identifier in ids.items()
+    }
+    monkeypatch.setenv(
+        "FINAI_ACCESS_TOKENS",
+        json.dumps(
+            {
+                "operator": operator.model_dump(mode="json"),
+                "reviewer": reviewer.model_dump(mode="json"),
+            }
+        ),
+    )
+    get_settings.cache_clear()
+    outsider = operator.model_copy(
+        update={
+            "scope": scope.model_copy(update={"legal_entity_id": "another-synthetic-company"}),
+            "permissions": ("read", "ingest", "ontology_read"),
+        }
+    )
+    grants = json.loads(os.environ["FINAI_ACCESS_TOKENS"])
+    grants["outsider"] = outsider.model_dump(mode="json")
+    monkeypatch.setenv("FINAI_ACCESS_TOKENS", json.dumps(grants))
+    get_settings.cache_clear()
+    client = TestClient(app, headers={"Authorization": "Bearer operator"})
+    payload = {
+        "scope": scope.model_dump(mode="json"),
+        "filename": "SYNTHETIC-tb.csv",
+        "csv_text": "account_code,debit,credit\n001,1.25,0\n002,0,1.25\n",
+        "context_version_id": versions["context"],
+        "account_version_ids": {code: versions[code] for code in ("001", "002")},
+    }
+    choices = client.get(
+        "/v1/ontology/context/accounts", params={"context_version_id": versions["context"]}
+    )
+    assert choices.status_code == 200, choices.text
+    assert {row["account_code"] for row in choices.json()["items"]} == {"001", "002"}
+    client.headers["Authorization"] = "Bearer outsider"
+    assert client.get(
+        "/v1/ontology/context/accounts", params={"context_version_id": versions["context"]}
+    ).status_code in (403, 409)
+    client.headers["Authorization"] = "Bearer operator"
+    source_only = client.post(
+        "/v1/ontology/context/source-accounts",
+        json={**payload, "context_version_id": None, "account_version_ids": {}},
+    )
+    assert source_only.status_code == 200, source_only.text
+    preview = client.post("/v1/ontology/context/source-accounts", json=payload)
+    assert preview.json()["account_codes"] == ["001", "002"]
+    response = client.post("/v1/hydration/ingest", json=payload)
+    assert response.status_code == 200, response.text
+    receipt = response.json()
+    assert receipt["binding_state"] == "CANONICAL_BOUND"
+    assert client.post("/v1/hydration/ingest", json=payload).json() == receipt
+    rid = receipt["receipt_id"]
+    client.headers["Authorization"] = "Bearer reviewer"
+    decision = {
+        "decision": "APPROVED",
+        "reason": "Independent synthetic accounting review",
+        "idempotency_key": str(uuid4()),
+        "expected_head": None,
+    }
+    response = client.post(f"/v1/workspace/constructions/{rid}/decision", json=decision)
+    assert response.status_code == 200, response.text
+    objects = client.get("/v1/workspace/objects").json()
+    assert len(objects) == 4
+    assert all("account_id" in obj["canonical_references"] for obj in objects)
+    exported = client.get(f"/v1/workspace/constructions/{rid}/export").json()
+    assert exported["construction"]["receipt"] == receipt
+    # A second retained source cannot promote after its pinned account is revoked.
+    client.headers["Authorization"] = "Bearer operator"
+    second = client.post(
+        "/v1/hydration/ingest", json={**payload, "filename": "SYNTHETIC-second.csv"}
+    ).json()
+    original = next(item for item in mutations if item.resource_id == ids["001"])
+    revoke = ResourceProposal(
+        title="SYNTHETIC revoke account",
+        rationale="Verify stale dependency fails closed",
+        access_entity=scope.legal_entity_id,
+        mutations=[
+            original.model_copy(
+                update={"expected_version_id": UUID(versions["001"]), "authority_state": "REVOKED"}
+            )
+        ],
+    )
+    resources.propose(operator, revoke)
+    resources.review(
+        reviewer,
+        revoke.proposal_id,
+        ResourceReview(decision="APPROVED", rationale="Independent synthetic revocation test"),
+    )
+    client.headers["Authorization"] = "Bearer reviewer"
+    denied = client.post(
+        f"/v1/workspace/constructions/{second['receipt_id']}/decision",
+        json={**decision, "idempotency_key": str(uuid4()), "expected_head": rid},
+    )
+    assert denied.status_code == 409, denied.text
+    assert (
+        client.get(f"/v1/workspace/constructions/{rid}/export").json()["construction"]["receipt"]
+        == receipt
+    )

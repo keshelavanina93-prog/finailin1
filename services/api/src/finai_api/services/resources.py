@@ -747,11 +747,15 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
 
 
 def resolve_identity(
-    principal: Principal, resource_id: UUID, known_at: datetime | None = None
+    principal: Principal, resource_id: UUID, known_at: datetime | None = None,
+    valid_at: datetime | None = None,
 ) -> dict[str, Any]:
     chain: list[str] = []
     current = str(resource_id)
     known_at = known_at or datetime.now(UTC)
+    valid_at = valid_at or known_at
+    if known_at.tzinfo is None or valid_at.tzinfo is None:
+        raise WorkspaceError(422, "Historical timestamps must include a timezone")
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         for _ in range(64):
             node = cursor.execute(
@@ -762,12 +766,12 @@ def resolve_identity(
                     "valid_from<=%s AND (valid_to IS NULL OR valid_to>%s) ORDER "
                     "BY system_from DESC LIMIT 1"
                 ),
-                (principal.scope.tenant_id, UUID(current), known_at, known_at, known_at),
+                (principal.scope.tenant_id, UUID(current), known_at, valid_at, valid_at),
             ).fetchone()
             if not node or node["authority_state"] != "APPROVED":
                 raise WorkspaceError(404, "No accepted identity exists at the requested time")
             chain.append(current)
-            row = cursor.execute(
+            resolutions = cursor.execute(
                 (
                     "SELECT * FROM (SELECT DISTINCT ON(v.resource_id) v.* FROM "
                     "resource_versions v WHERE v.tenant_id=%s AND "
@@ -777,14 +781,20 @@ def resolve_identity(
                     "attributes->>'source_id'=%s AND attributes->>'active'='true' "
                     "AND authority_state='APPROVED'"
                 ),
-                (principal.scope.tenant_id, known_at, known_at, known_at, current),
-            ).fetchone()
+                (principal.scope.tenant_id, known_at, valid_at, valid_at, current),
+            ).fetchall()
+            if len(resolutions) > 1:
+                raise WorkspaceError(409, "Conflicting identity resolutions at the requested time")
+            row = resolutions[0] if resolutions else None
             if not row:
                 return {
                     "canonical_id": current,
                     "display_name": node["display_name"],
                     "resolution_chain": chain,
                     "known_at": known_at,
+                    "valid_at": valid_at,
+                    "version_id": str(node["version_id"]),
+                    "authority_state": node["authority_state"],
                 }
             current = row["attributes"]["target_id"]
             if current in chain:
