@@ -54,3 +54,23 @@ export interface RollbackRequest {
   rationale: string;
   valid_from: string;
 }
+
+export interface ConsumptionStatus {
+  purpose: "CONSUMPTION_ELIGIBILITY_EXPLANATION";
+  consumption_id: string;
+  proof_hash: string;
+  current_use_authorized: false;
+  status: "BLOCKED" | "RECHECK_REQUIRED";
+  legacy_proof_requires_recheck: boolean;
+  checked_at: string;
+  checks: Array<{
+    subject: VersionReference;
+    role: "CONSUMER" | "INPUT" | "UPSTREAM";
+    retained_event_id: string | null;
+    current_event_id: string | null;
+    authority_state: AuthorityState | null;
+    availability_state: LifecycleRequest["availability_state"] | null;
+    event_changed: boolean;
+    blocker: "AUTHORITY_WITHDRAWN" | "AVAILABILITY_WITHDRAWN" | "MINIMUM_AUTHORITY_NOT_MET" | "VERSION_NOT_CURRENT_OR_ACCESSIBLE" | null;
+  }>;
+}

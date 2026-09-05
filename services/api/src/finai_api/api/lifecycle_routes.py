@@ -47,3 +47,8 @@ def consume(principal: User, request: ConsumptionRequest) -> dict[str, Any]:
 @router.get("/consumptions/{consumption_id}")
 def consumption_receipt(principal: User, consumption_id: UUID) -> dict[str, Any]:
     return lifecycle.consumption_receipt(principal, consumption_id)
+
+
+@router.get("/consumptions/{consumption_id}/status")
+def consumption_status(principal: User, consumption_id: UUID) -> dict[str, Any]:
+    return lifecycle.consumption_status(principal, consumption_id)

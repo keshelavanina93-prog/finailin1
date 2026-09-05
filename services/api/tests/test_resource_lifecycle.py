@@ -147,6 +147,10 @@ def test_reviewed_authority_current_guard_and_retained_history():
     assert retained["proof_hash"] == result["proof_hash"]
     assert retained["current_use_authorized"] is False
     assert len(result["upstream_authority"]) == 2
+    current_check = lifecycle.consumption_status(p, request.request_id)
+    assert current_check["status"] == "RECHECK_REQUIRED"
+    assert current_check["current_use_authorized"] is False
+    assert not any(item["blocker"] for item in current_check["checks"])
     with resources.resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as cursor:
         with pytest.raises(psycopg.Error), conn.transaction():
             cursor.execute(
@@ -215,6 +219,13 @@ def test_reviewed_authority_current_guard_and_retained_history():
         ancestor_event = lifecycle.history(p, ancestor_ref)["events"][-1]["event_id"]
     with pytest.raises(WorkspaceError, match="Upstream dependency authority"):
         lifecycle.consume(p, request)
+    withdrawal_check = lifecycle.consumption_status(p, UUID(result["consumption_id"]))
+    assert withdrawal_check["status"] == "BLOCKED"
+    assert any(
+        item["subject"]["resource_id"] == str(semantic.resource_id)
+        and item["blocker"] == "AUTHORITY_WITHDRAWN"
+        for item in withdrawal_check["checks"]
+    )
     advance("REVOKED")
     assert lifecycle.consumption_receipt(p, UUID(result["consumption_id"])) == retained
     with pytest.raises(WorkspaceError, match="required authority and availability"):
@@ -258,3 +269,5 @@ def test_reviewed_authority_current_guard_and_retained_history():
         lifecycle.consume(other, request)
     with pytest.raises(WorkspaceError, match="authorized context"):
         lifecycle.consumption_receipt(other, UUID(result["consumption_id"]))
+    with pytest.raises(WorkspaceError, match="authorized context"):
+        lifecycle.consumption_status(other, UUID(result["consumption_id"]))

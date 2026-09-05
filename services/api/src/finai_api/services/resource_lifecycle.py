@@ -341,3 +341,75 @@ def consumption_receipt(p: Principal, consumption_id: UUID) -> dict[str, Any]:
             "recorded_at": row["recorded_at"],
             "actor_id": row["actor_id"],
         }
+
+
+def consumption_status(p: Principal, consumption_id: UUID) -> dict[str, Any]:
+    retained = consumption_receipt(p, consumption_id)
+    proof = retained["proof"]
+    checks = []
+    references = {
+        item["version_id"]: {**item, "role": "UPSTREAM"}
+        for item in proof.get("upstream_authority", [])
+    }
+    for item in proof["inputs"]:
+        references[item["subject"]["version_id"]] = {
+            **item["subject"],
+            "event_id": item["event_id"],
+            "role": "INPUT",
+        }
+    references[proof["consumer"]["version_id"]] = {
+        **proof["consumer"],
+        "event_id": proof.get("consumer_event_id"),
+        "role": "CONSUMER",
+    }
+    with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
+        _lock(conn, p)
+        for item in references.values():
+            ref = VersionReference(resource_id=item["resource_id"], version_id=item["version_id"])
+            reason = None
+            current_event = None
+            state = None
+            availability = None
+            try:
+                _version(c, p, ref)
+                current_event = _latest(c, p, ref.version_id)
+                if current_event:
+                    state = current_event["payload"]["target_state"]
+                    availability = current_event["payload"]["availability_state"]
+                if state in ("REVOKED", "SUPERSEDED"):
+                    reason = "AUTHORITY_WITHDRAWN"
+                elif item["role"] != "CONSUMER" and current_event and availability != "AVAILABLE":
+                    reason = "AVAILABILITY_WITHDRAWN"
+                elif item["role"] == "INPUT" and (
+                    state not in ORDER or ORDER.index(state) < ORDER.index(proof["minimum_state"])
+                ):
+                    reason = "MINIMUM_AUTHORITY_NOT_MET"
+            except WorkspaceError as exc:
+                if exc.status not in (404, 409):
+                    raise
+                reason = "VERSION_NOT_CURRENT_OR_ACCESSIBLE"
+            current_id = str(current_event["event_id"]) if current_event else None
+            checks.append(
+                {
+                    "subject": ref.model_dump(mode="json"),
+                    "role": item["role"],
+                    "retained_event_id": item.get("event_id"),
+                    "current_event_id": current_id,
+                    "authority_state": state,
+                    "availability_state": availability,
+                    "event_changed": current_id != item.get("event_id"),
+                    "blocker": reason,
+                }
+            )
+    legacy = proof.get("contract_version") != "guarded-consumption/2"
+    blocked = legacy or any(item["blocker"] for item in checks)
+    return {
+        "purpose": "CONSUMPTION_ELIGIBILITY_EXPLANATION",
+        "consumption_id": str(consumption_id),
+        "current_use_authorized": False,
+        "proof_hash": retained["proof_hash"],
+        "status": "BLOCKED" if blocked else "RECHECK_REQUIRED",
+        "legacy_proof_requires_recheck": legacy,
+        "checks": checks,
+        "checked_at": datetime.now(UTC).isoformat(),
+    }

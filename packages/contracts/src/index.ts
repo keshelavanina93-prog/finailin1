@@ -6,7 +6,7 @@ export const epistemicStates = [
 ] as const;
 
 export type { PromotionCheck, SchemaField, CanonicalResource, ResourceMutation, ResourceProposal, ResourceProposalDetail, ProposalSummary, CanonicalDetail, HistoricalGraph } from "./ontology.js";
-export type { AuthorityState, VersionReference, LifecycleRequest, LifecycleReview, ConsumptionRequest, GuardedConsumption, RollbackRequest } from "./lifecycle.js";
+export type { AuthorityState, VersionReference, LifecycleRequest, LifecycleReview, ConsumptionRequest, GuardedConsumption, ConsumptionStatus, RollbackRequest } from "./lifecycle.js";
 
 export interface IngestRequest {
   scope: ExactScope;
