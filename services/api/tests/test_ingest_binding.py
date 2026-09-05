@@ -1,4 +1,6 @@
+import json
 from contextlib import contextmanager
+from hashlib import sha256
 from typing import Any
 from uuid import uuid4
 
@@ -143,6 +145,32 @@ def test_version_choices_change_receipt_identity(registry: dict[str, Any]) -> No
         update={"account_version_ids": {**request.account_version_ids, "001": uuid4()}}
     )
     assert compile_source(request).receipt_id != compile_source(changed).receipt_id
+
+
+def test_legacy_request_hash_and_alias_pin_identity(registry: dict[str, Any]) -> None:
+    request = registry["request"]
+    legacy = {
+        "scope": request.scope.model_dump(mode="json"),
+        "filename": request.filename,
+        "csv_text": request.csv_text,
+        "requested_objects": [],
+        "context_version_id": str(request.context_version_id),
+        "account_version_ids": {
+            key: str(value) for key, value in request.account_version_ids.items()
+        },
+    }
+    assert request.model_dump(mode="json") == legacy
+    assert canonical_sha256(request) == sha256(
+        json.dumps(legacy, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    aliased = request.model_copy(
+        update={
+            "source_system": "ERP",
+            "account_alias_version_ids": {"001": uuid4()},
+        }
+    )
+    assert compile_source(aliased).receipt_id != compile_source(request).receipt_id
+    assert "csv_text" not in aliased.model_dump(mode="json", exclude={"csv_text"})
 
 
 def test_source_only_is_explicit_and_cannot_attach_account_maps(registry: dict[str, Any]) -> None:

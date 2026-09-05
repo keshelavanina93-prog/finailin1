@@ -133,7 +133,7 @@ def bind_receipt(
     existing_connection: psycopg.Connection[Any] | None = None,
 ) -> IngestReceipt:
     if request.context_version_id is None:
-        if request.account_version_ids:
+        if request.account_version_ids or request.account_alias_version_ids:
             raise WorkspaceError(422, "Account version mappings require a canonical context")
         return receipt
     manager = (
@@ -156,16 +156,41 @@ def bind_receipt(
             )
         if len(set(request.account_version_ids.values())) != len(request.account_version_ids):
             raise WorkspaceError(422, "Source accounts require distinct canonical account versions")
+        if set(request.account_alias_version_ids) - accounts:
+            raise WorkspaceError(
+                422, "Alias mappings must correspond to recognized source accounts"
+            )
+        if request.account_alias_version_ids and not request.source_system:
+            raise WorkspaceError(422, "Pinned source aliases require an explicit source system")
         resolved: dict[str, CanonicalReference] = {}
+        alias_references: dict[str, CanonicalReference] = {}
         for code, version_id in request.account_version_ids.items():
             account = _accepted_version(conn, principal, version_id, "LocalAccount")
-            if (
-                account["attributes"]["chart_id"] != str(chart["resource_id"])
-                or account["attributes"]["account_code"] != code
-            ):
+            if account["attributes"]["chart_id"] != str(chart["resource_id"]):
                 raise WorkspaceError(
                     422,
-                    "Account version must match the exact source code and canonical ledger chart",
+                    "Account version must match the canonical ledger chart",
+                )
+            alias_version = request.account_alias_version_ids.get(code)
+            if alias_version is not None:
+                alias = _accepted_version(conn, principal, alias_version, "Alias")
+                if (
+                    alias["attributes"]["source_system"] != request.source_system
+                    or alias["attributes"]["external_id"] != code
+                ):
+                    raise WorkspaceError(
+                        422, "Alias does not match the exact source system and code"
+                    )
+                target = _dependency(conn, principal, alias, "target_id", "LocalAccount")
+                if target["version_id"] != version_id:
+                    raise WorkspaceError(
+                        409, "Alias target differs from the pinned account version"
+                    )
+                alias_references[code] = _reference(alias)
+            elif account["attributes"]["account_code"] != code:
+                raise WorkspaceError(
+                    422,
+                    "Account version must match the exact source code or a reviewed source alias",
                 )
             account_chart = _dependency(
                 conn, principal, account, "chart_id", "LocalChartOfAccounts"
@@ -194,6 +219,12 @@ def bind_receipt(
                         **(
                             {"account_id": resolved[candidate.values["account_code"]]}
                             if candidate.object_type in ("Account", "PeriodBalance")
+                            else {}
+                        ),
+                        **(
+                            {"account_alias_id": alias_references[candidate.values["account_code"]]}
+                            if candidate.object_type in ("Account", "PeriodBalance")
+                            and candidate.values["account_code"] in alias_references
                             else {}
                         ),
                     }

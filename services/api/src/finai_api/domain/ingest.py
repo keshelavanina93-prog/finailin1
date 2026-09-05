@@ -1,7 +1,7 @@
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SerializerFunctionWrapHandler, model_serializer
 
 from finai_api.domain.authority import ExactScope
 
@@ -15,6 +15,17 @@ class IngestRequest(BaseModel):
     requested_objects: tuple[str, ...] = ()
     context_version_id: UUID | None = None
     account_version_ids: dict[str, UUID] = Field(default_factory=dict, max_length=10000)
+    source_system: str | None = Field(default=None, min_length=1, max_length=128)
+    account_alias_version_ids: dict[str, UUID] = Field(default_factory=dict, max_length=10000)
+
+    @model_serializer(mode="wrap")
+    def serialize_request(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        result: dict[str, Any] = handler(self)
+        if self.source_system is None:
+            result.pop("source_system", None)
+        if not self.account_alias_version_ids:
+            result.pop("account_alias_version_ids", None)
+        return result
 
 
 class CanonicalReference(BaseModel):
