@@ -16,15 +16,20 @@ def socar_reference(principal: Principal) -> ResourceProposal:
             "SOCAR Georgia — reference model",
             {"code": "SOCAR-REFERENCE"},
         ),
-        ("petroleum", "BusinessDomain", "Petroleum domain", {"code": "PETROLEUM"}),
-        ("gas", "BusinessDomain", "Gas domain", {"code": "GAS"}),
+        ("petroleum", "BusinessDomain", "Petroleum industry classification", {"code": "PETROLEUM"}),
+        ("gas", "BusinessDomain", "Gas industry classification", {"code": "GAS"}),
         (
             "petroleum-entity",
             "LegalEntity",
-            "Petroleum legal entity — placeholder",
+            "SOCAR Georgia Petroleum — company reference",
             {"jurisdiction": "GE"},
         ),
-        ("gas-entity", "LegalEntity", "Gas legal entity — placeholder", {"jurisdiction": "GE"}),
+        (
+            "gas-entity",
+            "LegalEntity",
+            "SOCAR Georgia Gas — company reference",
+            {"jurisdiction": "GE"},
+        ),
         (
             "retail-unit",
             "BusinessUnit",
@@ -36,6 +41,12 @@ def socar_reference(principal: Principal) -> ResourceProposal:
             "LicensedOperator",
             "Gas licensed operator — placeholder",
             {"licence_reference": "UNVERIFIED-REFERENCE"},
+        ),
+        (
+            "licence",
+            "Licence",
+            "Gas distribution licence — unverified reference",
+            {"identifier": "UNVERIFIED-REFERENCE", "jurisdiction": "GE"},
         ),
         (
             "consolidation",
@@ -52,7 +63,7 @@ def socar_reference(principal: Principal) -> ResourceProposal:
         (
             "petroleum-pack",
             "DomainPack",
-            "Petroleum domain semantics",
+            "Petroleum industry classification semantics",
             {"code": "PETROLEUM", "version": "planned/1"},
         ),
         (
@@ -62,6 +73,9 @@ def socar_reference(principal: Principal) -> ResourceProposal:
             {"code": "GEORGIAN_GAS", "version": "planned/1"},
         ),
     ]
+    specs.sort(
+        key=lambda item: {"holding": 0, "petroleum-entity": 1, "gas-entity": 2}.get(item[0], 3)
+    )
     ids = {key: canonical_id(tenant, kind, f"reference:socar:{key}") for key, kind, _, _ in specs}
     mutations = [
         ResourceMutation(
@@ -76,19 +90,18 @@ def socar_reference(principal: Principal) -> ResourceProposal:
         for key, kind, name, attributes in specs
     ]
     links = [
-        ("holding", "HAS_BUSINESS_DOMAIN", "petroleum"),
-        ("holding", "HAS_BUSINESS_DOMAIN", "gas"),
         ("holding", "HAS_LEGAL_ENTITY", "petroleum-entity"),
         ("holding", "HAS_LEGAL_ENTITY", "gas-entity"),
         ("petroleum", "OPERATED_BY", "petroleum-entity"),
         ("gas", "OPERATED_BY", "gas-entity"),
-        ("gas", "OPERATED_BY", "licensed-operator"),
+        ("gas-entity", "HAS_OPERATOR", "licensed-operator"),
         ("petroleum-entity", "HAS_BUSINESS_UNIT", "retail-unit"),
         ("petroleum-entity", "PARTICIPATES_IN", "consolidation"),
         ("gas-entity", "PARTICIPATES_IN", "consolidation"),
         ("licensed-operator", "OPERATES", "network"),
-        ("petroleum", "USES_DOMAIN_PACK", "petroleum-pack"),
-        ("gas", "USES_DOMAIN_PACK", "gas-pack"),
+        ("licensed-operator", "HOLDS_LICENSE", "licence"),
+        ("petroleum-entity", "USES_DOMAIN_PACK", "petroleum-pack"),
+        ("gas-entity", "USES_DOMAIN_PACK", "gas-pack"),
     ]
     for source, relation, target in links:
         key = f"reference:socar:{source}:{relation}:{target}"
@@ -108,7 +121,7 @@ def socar_reference(principal: Principal) -> ResourceProposal:
             )
         )
     return ResourceProposal(
-        title="SOCAR multi-domain reference model",
+        title="SOCAR company-first reference model",
         rationale=(
             "Hypothetical structural reference only. Legal entities, "
             "operators, licence and membership facts require authentic "
