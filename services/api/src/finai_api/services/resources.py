@@ -180,6 +180,9 @@ def _check_scalar(kind: str, value: Any) -> bool:
 def _validate(
     conn: psycopg.Connection[Any], principal: Principal, proposal: ResourceProposal
 ) -> dict[str, Any]:
+    from finai_api.services.resource_rollback import validate_restoration
+
+    validate_restoration(conn, principal, proposal)
     tenant = principal.scope.tenant_id
     if (
         proposal.access_entity != principal.scope.legal_entity_id

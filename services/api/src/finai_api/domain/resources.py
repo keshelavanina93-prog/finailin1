@@ -55,6 +55,14 @@ class ResourceProposal(BaseModel):
     rationale: str = Field(min_length=10, max_length=2000)
     access_entity: str = Field(min_length=1, max_length=128)
     mutations: list[ResourceMutation] = Field(min_length=1, max_length=100)
+    restores_versions: dict[UUID, UUID] = Field(default_factory=dict, max_length=100)
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_proposal(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        if not self.restores_versions:
+            payload.pop("restores_versions", None)
+        return payload
 
     @model_validator(mode="after")
     def unique_mutations(self) -> "ResourceProposal":

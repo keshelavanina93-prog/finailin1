@@ -19,6 +19,7 @@ from finai_api.services.enterprise_reference import socar_reference
 from finai_api.services.historical_graph import historical_graph
 from finai_api.services.ingest_binding import context_accounts
 from finai_api.services.ingestion import SourceAuthorityDenied, compile_source
+from finai_api.services.resource_rollback import RollbackRequest, rollback_draft
 from finai_api.services.workspace import WorkspaceError
 
 router = APIRouter(prefix="/v1/ontology", tags=["shared ontology and identity"])
@@ -30,6 +31,12 @@ def reader(principal: Annotated[Principal, Depends(authenticated_principal)]) ->
 
 
 User = Annotated[Principal, Depends(reader)]
+
+
+@router.post("/rollback-proposal", response_model=ResourceProposal)
+def rollback_proposal(principal: User, request: RollbackRequest) -> ResourceProposal:
+    require_permission(principal, "ontology_propose")
+    return rollback_draft(principal, request)
 
 
 @router.post("/reference-proposal", response_model=ProposalDetail)

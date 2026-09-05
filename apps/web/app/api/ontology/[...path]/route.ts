@@ -4,7 +4,7 @@ type Context = { params: Promise<{ path: string[] }> };
 async function forward(request: NextRequest, context: Context) {
   const { path } = await context.params;
   const route = path.join("/");
-  if (!/^(catalog|context(?:\/(?:accounts|source-accounts))?|graph|aliases|reference-proposal|resources(?:\/[a-fA-F0-9-]+(?:\/graph)?)?|resolve\/[a-fA-F0-9-]+|proposals(?:\/[a-fA-F0-9-]+(?:\/decision)?)?)$/.test(route)) {
+  if (!/^(catalog|context(?:\/(?:accounts|source-accounts))?|graph|aliases|reference-proposal|rollback-proposal|resources(?:\/[a-fA-F0-9-]+(?:\/graph)?)?|resolve\/[a-fA-F0-9-]+|proposals(?:\/[a-fA-F0-9-]+(?:\/decision)?)?)$/.test(route)) {
     return Response.json({ detail: "Ontology route not found" }, { status: 404 });
   }
   const authorization = request.headers.get("authorization");

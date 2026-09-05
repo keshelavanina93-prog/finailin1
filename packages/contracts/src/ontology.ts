@@ -17,6 +17,7 @@ export interface ResourceMutation {
   evidence_class?: string;
 }
 export interface ResourceProposal {
+  restores_versions?: Record<string, string>;
   proposal_id: string; title: string; rationale: string; access_entity: string; mutations: ResourceMutation[];
 }
 export interface ResourceProposalDetail {
