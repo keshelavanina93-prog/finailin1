@@ -202,6 +202,8 @@ export interface ConstructionReceipt {
 }
 
 export interface SourcePreview {
+  profile:Array<{column_index:number;empty_cells:number;missing_cells:number;distinct_nonempty_values:number}>;
+  extra_width_rows:number;profile_scope:"ENTIRE_SOURCE";
   columns: string[]; rows: Array<{source_row:number;values:string[];width_matches_header:boolean}>;
   total_rows:number; matching_rows:number; offset:number; page_size:number; has_more:boolean;
   sha256:string; byte_length:number; integrity:"VERIFIED"; value_semantics:"SOURCE_TEXT";

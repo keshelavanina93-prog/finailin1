@@ -62,3 +62,17 @@ def test_preview_requires_source_permission_and_uses_scoped_integrity_reader(
 
     monkeypatch.setattr(workspace_routes.workspace, "source_bytes", unavailable)
     assert client.get(path).status_code == 404
+
+
+def test_column_profile_is_whole_source_and_preserves_text_distinctions() -> None:
+    result = preview(b"id,name\n001,\n1,A\n001\n2,B,extra\n", search="extra")
+    assert result["matching_rows"] == 1
+    assert result["total_rows"] == 4
+    assert result["profile_scope"] == "ENTIRE_SOURCE"
+    assert result["extra_width_rows"] == 1
+    assert result["profile"] == [
+        {"column_index": 0, "empty_cells": 0, "missing_cells": 0,
+         "distinct_nonempty_values": 3},
+        {"column_index": 1, "empty_cells": 1, "missing_cells": 1,
+         "distinct_nonempty_values": 2},
+    ]
