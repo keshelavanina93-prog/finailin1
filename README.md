@@ -56,7 +56,7 @@ From PowerShell on `D:`:
 D:
 mkdir D:\FinAI -Force
 cd D:\FinAI
-git clone https://github.com/Nina932/finailinear1.git
+git clone https://github.com/keshelavanina93-prog/finailin1.git finailinear1
 cd .\finailinear1
 .\scripts\bootstrap-local.ps1
 ```
