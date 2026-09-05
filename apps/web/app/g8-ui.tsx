@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { ArrowRight, WarningCircle, CheckCircle, Clock } from "@phosphor-icons/react";
 
 export function Brand({ compact = false }: { compact?: boolean }) {
-  return <div className="g8-brand"><Image src="/brand/nyx-core.jpg" alt="NYX Core — supplied brand mark" width={44} height={44} priority /><div><strong>G8</strong>{!compact && <span>by NYXCore</span>}</div></div>;
+  return <div className="g8-brand"><Image src="/brand/nyx-core-transparent.png" alt="NYX Core" width={44} height={44} priority /><div><strong>G8</strong>{!compact && <span>by NYXCore</span>}</div></div>;
 }
 export function Panel({ title, aside, children, className = "" }: { title: string; aside?: ReactNode; children: ReactNode; className?: string }) {
   return <section className={`g8-panel ${className}`}><header><h2>{title}</h2>{aside}</header>{children}</section>;

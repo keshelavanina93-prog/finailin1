@@ -344,3 +344,18 @@ button.g8-signal:hover {background:#132936;}
 @media(max-width:760px){.g8-executive-overview,.g8-home-bottom{grid-template-columns:1fr}.g8-company-hero{min-height:175px}.g8-company-hero>div:first-child{max-width:100%}.g8-company-hero h1{font-size:25px}.g8-hero-status{display:none}.g8-financial-metrics>div{padding:9px 6px}.g8-financial-metrics span{font-size:9px}.g8-finance-context{flex-wrap:wrap}}
 .g8-sidebar nav{gap:4px}.g8-sidebar nav button{min-height:43px;padding:10px 14px}.g8-sidebar nav button:disabled{opacity:1;color:#708c9c;cursor:not-allowed}.g8-sidebar nav button:disabled svg{opacity:.7}.g8-sidebar .g8-brand img{display:none}.g8-sidebar .g8-brand{padding-left:14px}.g8-sidebar .g8-brand strong{font-size:33px}.g8-sidebar .g8-brand span{font-size:12px}.nav-folded .g8-sidebar .g8-brand{padding-left:0}.nav-folded .g8-sidebar .g8-brand img{display:block}.g8-nav-bottom{padding-top:25px}.g8-tagline{margin-bottom:19px}.g8-sidebar{overflow-y:auto}.fold-navigation{top:49px}
 @media(max-width:760px){.g8-sidebar .g8-brand img{display:none}.g8-sidebar .g8-brand>div{display:flex}}
+
+/* Return to the spacious original entry layout, with integrated supplied-brand artwork. */
+.g8-login{grid-template-columns:minmax(0,1.35fr) minmax(340px,1fr);gap:6vw;padding:7vh 7vw;align-items:center;background:radial-gradient(ellipse at 12% 25%,#102f35 0%,#071119 57%);}
+.g8-login-story{min-width:0;padding:0;border:0;background:none;gap:30px;justify-content:center;}
+.g8-login-story .g8-brand{gap:14px;}.g8-login-story .g8-brand img{width:66px;height:66px;border-radius:0;}.g8-login-story .g8-brand strong{font-size:36px;}
+.g8-login-story>div:nth-child(2){margin:12px 0 0;}.g8-login-story h1{font-size:clamp(32px,3.55vw,56px);line-height:1.12;letter-spacing:-1.8px;max-width:720px;margin:18px 0 24px;}
+.g8-login-story .overline{color:#70cfc3;letter-spacing:2px;}.g8-login-story p{font-size:15px;line-height:1.75;max-width:530px;}
+.g8-login .g8-brand-banner{display:block;width:100%;max-width:none;height:auto;border-radius:0;mix-blend-mode:screen;mask-image:linear-gradient(to right,transparent,#000 12%,#000 88%,transparent);}
+.g8-principles{gap:20px;padding-top:22px;border-top:1px solid #26424b;margin-top:30px;}.g8-principles>span{border:0;padding:0;}.g8-principles small{color:#829fae;}
+.g8-login-form{padding:0;}.g8-login-form form{padding:36px;gap:20px;background:linear-gradient(145deg,#12232bee,#0b1820f5);border:1px solid #2b4650;border-radius:12px;box-shadow:0 26px 80px #0005;}
+.g8-login-form form>svg{margin:0;color:#64d5c5;}.g8-login-form input{background:#08141c;border-color:#2c4652;border-radius:5px;}.g8-login-form button{border-radius:5px;}.g8-login-form button:hover:not(:disabled){background:#69dbc8;}.g8-login-form h2{font-size:27px;}
+.g8-analyst>header>img,.nyx-toggle img,.g8-brand img{object-fit:contain;background:transparent;}
+@media(max-width:900px){.g8-login{padding:5vh 5vw;gap:5vw;grid-template-columns:minmax(0,1fr) minmax(300px,.9fr)}.g8-login-form form{padding:26px}.g8-principles{flex-wrap:wrap}.g8-login-story h1{font-size:36px}}
+@media(max-width:760px){.g8-login{grid-template-columns:1fr;padding:28px 22px;gap:26px}.g8-login-story{gap:16px}.g8-login-story .g8-brand img{width:48px;height:48px}.g8-login-story h1{font-size:32px;letter-spacing:-1px;margin:12px 0}.g8-login-story>div:nth-child(2){margin:0}.g8-login-story p{font-size:13px}.g8-login .g8-brand-banner{max-height:150px;object-fit:contain}.g8-principles{display:none}.g8-login-form form{max-width:none;padding:24px}.g8-login-form h2{font-size:24px}}
+.g8-login .g8-brand-banner{mask-image:radial-gradient(ellipse 75% 85% at 60% 50%,#000 28%,transparent 72%);}
