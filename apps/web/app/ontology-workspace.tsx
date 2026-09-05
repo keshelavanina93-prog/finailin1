@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import type { CanonicalDetail, CanonicalResource, Principal, ProposalSummary, ResourceMutation, ResourceProposalDetail, SchemaField } from "@finai/contracts";
 import PromotionReadiness from "./promotion-readiness";
 import IdentityHistory from "./identity-history";
+import ObjectSets from "./object-sets";
 import ProposalImpact, { SchemaChangeDetails } from "./proposal-impact";
 
 const metadata = new Set(["SchemaDefinition", "SemanticContract", "LinkType"]);
@@ -15,7 +16,7 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
   const [catalog, setCatalog] = useState<CanonicalResource[]>([]);
   const [nodes, setNodes] = useState<CanonicalResource[]>([]);
   const [queue, setQueue] = useState<ProposalSummary[]>([]);
-  const [tab, setTab] = useState<"graph" | "resources" | "review" | "registry">("graph");
+  const [tab, setTab] = useState<"graph" | "resources" | "review" | "registry" | "object_sets">("graph");
   const [detail, setDetail] = useState<CanonicalDetail | null>(null);
   const [proposal, setProposal] = useState<ResourceProposalDetail | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -124,10 +125,11 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
 
   return <section className="ontology-workspace">
     <div className="section-heading"><div><p className="overline">SHARED ENTERPRISE RESOURCES</p><h1>Enterprise & ontology</h1><p className="muted">Explore typed relationships, govern identity and review changes to shared business meaning.</p></div><button className="quiet" disabled={busy} onClick={() => setRevision(value => value + 1)}>Refresh</button></div>
-    <div className="ontology-tabs">{(["graph", "resources", "review", "registry"] as const).map(id => <button className={tab === id ? "active" : "quiet"} key={id} onClick={() => { setTab(id); setKind(""); }}>{id === "graph" ? "Enterprise graph" : id === "review" ? `Change review (${queue.filter(row => row.decision === "PENDING").length})` : label(id)}</button>)}</div>
+    <div className="ontology-tabs">{(["graph", "object_sets", "resources", "review", "registry"] as const).map(id => <button className={tab === id ? "active" : "quiet"} key={id} onClick={() => { setTab(id); setKind(""); }}>{id === "graph" ? "Enterprise graph" : id === "review" ? `Change review (${queue.filter(row => row.decision === "PENDING").length})` : label(id)}</button>)}</div>
     {error && <p className="error-banner" role="alert">{error}</p>}{notice && <p className="success-banner" role="status">{notice}</p>}
     {bounded && <p className="error-banner">This graph is limited to 1,000 visible resources. It is not a complete enterprise inventory.</p>}
     <div className="ontology-layout"><div>
+      {tab === "object_sets" && <ObjectSets token={token} catalog={catalog} />}
       {tab === "graph" && <section className="data-panel"><div className="toolbar"><div><h2>Enterprise relationships</h2><p className="muted">Legal ownership, operating domains and participation remain distinct.</p></div>{admin && canPropose && <button className="quiet" disabled={busy} onClick={() => void referenceProposal()}>Propose SOCAR reference graph</button>}</div>
         {!graphNodes.length ? <div className="empty-state"><h3>No accepted enterprise resources</h3><p>Create resources and typed relationships, then approve them with an independent reviewer. The SOCAR template is explicitly hypothetical reference data.</p></div> : <div className="enterprise-graph"><svg role="img" aria-label="Accepted enterprise relationship graph" viewBox={`0 0 840 ${Math.max(300, Math.ceil(graphNodes.length / 3) * 150)}`}>
           <defs><marker id="relation-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="#49757a" /></marker></defs>
