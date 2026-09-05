@@ -114,6 +114,14 @@ def approval_blockers(
     receipt: IngestReceipt, submitted_by: str | None, principal: Principal
 ) -> tuple[str, ...]:
     blockers: list[str] = []
+    if not receipt.context_version_id and any(
+        candidate.object_type == "PeriodBalance"
+        and any(key.startswith("dimension:") for key in candidate.values)
+        for candidate in receipt.candidates
+    ):
+        blockers.append(
+            "Analytical balances require canonical context and reviewed dimension rules."
+        )
     if "review" not in principal.permissions:
         blockers.append("This identity has no review permission.")
     if not submitted_by:

@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 from typing import Any
 
 import psycopg
@@ -73,24 +74,26 @@ def detail(principal: Principal, receipt_id: str) -> ReceiptDetail:
         )
 
         def indexed(value: IngestReceipt | None) -> dict[str, dict[str, Any]]:
-            return (
-                {
-                    (
-                        f"{item.object_type}:"
-                        f"{item.values.get('source_sheet', '')}:"
-                        f"{item.values.get('account_code', str(item.source_row))}"
-                    ): {
-                        "values": item.values,
-                        "canonical_references": {
-                            key: ref.model_dump(mode="json")
-                            for key, ref in item.canonical_references.items()
-                        },
-                    }
-                    for item in value.candidates
+            result: dict[str, dict[str, Any]] = {}
+            occurrences: dict[str, int] = {}
+            for item in value.candidates if value else ():
+                grain = {
+                    key: data for key, data in item.values.items() if key.startswith("dimension:")
                 }
-                if value
-                else {}
-            )
+                base = (
+                    f"{item.object_type}:{item.values.get('source_sheet', '')}:"
+                    f"{item.values.get('account_code', str(item.source_row))}:"
+                    f"{json.dumps(grain, sort_keys=True, ensure_ascii=False)}"
+                )
+                occurrences[base] = occurrences.get(base, 0) + 1
+                result[f"{base}:{occurrences[base]}"] = {
+                    "values": item.values,
+                    "canonical_references": {
+                        key: ref.model_dump(mode="json")
+                        for key, ref in item.canonical_references.items()
+                    },
+                }
+            return result
 
         before, after = indexed(previous), indexed(receipt)
         shared = before.keys() & after.keys()

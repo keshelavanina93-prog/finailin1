@@ -101,6 +101,8 @@ def context_accounts(
     context_version_id: UUID,
     offset: int = 0,
 ) -> dict[str, Any]:
+    from finai_api.services.account_dimensions import choices
+
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         _, chart = _context(conn, principal, context_version_id)
         rows = cursor.execute(
@@ -117,6 +119,7 @@ def context_accounts(
                     "version_id": str(row["version_id"]),
                     "display_name": row["display_name"],
                     "account_code": row["attributes"]["account_code"],
+                    "dimension_rules": choices(conn, principal, row),
                 }
                 for row in rows[:100]
             ],
@@ -133,7 +136,12 @@ def bind_receipt(
     existing_connection: psycopg.Connection[Any] | None = None,
 ) -> IngestReceipt:
     if request.context_version_id is None:
-        if request.account_version_ids or request.account_alias_version_ids:
+        if (
+            request.account_version_ids
+            or request.account_alias_version_ids
+            or request.account_dimension_rule_version_ids
+            or request.dimension_member_version_ids
+        ):
             raise WorkspaceError(422, "Account version mappings require a canonical context")
         return receipt
     manager = (
@@ -163,6 +171,7 @@ def bind_receipt(
         if request.account_alias_version_ids and not request.source_system:
             raise WorkspaceError(422, "Pinned source aliases require an explicit source system")
         resolved: dict[str, CanonicalReference] = {}
+        account_nodes: dict[str, dict[str, Any]] = {}
         alias_references: dict[str, CanonicalReference] = {}
         for code, version_id in request.account_version_ids.items():
             account = _accepted_version(conn, principal, version_id, "LocalAccount")
@@ -211,6 +220,7 @@ def bind_receipt(
                     409, "Account identity was redirected; review its canonical binding"
                 )
             resolved[code] = _reference(account)
+            account_nodes[code] = account
         candidates = tuple(
             candidate.model_copy(
                 update={
@@ -232,7 +242,7 @@ def bind_receipt(
             )
             for candidate in receipt.candidates
         )
-        return receipt.model_copy(
+        bound = receipt.model_copy(
             update={
                 "context_version_id": request.context_version_id,
                 "canonical_references": references,
@@ -242,3 +252,6 @@ def bind_receipt(
                 else "SOURCE_ONLY",
             }
         )
+        from finai_api.services.account_dimensions import bind_dimensions
+
+        return bind_dimensions(conn, principal, request, bound, account_nodes)

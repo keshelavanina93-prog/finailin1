@@ -367,6 +367,20 @@ def _validate(
                 or not item.attributes["code"].isupper()
             ):
                 raise WorkspaceError(422, "Currency code must contain three uppercase letters")
+            if item.object_type == "AccountDimensionRule":
+                account = target(item.attributes["account_id"], identifier, "DIMENSION_ACCOUNT")
+                if account["access_entity"] != access_entity:
+                    raise WorkspaceError(
+                        422, "Dimension rules must share their account access boundary"
+                    )
+                expected_key = (
+                    f"account-dimension:{item.attributes['account_id']}:"
+                    f"{item.attributes['dimension_id']}"
+                )
+                if item.identity_key != expected_key:
+                    raise WorkspaceError(
+                        422, "Dimension rule key must identify its account and dimension"
+                    )
             if item.object_type == "Ledger":
                 chart = target(item.attributes["chart_id"], identifier, "LEDGER_CHART")
                 if chart["attributes"]["legal_entity_id"] != item.attributes["legal_entity_id"]:
@@ -960,7 +974,7 @@ def context_binding(principal: Principal) -> dict[str, Any]:
             (
                 "SELECT target_resource_id,target_version_id,relation FROM "
                 "resource_dependencies WHERE tenant_id=%s AND version_id=%s "
-                "AND relation LIKE 'FIELD:%'"
+                "AND relation LIKE 'FIELD:%%'"
             ),
             (principal.scope.tenant_id, row["version_id"]),
         ).fetchall()

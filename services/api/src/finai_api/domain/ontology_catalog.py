@@ -71,6 +71,11 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
     "GroupAccount": {"account_code": "AccountCode"},
     "DimensionDefinition": {"code": "Identifier"},
     "DimensionMember": {"dimension_id": "@DimensionDefinition", "code": "Identifier"},
+    "AccountDimensionRule": {
+        "account_id": "@LocalAccount",
+        "dimension_id": "@DimensionDefinition",
+        "required": "Flag",
+    },
     "Party": {"registration_code?": "Identifier"},
     "Customer": {"party_id": "@Party"},
     "Supplier": {"party_id": "@Party"},

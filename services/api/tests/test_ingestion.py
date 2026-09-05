@@ -35,6 +35,19 @@ def test_unfamiliar_source_preserves_observations_without_inventing_semantics() 
     assert receipt.functions_executed == ()
 
 
+def test_analytical_rows_preserve_grain_and_reject_duplicates() -> None:
+    request = source("account_code,debit,credit,dimension:DEPT\n001,1,0,01\n001,0,1,02\n")
+    receipt = compile_source(request)
+    balances = [c for c in receipt.candidates if c.object_type == "PeriodBalance"]
+    assert [c.values["dimension:DEPT"] for c in balances] == ["01", "02"]
+    assert [c.source_row for c in balances] == [2, 3]
+    assert not receipt.rejects and receipt.reconciliation["status"] == "PASS"
+    duplicate = compile_source(
+        request.model_copy(update={"csv_text": request.csv_text + "001,1,0,01\n"})
+    )
+    assert "duplicate account/dimension grain" in duplicate.rejects[0]
+
+
 def test_bom_is_retained_in_source_hash_but_not_column_binding() -> None:
     from hashlib import sha256
 

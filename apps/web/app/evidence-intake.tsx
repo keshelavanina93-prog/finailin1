@@ -4,8 +4,9 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { IngestReceipt, Principal } from "@finai/contracts";
 import ReportInputs from "./report-inputs";
 
-type Account = { resource_id: string; version_id: string; display_name: string; account_code: string };
-type Prepared = { filename: string; csv_text?: string; xls_base64?: string; xlsx_base64?: string; context_version_id: string | null; codes: string[]; accounts: Account[]; observations: Record<string, string>; rejects: string[]; warnings: string[] };
+type DimensionRule = { rule_version_id: string; dimension_code: string; required: boolean; members: Array<{ code: string; version_id: string }> };
+type Account = { resource_id: string; version_id: string; display_name: string; account_code: string; dimension_rules: DimensionRule[] };
+type Prepared = { filename: string; csv_text?: string; xls_base64?: string; xlsx_base64?: string; context_version_id: string | null; codes: string[]; accounts: Account[]; observations: Record<string, string>; dimensionValues: Record<string, string[]>; rejects: string[]; warnings: string[] };
 
 export default function EvidenceIntake({ token, principal, onRetained }: {
   token: string; principal: Principal; onRetained: (receipt: IngestReceipt) => Promise<void>;
@@ -46,7 +47,7 @@ export default function EvidenceIntake({ token, principal, onRetained }: {
       };
       const context = await request<{ binding: { version_id: string } | null }>("/api/ontology/context");
       const context_version_id = sourceOnly || isWorkbook || sourceUse !== "ACTUAL_INPUT" ? null : context.binding?.version_id ?? null;
-      const source = await request<{ account_codes: string[]; source_class: string; observed_bindings: Record<string, string>; rejects: string[]; warnings: string[] }>("/api/ontology/context/source-accounts", {
+      const source = await request<{ account_codes: string[]; source_class: string; observed_bindings: Record<string, string>; dimension_values: Record<string, string[]>; rejects: string[]; warnings: string[] }>("/api/ontology/context/source-accounts", {
         scope: principal.scope, filename: file.name, ...payload, context_version_id, source_use: sourceUse,
       });
       const accounts: Account[] = [];
@@ -66,7 +67,7 @@ export default function EvidenceIntake({ token, principal, onRetained }: {
       if (!alive.current) return;
       setPage(0); setBindings(selected);
       setPrepared({ filename: file.name, ...payload, context_version_id, codes: source.account_codes, accounts,
-        observations: source.observed_bindings, rejects: source.rejects, warnings: source.warnings });
+        observations: source.observed_bindings, dimensionValues: source.dimension_values, rejects: source.rejects, warnings: source.warnings });
     } catch (failure) { setError(failure instanceof Error ? failure.message : "Source preparation failed"); }
     finally { setBusy(false); }
   }
@@ -81,6 +82,14 @@ export default function EvidenceIntake({ token, principal, onRetained }: {
         xlsx_base64: prepared.xlsx_base64, source_use: sourceUse,
         context_version_id: prepared.context_version_id,
         account_version_ids: prepared.context_version_id ? bindings : {},
+        account_dimension_rule_version_ids: prepared.context_version_id ? Object.fromEntries(prepared.codes.map(code => [code, (prepared.accounts.find(account => account.version_id === bindings[code])?.dimension_rules ?? []).map(rule => rule.rule_version_id)])) : {},
+        dimension_member_version_ids: prepared.context_version_id ? Object.fromEntries(Object.entries(prepared.dimensionValues).map(([name, values]) => {
+          const members = prepared.accounts.filter(account => Object.values(bindings).includes(account.version_id)).flatMap(account => account.dimension_rules.filter(rule => rule.dimension_code === name).flatMap(rule => rule.members));
+          return [name, Object.fromEntries(values.flatMap(value => {
+            const matches = [...new Set(members.filter(member => member.code === value).map(member => member.version_id))];
+            return matches.length === 1 ? [[value, matches[0]]] : [];
+          }))];
+        })) : {},
       });
       if (!alive.current) return;
       setPrepared(null); fileForm.current?.reset(); await onRetained(receipt);
@@ -106,6 +115,7 @@ export default function EvidenceIntake({ token, principal, onRetained }: {
       {prepared.warnings.map((warning, index) => <p className="warning" key={index}>{warning}</p>)}
       {prepared.rejects.map((reason, index) => <p role="alert" className="error-banner" key={index}>{reason}</p>)}
       <p>{needsBindings ? "Review source codes against the accepted chart. Every choice pins an immutable account version; a separate reviewer approves the construction." : "This intake retains source observations. It does not establish canonical financial identity."}</p>
+      {needsBindings && <div><h4>Account dimensions</h4><p>CSV analytical columns use dimension: followed by the canonical dimension code. Values must match accepted member codes. Missing or unknown values are retained as row findings and block approval.</p>{prepared.codes.flatMap(code => (prepared.accounts.find(account => account.version_id === bindings[code])?.dimension_rules ?? []).map(rule => <p key={`${code}:${rule.rule_version_id}`}>{code}: dimension:{rule.dimension_code} — {rule.required ? "required" : "optional"}</p>))}</div>}
       {needsBindings && <div className="data-scroll"><table><thead><tr><th>Source account</th><th>Shared account</th></tr></thead><tbody>
         {prepared.codes.slice(page * 50, (page + 1) * 50).map(code => <tr key={code}><td>{code}</td><td><select disabled={busy} aria-label={`Canonical account for ${code}`} value={bindings[code] ?? ""} onChange={event => setBindings(previous => ({ ...previous, [code]: event.target.value }))}>
           <option value="">Select an accepted account</option>{prepared.accounts.filter(account => account.account_code === code).map(account => <option key={account.version_id} value={account.version_id}>{account.account_code} · {account.display_name}</option>)}

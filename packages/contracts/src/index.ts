@@ -21,6 +21,8 @@ export interface IngestRequest {
   account_version_ids?: Record<string, string>;
   source_system?: string | null;
   account_alias_version_ids?: Record<string, string>;
+  account_dimension_rule_version_ids?: Record<string, string[]>;
+  dimension_member_version_ids?: Record<string, Record<string, string>>;
 }
 
 export interface IngestReceipt {

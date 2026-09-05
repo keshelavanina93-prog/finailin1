@@ -42,9 +42,13 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
     candidates: list[Candidate] = []
     rejects: list[str] = []
     warnings = ["Semantic review and governed promotion are required; no canonical facts created."]
-    used = ("account_code", "debit", "credit") if tb else tuple(columns)
+    dimension_columns = tuple(name for name in columns if name.startswith("dimension:"))
+    if any(not name.removeprefix("dimension:").strip() for name in dimension_columns):
+        raise ValueError("Dimension columns require a canonical dimension code after dimension:")
+    used = ("account_code", "debit", "credit", *dimension_columns) if tb else tuple(columns)
     debit_total, credit_total = Decimal(0), Decimal(0)
     accounts: set[str] = set()
+    grains: set[tuple[str, ...]] = set()
     with localcontext() as context:
         context.prec = 50
         for row_number, row in enumerate(reader, 2):
@@ -64,9 +68,10 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
                 )
                 continue
             account = row["account_code"]
-            if not account.strip() or account in accounts:
+            grain = (account, *(row[name] for name in dimension_columns))
+            if not account.strip() or grain in grains:
                 rejects.append(
-                    f"row {row_number}: empty or duplicate account; dimensions need review"
+                    f"row {row_number}: empty account or duplicate account/dimension grain"
                 )
                 continue
             try:
@@ -83,6 +88,7 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
                 rejects.append(f"row {row_number}: amounts require finite nonnegative decimals")
                 continue
             accounts.add(account)
+            grains.add(grain)
             debit_total += debit
             credit_total += credit
             candidates.extend(
@@ -103,6 +109,7 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
                             "debit": str(debit),
                             "credit": str(credit),
                             "net_balance": str(debit - credit),
+                            **{name: row[name] for name in dimension_columns},
                         },
                     ),
                 ]

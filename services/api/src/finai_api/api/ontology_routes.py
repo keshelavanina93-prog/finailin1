@@ -165,6 +165,12 @@ def source_accounts(principal: User, request: IngestRequest) -> dict[str, Any]:
     return {
         "source_class": receipt.source_class,
         "observed_bindings": receipt.observed_bindings,
+        "dimension_values": {
+            field.removeprefix("dimension:"): sorted({
+                candidate.values[field] for candidate in receipt.candidates
+                if field in candidate.values and candidate.values[field].strip()
+            }) for field in receipt.used_fields if field.startswith("dimension:")
+        },
         "rejects": receipt.rejects,
         "warnings": receipt.warnings,
         "account_codes": sorted(

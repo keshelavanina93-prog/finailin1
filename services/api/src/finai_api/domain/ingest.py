@@ -34,6 +34,12 @@ class IngestRequest(BaseModel):
         "source-inspection/1", "source-inspection/2", "source-inspection/3"
     ] = "source-inspection/3"
     account_alias_version_ids: dict[str, UUID] = Field(default_factory=dict, max_length=10000)
+    account_dimension_rule_version_ids: dict[str, tuple[UUID, ...]] = Field(
+        default_factory=dict, max_length=10000
+    )
+    dimension_member_version_ids: dict[str, dict[str, UUID]] = Field(
+        default_factory=dict, max_length=100
+    )
 
     @model_validator(mode="after")
     def validate_source(self) -> Self:
@@ -82,6 +88,9 @@ class IngestRequest(BaseModel):
             result.pop("source_system", None)
         if not self.account_alias_version_ids:
             result.pop("account_alias_version_ids", None)
+        for field in ("account_dimension_rule_version_ids", "dimension_member_version_ids"):
+            if not getattr(self, field):
+                result.pop(field, None)
         return result
 
 

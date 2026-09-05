@@ -61,6 +61,9 @@ def registry(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         yield Connection()
 
     monkeypatch.setattr(binding, "resource_connection", connection)
+    from finai_api.services import account_dimensions
+
+    monkeypatch.setattr(account_dimensions, "rules_for_account", lambda *args: [])
     monkeypatch.setattr(
         binding, "_accepted_version", lambda conn, user, version, kind: versions[version]
     )
