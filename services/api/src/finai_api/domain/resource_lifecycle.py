@@ -43,6 +43,7 @@ class LifecycleReview(BaseModel):
 
 class ConsumptionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
+    request_id: UUID = Field(default_factory=uuid4)
     consumer: VersionReference
     inputs: list[VersionReference] = Field(min_length=1, max_length=1000)
     minimum_state: AuthorityState = "AUTHORITATIVE"

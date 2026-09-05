@@ -1,0 +1,7 @@
+# NIN-27 guarded consumption receipts
+
+Guarded consumption persists an immutable receipt with canonical consumer/input versions, content hashes, lifecycle event pins, actor, checked time and proof hash. Identical retries retain the same proof. Reusing an identity after authority changes is refused; revoked values cannot replay as current. Historical retrieval explicitly returns `HISTORICAL_CONSUMPTION_EVIDENCE` and `current_use_authorized=false`.
+
+Migrations 016/017 enforce policy inheritance, exact complete input pins, effective intervals, lifecycle-state equality and immutable storage. The focused PostgreSQL lifecycle journey passed, including idempotency, changed-authority refusal, retained history after revocation, scoped access denial and forged-state rejection. A stopped existing PostgreSQL cluster was restarted on D: before migration; migration connection failure is now bounded to five seconds. Ruff, affected mypy, contracts typecheck, web lint and production build passed. API/web/private MinIO are supervised and healthy locally.
+
+This is foundation authority/audit evidence. It does not claim full NIN-27 completion, authentic accounting output, report execution or NIN-22 acceptance. Petroleum reconstruction remains REFERENCE_ONLY. Existing unrelated ontology edits were preserved.

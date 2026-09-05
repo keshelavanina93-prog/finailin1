@@ -1,6 +1,8 @@
 """Independent material authority; registry approval never grants consumption authority."""
 
+import json
 from datetime import UTC, datetime
+from hashlib import sha256
 from typing import Any, cast
 from uuid import UUID, uuid4
 
@@ -253,6 +255,7 @@ def consume(p: Principal, r: ConsumptionRequest) -> dict[str, Any]:
                 {
                     "subject": ref.model_dump(mode="json"),
                     "event_id": str(event["event_id"]),
+                    "content_hash": version["content_hash"],
                     "authority_state": state,
                     "attributes": version["attributes"],
                     "access_entity": version["access_entity"],
@@ -261,11 +264,77 @@ def consume(p: Principal, r: ConsumptionRequest) -> dict[str, Any]:
                     "availability_state": event["payload"]["availability_state"],
                 }
             )
-        return {
+        proof = {
             "purpose": "GUARDED_CURRENT_CONSUMPTION",
+            "consumption_id": str(r.request_id),
             "consumer": r.consumer.model_dump(mode="json"),
+            "consumer_content_hash": consumer["content_hash"],
+            "consumer_event_id": str(consumer_event["event_id"]) if consumer_event else None,
             "minimum_state": minimum,
             "access_entity": consumer["access_entity"],
-            "checked_at": datetime.now(UTC).isoformat(),
-            "inputs": values,
+            "inputs": sorted(values, key=lambda item: item["subject"]["version_id"]),
+        }
+        proof_hash = _proof_hash(proof)
+        previous = c.execute(
+            "SELECT * FROM guarded_consumption_receipts WHERE tenant_id=%s AND consumption_id=%s",
+            (p.scope.tenant_id, r.request_id),
+        ).fetchone()
+        if previous:
+            if (
+                previous["request_hash"] != canonical_sha256(r)
+                or previous["actor_id"] != p.actor_id
+            ):
+                raise WorkspaceError(409, "Consumption identity already used by another request")
+            if previous["proof_hash"] != proof_hash:
+                raise WorkspaceError(
+                    409, "Consumption authority changed; use a new request identity"
+                )
+            return {
+                **previous["payload"],
+                "proof_hash": proof_hash,
+                "checked_at": previous["recorded_at"].isoformat(),
+            }
+        saved = c.execute(
+            "INSERT INTO guarded_consumption_receipts "
+            "(tenant_id,consumption_id,consumer_resource_id,consumer_version_id,access_entity,"
+            "actor_id,request_hash,proof_hash,payload) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s) "
+            "RETURNING recorded_at",
+            (
+                p.scope.tenant_id,
+                r.request_id,
+                r.consumer.resource_id,
+                r.consumer.version_id,
+                consumer["access_entity"],
+                p.actor_id,
+                canonical_sha256(r),
+                proof_hash,
+                Jsonb(proof),
+            ),
+        ).fetchone()
+        assert saved is not None
+        return {**proof, "proof_hash": proof_hash, "checked_at": saved["recorded_at"].isoformat()}
+
+
+def _proof_hash(proof: dict[str, Any]) -> str:
+    return sha256(json.dumps(proof, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def consumption_receipt(p: Principal, consumption_id: UUID) -> dict[str, Any]:
+    require_permission(p, "ontology_read")
+    with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
+        row = c.execute(
+            "SELECT * FROM guarded_consumption_receipts WHERE tenant_id=%s AND consumption_id=%s",
+            (p.scope.tenant_id, consumption_id),
+        ).fetchone()
+        if row is None:
+            raise WorkspaceError(404, "Consumption receipt unavailable in authorized context")
+        if _proof_hash(row["payload"]) != row["proof_hash"]:
+            raise WorkspaceError(503, "Retained consumption proof failed integrity verification")
+        return {
+            "purpose": "HISTORICAL_CONSUMPTION_EVIDENCE",
+            "current_use_authorized": False,
+            "proof": row["payload"],
+            "proof_hash": row["proof_hash"],
+            "recorded_at": row["recorded_at"],
+            "actor_id": row["actor_id"],
         }

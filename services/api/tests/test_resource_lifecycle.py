@@ -4,8 +4,10 @@ import os
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
+import psycopg
 import pytest
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 from finai_api.domain.authority import ExactScope
 from finai_api.domain.ontology_catalog import canonical_id
@@ -135,6 +137,38 @@ def test_reviewed_authority_current_guard_and_retained_history():
     for state in lifecycle.ORDER[3:]:
         advance(state)
     result = lifecycle.consume(p, request)
+    assert lifecycle.consume(p, request) == result
+    retained = lifecycle.consumption_receipt(p, request.request_id)
+    assert retained["proof_hash"] == result["proof_hash"]
+    assert retained["current_use_authorized"] is False
+    with resources.resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as cursor:
+        with pytest.raises(psycopg.Error), conn.transaction():
+            cursor.execute(
+                "DELETE FROM guarded_consumption_receipts WHERE tenant_id=%s AND consumption_id=%s",
+                (p.scope.tenant_id, request.request_id),
+            )
+        forged = {
+            **retained["proof"],
+            "consumption_id": str(uuid4()),
+            "inputs": [{**retained["proof"]["inputs"][0], "epistemic_state": "OBSERVED"}],
+        }
+        with pytest.raises(psycopg.Error, match="state differs"), conn.transaction():
+            cursor.execute(
+                "INSERT INTO guarded_consumption_receipts "
+                "(tenant_id,consumption_id,consumer_resource_id,consumer_version_id,access_entity,"
+                "actor_id,request_hash,proof_hash,payload) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (
+                    p.scope.tenant_id,
+                    forged["consumption_id"],
+                    request.consumer.resource_id,
+                    request.consumer.version_id,
+                    result["access_entity"],
+                    p.actor_id,
+                    "0" * 64,
+                    "0" * 64,
+                    Jsonb(forged),
+                ),
+            )
     assert result["minimum_state"] == "AUTHORITATIVE"
     assert result["inputs"][0]["epistemic_state"] == "INFERRED"
     assert result["inputs"][0]["access_entity"] == "__PLATFORM__"
@@ -147,8 +181,12 @@ def test_reviewed_authority_current_guard_and_retained_history():
     assert historical["state"]["availability_state"] == "AVAILABLE"
     assert lifecycle.history(p, ref)["state"]["availability_state"] == "STALE"
     advance("AUTHORITATIVE", "AVAILABLE")
+    with pytest.raises(WorkspaceError, match="authority changed"):
+        lifecycle.consume(p, request)
+    request = request.model_copy(update={"request_id": uuid4()})
     assert lifecycle.consume(p, request)["inputs"][0]["availability_state"] == "AVAILABLE"
     advance("REVOKED")
+    assert lifecycle.consumption_receipt(p, UUID(result["consumption_id"])) == retained
     with pytest.raises(WorkspaceError, match="required authority and availability"):
         lifecycle.consume(p, request)
     # Terminal consumer lifecycle denies its own current use independently of its inputs.
@@ -188,3 +226,5 @@ def test_reviewed_authority_current_guard_and_retained_history():
     )
     with pytest.raises(WorkspaceError, match="authorized context"):
         lifecycle.consume(other, request)
+    with pytest.raises(WorkspaceError, match="authorized context"):
+        lifecycle.consumption_receipt(other, UUID(result["consumption_id"]))

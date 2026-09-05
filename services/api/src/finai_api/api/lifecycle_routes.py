@@ -42,3 +42,8 @@ def history(
 @router.post("/consume")
 def consume(principal: User, request: ConsumptionRequest) -> dict[str, Any]:
     return lifecycle.consume(principal, request)
+
+
+@router.get("/consumptions/{consumption_id}")
+def consumption_receipt(principal: User, consumption_id: UUID) -> dict[str, Any]:
+    return lifecycle.consumption_receipt(principal, consumption_id)

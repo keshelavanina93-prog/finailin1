@@ -17,12 +17,17 @@ export interface LifecycleRequest {
 export interface LifecycleReview { decision: "APPROVED" | "REJECTED"; reason: string }
 
 export interface ConsumptionRequest {
+  request_id?: string;
   consumer: VersionReference;
   inputs: VersionReference[];
   minimum_state?: AuthorityState;
 }
 
 export interface GuardedConsumption {
+  consumption_id: string;
+  proof_hash: string;
+  consumer_content_hash: string;
+  consumer_event_id: string | null;
   purpose: "GUARDED_CURRENT_CONSUMPTION";
   consumer: VersionReference;
   minimum_state: AuthorityState;
@@ -31,6 +36,7 @@ export interface GuardedConsumption {
   inputs: Array<{
     subject: VersionReference;
     event_id: string;
+    content_hash: string;
     authority_state: AuthorityState;
     attributes: Record<string, unknown>;
     access_entity: string;

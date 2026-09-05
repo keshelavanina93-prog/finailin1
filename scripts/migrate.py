@@ -7,7 +7,7 @@ import psycopg
 
 root = Path(__file__).resolve().parents[1]
 with psycopg.connect(
-    os.environ["FINAI_MIGRATION_DATABASE_URL"], autocommit=True
+    os.environ["FINAI_MIGRATION_DATABASE_URL"], autocommit=True, connect_timeout=5
 ) as conn:
     for migration in sorted((root / "services/api/migrations").glob("*.sql")):
         version = int(migration.name.split("_")[0])
