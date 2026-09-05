@@ -22,6 +22,7 @@ from finai_api.domain.resources import (
 from finai_api.domain.review import Principal
 from finai_api.services.dependency_impact import downstream_impact, impact_fingerprint
 from finai_api.services.schema_compatibility import SchemaCompatibilityError, schema_compatibility
+from finai_api.services.semantic_diff import semantic_diff
 from finai_api.services.workspace import WorkspaceError
 from finai_api.storage import connection
 
@@ -481,12 +482,16 @@ def _validate(
                 **schema_impact,
                 "name": item.display_name,
                 "operation": "UPDATE" if previous else "CREATE",
+                "semantic_diff": semantic_diff(previous, item, access_entity),
                 "fields_changed": sorted(
                     key
                     for key in set(item.attributes)
                     | set(previous["attributes"] if previous else {})
-                    if item.attributes.get(key)
-                    != (previous["attributes"].get(key) if previous else None)
+                    if key not in item.attributes
+                    or not previous
+                    or key not in previous["attributes"]
+                    or type(item.attributes[key]) is not type(previous["attributes"][key])
+                    or item.attributes[key] != previous["attributes"][key]
                 ),
             }
         )

@@ -60,8 +60,31 @@ def test_promotion_check_preserves_state_and_detects_competing_change() -> None:
     competing = proposal(update.model_copy(update={"display_name": "Competing synthetic meaning"}))
     resources.propose(proposer, pending)
     resources.propose(proposer, competing)
+    retained_diff = resources.proposal_detail(reviewer, pending.proposal_id).validation["impact"][
+        0
+    ]["semantic_diff"]
+    assert retained_diff["base_version_id"] == str(update.expected_version_id)
+    assert retained_diff["changes"] == [
+        {
+            "path": "/display_name",
+            "category": "PRESENTATION",
+            "operation": "CHANGE",
+            "before": {"present": True, "value": "Synthetic meaning"},
+            "after": {"present": True, "value": "Updated synthetic meaning"},
+        }
+    ]
+    # Reading a retained proposal opens a new database connection. Accepted state is untouched.
+    assert resources.get_resource(reviewer, definition.resource_id)["resource"]["display_name"] == (
+        "Synthetic meaning"
+    )
     assert resources.promotion_check(reviewer, pending.proposal_id)["status"] == "ELIGIBLE"
     resources.review(reviewer, competing.proposal_id, decision)
+    assert (
+        resources.proposal_detail(reviewer, pending.proposal_id).validation["impact"][0][
+            "semantic_diff"
+        ]
+        == retained_diff
+    )
     check = resources.promotion_check(reviewer, pending.proposal_id)
     assert check["status"] == "BLOCKED"
     assert "accepted version changed" in check["blockers"][0]

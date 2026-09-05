@@ -20,10 +20,15 @@ export interface ResourceProposal {
   restores_versions?: Record<string, string>;
   proposal_id: string; title: string; rationale: string; access_entity: string; mutations: ResourceMutation[];
 }
+export interface SemanticDiff {
+  format_version: 1; base_version_id: string | null;
+  changes: Array<{ path: string; category: string; operation: "ADD" | "REMOVE" | "CHANGE";
+    before: { present: boolean; value?: unknown }; after: { present: boolean; value?: unknown } }>;
+}
 export interface ResourceProposalDetail {
   proposal: ResourceProposal; submitted_by: string; created_at: string; decision: string | null;
   reviewed_by: string | null; review_rationale: string | null; recorded_at: string | null;
-  validation: { impact: Array<{ resource_id: string; name: string; operation: string; fields_changed: string[]; compatibility?: "BACKWARD_COMPATIBLE" | "INITIAL"; semantic_changes?: Array<{ field_id: string | null; field_name: string; change: string; before: unknown; after: unknown }> }>;
+  validation: { impact: Array<{ resource_id: string; name: string; operation: string; fields_changed: string[]; semantic_diff?: SemanticDiff; compatibility?: "BACKWARD_COMPATIBLE" | "INITIAL"; semantic_changes?: Array<{ field_id: string | null; field_name: string; change: string; before: unknown; after: unknown }> }>;
     downstream_impact?: { status: "COMPLETE" | "RESTRICTED"; selection: "CURRENT_ACCEPTED_HEADS_AND_PROPOSED"; max_depth: number; max_resources: number;
       affected: Array<{root_resource_id: string; resource_id: string; version_id: string; object_type: string; display_name: string; depth: number; state: "CURRENT" | "PROPOSED"}> };
     dependency_heads: Record<string,string>; compatibility: string; identity_cycles: string };

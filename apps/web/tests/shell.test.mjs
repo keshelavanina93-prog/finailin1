@@ -12,7 +12,7 @@ const request = (body = "{}", auth = true) => new Request("http://localhost/api/
 
 test("proxy rejects missing credentials and oversized input", async () => {
   assert.equal((await POST(request("{}", false))).status, 401);
-  assert.equal((await POST(request("x".repeat(2_000_001)))).status, 413);
+  assert.equal((await POST(request("x".repeat(6_000_001)))).status, 413);
 });
 
 test("proxy forwards exact body and credential and preserves upstream denial", async (t) => {
