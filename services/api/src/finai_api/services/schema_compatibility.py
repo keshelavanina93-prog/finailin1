@@ -75,6 +75,13 @@ def validate_schema(name: str, attributes: dict[str, Any]) -> dict[str, dict[str
         if identifier in identifiers:
             raise SchemaCompatibilityError(422, "Field identities must be unique within a schema")
         identifiers.add(identifier)
+        permissions = spec.get("read_permissions", [])
+        if (
+            not isinstance(permissions, list)
+            or any(value != "restricted_read" for value in permissions)
+            or len(permissions) != len(set(permissions))
+        ):
+            raise SchemaCompatibilityError(422, "Unsupported or duplicate field read permission")
         if not isinstance(spec["kind"], str) or spec["kind"] not in KINDS:
             raise SchemaCompatibilityError(422, f"Unknown field value kind: {field_name}")
         if type(spec["required"]) is not bool or type(spec.get("deprecated", False)) is not bool:
@@ -149,7 +156,27 @@ def schema_compatibility(
                 before.get("deprecated", False),
                 after.get("deprecated", False),
             )
-        semantic_keys = {"field_id", "semantic_id", "kind", "target_type", "required", "deprecated"}
+        old_permissions = before.get("read_permissions", [])
+        new_permissions = after.get("read_permissions", [])
+        if old_permissions != new_permissions:
+            change(
+                field_name,
+                before["field_id"],
+                "READ_POLICY_CHANGED",
+                old_permissions,
+                new_permissions,
+            )
+            if not set(old_permissions).issubset(new_permissions):
+                breaking.add(field_name + " (read-policy weakening)")
+        semantic_keys = {
+            "field_id",
+            "semantic_id",
+            "kind",
+            "target_type",
+            "required",
+            "deprecated",
+            "read_permissions",
+        }
         if any(
             before.get(key) != after.get(key) for key in (set(before) | set(after)) - semantic_keys
         ):

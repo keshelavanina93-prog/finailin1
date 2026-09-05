@@ -71,7 +71,7 @@ export interface Principal {
   actor_id: string;
   display_name: string;
   scope: ExactScope;
-  permissions: Array<"read" | "ingest" | "review" | "export" | "ontology_read" | "ontology_propose" | "ontology_review" | "ontology_admin">;
+  permissions: Array<"read" | "ingest" | "review" | "export" | "ontology_read" | "ontology_propose" | "ontology_review" | "ontology_admin" | "restricted_read">;
 }
 
 export interface ReviewDecision {

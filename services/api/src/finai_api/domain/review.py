@@ -23,6 +23,7 @@ class Principal(BaseModel):
             "ontology_propose",
             "ontology_review",
             "ontology_admin",
+            "restricted_read",
         ],
         ...,
     ] = ("read",)

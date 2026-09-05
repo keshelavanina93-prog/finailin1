@@ -1,4 +1,5 @@
 export interface SchemaField {
+  read_permissions?: Array<"restricted_read">;
   field_id: string; semantic_id: string; kind: string; required: boolean;
   target_type?: string | null; deprecated?: boolean;
 }

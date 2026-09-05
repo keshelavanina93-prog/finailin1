@@ -22,6 +22,19 @@ def shape() -> dict:
     }
 
 
+def test_field_read_policy_cannot_be_silently_weakened() -> None:
+    before = shape()
+    after = deepcopy(before)
+    after["fields"]["code"]["read_permissions"] = ["restricted_read"]
+    result = schema_compatibility("ProtectedValue", after, before)
+    assert any(item["change"] == "READ_POLICY_CHANGED" for item in result["semantic_changes"])
+    with pytest.raises(SchemaCompatibilityError, match="read-policy weakening"):
+        schema_compatibility("ProtectedValue", before, after)
+    after["fields"]["code"]["read_permissions"] = ["invented_permission"]
+    with pytest.raises(SchemaCompatibilityError, match="Unsupported"):
+        schema_compatibility("ProtectedValue", after)
+
+
 def test_optional_addition_loosening_and_deprecation_have_stable_structured_diff() -> None:
     old = shape()
     new = deepcopy(old)

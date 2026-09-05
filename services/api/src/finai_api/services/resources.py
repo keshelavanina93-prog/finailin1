@@ -40,11 +40,12 @@ def resource_connection(principal: Principal) -> Iterator[psycopg.Connection[Any
             (
                 "SELECT "
                 "set_config('finai.entity_id',%s,true),set_config('finai.tena"
-                "nt_access',%s,true)"
+                "nt_access',%s,true),set_config('finai.read_permissions',%s,true)"
             ),
             (
                 principal.scope.legal_entity_id,
                 "true" if "ontology_admin" in principal.permissions else "false",
+                json.dumps(principal.permissions),
             ),
         )
         yield conn
