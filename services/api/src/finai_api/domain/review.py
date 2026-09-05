@@ -13,7 +13,19 @@ class Principal(BaseModel):
     actor_id: str = Field(min_length=1, max_length=128)
     display_name: str = Field(min_length=1, max_length=128)
     scope: ExactScope
-    permissions: tuple[Literal["read", "ingest", "review", "export"], ...] = ("read",)
+    permissions: tuple[
+        Literal[
+            "read",
+            "ingest",
+            "review",
+            "export",
+            "ontology_read",
+            "ontology_propose",
+            "ontology_review",
+            "ontology_admin",
+        ],
+        ...,
+    ] = ("read",)
 
 
 class ReviewRequest(BaseModel):

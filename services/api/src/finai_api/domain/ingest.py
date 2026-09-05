@@ -1,4 +1,5 @@
 from typing import Literal
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -12,6 +13,7 @@ class IngestRequest(BaseModel):
     filename: str = Field(min_length=1, max_length=256)
     csv_text: str = Field(min_length=1, max_length=1_000_000)
     requested_objects: tuple[str, ...] = ()
+    context_version_id: UUID | None = None
 
 
 class Candidate(BaseModel):
@@ -26,6 +28,8 @@ class Candidate(BaseModel):
 class IngestReceipt(BaseModel):
     receipt_id: str
     request_sha256: str
+    context_version_id: UUID | None = None
+    canonical_references: dict[str, dict[str, str]] = Field(default_factory=dict)
     source_sha256: str
     scope: ExactScope
     source_class: Literal["TRIAL_BALANCE", "UNFAMILIAR_TABULAR"]

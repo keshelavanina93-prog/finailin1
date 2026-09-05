@@ -2,6 +2,7 @@ import psycopg
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from finai_api.api.ontology_routes import router as ontology_router
 from finai_api.api.routes import router
 from finai_api.api.workspace_routes import router as workspace_router
 from finai_api.services.workspace import WorkspaceError
@@ -13,6 +14,7 @@ app = FastAPI(
 )
 app.include_router(router)
 app.include_router(workspace_router)
+app.include_router(ontology_router)
 
 
 @app.exception_handler(WorkspaceError)

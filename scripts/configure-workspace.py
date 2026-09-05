@@ -29,6 +29,32 @@ if not any("review" in grant["permissions"] for grant in grants.values()):
         "permissions": ["read", "review", "export"],
     }
 configuration["FINAI_ACCESS_TOKENS"] = json.dumps(grants)
+for grant in grants.values():
+    permissions = set(grant["permissions"])
+    permissions.add("ontology_read")
+    if "ingest" in permissions:
+        permissions.add("ontology_propose")
+    if "review" in permissions:
+        permissions.add("ontology_review")
+    grant["permissions"] = sorted(permissions)
+for actor, display_name, capability in (
+    ("local-steward", "Enterprise identity steward", "ontology_propose"),
+    ("local-steward-reviewer", "Enterprise identity reviewer", "ontology_review"),
+):
+    if not any(grant["actor_id"] == actor for grant in grants.values()):
+        grants[secrets.token_hex(32)] = {
+            "actor_id": actor,
+            "display_name": display_name,
+            "scope": next(iter(grants.values()))["scope"],
+            "permissions": [
+                "read",
+                "export",
+                "ontology_read",
+                "ontology_admin",
+                capability,
+            ],
+        }
+configuration["FINAI_ACCESS_TOKENS"] = json.dumps(grants)
 path.write_text(json.dumps(configuration, indent=2))
 print(
     "Configured separate local operator/reviewer identities in .finai/local.json; no secrets printed."

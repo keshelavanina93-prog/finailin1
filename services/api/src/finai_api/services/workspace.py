@@ -75,7 +75,10 @@ def detail(principal: Principal, receipt_id: str) -> ReceiptDetail:
         def indexed(value: IngestReceipt | None) -> dict[str, dict[str, str]]:
             return (
                 {
-                    f"{item.object_type}:{item.values.get('account_code', str(item.source_row))}": item.values
+                    (
+                        f"{item.object_type}:"
+                        f"{item.values.get('account_code', str(item.source_row))}"
+                    ): item.values
                     for item in value.candidates
                 }
                 if value
@@ -116,7 +119,8 @@ def list_intake(principal: Principal, offset: int, state: str | None) -> list[In
             "r.ingested_at, jsonb_array_length(r.receipt->'candidates') AS candidate_count, "
             "jsonb_array_length(r.receipt->'rejects') AS reject_count, "
             "r.receipt->'reconciliation'->>'status' AS reconciliation_status, "
-            "coalesce(d.decision, 'PENDING') AS review_state, (h.receipt_id IS NOT NULL) AS is_current "
+            "coalesce(d.decision, 'PENDING') AS review_state, "
+            "(h.receipt_id IS NOT NULL) AS is_current "
             "FROM hydration_runs r LEFT JOIN construction_decisions d "
             "ON r.tenant_id=d.tenant_id AND r.receipt_id=d.receipt_id "
             "LEFT JOIN workspace_heads h ON r.tenant_id=h.tenant_id AND r.receipt_id=h.receipt_id "
@@ -170,7 +174,8 @@ def decide(principal: Principal, receipt_id: str, request: ReviewRequest) -> Rev
                     )
             decision = cursor.execute(
                 "INSERT INTO construction_decisions "
-                "(tenant_id, receipt_id, decision_id, exact_scope, decision, actor_id, reason, previous_head) "
+                "(tenant_id, receipt_id, decision_id, exact_scope, decision, "
+                "actor_id, reason, previous_head) "
                 "VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *",
                 (
                     principal.scope.tenant_id,
@@ -205,7 +210,8 @@ def decide(principal: Principal, receipt_id: str, request: ReviewRequest) -> Rev
                     rows,
                 )
             conn.execute(
-                "INSERT INTO workspace_heads (tenant_id, scope_hash, source_class, exact_scope, receipt_id) "
+                "INSERT INTO workspace_heads (tenant_id, scope_hash, "
+                "source_class, exact_scope, receipt_id) "
                 "VALUES (%s,%s,%s,%s,%s) ON CONFLICT (tenant_id, scope_hash, source_class) "
                 "DO UPDATE SET receipt_id=EXCLUDED.receipt_id, updated_at=clock_timestamp()",
                 (
@@ -285,12 +291,16 @@ def summary(principal: Principal) -> WorkspaceSummary:
     with connection(principal.scope) as conn:
         counts = conn.execute(
             "SELECT coalesce(d.decision,'PENDING'), count(*) FROM hydration_runs r "
-            "LEFT JOIN construction_decisions d ON r.tenant_id=d.tenant_id AND r.receipt_id=d.receipt_id "
+            "LEFT JOIN construction_decisions d ON "
+            "r.tenant_id=d.tenant_id AND r.receipt_id=d.receipt_id "
             "WHERE r.tenant_id=%s AND r.exact_scope=%s GROUP BY coalesce(d.decision,'PENDING')",
             (principal.scope.tenant_id, _scope(principal)),
         ).fetchall()
         heads = conn.execute(
-            "SELECT source_class, receipt_id FROM workspace_heads WHERE tenant_id=%s AND exact_scope=%s",
+            (
+                "SELECT source_class, receipt_id FROM workspace_heads WHERE "
+                "tenant_id=%s AND exact_scope=%s"
+            ),
             (principal.scope.tenant_id, _scope(principal)),
         ).fetchall()
         state_counts = dict(counts)

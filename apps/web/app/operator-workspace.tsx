@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import type { IngestReceipt, IntakeItem, ObjectDetail, Principal, ReceiptDetail, WorkspaceObject, WorkspaceSummary } from "@finai/contracts";
 import ReceiptPanel from "./receipt-panel";
 import ObjectPanel from "./object-panel";
+import OntologyWorkspace from "./ontology-workspace";
 
 async function decodeError(response: Response): Promise<string> {
   const data = await response.json().catch(() => null);
@@ -15,7 +16,7 @@ async function decodeError(response: Response): Promise<string> {
 export default function OperatorWorkspace() {
   const [token, setToken] = useState("");
   const [principal, setPrincipal] = useState<Principal | null>(null);
-  const [view, setView] = useState<"intake" | "objects" | "history">("intake");
+  const [view, setView] = useState<"intake" | "objects" | "history" | "ontology">("intake");
   const [summary, setSummary] = useState<WorkspaceSummary | null>(null);
   const [intake, setIntake] = useState<IntakeItem[]>([]);
   const [objects, setObjects] = useState<WorkspaceObject[]>([]);
@@ -44,7 +45,7 @@ export default function OperatorWorkspace() {
   }, [token]);
 
   useEffect(() => {
-    if (!principal) return;
+    if (!principal || view === "ontology") return;
     let cancelled = false;
     const query = new URLSearchParams({ offset: String(offset) });
     if (view === "objects") {
@@ -112,9 +113,12 @@ export default function OperatorWorkspace() {
     try {
       if (!file.size || file.size > 1_000_000) throw new Error("Choose a nonempty UTF-8 CSV smaller than 1 MB.");
       const text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(await file.arrayBuffer());
+      const contextResponse = await fetch("/api/ontology/context", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+      if (!contextResponse.ok) throw new Error(await decodeError(contextResponse));
+      const context = await contextResponse.json();
       const response = await fetch("/api/hydration", { method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ scope: principal.scope, filename: file.name, csv_text: text }),
+        body: JSON.stringify({ scope: principal.scope, filename: file.name, csv_text: text, context_version_id: context.binding?.version_id ?? null }),
       });
       if (!response.ok) throw new Error(await decodeError(response));
       const receipt: IngestReceipt = await response.json();
@@ -177,10 +181,10 @@ export default function OperatorWorkspace() {
   const count = view === "objects" ? objects.length : intake.length;
   return <main className="operator-shell">
     <aside className="navigation"><div className="wordmark">F<span>FinAI<small>NYX CORE</small></span></div><p className="nav-caption">ENTERPRISE WORKSPACE</p>
-      {([ ["intake", "Evidence intake", "01"], ["objects", "Object workspace", "02"], ["history", "Construction history", "03"] ] as const).map(([id, label, number]) => <button key={id} className={view === id ? "nav-link active" : "nav-link"} onClick={() => navigate(id)}><small>{number}</small>{label}</button>)}
+      {([ ["intake", "Evidence intake", "01"], ["objects", "Object workspace", "02"], ["history", "Construction history", "03"], ["ontology", "Enterprise & ontology", "04"] ] as const).map(([id, label, number]) => <button key={id} className={view === id ? "nav-link active" : "nav-link"} onClick={() => navigate(id)}><small>{number}</small>{label}</button>)}
       <div className="identity-card"><strong>{principal.display_name}</strong><small>{principal.permissions.join(" · ")}</small><button className="quiet" onClick={signOut}>Switch identity / sign out</button></div></aside>
     <div className="operator-main"><header className="scope-bar"><div><small>LEGAL ENTITY</small><strong>{principal.scope.legal_entity_id}</strong></div><div><small>PERIOD</small><strong>{principal.scope.period}</strong></div><div><small>CURRENCY</small><strong>{principal.scope.currency}</strong></div><span className="scope-lock">Exact scope · identity bound</span></header>
-      <div className="operator-content"><div className="section-heading"><div><p className="overline">SOURCE → CONSTRUCTION → REVIEW → OBJECTS</p><h1>{view === "intake" ? "Evidence intake" : view === "objects" ? "Object workspace" : "Construction history"}</h1><p className="muted">{view === "objects" ? "Inspect accepted objects and follow every value back to source evidence." : "Review source construction without losing the evidence or earlier versions."}</p></div><button className="quiet" disabled={loading || busy} onClick={() => { setRevision(value => value + 1); if (detail) void openConstruction(detail.receipt.receipt_id); }}>Refresh</button></div>
+      <div className="operator-content">{view === "ontology" ? <OntologyWorkspace token={token} principal={principal} /> : <><div className="section-heading"><div><p className="overline">SOURCE → CONSTRUCTION → REVIEW → OBJECTS</p><h1>{view === "intake" ? "Evidence intake" : view === "objects" ? "Object workspace" : "Construction history"}</h1><p className="muted">{view === "objects" ? "Inspect accepted objects and follow every value back to source evidence." : "Review source construction without losing the evidence or earlier versions."}</p></div><button className="quiet" disabled={loading || busy} onClick={() => { setRevision(value => value + 1); if (detail) void openConstruction(detail.receipt.receipt_id); }}>Refresh</button></div>
         <div className="summary-grid"><article><span>Pending review</span><strong>{summary?.pending_count ?? "—"}</strong></article><article><span>Accepted constructions</span><strong>{summary?.approved_count ?? "—"}</strong></article><article><span>Rejected constructions</span><strong>{summary?.rejected_count ?? "—"}</strong></article><article><span>Current source versions</span><strong>{summary?.active_versions.length ?? "—"}</strong></article></div>
         {error && <div role="alert" className="error-banner">{error}</div>}{notice && <div role="status" className="success-banner">{notice}</div>}
         {view === "intake" && principal.permissions.includes("ingest") && <form className="upload-strip" onSubmit={upload}><div><h3>Ingest a source</h3><p>UTF-8 CSV · TB headers: account_code, debit, credit · unfamiliar schemas retain raw records</p></div><label className="file-label">Source CSV<input type="file" accept=".csv,text/csv" name="source" required /></label><button disabled={busy}>{busy ? "Working…" : "Retain & construct"}</button></form>}
@@ -192,7 +196,7 @@ export default function OperatorWorkspace() {
           <div className="pagination"><button className="quiet" disabled={loading || offset === 0} onClick={() => setOffset(Math.max(0, offset - pageSize))}>Previous</button><span>Page {Math.floor(offset / pageSize) + 1}</span><button className="quiet" disabled={loading || count < pageSize} onClick={() => setOffset(offset + pageSize)}>Next</button></div></section>}
         {detail && <ReceiptPanel key={detail.receipt.receipt_id} detail={detail} principal={principal} busy={busy} onDecision={decide} onExport={format => void download(format)} onClose={() => { selection.current++; setDetail(null); }} onObjects={() => { const id = detail.receipt.receipt_id; navigate("objects"); setVersion(id); }} />}
         {inspector && <ObjectPanel detail={inspector} onClose={() => { selection.current++; setInspector(null); }} />}
-        <footer className="workspace-footer"><span>Scope: {principal.scope.tenant_id}</span><span>Accepted construction ≠ certified financial truth</span></footer>
+        </>}<footer className="workspace-footer"><span>Scope: {principal.scope.tenant_id}</span><span>Accepted construction ≠ certified financial truth</span></footer>
       </div></div>
   </main>;
 }

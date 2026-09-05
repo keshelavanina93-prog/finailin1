@@ -5,7 +5,11 @@ export const epistemicStates = [
   "UNAVAILABLE",
 ] as const;
 
+export type { SchemaField, CanonicalResource, ResourceMutation, ResourceProposal, ResourceProposalDetail, ProposalSummary, CanonicalDetail } from "./ontology.js";
+
 export interface IngestReceipt {
+  context_version_id: string | null;
+  canonical_references: Record<string, { resource_id: string; version_id: string }>;
   receipt_id: string;
   request_sha256: string;
   source_sha256: string;
@@ -34,7 +38,7 @@ export interface Principal {
   actor_id: string;
   display_name: string;
   scope: ExactScope;
-  permissions: Array<"read" | "ingest" | "review" | "export">;
+  permissions: Array<"read" | "ingest" | "review" | "export" | "ontology_read" | "ontology_propose" | "ontology_review" | "ontology_admin">;
 }
 
 export interface ReviewDecision {
