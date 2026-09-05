@@ -6,6 +6,18 @@ export const epistemicStates = [
 ] as const;
 
 export type { SchemaField, CanonicalResource, ResourceMutation, ResourceProposal, ResourceProposalDetail, ProposalSummary, CanonicalDetail, HistoricalGraph } from "./ontology.js";
+export type { AuthorityState, VersionReference, LifecycleRequest, LifecycleReview, ConsumptionRequest, GuardedConsumption, RollbackRequest } from "./lifecycle.js";
+
+export interface IngestRequest {
+  scope: ExactScope;
+  filename: string;
+  csv_text: string;
+  requested_objects?: string[];
+  context_version_id?: string | null;
+  account_version_ids?: Record<string, string>;
+  source_system?: string | null;
+  account_alias_version_ids?: Record<string, string>;
+}
 
 export interface IngestReceipt {
   binding_state: "SOURCE_ONLY" | "CANONICAL_BOUND";

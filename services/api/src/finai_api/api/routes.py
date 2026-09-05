@@ -17,6 +17,7 @@ from finai_api.storage import retain, retrieve
 
 router = APIRouter()
 compiler = AuthorityCompiler()
+REQUIRED_SCHEMA_VERSION = 11
 
 
 @router.get("/health", tags=["operations"])
@@ -32,12 +33,17 @@ def health() -> dict[str, str]:
 
 @router.get("/ready", tags=["operations"])
 def readiness(response: Response) -> dict[str, str]:
-    status = {"database": "unavailable", "evidence_store": "unavailable"}
+    status = {"database": "unavailable", "schema": "unavailable", "evidence_store": "unavailable"}
     dsn = get_settings().database_url.get_secret_value()
     if dsn:
         try:
             with psycopg.connect(dsn, connect_timeout=3) as conn:
                 conn.execute("SELECT source_storage FROM hydration_runs LIMIT 0")
+                applied = conn.execute("SELECT version FROM schema_migrations").fetchall()
+                if set(range(1, REQUIRED_SCHEMA_VERSION + 1)).issubset({row[0] for row in applied}):
+                    status["schema"] = "ready"
+                else:
+                    status["schema"] = "migration_required"
             status["database"] = "ready"
         except psycopg.Error:
             pass
