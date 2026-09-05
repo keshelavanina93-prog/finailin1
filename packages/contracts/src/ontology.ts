@@ -18,6 +18,7 @@ export interface ResourceMutation {
   evidence_class?: string;
 }
 export interface ResourceProposal {
+  expectations?: Array<{name: string; resource_id: string; attribute_path: string[]; expected: unknown}>;
   restores_versions?: Record<string, string>;
   proposal_id: string; title: string; rationale: string; access_entity: string; mutations: ResourceMutation[];
 }

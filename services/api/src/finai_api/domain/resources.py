@@ -48,6 +48,14 @@ class ResourceMutation(BaseModel):
         return self
 
 
+class ProposalExpectation(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    name: str = Field(min_length=3, max_length=200)
+    resource_id: UUID
+    attribute_path: list[str] = Field(min_length=1, max_length=16)
+    expected: Any
+
+
 class ResourceProposal(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     proposal_id: UUID = Field(default_factory=uuid4)
@@ -55,11 +63,14 @@ class ResourceProposal(BaseModel):
     rationale: str = Field(min_length=10, max_length=2000)
     access_entity: str = Field(min_length=1, max_length=128)
     mutations: list[ResourceMutation] = Field(min_length=1, max_length=100)
+    expectations: list[ProposalExpectation] = Field(default_factory=list, max_length=100)
     restores_versions: dict[UUID, UUID] = Field(default_factory=dict, max_length=100)
 
     @model_serializer(mode="wrap")
     def preserve_legacy_proposal(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
         payload: dict[str, Any] = handler(self)
+        if not self.expectations:
+            payload.pop("expectations", None)
         if not self.restores_versions:
             payload.pop("restores_versions", None)
         return payload
@@ -68,6 +79,9 @@ class ResourceProposal(BaseModel):
     def unique_mutations(self) -> "ResourceProposal":
         if len({item.resource_id for item in self.mutations}) != len(self.mutations):
             raise ValueError("A change set may contain only one version per canonical identity")
+        mutation_ids = {item.resource_id for item in self.mutations}
+        if any(check.resource_id not in mutation_ids for check in self.expectations):
+            raise ValueError("Expectations must bind to a resource in this proposal")
         return self
 
 

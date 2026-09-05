@@ -8,7 +8,12 @@ import pytest
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.authority import ExactScope, canonical_sha256
-from finai_api.domain.resources import ResourceMutation, ResourceProposal, ResourceReview
+from finai_api.domain.resources import (
+    ProposalExpectation,
+    ResourceMutation,
+    ResourceProposal,
+    ResourceReview,
+)
 from finai_api.domain.review import Principal
 from finai_api.services import resources
 from finai_api.services.proposal_evaluation import record_evaluation, require_evaluation
@@ -76,6 +81,41 @@ def test_database_rejects_missing_evidence_and_retains_evidence_after_promotion(
                 valid_from=datetime.now(UTC),
             )
         ],
+    )
+    failed = proposal.model_copy(
+        update={
+            "proposal_id": uuid4(),
+            "expectations": [
+                ProposalExpectation(
+                    name="Meaning remains monetary",
+                    resource_id=proposal.mutations[0].resource_id,
+                    attribute_path=["kind"],
+                    expected="money",
+                )
+            ],
+        }
+    )
+    failed_detail = resources.propose(operator, failed)
+    assert failed_detail.validation["evaluation"]["status"] == "FAIL"
+    assert resources.promotion_check(reviewer, failed.proposal_id)["status"] == "BLOCKED"
+    with pytest.raises(WorkspaceError, match="expectations failed"):
+        resources.review(
+            reviewer,
+            failed.proposal_id,
+            ResourceReview(decision="APPROVED", rationale="Cannot override failed expectation"),
+        )
+    assert resources.proposal_detail(reviewer, failed.proposal_id).decision is None
+    proposal = proposal.model_copy(
+        update={
+            "expectations": [
+                ProposalExpectation(
+                    name="Meaning remains an identifier",
+                    resource_id=proposal.mutations[0].resource_id,
+                    attribute_path=["kind"],
+                    expected="identifier",
+                )
+            ]
+        }
     )
     detail = resources.propose(operator, proposal)
     evidence = detail.validation["evaluation"]
