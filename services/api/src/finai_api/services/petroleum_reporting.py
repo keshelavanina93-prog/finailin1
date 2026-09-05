@@ -251,7 +251,8 @@ def reconstruct(content: bytes) -> dict[str, Any]:
         "missing_requirements": [
             "Reviewed source company/period/currency",
             "Approved canonical Product/Segment mapping",
-            "Company-matched Base/GL for G&A",
+            "Petroleum expense evidence or approved cross-company allocation/recharge, "
+            "with reporting perimeter and duplicate-cost checks",
             "Reviewed COGS versus G&A overlap",
             "MR V8 report-definition and metric mapping",
         ],
