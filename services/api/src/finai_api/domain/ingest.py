@@ -101,6 +101,19 @@ class Candidate(BaseModel):
     authority_state: Literal["MAPPED_CANDIDATE"] = "MAPPED_CANDIDATE"
 
 
+class SourceRetention(BaseModel):
+    """Storage classification; does not assert a legal retention period or hold."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    contract_version: Literal["source-retention/1"] = "source-retention/1"
+    artifact_class: Literal["IMMUTABLE_SOURCE_EVIDENCE"] = "IMMUTABLE_SOURCE_EVIDENCE"
+    disposition: Literal["PRESERVE_PENDING_GOVERNED_DISPOSITION"] = (
+        "PRESERVE_PENDING_GOVERNED_DISPOSITION"
+    )
+    automatic_expiry_allowed: Literal[False] = False
+    legal_policy_state: Literal["NOT_ESTABLISHED"] = "NOT_ESTABLISHED"
+
+
 class SourceStorage(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     backend: Literal["S3"] = "S3"
@@ -109,6 +122,7 @@ class SourceStorage(BaseModel):
     sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     byte_length: int = Field(ge=1, le=16_000_000)
     version_id: str | None = Field(default=None, max_length=1024)
+    retention: SourceRetention | None = None
 
 
 class IngestReceipt(BaseModel):

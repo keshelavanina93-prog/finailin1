@@ -9,7 +9,7 @@ from botocore.exceptions import BotoCoreError, ClientError
 
 from finai_api.config import get_settings
 from finai_api.domain.authority import ExactScope, canonical_sha256
-from finai_api.domain.ingest import SourceStorage
+from finai_api.domain.ingest import SourceRetention, SourceStorage
 
 
 class EvidenceStoreUnavailable(RuntimeError):
@@ -49,9 +49,28 @@ def _client() -> Any:
 
 def check_ready() -> None:
     try:
-        _client().head_bucket(Bucket=get_settings().s3_bucket)
+        client = _client()
+        client.head_bucket(Bucket=get_settings().s3_bucket)
+        _check_retention(client, get_settings().s3_bucket)
     except (BotoCoreError, ClientError, OSError) as exc:
         raise EvidenceStoreUnavailable("Private evidence object storage is unavailable") from exc
+
+
+def _check_retention(client: Any, bucket: str) -> None:
+    """A dedicated evidence bucket must not have automatic object deletion rules."""
+    try:
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bucket)
+    except ClientError as exc:
+        if exc.response.get("Error", {}).get("Code") == "NoSuchLifecycleConfiguration":
+            return
+        raise
+    for rule in lifecycle.get("Rules", []):
+        if rule.get("Status") == "Enabled" and (
+            "Expiration" in rule or "NoncurrentVersionExpiration" in rule
+        ):
+            raise EvidenceStoreUnavailable(
+                "Evidence bucket automatic expiry conflicts with governed retention"
+            )
 
 
 def _verified_get(client: Any, metadata: SourceStorage) -> tuple[bytes, str | None]:
@@ -85,8 +104,10 @@ def preserve(scope: ExactScope, content: bytes, expected_hash: str) -> SourceSto
         object_key=object_key(scope, expected_hash),
         sha256=expected_hash,
         byte_length=len(content),
+        retention=SourceRetention(),
     )
     try:
+        _check_retention(client, metadata.bucket)
         try:
             response = client.put_object(
                 Bucket=metadata.bucket,

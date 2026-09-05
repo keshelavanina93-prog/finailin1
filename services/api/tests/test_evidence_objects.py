@@ -15,6 +15,10 @@ class ObjectClient:
         self.objects: dict[str, list[bytes]] = {}
         self.puts: list[dict[str, Any]] = []
         self.corrupt = False
+        self.lifecycle: dict[str, Any] = {"Rules": []}
+
+    def get_bucket_lifecycle_configuration(self, **kwargs: Any) -> dict[str, Any]:
+        return self.lifecycle
 
     def put_object(self, **kwargs: Any) -> dict[str, Any]:
         self.puts.append(kwargs)
@@ -59,6 +63,10 @@ def test_create_only_replay_and_version_pinned_reads(
     assert metadata == evidence_objects.preserve(scope, content, sha256(content).hexdigest())
     assert len(client.objects[metadata.object_key]) == 1
     assert metadata.version_id == "1"
+    assert metadata.retention is not None
+    assert metadata.retention.artifact_class == "IMMUTABLE_SOURCE_EVIDENCE"
+    assert metadata.retention.automatic_expiry_allowed is False
+    assert metadata.retention.legal_policy_state == "NOT_ESTABLISHED"
     assert evidence_objects.read(scope, metadata) == content
     # A privileged external writer adding a later version cannot alter a pinned receipt.
     client.objects[metadata.object_key].append(b"later external overwrite")
@@ -94,3 +102,13 @@ def test_scope_key_and_input_hash_are_verified(
     with pytest.raises(evidence_objects.EvidenceStoreUnavailable, match="integrity"):
         evidence_objects.preserve(scope, content, "0" * 64)
     assert len(client.puts) == 1
+
+
+@pytest.mark.parametrize("expiry", ["Expiration", "NoncurrentVersionExpiration"])
+def test_automatic_expiry_refuses_evidence_write(object_store, expiry):
+    client, scope = object_store
+    client.lifecycle = {"Rules": [{"Status": "Enabled", expiry: {"Days": 1}}]}
+    content = b"retained evidence"
+    with pytest.raises(evidence_objects.EvidenceStoreUnavailable, match="automatic expiry"):
+        evidence_objects.preserve(scope, content, sha256(content).hexdigest())
+    assert client.puts == []

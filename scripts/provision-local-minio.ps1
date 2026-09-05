@@ -16,6 +16,12 @@ if (-not (Test-Path -LiteralPath $adminPath)) {
 # Remove broad inherited access from local credential files; retain the current user and SYSTEM.
 foreach ($credentialPath in @($adminPath, $configurationPath)) {
     $acl = Get-Acl -LiteralPath $credentialPath
+    $allowedSids = @([Security.Principal.WindowsIdentity]::GetCurrent().User.Value, 'S-1-5-18')
+    $existingRules = @($acl.GetAccessRules($true, $true, [Security.Principal.SecurityIdentifier]))
+    if ($acl.AreAccessRulesProtected -and $existingRules.Count -gt 0 -and
+        @($existingRules | Where-Object { $_.IdentityReference.Value -notin $allowedSids }).Count -eq 0) {
+        continue
+    }
     $acl.SetAccessRuleProtection($true, $false)
     $acl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new([Security.Principal.WindowsIdentity]::GetCurrent().User, 'FullControl', 'Allow'))
     $acl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new([Security.Principal.SecurityIdentifier]::new('S-1-5-18'), 'FullControl', 'Allow'))
@@ -28,16 +34,18 @@ $env:MC_CONFIG_DIR = Join-Path $env:FINAI_RUNTIME_ROOT 'tools\minio\mc-config'
 try {
     & "$env:VIRTUAL_ENV\Scripts\python.exe" "$PSScriptRoot\provision-minio-bucket.py"
     $configuration = Get-Content -Raw -LiteralPath $configurationPath | ConvertFrom-Json -AsHashtable
-    if (-not $configuration.FINAI_S3_ACCESS_KEY) {
-        $policyPath = Join-Path $env:FINAI_RUNTIME_ROOT 'tools\minio\evidence-policy.json'
+    $policyPath = Join-Path $env:FINAI_RUNTIME_ROOT 'tools\minio\evidence-policy.json'
         @{ Version = '2012-10-17'; Statement = @(
-            @{ Effect = 'Allow'; Action = @('s3:GetBucketLocation', 's3:GetBucketVersioning', 's3:ListBucket'); Resource = @('arn:aws:s3:::g8-evidence') },
+            @{ Effect = 'Allow'; Action = @('s3:GetBucketLocation', 's3:GetBucketVersioning', 's3:GetLifecycleConfiguration', 's3:ListBucket'); Resource = @('arn:aws:s3:::g8-evidence') },
             @{ Effect = 'Allow'; Action = @('s3:GetObject', 's3:GetObjectVersion', 's3:PutObject'); Resource = @('arn:aws:s3:::g8-evidence/*') }
         ) } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $policyPath -Encoding utf8
+    if (-not $configuration.FINAI_S3_ACCESS_KEY) {
         $generated = & $mc --json admin user svcacct add g8root $admin.accessKey --policy $policyPath | ConvertFrom-Json
         if (-not $generated.accessKey -or -not $generated.secretKey) { throw 'MinIO did not return scoped credentials.' }
         $configuration.FINAI_S3_ACCESS_KEY = $generated.accessKey
         $configuration.FINAI_S3_SECRET_KEY = $generated.secretKey
+    } else {
+        & $mc --json admin user svcacct edit g8root $configuration.FINAI_S3_ACCESS_KEY --policy $policyPath | Out-Null
     }
     $configuration.FINAI_S3_ENDPOINT = 'http://127.0.0.1:9061'
     $configuration.FINAI_S3_BUCKET = 'g8-evidence'

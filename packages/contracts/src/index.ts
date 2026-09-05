@@ -37,6 +37,13 @@ export interface IngestReceipt {
     sha256: string;
     byte_length: number;
     version_id?: string | null;
+    retention?: {
+      contract_version: "source-retention/1";
+      artifact_class: "IMMUTABLE_SOURCE_EVIDENCE";
+      disposition: "PRESERVE_PENDING_GOVERNED_DISPOSITION";
+      automatic_expiry_allowed: false;
+      legal_policy_state: "NOT_ESTABLISHED";
+    } | null;
   } | null;
   scope: ExactScope;
   source_class: "TRIAL_BALANCE" | "UNFAMILIAR_TABULAR" | "WORKBOOK_PACKAGE";
