@@ -1,3 +1,4 @@
+import base64
 import json
 from hashlib import sha256
 from typing import Annotated, Any, Literal
@@ -15,7 +16,8 @@ from finai_api.domain.review import (
     WorkspaceSummary,
 )
 from finai_api.security import authenticated_principal, require_permission
-from finai_api.services import source_preview, workspace
+from finai_api.services import source_preview, workbook_source, workspace, xls_source
+from finai_api.services.report_inputs import ReportInputRequest, assessments, retain_assessment
 
 router = APIRouter(prefix="/v1/workspace", tags=["operator workspace"])
 
@@ -26,6 +28,17 @@ def reader(principal: Annotated[Principal, Depends(authenticated_principal)]) ->
 
 
 User = Annotated[Principal, Depends(reader)]
+
+
+@router.post("/report-inputs")
+def report_input_assessment(request: ReportInputRequest, principal: User) -> dict[str, Any]:
+    require_permission(principal, "ingest")
+    return retain_assessment(principal, request)
+
+
+@router.get("/report-inputs")
+def report_input_history(principal: User) -> list[dict[str, Any]]:
+    return assessments(principal)
 
 
 @router.get("/session", response_model=Principal)
@@ -85,18 +98,35 @@ def preview_source(
     # Browsing original cells has the same permission as downloading the original.
     require_permission(principal, "export")
     response.headers["Cache-Control"] = "no-store"
-    return source_preview.preview(workspace.source_bytes(principal, receipt_id), offset, search)
+    content = workspace.source_bytes(principal, receipt_id)
+    if content.startswith(b"PK\x03\x04"):
+        return workbook_source.preview_workbook(content, offset, search)
+    if content.startswith(xls_source.SIGNATURE):
+        return xls_source.preview_xls(content, offset, search)
+    return source_preview.preview(content, offset, search)
 
 
 @router.get("/constructions/{receipt_id}/source")
 def source(receipt_id: str, principal: User) -> Response:
     require_permission(principal, "export")
     content = workspace.source_bytes(principal, receipt_id)
+    is_xls = content.startswith(xls_source.SIGNATURE)
+    if content.startswith(b"PK\x03\x04"):
+        return Response(
+            content,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": 'attachment; filename="retained-source.xlsx"',
+                "Cache-Control": "no-store",
+            },
+        )
     return Response(
         content,
-        media_type="text/csv; charset=utf-8",
+        media_type="application/vnd.ms-excel" if is_xls else "text/csv; charset=utf-8",
         headers={
-            "Content-Disposition": 'attachment; filename="retained-source.csv"',
+            "Content-Disposition": 'attachment; filename="retained-source.xls"'
+            if is_xls
+            else 'attachment; filename="retained-source.csv"',
             "Cache-Control": "no-store",
             "X-Content-SHA256": sha256(content).hexdigest(),
         },
@@ -107,11 +137,22 @@ def source(receipt_id: str, principal: User) -> Response:
 def export(receipt_id: str, principal: User) -> Response:
     require_permission(principal, "export")
     construction = workspace.detail(principal, receipt_id)
+    source_content = workspace.source_bytes(principal, receipt_id)
+    source_payload = (
+        {
+            "source_base64": base64.b64encode(source_content).decode("ascii"),
+            "source_encoding": "OOXML_XLSX"
+            if source_content.startswith(b"PK\x03\x04")
+            else "BIFF_XLS",
+        }
+        if source_content.startswith((xls_source.SIGNATURE, b"PK\x03\x04"))
+        else {"source_utf8": source_content.decode("utf-8")}
+    )
     bundle = {
         "format": "finai-evidence-bundle/1",
         "scope": principal.scope.model_dump(mode="json"),
         "construction": construction.model_dump(mode="json"),
-        "source_utf8": workspace.source_bytes(principal, receipt_id).decode("utf-8"),
+        **source_payload,
         "certification": "NOT_CERTIFIED",
         "exported_by": principal.actor_id,
     }

@@ -77,7 +77,7 @@ def _verified_get(client: Any, metadata: SourceStorage) -> tuple[bytes, str | No
 
 
 def preserve(scope: ExactScope, content: bytes, expected_hash: str) -> SourceStorage:
-    if not content or len(content) > 4_000_000 or sha256(content).hexdigest() != expected_hash:
+    if not content or len(content) > 16_000_000 or sha256(content).hexdigest() != expected_hash:
         raise EvidenceStoreUnavailable("Source integrity verification failed before retention")
     client = _client()
     metadata = SourceStorage(

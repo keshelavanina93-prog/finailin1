@@ -164,6 +164,9 @@ def source_accounts(principal: User, request: IngestRequest) -> dict[str, Any]:
         raise WorkspaceError(422, str(exc)) from exc
     return {
         "source_class": receipt.source_class,
+        "observed_bindings": receipt.observed_bindings,
+        "rejects": receipt.rejects,
+        "warnings": receipt.warnings,
         "account_codes": sorted(
             {
                 candidate.values["account_code"]

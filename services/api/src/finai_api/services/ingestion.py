@@ -13,6 +13,15 @@ class SourceAuthorityDenied(ValueError):
 
 def compile_source(request: IngestRequest) -> IngestReceipt:
     """One deterministic, bounded compiler for recognized and unfamiliar CSV evidence."""
+    if request.xlsx_base64 is not None:
+        from finai_api.services.workbook_source import compile_workbook
+
+        return compile_workbook(request)
+    if request.xls_base64 is not None:
+        from finai_api.services.xls_source import compile_xls
+
+        return compile_xls(request)
+    assert request.csv_text is not None
     reader = csv.DictReader(
         io.StringIO(request.csv_text.removeprefix("\ufeff"), newline=""), strict=True
     )

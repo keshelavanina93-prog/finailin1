@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     s3_bucket: str = "g8-evidence"
     s3_region: str = "us-east-1"
     access_tokens: SecretStr = SecretStr("{}")
+    temporal_address: str = "127.0.0.1:7233"
+    temporal_namespace: str = "default"
 
 
 @lru_cache

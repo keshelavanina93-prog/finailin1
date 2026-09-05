@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import type { Principal, ReceiptDetail } from "@finai/contracts";
 import CanonicalTrace from "./canonical-trace";
+import SourceInspection from "./source-inspection";
+import TrialBalanceReview from "./trial-balance-review";
 
 type Props = {
   detail: ReceiptDetail;
@@ -28,6 +30,7 @@ export default function ReceiptPanel({ detail, principal, busy, onDecision, onEx
     await onDecision(value, reason, intent.current.key);
   }
 
+  if (receipt.authority_contract_version === "1c-tb-observations/1") return <TrialBalanceReview detail={detail} principal={principal} onClose={onClose} onExport={onExport} />;
   return <section className="construction" aria-label="Construction review">
     <div className="section-heading"><div><p className="overline">CONSTRUCTION REVIEW</p><h2>{detail.filename}</h2></div>
       <button className="quiet" onClick={onClose}>Close review</button></div>
@@ -37,12 +40,13 @@ export default function ReceiptPanel({ detail, principal, busy, onDecision, onEx
           <span>{receipt.source_class.replaceAll("_", " ")}</span><span>{receipt.candidates.length} proposed objects</span></div>
         <p className="muted">{receipt.binding_state === "CANONICAL_BOUND" ? "Shared identity bound · financial certification remains separate" : "Source-only construction · canonical accounting identity unavailable"}</p>
         <CanonicalTrace references={receipt.canonical_references} />
+        <SourceInspection receipt={receipt} decision={decision} />
         <nav className="pipeline-nav" aria-label="Compilation stages">
           {receipt.plan.map((name, index) => <button aria-pressed={stage === name} className={stage === name ? "selected" : ""}
             onClick={() => setStage(name)} key={name}><small>{String(index + 1).padStart(2, "0")}</small>{name}</button>)}
         </nav>
         <div className="stage-content">
-          {stage === "preserve" && <><h3>Retained source evidence</h3><p>Original submitted UTF-8 content is retained with this construction.</p><p>{receipt.source_storage ? `Stored separately as original evidence · ${receipt.source_storage.byte_length.toLocaleString()} bytes` : "Retained in the original construction store"}. Downloads verify the content against the retained hash.</p><code className="full-hash">{receipt.source_sha256}</code><p>Submitted by {detail.submitted_by ?? "Legacy identity unavailable"} · {new Date(detail.ingested_at).toLocaleString()}</p></>}
+          {stage === "preserve" && <><h3>Retained source evidence</h3><p>Original submitted bytes are retained with this construction.</p><p>{receipt.source_storage ? `Stored separately as original evidence · ${receipt.source_storage.byte_length.toLocaleString()} bytes` : "Retained in the original construction store"}. Downloads verify the content against the retained hash.</p><code className="full-hash">{receipt.source_sha256}</code><p>Submitted by {detail.submitted_by ?? "Legacy identity unavailable"} · {new Date(detail.ingested_at).toLocaleString()}</p></>}
           {stage === "classify" && <><h3>{receipt.source_class.replaceAll("_", " ")}</h3><p>Structural recognition determines the source contract. It does not certify the source or establish deeper transactions.</p><p>Pack: {receipt.pack_version}</p></>}
           {stage === "authority-check" && <><h3>Source authority: {receipt.authority_contract_version}</h3><p>{receipt.source_class === "TRIAL_BALANCE" ? "Account and period-balance candidates only. Invoices, journal documents and inventory movements require their own evidence." : "Raw source records only. Business identities and financial meaning have not been inferred."}</p><p>Review approval accepts the construction, not a certified financial statement.</p></>}
           {(stage === "profile" || stage === "bind") && <><h3>Source field coverage</h3><p>Used: {receipt.used_fields.join(", ")}</p><p>Unused: {receipt.unused_fields.join(", ") || "None"}</p><p>Executed functions: {receipt.functions_executed.join(", ") || "No financial functions"}</p></>}
@@ -65,7 +69,7 @@ export default function ReceiptPanel({ detail, principal, busy, onDecision, onEx
           <button disabled={busy || reason.trim().length < 10 || detail.approval_blockers.length > 0} onClick={() => void decide("APPROVED")}>Approve construction</button>
           <button className="danger" disabled={busy || reason.trim().length < 10 || !canReject} onClick={() => void decide("REJECTED")}>Reject construction</button>
         </>}
-        {principal.permissions.includes("export") && <div className="export-actions"><button className="quiet" onClick={() => onExport("source")}>Download original CSV</button><button className="quiet" onClick={() => onExport("export")}>Export evidence bundle</button></div>}
+        {principal.permissions.includes("export") && <div className="export-actions"><button className="quiet" onClick={() => onExport("source")}>Download original source</button><button className="quiet" onClick={() => onExport("export")}>Export evidence bundle</button></div>}
         <p className="muted">No posting or external-system action occurs here.</p>
       </aside>
     </div>

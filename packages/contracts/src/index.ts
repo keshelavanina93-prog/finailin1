@@ -11,7 +11,10 @@ export type { AuthorityState, VersionReference, LifecycleRequest, LifecycleRevie
 export interface IngestRequest {
   scope: ExactScope;
   filename: string;
-  csv_text: string;
+  csv_text?: string;
+  xls_base64?: string;
+  xlsx_base64?: string;
+  source_use?: "ACTUAL_INPUT" | "HISTORICAL_REFERENCE" | "REPORT_TEMPLATE" | "MAPPING_REFERENCE";
   requested_objects?: string[];
   context_version_id?: string | null;
   account_version_ids?: Record<string, string>;
@@ -35,7 +38,14 @@ export interface IngestReceipt {
     version_id?: string | null;
   } | null;
   scope: ExactScope;
-  source_class: "TRIAL_BALANCE" | "UNFAMILIAR_TABULAR";
+  source_class: "TRIAL_BALANCE" | "UNFAMILIAR_TABULAR" | "WORKBOOK_PACKAGE";
+  source_profile?: {
+    source_use?: string;
+    sheets?: Array<{ sheet: string; source_type: string; grain: string; source_rows: number; formula_count: number; periods: string[]; company_labels: string[]; content_sha256: string }>;
+    findings?: Array<{ code: string; sheet: string; message: string; coordinates: string[]; occurrences?: number }>;
+    dependencies?: Array<{ source: string; target: string; formula_count: number; resolved_sheet: boolean }>;
+  };
+  process_steps?: Array<{ id: string; state: string; depends_on: string[]; started_at: string | null; completed_at: string | null; function: string; input_ids: string[]; output_ids: string[] }>;
   authority_state: "MAPPED_CANDIDATE";
   plan: string[];
   candidates: Array<{

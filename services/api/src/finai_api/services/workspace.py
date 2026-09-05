@@ -77,6 +77,7 @@ def detail(principal: Principal, receipt_id: str) -> ReceiptDetail:
                 {
                     (
                         f"{item.object_type}:"
+                        f"{item.values.get('source_sheet', '')}:"
                         f"{item.values.get('account_code', str(item.source_row))}"
                     ): {
                         "values": item.values,
@@ -298,14 +299,14 @@ def object_detail(principal: Principal, object_id: str) -> ObjectDetail:
             raise WorkspaceError(404, "Object not found in authorized scope")
         obj = WorkspaceObject.model_validate(row[0])
         run = _run(conn, principal, obj.receipt_id)
-        reader = csv.DictReader(
-            io.StringIO(
-                retained_source(principal.scope, run).decode("utf-8").removeprefix("\ufeff")
+        content = retained_source(principal.scope, run)
+        if run["request"].get("source_encoding") in {"BIFF_XLS", "OOXML_XLSX"}:
+            source_row = obj.values
+        else:
+            reader = csv.DictReader(io.StringIO(content.decode("utf-8").removeprefix("\ufeff")))
+            source_row = next(
+                (values for index, values in enumerate(reader, 2) if index == obj.source_row), {}
             )
-        )
-        source_row = next(
-            (values for index, values in enumerate(reader, 2) if index == obj.source_row), {}
-        )
         with conn.cursor(row_factory=dict_row) as cursor:
             decision = cursor.execute(
                 "SELECT * FROM construction_decisions WHERE tenant_id=%s AND receipt_id=%s",

@@ -5,8 +5,10 @@ from fastapi.responses import JSONResponse
 from finai_api.api.lifecycle_routes import router as lifecycle_router
 from finai_api.api.ontology_routes import router as ontology_router
 from finai_api.api.operations_routes import router as operations_router
+from finai_api.api.reporting_routes import router as reporting_router
 from finai_api.api.routes import router
 from finai_api.api.workspace_routes import router as workspace_router
+from finai_api.api.workflow_routes import router as workflow_router
 from finai_api.evidence_objects import EvidenceStoreUnavailable
 from finai_api.services.workspace import WorkspaceError
 
@@ -16,7 +18,9 @@ app = FastAPI(
     version="0.1.0",
 )
 app.include_router(router)
+app.include_router(reporting_router)
 app.include_router(workspace_router)
+app.include_router(workflow_router)
 app.include_router(ontology_router)
 app.include_router(lifecycle_router)
 app.include_router(operations_router)

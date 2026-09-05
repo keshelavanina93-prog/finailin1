@@ -1,4 +1,5 @@
 import csv
+from datetime import UTC, datetime
 from typing import Annotated
 
 import psycopg
@@ -17,7 +18,7 @@ from finai_api.storage import retain, retrieve
 
 router = APIRouter()
 compiler = AuthorityCompiler()
-REQUIRED_SCHEMA_VERSION = 12
+REQUIRED_SCHEMA_VERSION = 15
 
 
 @router.get("/health", tags=["operations"])
@@ -81,7 +82,28 @@ def ingest(
     if request.scope != scope:
         raise HTTPException(403, "Exact scope does not match credential")
     try:
+        started = datetime.now(UTC).isoformat()
         receipt = bind_receipt(principal, request, compile_source(request))
+        receipt = receipt.model_copy(
+            update={
+                "process_steps": (
+                    {
+                        "id": "inspect",
+                        "state": "COMPLETED",
+                        "depends_on": [],
+                        "started_at": started,
+                        "completed_at": datetime.now(UTC).isoformat(),
+                        "function": receipt.classifier_version,
+                        "input_ids": [receipt.source_sha256],
+                        "output_ids": [receipt.receipt_id],
+                        "operations": list(receipt.functions_executed),
+                        "mapping_version": receipt.authority_contract_version,
+                        "warning_count": len(receipt.warnings),
+                        "reject_count": len(receipt.rejects),
+                    },
+                )
+            }
+        )
     except SourceAuthorityDenied as exc:
         raise HTTPException(403, str(exc)) from exc
     except (ValueError, csv.Error) as exc:

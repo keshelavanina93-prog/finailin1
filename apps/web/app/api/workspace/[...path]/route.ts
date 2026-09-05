@@ -6,13 +6,13 @@ async function forward(request: NextRequest, context: Context) {
   const { path } = await context.params;
   // Fixed upstream host and explicitly allowed routes: never turn this into an arbitrary proxy.
   const route = path.join("/");
-  if (!/^(session|summary|intake|objects(?:\/[a-zA-Z0-9_:.-]+)?|constructions\/[a-zA-Z0-9_-]+(?:\/(decision|source|export|preview))?)$/.test(route)) {
+  if (!/^(session|summary|intake|workflows(?:\/[a-zA-Z0-9_-]+(?:\/control)?)?|report-inputs|report-calculations(?:\/[a-zA-Z0-9_-]+(?:\/export)?)?|objects(?:\/[a-zA-Z0-9_:.-]+)?|constructions\/[a-zA-Z0-9_-]+(?:\/(decision|source|export|preview))?)$/.test(route)) {
     return Response.json({ detail: "Workspace route not found" }, { status: 404 });
   }
   const authorization = request.headers.get("authorization");
   if (!authorization) return Response.json({ detail: "Sign in to continue" }, { status: 401 });
   const body = request.method === "POST" ? await request.text() : undefined;
-  if (body && Buffer.byteLength(body) > 8192) {
+  if (body && Buffer.byteLength(body) > ((route === "report-inputs" || route === "workflows") ? 16000 : 8192)) {
     return Response.json({ detail: "Review request too large" }, { status: 413 });
   }
   try {
