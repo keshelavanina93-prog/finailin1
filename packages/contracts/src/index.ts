@@ -5,7 +5,7 @@ export const epistemicStates = [
   "UNAVAILABLE",
 ] as const;
 
-export type { SchemaField, CanonicalResource, ResourceMutation, ResourceProposal, ResourceProposalDetail, ProposalSummary, CanonicalDetail } from "./ontology.js";
+export type { SchemaField, CanonicalResource, ResourceMutation, ResourceProposal, ResourceProposalDetail, ProposalSummary, CanonicalDetail, HistoricalGraph } from "./ontology.js";
 
 export interface IngestReceipt {
   binding_state: "SOURCE_ONLY" | "CANONICAL_BOUND";

@@ -9,7 +9,7 @@ from finai_api.evidence_objects import EvidenceStoreUnavailable
 from finai_api.services.workspace import WorkspaceError
 
 app = FastAPI(
-    title="FinAI / NYX Core API",
+    title="G8 by NYXCore API",
     summary="Evidence-native enterprise operating platform",
     version="0.1.0",
 )

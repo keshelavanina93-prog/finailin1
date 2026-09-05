@@ -16,6 +16,7 @@ from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import resources
 from finai_api.services.enterprise_reference import socar_reference
+from finai_api.services.historical_graph import historical_graph
 from finai_api.services.ingest_binding import context_accounts
 from finai_api.services.ingestion import SourceAuthorityDenied, compile_source
 from finai_api.services.workspace import WorkspaceError
@@ -159,3 +160,13 @@ def source_accounts(principal: User, request: IngestRequest) -> dict[str, Any]:
             }
         ),
     }
+
+
+@router.get("/resources/{resource_id}/graph")
+def resource_history_graph(
+    principal: User,
+    resource_id: UUID,
+    valid_at: datetime | None = None,
+    known_at: datetime | None = None,
+) -> dict[str, Any]:
+    return historical_graph(principal, resource_id, valid_at=valid_at, known_at=known_at)

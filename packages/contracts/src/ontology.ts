@@ -34,3 +34,15 @@ export interface CanonicalDetail {
   resource: CanonicalResource; versions: CanonicalResource[];
   dependents: Array<{resource_id: string; version_id:string; display_name:string; object_type:string; relation:string}>;
 }
+export interface HistoricalGraph {
+  purpose: "HISTORICAL_LINEAGE";
+  root_resource_id: string;
+  root_version_id: string;
+  valid_at: string;
+  known_at: string;
+  max_depth: number;
+  max_nodes: number;
+  max_edges: number;
+  nodes: Array<{ resource_id: string; version_id: string; object_type: string; display_name: string; authority_state: string; valid_from: string; valid_to: string | null; system_from: string }>;
+  edges: Array<{ source_version_id: string; target_version_id: string; relation: string }>;
+}
