@@ -14,7 +14,7 @@ def test_compiler_separates_evidence_states(
     by_field = {item.field: item for item in receipt.fields}
 
     assert by_field["account_code"].state is EpistemicState.OBSERVED
-    assert by_field["account_code"].authoritative is True
+    assert by_field["account_code"].authoritative is False
     assert by_field["net_balance"].state is EpistemicState.DERIVED
     assert by_field["net_balance"].rule_id == "finance.tb.net-balance"
     assert by_field["customer_invoice_id"].state is EpistemicState.UNAVAILABLE

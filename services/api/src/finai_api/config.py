@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,6 +10,8 @@ class Settings(BaseSettings):
     environment: str = "local"
     service_name: str = "finai-api"
     api_version: str = "0.1.0"
+    database_url: SecretStr = SecretStr("")
+    access_tokens: SecretStr = SecretStr("{}")
 
 
 @lru_cache

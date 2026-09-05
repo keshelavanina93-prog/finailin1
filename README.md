@@ -73,10 +73,13 @@ docs/architecture     architectural decisions and authority invariants
 scripts               D:-only bootstrap, guard, and verification
 ```
 
-The first implemented vertical slice is the generic Enterprise Hydration / Source
-Authority compiler. It accepts a versioned source authority contract with exact
-tenant, legal-entity, period, and currency scope, then emits a deterministic,
-content-addressed construction receipt. Each requested field is classified as:
+The initial compiler preview classifies client-declared fields, without proving
+source retention or executing rules. Its fields are never authoritative.
+The persisted ingestion path now accepts UTF-8 CSV, with server-owned source
+contracts and exact tenant/entity/period/currency authorization. It retains the
+submitted UTF-8 bytes, executes bounded decimal TB derivations, and writes a
+deterministic construction receipt to PostgreSQL. Unknown schemas produce only
+source-record candidates. Epistemic states remain distinct from business authority:
 
 - `OBSERVED` — directly supported by retained evidence;
 - `DERIVED` — deterministically produced by a versioned rule over observed inputs;
@@ -93,17 +96,28 @@ From the canonical Windows checkout:
 
 ```powershell
 .\scripts\bootstrap-local.ps1
+.\scripts\start-local-postgres.ps1 -PostgresBin D:\PG18\pgsql\bin
 .\scripts\verify-local.ps1
 ```
 
 Run the services directly:
 
 ```powershell
-.\.venv\Scripts\python.exe -m uvicorn finai_api.main:app --app-dir services\api\src --reload
+.\scripts\load-local.ps1
+.\.venv\Scripts\python.exe -m uvicorn finai_api.main:app --app-dir services\api\src --host 127.0.0.1 --port 8000
 pnpm --filter @finai/web dev
 ```
 
-Or run the container topology after bootstrap has created the D:-local data root:
+The local PostgreSQL cluster binds to `127.0.0.1:55439`, uses SCRAM credentials,
+and stores all data beneath `.finai/data/postgres-native`. Configuration and the
+generated exact-scope access token are in ignored `.finai/local.json`. Use its
+token and scope in the operator form. Tokens are kept in browser memory only.
+This is bootstrap authentication; enterprise identity and approval remain open.
+
+The container topology requires explicit database migration and a restricted
+runtime DSN plus access-token configuration. On Windows, do not build/run Docker
+until its engine image, build-cache and volume storage have been verified on D:;
+the bind mount alone does not prove the engine's storage location.
 
 ```powershell
 docker compose up --build
@@ -115,8 +129,13 @@ docker compose up --build
 
 ## Acceptance boundary
 
-This foundation proves local structure, exact-scope authority classification,
-deterministic receipts, shared frontend contracts, an operator shell, automated
-tests, and production builds. It does not yet prove source parsing, immutable object
-storage, database persistence, canonical promotion, reconciliation, approval,
-external-system delivery, authentic-source acceptance, scale, or production release.
+This implementation adds CSV parsing, deterministic TB balance checks, immutable
+PostgreSQL evidence/receipt retention, restricted-role tenant isolation, exact-scope
+read denial, idempotent replay, and a connected ingestion workspace. The compiler
+and database produce candidates only. Row observations do not prove source authenticity.
+
+NIN-24 remains unaccepted: semantic memory, configurable ontology registries,
+durable workflow DAG execution, reviewed promotion and canonical object workspaces
+remain open. Enterprise identity, authentic 1C/SAP integrations, financial reporting,
+scale and production release acceptance also remain open. See
+`docs/architecture/0002-retained-hydration.md` for the binding issue mapping.

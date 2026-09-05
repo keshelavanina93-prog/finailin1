@@ -4,6 +4,28 @@ from uuid import UUID
 
 import pytest
 
+from finai_api.config import get_settings
+
+
+@pytest.fixture(autouse=True)
+def configured_auth(monkeypatch: pytest.MonkeyPatch) -> None:
+    import json
+
+    monkeypatch.setenv(
+        "FINAI_ACCESS_TOKENS",
+        json.dumps(
+            {
+                "test-token": {
+                    "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                    "legal_entity_id": "entity-ge-001",
+                    "period": "2026-08",
+                    "currency": "GEL",
+                }
+            }
+        ),
+    )
+    get_settings.cache_clear()
+
 
 @pytest.fixture
 def request_payload() -> Callable[..., dict[str, Any]]:

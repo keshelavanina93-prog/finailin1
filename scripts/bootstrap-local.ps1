@@ -18,7 +18,7 @@ $directories = @{
     PnpmStore = Join-Path $runtimeRoot 'pnpm-store'
     Data = Join-Path $runtimeRoot 'data'
     Artifacts = Join-Path $runtimeRoot 'artifacts'
-    Worktrees = 'D:\FinAI\worktrees'
+    Worktrees = Join-Path $runtimeRoot 'worktrees'
 }
 
 $directories.Values | ForEach-Object {
@@ -36,13 +36,22 @@ $env:PNPM_STORE_DIR = $directories.PnpmStore
 $env:FINAI_DATA_DIR = $directories.Data
 $env:FINAI_ARTIFACTS_DIR = $directories.Artifacts
 $env:VIRTUAL_ENV = Join-Path $repositoryRoot '.venv'
+$env:UV_PYTHON_INSTALL_DIR = Join-Path $runtimeRoot 'python'
+$env:UV_TOOL_DIR = Join-Path $runtimeRoot 'tools'
+$env:npm_config_cache = Join-Path $runtimeRoot 'cache\npm'
+$env:npm_config_userconfig = Join-Path $runtimeRoot 'npmrc'
+$env:COREPACK_HOME = Join-Path $runtimeRoot 'cache\corepack'
+$env:PLAYWRIGHT_BROWSERS_PATH = Join-Path $runtimeRoot 'cache\playwright'
+$env:PYTHONPYCACHEPREFIX = Join-Path $runtimeRoot 'cache\pycache'
+$env:NEXT_TELEMETRY_DISABLED = '1'
+$env:TURBO_TELEMETRY_DISABLED = '1'
 
 & (Join-Path $PSScriptRoot 'assert-d-drive.ps1') -RepositoryRoot $repositoryRoot
 
 if (-not $SkipInstall) {
     Push-Location $repositoryRoot
     try {
-        pnpm install --store-dir $directories.PnpmStore --no-frozen-lockfile
+        pnpm install --store-dir $directories.PnpmStore --frozen-lockfile
 
         if (-not (Test-Path -LiteralPath $env:VIRTUAL_ENV)) {
             python -m venv $env:VIRTUAL_ENV

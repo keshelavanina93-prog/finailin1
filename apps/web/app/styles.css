@@ -23,6 +23,20 @@ body {
 }
 
 main { min-height: 100vh; }
+label { display: grid; gap: 6px; margin: 14px 0; font-size: 12px; }
+input, button { font: inherit; color: inherit; background: #102425; border: 1px solid #42635e; padding: 10px; width: 100%; min-width: 0; }
+button { cursor: pointer; background: #1d6252; }
+button:disabled { opacity: .6; cursor: wait; }
+input:focus, button:focus, summary:focus { outline: 2px solid #66dfbc; outline-offset: 3px; }
+.resultBody { padding: 24px; font-size: 13px; line-height: 1.6; }
+.receipt strong, .hash code { overflow-wrap: anywhere; }
+.tableScroll { overflow: auto; max-height: 560px; }
+table { border-collapse: collapse; width: 100%; font-size: 12px; }
+td, th { padding: 12px; border-bottom: 1px solid #284340; text-align: left; }
+th { position: sticky; top: 0; background: #102425; }
+pre { overflow: auto; max-height: 400px; }
+.pipeline { display: flex; flex-wrap: wrap; gap: 24px; }
+[role="alert"] { color: #ffaaaa; }
 
 .topbar {
   align-items: center;

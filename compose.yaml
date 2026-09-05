@@ -21,6 +21,11 @@ services:
     build: ./services/api
     environment:
       FINAI_ENVIRONMENT: local
+      FINAI_DATABASE_URL: ${FINAI_DATABASE_URL:?Set a restricted PostgreSQL runtime DSN}
+      FINAI_ACCESS_TOKENS: ${FINAI_ACCESS_TOKENS:?Set exact-scope credentials}
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "127.0.0.1:8000:8000"
     healthcheck:

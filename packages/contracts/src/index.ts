@@ -5,6 +5,26 @@ export const epistemicStates = [
   "UNAVAILABLE",
 ] as const;
 
+export interface IngestReceipt {
+  receipt_id: string;
+  request_sha256: string;
+  source_sha256: string;
+  scope: ExactScope;
+  source_class: "TRIAL_BALANCE" | "UNFAMILIAR_TABULAR";
+  authority_state: "MAPPED_CANDIDATE";
+  plan: string[];
+  candidates: Array<{
+    object_type: string;
+    source_row: number;
+    epistemic_state: "OBSERVED" | "DERIVED";
+    authority_state: "MAPPED_CANDIDATE";
+    values: Record<string, string>;
+  }>;
+  rejects: string[];
+  warnings: string[];
+  reconciliation: Record<string, string>;
+}
+
 export type EpistemicState = (typeof epistemicStates)[number];
 export type SourceKind = "TRIAL_BALANCE" | "GENERAL_LEDGER" | "DATABASE" | "DOCUMENT";
 

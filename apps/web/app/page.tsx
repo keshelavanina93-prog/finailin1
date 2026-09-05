@@ -1,140 +1,86 @@
-import type { FieldAuthority } from "@finai/contracts";
+"use client";
 
-const authorityFields: FieldAuthority[] = [
-  {
-    field: "account_code",
-    state: "OBSERVED",
-    authoritative: true,
-    evidence_ids: ["ev_tb_2026_08"],
-    source_path: "sheet:TB!A:A",
-    dependencies: [],
-    rationale: "Directly declared by the source authority contract.",
-  },
-  {
-    field: "net_balance",
-    state: "DERIVED",
-    authoritative: true,
-    evidence_ids: ["ev_tb_2026_08"],
-    rule_id: "finance.tb.net-balance",
-    rule_version: 1,
-    dependencies: ["debit", "credit"],
-    rationale: "Deterministically derived from observed dependencies.",
-  },
-  {
-    field: "account_semantic_class",
-    state: "INFERRED",
-    authoritative: false,
-    evidence_ids: [],
-    dependencies: [],
-    rationale: "Candidate interpretation requires human review and supporting evidence.",
-  },
-  {
-    field: "customer_invoice_id",
-    state: "UNAVAILABLE",
-    authoritative: false,
-    evidence_ids: [],
-    dependencies: [],
-    rationale: "A trial balance cannot establish invoice-level evidence.",
-  },
-];
-
-const stages = [
-  ["01", "Evidence received", "Immutable hash retained"],
-  ["02", "Authority compiled", "Exact scope enforced"],
-  ["03", "Validation pending", "No canonical promotion"],
-];
+import { useState, type FormEvent } from "react";
+import type { IngestReceipt } from "@finai/contracts";
 
 export default function Home() {
-  return (
-    <main>
-      <header className="topbar">
-        <div className="brand">
-          <span className="brandMark">F</span>
-          <div>
-            <strong>FinAI</strong>
-            <span>NYX CORE</span>
-          </div>
-        </div>
-        <div className="context">
-          <span>Legal entity · GE-001</span>
-          <span>Period · 2026-08</span>
-          <span>Currency · GEL</span>
-        </div>
-        <div className="environment">LOCAL · CANDIDATE</div>
-      </header>
-
-      <section className="hero">
-        <div>
-          <p className="eyebrow">ENTERPRISE HYDRATION / SOURCE AUTHORITY</p>
-          <h1>Construct what the evidence can prove.</h1>
-          <p className="heroCopy">
-            A trial balance hydrates the prebuilt finance operating model without inventing
-            transactions, documents, or authority absent from the source.
-          </p>
-        </div>
-        <div className="receipt">
-          <span>CONSTRUCTION RECEIPT</span>
-          <strong>cr_93e4a66f0d851c72829bb113</strong>
-          <small>Candidate only · promotion requires reconciliation and approval</small>
-        </div>
+  const [receipt, setReceipt] = useState<IngestReceipt | null>(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function ingest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const file = data.get("source") as File;
+    setError(""); setReceipt(null); setBusy(true);
+    try {
+      if (file.size > 1_000_000) throw new Error("Choose a CSV smaller than 1 MB.");
+      const response = await fetch("/api/hydration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.get("token")}` },
+        body: JSON.stringify({
+          scope: { tenant_id: data.get("tenant"), legal_entity_id: data.get("entity"),
+            period: data.get("period"), currency: data.get("currency") },
+          filename: file.name, csv_text: new TextDecoder("utf-8", { fatal: true, ignoreBOM: true })
+            .decode(await file.arrayBuffer()),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(typeof result.detail === "string"
+        ? result.detail : "Request validation failed. Check the file and exact scope.");
+      setReceipt(result);
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : "Ingestion failed");
+    } finally { setBusy(false); }
+  }
+  return <main>
+    <header className="topbar">
+      <div className="brand"><span className="brandMark">F</span><div><strong>FinAI</strong><span>NYX CORE</span></div></div>
+      <div className="context">Enterprise Hydration · Source Authority</div>
+      <div className="environment">CANDIDATE WORKSPACE</div>
+    </header>
+    <section className="hero">
+      <div><p className="eyebrow">EVIDENCE → UNDERSTANDING → REVIEW</p>
+        <h1>Construct what the evidence can prove.</h1>
+        <p className="heroCopy">Upload a trial balance or an unfamiliar CSV. Inspect retained evidence,
+          source boundaries and proposed objects before any canonical promotion.</p></div>
+      <div className="receipt"><span>CONSTRUCTION RECEIPT</span>
+        <strong>{receipt?.receipt_id ?? "Awaiting source evidence"}</strong>
+        <small>Candidate only · promotion requires reconciliation and approval</small></div>
+    </section>
+    <section className="workspace">
+      <form className="sourcePanel" onSubmit={ingest}>
+        <p className="panelLabel">SOURCE AND EXACT SCOPE</p>
+        <label>Access token<input name="token" type="password" autoComplete="off" required /></label>
+        <label>Tenant UUID<input name="tenant" required /></label>
+        <label>Legal entity<input name="entity" required maxLength={128} /></label>
+        <label>Period<input name="period" type="month" required /></label>
+        <label>Currency<input name="currency" pattern="[A-Z]{3}" maxLength={3} placeholder="GEL" required /></label>
+        <label>CSV source<input name="source" type="file" accept=".csv,text/csv" required /></label>
+        <p className="heroCopy">TB columns: account_code, debit, credit. Other schemas remain source records.</p>
+        <button disabled={busy}>{busy ? "Retaining and compiling…" : "Ingest evidence"}</button>
+        {error && <p role="alert">{error}</p>}
+      </form>
+      <section className="authorityPanel" aria-live="polite">
+        <div className="panelHeader"><div><p className="panelLabel">EVIDENCE WORKSPACE</p>
+          <h2>{receipt?.source_class ?? "No source ingested"}</h2></div>
+          <span className="count">{receipt?.candidates.length ?? 0} candidates</span></div>
+        {receipt ? <div className="resultBody">
+          <p><strong>{receipt.authority_state}</strong> · Reconciliation: {receipt.reconciliation.status}</p>
+          <p className="hash">Source SHA-256 <code>{receipt.source_sha256}</code></p>
+          <ol className="pipeline" aria-label="Executed compilation plan">
+            {receipt.plan.map(stage => <li key={stage}>{stage}</li>)}</ol>
+          {receipt.warnings.map(warning => <p key={warning}>{warning}</p>)}
+          <h3>Rejected rows ({receipt.rejects.length})</h3>
+          {receipt.rejects.map(reject => <p key={reject} role="status">{reject}</p>)}
+          <div className="tableScroll"><table><thead><tr><th>Source row</th><th>Object</th><th>Evidence state</th><th>Values</th></tr></thead>
+            <tbody>{receipt.candidates.map((candidate, i) => <tr key={i}>
+              <td>{candidate.source_row}</td><td>{candidate.object_type}</td>
+              <td>{candidate.epistemic_state}</td><td><code>{JSON.stringify(candidate.values)}</code></td>
+            </tr>)}</tbody></table></div>
+          <details><summary>Full construction receipt</summary><pre>{JSON.stringify(receipt, null, 2)}</pre></details>
+        </div> : <p className="resultBody">Ingest evidence to see the compilation plan, candidates, rejected rows and durable receipt.</p>}
       </section>
-
-      <section className="stageGrid" aria-label="Hydration stages">
-        {stages.map(([number, title, detail]) => (
-          <article key={number} className="stage">
-            <span>{number}</span>
-            <div>
-              <strong>{title}</strong>
-              <p>{detail}</p>
-            </div>
-          </article>
-        ))}
-      </section>
-
-      <section className="workspace">
-        <aside className="sourcePanel">
-          <p className="panelLabel">SOURCE AUTHORITY CONTRACT</p>
-          <dl>
-            <div><dt>Source kind</dt><dd>Trial balance</dd></div>
-            <div><dt>Evidence</dt><dd>tb-2026-08.xlsx</dd></div>
-            <div><dt>Tenant</dt><dd>805d8a32…</dd></div>
-            <div><dt>Entity</dt><dd>entity-ge-001</dd></div>
-            <div><dt>Period</dt><dd>2026-08</dd></div>
-            <div><dt>Currency</dt><dd>GEL</dd></div>
-          </dl>
-          <div className="hash">
-            <span>SHA-256</span>
-            <code>aaaaaaaaaaaa…aaaaaaaa</code>
-          </div>
-        </aside>
-
-        <section className="authorityPanel">
-          <div className="panelHeader">
-            <div>
-              <p className="panelLabel">FIELD AUTHORITY</p>
-              <h2>Hydrated finance model</h2>
-            </div>
-            <span className="count">{authorityFields.length} fields</span>
-          </div>
-          <div className="fieldTable" role="table" aria-label="Field authority assessment">
-            <div className="tableHead" role="row">
-              <span>Field</span><span>State</span><span>Authority basis</span>
-            </div>
-            {authorityFields.map((item) => (
-              <div className="tableRow" role="row" key={item.field}>
-                <code>{item.field}</code>
-                <span className={`badge badge-${item.state.toLowerCase()}`}>{item.state}</span>
-                <p>{item.rationale}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </section>
-
-      <footer>
-        <span>Known · how it is known · whether it is authoritative</span>
-        <span>Compiler authority-compiler/0.1</span>
-      </footer>
-    </main>
-  );
+    </section>
+    <footer><span>Evidence state and business authority remain separate</span><span>Hydration compiler / 1</span></footer>
+  </main>;
 }

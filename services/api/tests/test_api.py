@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from finai_api.main import app
 
-client = TestClient(app)
+client = TestClient(app, headers={"Authorization": "Bearer test-token"})
 
 
 def test_health() -> None:

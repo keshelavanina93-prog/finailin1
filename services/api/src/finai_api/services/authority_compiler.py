@@ -53,10 +53,10 @@ class AuthorityCompiler:
             return FieldAuthority(
                 field=name,
                 state=EpistemicState.OBSERVED,
-                authoritative=True,
+                authoritative=False,
                 evidence_ids=evidence_ids,
                 source_path=source_path,
-                rationale="Directly declared by the source authority contract.",
+                rationale="Client-declared evidence; retention and validation are not established.",
             )
 
         rule = rules.get(name)
@@ -68,12 +68,12 @@ class AuthorityCompiler:
                 return FieldAuthority(
                     field=name,
                     state=EpistemicState.DERIVED,
-                    authoritative=True,
+                    authoritative=False,
                     evidence_ids=evidence_ids,
                     rule_id=rule.rule_id,
                     rule_version=rule.rule_version,
                     dependencies=rule.depends_on,
-                    rationale="Deterministically derived from observed dependencies.",
+                    rationale="Proposed derivation only; this preview has not executed the rule.",
                 )
             return FieldAuthority(
                 field=name,
@@ -83,8 +83,7 @@ class AuthorityCompiler:
                 rule_version=rule.rule_version,
                 dependencies=rule.depends_on,
                 rationale=(
-                    "Derivation is blocked; missing observed dependencies: "
-                    f"{', '.join(missing)}."
+                    f"Derivation is blocked; missing observed dependencies: {', '.join(missing)}."
                 ),
             )
 

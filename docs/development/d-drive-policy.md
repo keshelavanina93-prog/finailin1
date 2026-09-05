@@ -13,5 +13,18 @@ pip, uv, temp, data, and artifact paths for the current process.
 canonical path or a guarded process variable points away from D:. Linux CI is not
 subject to a Windows drive-letter policy; it still uses isolated runner paths.
 
-Additional worktrees belong below `D:\FinAI\worktrees` and should be created only
-after running the guard.
+Additional worktree storage is reserved below `.finai/worktrees`. The current
+bootstrap permits development only from the canonical checkout; it does not
+authorize running builds from another checkout.
+
+Guards reject unset cache/temp/runtime locations, paths outside the canonical
+checkout, and reparse-point ancestors. npm, Corepack, uv Python/tool installations,
+Python bytecode, pnpm and Playwright browser caches are explicitly redirected.
+Bootstrap guards run in Windows PowerShell as well as PowerShell 7; Linux CI is
+exempt from drive letters. Provision/load scripts use PowerShell 7.
+
+Run bootstrap in every new process before invoking tools. These controls govern
+the supplied development commands, not arbitrary third-party commands launched
+outside them. Existing system executables may be read from C:; no project data is
+written there by these scripts. Docker engine storage must be independently
+verified on D: before use. Prefer the isolated native PostgreSQL script locally.
