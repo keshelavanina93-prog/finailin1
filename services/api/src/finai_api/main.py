@@ -1,6 +1,10 @@
-from fastapi import FastAPI
+import psycopg
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 from finai_api.api.routes import router
+from finai_api.api.workspace_routes import router as workspace_router
+from finai_api.services.workspace import WorkspaceError
 
 app = FastAPI(
     title="FinAI / NYX Core API",
@@ -8,3 +12,19 @@ app = FastAPI(
     version="0.1.0",
 )
 app.include_router(router)
+app.include_router(workspace_router)
+
+
+@app.exception_handler(WorkspaceError)
+async def workspace_error(_request: Request, exc: WorkspaceError) -> JSONResponse:
+    return JSONResponse(status_code=exc.status, content={"detail": exc.detail})
+
+
+@app.exception_handler(psycopg.Error)
+async def database_error(_request: Request, exc: psycopg.Error) -> JSONResponse:
+    if isinstance(exc, psycopg.errors.UniqueViolation):
+        return JSONResponse(
+            status_code=409,
+            content={"detail": "Conflicting request identity; refresh before retrying"},
+        )
+    return JSONResponse(status_code=503, content={"detail": "Workspace storage is unavailable"})

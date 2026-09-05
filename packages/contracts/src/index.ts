@@ -23,6 +23,82 @@ export interface IngestReceipt {
   rejects: string[];
   warnings: string[];
   reconciliation: Record<string, string>;
+  authority_contract_version: string;
+  pack_version: string;
+  used_fields: string[];
+  unused_fields: string[];
+  functions_executed: string[];
+}
+
+export interface Principal {
+  actor_id: string;
+  display_name: string;
+  scope: ExactScope;
+  permissions: Array<"read" | "ingest" | "review" | "export">;
+}
+
+export interface ReviewDecision {
+  decision_id: string;
+  receipt_id: string;
+  decision: "APPROVED" | "REJECTED";
+  actor_id: string;
+  reason: string;
+  previous_head: string | null;
+  decided_at: string;
+}
+
+export interface IntakeItem {
+  receipt_id: string;
+  filename: string;
+  source_class: string;
+  source_sha256: string;
+  submitted_by: string | null;
+  ingested_at: string;
+  candidate_count: number;
+  reject_count: number;
+  reconciliation_status: string;
+  review_state: "PENDING" | "APPROVED" | "REJECTED";
+  is_current: boolean;
+}
+
+export interface ReceiptDetail {
+  receipt: IngestReceipt;
+  filename: string;
+  submitted_by: string | null;
+  ingested_at: string;
+  decision: ReviewDecision | null;
+  current_head: string | null;
+  approval_blockers: string[];
+  impact: Record<"added" | "changed" | "removed" | "unchanged", number>;
+}
+
+export interface WorkspaceObject {
+  object_id: string;
+  receipt_id: string;
+  object_index: number;
+  object_type: string;
+  source_row: number;
+  epistemic_state: "OBSERVED" | "DERIVED";
+  authority_state: "APPROVED";
+  values: Record<string, string>;
+  function: string | null;
+}
+
+export interface ObjectDetail {
+  object: WorkspaceObject;
+  scope: ExactScope;
+  source_sha256: string;
+  source_row_values: Record<string, string>;
+  decision: ReviewDecision;
+  is_current: boolean;
+}
+
+export interface WorkspaceSummary {
+  scope: ExactScope;
+  pending_count: number;
+  approved_count: number;
+  rejected_count: number;
+  active_versions: Array<{ source_class: string; receipt_id: string }>;
 }
 
 export type EpistemicState = (typeof epistemicStates)[number];

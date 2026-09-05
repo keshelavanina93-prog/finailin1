@@ -7,7 +7,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from finai_api.config import get_settings
 from finai_api.domain.authority import CompileHydrationRequest, ConstructionReceipt, ExactScope
 from finai_api.domain.ingest import IngestReceipt, IngestRequest
-from finai_api.security import authorized_scope
+from finai_api.domain.review import Principal
+from finai_api.security import authenticated_principal, authorized_scope, require_permission
 from finai_api.services.authority_compiler import AuthorityCompiler
 from finai_api.services.ingestion import SourceAuthorityDenied, compile_source
 from finai_api.storage import retain, retrieve
@@ -44,8 +45,10 @@ def compile_hydration(
 @router.post("/v1/hydration/ingest", response_model=IngestReceipt, tags=["enterprise hydration"])
 def ingest(
     request: IngestRequest,
-    scope: Annotated[ExactScope, Depends(authorized_scope)],
+    principal: Annotated[Principal, Depends(authenticated_principal)],
 ) -> IngestReceipt:
+    require_permission(principal, "ingest")
+    scope = principal.scope
     if request.scope != scope:
         raise HTTPException(403, "Exact scope does not match credential")
     try:
@@ -55,7 +58,7 @@ def ingest(
     except (ValueError, csv.Error) as exc:
         raise HTTPException(422, str(exc)) from exc
     try:
-        return retain(request, receipt)
+        return retain(request, receipt, principal.actor_id)
     except (psycopg.Error, RuntimeError) as exc:
         raise HTTPException(503, "Evidence store unavailable; no receipt accepted") from exc
 

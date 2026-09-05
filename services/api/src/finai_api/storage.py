@@ -20,11 +20,13 @@ def connection(scope: ExactScope) -> Iterator[psycopg.Connection[Any]]:
         yield conn
 
 
-def retain(request: IngestRequest, receipt: IngestReceipt) -> IngestReceipt:
+def retain(
+    request: IngestRequest, receipt: IngestReceipt, actor_id: str | None = None
+) -> IngestReceipt:
     with connection(request.scope) as conn:
         conn.execute(
             "INSERT INTO hydration_runs (tenant_id, receipt_id, exact_scope, source_bytes, "
-            "source_sha256, request, receipt) VALUES (%s,%s,%s,%s,%s,%s,%s) "
+            "source_sha256, request, receipt, submitted_by) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) "
             "ON CONFLICT (tenant_id, receipt_id) DO NOTHING",
             (
                 request.scope.tenant_id,
@@ -34,6 +36,7 @@ def retain(request: IngestRequest, receipt: IngestReceipt) -> IngestReceipt:
                 receipt.source_sha256,
                 Jsonb(request.model_dump(mode="json")),
                 Jsonb(receipt.model_dump(mode="json")),
+                actor_id,
             ),
         )
         row = conn.execute(

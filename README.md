@@ -4,6 +4,39 @@ FinAI / NYX Core is an evidence-native Financial and Industrial Decision Intelli
 
 This repository is the implementation repository for the Linear program **FinAI / NYX Core — Platform Reconstruction & Authority**.
 
+## Current operator application
+
+The workspace now connects evidence intake, construction review, independent
+approval/rejection, accepted object versions, source-row lineage, history, and
+evidence export. Scope and actions come from the signed-in identity. Approval
+accepts a construction; it does not certify financial truth or post to an ERP.
+
+Upgrade an existing local checkout:
+
+```powershell
+.\scripts\load-local.ps1
+.\.venv\Scripts\python.exe scripts\migrate.py
+.\.venv\Scripts\python.exe scripts\configure-workspace.py
+pnpm build
+```
+
+In separate PowerShell terminals, run:
+
+```powershell
+.\scripts\run-workspace.ps1 -Service api
+.\scripts\run-workspace.ps1 -Service web
+```
+
+Open `http://127.0.0.1:3061`. To sign in, run
+`.\scripts\copy-workspace-key.ps1 -Role Operator` and paste the key. Use
+`-Role Reviewer` in a separate session to review submissions. These are local
+bootstrap identities; enterprise identity integration remains open. Existing
+intakes without recorded submitter identity cannot be approved; submit a new
+source version with an identified operator.
+
+See `docs/architecture/0003-reviewed-object-workspace.md` for the implemented
+behavior, limitations and dependency order for the complete platform.
+
 ## Binding local-development rule
 
 Local Windows development is **D:-only**.
@@ -135,7 +168,8 @@ read denial, idempotent replay, and a connected ingestion workspace. The compile
 and database produce candidates only. Row observations do not prove source authenticity.
 
 NIN-24 remains unaccepted: semantic memory, configurable ontology registries,
-durable workflow DAG execution, reviewed promotion and canonical object workspaces
-remain open. Enterprise identity, authentic 1C/SAP integrations, financial reporting,
+durable workflow DAG execution and full canonical authority remain open. The
+reviewed construction/object workflow is now implemented, with production
+acceptance still outstanding. Enterprise identity, authentic 1C/SAP integrations, financial reporting,
 scale and production release acceptance also remain open. See
 `docs/architecture/0002-retained-hydration.md` for the binding issue mapping.

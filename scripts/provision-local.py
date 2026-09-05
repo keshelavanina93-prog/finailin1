@@ -21,7 +21,8 @@ with psycopg.connect(admin, autocommit=True) as conn:
     conn.execute("CREATE DATABASE finai_dev")
 database_admin = make_conninfo(admin, dbname="finai_dev")
 with psycopg.connect(database_admin) as conn:
-    conn.execute((root / "services/api/migrations/001_hydration.sql").read_text())
+    for migration in sorted((root / "services/api/migrations").glob("*.sql")):
+        conn.execute(migration.read_text())
     conn.execute("GRANT CONNECT ON DATABASE finai_dev TO finai_runtime")
     conn.execute("GRANT USAGE ON SCHEMA public TO finai_runtime")
     conn.execute("GRANT SELECT, INSERT ON hydration_runs TO finai_runtime")
