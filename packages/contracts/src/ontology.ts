@@ -55,7 +55,13 @@ export interface HistoricalGraph {
   edges: Array<{ source_version_id: string; target_version_id: string; relation: string }>;
 }
 
+export interface ProposalEvaluation {
+  evaluator: string; proposal_hash: string; binding_hash: string; status: "PASS" | "FAIL";
+  recorded_at: string; checks: string[]; scope: string;
+}
+
 export interface PromotionCheck {
+  evaluation?: ProposalEvaluation | null;
   proposal_id: string; status: "DECIDED" | "BLOCKED" | "ELIGIBLE";
   checked_at: string; blockers: string[]; advisory: true; decision: string | null;
 }

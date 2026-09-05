@@ -21,6 +21,7 @@ from finai_api.domain.resources import (
 )
 from finai_api.domain.review import Principal
 from finai_api.services.dependency_impact import downstream_impact, impact_fingerprint
+from finai_api.services.proposal_evaluation import record_evaluation, require_evaluation
 from finai_api.services.schema_compatibility import SchemaCompatibilityError, schema_compatibility
 from finai_api.services.semantic_diff import semantic_diff
 from finai_api.services.workspace import WorkspaceError
@@ -578,6 +579,7 @@ def propose(principal: Principal, proposal: ResourceProposal) -> ProposalDetail:
             "fingerprint": fingerprint,
             **({"status": "RESTRICTED", "affected": []} if restricted else {}),
         }
+        validation["evaluation"] = record_evaluation(proposal, validation)
         conn.execute(
             (
                 "INSERT INTO resource_proposals "
@@ -672,6 +674,7 @@ def _promotion_validation(
     retained: dict[str, Any],
 ) -> dict[str, Any]:
     """The read check and atomic promotion must use the same eligibility rules."""
+    require_evaluation(proposal, retained)
     validation = _validate(conn, principal, proposal)
     if validation["dependency_heads"] != retained["dependency_heads"]:
         raise WorkspaceError(409, "A reviewed dependency changed; submit a refreshed proposal")
@@ -727,6 +730,7 @@ def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
             "status": "DECIDED" if row["decision"] else "BLOCKED" if blockers else "ELIGIBLE",
             "checked_at": datetime.now(UTC).isoformat(),
             "blockers": blockers,
+            "evaluation": row["payload"]["validation"].get("evaluation"),
             "advisory": True,
             "decision": row["decision"],
         }

@@ -21,6 +21,13 @@ export default function PromotionReadiness({token,proposalId}: {token:string;pro
   return <section className="g8-promotion" aria-label="Current promotion eligibility"><header><h3>Promotion eligibility</h3><Badge tone={result?.status === "ELIGIBLE" ? "good" : "warning"}>{busy ? "Checking" : result?.status ?? "Unavailable"}</Badge></header>
     {error && <p role="status">{error}</p>}{result?.blockers.map(reason=><p className="g8-inline-error" key={reason}>{reason}</p>)}
     {result?.status === "ELIGIBLE" && <p>Current dependencies and policy checks pass for this identity. Approval will validate them again.</p>}
+    {result && <section aria-label="Retained evaluation evidence"><h4>Evaluation evidence</h4>
+      {result.evaluation ? <><p>Structural checks: {result.evaluation.status === "PASS" ? "Passed" : "Failed"}</p><p>{result.evaluation.scope}</p>
+        <ul>{result.evaluation.checks.map(check => <li key={check}>{check}</li>)}</ul>
+        <small>Recorded {new Date(result.evaluation.recorded_at).toLocaleString()}</small>
+        <details><summary>Evidence trace</summary><p>{result.evaluation.evaluator}</p><p className="full-hash">Proposal: {result.evaluation.proposal_hash}</p><p className="full-hash">Evaluation binding: {result.evaluation.binding_hash}</p></details>
+      </> : <p>No evaluation was retained for this proposal. Submit a refreshed proposal before promotion.</p>}
+    </section>}
     {result && <small>Checked {new Date(result.checked_at).toLocaleTimeString()} · advisory; this check does not approve</small>}
     <button className="g8-link" disabled={busy} onClick={()=>setRevision(value=>value+1)}>Recheck eligibility</button></section>;
 }
