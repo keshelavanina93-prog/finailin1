@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
+from finai_api.services.effective_version import retained_with_effective_version
 from finai_api.services.workspace import WorkspaceError
 
 
@@ -30,15 +31,12 @@ def upstream_authority(cursor: Any, tenant: UUID, consumer: UUID) -> list[dict[s
             seen.add(version)
             if len(seen) > 1000:
                 raise WorkspaceError(409, "Current-use lineage exceeds the bounded resource limit")
-            row = cursor.execute(
-                "SELECT v.*,h.version_id AS head FROM resource_versions v "
-                "JOIN resource_heads h USING(tenant_id,resource_id) WHERE v.tenant_id=%s "
-                "AND v.resource_id=%s AND v.version_id=%s",
-                (tenant, dependency["target_resource_id"], version),
-            ).fetchone()
+            row = retained_with_effective_version(
+                cursor, tenant, dependency["target_resource_id"], version, now
+            )
             if (
                 row is None
-                or row["head"] != version
+                or row["effective_version_id"] != version
                 or row["authority_state"] != "APPROVED"
                 or (
                     row["valid_from"] > now

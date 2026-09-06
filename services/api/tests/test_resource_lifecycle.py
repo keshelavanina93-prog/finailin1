@@ -1,7 +1,7 @@
 """Native PostgreSQL lifecycle contract; synthetic definitions are not certified facts."""
 
 import os
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 import psycopg
@@ -147,6 +147,69 @@ def test_reviewed_authority_current_guard_and_retained_history():
     assert retained["proof_hash"] == result["proof_hash"]
     assert retained["current_use_authorized"] is False
     assert len(result["upstream_authority"]) == 2
+    # Scheduling successors changes editing heads, not today's effective authority.
+    future_at = datetime.now(UTC) + timedelta(days=30)
+    scheduled = []
+    for original in (semantic, schema, consumer):
+        head = resources.get_resource(p, original.resource_id)["resource"]
+        scheduled.append(
+            original.model_copy(
+                update={
+                    "expected_version_id": UUID(head["version_id"]),
+                    "display_name": original.display_name + " scheduled successor",
+                    "valid_from": future_at,
+                }
+            )
+        )
+    scheduled_proposal = ResourceProposal(
+        title="Schedule synthetic future definitions",
+        rationale="Future publication must preserve current effective consumption",
+        access_entity="__TENANT__",
+        mutations=scheduled,
+    )
+    resources.propose(p, scheduled_proposal)
+    resources.review(
+        reviewer,
+        scheduled_proposal.proposal_id,
+        ResourceReview(decision="APPROVED", rationale="Review future synthetic definitions"),
+    )
+    future_consumer = resources.get_resource(p, consumer.resource_id)["resource"]
+    assert future_consumer["version_id"] != cv["version_id"]
+    assert lifecycle.consume(p, request) == result
+    # A fresh receipt also exercises all SQL insertion guards after scheduling.
+    fresh = lifecycle.consume(p, request.model_copy(update={"request_id": uuid4()}))
+    assert fresh["consumer"]["version_id"] == str(cv["version_id"])
+    future_ref = VersionReference(
+        resource_id=consumer.resource_id, version_id=future_consumer["version_id"]
+    )
+    with resources.resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as cursor:
+        with pytest.raises(WorkspaceError, match="current use"):
+            lifecycle._version(cursor, p, future_ref)
+        # Boundary selection is deterministic without advancing wall-clock time.
+        assert cursor.execute(
+            "SELECT g8_effective_version_id(%s,%s,%s) AS version",
+            (p.scope.tenant_id, consumer.resource_id, future_at),
+        ).fetchone()["version"] == UUID(future_consumer["version_id"])
+        forged_future = {
+            **fresh,
+            "consumption_id": str(uuid4()),
+            "consumer": future_ref.model_dump(mode="json"),
+            "consumer_content_hash": future_consumer["content_hash"],
+        }
+        with (
+            pytest.raises(psycopg.Error, match="Invalid canonical consumption"),
+            conn.transaction(),
+        ):
+            cursor.execute(
+                "INSERT INTO guarded_consumption_receipts "
+                "(tenant_id,consumption_id,consumer_resource_id,consumer_version_id,access_entity,"
+                "actor_id,request_hash,proof_hash,payload) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (
+                    p.scope.tenant_id, forged_future["consumption_id"], consumer.resource_id,
+                    future_ref.version_id, fresh["access_entity"], p.actor_id, "0" * 64,
+                    "0" * 64, Jsonb(forged_future),
+                ),
+            )
     current_check = lifecycle.consumption_status(p, request.request_id)
     assert current_check["status"] == "RECHECK_REQUIRED"
     assert current_check["current_use_authorized"] is False
@@ -195,7 +258,10 @@ def test_reviewed_authority_current_guard_and_retained_history():
         lifecycle.consume(p, request)
     request = request.model_copy(update={"request_id": uuid4()})
     assert lifecycle.consume(p, request)["inputs"][0]["availability_state"] == "AVAILABLE"
-    ancestor = resources.get_resource(p, semantic.resource_id)["resource"]
+    ancestor = next(
+        item for item in result["upstream_authority"]
+        if item["resource_id"] == str(semantic.resource_id)
+    )
     ancestor_ref = VersionReference(
         resource_id=semantic.resource_id, version_id=ancestor["version_id"]
     )
@@ -271,3 +337,42 @@ def test_reviewed_authority_current_guard_and_retained_history():
         lifecycle.consumption_receipt(other, UUID(result["consumption_id"]))
     with pytest.raises(WorkspaceError, match="authorized context"):
         lifecycle.consumption_status(other, UUID(result["consumption_id"]))
+    # A registry revocation effective now wins over the prior approved interval,
+    # even though a separately published successor has a future effective date.
+    editing_head = resources.get_resource(p, semantic.resource_id)["resource"]
+    revoked = semantic.model_copy(
+        update={
+            "expected_version_id": UUID(editing_head["version_id"]),
+            "valid_from": datetime.now(UTC),
+            "authority_state": "REVOKED",
+        }
+    )
+    withdrawal = ResourceProposal(
+        title="Revoke current synthetic semantic meaning",
+        rationale="A revoked temporal winner must never resurrect approved history",
+        access_entity="__TENANT__",
+        mutations=[revoked],
+    )
+    resources.propose(p, withdrawal)
+    resources.review(
+        reviewer, withdrawal.proposal_id,
+        ResourceReview(decision="APPROVED", rationale="Review synthetic registry withdrawal"),
+    )
+    revoked_head = resources.get_resource(p, semantic.resource_id)["resource"]
+    with resources.resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as cursor:
+        winner = cursor.execute(
+            "SELECT g8_effective_version_id(%s,%s,clock_timestamp()) AS version",
+            (p.scope.tenant_id, semantic.resource_id),
+        ).fetchone()["version"]
+        assert winner == UUID(revoked_head["version_id"])
+        assert winner != ancestor_ref.version_id
+        for rejected in (
+            ancestor_ref,
+            VersionReference(resource_id=semantic.resource_id, version_id=winner),
+        ):
+            with pytest.raises(WorkspaceError, match="current use"):
+                lifecycle._version(cursor, p, rejected)
+        # Historical access still resolves the exact earlier immutable version.
+        assert lifecycle._version(cursor, p, ancestor_ref, current=False)["version_id"] == (
+            ancestor_ref.version_id
+        )

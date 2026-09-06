@@ -18,6 +18,7 @@ from finai_api.domain.resource_lifecycle import (
 )
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
+from finai_api.services.effective_version import retained_with_effective_version
 from finai_api.services.resources import resource_connection
 from finai_api.services.upstream_authority import upstream_authority
 from finai_api.services.workspace import WorkspaceError
@@ -40,17 +41,14 @@ def _lock(conn: Any, p: Principal) -> None:
 
 
 def _version(c: Any, p: Principal, ref: VersionReference, current: bool = True) -> dict[str, Any]:
-    row = c.execute(
-        "SELECT v.*,h.version_id AS head FROM resource_versions v JOIN "
-        "resource_heads h USING(tenant_id,resource_id) WHERE v.tenant_id=%s AND "
-        "v.resource_id=%s AND v.version_id=%s",
-        (p.scope.tenant_id, ref.resource_id, ref.version_id),
-    ).fetchone()
+    now = datetime.now(UTC)
+    row = retained_with_effective_version(
+        c, p.scope.tenant_id, ref.resource_id, ref.version_id, now
+    )
     if row is None:
         raise WorkspaceError(404, "Version unavailable in authorized context")
-    now = datetime.now(UTC)
     if current and (
-        row["head"] != ref.version_id
+        row["effective_version_id"] != ref.version_id
         or row["authority_state"] != "APPROVED"
         or row["valid_from"] > now
         or (row["valid_to"] is not None and row["valid_to"] <= now)

@@ -1,0 +1,14 @@
+{
+  "checked_at": "2026-09-06T22:34:27.409657+00:00",
+  "migration": 32,
+  "migration_applied": true,
+  "web_api_lifecycle_status": 200,
+  "subject": {
+    "resource_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+    "version_id": "72417af7-1f6f-5d11-b6ff-607e96169191"
+  },
+  "purpose": "HISTORICAL_LIFECYCLE",
+  "scope": "Read-only deployed lifecycle path using retained Gas company identity",
+  "scheduled_version_acceptance": "See focused native test_resource_lifecycle.py proof",
+  "financial_authority_or_release_acceptance": false
+}
