@@ -24,3 +24,16 @@ schema evolution. Existing object-set pagination/traversal and definition-histor
 Scalar cases cover boolean/integer distinction, UUID/date/time/decimal validation and required
 null refusal. Synthetic schema fixtures establish local contracts, not authentic source or
 complete product acceptance.
+
+## Saved temporal definitions and promotion
+
+Publication of a time-bound Object Set now resolves its schema/link semantic dependencies
+inside the publication transaction at the query's effective and knowledge times. Its exact
+historical dependencies are retained while current heads remain concurrency fences. Proposed
+new definitions cannot masquerade as already known historical schema versions.
+
+Promotion now compares the complete reviewed dependency pin sets as well as heads and impact.
+This catches an effective-time boundary crossed between proposal and review even if the future
+schema was already known and its head did not change. The proposal remains undecided and must
+be refreshed; historical evidence is never rewritten. Native PostgreSQL checks prove frozen
+query publication/replay after schema evolution and refusal at that moving-time boundary.

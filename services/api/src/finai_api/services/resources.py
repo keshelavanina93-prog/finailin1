@@ -24,6 +24,7 @@ from finai_api.services.dependency_impact import downstream_impact, impact_finge
 from finai_api.services.proposal_evaluation import record_evaluation, require_evaluation
 from finai_api.services.schema_compatibility import SchemaCompatibilityError, schema_compatibility
 from finai_api.services.semantic_diff import semantic_diff
+from finai_api.services.temporal_definition_dependency import query_dependency
 from finai_api.services.workspace import WorkspaceError
 from finai_api.storage import connection
 
@@ -269,7 +270,23 @@ def _validate(
     validation_time = datetime.now(UTC)
 
     def target(identifier: str, source: str, relation: str) -> dict[str, Any]:
-        if identifier in mutations:
+        source_item = mutations[source]
+        query_payload = source_item.attributes.get("definition", {})
+        temporal_query = (
+            source_item.object_type == "ObjectSetDefinition"
+            and isinstance(query_payload, dict)
+            and (query_payload.get("valid_at") or query_payload.get("known_at"))
+            and relation.startswith(
+                ("DEFINITION_TYPE:", "DEFINITION_LINK:", "TRAVERSAL_CANDIDATE:", "SET_ROOT:")
+            )
+        )
+        if temporal_query:
+            # Heads still fence concurrent publication. The semantic dependency pin
+            # itself must describe the schema/link used by the saved temporal query.
+            head = _get(conn, tenant, UUID(identifier))
+            external_heads[identifier] = str(head["version_id"])
+            result = query_dependency(conn, tenant, identifier, query_payload, validation_time)
+        elif identifier in mutations:
             item = mutations[identifier]
             result = {
                 **item.model_dump(mode="json"),
@@ -861,6 +878,17 @@ def _promotion_validation(
     validation = _validate(conn, principal, proposal)
     if validation["dependency_heads"] != retained["dependency_heads"]:
         raise WorkspaceError(409, "A reviewed dependency changed; submit a refreshed proposal")
+
+    def pins(value: dict[str, Any]) -> dict[str, list[tuple[str, str, str]]]:
+        return {
+            source: sorted(
+                (item["resource_id"], item["version_id"], item["relation"]) for item in dependencies
+            )
+            for source, dependencies in value["dependencies"].items()
+        }
+
+    if pins(validation) != pins(retained):
+        raise WorkspaceError(409, "Reviewed dependency versions changed; refresh the proposal")
     if impact_fingerprint(validation["downstream_impact"]) != retained.get(
         "downstream_impact", {}
     ).get("fingerprint"):

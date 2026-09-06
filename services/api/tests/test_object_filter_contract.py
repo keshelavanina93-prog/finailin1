@@ -13,6 +13,9 @@ from finai_api.domain.resources import ResourceMutation, ResourceProposal, Resou
 from finai_api.services import resources
 from finai_api.services.object_filter_contract import validate_filters
 from finai_api.services.object_sets import query_objects
+from finai_api.services.ontology_definition_validation import validate_definition
+from finai_api.services.ontology_definitions import definition, run_set
+from finai_api.services.temporal_definition_dependency import TemporalDependencyUnavailable
 from finai_api.services.workspace import WorkspaceError
 
 
@@ -41,8 +44,42 @@ def test_null_does_not_bypass_required_property_contract():
         validate_filters(query, {"value": {"kind": "text", "required": True}})
 
 
+def test_historical_incoming_traversal_ignores_types_not_yet_known():
+    schema_ids = {name: str(uuid4()) for name in ("LegalEntity", "Chart", "FutureType")}
+    inverse = {value: name for name, value in schema_ids.items()}
+    saved = ResourceMutation(
+        object_type="ObjectSetDefinition",
+        identity_key=uuid4().hex,
+        display_name="Historical incoming references",
+        valid_from=datetime.now(UTC),
+        attributes={
+            "definition": {
+                "object_type": "LegalEntity",
+                "known_at": "2026-01-01T00:00:00Z",
+                "traversal": [{"kind": "reference", "direction": "incoming", "name": "owner"}],
+            }
+        },
+    )
+
+    def target(identifier, source, relation):
+        name = inverse[identifier]
+        if name == "FutureType":
+            raise TemporalDependencyUnavailable()
+        return {
+            "attributes": {
+                "fields": {"owner": {"kind": "reference", "target_type": "LegalEntity"}}
+                if name == "Chart"
+                else {}
+            }
+        }
+
+    validate_definition(saved, schema_ids, {}, target)
+
+
 @DB
-def test_query_and_saved_definition_share_effective_and_known_schema_contract(retained):
+def test_query_and_saved_definition_share_effective_and_known_schema_contract(
+    retained, monkeypatch
+):
     reader, _ = retained
     operator = reader.model_copy(
         update={
@@ -153,3 +190,86 @@ def test_query_and_saved_definition_share_effective_and_known_schema_contract(re
     after = query_objects(reader, later)
     assert after.total == 0  # A valid filter with no matches is a genuine empty set.
     assert after.filter_schema_versions[0].version_id == UUID(second["version_id"])
+    # Publication after a schema correction must bind the query's original schema,
+    # not the latest head, when its effective and knowledge times are fixed.
+    frozen = ResourceMutation(
+        object_type="ObjectSetDefinition",
+        identity_key=uuid4().hex,
+        display_name="Synthetic frozen typed query",
+        valid_from=start,
+        attributes={
+            "definition": good.model_copy(
+                update={
+                    "valid_at": start,
+                    "known_at": known_first,
+                }
+            ).model_dump(mode="json")
+        },
+    )
+    frozen_version = publish(frozen)[0]
+    accepted = definition(reader, frozen.resource_id)
+    schema_pin = next(
+        value
+        for value in accepted["dependencies"]
+        if value["relation"] == f"DEFINITION_TYPE:{kind}"
+    )
+    assert str(schema_pin["version_id"]) == first["version_id"]
+    replay = run_set(reader, frozen.resource_id, UUID(frozen_version["version_id"]), 0, 50)
+    assert replay["total"] == 1
+    assert replay["filter_schema_versions"][0]["version_id"] == first["version_id"]
+    invalid_frozen = frozen.model_copy(
+        update={
+            "resource_id": uuid4(),
+            "identity_key": uuid4().hex,
+            "attributes": {
+                "definition": later.model_copy(
+                    update={
+                        "known_at": known_first,
+                    }
+                ).model_dump(mode="json")
+            },
+        }
+    )
+    with pytest.raises(WorkspaceError, match="undeclared"):
+        publish(invalid_frozen)
+    # A fixed knowledge boundary with a moving business date can cross an already
+    # known future schema between proposal and review without any head change.
+    moving = frozen.model_copy(
+        update={
+            "resource_id": uuid4(),
+            "identity_key": uuid4().hex,
+            "access_entity": reader.scope.legal_entity_id,
+            "attributes": {
+                "definition": good.model_copy(
+                    update={
+                        "known_at": datetime.now(UTC),
+                        "valid_at": None,
+                    }
+                ).model_dump(mode="json")
+            },
+        }
+    )
+    pending = ResourceProposal(
+        title="Synthetic moving business time",
+        rationale="Verify exact reviewed temporal pins",
+        access_entity="__TENANT__",
+        mutations=[moving],
+    )
+    resources.propose(operator, pending)
+
+    class Later(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return future + timedelta(days=1)
+
+    with monkeypatch.context() as context:
+        context.setattr(resources, "datetime", Later)
+        with pytest.raises(WorkspaceError, match="Reviewed dependency versions changed"):
+            resources.review(
+                reviewer,
+                pending.proposal_id,
+                ResourceReview(
+                    decision="APPROVED", rationale="Review after effective schema boundary"
+                ),
+            )
+    assert resources.proposal_detail(operator, pending.proposal_id).decision is None

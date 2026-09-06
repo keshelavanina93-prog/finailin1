@@ -19,6 +19,7 @@ from finai_api.domain.ontology_definitions import (
 from finai_api.domain.regulation import RegulatoryDefinition
 from finai_api.domain.resources import ResourceMutation
 from finai_api.services.object_filter_contract import validate_filters
+from finai_api.services.temporal_definition_dependency import TemporalDependencyUnavailable
 from finai_api.services.workspace import WorkspaceError
 
 
@@ -141,7 +142,12 @@ def validate_definition(
             else:
                 outputs = set()
                 for name, identifier in schemas.items():
-                    candidate = target(identifier, source, "TRAVERSAL_CANDIDATE:" + name)
+                    try:
+                        candidate = target(identifier, source, "TRAVERSAL_CANDIDATE:" + name)
+                    except TemporalDependencyUnavailable:
+                        # An unrelated type introduced later is not a historical
+                        # incoming-reference candidate. Explicit endpoints still fail.
+                        continue
                     spec = candidate["attributes"]["fields"].get(step["name"], {})
                     if spec.get("kind") == "reference" and spec.get("target_type") in current_types:
                         outputs.add(name)
