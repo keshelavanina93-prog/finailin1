@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { CanonicalResource } from "@finai/contracts";
+
+export type SourceAccountNavigation = {
+  onInspectResource?: (reference: Pick<CanonicalResource, "resource_id" | "version_id">) => void;
+  onTraceResource?: (reference: Pick<CanonicalResource, "resource_id" | "version_id">) => void;
+};
 
 type Definition = {
   resource_id: string;
@@ -28,9 +34,9 @@ type Result = {
   blockers: string[];
 };
 
-export default function SegAccountObservations({ token, documentId, sheet, profile, companyId }: {
+export default function SegAccountObservations({ token, documentId, sheet, profile, companyId, onInspectResource, onTraceResource }: {
   token: string; documentId: string; sheet: string; profile: string; companyId: string;
-}) {
+} & SourceAccountNavigation) {
   const identity = JSON.stringify([token, documentId, sheet, profile, companyId]);
   const [state, setState] = useState<{ key: string; busy: boolean; result: Result | null; error: string } | null>(null);
   const request = useRef<AbortController | null>(null);
@@ -74,6 +80,10 @@ export default function SegAccountObservations({ token, documentId, sheet, profi
             <summary>{definition.display_name}</summary>
             <p>Exact-code candidate · {definition.evidence_class.toLowerCase().replaceAll("_", " ")}</p>
             {typeof definition.attributes.source_name === "string" && <p>{definition.attributes.source_name}</p>}
+            {(onInspectResource || onTraceResource) && <div>
+              {onInspectResource && <button className="g8-link" onClick={() => onInspectResource({ resource_id: definition.resource_id, version_id: definition.version_id })}>Inspect retained definition</button>}
+              {onTraceResource && <button className="g8-link" onClick={() => onTraceResource({ resource_id: definition.resource_id, version_id: definition.version_id })}>Trace source evidence</button>}
+            </div>}
             <details><summary>Source provenance and exact version</summary>
               <dl><dt>Definition identity</dt><dd><code>{definition.resource_id}</code></dd><dt>Retained version</dt><dd><code>{definition.version_id}</code></dd>
                 {typeof definition.attributes.source_record_id === "string" && <><dt>Source record</dt><dd><code>{definition.attributes.source_record_id}</code></dd></>}

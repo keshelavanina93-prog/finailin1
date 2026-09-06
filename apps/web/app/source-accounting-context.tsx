@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
 import SegAccountObservations from "./seg-account-observations";
+import type { SourceAccountNavigation } from "./seg-account-observations";
 
 type Resource = { resource_id: string; version_id: string; display_name: string; attributes: Record<string, string> };
 type SourceObservations = { source_sha256: string; construction_receipt_id?: string; source_snapshot?: { source_use?: string }; row_count: number; granularity?: string; deepest_valid_drill?: string; unresolved?: string[]; sample_rows?: { row: number; numeric_observations: Record<string, { coordinate: string; value: string }> }[] };
@@ -9,9 +10,9 @@ type Context = { scope_id: string; observed: Record<string, string>; source_coor
 const fields = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "transaction_currency_id", "reporting_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
 const required = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
 
-export default function SourceAccountingContext({ token, documentId, sheet, profile, companyId, canPropose, onProposal }: {
+export default function SourceAccountingContext({ token, documentId, sheet, profile, companyId, canPropose, onProposal, onInspectResource, onTraceResource }: {
   token: string; documentId: string; sheet: string; profile: string; companyId: string; canPropose: boolean; onProposal: (id: string) => void;
-}) {
+} & SourceAccountNavigation) {
   const [loaded, setLoaded] = useState<{ key: string; value: Context } | null>(null);
   const [use, setUse] = useState("");
   const [selection, setSelection] = useState<Record<string, string>>({});
@@ -127,7 +128,7 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
         </>}
       </fieldset>}
       {profile === "seg_expense_base" && <p>The source amount and annotated Amount have unresolved currency and accounting meanings. Petroleum counterparty labels do not identify the source company.</p>}
-      {profile === "seg_expense_base" && context.company_binding?.accepted && <SegAccountObservations key={`${documentId}:${sheet}:${companyId}`} token={token} documentId={documentId} sheet={sheet} profile={profile} companyId={companyId}/>}
+      {profile === "seg_expense_base" && context.company_binding?.accepted && <SegAccountObservations key={`${documentId}:${sheet}:${companyId}`} token={token} documentId={documentId} sheet={sheet} profile={profile} companyId={companyId} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>}
       <p>Observed scope: {context.scope ? "Published" : "Awaiting publication"}. Reviewed selection: {context.binding ? context.binding.attributes.source_use.toLowerCase().replaceAll("_", " ") : "Not selected"}.</p>
       {context.accounting_eligibility && <div><p><strong>{context.accounting_eligibility.eligible_for_accounting ? "Available for guarded accounting use" : "Accounting use is not available"}</strong> · {context.accounting_eligibility.reason}</p>
         {context.binding && <details><summary>Selection timing</summary><dl><dt>Effective from</dt><dd>{context.accounting_eligibility.effective_from ?? "Unavailable"}</dd><dt>Effective until</dt><dd>{context.accounting_eligibility.effective_to ?? "Open ended"}</dd><dt>Recorded at</dt><dd>{context.accounting_eligibility.known_from ?? "Unavailable"}</dd></dl></details>}

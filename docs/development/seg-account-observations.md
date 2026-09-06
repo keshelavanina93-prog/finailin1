@@ -46,3 +46,19 @@ Its default is 8061, matching the packaged runtime, instead of the obsolete
 8000 default. Explicit FINAI_API_URL overrides remain authoritative. Focused
 proxy lint and the isolated production build including TypeScript pass.
 These are live HTTP integration checks, not authenticated browser acceptance.
+
+## Candidate investigation
+
+Data and NYX source-account candidates now offer Inspect retained definition
+and Trace source evidence. Both use the existing shared canonical navigation
+with the candidate resource ID and immutable version ID. The inspector refuses
+an unavailable recorded version; it does not fall back to the latest version.
+The Data explorer retains its source selection when opening the inspector.
+
+Authenticated live web-proxy verification reopened candidate version
+93eb5aae-9e04-5a5b-8595-c483d895737d and returned its matching trace root,
+10 nodes and 13 recorded connections. Evidence is retained locally in
+`.finai/artifacts/seg-definition-trace.json`. Focused lint and TypeScript pass.
+These navigation actions do not select a mapping or authorize accounting use.
+Authenticated browser interaction remains unverified because the browser
+is currently signed out.

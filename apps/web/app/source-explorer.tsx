@@ -5,10 +5,11 @@ import type {IntakeItem,Principal,ReceiptDetail,SourcePreview} from "@finai/cont
 import {Badge,Empty} from "./g8-ui";
 import {readable} from "./g8-model";
 import SourceAccountingContext from "./source-accounting-context";
+import type {SourceAccountNavigation} from "./seg-account-observations";
 
-export default function SourceExplorer({token,principal,sources,initialReceiptId,onReview,onSelect,companyId,onProposal}: {
+export default function SourceExplorer({token,principal,sources,initialReceiptId,onReview,onSelect,companyId,onProposal,onInspectResource,onTraceResource}: {
   token:string;principal:Principal;sources:IntakeItem[];initialReceiptId?:string;onReview:(receiptId:string)=>void;onSelect:(source:IntakeItem)=>void;companyId?:string;onProposal?:(proposalId:string)=>void;
-}) {
+} & SourceAccountNavigation) {
   const [selected,setSelected]=useState(initialReceiptId ?? "");const [tab,setTab]=useState("rows");
   const [filter,setFilter]=useState("");const [query,setQuery]=useState("");const [search,setSearch]=useState("");const [offset,setOffset]=useState(0);
   const [preview,setPreview]=useState<SourcePreview|null>(null);const [detail,setDetail]=useState<ReceiptDetail|null>(null);
@@ -54,7 +55,7 @@ export default function SourceExplorer({token,principal,sources,initialReceiptId
     {!companyId?<p role="status">Select a canonical company in the workspace before inspecting its source binding. Source names do not choose a company automatically.</p>:!principal.permissions.includes("ontology_read")?<p role="status">Canonical source interpretation is unavailable for this session.</p>:<>
       <label>Source sheet{accountingSheets.length?<select value={accountingChoice.sheet} onChange={event=>chooseAccounting("sheet",event.target.value)}><option value="">Select a retained sheet</option>{accountingSheets.map(item=><option key={item.sheet} value={item.sheet}>{item.sheet}</option>)}</select>:<input value={accountingChoice.sheet} onChange={event=>chooseAccounting("sheet",event.target.value)} maxLength={128} aria-label="Exact source sheet name"/>}</label>
       <label>Source layout<select value={accountingChoice.profile} onChange={event=>chooseAccounting("profile",event.target.value)}><option value="">Select a supported layout</option><option value="seg_expense_base">Recorder-line Base with accounting annotations</option><option value="1c_tb">1C trial balance</option><option value="1c_journal">1C journal movement</option></select></label>
-      {accountingChoice.sheet.trim()&&accountingChoice.profile&&<SourceAccountingContext key={`${receiptId}:${accountingChoice.sheet}:${accountingChoice.profile}:${companyId}`} token={token} documentId={current.receipt_id} sheet={accountingChoice.sheet} profile={accountingChoice.profile} companyId={companyId} canPropose={Boolean(onProposal)&&principal.permissions.includes("ontology_propose")} onProposal={onProposal??(()=>{})}/>}
+      {accountingChoice.sheet.trim()&&accountingChoice.profile&&<SourceAccountingContext key={`${receiptId}:${accountingChoice.sheet}:${accountingChoice.profile}:${companyId}`} token={token} documentId={current.receipt_id} sheet={accountingChoice.sheet} profile={accountingChoice.profile} companyId={companyId} canPropose={Boolean(onProposal)&&principal.permissions.includes("ontology_propose")} onProposal={onProposal??(()=>{})} onInspectResource={onInspectResource?reference=>{setSelected(current.receipt_id);onInspectResource(reference);}:undefined} onTraceResource={onTraceResource}/>}
     </>}
   </div>}
   </div></section>;
