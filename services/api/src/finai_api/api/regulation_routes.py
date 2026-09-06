@@ -12,6 +12,7 @@ from finai_api.domain.regulation import RegulatoryDefinition, assess_rule
 from finai_api.domain.resources import ResourceMutation, ResourceProposal
 from finai_api.security import require_permission
 from finai_api.services import resources
+from finai_api.services.regulatory_licence_context import bind_assessment, licence_bindings
 from finai_api.services.workspace import WorkspaceError
 
 router = APIRouter(prefix="/v1/ontology/regulation", tags=["regulation"])
@@ -73,6 +74,7 @@ def rules(
         raise WorkspaceError(422, "Regulatory scope requires a legal entity")
     # Registry valid time describes the interpretation's availability, not the legal period.
     page = resources.list_resources(principal, "RegulatoryRule", "", offset, known_at, known_at)
+    holders, complete = licence_bindings(principal, legal_entity_id, at, known_at)
     results = []
     for item in page:
         if str(item.attributes["legal_entity_id"]) != str(legal_entity_id):
@@ -81,7 +83,12 @@ def rules(
         results.append(
             {
                 "resource": item,
-                "assessment": assess_rule(definition, at.date(), activity, customer_count),
+                "assessment": bind_assessment(
+                    assess_rule(definition, at.date(), activity, customer_count),
+                    resources.version_references(principal, item.version_id),
+                    holders,
+                    complete,
+                ),
             }
         )
     return {
