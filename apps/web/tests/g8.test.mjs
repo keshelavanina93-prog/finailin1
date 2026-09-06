@@ -29,8 +29,8 @@ test("readiness preserves partial outage as an observed 503 without caching",asy
   assert.equal((await response.json()).evidence_store,"unavailable");
 });
 test("company context cannot treat a revoked identity or operating domain as a company",()=>{
-  const accepted={resource_id:"gas",object_type:"LegalEntity",authority_state:"APPROVED"};
-  assert.deepEqual(acceptedCompanies([accepted,{...accepted,authority_state:"REVOKED"},{...accepted,object_type:"OperatingDomain"}]),[accepted]);
+  const accepted={resource_id:"gas",object_type:"LegalEntity",authority_state:"APPROVED",evidence_class:"SOURCE_BOUND"};
+  assert.deepEqual(acceptedCompanies([accepted,{...accepted,evidence_class:"USER_ASSERTED"},{...accepted,evidence_class:"REFERENCE_TEMPLATE"},{...accepted,authority_state:"REVOKED"},{...accepted,object_type:"OperatingDomain"}]),[accepted]);
   assert.equal(belongsToCompany({resource_id:"asset",attributes:{company_id:"petroleum"}},"gas"),false);
   assert.equal(belongsToCompany({resource_id:"asset",attributes:{legal_entity_id:"gas"}},"gas"),true);
 });
