@@ -5,9 +5,11 @@ from typing import Any
 
 from psycopg.types.json import Jsonb
 
-from finai_api.domain.object_sets import ObjectSetQuery, ObjectSetResult
+from finai_api.domain.object_sets import FilterSchemaVersion, ObjectSetQuery, ObjectSetResult
 from finai_api.domain.review import Principal
+from finai_api.services.object_filter_contract import validate_filters
 from finai_api.services.resources import resource_connection
+from finai_api.services.workspace import WorkspaceError
 
 
 def query_objects(
@@ -114,6 +116,14 @@ def query_objects(
             args.append(step.name)
         ctes.append(f"s{index} AS ({sql})")
     final = f"s{len(request.traversal)}"
+    if request.filters:
+        ctes.append(
+            "filter_schema_candidates AS (SELECT DISTINCT ON(resource_id) * FROM versions "
+            "WHERE object_type='SchemaDefinition' AND identity_key=ANY(%s::text[]) "
+            "AND valid_from<=%s AND (valid_to IS NULL OR valid_to>%s) "
+            "ORDER BY resource_id,system_from DESC,version_id)"
+        )
+        args += [root_types, request.valid_at, request.valid_at]
     ctes += [
         f"page AS (SELECT * FROM {final} ORDER BY display_name,resource_id,version_id "
         "LIMIT %s OFFSET %s)",
@@ -124,13 +134,34 @@ def query_objects(
         "WITH " + ", ".join(ctes) + f" SELECT (SELECT count(*) FROM {final}), "
         "coalesce((SELECT jsonb_object_agg(object_type,n) FROM groups),'{}'::jsonb), "
         "coalesce((SELECT jsonb_agg(to_jsonb(page) - 'tenant_id' "
-        "ORDER BY display_name,resource_id,version_id) FROM page),'[]'::jsonb)"
+        "ORDER BY display_name,resource_id,version_id) FROM page),'[]'::jsonb), "
+        + (
+            "coalesce((SELECT jsonb_agg(to_jsonb(s)) FROM filter_schema_candidates s "
+            "WHERE authority_state='APPROVED'),'[]'::jsonb)"
+            if request.filters
+            else "'[]'::jsonb"
+        )
     )
     with resource_connection(principal) as conn:
         conn.execute("SELECT set_config('statement_timeout','10000',true)")
         row = conn.execute(sql, args).fetchone()
         assert row is not None  # Aggregate SELECT always returns one row, including empty sets.
-        total, counts, objects = row
+        total, counts, objects, filter_schemas = row
+    schema_pins = []
+    if request.filters:
+        schemas = {schema["identity_key"]: schema for schema in filter_schemas}
+        if set(schemas) != set(root_types):
+            raise WorkspaceError(422, "Query filter schema unavailable at the requested time")
+        for kind in sorted(schemas):
+            schema = schemas[kind]
+            validate_filters(request.filters, schema["attributes"]["fields"])
+            schema_pins.append(
+                FilterSchemaVersion(
+                    object_type=kind,
+                    resource_id=schema["resource_id"],
+                    version_id=schema["version_id"],
+                )
+            )
     return ObjectSetResult(
         query=request,
         total=total,
@@ -139,4 +170,5 @@ def query_objects(
         next_offset=request.offset + request.limit
         if request.offset + request.limit < total
         else None,
+        filter_schema_versions=schema_pins,
     )

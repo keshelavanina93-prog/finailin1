@@ -40,6 +40,12 @@ class ObjectSetQuery(BaseModel):
         return value
 
 
+class FilterSchemaVersion(BaseModel):
+    object_type: str
+    resource_id: UUID
+    version_id: UUID
+
+
 class ObjectSetResult(BaseModel):
     contract: Literal["ontology-object-set/1"] = "ontology-object-set/1"
     query: ObjectSetQuery
@@ -47,3 +53,4 @@ class ObjectSetResult(BaseModel):
     counts_by_type: dict[str, int]
     objects: list[dict[str, Any]]
     next_offset: int | None
+    filter_schema_versions: list[FilterSchemaVersion] = Field(default_factory=list)

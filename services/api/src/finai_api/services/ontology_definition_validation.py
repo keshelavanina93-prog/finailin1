@@ -7,6 +7,7 @@ from uuid import UUID, uuid5
 
 from pydantic import ValidationError
 
+from finai_api.domain.object_sets import PropertyFilter
 from finai_api.domain.ontology_definitions import (
     DEFINITION_MODELS,
     DerivedDefinition,
@@ -17,6 +18,7 @@ from finai_api.domain.ontology_definitions import (
 )
 from finai_api.domain.regulation import RegulatoryDefinition
 from finai_api.domain.resources import ResourceMutation
+from finai_api.services.object_filter_contract import validate_filters
 from finai_api.services.workspace import WorkspaceError
 
 
@@ -104,9 +106,9 @@ def validate_definition(
         payload = definition.model_dump(mode="json")
         root = schema(payload["object_type"])
         fields = root["attributes"]["fields"]
-        for condition in payload["filters"]:
-            if condition["field"] not in fields:
-                raise WorkspaceError(422, "Object Set filter references an undeclared property")
+        validate_filters(
+            [PropertyFilter.model_validate(value) for value in payload["filters"]], fields
+        )
         # Traversal definitions bind the link type and endpoint schemas, not UI labels.
         current_types = {payload["object_type"]}
         for step in payload["traversal"]:
