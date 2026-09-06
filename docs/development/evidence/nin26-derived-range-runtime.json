@@ -1,0 +1,14 @@
+{
+  "checked_at": "2026-09-06T22:55:52.691978+00:00",
+  "web_api_status": 200,
+  "definition_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+  "definition_version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+  "derived_rows": 5,
+  "all_available": true,
+  "exact_object_versions_preserved": true,
+  "run_id": "fcr_9d55c75366bdb35dd65ac5288b28da9be57f46af6d9c6e17eb0390cb1dff8f2f",
+  "retained_readback_equal": true,
+  "scope": "Retained source account labels, not financial results",
+  "range_failure_proof": "Focused derived decimal range regression",
+  "financial_certification_or_release_acceptance": false
+}

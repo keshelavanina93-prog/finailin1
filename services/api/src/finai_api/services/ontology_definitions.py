@@ -1,7 +1,7 @@
 """Canonical ontology definition publication and execution; no parallel persistence store."""
 
 from datetime import UTC, datetime
-from decimal import Decimal, InvalidOperation, localcontext
+from decimal import Decimal, DecimalException, InvalidOperation, localcontext
 from typing import Any
 from uuid import UUID, uuid4, uuid5
 
@@ -151,6 +151,29 @@ def preview_definition(principal: Principal, request: DefinitionWrite) -> Any:
     return {"status": "VALID_AT_PREVIEW", "validation": validation, "publication_required": True}
 
 
+MAX_DERIVED_DECIMAL_CHARACTERS = 4096
+
+
+def _bounded_decimal_text(value: Decimal) -> str:
+    """Check fixed-format length before allocating exponent-expanded output."""
+    if not value.is_finite():
+        raise ValueError("Non-finite arithmetic result")
+    sign, digits, exponent = value.as_tuple()
+    assert isinstance(exponent, int)  # Finite Decimal exponents are integral.
+    count = len(digits)
+    if exponent >= 0:
+        length = 1 if value.is_zero() else count + exponent
+    elif count + exponent > 0:
+        length = count + 1  # Decimal point inside the coefficient.
+    else:
+        length = 2 - exponent  # Leading zero, point, fractional zeroes and digits.
+    if length + sign > MAX_DERIVED_DECIMAL_CHARACTERS:
+        raise ValueError(
+            f"Derived decimal output exceeds {MAX_DERIVED_DECIMAL_CHARACTERS} characters"
+        )
+    return format(value, "f")
+
+
 def evaluate_expression(expression: Expression, values: dict[str, Any]) -> Any:
     if expression.op == "field":
         assert expression.field is not None
@@ -186,7 +209,7 @@ def evaluate_expression(expression: Expression, values: dict[str, Any]) -> Any:
                 if other == 0:
                     raise ValueError("Division by zero")
                 value /= other
-        return format(value, "f")
+        return _bounded_decimal_text(value)
 
 
 def derived_values(
@@ -235,6 +258,11 @@ def derived_values(
                 )
             except (ValueError, InvalidOperation) as exc:
                 computed.update(value=None, status="UNAVAILABLE", reason=str(exc))
+            except DecimalException as exc:
+                computed.update(
+                    value=None, status="UNAVAILABLE",
+                    reason=f"Decimal arithmetic range failure: {type(exc).__name__}",
+                )
             result.append(computed)
     return result
 
