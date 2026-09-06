@@ -1,3 +1,5 @@
+import { backendBaseUrl } from "../backend";
+
 export async function POST(request: Request) {
   const authorization = request.headers.get("authorization");
   if (!authorization) return Response.json({ detail: "Access token required" }, { status: 401 });
@@ -6,7 +8,7 @@ export async function POST(request: Request) {
     return Response.json({ detail: "Request too large" }, { status: 413 });
   }
   try {
-    const upstream = await fetch(`${process.env.FINAI_API_URL ?? "http://127.0.0.1:8000"}/v1/hydration/ingest`, {
+    const upstream = await fetch(`${backendBaseUrl()}/v1/hydration/ingest`, {
       method: "POST", headers: { "Content-Type": "application/json", Authorization: authorization },
       body, cache: "no-store", signal: AbortSignal.timeout(30_000),
     });

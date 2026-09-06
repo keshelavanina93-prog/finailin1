@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { backendBaseUrl } from "../../backend";
 
 type Context = { params: Promise<{ path: string[] }> };
 async function forward(request: NextRequest, context: Context) {
@@ -31,7 +32,7 @@ async function forward(request: NextRequest, context: Context) {
     for (const chunk of chunks) { body.set(chunk, offset); offset += chunk.byteLength; }
   }
   try {
-    const result = await fetch(`${process.env.FINAI_API_URL ?? "http://127.0.0.1:8000"}/v1/ontology/${route}${request.nextUrl.search}`, {
+    const result = await fetch(`${backendBaseUrl()}/v1/ontology/${route}${request.nextUrl.search}`, {
       method: request.method, body, headers: { Authorization: authorization, "Content-Type": binary ? "application/octet-stream" : "application/json" },
       cache: "no-store", signal: AbortSignal.timeout(30_000),
     });

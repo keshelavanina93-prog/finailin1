@@ -30,3 +30,19 @@ monetary interpretation. In particular, source column S and annotated column AD
 have not been equated, assigned a currency or treated as interchangeable
 net/gross/VAT amounts. The pending user question requests that missing meaning;
 no sign-in context or account-prefix heuristic substitutes for it.
+
+## Live web integration checkpoint
+
+On 2026-09-06 the existing web surface on port 3062 had an explicit
+FINAI_API_URL pointing to 8062, but no API process was listening there.
+Starting the managed API on its configured 8062 port restored authenticated
+web-proxy session, readiness and account-observation responses to HTTP 200.
+The retained response contains 596 rows and 38 codes; accounting use remains
+false. Local evidence: `.finai/artifacts/live-web-source-accounting.json`.
+The existing web process and its explicit configuration were preserved.
+
+Separately, the five server proxy routes now share one API base resolver.
+Its default is 8061, matching the packaged runtime, instead of the obsolete
+8000 default. Explicit FINAI_API_URL overrides remain authoritative. Focused
+proxy lint and the isolated production build including TypeScript pass.
+These are live HTTP integration checks, not authenticated browser acceptance.
