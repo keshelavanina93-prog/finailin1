@@ -174,6 +174,15 @@ pre { overflow:auto; max-height:400px; font-size:10px; line-height:1.6; color:#9
 .g8-search-results small {display:block;color:var(--g8-muted);font-size:10px;}
 .g8-top-context {margin-left:auto;display:flex;align-items:center;gap:6px;max-width:260px;min-width:120px;}
 .g8-top-context label {min-width:0;}
+.g8-company-picker{position:relative;margin:0 0 16px;max-width:100%;z-index:9}
+.g8-context-chip{display:flex;align-items:center;gap:16px;max-width:100%;border:1px solid var(--g8-border);background:var(--g8-nav);padding:8px 12px;border-radius:6px;font-size:12px;text-align:left}
+.g8-context-chip>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.g8-context-popover{position:absolute;top:calc(100% + 6px);left:0;width:min(480px,calc(100vw - 40px));max-height:65dvh;overflow:auto;padding:16px;background:var(--g8-nav);border:1px solid var(--g8-border);border-radius:8px;box-shadow:0 12px 30px #0005}
+.g8-context-popover label{display:grid;gap:6px;font-size:12px}.g8-context-popover input{width:100%;min-width:0}
+.g8-context-popover h3{font-size:12px;margin:18px 0 4px}.g8-context-popover p{font-size:11px;color:var(--g8-muted);margin:4px 0 8px}
+.g8-company-option{display:block;width:100%;padding:10px;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--g8-border);font-size:12px;overflow-wrap:anywhere}
+.g8-company-option small{display:block;color:var(--g8-muted);font-size:10px;margin-top:4px}.g8-company-option[aria-pressed=true]{background:var(--g8-bg);outline:1px solid var(--g8-border)}
+.g8-module-tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--g8-border);margin:0 0 16px;padding-bottom:8px}.g8-module-tabs button{padding:8px 12px;background:transparent;border:1px solid transparent;font-size:12px}.g8-module-tabs button[aria-pressed=true]{background:var(--g8-nav);border-color:var(--g8-border);border-radius:5px}
 .g8-top-context select {font-size:11px;border:1px solid var(--g8-border);padding:9px;max-width:235px;background:var(--g8-bg);text-overflow:ellipsis;}
 .g8-icon {display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--g8-muted);padding:7px;border-radius:4px;}
 .g8-icon:hover {background:var(--g8-raised);color:var(--g8-text);}
@@ -359,3 +368,6 @@ button.g8-signal:hover {background:#132936;}
 @media(max-width:900px){.g8-login{padding:5vh 5vw;gap:5vw;grid-template-columns:minmax(0,1fr) minmax(300px,.9fr)}.g8-login-form form{padding:26px}.g8-principles{flex-wrap:wrap}.g8-login-story h1{font-size:36px}}
 @media(max-width:760px){.g8-login{grid-template-columns:1fr;padding:28px 22px;gap:26px}.g8-login-story{gap:16px}.g8-login-story .g8-brand img{width:48px;height:48px}.g8-login-story h1{font-size:32px;letter-spacing:-1px;margin:12px 0}.g8-login-story>div:nth-child(2){margin:0}.g8-login-story p{font-size:13px}.g8-login .g8-brand-banner{max-height:150px;object-fit:contain}.g8-principles{display:none}.g8-login-form form{max-width:none;padding:24px}.g8-login-form h2{font-size:24px}}
 .g8-login .g8-brand-banner{mask-image:radial-gradient(ellipse 75% 85% at 60% 50%,#000 28%,transparent 72%);}
+
+.g8-context-chip,.g8-company-option,.g8-module-tabs button{color:var(--g8-text)}
+.g8-company-option{white-space:normal}
