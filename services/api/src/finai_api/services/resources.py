@@ -440,6 +440,9 @@ def _validate(
                 from finai_api.services.licence_notices import validate as validate_licence_notice
 
                 validate_licence_notice(principal, item, target)
+            if item.object_type == "SourceRegulatoryPublication":
+                from finai_api.services.regulatory_sources import validate as validate_publication
+                validate_publication(principal, item, target)
             if item.object_type in {"SourceCorporateObservation", "CorporateDisclosureBinding"}:
                 from finai_api.services.corporate_disclosures import validate
 

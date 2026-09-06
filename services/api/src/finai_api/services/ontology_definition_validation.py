@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from decimal import Decimal, InvalidOperation
 from typing import Any
+from uuid import UUID, uuid5
 
 from pydantic import ValidationError
 
@@ -37,6 +38,19 @@ def validate_definition(
         act = target(str(item.attributes["act_id"]), source, "REGULATORY_ACT")
         if str(act["attributes"].get("evidence_id")) != str(item.attributes["evidence_id"]):
             raise WorkspaceError(422, "Rule evidence must match the referenced act version")
+        if act["attributes"].get("reference", "").startswith("MATSNE:"):
+            observation = target(
+                str(uuid5(UUID(str(item.attributes["evidence_id"])), "matsne-publication")),
+                source,
+                "REGULATORY_PUBLICATION",
+            )
+            if (
+                definition.source_version_complete
+                and not observation["attributes"]["observation"]["current_law_verified"]
+            ):
+                raise WorkspaceError(
+                    422, "Retained Matsne capture does not verify complete applicable law"
+                )
         return
 
     if item.object_type == "FactReconciliation":
