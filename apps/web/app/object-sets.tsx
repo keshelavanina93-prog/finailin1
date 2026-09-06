@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { CanonicalResource, SchemaField } from "@finai/contracts";
 import ObjectBindingAction from "./object-binding-action";
 import DerivedPropertyRun from "./derived-property-run";
+import OntologyDefinitionEditor from "./ontology-definition-editor";
 
 type Query = {
   object_type: string; search: string; filters: { field: string; value: string | number | boolean }[];
@@ -121,6 +122,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
 
   return <section className="data-panel">
     <div className="toolbar"><div><h2>Object Sets</h2><p className="muted">Explore across companies in your workspace. Find canonical objects and follow their version-bound relationships.</p></div></div>
+    <OntologyDefinitionEditor token={token} definitions={definitions} onProposal={onProposal}/>
     <div className="resource-form"><label>Published sets and type groups<select value={libraryId} onChange={event => setLibraryId(event.target.value)}><option value="">Choose a published definition</option>{definitions.filter(item => ["ObjectSetDefinition", "ObjectInterface", "ObjectTypeGroup"].includes(item.object_type)).map(item => <option key={item.resource_id} value={item.resource_id}>{item.display_name} · {label(item.object_type)}</option>)}</select></label><button type="button" disabled={busy || !libraryId} onClick={() => void openPublished()}>Open published set</button></div>
     <form className="resource-form" onSubmit={submit}>
       <label>Object type<select value={kind} onChange={event => { setKind(event.target.value); setField(""); }}>{schemas.map(schema => <option key={schema.resource_id} value={schema.identity_key}>{label(schema.identity_key)}</option>)}</select></label>

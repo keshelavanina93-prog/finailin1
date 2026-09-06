@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, ConfigDict, Field
 
 from finai_api.domain.object_sets import ObjectSetQuery
-from finai_api.domain.ontology_definitions import DefinitionWrite
+from finai_api.domain.ontology_definitions import DEFINITION_MODELS, DefinitionWrite
 from finai_api.domain.resources import ResourceReview
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal
@@ -92,6 +92,23 @@ def list_definitions(principal: User) -> list[dict[str, Any]]:
 @router.post("/definitions")
 def propose_definition(principal: User, request: DefinitionWrite) -> Any:
     return definitions.propose_definition(principal, request)
+
+
+@router.post("/definitions/preview")
+def preview_definition(principal: User, request: DefinitionWrite) -> Any:
+    return definitions.preview_definition(principal, request)
+
+
+@router.get("/definitions/contracts")
+def definition_contracts(principal: User) -> Any:
+    return {
+        "write": DefinitionWrite.model_json_schema(),
+        "kinds": {
+            name: model.model_json_schema()
+            for name, model in DEFINITION_MODELS.items()
+            if name != "RegulatoryRule"
+        },
+    }
 
 
 @router.get("/definitions/{identity}")

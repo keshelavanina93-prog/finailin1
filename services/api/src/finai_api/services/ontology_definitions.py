@@ -73,7 +73,7 @@ def definition(principal: Principal, identity: UUID, version: UUID | None = None
         return row
 
 
-def propose_definition(principal: Principal, request: DefinitionWrite) -> Any:
+def prepare_definition(principal: Principal, request: DefinitionWrite) -> ResourceProposal:
     if request.resource_id:
         current = definition(principal, request.resource_id)
         if current["object_type"] != request.kind or current["identity_key"] != request.key:
@@ -90,15 +90,30 @@ def propose_definition(principal: Principal, request: DefinitionWrite) -> Any:
         attributes=request.attributes,
         valid_from=datetime.now(UTC),
     )
-    return resources.propose(
-        principal,
-        ResourceProposal(
-            title="Publish ontology definition: " + request.name[:160],
-            rationale=request.rationale,
-            access_entity=entity,
-            mutations=[mutation],
-        ),
+    return ResourceProposal(
+        title="Publish ontology definition: " + request.name[:160],
+        rationale=request.rationale,
+        access_entity=entity,
+        mutations=[mutation],
     )
+
+
+def propose_definition(principal: Principal, request: DefinitionWrite) -> Any:
+    return resources.propose(principal, prepare_definition(principal, request))
+
+
+def preview_definition(principal: Principal, request: DefinitionWrite) -> Any:
+    proposal = prepare_definition(principal, request)
+    with resources.resource_connection(principal) as conn:
+        conn.execute(
+            "SELECT pg_advisory_xact_lock(hashtextextended(%s,0))",
+            (f"canonical:{principal.scope.tenant_id}",),
+        )
+        validation = resources._validate(conn, principal, proposal)
+    impact = validation["downstream_impact"]
+    if impact["requires_tenant_steward"]:
+        validation["downstream_impact"] = {**impact, "status": "RESTRICTED", "affected": []}
+    return {"status": "VALID_AT_PREVIEW", "validation": validation, "publication_required": True}
 
 
 def evaluate_expression(expression: Expression, values: dict[str, Any]) -> Any:
