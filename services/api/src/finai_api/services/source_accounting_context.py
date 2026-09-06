@@ -318,11 +318,12 @@ def validate_active_selection(attrs, scope_attrs, target):
 
 def inspect(principal, document_id, sheet, profile, company_id):
     from finai_api.services.accounting_binding_status import inspect as inspect_status
+    from finai_api.services.source_company_alias import _effective_resources
     from finai_api.services.source_company_alias import inspect as inspect_company_alias
 
     identity, attrs, coordinate, label = observe(principal, document_id, sheet, profile, company_id)
     binding_id = uuid5(identity, "accounting-binding")
-    heads = resources.current_resources(
+    effective = _effective_resources(
         principal, [identity, binding_id, UUID(attrs["chart_id"])]
     )
     company_binding = inspect_company_alias(principal, document_id, sheet, profile, company_id)
@@ -334,7 +335,7 @@ def inspect(principal, document_id, sheet, profile, company_id):
         unresolved.append(
             "The source company label needs a reviewed binding to the selected canonical company"
         )
-    chart = heads.get(attrs["chart_id"])
+    chart = effective.get(attrs["chart_id"])
     if (
         not chart
         or chart["authority_state"] != "APPROVED"
@@ -376,15 +377,15 @@ def inspect(principal, document_id, sheet, profile, company_id):
         "binding_id": str(binding_id),
         "observed": attrs,
         "source_coordinate": coordinate,
-        "scope": heads.get(str(identity)),
-        "binding": heads.get(str(binding_id)),
+        "scope": effective.get(str(identity)),
+        "binding": effective.get(str(binding_id)),
         "candidates": candidates,
         "financial_eligibility": "NOT_CERTIFIED",
         "canonical_ready": not unresolved,
         "unresolved": unresolved,
         "source_company_label": label,
         "company_binding": company_binding,
-        "accounting_eligibility": inspect_status(principal, heads.get(str(binding_id))),
+        "accounting_eligibility": inspect_status(principal, effective.get(str(binding_id))),
         "source_observations": source_observations(principal, document_id, sheet, profile),
     }
 
@@ -394,10 +395,12 @@ def propose_scope(principal, document_id, sheet, profile, company_id):
     if not result["canonical_ready"]:
         raise WorkspaceError(409, "; ".join(result["unresolved"]))
     attrs = result["observed"]
-    if result["scope"]:
-        if result["scope"]["attributes"] != attrs:
+    editing = resources.current_resources(principal, [UUID(result["scope_id"])])
+    existing_scope = editing.get(result["scope_id"])
+    if existing_scope:
+        if existing_scope["attributes"] != attrs:
             raise WorkspaceError(409, "Source scope changed; review a new parser binding")
-        raise WorkspaceError(409, "This source accounting scope is already published")
+        raise WorkspaceError(409, "This source accounting scope is already published or scheduled")
     now = datetime.now(UTC)
     records = resources.current_resources(principal, [UUID(attrs["source_record_id"])])
     mutations = []
@@ -445,6 +448,19 @@ def propose_binding(principal, document_id, sheet, profile, company_id, selectio
         raise WorkspaceError(409, "; ".join(result["unresolved"]))
     if not result["scope"] or result["scope"]["authority_state"] != "APPROVED":
         raise WorkspaceError(409, "Publish observed source scope before choosing accounting use")
+    editing = resources.current_resources(
+        principal, [UUID(result["scope_id"]), UUID(result["binding_id"])]
+    )
+    for field in ("scope", "binding"):
+        displayed = result[field]
+        head = editing.get(result[field + "_id"])
+        if (head["version_id"] if head else None) != (
+            displayed["version_id"] if displayed else None
+        ):
+            raise WorkspaceError(
+                409, "Source accounting context has a newer or scheduled publication; "
+                "review that publication before replacing the current selection"
+            )
     prior = result["binding"]
     attrs = {"scope_id": result["scope_id"], **selection.model_dump(mode="json", exclude_none=True)}
     if prior and prior["attributes"] == attrs:

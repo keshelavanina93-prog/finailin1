@@ -1,5 +1,6 @@
 """Read the retained SEG match without proposing identity or accounting changes."""
 
+import argparse
 import json
 import os
 from datetime import UTC, datetime
@@ -9,6 +10,11 @@ import httpx
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output", default="docs/development/evidence/nin26-effective-source-company.json"
+    )
+    args = parser.parse_args()
     token = next(
         key
         for key, value in json.loads(os.environ["FINAI_ACCESS_TOKENS"]).items()
@@ -45,7 +51,7 @@ def main():
         "financial_certification_or_release_acceptance": False,
         "scope": "Existing retained SEG source identity match; read-only inspection",
     }
-    Path("docs/development/evidence/nin26-effective-source-company.json").write_text(
+    Path(args.output).write_text(
         json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     print("Retained SEG company match remains accepted; accounting remains unestablished.")
