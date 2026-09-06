@@ -42,8 +42,21 @@ KINDS = [
 ]
 
 
-def project(nodes, pins, company_id=None):
+def project(nodes, pins, company_id=None, pinned_scopes=()):
     by_id = {n["resource_id"]: n for n in nodes}
+    # Historical pins explain a reviewed selection; they never replace snapshot state.
+    scope_versions = {
+        n["version_id"]: n
+        for n in [*nodes, *pinned_scopes]
+        if n["object_type"] == "SourceAccountingScope"
+    }
+    bindings_by_scope = {}
+    for binding in nodes:
+        if binding["object_type"] != "SourceAccountingBinding":
+            continue
+        scope = scope_versions.get(pins.get((binding["version_id"], "scope_id")))
+        if scope and scope["resource_id"] == binding["attributes"].get("scope_id"):
+            bindings_by_scope.setdefault(scope["resource_id"], []).append(binding)
 
     def linked(node, field):
         pin = pins.get((node["version_id"], field))
@@ -149,12 +162,7 @@ def project(nodes, pins, company_id=None):
         if node["object_type"] == "SourceAccountingScope":
             owner = linked(node, "legal_entity_id")
             if owner and owner["resource_id"] == str(company_id):
-                bindings = [
-                    b
-                    for b in nodes
-                    if b["object_type"] == "SourceAccountingBinding"
-                    and linked(b, "scope_id") == node
-                ]
+                bindings = bindings_by_scope.get(node["resource_id"], [])
                 accounting.append({"scope": node, "bindings": bindings})
         if node["object_type"] == "LicenceNoticeBinding":
             owner = linked(node, "company_id")
@@ -255,6 +263,33 @@ def project(nodes, pins, company_id=None):
     return result
 
 
+def inspect_binding_eligibility(principal, result):
+    """Current advisory checks are independent of the requested historical snapshot."""
+    from finai_api.services.accounting_binding_status import inspect
+
+    if result["context"] is None:
+        return
+    checked = 0
+    for source in result["context"]["accounting_sources"]:
+        statuses = source["binding_eligibility"] = {}
+        for binding in source["bindings"]:
+            if checked < 100:
+                statuses[binding["version_id"]] = inspect(principal, binding)
+                checked += 1
+            else:
+                statuses[binding["version_id"]] = {
+                    "state": "ELIGIBILITY_NOT_CHECKED",
+                    "reason": "Company preview reached its 100 selection check bound; "
+                    "open the source selection for its current eligibility",
+                    "checked_at": None,
+                    "advisory": True,
+                    "current_use_authorized": False,
+                    "eligible_for_accounting": False,
+                    "binding_version_id": binding["version_id"],
+                    "reviewed_source_use": binding["attributes"].get("source_use"),
+                }
+
+
 def select_accounting(result, ledger_id=None, book_id=None, period_id=None):
     if not any((ledger_id, book_id, period_id)):
         return None
@@ -317,15 +352,36 @@ def resolve(
         nodes = [CanonicalResource.model_validate(r).model_dump(mode="json") for r in rows]
         deps = cursor.execute(
             "SELECT version_id,relation,target_version_id FROM resource_dependencies "
-            "WHERE tenant_id=%s AND version_id=ANY(%s::uuid[]) AND relation LIKE 'FIELD:%%'",
+            "WHERE tenant_id=%s AND version_id=ANY(%s::uuid[]) AND relation LIKE 'FIELD:%%' "
+            "LIMIT 50001",
             (principal.scope.tenant_id, [r["version_id"] for r in rows]),
         ).fetchall()
+        if len(deps) > 50000:
+            raise WorkspaceError(409, "Company snapshot exceeds the supported dependency bound")
         pins = {
             (str(d["version_id"]), d["relation"].removeprefix("FIELD:")): str(
                 d["target_version_id"]
             )
             for d in deps
         }
-        result = project(nodes, pins, company_id)
+        scope_pins = [
+            pins[(n["version_id"], "scope_id")]
+            for n in nodes
+            if n["object_type"] == "SourceAccountingBinding"
+            and (n["version_id"], "scope_id") in pins
+        ]
+        retained_scopes = cursor.execute(
+            "SELECT v.*,i.identity_key FROM resource_versions v "
+            "JOIN canonical_identities i USING(tenant_id,resource_id) "
+            "WHERE v.tenant_id=%s AND v.version_id=ANY(%s::uuid[]) "
+            "AND v.object_type='SourceAccountingScope' AND v.system_from<=%s LIMIT 5001",
+            (principal.scope.tenant_id, scope_pins, known_at),
+        ).fetchall()
+        pinned_scopes = [
+            CanonicalResource.model_validate(r).model_dump(mode="json") for r in retained_scopes
+        ]
+        result = project(nodes, pins, company_id, pinned_scopes)
         result["accounting_selection"] = select_accounting(result, ledger_id, book_id, period_id)
-        return {**result, "valid_at": valid_at.isoformat(), "known_at": known_at.isoformat()}
+    # Do not hold the snapshot connection while the shared guard inspects current state.
+    inspect_binding_eligibility(principal, result)
+    return {**result, "valid_at": valid_at.isoformat(), "known_at": known_at.isoformat()}

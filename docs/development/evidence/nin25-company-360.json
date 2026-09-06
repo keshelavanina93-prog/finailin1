@@ -1,0 +1,57 @@
+{
+  "checked_at": "2026-09-06T20:22:13.612834+00:00",
+  "capability": "NIN-25 company-360",
+  "source": "existing retained canonical resources in native PostgreSQL",
+  "mode": "read-only authenticated TestClient",
+  "companies": [
+    {
+      "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "company_version": "72417af7-1f6f-5d11-b6ff-607e96169191",
+      "name": "შპს სოკარ ჯორჯია გაზი",
+      "latency_ms": 425,
+      "ledger_count": 0,
+      "source_scope_count": 0,
+      "relationship_count": 0,
+      "filing_count": 22,
+      "licence_evidence_count": 1
+    },
+    {
+      "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "company_version": "dd21bd46-3525-535d-89ba-6ffa2e05a6e5",
+      "name": "სოკარ ჯორჯია პეტროლეუმი // Сокар Джорджия Петролеум",
+      "latency_ms": 400,
+      "ledger_count": 0,
+      "source_scope_count": 1,
+      "relationship_count": 0,
+      "filing_count": 5,
+      "licence_evidence_count": 0
+    }
+  ],
+  "unauthenticated_denied": true,
+  "browser_acceptance": "UNVERIFIED",
+  "gates": {
+    "CODE_PRESENT": true,
+    "LOCAL_CONTRACT_PASS": true,
+    "LOCAL_INTEGRATED_PASS": true,
+    "AUTHENTIC_SOURCE_PASS": "retained company projection only",
+    "BROWSER_ACCEPTANCE_PASS": false,
+    "RELEASE_ACCEPTED": false
+  },
+  "limits": {
+    "directory_page": 50,
+    "graph_nodes": 200,
+    "graph_edges": 400,
+    "snapshot_resources": 5000,
+    "binding_eligibility_checks": 100
+  },
+  "release_accepted": false,
+  "live_web_proxy": {
+    "web_port": 3062,
+    "api_port": 8062,
+    "company_statuses": {
+      "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d": 200,
+      "dc706c30-a8fb-57dc-b098-8a6bf2c2309d": 200
+    }
+  },
+  "browser_blocker": "Signed out; authenticated visual and interaction acceptance pending"
+}
