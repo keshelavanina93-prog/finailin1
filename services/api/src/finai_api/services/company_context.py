@@ -69,15 +69,46 @@ def project(nodes, pins, company_id=None):
                 }
             )
     source_companies = {}
+    reported_groups = {}
     for node in nodes:
         if node["object_type"] == "SourceAccountingScope":
             owner = linked(node, "legal_entity_id")
             if owner:
                 source_companies[owner["resource_id"]] = owner
+        if node["object_type"] == "CorporateDisclosureBinding":
+            reporter, party, observation = [
+                linked(node, field)
+                for field in ("reporter_id", "related_entity_id", "observation_id")
+            ]
+            if not reporter or not party or not observation:
+                continue
+            observed = observation["attributes"]["observation"]
+            if observed["reported_role"] != "SUBSIDIARY":
+                continue
+            key = (reporter["resource_id"], node["attributes"]["reporting_year"])
+            group = reported_groups.setdefault(
+                key,
+                {
+                    "reporter": reporter,
+                    "reporting_year": key[1],
+                    "members": [],
+                    "basis": "REPORTED_GROUP_DISCLOSURE",
+                },
+            )
+            group["members"].append(
+                {
+                    "company": party,
+                    "binding": node,
+                    "observation": observation,
+                    "reported_percent": observed.get("reported_percent"),
+                    "former_indicator": observed.get("former_indicator", ""),
+                }
+            )
     result = {
         "workspaces": workspaces,
         "context": None,
         "source_companies": list(source_companies.values()),
+        "reported_groups": list(reported_groups.values()),
     }
     if company_id is None:
         return result

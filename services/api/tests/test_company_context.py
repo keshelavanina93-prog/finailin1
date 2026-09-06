@@ -91,6 +91,7 @@ def test_disclosed_subsidiaries_are_not_current_ownership_or_consolidation():
                 "reporter_id": company,
                 "related_entity_id": party,
                 "observation_id": observation,
+                "reporting_year": 2024,
             },
         },
     ]
@@ -99,7 +100,10 @@ def test_disclosed_subsidiaries_are_not_current_ownership_or_consolidation():
         ("b1", "related_entity_id"): "p1",
         ("b1", "observation_id"): "o1",
     }
-    result = project(nodes, pins, company)["context"]
+    projection = project(nodes, pins, company)
+    assert projection["reported_groups"][0]["reporting_year"] == 2024
+    assert projection["reported_groups"][0]["members"][0]["company"]["resource_id"] == party
+    result = projection["context"]
     assert len(result["disclosures"]) == 1
     assert result["relationships"] == []
     assert len(result["structural_resources"]) == 1
