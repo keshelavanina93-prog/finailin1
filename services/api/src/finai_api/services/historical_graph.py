@@ -21,6 +21,7 @@ def historical_graph(
     resource_id: UUID,
     valid_at: datetime | None = None,
     known_at: datetime | None = None,
+    root_version_id: UUID | None = None,
 ) -> dict[str, Any]:
     if any(value is not None and value.tzinfo is None for value in (valid_at, known_at)):
         raise WorkspaceError(422, "Historical timestamps must include a timezone")
@@ -34,11 +35,23 @@ def historical_graph(
         valid_at = valid_at or known_at
         root = cursor.execute(
             "SELECT resource_id,version_id,object_type,display_name,authority_state,"
-            "valid_from,valid_to,system_from FROM resource_versions "
+            "valid_from,valid_to,system_from,"
+            "attributes->>'document_id' AS source_document_id "
+            "FROM resource_versions "
             "WHERE tenant_id=%s AND resource_id=%s AND system_from<=%s "
-            "AND valid_from<=%s AND (valid_to IS NULL OR valid_to>%s) "
+            "AND (%s::uuid IS NOT NULL OR (valid_from<=%s AND (valid_to IS NULL OR valid_to>%s))) "
+            "AND (%s::uuid IS NULL OR version_id=%s) "
             "ORDER BY system_from DESC,version_id LIMIT 1",
-            (principal.scope.tenant_id, resource_id, known_at, valid_at, valid_at),
+            (
+                principal.scope.tenant_id,
+                resource_id,
+                known_at,
+                root_version_id,
+                valid_at,
+                valid_at,
+                root_version_id,
+                root_version_id,
+            ),
         ).fetchone()
         if root is None:
             raise WorkspaceError(404, "Historical resource not found in authorized context")
@@ -73,7 +86,9 @@ def historical_graph(
                     raise WorkspaceError(409, "Historical lineage exceeds the depth or node bound")
                 target_node = cursor.execute(
                     "SELECT resource_id,version_id,object_type,display_name,authority_state,"
-                    "valid_from,valid_to,system_from FROM resource_versions "
+                    "valid_from,valid_to,system_from,"
+                    "attributes->>'document_id' AS source_document_id "
+                    "FROM resource_versions "
                     "WHERE tenant_id=%s AND resource_id=%s AND version_id=%s",
                     (
                         principal.scope.tenant_id,
@@ -118,6 +133,7 @@ def historical_graph(
             raise WorkspaceError(409, "Historical lineage contains a dependency cycle")
         return {
             "purpose": "HISTORICAL_LINEAGE",
+            "root_selection": "EXACT_VERSION" if root_version_id else "AS_OF",
             "root_resource_id": str(resource_id),
             "root_version_id": root_version,
             "valid_at": valid_at,
