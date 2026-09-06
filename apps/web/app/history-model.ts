@@ -1,6 +1,6 @@
 import type {CanonicalResource} from "@finai/contracts";
 
-export type HistorySelection = {resource_id:string; version_id:string; company_id:string};
+export type HistorySelection = {resource_id:string; version_id:string; company_id:string; known_at?:string};
 export type HistoryValue = {present:boolean; value?:unknown};
 export type HistoryChange = {path:string[]; before:HistoryValue; after:HistoryValue; changed:boolean};
 

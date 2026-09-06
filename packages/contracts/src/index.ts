@@ -6,7 +6,7 @@ export const epistemicStates = [
   "UNAVAILABLE",
 ] as const;
 
-export type { PromotionCheck, SchemaField, CanonicalResource, ResourceMutation, ResourceProposal, ResourceProposalDetail, ProposalSummary, CanonicalDetail, HistoricalGraph } from "./ontology.js";
+export type { PromotionCheck, SchemaField, CanonicalResource, ResourceMutation, ResourceProposal, ResourceProposalDetail, ProposalSummary, CanonicalDetail, OperatorInspection, HistoricalGraph } from "./ontology.js";
 export type { AuthorityState, VersionReference, LifecycleRequest, LifecycleReview, ConsumptionRequest, GuardedConsumption, ConsumptionStatus, RollbackRequest } from "./lifecycle.js";
 export type { SourceEvent, RetainedSourceEvent, EventReplay } from "./source-event.js";
 

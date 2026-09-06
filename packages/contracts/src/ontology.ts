@@ -43,6 +43,15 @@ export interface CanonicalDetail {
   resource: CanonicalResource; versions: CanonicalResource[];
   dependents: Array<{resource_id: string; version_id:string; display_name:string; object_type:string; relation:string}>;
 }
+
+export interface OperatorInspection extends CanonicalDetail {
+  known_at: string;
+  selection_mode: "EXACT_VERSION" | "LATEST_KNOWN";
+  purpose: "HISTORICAL_INSPECTION";
+  current_use_authorized: false;
+  versions_truncated: boolean;
+  dependents_truncated: boolean;
+}
 export interface HistoricalGraph {
   purpose: "HISTORICAL_LINEAGE";
   root_resource_id: string;

@@ -1,0 +1,32 @@
+{
+  "retained_resource_journeys": [
+    {
+      "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "resource_id": "ba373aa4-0047-5c25-8508-27800c3ecc0e",
+      "version_id": "7f4e68f4-b569-5681-8d54-628d19ce4d77",
+      "known_at": "2026-09-06T21:16:38.862095+00:00",
+      "history_versions": 2,
+      "trace_nodes": 17,
+      "before_recording_status": 404,
+      "current_use_authorized": false,
+      "live_web_api_status": 200
+    },
+    {
+      "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "resource_id": "25c1939a-e256-5027-b743-27f79e7462fd",
+      "version_id": "9b7a1d00-7f16-5558-aa5a-7023f3cd9b93",
+      "known_at": "2026-09-06T21:16:39.171247+00:00",
+      "history_versions": 1,
+      "trace_nodes": 17,
+      "before_recording_status": 404,
+      "current_use_authorized": false,
+      "live_web_api_status": 200
+    }
+  ],
+  "native_temporal_and_isolation_checks": "PASS",
+  "derived_coalesce_focused_checks": "PASS",
+  "browser_acceptance": false,
+  "release_accepted": false,
+  "frontend_build": "PASS",
+  "frontend_types_lint": "PASS"
+}

@@ -150,9 +150,14 @@ def evaluate_expression(expression: Expression, values: dict[str, Any]) -> Any:
         return values.get(expression.field)
     if expression.op == "literal":
         return expression.value
-    operands = [evaluate_expression(arg, values) for arg in expression.args]
     if expression.op == "coalesce":
-        return next((value for value in operands if value is not None), None)
+        # An unused fallback must not invalidate an observed value, including zero.
+        for argument in expression.args:
+            value = evaluate_expression(argument, values)
+            if value is not None:
+                return value
+        return None
+    operands = [evaluate_expression(arg, values) for arg in expression.args]
     if any(value is None for value in operands):
         return None
     if expression.op == "concat":
