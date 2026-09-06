@@ -24,6 +24,8 @@ from finai_api.services.workspace import WorkspaceError
 def definitions(
     principal: Principal, valid_at: datetime | None = None, known_at: datetime | None = None
 ) -> list[dict[str, Any]]:
+    if any(value is not None and value.tzinfo is None for value in (valid_at, known_at)):
+        raise WorkspaceError(422, "Definition timestamps must include a timezone")
     now = datetime.now(UTC)
     with resources.resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cur:
         return cur.execute(
@@ -43,7 +45,16 @@ def definitions(
         ).fetchall()
 
 
-def definition(principal: Principal, identity: UUID, version: UUID | None = None) -> dict[str, Any]:
+def definition(
+    principal: Principal,
+    identity: UUID,
+    version: UUID | None = None,
+    *,
+    valid_at: datetime | None = None,
+    known_at: datetime | None = None,
+) -> dict[str, Any]:
+    if any(value is not None and value.tzinfo is None for value in (valid_at, known_at)):
+        raise WorkspaceError(422, "Definition timestamps must include a timezone")
     with resources.resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cur:
         if version:
             row = cur.execute(
@@ -51,6 +62,22 @@ def definition(principal: Principal, identity: UUID, version: UUID | None = None
                 "USING(tenant_id,resource_id) WHERE v.tenant_id=%s AND v.resource_id=%s "
                 "AND v.version_id=%s",
                 (principal.scope.tenant_id, identity, version),
+            ).fetchone()
+        elif valid_at is not None or known_at is not None:
+            now = datetime.now(UTC)
+            row = cur.execute(
+                "SELECT v.*,i.identity_key FROM resource_versions v JOIN canonical_identities i "
+                "USING(tenant_id,resource_id) WHERE v.tenant_id=%s AND v.resource_id=%s "
+                "AND v.system_from<=%s AND v.valid_from<=%s "
+                "AND (v.valid_to IS NULL OR v.valid_to>%s) "
+                "ORDER BY v.system_from DESC,v.version_id LIMIT 1",
+                (
+                    principal.scope.tenant_id,
+                    identity,
+                    known_at or now,
+                    valid_at or now,
+                    valid_at or now,
+                ),
             ).fetchone()
         else:
             row = resources._get(conn, principal.scope.tenant_id, identity)
@@ -199,7 +226,9 @@ def derived_values(
     return result
 
 
-def derive_query(principal, query: ObjectSetQuery, ids: list[UUID], versions: dict[UUID, UUID]):
+def derive_query(
+    principal: Principal, query: ObjectSetQuery, ids: list[UUID], versions: dict[UUID, UUID]
+) -> dict[str, Any]:
     if (query.valid_at is not None or query.known_at is not None) and not versions:
         raise WorkspaceError(422, "Time-bound derived queries require explicit definition versions")
     if len(ids) != len(set(ids)) or (versions and set(versions) != set(ids)):
@@ -241,7 +270,9 @@ def run_set(
     valid_at: datetime | None = None,
     known_at: datetime | None = None,
 ) -> dict[str, Any]:
-    resource = definition(principal, identity, version)
+    # Explicit pins intentionally support replaying a saved definition over historical data.
+    # Without a pin, the caller's as-of context selects the definition as well as its objects.
+    resource = definition(principal, identity, version, valid_at=valid_at, known_at=known_at)
     if resource["object_type"] != "ObjectSetDefinition":
         raise WorkspaceError(422, "Resource is not an Object Set")
     query = ObjectSetQuery.model_validate(resource["attributes"]["definition"])
@@ -273,6 +304,8 @@ def run_group(
     valid_at: datetime | None = None,
     known_at: datetime | None = None,
 ) -> dict[str, Any]:
+    if any(value is not None and value.tzinfo is None for value in (valid_at, known_at)):
+        raise WorkspaceError(422, "Definition timestamps must include a timezone")
     now = datetime.now(UTC)
     query = ObjectSetQuery(
         object_type="ObjectInterface",
@@ -281,7 +314,9 @@ def run_group(
         valid_at=valid_at or now,
         known_at=known_at or now,
     )
-    resource = definition(principal, identity, version)
+    resource = definition(
+        principal, identity, version, valid_at=query.valid_at, known_at=query.known_at
+    )
     mappings = {}
     if resource["object_type"] == "ObjectTypeGroup":
         types = resource["attributes"]["definition"]["types"]

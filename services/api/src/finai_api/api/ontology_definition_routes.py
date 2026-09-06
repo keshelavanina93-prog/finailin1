@@ -85,8 +85,10 @@ def aggregate(principal: User, identity: UUID, request: AggregateRun) -> dict[st
 
 
 @router.get("/definitions")
-def list_definitions(principal: User) -> list[dict[str, Any]]:
-    return definitions.definitions(principal)
+def list_definitions(
+    principal: User, valid_at: datetime | None = None, known_at: datetime | None = None
+) -> list[dict[str, Any]]:
+    return definitions.definitions(principal, valid_at, known_at)
 
 
 @router.post("/definitions")
@@ -112,8 +114,16 @@ def definition_contracts(principal: User) -> Any:
 
 
 @router.get("/definitions/{identity}")
-def get_definition(principal: User, identity: UUID, version: UUID | None = None) -> dict[str, Any]:
-    return definitions.definition(principal, identity, version)
+def get_definition(
+    principal: User,
+    identity: UUID,
+    version: UUID | None = None,
+    valid_at: datetime | None = None,
+    known_at: datetime | None = None,
+) -> dict[str, Any]:
+    return definitions.definition(
+        principal, identity, version, valid_at=valid_at, known_at=known_at
+    )
 
 
 @router.post("/proposals/{identity}/decision")
