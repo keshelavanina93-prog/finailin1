@@ -3,6 +3,7 @@
 import {useEffect,useRef,useState,type FormEvent} from "react";
 import type {Principal} from "@finai/contracts";
 import {Panel} from "./g8-ui";
+import ArtifactPreservation from "./artifact-preservation";
 import SourceCorporateDisclosure from "./source-corporate-disclosure";
 import SourceLicenceNotice from "./source-licence-notice";
 import SourceAccountBindings from "./source-account-bindings";
@@ -63,6 +64,7 @@ export default function SourceDocuments({token,principal,onProposal,companyDocum
   return <Panel title="Original source documents"><p>Retain the original workbook, then inspect its company evidence. Accounting interpretation and company review remain separate steps.</p>
     {principal.permissions.includes("ingest")&&<form onSubmit={upload}><label>Original document (maximum 32 MB)<input type="file" name="file" required disabled={busy}/></label><button disabled={busy}>Retain original</button></form>}
     {document&&<p role="status">Retained {document.filename} · {document.byte_length.toLocaleString()} bytes · SHA-256 {document.sha256}</p>}
+    {/^doc_[a-f0-9]{64}$/.test(reference)&&<ArtifactPreservation token={token} artifact={{kind:"SOURCE_DOCUMENT",document_id:reference}} canRecord={principal.permissions.includes("ontology_read")}/>}
     <fieldset disabled={busy}><legend>Inspect retained company evidence</legend>
       <label htmlFor="retained-document-select">Retained sources</label><select id="retained-document-select" value={reference} onChange={e=>{setReference(e.target.value);setDocument(documents.find(d=>d.document_id===e.target.value)??null);setPreview(null);setSheet("");change();}}><option value="">Select an original source</option>{documents.filter(d=>companyDocumentIds===undefined||companyDocumentIds.includes(d.document_id)).map(d=><option key={d.document_id} value={d.document_id}>{d.filename}</option>)}</select>
       <label>Retained document reference<input value={reference} onChange={e=>{setReference(e.target.value);setDocument(null);setPreview(null);change();}} placeholder="doc_…"/></label>

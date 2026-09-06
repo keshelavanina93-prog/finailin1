@@ -1,0 +1,103 @@
+{
+  "checked_at": "2026-09-06T23:53:45.620948+00:00",
+  "artifact": {
+    "reference": {
+      "kind": "SOURCE_RECEIPT",
+      "receipt_id": "ir_e630518b23cd9855216cf776fa87e51a5b3d964a912ebc480f47e910b6a073e6"
+    },
+    "artifact_class": "IMMUTABLE_SOURCE_EVIDENCE",
+    "content_hash": "d7c7e67c093b40b6f9209b301ca8fab7e4febc85c27d735babb95fa2028a8f0a",
+    "exact_scope": {
+      "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+      "legal_entity_id": "entity-ge-001",
+      "period": "2026-08",
+      "currency": "GEL"
+    },
+    "recorded_at": "2026-09-05T12:31:20.351251+04:00",
+    "authority_scope": "SOURCE_OBSERVATION"
+  },
+  "evaluations": [
+    {
+      "evaluation_id": "6f0c36af-9571-5dac-8c16-4454d084f5ed",
+      "proof_hash": "37ea0c7bc0171ae5d5edff2779bfe79ca92fca1e7ebea2d9407969524b342d8e",
+      "proof": {
+        "policy": null,
+        "status": "PRESERVED",
+        "purpose": "DISPOSITION_EVALUATION_ONLY",
+        "reasons": [
+          "POLICY_NOT_ESTABLISHED"
+        ],
+        "artifact": {
+          "reference": {
+            "kind": "SOURCE_RECEIPT",
+            "receipt_id": "ir_e630518b23cd9855216cf776fa87e51a5b3d964a912ebc480f47e910b6a073e6"
+          },
+          "exact_scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "recorded_at": "2026-09-05T12:31:20.351251+04:00",
+          "content_hash": "d7c7e67c093b40b6f9209b301ca8fab7e4febc85c27d735babb95fa2028a8f0a",
+          "artifact_class": "IMMUTABLE_SOURCE_EVIDENCE",
+          "authority_scope": "SOURCE_OBSERVATION"
+        },
+        "eligible_at": null,
+        "evaluated_at": "2026-09-06T23:53:45.158125+00:00",
+        "contract_version": "artifact-retention/1",
+        "requested_action": "PRESERVE",
+        "requested_policy": null,
+        "execution_authorized": false,
+        "effective_disposition": "PRESERVE",
+        "legal_compliance_established": false
+      },
+      "recorded_at": "2026-09-07T03:53:45.164288+04:00",
+      "execution_authorized": false,
+      "current_use_authorized": false
+    },
+    {
+      "evaluation_id": "3f582efc-1572-56ac-9015-fcfbd91375c8",
+      "proof_hash": "79f02f1431a10d3634992c2862434daa49b70ba7b0417b9262e9b7cc8870a7f1",
+      "proof": {
+        "policy": null,
+        "status": "BLOCKED",
+        "purpose": "DISPOSITION_EVALUATION_ONLY",
+        "reasons": [
+          "POLICY_NOT_ESTABLISHED"
+        ],
+        "artifact": {
+          "reference": {
+            "kind": "SOURCE_RECEIPT",
+            "receipt_id": "ir_e630518b23cd9855216cf776fa87e51a5b3d964a912ebc480f47e910b6a073e6"
+          },
+          "exact_scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "recorded_at": "2026-09-05T12:31:20.351251+04:00",
+          "content_hash": "d7c7e67c093b40b6f9209b301ca8fab7e4febc85c27d735babb95fa2028a8f0a",
+          "artifact_class": "IMMUTABLE_SOURCE_EVIDENCE",
+          "authority_scope": "SOURCE_OBSERVATION"
+        },
+        "eligible_at": null,
+        "evaluated_at": "2026-09-06T23:53:45.408644+00:00",
+        "contract_version": "artifact-retention/1",
+        "requested_action": "DELETE",
+        "requested_policy": null,
+        "execution_authorized": false,
+        "effective_disposition": "PRESERVE",
+        "legal_compliance_established": false
+      },
+      "recorded_at": "2026-09-07T03:53:45.415166+04:00",
+      "execution_authorized": false,
+      "current_use_authorized": false
+    }
+  ],
+  "repeat_and_history_equal": true,
+  "source_still_readable_and_hash_unchanged": true,
+  "disposition_executed": false,
+  "legal_compliance_established": false
+}
