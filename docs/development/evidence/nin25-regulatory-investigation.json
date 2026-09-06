@@ -1,0 +1,132 @@
+{
+  "capability": "NIN-25 retained regulatory readiness and dependency investigation",
+  "mode": "native authenticated API; retains potential dependency-impact evidence only",
+  "companies": [
+    {
+      "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "context_basis": "INCOMPLETE_CONTEXT",
+      "rules": [
+        {
+          "resource_id": "f2412b1d-fe1f-423e-966d-95f326d0cc0a",
+          "version_id": "123923c7-5ee4-5c53-8ca7-7f4c08432655",
+          "assessment": {
+            "legal_state": "SOURCE_VERSION_INCOMPLETE",
+            "applicability": "LICENCE_BINDING_REQUIRED",
+            "effective_obligation": false,
+            "days_to_deadline": 481,
+            "obligation": "Implement the uniform gas-sector accounting and reporting system specified in the resolution and annexes, subject to verified licence and customer-count applicability.",
+            "licence_context": {
+              "state": "LICENCE_BINDING_REQUIRED",
+              "holder_relationships": []
+            },
+            "blocking_reasons": [
+              "SOURCE_VERSION_INCOMPLETE",
+              "CONTEXT_REQUIRED",
+              "LICENCE_BINDING_REQUIRED"
+            ]
+          },
+          "dependencies": {
+            "act_id": {
+              "resource_id": "37f24085-8713-534f-83ae-99d57b2b445b",
+              "version_id": "007bb095-f751-5111-a736-4c17f65b8bb7"
+            },
+            "legal_entity_id": {
+              "resource_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+              "version_id": "72417af7-1f6f-5d11-b6ff-607e96169191"
+            },
+            "evidence_id": {
+              "resource_id": "54617d0b-13de-5378-8910-614ed2238191",
+              "version_id": "c58f419b-2a3f-58c9-aa38-e81a624b3260"
+            },
+            "licence_id": {
+              "resource_id": "d0ab4a79-c88d-5d13-b1bc-df07fc4b5623",
+              "version_id": "cddbe466-95c8-52ff-beff-902dc4541785"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "context_basis": "INCOMPLETE_CONTEXT",
+      "rules": []
+    }
+  ],
+  "publications": [
+    {
+      "resource_id": "563a262c-0c6c-5d5d-a92a-841c44fadf90",
+      "version_id": "00bdd965-2127-5504-b75d-40a0e9dcad9a",
+      "document": {
+        "document_id": "doc_07f0954fd96c55253a7b8b06d94926913389934d3e1fa6cdd8115bf036c4b048",
+        "sha256": "e580af6f6b12020851784d6638d137a6f4195a42a7ab1c41ad3283ae0a2f0e22"
+      },
+      "completeness": "UNVERIFIED_COMPLETENESS",
+      "retained_impact_id": "fcr_e2c449e9ca4af91862854cc824f680f15ef95abc1d5dfb01da9c93df4a349829",
+      "impact_reopened_equal": true,
+      "affected_count": 2,
+      "legal_change_verified": false,
+      "accounting_effects": false
+    },
+    {
+      "resource_id": "84dd5429-992e-5129-ab5c-685a26bf079b",
+      "version_id": "c5d01aa3-2a2b-50c7-b217-07c8f1f7d943",
+      "document": {
+        "document_id": "doc_96508bf857b3db8756022f448619a18e6cb52a6bdbe1849151a447c5f3a338ed",
+        "sha256": "3d18ab6a89705a338cbf0a5ecb7364a4441ad1c93e36963845f5ba2e31edee59"
+      },
+      "completeness": "OLDER_PUBLICATION_ONLY",
+      "retained_impact_id": "fcr_281f97ae52947c62c76eae535bdace2540b3a9f5c0036e8c0a0951f71548479a",
+      "impact_reopened_equal": true,
+      "affected_count": 1,
+      "legal_change_verified": false,
+      "accounting_effects": false
+    }
+  ],
+  "browser_acceptance": false,
+  "NIN_40_complete": false,
+  "release_accepted": false,
+  "monitor_workbench_continuity": [
+    {
+      "workflow_id": "rgm_d52ab5c3c5ecba17e83e1823d2936435aec2f2c23407a57dc16e228b3f7f60a8",
+      "source_health": "INITIAL_CAPTURE",
+      "freshness": "WITHIN_CHECK_WINDOW",
+      "runtime": "UNOBSERVABLE",
+      "in_shared_workbench": true,
+      "company_binding": "UNBOUND",
+      "runtime_after_service_restore": {
+        "state": "ENABLED",
+        "next_checks": [
+          "2026-09-07T00:00:00+00:00",
+          "2026-09-08T00:00:00+00:00",
+          "2026-09-09T00:00:00+00:00",
+          "2026-09-10T00:00:00+00:00",
+          "2026-09-11T00:00:00+00:00",
+          "2026-09-12T00:00:00+00:00",
+          "2026-09-13T00:00:00+00:00",
+          "2026-09-14T00:00:00+00:00",
+          "2026-09-15T00:00:00+00:00",
+          "2026-09-16T00:00:00+00:00"
+        ],
+        "running_checks": 0,
+        "started_actions": 1,
+        "latest_execution": "COMPLETED"
+      },
+      "source_health_after_service_restore": "INITIAL_CAPTURE"
+    }
+  ],
+  "live_web_api_readback": [
+    {
+      "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "status": 200,
+      "no_activity_assumed": true
+    },
+    {
+      "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "status": 200,
+      "no_activity_assumed": true
+    }
+  ],
+  "build_pass": true,
+  "focused_rule_and_licence_checks": "passed",
+  "static_analysis": "Domain logic passes; existing Temporal ScheduleActionExecution base-type attribute warning remains in route module"
+}

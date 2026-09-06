@@ -28,9 +28,10 @@ class RegulatoryDefinition(BaseModel):
 
 
 def assess_rule(
-    definition: RegulatoryDefinition, at: date, activity: str, customer_count: int | None
+    definition: RegulatoryDefinition, at: date, activity: str | None, customer_count: int | None
 ) -> dict:
     """An assessment of supplied context, never an automatic accounting action."""
+    state: str
     if definition.legal_status != "ENACTED":
         state = definition.legal_status
     elif not definition.source_version_complete:
@@ -41,11 +42,17 @@ def assess_rule(
         state = "EXPIRED"
     else:
         state = "CURRENT_EFFECTIVE"
-    if activity != definition.activity:
+    if activity is None:
+        applicability = "CONTEXT_REQUIRED"
+    elif activity != definition.activity:
         applicability = "NOT_APPLICABLE"
     elif definition.minimum_customers is not None and customer_count is None:
         applicability = "CONTEXT_REQUIRED"
-    elif definition.minimum_customers is not None and customer_count < definition.minimum_customers:
+    elif (
+        definition.minimum_customers is not None
+        and customer_count is not None
+        and customer_count < definition.minimum_customers
+    ):
         applicability = "NOT_APPLICABLE"
     else:
         applicability = "APPLICABLE"

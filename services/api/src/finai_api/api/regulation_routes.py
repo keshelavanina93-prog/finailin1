@@ -227,7 +227,7 @@ def propose_rule(principal: User, request: RuleProposal):
 def rules(
     principal: User,
     legal_entity_id: UUID,
-    activity: Literal["DISTRIBUTION", "TRANSMISSION", "SUPPLY"],
+    activity: Literal["DISTRIBUTION", "TRANSMISSION", "SUPPLY"] | None = None,
     customer_count: Annotated[int | None, Query(ge=0)] = None,
     at: datetime | None = None,
     known_at: datetime | None = None,
@@ -269,7 +269,8 @@ def rules(
         "rules": results,
         "at": at,
         "known_at": known_at,
-        "context_basis": "USER_SUPPLIED_SCENARIO",
+        "context_basis": "USER_SUPPLIED_SCENARIO" if activity else "INCOMPLETE_CONTEXT",
+        "activity": activity,
         "company": {key: entity[key] for key in ("resource_id", "version_id", "display_name")},
         "accounting_effects_created": False,
         "next_offset": offset + 100 if len(page) == 100 else None,

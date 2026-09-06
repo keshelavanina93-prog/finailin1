@@ -66,6 +66,14 @@ def test_invalid_window_rejected():
         definition(effective_to="2026-01-01")
 
 
+@pytest.mark.parametrize("count", [None, 0, 60000])
+def test_missing_activity_neither_activates_nor_excludes_a_rule(count):
+    result = assess_rule(definition(), date(2027, 7, 1), None, count)
+    assert result["legal_state"] == "CURRENT_EFFECTIVE"
+    assert result["applicability"] == "CONTEXT_REQUIRED"
+    assert result["effective_obligation"] is False
+
+
 def test_rule_requires_same_evidence_as_pinned_act():
     from datetime import UTC, datetime
     from uuid import uuid4

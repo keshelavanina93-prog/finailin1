@@ -12,12 +12,12 @@ import {Value} from "./operator-history";
 const label=(s:string)=>s.toLowerCase().replaceAll("_"," ");
 const commandLabel=(s:string)=>({complete:"Acknowledge source review",resume:"Resume",pause:"Pause",retry:"Retry processing",cancel:"Cancel process"}[s]??s);
 type Queue={items:ActionItem[];truncated:boolean};
-export default function ActionWorkbench({token,principal,companyId,onInspect}:{token:string;principal:Principal;companyId:string;onInspect:(id:string)=>void}){
+export default function ActionWorkbench({token,principal,companyId,onInspect,initialWorkflowId}:{token:string;principal:Principal;companyId:string;initialWorkflowId?:string;onInspect:(id:string)=>void}){
  const commandPanel=useRef<HTMLElement>(null);
  const contextKey=`g8-actions:${principal.actor_id}:${JSON.stringify(principal.scope)}:${companyId}`;
  const [saved]=useState(()=>{try{return JSON.parse(sessionStorage.getItem(contextKey)??"{}");}catch{return {};}});
- const [selected,setSelected]=useState<string>(typeof saved.selected==="string"?saved.selected:"");
- const [unbound,setUnbound]=useState(saved.unbound===true);const [filter,setFilter]=useState(typeof saved.filter==="string"?saved.filter.slice(0,128):"");
+ const [selected,setSelected]=useState<string>(initialWorkflowId??(typeof saved.selected==="string"?saved.selected:""));
+ const [unbound,setUnbound]=useState(Boolean(initialWorkflowId)||saved.unbound===true);const [filter,setFilter]=useState(initialWorkflowId?"":typeof saved.filter==="string"?saved.filter.slice(0,128):"");
  const [queue,setQueue]=useState<Queue|null>(null);const [run,setRun]=useState<WorkRun|null>(null);
  const [queueError,setQueueError]=useState("");const [error,setError]=useState("");const [revision,setRevision]=useState(0);
  const [busy,setBusy]=useState(false);const [reason,setReason]=useState("");const [notice,setNotice]=useState("");
