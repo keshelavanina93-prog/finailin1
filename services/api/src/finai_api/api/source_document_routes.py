@@ -104,6 +104,15 @@ def accounting_observations(principal: User, identity: str, request: SourceConte
     )
 
 
+@router.post("/{identity}/accounting-context/account-observations")
+def accounting_account_observations(principal: User, identity: str, request: SourceContextRead):
+    from finai_api.services import seg_account_observations
+
+    return seg_account_observations.inspect(
+        principal, identity, request.sheet, request.profile, request.company_id
+    )
+
+
 @router.post("/{identity}/accounting-context/inspect")
 def inspect_accounting_context(principal: User, identity: str, request: SourceContextRead):
     return source_accounting_context.inspect(

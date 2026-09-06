@@ -55,6 +55,17 @@ def main():
             },
         )
         assert denied.status_code == 409, denied.text
+        accounts = None
+        if context["company_binding"]["accepted"]:
+            account_response = client.post(
+                path + "account-observations", json=selection
+            )
+            assert account_response.status_code == 200, account_response.text
+            accounts = account_response.json()
+            assert accounts["observed_code_count"] == 38
+            assert accounts["row_count"] == 596
+            assert accounts["mapping_state"] == "CANDIDATE_REVIEW"
+            assert accounts["accounting_use_authorized"] is False
     evidence = {
         "checked_at": datetime.now(UTC).isoformat(),
         "api_inspection_status": response.status_code,
@@ -73,6 +84,16 @@ def main():
         "authentic_accounting_calculation": False,
         "financial_certification": None,
         "browser_acceptance": "UNVERIFIED",
+        "account_observations": {
+            "observed_code_count": accounts["observed_code_count"],
+            "mapping_state": accounts["mapping_state"],
+            "codes_with_definition_candidates": sum(
+                bool(row["definitions"]) for row in accounts["rows"]
+            ),
+            "accounting_use_authorized": False,
+        }
+        if accounts
+        else None,
     }
     destination = Path(".finai/artifacts/source-accounting-context-v2.json")
     destination.parent.mkdir(parents=True, exist_ok=True)
