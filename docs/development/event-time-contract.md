@@ -9,3 +9,9 @@ A canonical enterprise stream must have an independently accepted policy version
 Focused PostgreSQL evidence: duplicate replay, conflicting identity refusal, late retention/watermark, deterministic tie ordering, historical reconstruction, explicit backfill, future-time refusal and cross-company denial passed. Migration019 applied; affected source checks passed. Existing unrelated ontology edits and Petroleum REFERENCE_ONLY quarantine preserved.
 
 Integration evidence: affected mypy/Ruff and production build passed. Authenticated replay through the running web API returned BACKFILL_OBSERVATION, OBSERVED, three retained events, one late event, and current_use_authorized=false after API/web restart on the migrated database.
+
+## Scheduled policy parity
+
+Migration 033 aligns the database event-admission trigger with the shared current-effective version resolver. Publishing a future policy no longer interrupts admission under the still-effective policy. Publication heads remain the editing/conflict boundary; exact retained stream-version pins and version-specific watermarks remain unchanged.
+
+The native `test_event_time.py` regression reproduced the former database refusal after scheduling a successor. After migration 033 it passed (2.44 seconds): current-policy admission and duplicate recovery succeed, the late watermark still uses the old 30-second policy rather than the scheduled 300-second policy, premature future-policy use is refused, and historical replay/backfill/isolation remain intact. Ruff passed. Fixtures are synthetic observed events, not live gas telemetry, accounting facts or certification.

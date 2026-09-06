@@ -97,6 +97,30 @@ def test_retained_lateness_deterministic_replay_and_scope() -> None:
     )
     retained = event_time.retain_event(p, first)
     assert event_time.retain_event(p, first) == retained
+    scheduled = ResourceProposal(
+        title="Schedule a synthetic stream policy",
+        rationale="A future policy must not interrupt the currently effective stream",
+        access_entity=p.scope.legal_entity_id,
+        mutations=[stream.model_copy(update={
+            "expected_version_id": ref.version_id,
+            "valid_from": datetime.now(UTC) + timedelta(days=30),
+            "attributes": {**policy, "allowed_lateness_seconds": 300},
+        })],
+    )
+    resources.propose(p, scheduled)
+    resources.review(
+        reviewer, scheduled.proposal_id,
+        ResourceReview(decision="APPROVED", rationale="Review synthetic future event policy"),
+    )
+    assert event_time.retain_event(p, first) == retained
+    future_ref = VersionReference(
+        resource_id=stream.resource_id,
+        version_id=uuid5(scheduled.proposal_id, str(stream.resource_id)),
+    )
+    with pytest.raises(WorkspaceError, match="current use"):
+        event_time.retain_event(
+            p, first.model_copy(update={"stream": future_ref, "event_id": "premature-policy"})
+        )
     with pytest.raises(WorkspaceError, match="different retained content"):
         event_time.retain_event(p, first.model_copy(update={"payload": {"raw": "11"}}))
     late = event_time.retain_event(
@@ -107,6 +131,7 @@ def test_retained_lateness_deterministic_replay_and_scope() -> None:
     )
     assert late["admission"] == "RETAINED_LATE"
     assert late["watermark"] == base + timedelta(seconds=30)
+    assert late["stream_version_id"] == str(ref.version_id)
     event_time.retain_event(p, first.model_copy(update={"event_id": "z", "payload": {"raw": "12"}}))
     now = datetime.now(UTC)
     replayed = event_time.replay(p, stream.resource_id, now)
