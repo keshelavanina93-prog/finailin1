@@ -44,6 +44,8 @@ def main() -> None:
         "SourceAccountingBinding",
         "SourceCorporateObservation",
         "CorporateDisclosureBinding",
+        "SourceLicenceNotice",
+        "LicenceNoticeBinding",
     }
     mutations = []
     for spec in platform_definitions(author.scope.tenant_id):

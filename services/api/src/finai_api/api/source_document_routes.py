@@ -9,6 +9,7 @@ from finai_api.api.ontology_routes import User
 from finai_api.security import require_permission
 from finai_api.services import (
     corporate_disclosures,
+    licence_notices,
     source_account_binding,
     source_accounting_context,
     source_accounting_reconciliation,
@@ -21,6 +22,19 @@ from finai_api.services.source_documents import document_bytes, list_documents, 
 from finai_api.services.workspace import WorkspaceError
 
 router = APIRouter(prefix="/v1/ontology/source-documents", tags=["retained source documents"])
+
+
+@router.post("/{identity}/licence/inspect")
+def inspect_licence_notice(principal: User, identity: str):
+    return licence_notices.inspect(principal, identity)
+
+
+@router.post("/{identity}/licence/proposal")
+def propose_licence_notice(
+    principal: User, identity: str, request: licence_notices.NoticeSelection
+):
+    require_permission(principal, "ontology_propose")
+    return licence_notices.propose(principal, identity, request)
 
 
 @router.post("/{identity}/corporate/inspect")
