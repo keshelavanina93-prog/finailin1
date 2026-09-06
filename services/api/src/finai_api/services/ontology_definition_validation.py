@@ -39,6 +39,34 @@ def validate_definition(
             raise WorkspaceError(422, "Rule evidence must match the referenced act version")
         return
 
+    if item.object_type == "FactReconciliation":
+        contracts = [
+            FactContract.model_validate(
+                target(str(item.attributes[side + "_contract_id"]), source, "RECONCILE:" + side)[
+                    "attributes"
+                ]["definition"]
+            )
+            for side in ("left", "right")
+        ]
+        if item.attributes["left_contract_id"] == item.attributes["right_contract_id"]:
+            raise WorkspaceError(422, "Reconciliation needs two distinct fact contracts")
+        for contract in contracts:
+            if not set(definition.group_by).issubset(contract.dimensions):
+                raise WorkspaceError(422, "Reconciliation grain must be shared declared dimensions")
+            if contract.time_field not in definition.group_by:
+                raise WorkspaceError(
+                    422, "Reconciliation must preserve the declared reporting period"
+                )
+            if contract.aggregation in {"ratio_of_sums", "non_additive"}:
+                raise WorkspaceError(422, "Reconcile underlying components, not ratios")
+        if (
+            set(contracts[0].partition_fields) != set(contracts[1].partition_fields)
+            or contracts[0].unit_field != contracts[1].unit_field
+            or contracts[0].time_field != contracts[1].time_field
+        ):
+            raise WorkspaceError(422, "Reconciliation must preserve matching accounting partitions")
+        return
+
     def schema(name: str) -> dict[str, Any]:
         if name not in schemas:
             raise WorkspaceError(422, f"Unknown ontology type: {name}")
@@ -183,6 +211,25 @@ def validate_definition(
         measure = fields.get(definition.measure, {})
         if measure.get("kind") not in {"decimal", "integer"} or not measure.get("required"):
             raise WorkspaceError(422, "Fact measure must be a required numeric scalar")
+        if definition.denominator_measure:
+            denominator = fields.get(definition.denominator_measure, {})
+            if denominator.get("kind") not in {"decimal", "integer"} or not denominator.get(
+                "required"
+            ):
+                raise WorkspaceError(422, "Ratio denominator must be a required numeric scalar")
+        if definition.row_role_field:
+            role = fields.get(definition.row_role_field, {})
+            if role.get("kind") not in {"identifier", "text"} or not role.get("required"):
+                raise WorkspaceError(422, "Row role must be a required text or identifier field")
+        if definition.parent_key_field:
+            parent = fields.get(definition.parent_key_field, {})
+            key = fields[definition.hierarchy_key_field]
+            if parent.get("kind") != key.get("kind") or key.get("kind") not in {
+                "identifier",
+                "text",
+                "reference",
+            }:
+                raise WorkspaceError(422, "Parent and hierarchy keys need compatible identities")
     elif item.object_type == "ObjectBinding":
         source_schema = target(item.attributes["source_schema_id"], source, "BINDING_SOURCE")
         destination = target(item.attributes["target_schema_id"], source, "BINDING_TARGET")

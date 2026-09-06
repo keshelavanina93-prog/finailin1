@@ -14,6 +14,7 @@ from finai_api.services import ontology_definitions as definitions
 from finai_api.services import resources
 from finai_api.services.account_ontology import inspect_accounts, propose_accounts
 from finai_api.services.fact_aggregation import aggregate_facts
+from finai_api.services.fact_reconciliation import reconcile_facts
 from finai_api.services.object_sets import query_objects
 
 router = APIRouter(prefix="/v1/ontology/model", tags=["ontology model and execution"])
@@ -53,6 +54,18 @@ class AggregateRun(BaseModel):
     query: ObjectSetQuery
     group_by: list[str] = Field(default_factory=list, max_length=20)
     as_of: date | None = None
+
+
+class ReconcileRun(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    left: ObjectSetQuery
+    right: ObjectSetQuery
+    as_of: date | None = None
+
+
+@router.post("/facts/{identity}/reconcile")
+def reconcile(principal: User, identity: UUID, request: ReconcileRun) -> dict[str, Any]:
+    return reconcile_facts(principal, identity, request.left, request.right, request.as_of)
 
 
 @router.post("/facts/{identity}/aggregate")

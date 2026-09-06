@@ -12,8 +12,6 @@ Name = Annotated[str, Field(pattern=r"^[a-zA-Z][a-zA-Z0-9_]{0,127}$")]
 TypeName = Annotated[str, Field(pattern=r"^[A-Z][A-Za-z0-9]{1,63}$")]
 
 
-
-
 class Definition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -96,12 +94,22 @@ class FactContract(Definition):
     grain: list[Name] = Field(min_length=1, max_length=20)
     dimensions: list[Name] = Field(default_factory=list, max_length=20)
     measure: Name
-    aggregation: Literal["flow_sum", "closing_balance", "non_additive"]
+    aggregation: Literal[
+        "flow_sum", "closing_balance", "cumulative_snapshot", "non_additive", "ratio_of_sums"
+    ]
     time_field: Name
     unit_field: Name
     source_family: str = Field(min_length=1, max_length=128)
     source_family_field: Name
     authority_basis: str = Field(min_length=10, max_length=2000)
+    partition_fields: list[Name] = Field(default_factory=list, max_length=20)
+    row_role_field: Name | None = None
+    included_row_role: str | None = Field(default=None, min_length=1, max_length=128)
+    denominator_measure: Name | None = None
+    ratio_scale: int = Field(default=6, ge=0, le=12)
+    ratio_multiplier: Literal[1, 100] = 1
+    hierarchy_key_field: Name | None = None
+    parent_key_field: Name | None = None
 
     @model_validator(mode="after")
     def valid_grain(self) -> "FactContract":
@@ -115,7 +123,29 @@ class FactContract(Definition):
             raise ValueError("Aggregation dimensions must belong to the fact grain")
         if self.measure in self.grain:
             raise ValueError("The measure cannot be a grain key")
+        if len(set(self.partition_fields)) != len(self.partition_fields) or not set(
+            self.partition_fields
+        ).issubset(self.grain):
+            raise ValueError("Mandatory accounting partitions must be distinct grain fields")
+        if (self.row_role_field is None) != (self.included_row_role is None):
+            raise ValueError("Source row role requires both a field and an explicit selected role")
+        if (self.aggregation == "ratio_of_sums") != (self.denominator_measure is not None):
+            raise ValueError("Ratio aggregation requires an explicit denominator component")
+        if self.denominator_measure in self.grain:
+            raise ValueError("A denominator measure cannot be a grain key")
+        if (self.hierarchy_key_field is None) != (self.parent_key_field is None):
+            raise ValueError("Hierarchy requires both fact key and parent key fields")
+        if self.hierarchy_key_field and self.hierarchy_key_field not in self.grain:
+            raise ValueError("Hierarchy identity must belong to the fact grain")
         return self
+
+
+class FactReconciliation(Definition):
+    group_by: list[Name] = Field(min_length=1, max_length=20)
+    absolute_tolerance: str = Field(pattern=r"^(0|[1-9][0-9]{0,20})(\.[0-9]{1,12})?$")
+    authority_side: Literal["left", "right"]
+    relationship: Literal["OVERLAPPING_REPRESENTATION", "SOURCE_CONTROL"]
+    rationale: str = Field(min_length=10, max_length=2000)
 
 
 DEFINITION_MODELS: dict[str, type[BaseModel]] = {
@@ -126,6 +156,7 @@ DEFINITION_MODELS: dict[str, type[BaseModel]] = {
     "DerivedProperty": DerivedDefinition,
     "ObjectBinding": BindingDefinition,
     "FactContract": FactContract,
+    "FactReconciliation": FactReconciliation,
     "RegulatoryRule": RegulatoryDefinition,
 }
 
@@ -141,6 +172,7 @@ class DefinitionWrite(Definition):
         "DerivedProperty",
         "ObjectBinding",
         "FactContract",
+        "FactReconciliation",
     ]
     name: str = Field(min_length=1, max_length=200)
     key: str = Field(min_length=1, max_length=256)

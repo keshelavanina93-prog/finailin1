@@ -6,7 +6,7 @@ async function forward(request: NextRequest, context: Context) {
   const route = path.join("/");
   const lifecycle = /^lifecycle\/(?:requests(?:\/[a-fA-F0-9-]+\/review)?|versions\/[a-fA-F0-9-]+|consumptions\/[a-fA-F0-9-]+(?:\/status)?|consume)$/.test(route);
   const eventTime = /^event-time\/(?:events|streams\/[a-fA-F0-9-]+\/replay)$/.test(route);
-  const model = /^model\/(?:definitions(?:\/[a-fA-F0-9-]+)?|proposals\/[a-fA-F0-9-]+\/decision|(?:sets|groups)\/[a-fA-F0-9-]+\/objects|bindings\/[a-fA-F0-9-]+\/proposal|facts\/[a-fA-F0-9-]+\/aggregate|sources\/ir_[a-f0-9]{64}\/accounts(?:\/proposal)?|derived\/query)$/.test(route);
+  const model = /^model\/(?:definitions(?:\/[a-fA-F0-9-]+)?|proposals\/[a-fA-F0-9-]+\/decision|(?:sets|groups)\/[a-fA-F0-9-]+\/objects|bindings\/[a-fA-F0-9-]+\/proposal|facts\/[a-fA-F0-9-]+\/(?:aggregate|reconcile)|sources\/ir_[a-f0-9]{64}\/accounts(?:\/proposal)?|derived\/query)$/.test(route);
   if (!/^regulation\/(rules|proposals)$/.test(route) && !model && !lifecycle && !eventTime && route !== "object-sets/query" && !/^(catalog|context(?:\/(?:accounts|source-accounts))?|graph|aliases|reference-proposal|rollback-proposal|resources(?:\/[a-fA-F0-9-]+(?:\/graph)?)?|resolve\/[a-fA-F0-9-]+|proposals(?:\/[a-fA-F0-9-]+(?:\/(?:decision|promotion-check))?)?)$/.test(route)) {
     return Response.json({ detail: "Ontology route not found" }, { status: 404 });
   }

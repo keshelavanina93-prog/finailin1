@@ -38,6 +38,10 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "source_name": "Text", "definition": "OntologyDefinition",
     },
     "FactContract": {"schema_id": "@SchemaDefinition", "definition": "OntologyDefinition"},
+    "FactReconciliation": {
+        "left_contract_id": "@FactContract", "right_contract_id": "@FactContract",
+        "definition": "OntologyDefinition",
+    },
     "ObjectSetDefinition": {"definition": "OntologyDefinition"},
     "ObjectInterface": {"definition": "OntologyDefinition"},
     "ObjectTypeImplementation": {
