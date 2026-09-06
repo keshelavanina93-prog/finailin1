@@ -66,3 +66,17 @@ persistence/lifecycle compatibility. The isolated production web build passed.
 
 `AUTHENTIC_SOURCE_READ` does not mean `AUTHENTIC_ACCOUNTING_CALCULATION`,
 `FINANCIAL_CERTIFICATION`, `BROWSER_ACCEPTED`, or release acceptance.
+
+## Current eligibility is distinct from the reviewed selection
+
+The context API and G8 source review now retain the reviewed source-use label
+and show a separate current eligibility assessment, including effective and
+knowledge timestamps. Legacy selections require version 2 interpretation;
+review candidates, incomplete bindings, unavailable lifecycle state, expired
+versions and withdrawn/stale dependencies cannot appear available for accounting.
+The assessment reuses immutable binding validation and the publication/current
+authority guard. It is always advisory and never an execution grant: each
+calculation still rechecks its exact consumer contract. Four focused presentation
+contract tests cover legacy/candidate history and guard outcomes. Authentic
+source inspection remains 200 and unresolved activation remains 409 after the
+SEG company-label binding; no accounting interpretation has been fabricated.

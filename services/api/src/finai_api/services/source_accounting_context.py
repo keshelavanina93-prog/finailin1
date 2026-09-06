@@ -272,6 +272,8 @@ def published_context(principal, evidence_id, sheet, profile, company_id):
         and scope["authority_state"] == "APPROVED"
         and binding["authority_state"] == "APPROVED"
     )
+    from finai_api.services.accounting_binding_status import inspect as inspect_status
+
     return {
         "scope_id": str(scope_id),
         "scope_version_id": scope["version_id"] if scope else None,
@@ -281,6 +283,7 @@ def published_context(principal, evidence_id, sheet, profile, company_id):
         if accepted
         else {},
         "financial_eligibility": "NOT_CERTIFIED",
+        "accounting_eligibility": inspect_status(principal, binding),
     }
 
 
@@ -312,6 +315,7 @@ def validate_active_selection(attrs, scope_attrs, target):
 
 
 def inspect(principal, document_id, sheet, profile, company_id):
+    from finai_api.services.accounting_binding_status import inspect as inspect_status
     from finai_api.services.source_company_alias import inspect as inspect_company_alias
 
     identity, attrs, coordinate, label = observe(principal, document_id, sheet, profile, company_id)
@@ -378,6 +382,7 @@ def inspect(principal, document_id, sheet, profile, company_id):
         "unresolved": unresolved,
         "source_company_label": label,
         "company_binding": company_binding,
+        "accounting_eligibility": inspect_status(principal, heads.get(str(binding_id))),
         "source_observations": source_observations(principal, document_id, sheet, profile),
     }
 

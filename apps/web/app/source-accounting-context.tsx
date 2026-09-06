@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 type Resource = { resource_id: string; version_id: string; display_name: string; attributes: Record<string, string> };
 type SourceObservations = { source_sha256: string; construction_receipt_id?: string; source_snapshot?: { source_use?: string }; row_count: number; granularity?: string; deepest_valid_drill?: string; unresolved?: string[]; sample_rows?: { row: number; numeric_observations: Record<string, { coordinate: string; value: string }> }[] };
 type CompanyBinding = { accepted: boolean; can_propose: boolean; company: Pick<Resource, "resource_id" | "display_name"> | null; source_label: string; alias: Resource | null; reason?: string };
-type Context = { scope_id: string; observed: Record<string, string>; source_coordinate?: string; source_company_label?: string; canonical_ready?: boolean; unresolved?: string[]; source_observations?: SourceObservations; company_binding?: CompanyBinding; scope: Resource | null; binding: Resource | null; candidates: Record<string, Resource[]> };
+type Context = { scope_id: string; observed: Record<string, string>; source_coordinate?: string; source_company_label?: string; canonical_ready?: boolean; unresolved?: string[]; source_observations?: SourceObservations; company_binding?: CompanyBinding; accounting_eligibility?: { state: string; reason: string; eligible_for_accounting: boolean; effective_from: string | null; effective_to: string | null; known_from: string | null }; scope: Resource | null; binding: Resource | null; candidates: Record<string, Resource[]> };
 const fields = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "transaction_currency_id", "reporting_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
 const required = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
 
@@ -126,7 +126,10 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
         </>}
       </fieldset>}
       {profile === "seg_expense_base" && <p>The source amount and annotated Amount have unresolved currency and accounting meanings. Petroleum counterparty labels do not identify the source company.</p>}
-      <p>Observed scope: {context.scope ? "Published" : "Awaiting publication"}. Accounting use: {context.binding ? context.binding.attributes.source_use.toLowerCase().replaceAll("_", " ") : "Not selected"}.</p>
+      <p>Observed scope: {context.scope ? "Published" : "Awaiting publication"}. Reviewed selection: {context.binding ? context.binding.attributes.source_use.toLowerCase().replaceAll("_", " ") : "Not selected"}.</p>
+      {context.accounting_eligibility && <div><p><strong>{context.accounting_eligibility.eligible_for_accounting ? "Available for guarded accounting use" : "Accounting use is not available"}</strong> · {context.accounting_eligibility.reason}</p>
+        {context.binding && <details><summary>Selection timing</summary><dl><dt>Effective from</dt><dd>{context.accounting_eligibility.effective_from ?? "Unavailable"}</dd><dt>Effective until</dt><dd>{context.accounting_eligibility.effective_to ?? "Open ended"}</dd><dt>Recorded at</dt><dd>{context.accounting_eligibility.known_from ?? "Unavailable"}</dd></dl></details>}
+        <small>This inspection is advisory. Every calculation rechecks its accepted inputs and current authority.</small></div>}
       {!context.scope && canPropose && <button disabled={busy || !canonicalReady} onClick={() => void run("scope-proposal")}>Propose observed source scope</button>}
       {context.scope && <>
         <label htmlFor={`${prefix}-use`}>Source use</label><select id={`${prefix}-use`} value={use} onChange={event => setUse(event.target.value)}>
