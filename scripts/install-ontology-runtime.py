@@ -39,6 +39,7 @@ def main() -> None:
         "SourceJournalMovement",
         "SourceTrialBalanceRow",
         "CompanyDimension",
+        "CompanyWorkspace",
         "SourceDimensionAssignment",
         "SourceAccountingScope",
         "SourceAccountingBinding",

@@ -8,7 +8,7 @@ async function load(path) {
   return import(`data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`);
 }
 const {GET}=await load("../app/api/readiness/route.ts");
-const {acceptedCompanies,belongsToCompany,workItems}=await load("../app/g8-model.ts");
+const {belongsToCompany,workItems}=await load("../app/g8-model.ts");
 test("readiness never queries storage for missing or denied identity",async t=>{
   let calls=0;
   t.mock.method(globalThis,"fetch",async()=>{calls++;return Response.json({detail:"Denied"},{status:403});});
@@ -28,9 +28,7 @@ test("readiness preserves partial outage as an observed 503 without caching",asy
   assert.equal(response.status,503);assert.equal(calls,2);assert.equal(response.headers.get("Cache-Control"),"no-store");
   assert.equal((await response.json()).evidence_store,"unavailable");
 });
-test("company context cannot treat a revoked identity or operating domain as a company",()=>{
-  const accepted={resource_id:"gas",object_type:"LegalEntity",authority_state:"APPROVED",evidence_class:"SOURCE_BOUND"};
-  assert.deepEqual(acceptedCompanies([accepted,{...accepted,evidence_class:"USER_ASSERTED"},{...accepted,evidence_class:"REFERENCE_TEMPLATE"},{...accepted,authority_state:"REVOKED"},{...accepted,object_type:"OperatingDomain"}]),[accepted]);
+test("direct resource membership does not cross company IDs",()=>{
   assert.equal(belongsToCompany({resource_id:"asset",attributes:{company_id:"petroleum"}},"gas"),false);
   assert.equal(belongsToCompany({resource_id:"asset",attributes:{legal_entity_id:"gas"}},"gas"),true);
 });

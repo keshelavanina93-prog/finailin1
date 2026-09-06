@@ -7,13 +7,13 @@ import { House, Buildings, Database, Graph as GraphIcon, GearSix, MagnifyingGlas
 import type { CanonicalDetail, CanonicalResource, IntakeItem, Principal, ReceiptDetail, ResourceProposalDetail } from "@finai/contracts";
 import type { EngineeringView } from "./operator-workspace";
 import { Badge, Brand, Empty, Panel, Signal } from "./g8-ui";
-import { acceptedCompanies, belongsToCompany, emptySnapshot, readable, workItems, type Loadable, type Snapshot, type WorkItem } from "./g8-model";
+import { belongsToCompany, emptySnapshot, readable, workItems, type Loadable, type Snapshot, type WorkItem } from "./g8-model";
 import ProposalImpact from "./proposal-impact";
 import PromotionReadiness from "./promotion-readiness";
 import ResourceAuthority from "./resource-authority";
 import SourceExplorer from "./source-explorer";
 import SourceDocuments from "./source-documents";
-import CompanySetup from "./company-setup";
+import CompanyWorkspace, {type CompanyIndex, type Context as ResolvedCompanyContext} from "./company-workspace";
 import NyxInteraction from "./nyx-interaction";
 import WorkQueue,{WorkspaceHealth} from "./work-queue";
 import OperationsMap from "./operations-map";
@@ -62,7 +62,10 @@ export default function G8Workspace() {
 
 function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal;onSignOut:()=>void}) {
   const [mapState,setMapState]=useState<MapWorkspaceState>(initialMapState);const [mapSelection,setMapSelection]=useState<MapSelection|null>(null);
-  const [disclosures,setDisclosures] = useState<Loadable<CanonicalResource[]>>({data:null,error:null});
+  const [resolvedCompany,setResolvedCompany]=useState<ResolvedCompanyContext|null>(null);
+  const [companyContextError,setCompanyContextError]=useState("");
+  const [companyIndex,setCompanyIndex] = useState<CompanyIndex|null>(null);
+  const [exploredCompany,setExploredCompany] = useState<CanonicalResource|null>(null);
   const [companyDirectory,setCompanyDirectory] = useState<Loadable<CanonicalResource[]>>({data:null,error:null});
   const [view,setView] = useState<View>("home"); const [snapshot,setSnapshot] = useState<Snapshot>(emptySnapshot);
   const [loading,setLoading] = useState(true); const [revision,setRevision] = useState(0); const [updated,setUpdated] = useState("");
@@ -99,19 +102,20 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
       setLoading(true);
       async function read<T>(path:string): Promise<Loadable<T>> {try {return {data:await get<T>(path,token,controller.signal),error:null};} catch(error) {return {data:null,error:error instanceof Error ? error.message : "Unavailable"};}}
       const noAccess = Promise.resolve({data:null,error:"Your identity does not include ontology access."});
-      async function loadCompanies(kind = "LegalEntity"): Promise<Loadable<CanonicalResource[]>> {
-        try {const rows:CanonicalResource[]=[];const at=encodeURIComponent(new Date().toISOString());
-          for(let offset=0;;offset+=100){const page=await get<CanonicalResource[]>(`ontology/resources?object_type=${kind}&offset=${offset}&valid_at=${at}&known_at=${at}`,token,controller.signal);rows.push(...page);if(page.length<100)break;}
+      async function loadCompanies(): Promise<Loadable<CanonicalResource[]>> {
+        try {const index=await get<CompanyIndex>("ontology/company-context",token,controller.signal);
+          const rows=index.workspaces.map(w=>w.company);
+          if(!cancelled){setCompanyIndex(index);setCompanyDirectory({data:rows,error:null});}
           return {data:rows,error:null};
-        }catch(error){return {data:null,error:error instanceof Error?error.message:"Company directory unavailable"};}
+        }catch(error){const result={data:null,error:error instanceof Error?error.message:"Company context unavailable"};if(!cancelled)setCompanyDirectory(result);return result;}
       }
-      const [summary,evidence,graph,proposals,context,readiness,directory,bindings,observations] = await Promise.all([
+      const [summary,evidence,graph,proposals,context,readiness,directory] = await Promise.all([
         read<NonNullable<Snapshot["summary"]["data"]>>("workspace/summary"),read<NonNullable<Snapshot["evidence"]["data"]>>("workspace/intake"),
         canOntology ? read<NonNullable<Snapshot["graph"]["data"]>>("ontology/graph") : noAccess,
         canOntology ? read<NonNullable<Snapshot["proposals"]["data"]>>("ontology/proposals") : noAccess,
         canOntology ? read<NonNullable<Snapshot["context"]["data"]>>("ontology/context") : noAccess,
-        read<NonNullable<Snapshot["readiness"]["data"]>>("readiness"),canOntology?loadCompanies():noAccess,canOntology?loadCompanies("CorporateDisclosureBinding"):noAccess,canOntology?loadCompanies("SourceCorporateObservation"):noAccess]);
-      if (!cancelled) {setCompanyDirectory(directory);setDisclosures({data:[...(bindings.data??[]),...(observations.data??[])],error:bindings.error??observations.error});setSnapshot({summary,evidence,graph,proposals,context,readiness});setUpdated(new Date().toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"}));setLoading(false);}
+        read<NonNullable<Snapshot["readiness"]["data"]>>("readiness"),canOntology?loadCompanies():noAccess]);
+      if (!cancelled) {setCompanyDirectory(directory);setSnapshot({summary,evidence,graph,proposals,context,readiness});setUpdated(new Date().toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"}));setLoading(false);}
     }
     void load(); return () => {cancelled=true;controller.abort();};
   },[token,canOntology,revision]);
@@ -120,12 +124,25 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
     document.addEventListener("keydown",shortcut); return () => document.removeEventListener("keydown",shortcut);
   },[]);
   const resources = snapshot.graph.data?.resources ?? [];
-  const companies = acceptedCompanies(companyDirectory.data ?? []);
-  // A company choice is an explorer selection. The server-issued evidence scope never changes with it.
+  const companies = [...(companyDirectory.data??[]),...(exploredCompany && !(companyDirectory.data??[]).some(c=>c.resource_id===exploredCompany.resource_id)?[exploredCompany]:[])];
+  // Canonical company context is resolved separately from legacy credential-bound intake receipts.
   const company = companies.find(item => item.resource_id === companyId);
   const contextCompanyId = snapshot.context.data?.canonical_references.legal_entity_id?.resource_id;
   const boundCompany = companies.find(item => item.resource_id === contextCompanyId);
   const currentCompany = company ?? boundCompany;
+  const selectedCompanyId=currentCompany?.resource_id??"";
+  useEffect(()=>{
+    const controller=new AbortController();
+    if(!selectedCompanyId)return ()=>controller.abort();
+    void get<{context:ResolvedCompanyContext}>(`ontology/company-context?company_id=${selectedCompanyId}`,token,controller.signal).then(result=>{if(!controller.signal.aborted){setResolvedCompany(result.context);setCompanyContextError("");}}).catch(error=>{if(!controller.signal.aborted){setResolvedCompany(null);setCompanyContextError(String(error));}});
+    return ()=>controller.abort();
+  },[selectedCompanyId,token,revision]);
+  const resolvedContext=resolvedCompany?.company.resource_id===selectedCompanyId?resolvedCompany:null;
+  const companyDocumentIds=resolvedContext?[...new Set([
+    ...resolvedContext.accounting_sources.map(row=>String(row.scope.attributes.document_id)),
+    ...resolvedContext.disclosures.map(row=>String(row.observation.attributes.document_id)),
+    ...resolvedContext.licence_evidence.flatMap(row=>row.notice?[String(row.notice.attributes.document_id)]:[]),
+  ])]:[];
   const companyMismatch = !!currentCompany && currentCompany.resource_id !== contextCompanyId;
   const scopedEvidence = companyMismatch ? [] : snapshot.evidence.data ?? [];
   const scopedProposals = (snapshot.proposals.data ?? []).filter(item => !currentCompany || item.access_entity === currentCompany.access_entity || item.access_entity === "__PLATFORM__");
@@ -167,7 +184,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
     {view === "system" ? <><div className="g8-page-heading"><div><p className="overline">ADVANCED INTERNAL ACCESS</p><h1>System / Engineering</h1><p>Evidence intake, construction, registry and governed review tools.</p></div><Badge>Advanced</Badge></div><Engineering key={`${engineering.view}:${engineering.receiptId ?? ""}:${engineering.proposalId ?? ""}`} token={token} principal={principal} initialView={engineering.view} receiptId={engineering.receiptId} proposalId={engineering.proposalId}/></> : <>
       <div className={`g8-page-heading ${view==="home"?"g8-company-hero":""}`}><div><p className="overline">{view === "home" ? `Welcome, ${principal.display_name}.` : "ENTERPRISE WORKSPACE"}</p><h1>{view === "home" ? currentCompany?.display_name ?? "Your company workspace" : view === "companies" ? "Companies" : view === "data" ? "Data & evidence" : view === "operations" ? "Operations & Maps" : view === "regulation" ? "Regulation" : "Ontology"}</h1><p>{view === "home" ? "Financial reality. Operational context. Evidence-led decisions." : view === "companies" ? "Shared company identities. One connected business context." : view === "data" ? "Retained sources, review state and traceable versions." : "Explore the business resources behind your workspace."}</p></div>{view==="home"?<div className="g8-hero-status"><span><ShieldCheck size={15}/>{ready?.status==="ready"?"Workspace ready":"Checking workspace"}</span><strong>{currentCompany?.display_name??"Set your company context"}</strong><p>{currentCompany?readable(currentCompany.evidence_class):"Connect the company behind your work."}</p><button className="g8-link" onClick={()=>navigate("companies")}>Open Companies<ArrowRight size={13}/></button></div>:<Badge tone={currentCompany ? tone(currentCompany.authority_state) : "neutral"}>{currentCompany ? readable(currentCompany.evidence_class) : "Company not selected"}</Badge>}</div>
       {snapshot.graph.data?.bounded && <p className="g8-inline-error">Showing up to 1,000 authorized resources. This is a bounded view.</p>}
-      {companyMismatch && <p className="g8-inline-error">Company exploration selected. Evidence remains bound to your sign-in scope; no source data is attributed to this company.</p>}
+      {companyMismatch && <p className="g8-inline-error">Canonical company context selected. Legacy intake receipts require their own exact source binding; company-bound documents are shown in Data.</p>}
       {view === "home" && <><div className="g8-actionbar"><button onClick={()=>{setWorkFilter("pending");workRef.current?.scrollIntoView({behavior:"smooth"});}}><Tray size={23}/><span>Review items<small>{loading ? "Checking…" : `${pending.length} in loaded queues`}</small></span></button><button onClick={()=>{setNyxFolded(false);setRail(true);setNyxTab("interact");}}><ChartLineUp size={23}/><span>Investigate<small>Ask NYX about evidence</small></span></button>{principal.permissions.includes("ingest") && <button onClick={()=>openEngineering("intake")}><UploadSimple size={23}/><span>New data source<small>Retain source evidence</small></span></button>}<button disabled title="Reporting is not connected yet"><ChartLineUp size={23}/><span>Create report<small>Not connected</small></span></button><button disabled title="Planning is not connected yet"><GraphIcon size={23}/><span>New scenario<small>Not connected</small></span></button></div>
       <WorkspaceHealth snapshot={snapshot} loading={loading} onRefresh={refresh} onData={()=>navigate("data")}/>
       <ExecutiveOverview operationalPanel={<OperationsMap key={currentCompany?.resource_id??"scope"} {...mapProps} compact onOpen={()=>navigate("operations")}/>} company={currentCompany?.display_name??"Select company"} period={principal.scope.period} currency={principal.scope.currency} resources={visibleResources} resourcesAvailable={!loading && !!snapshot.graph.data && !companyMismatch} onData={()=>navigate("data")} onCompanies={()=>navigate("companies")} onOntology={()=>navigate("ontology")}/>
@@ -176,27 +193,9 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
       {view === "operations" && <OperationsMap key={currentCompany?.resource_id??"scope"} {...mapProps}/>}
       {view === "ontology" && <AccountingFacts token={token} />}
       {view === "ontology" && <ObjectSets token={token} onProposal={id => openEngineering("ontology", undefined, id)} />}
-      {view === "companies" && <><CompanySetup token={token} principal={principal} onSubmitted={value=>{refresh();void inspectWork({id:value.proposal.proposal_id,kind:"proposal",title:value.proposal.title,state:"PENDING",reason:value.proposal.rationale,date:value.created_at,severity:1});}}/>
-        <Panel title="Company identities & disclosure evidence" aside={<Badge>{companies.length} recorded identities</Badge>}>
-          <p>These records identify parties found in retained sources. Record acceptance does not confirm current group membership, legal status, consolidation scope or operational readiness.</p>
-          <p>Templates and identities without source binding remain in governance tools. Historical disclosures remain available as evidence.</p>
-          {companyDirectory.error ? <Empty title="Company directory unavailable">{companyDirectory.error}</Empty> : <div className="g8-company-list">{companies.map(item=>{
-            const rows = (disclosures.data??[]).filter(row=>row.object_type==="CorporateDisclosureBinding" && (row.attributes.related_entity_id===item.resource_id || row.attributes.reporter_id===item.resource_id));
-            return <article key={item.resource_id}><Buildings size={28}/><div><h3>{item.display_name}</h3>
-              <p>{item.attributes.registration_code ? `Registration code: ${String(item.attributes.registration_code)}` : "Registration identity: inspect source bindings"}</p>
-              <Badge>{item.evidence_class==="SOURCE_BOUND" ? "Source identity recorded" : "User-entered identity"}</Badge>
-              {disclosures.error ? <p role="alert">Disclosure evidence unavailable: {disclosures.error}</p> : rows.length ? <details><summary>{rows.length} dated disclosure references</summary><ul>{rows.map(binding=>{
-                const observation=(disclosures.data??[]).find(row=>row.resource_id===binding.attributes.observation_id)?.attributes.observation as {reported_role?:string;reported_percent?:string|null;former_indicator?:string}|undefined;
-                const reporter=companies.find(row=>row.resource_id===binding.attributes.reporter_id);
-                const related=companies.find(row=>row.resource_id===binding.attributes.related_entity_id);
-                return <li key={binding.resource_id}><strong>{String(binding.attributes.reporting_year)}</strong> · {reporter?.display_name??"Reporter unavailable"} reported {related?.display_name??"Party unavailable"} as {observation?.reported_role=== "PARENT" ? "parent" : observation?.reported_role==="SUBSIDIARY" ? "subsidiary" : "relationship unavailable"}. Reported share: {observation?.reported_percent==null ? "not stated" : `${observation.reported_percent}%`}.{observation?.former_indicator ? ` Former-party source marker: ${observation.former_indicator}.` : ""} <button className="g8-link" onClick={()=>void inspect(binding)}>Inspect dated evidence</button></li>;
-              })}</ul></details> : <p>No corporate disclosure relationship recorded.</p>}
-              <p>Current ownership and operating status: not established by this directory.</p>
-            </div><button className="g8-link" onClick={()=>{setCompanyId(item.resource_id);clearSelection();navigate("home");}}>Explore company context<ArrowRight size={16}/></button><button className="g8-icon" aria-label={`Inspect ${item.display_name}`} onClick={()=>void inspect(item)}><GraphIcon size={19}/></button></article>;
-          })}</div>}
-        </Panel></>}
-
-      {view === "data" && <><SourceDocuments token={token} principal={principal} onProposal={id=>openEngineering("ontology",undefined,id)} />{snapshot.evidence.error ? <Empty title="Source inventory unavailable">{snapshot.evidence.error}</Empty> : <SourceExplorer key={currentCompany?.resource_id ?? "scope"} token={token} principal={principal} sources={scopedEvidence} onSelect={inspectSource} initialReceiptId={work?.kind === "evidence" ? work.id : undefined} onReview={id=>openEngineering("history",id)}/>}<div className="g8-panel-foot">Evidence scope: {boundCompany?.display_name ?? "Sign-in scope"} · {principal.scope.period} · {principal.scope.currency}<button className="g8-link" onClick={()=>openEngineering("intake")}>Retain a new source<ArrowRight size={13}/></button></div></>}
+      {companyContextError&&<p role="alert">Company context: {companyContextError}</p>}
+      {view === "companies" && <>{companyDirectory.error&&<p role="alert">{companyDirectory.error}</p>}<CompanyWorkspace key={`${token}:${currentCompany?.resource_id??"none"}`} token={token} index={companyIndex} companyId={currentCompany?.resource_id??""} onSelect={node=>{setExploredCompany(node);setCompanyId(node.resource_id);clearSelection();}} onInspect={node=>void inspect(node)}/></>}
+      {view === "data" && <><SourceDocuments key={selectedCompanyId||"all"} companyDocumentIds={selectedCompanyId?companyDocumentIds:undefined} token={token} principal={principal} onProposal={id=>openEngineering("ontology",undefined,id)} />{snapshot.evidence.error ? <Empty title="Source inventory unavailable">{snapshot.evidence.error}</Empty> : <SourceExplorer key={currentCompany?.resource_id ?? "scope"} token={token} principal={principal} sources={scopedEvidence} onSelect={inspectSource} initialReceiptId={work?.kind === "evidence" ? work.id : undefined} onReview={id=>openEngineering("history",id)}/>}<div className="g8-panel-foot">Evidence scope: {boundCompany?.display_name ?? "Sign-in scope"} · {principal.scope.period} · {principal.scope.currency}<button className="g8-link" onClick={()=>openEngineering("intake")}>Retain a new source<ArrowRight size={13}/></button></div></>}
       {view === "ontology" && <Panel title="Business resources" aside={<Badge>{visibleResources.length} in view</Badge>}>{snapshot.graph.error ? <Empty title="Ontology unavailable">{snapshot.graph.error}</Empty> : !visibleResources.length ? <Empty title={loading ? "Loading business resources…" : "No accepted resources in this context"}>Accepted companies, accounts, relationships and other business resources will appear here with their authority and evidence.</Empty> : <div className="g8-table-scroll"><table><thead><tr><th>Resource</th><th>Type</th><th>Authority</th><th>Evidence</th><th>Effective</th></tr></thead><tbody>{visibleResources.map(item=><tr key={item.resource_id}><td><button className="g8-link" onClick={()=>void inspect(item)}>{item.display_name}</button></td><td>{readable(item.object_type)}</td><td><Badge tone={tone(item.authority_state)}>{item.authority_state}</Badge></td><td>{readable(item.evidence_class)}</td><td>{date(item.valid_from)}</td></tr>)}</tbody></table></div>}<div className="g8-panel-foot">Accepted business context · current effective versions<button className="g8-link" onClick={()=>openEngineering("ontology")}>Open governance tools<ArrowRight size={13}/></button></div></Panel>}
       <footer className="g8-footer"><span><ShieldCheck size={13}/> Governed evidence · explicit authority</span><span>{snapshot.context.data?.binding ? "Company binding available" : "No confirmed company binding"}</span></footer></>}
     </main>
@@ -205,7 +204,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
       {selected && <div className="g8-inspector"><p className="overline">RESOURCE CONTEXT</p><h3>{selected.resource.display_name}</h3><Badge tone={tone(selected.resource.authority_state)}>{selected.resource.authority_state}</Badge><p>{readable(selected.resource.object_type)} · {readable(selected.resource.evidence_class)}</p><ResourceAuthority key={selected.resource.version_id} token={token} resource={selected.resource}/><dl><dt>Effective from</dt><dd>{date(selected.resource.valid_from)}</dd><dt>Retained versions</dt><dd>{selected.versions.length}</dd><dt>Visible dependents</dt><dd>{selected.dependents.length}</dd></dl>{selected.dependents.slice(0,8).map(item=><button className="g8-panel-action" key={item.resource_id} onClick={()=>void inspect({...selected.resource,resource_id:item.resource_id})}>{item.display_name}<ArrowRight size={13}/></button>)}<details><summary>Identity & version</summary><small>{selected.resource.resource_id}<br/>{selected.resource.version_id}</small></details><button className="g8-link" onClick={clearSelection}>Clear selection</button></div>}
       {work && items.find(item=>item.id===work.id&&item.kind===work.kind)?.state!==work.state&&<p className="g8-inline-error">The selected work snapshot differs from the latest queue, or is no longer listed. <button className="g8-link" onClick={()=>void inspectWork(items.find(item=>item.id===work.id&&item.kind===work.kind)??work)}>Reload selected evidence</button></p>}
       {work && <div className="g8-inspector"><p className="overline">WHY THIS NEEDS ATTENTION</p><h3>{work.title}</h3><Badge tone={tone(work.state)}>{work.state}</Badge><p>{work.reason}</p>{receipt && <><h3>Review eligibility</h3>{receipt.approval_blockers.length ? receipt.approval_blockers.map(reason=><p className="g8-inline-error" key={reason}>{reason}</p>) : <p>No approval blockers reported. Independent review remains required.</p>}<h3>Proposed object impact</h3><dl>{Object.entries(receipt.impact).map(([key,value])=><div key={key}><dt>{readable(key)}</dt><dd>{value}</dd></div>)}</dl><button className="g8-panel-action" onClick={()=>openEngineering("history",work.id)}>Open evidence & review<ArrowRight size={15}/></button></>}{proposal && <><PromotionReadiness key={proposal.proposal.proposal_id} token={token} proposalId={proposal.proposal.proposal_id}/><ProposalImpact validation={proposal.validation}/><button className="g8-panel-action" onClick={()=>openEngineering("ontology",undefined,work.id)}>Open governed change review<ArrowRight size={15}/></button></>}<button className="g8-link" onClick={clearSelection}>Clear selection</button></div>}
-      {!work && !selected && !mapSelection && !detailBusy && <><h3>What needs attention?</h3><p className="g8-subtle">Open a work item to see its reason, source evidence and available review path.</p><button className="g8-panel-action" onClick={()=>{navigate("home");setWorkFilter("pending");}}>Review current work<ArrowRight size={15}/></button><button className="g8-panel-action" onClick={()=>navigate("data")}>Trace source evidence<ArrowRight size={15}/></button><button className="g8-panel-action" onClick={()=>navigate("companies")}>Explore companies<ArrowRight size={15}/></button></>}
+      {!work && !selected && !mapSelection && !detailBusy && <><p>{resolvedContext?`Accounting context: ${resolvedContext.accounting_state.replaceAll("_"," ")} · ${resolvedContext.accounting_sources.length} source scopes · ${resolvedContext.dimensions.length} analytical dimensions`:"Select a company to resolve its canonical context."}</p><h3>What needs attention?</h3><p className="g8-subtle">Open a work item to see its reason, source evidence and available review path.</p><button className="g8-panel-action" onClick={()=>{navigate("home");setWorkFilter("pending");}}>Review current work<ArrowRight size={15}/></button><button className="g8-panel-action" onClick={()=>navigate("data")}>Trace source evidence<ArrowRight size={15}/></button><button className="g8-panel-action" onClick={()=>navigate("companies")}>Explore companies<ArrowRight size={15}/></button></>}
       </div></div><footer><ShieldCheck size={17}/><p>Only governed context is shown here. Natural-language analysis is not connected.</p></footer></aside>
   </div>;
 }

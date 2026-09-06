@@ -427,6 +427,15 @@ def _validate(
             from finai_api.services.ontology_definition_validation import validate_definition
 
             validate_definition(item, schema_by_name, link_by_name, target)
+            if item.object_type == "CompanyWorkspace":
+                for field in ("company_id", "enterprise_id", "domain_pack_id"):
+                    dependency = target(
+                        item.attributes[field], str(item.resource_id), "COMPANY_WORKSPACE:" + field
+                    )
+                    if dependency["evidence_class"] == "REFERENCE_TEMPLATE":
+                        raise WorkspaceError(
+                            422, "A company workspace cannot use template identities"
+                        )
             if item.object_type in {"SourceLicenceNotice", "LicenceNoticeBinding"}:
                 from finai_api.services.licence_notices import validate as validate_licence_notice
 

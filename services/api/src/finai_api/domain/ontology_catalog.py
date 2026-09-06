@@ -90,6 +90,8 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "source_schema_id": "@SchemaDefinition", "target_schema_id": "@SchemaDefinition",
         "definition": "OntologyDefinition",
     },
+    "CompanyWorkspace": {"company_id": "@LegalEntity", "enterprise_id": "@EnterpriseGroup",
+                         "domain_pack_id": "@DomainPack", "rationale": "Text"},
     "EnterpriseGroup": {"code": "Identifier"},
     "BusinessDomain": {"code": "Identifier", "domain_pack?": "@DomainPack"},
     "LegalEntity": {"registration_code?": "Identifier", "jurisdiction?": "Text"},

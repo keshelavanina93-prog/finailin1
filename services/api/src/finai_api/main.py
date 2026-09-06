@@ -2,6 +2,7 @@ import psycopg
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from finai_api.api.company_context_routes import router as company_context_router
 from finai_api.api.event_time_routes import router as event_time_router
 from finai_api.api.lifecycle_routes import router as lifecycle_router
 from finai_api.api.object_set_routes import router as object_set_router
@@ -34,6 +35,7 @@ app.include_router(event_time_router)
 app.include_router(operations_router)
 app.include_router(regulation_router)
 app.include_router(source_document_router)
+app.include_router(company_context_router)
 
 
 @app.exception_handler(WorkspaceError)

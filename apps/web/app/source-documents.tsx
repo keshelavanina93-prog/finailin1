@@ -11,7 +11,7 @@ type Document = {document_id:string;filename:string;sha256:string;byte_length:nu
 type Observation = {companies:{source_label:string;row_count:number;first_coordinate:string}[];unassigned_row_count:number};
 type Preview = {sheets:string[];sheet?:string;row_count?:number;column_count?:number;offset?:number;next_offset?:number|null;rows?:{row:number;cells:{coordinate:string;type:number;value:string|number}[]}[]};
 
-export default function SourceDocuments({token,principal,onProposal}:{token:string;principal:Principal;onProposal:(id:string)=>void}) {
+export default function SourceDocuments({token,principal,onProposal,companyDocumentIds}:{companyDocumentIds?:string[];token:string;principal:Principal;onProposal:(id:string)=>void}) {
   const [document,setDocument]=useState<Document|null>(null);
   const [documents,setDocuments]=useState<Document[]>([]);
   const [reference,setReference]=useState("");
@@ -64,7 +64,7 @@ export default function SourceDocuments({token,principal,onProposal}:{token:stri
     {principal.permissions.includes("ingest")&&<form onSubmit={upload}><label>Original document (maximum 32 MB)<input type="file" name="file" required disabled={busy}/></label><button disabled={busy}>Retain original</button></form>}
     {document&&<p role="status">Retained {document.filename} · {document.byte_length.toLocaleString()} bytes · SHA-256 {document.sha256}</p>}
     <fieldset disabled={busy}><legend>Inspect retained company evidence</legend>
-      <label htmlFor="retained-document-select">Retained sources</label><select id="retained-document-select" value={reference} onChange={e=>{setReference(e.target.value);setDocument(documents.find(d=>d.document_id===e.target.value)??null);setPreview(null);setSheet("");change();}}><option value="">Select an original source</option>{documents.map(d=><option key={d.document_id} value={d.document_id}>{d.filename}</option>)}</select>
+      <label htmlFor="retained-document-select">Retained sources</label><select id="retained-document-select" value={reference} onChange={e=>{setReference(e.target.value);setDocument(documents.find(d=>d.document_id===e.target.value)??null);setPreview(null);setSheet("");change();}}><option value="">Select an original source</option>{documents.filter(d=>companyDocumentIds===undefined||companyDocumentIds.includes(d.document_id)).map(d=><option key={d.document_id} value={d.document_id}>{d.filename}</option>)}</select>
       <label>Retained document reference<input value={reference} onChange={e=>{setReference(e.target.value);setDocument(null);setPreview(null);change();}} placeholder="doc_…"/></label>
       <label htmlFor="retained-source-format">Source format</label><select id="retained-source-format" value={mode} onChange={e=>{setMode(e.target.value);change();}}><option value="company_column">Company column in XLS</option><option value="1c_tb_title">1C trial balance title in XLS</option></select>
       <label>Worksheet name<input value={sheet} list="source-worksheet-names" onChange={e=>{setSheet(e.target.value);change();}}/></label><datalist id="source-worksheet-names">{preview?.sheets.map(name=><option key={name} value={name}/>)}</datalist>

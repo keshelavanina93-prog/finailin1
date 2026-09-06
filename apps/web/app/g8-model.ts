@@ -19,9 +19,6 @@ export function workItems(evidence: IntakeItem[], proposals: ProposalSummary[]):
       severity:item.decision === "PENDING" ? 1 : 3,reason:item.rationale})),
   ].sort((a,b) => a.severity-b.severity || b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
 }
-export function acceptedCompanies(resources: CanonicalResource[]) {
-  return resources.filter(resource => ["LegalEntity","Company"].includes(resource.object_type) && resource.authority_state === "APPROVED" && resource.evidence_class === "SOURCE_BOUND");
-}
 export function belongsToCompany(resource: CanonicalResource, companyId: string) {
   return resource.resource_id === companyId || ["legal_entity_id","company_id","owner_id"].some(key => resource.attributes[key] === companyId);
 }
