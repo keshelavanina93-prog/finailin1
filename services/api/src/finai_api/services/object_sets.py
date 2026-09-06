@@ -10,7 +10,9 @@ from finai_api.domain.review import Principal
 from finai_api.services.resources import resource_connection
 
 
-def query_objects(principal: Principal, request: ObjectSetQuery, types: list[str] | None = None) -> ObjectSetResult:
+def query_objects(
+    principal: Principal, request: ObjectSetQuery, types: list[str] | None = None
+) -> ObjectSetResult:
     now = datetime.now(UTC)
     request = request.model_copy(
         update={
@@ -20,22 +22,35 @@ def query_objects(principal: Principal, request: ObjectSetQuery, types: list[str
     )
     # One statement gives counts, page and traversal a single database snapshot.
     # Only internal CTE names are interpolated; every caller value is a parameter.
-    args: list[Any] = [
-        principal.scope.tenant_id,
-        request.known_at,
-        request.valid_at,
-        request.valid_at,
-        types if types is not None else [request.object_type],
-    ]
+    root_types = types if types is not None else [request.object_type]
+    forward = all(
+        step.kind == "reference" and step.direction == "outgoing" for step in request.traversal
+    )
+    args: list[Any] = [principal.scope.tenant_id, request.known_at]
+    materialization = "NOT MATERIALIZED" if forward else "MATERIALIZED"
     ctes = [
-        "versions AS MATERIALIZED (SELECT v.*,i.identity_key FROM resource_versions v "
+        f"versions AS {materialization} (SELECT v.*,i.identity_key FROM resource_versions v "
         "JOIN canonical_identities i USING(tenant_id,resource_id) "
         "WHERE v.tenant_id=%s AND v.system_from<=%s)",
-        "effective AS (SELECT DISTINCT ON(resource_id) * FROM versions "
+    ]
+    if forward:
+        # Types cannot change for an identity. Filter before temporal selection,
+        # and constrain both sides of the RLS-protected identity/version join.
+        ctes.append(
+            "root_versions AS (SELECT v.*,i.identity_key FROM resource_versions v "
+            "JOIN canonical_identities i USING(tenant_id,resource_id) "
+            "WHERE v.tenant_id=%s AND v.system_from<=%s "
+            "AND v.object_type=ANY(%s::text[]) AND i.object_type=ANY(%s::text[]))"
+        )
+        args += [principal.scope.tenant_id, request.known_at, root_types, root_types]
+    effective_source = "root_versions" if forward else "versions"
+    ctes += [
+        f"effective AS (SELECT DISTINCT ON(resource_id) * FROM {effective_source} "
         "WHERE valid_from<=%s AND (valid_to IS NULL OR valid_to>%s) "
         "ORDER BY resource_id,system_from DESC,version_id)",
         "current_objects AS (SELECT * FROM effective WHERE authority_state='APPROVED')",
     ]
+    args += [request.valid_at, request.valid_at, root_types]
     predicate = "object_type=ANY(%s::text[])"
     if request.resource_ids is not None:
         predicate += " AND resource_id=ANY(%s::uuid[])"
@@ -50,14 +65,22 @@ def query_objects(principal: Principal, request: ObjectSetQuery, types: list[str
         previous = f"s{index - 1}"
         if step.kind == "reference":
             if step.direction == "outgoing":
+                destination = (
+                    "JOIN LATERAL (SELECT * FROM versions pinned "
+                    "WHERE pinned.tenant_id=d.tenant_id "
+                    "AND pinned.resource_id=d.target_resource_id "
+                    "AND pinned.version_id=d.target_version_id LIMIT 1) t ON true "
+                    if forward
+                    else "JOIN versions t ON t.tenant_id=d.tenant_id "
+                    "AND t.resource_id=d.target_resource_id "
+                    "AND t.version_id=d.target_version_id "
+                )
                 sql = (
                     f"SELECT DISTINCT t.* FROM {previous} s "
                     "JOIN resource_dependencies d ON d.tenant_id=s.tenant_id "
                     "AND d.version_id=s.version_id AND d.relation=%s "
-                    "JOIN versions t ON t.tenant_id=d.tenant_id "
-                    "AND t.resource_id=d.target_resource_id "
-                    "AND t.version_id=d.target_version_id "
-                    "WHERE t.authority_state='APPROVED'"
+                    + destination
+                    + "WHERE t.authority_state='APPROVED'"
                 )
             else:
                 sql = (

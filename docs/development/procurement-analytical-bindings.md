@@ -47,3 +47,14 @@ Movement pagination now retains the initial Object Set effective-time and knowle
 snapshot through the dedicated API and browser requests. Supplied timestamps must include
 a timezone. The browser retrieved two disjoint 50-row pages from the same 124-movement
 set with identical snapshot timestamps; a new first-page query explicitly refreshes it.
+
+The shared Object Set executor now filters immutable root object types before temporal
+selection for root-only and outgoing-reference queries. Outgoing targets are fetched by
+the exact retained dependency version; they are not rebound to current heads. Incoming
+and relationship traversals preserve their existing query path. RLS remains in effect.
+The previous and updated implementations returned identical root, empty-set, multi-type
+and single-reference results on retained resources. The full assignment → member →
+dimension traversal exceeded the previous 10-second statement limit; the new path
+returned all three expected dimension identities in 0.93 seconds directly and about
+1.1 seconds through the mounted web proxy. These are local authentic-data measurements,
+not a claim of production-scale acceptance.
