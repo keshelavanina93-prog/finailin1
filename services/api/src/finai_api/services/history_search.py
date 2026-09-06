@@ -1,9 +1,11 @@
 """Bounded as-of discovery over canonical versions and exact ownership pins."""
 
+from collections import Counter
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
+from psycopg.errors import QueryCanceled
 from psycopg.rows import dict_row
 
 from finai_api.domain.resources import CanonicalResource
@@ -11,9 +13,8 @@ from finai_api.domain.review import Principal
 from finai_api.services.resources import resource_connection
 from finai_api.services.workspace import WorkspaceError
 
-MAX_VERSIONS = 5000
-MAX_PINS = 20000
-MAX_OWNERSHIP_DEPTH = 16
+MAX_OFFSET = 2_147_483_647
+SEARCH_TIMEOUT_MS = 15_000
 OWNERSHIP_FIELDS = frozenset(
     {"company_id", "legal_entity_id", "chart_id", "ledger_id", "book_id", "scope_id"}
 )
@@ -77,16 +78,19 @@ def project(
             if source_version not in owned:
                 owned.add(source_version)
                 pending.append(source_version)
-    needle = q.strip().casefold()
+    needle = q.strip().lower()
+    discovered_matches = [
+        row
+        for row in latest.values()
+        if str(row["version_id"]) in owned
+        and (not needle or needle in row["display_name"].lower())
+    ]
+    # Facets describe the complete bounded historical result, never just its visible page.
+    # Apply the chosen type afterwards so other matching categories remain discoverable.
+    type_counts = Counter(row["object_type"] for row in discovered_matches)
     matched = sorted(
-        (
-            row
-            for row in latest.values()
-            if str(row["version_id"]) in owned
-            and (not object_type or row["object_type"] == object_type)
-            and (not needle or needle in row["display_name"].casefold())
-        ),
-        key=lambda row: (row["display_name"].casefold(), str(row["resource_id"])),
+        (row for row in discovered_matches if not object_type or row["object_type"] == object_type),
+        key=lambda row: (row["display_name"].lower(), str(row["resource_id"])),
     )
     return {
         "resources": [
@@ -94,6 +98,10 @@ def project(
             for row in matched[offset : offset + limit]
         ],
         "has_more": len(matched) > offset + limit,
+        "matched_count": len(matched),
+        "type_facets": [
+            {"object_type": kind, "count": type_counts[kind]} for kind in sorted(type_counts)
+        ],
         "offset": offset,
         "limit": limit,
     }
@@ -113,83 +121,100 @@ def search(
     effective_at = effective_at or known_at
     if effective_at.tzinfo is None or known_at.tzinfo is None:
         raise WorkspaceError(422, "Historical timestamps must include a timezone")
-    if not 0 <= offset <= MAX_VERSIONS or not 1 <= limit <= 100 or len(q) > 200:
+    if not 0 <= offset <= MAX_OFFSET or not 1 <= limit <= 100 or len(q) > 200:
         raise WorkspaceError(422, "Historical search exceeds the supported page or query bound")
     with (
         resource_connection(principal, repeatable_read=True) as conn,
         conn.cursor(row_factory=dict_row) as cursor,
     ):
-        # Start with the selected company, then follow reverse exact ownership pins.
-        # The bound applies to this company, never to unrelated tenant history.
-        rows = cursor.execute(
-            "SELECT v.*,i.identity_key FROM resource_versions v "
-            "JOIN canonical_identities i USING(tenant_id,resource_id) "
-            "WHERE v.tenant_id=%s AND v.resource_id=%s AND v.object_type='LegalEntity' "
-            "AND v.system_from<=%s "
-            "ORDER BY v.system_from,v.version_id LIMIT %s",
-            (principal.scope.tenant_id, company_id, known_at, MAX_VERSIONS + 1),
-        ).fetchall()
-        discovered = {row["version_id"]: row for row in rows}
-        frontier = list(discovered)
-        for depth in range(MAX_OWNERSHIP_DEPTH + 1):
-            if not frontier:
-                break
-            if len(discovered) > MAX_VERSIONS:
-                raise WorkspaceError(409, "Company history exceeds the retained version bound")
-            children = cursor.execute(
-                "SELECT DISTINCT v.*,i.identity_key FROM resource_dependencies d "
-                "JOIN resource_versions v ON v.tenant_id=d.tenant_id AND v.version_id=d.version_id "
-                "JOIN canonical_identities i ON i.tenant_id=v.tenant_id "
-                "AND i.resource_id=v.resource_id "
-                "WHERE d.tenant_id=%s AND d.target_version_id=ANY(%s::uuid[]) "
-                "AND d.relation=ANY(%s::text[]) AND v.system_from<=%s "
-                "AND v.attributes->>substring(d.relation from 7)=d.target_resource_id::text "
-                "AND NOT (v.version_id=ANY(%s::uuid[])) LIMIT %s",
-                (
-                    principal.scope.tenant_id,
-                    frontier,
-                    ["FIELD:" + field for field in sorted(OWNERSHIP_FIELDS)],
-                    known_at,
-                    list(discovered),
-                    MAX_VERSIONS + 1 - len(discovered),
-                ),
-            ).fetchall()
-            if children and depth == MAX_OWNERSHIP_DEPTH:
-                raise WorkspaceError(409, "Company history exceeds the ownership depth bound")
-            frontier = [row["version_id"] for row in children]
-            discovered.update({row["version_id"]: row for row in children})
-        # Include the selected as-of version even if a later correction moved an identity
-        # to another company. project() must exclude it, not resurrect its old owner.
-        selected = cursor.execute(
-            "SELECT DISTINCT ON(v.resource_id) v.*,i.identity_key FROM resource_versions v "
-            "JOIN canonical_identities i USING(tenant_id,resource_id) "
-            "WHERE v.tenant_id=%s AND v.resource_id=ANY(%s::uuid[]) AND v.system_from<=%s "
-            "AND v.valid_from<=%s AND (v.valid_to IS NULL OR v.valid_to>%s) "
-            "ORDER BY v.resource_id,v.system_from DESC,v.version_id DESC LIMIT %s",
-            (
-                principal.scope.tenant_id,
-                list({r["resource_id"] for r in discovered.values()}),
-                known_at,
-                effective_at,
-                effective_at,
-                MAX_VERSIONS + 1,
-            ),
-        ).fetchall()
-        discovered.update({row["version_id"]: row for row in selected})
-        rows = list(discovered.values())
-        if len(rows) > MAX_VERSIONS:
-            raise WorkspaceError(409, "Historical search exceeds the retained version bound")
-        pins = cursor.execute(
-            "SELECT version_id,target_resource_id,target_version_id,relation "
-            "FROM resource_dependencies WHERE tenant_id=%s "
-            "AND version_id=ANY(%s::uuid[]) ORDER BY version_id,target_version_id,relation "
-            "LIMIT %s",
-            (principal.scope.tenant_id, [row["version_id"] for row in rows], MAX_PINS + 1),
-        ).fetchall()
-        if len(pins) > MAX_PINS:
-            raise WorkspaceError(409, "Historical search exceeds the retained ownership bound")
+        # The retained company may contain millions of observations. Keep traversal and
+        # aggregation in PostgreSQL; only the requested page crosses into application memory.
+        # UNION (not UNION ALL) makes exact-version reachability cycle safe. The indexed
+        # target identity AND version comparison preserves immutable ownership evidence.
+        cursor.execute(
+            "SELECT set_config('statement_timeout', %s, true)", (str(SEARCH_TIMEOUT_MS),)
+        )
+        try:
+            result = cursor.execute(
+                """WITH RECURSIVE owned(resource_id,version_id) AS (
+                    SELECT resource_id,version_id FROM resource_versions
+                    WHERE tenant_id=%(tenant)s AND resource_id=%(company)s
+                      AND object_type='LegalEntity' AND system_from<=%(known)s
+                    UNION
+                    SELECT v.resource_id,v.version_id
+                    FROM owned o JOIN resource_dependencies d
+                      ON d.tenant_id=%(tenant)s AND d.target_resource_id=o.resource_id
+                      AND d.target_version_id=o.version_id
+                    JOIN resource_versions v
+                      ON v.tenant_id=d.tenant_id AND v.version_id=d.version_id
+                    WHERE d.relation=ANY(%(fields)s) AND v.system_from<=%(known)s
+                      AND v.attributes->>substring(d.relation from 7)=d.target_resource_id::text
+                ), identities AS (
+                    SELECT DISTINCT resource_id FROM owned
+                ), selected AS MATERIALIZED (
+                    SELECT latest.*,i.identity_key FROM identities ids
+                    CROSS JOIN LATERAL (
+                        SELECT v.* FROM resource_versions v
+                        WHERE v.tenant_id=%(tenant)s AND v.resource_id=ids.resource_id
+                          AND v.system_from<=%(known)s AND v.valid_from<=%(effective)s
+                          AND (v.valid_to IS NULL OR v.valid_to>%(effective)s)
+                        ORDER BY v.system_from DESC,v.version_id DESC LIMIT 1
+                    ) latest JOIN canonical_identities i
+                      ON i.tenant_id=latest.tenant_id AND i.resource_id=latest.resource_id
+                ), matches AS MATERIALIZED (
+                    SELECT s.* FROM selected s JOIN owned o
+                      ON o.resource_id=s.resource_id AND o.version_id=s.version_id
+                    WHERE strpos(lower(s.display_name),lower(%(query)s))>0
+                ), filtered AS (
+                    SELECT * FROM matches
+                    WHERE %(kind)s::text IS NULL OR object_type=%(kind)s
+                ), page AS (
+                    SELECT * FROM filtered
+                    ORDER BY lower(display_name),resource_id
+                    OFFSET %(offset)s LIMIT %(limit)s
+                ) SELECT
+                    EXISTS(SELECT 1 FROM selected WHERE resource_id=%(company)s
+                           AND object_type='LegalEntity') AS company_available,
+                    (SELECT count(*) FROM filtered) AS matched_count,
+                    COALESCE((SELECT jsonb_agg(to_jsonb(page)
+                        ORDER BY lower(display_name),resource_id) FROM page),
+                        '[]'::jsonb) AS resources,
+                    COALESCE((SELECT jsonb_agg(to_jsonb(f) ORDER BY object_type) FROM (
+                        SELECT object_type,count(*) AS count FROM matches GROUP BY object_type
+                    ) f),'[]'::jsonb) AS type_facets""",
+                {
+                    "tenant": principal.scope.tenant_id,
+                    "company": company_id,
+                    "known": known_at,
+                    "effective": effective_at,
+                    "fields": ["FIELD:" + field for field in sorted(OWNERSHIP_FIELDS)],
+                    "query": q.strip(),
+                    "kind": object_type,
+                    "offset": offset,
+                    "limit": limit,
+                },
+            ).fetchone()
+        except QueryCanceled as exc:
+            raise WorkspaceError(
+                409,
+                "Historical discovery exceeded its execution budget; no partial results returned",
+            ) from exc
+        if not result or not result["company_available"]:
+            raise WorkspaceError(404, "Company is unavailable at the selected historical context")
+        page_result = {
+            "resources": [
+                CanonicalResource.model_validate(row).model_dump(mode="json")
+                for row in result["resources"]
+            ],
+            "matched_count": result["matched_count"],
+            "type_facets": result["type_facets"],
+            "has_more": result["matched_count"] > offset + limit,
+            "offset": offset,
+            "limit": limit,
+        }
+
     return {
-        **project(rows, pins, company_id, effective_at, q, object_type, offset, limit),
+        **page_result,
         "company_id": str(company_id),
         "effective_at": effective_at.isoformat(),
         "known_at": known_at.isoformat(),

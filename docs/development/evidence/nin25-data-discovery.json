@@ -1,0 +1,99 @@
+{
+  "checked_at": "2026-09-06T20:38:26.795849+00:00",
+  "capability": "NIN-25 / NIN-35 company resource discovery",
+  "mode": "authenticated native TestClient with retained canonical company resources",
+  "companies": [
+    {
+      "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "company_version": "72417af7-1f6f-5d11-b6ff-607e96169191",
+      "name": "შპს სოკარ ჯორჯია გაზი",
+      "matched_count": 4,
+      "type_facets": [
+        {
+          "count": 1,
+          "object_type": "CompanyWorkspace"
+        },
+        {
+          "count": 1,
+          "object_type": "LegalEntity"
+        },
+        {
+          "count": 1,
+          "object_type": "LicenceNoticeBinding"
+        },
+        {
+          "count": 1,
+          "object_type": "RegulatoryRule"
+        }
+      ],
+      "visible_page_size": 1,
+      "category_filters_verified": true
+    },
+    {
+      "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "company_version": "dd21bd46-3525-535d-89ba-6ffa2e05a6e5",
+      "name": "სოკარ ჯორჯია პეტროლეუმი // Сокар Джорджия Петролеум",
+      "matched_count": 5629,
+      "type_facets": [
+        {
+          "count": 1,
+          "object_type": "CompanyWorkspace"
+        },
+        {
+          "count": 1,
+          "object_type": "LegalEntity"
+        },
+        {
+          "count": 93,
+          "object_type": "LocalAccount"
+        },
+        {
+          "count": 1,
+          "object_type": "LocalChartOfAccounts"
+        },
+        {
+          "count": 1,
+          "object_type": "SourceAccountingScope"
+        },
+        {
+          "count": 5532,
+          "object_type": "SourceTrialBalanceRow"
+        }
+      ],
+      "visible_page_size": 1,
+      "category_filters_verified": true
+    }
+  ],
+  "facets_before_type_and_pagination": true,
+  "browser_acceptance": false,
+  "NIN_42_completion": false,
+  "release_accepted": false,
+  "live_web_api_readback": {
+    "url": "http://127.0.0.1:3062",
+    "checks": [
+      {
+        "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+        "offset": 3,
+        "status": 200,
+        "seconds": 0.273,
+        "exact_version": "72417af7-1f6f-5d11-b6ff-607e96169191",
+        "final_page_verified": true
+      },
+      {
+        "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+        "offset": 5628,
+        "status": 200,
+        "seconds": 4.622,
+        "exact_version": "dd21bd46-3525-535d-89ba-6ffa2e05a6e5",
+        "final_page_verified": true
+      }
+    ]
+  },
+  "build_pass": true,
+  "context_behavior": [
+    "Only explicit source selection changes shared inspection",
+    "Missing selected receipt never substitutes a different source",
+    "Repeated source selection reveals retained sources without remount",
+    "History and trace preserve mounted Data panels"
+  ]
+}

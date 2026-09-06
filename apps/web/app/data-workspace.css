@@ -1,0 +1,30 @@
+/* Data composition v1: shared G8 design tokens; canonical panels retain their controls. */
+.dataws { border:1px solid var(--g8-border); border-radius:var(--g8-radius); background:var(--g8-surface); min-width:0; overflow:hidden; container-type:inline-size; }
+.dataws-header { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; padding:22px 24px; background:linear-gradient(110deg,var(--g8-raised),var(--g8-surface)); }
+.dataws-eyebrow { font-size:9px; font-weight:600; letter-spacing:1.5px; color:var(--g8-cyan); margin:0 0 8px; }
+.g8-app .dataws-header h2 { font-size:22px; font-weight:600; letter-spacing:-.5px; margin:0 0 7px; }
+.dataws-header p:last-child { color:var(--g8-muted); font-size:11px; margin:0; }
+.dataws .dataws-intake { display:inline-flex; align-items:center; gap:7px; padding:8px 11px; background:transparent; color:var(--g8-cyan); border:1px solid var(--g8-border); font-size:11px; font-weight:500; }
+.dataws .dataws-intake:hover { background:var(--g8-raised); border-color:var(--g8-cyan); }
+.dataws-context { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:12px 24px; border-top:1px solid var(--g8-border); border-bottom:1px solid var(--g8-border); font-size:11px; }
+.dataws-context>span:first-child { display:flex; align-items:center; flex-wrap:wrap; gap:10px; min-width:0; }
+.dataws-context strong { font-size:11px; font-weight:500; overflow-wrap:anywhere; }
+.dataws-context-label { color:var(--g8-muted); font-size:10px; }
+.dataws-observed { color:var(--g8-muted); text-align:right; font-size:10px; }
+.dataws-count-note { display:block; color:var(--g8-muted); font-size:9px; margin-top:2px; }
+.dataws-tabs { display:flex; gap:22px; padding:0 24px; overflow:auto; border-bottom:1px solid var(--g8-border); scrollbar-width:thin; }
+.dataws-tabs button { display:inline-flex; align-items:center; gap:7px; flex:none; padding:13px 0; background:transparent; border:0; border-bottom:2px solid transparent; border-radius:0; color:var(--g8-muted); font-size:11px; font-weight:500; }
+.dataws-tabs button[aria-selected=true] { color:var(--g8-accent); border-bottom-color:var(--g8-accent); }
+.dataws-tabs button:hover { color:var(--g8-text); background:transparent; }
+.dataws-tabs button:focus-visible { outline-offset:-3px; }
+.dataws-guidance { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 24px; font-size:10px; color:var(--g8-muted); border-bottom:1px solid var(--g8-border); }
+.dataws-guidance>span:last-child { flex:none; font-size:9px; color:var(--g8-cyan); }
+.dataws-panel { padding:20px; min-width:0; min-height:380px; max-height:calc(100dvh - 285px); overflow:auto; scrollbar-width:thin; overscroll-behavior:contain; }
+.dataws-panel[hidden] { display:none; }
+.dataws-panel:focus-visible { outline:1px solid var(--g8-cyan); outline-offset:-2px; }
+.dataws-panel>.g8-history-explorer { margin:0; }
+.dataws-panel>.source-browser { margin:0; }
+.dataws-foot { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px 20px; padding:11px 24px; border-top:1px solid var(--g8-border); font-size:9px; color:var(--g8-muted); line-height:1.6; }
+@container (max-width:700px) { .dataws-header { padding:18px; flex-wrap:wrap; gap:14px; } .dataws-context { padding:12px 18px; } .dataws-observed { text-align:left; } .dataws-tabs { padding:0 18px; gap:18px; } .dataws-guidance { padding:11px 18px; } .dataws-guidance>span:last-child { display:none; } .dataws-panel { padding:12px; } .dataws-foot { padding:10px 18px; } }
+@media(max-height:650px) { .dataws-panel { min-height:280px; max-height:65dvh; } }
+@media(max-width:600px) { .dataws-tabs { gap:16px; } .dataws-tabs button { font-size:10px; } .dataws-panel { min-height:340px; max-height:75dvh; } }
