@@ -16,7 +16,6 @@ from finai_api.services.account_ontology import inspect_accounts, propose_accoun
 from finai_api.services.fact_aggregation import aggregate_facts
 from finai_api.services.fact_reconciliation import reconcile_facts
 from finai_api.services.fact_runs import read_run, retain_run
-from finai_api.services.object_sets import query_objects
 
 router = APIRouter(prefix="/v1/ontology/model", tags=["ontology model and execution"])
 User = Annotated[Principal, Depends(authenticated_principal)]
@@ -48,6 +47,7 @@ class DerivedRun(BaseModel):
     model_config = ConfigDict(extra="forbid")
     query: ObjectSetQuery
     definitions: list[UUID] = Field(min_length=1, max_length=20)
+    definition_versions: dict[UUID, UUID] = Field(default_factory=dict, max_length=20)
 
 
 class AggregateRun(BaseModel):
@@ -137,10 +137,10 @@ def bind(principal: User, identity: UUID, request: BindingRun) -> Any:
 
 @router.post("/derived/query")
 def derive(principal: User, request: DerivedRun) -> dict[str, Any]:
-    result = query_objects(principal, request.query)
-    return {
-        **result.model_dump(mode="json"),
-        "derived_values": definitions.derived_values(
-            principal, result.objects, request.definitions
+    return retain_run(
+        principal,
+        definitions.derive_query(
+            principal, request.query, request.definitions, request.definition_versions
         ),
-    }
+        runtime="ontology-derived/1",
+    )

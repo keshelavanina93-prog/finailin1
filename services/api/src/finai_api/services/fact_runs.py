@@ -13,14 +13,16 @@ from finai_api.services.workspace import WorkspaceError
 from finai_api.storage import connection
 
 
-def retain_run(principal: Principal, result: dict) -> dict:
+def retain_run(
+    principal: Principal, result: dict, *, runtime: str = "accounting-contracts/2"
+) -> dict:
     require_permission(principal, "ontology_read")
     scope = principal.scope.model_dump(mode="json")
     payload = jsonable_encoder(
         {
             **result,
             "scope": scope,
-            "calculation_runtime": "accounting-contracts/2",
+            "calculation_runtime": runtime,
             "read_permissions": sorted(principal.permissions),
         }
     )
@@ -72,7 +74,17 @@ def read_run(principal: Principal, run_id: str) -> dict:
     def collect(value):
         if isinstance(value, dict):
             for key, child in value.items():
-                if key in {"version_id", "contract_version_id"}:
+                if (
+                    key
+                    in {
+                        "version_id",
+                        "contract_version_id",
+                        "object_version_id",
+                        "definition_version_id",
+                        "schema_version_id",
+                    }
+                    and child is not None
+                ):
                     versions.add(str(child))
                 else:
                     collect(child)

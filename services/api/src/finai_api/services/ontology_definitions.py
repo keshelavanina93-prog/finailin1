@@ -135,11 +135,14 @@ def evaluate_expression(expression: Expression, values: dict[str, Any]) -> Any:
 
 
 def derived_values(
-    principal: Principal, objects: list[dict[str, Any]], ids: list[UUID]
+    principal: Principal,
+    objects: list[dict[str, Any]],
+    ids: list[UUID],
+    versions: dict[UUID, UUID] | None = None,
 ) -> list[dict[str, Any]]:
     result = []
     for identity in ids:
-        resource = definition(principal, identity)
+        resource = definition(principal, identity, (versions or {}).get(identity))
         if resource["object_type"] != "DerivedProperty":
             raise WorkspaceError(422, "Requested resource is not a derived property")
         model = DerivedDefinition.model_validate(resource["attributes"]["definition"])
@@ -149,8 +152,6 @@ def derived_values(
         if schema is None:
             raise WorkspaceError(409, "Derived property schema dependency is unavailable")
         for obj in objects:
-            if obj["object_type"] != schema["identity_key"]:
-                continue
             computed = {
                 "object_id": obj["resource_id"],
                 "object_version_id": obj["version_id"],
@@ -160,6 +161,14 @@ def derived_values(
                 "kind": model.result_kind,
                 "epistemic_state": "DERIVED",
             }
+            if obj["object_type"] != schema["identity_key"]:
+                computed.update(
+                    value=None,
+                    status="NOT_APPLICABLE",
+                    reason="Property targets another object type",
+                )
+                result.append(computed)
+                continue
             try:
                 if str(obj["schema_version_id"]) != str(schema["version_id"]):
                     raise ValueError(
@@ -173,6 +182,39 @@ def derived_values(
                 computed.update(value=None, status="UNAVAILABLE", reason=str(exc))
             result.append(computed)
     return result
+
+
+def derive_query(principal, query: ObjectSetQuery, ids: list[UUID], versions: dict[UUID, UUID]):
+    if (query.valid_at is not None or query.known_at is not None) and not versions:
+        raise WorkspaceError(422, "Time-bound derived queries require explicit definition versions")
+    if len(ids) != len(set(ids)) or (versions and set(versions) != set(ids)):
+        raise WorkspaceError(
+            422, "Definition pins must identify every selected property exactly once"
+        )
+    selected = [definition(principal, identity, versions.get(identity)) for identity in ids]
+    if any(row["object_type"] != "DerivedProperty" for row in selected):
+        raise WorkspaceError(422, "Requested resource is not a derived property")
+    pins = {row["resource_id"]: row["version_id"] for row in selected}
+    result = query_objects(principal, query)
+    return {
+        **result.model_dump(mode="json"),
+        "contract": "ontology-derived-result/1",
+        "definition_versions": [
+            {
+                "resource_id": row["resource_id"],
+                "version_id": row["version_id"],
+                "definition": row["attributes"],
+                "schema_versions": [
+                    {"resource_id": pin["resource_id"], "version_id": pin["version_id"]}
+                    for pin in row["dependencies"]
+                    if pin["relation"] == "FIELD:schema_id"
+                ],
+            }
+            for row in selected
+        ],
+        "derived_values": derived_values(principal, result.objects, ids, pins),
+        "coverage": "QUERY_PAGE_ONLY",
+    }
 
 
 def run_set(
