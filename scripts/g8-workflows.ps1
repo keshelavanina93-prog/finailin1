@@ -4,6 +4,48 @@ param([ValidateSet('start','stop','status')][string]$Action='status',
       [ValidateSet('all','temporal','worker')][string]$Service='all')
 $ErrorActionPreference='Stop'
 $taskRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$taskRuntime=Join-Path $taskRoot '.finai'
+$taskState=Join-Path $taskRuntime 'workflow-processes.json'
+
+function Get-WorkflowProcess($Record) {
+ if($null -eq $Record){return $null}
+ Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$Record.pid)"
+}
+function Test-WorkflowOwnership($Record,$Process) {
+ return [bool]($Record -and $Process -and $Process.ExecutablePath -eq $Record.exe -and
+  $Process.CommandLine -eq $Record.command -and
+  $Process.CreationDate.ToUniversalTime() -eq ([datetime]$Record.created).ToUniversalTime())
+}
+function Test-TemporalReachability {
+ $connection=[Net.Sockets.TcpClient]::new()
+ try {
+  $pending=$connection.ConnectAsync('127.0.0.1',7233)
+  return [bool]($pending.Wait(1500) -and $connection.Connected)
+ } catch {return $false} finally {$connection.Dispose()}
+}
+function Write-WorkflowStatus($Records) {
+ foreach($name in @('temporal','worker') | Where-Object {$Service -eq 'all' -or $_ -eq $Service}){
+  $record=@($Records | Where-Object name -eq $name) | Select-Object -First 1
+  $process=Get-WorkflowProcess $record
+  $owned=Test-WorkflowOwnership $record $process
+  $state=if($owned){'RUNNING'}elseif($process){'OWNERSHIP_CHANGED'}elseif($record){'STOPPED'}else{'NOT_MANAGED'}
+  $reachable=if($name -eq 'temporal'){Test-TemporalReachability}else{$null}
+  [pscustomobject]@{
+   Service=$name;Running=$owned;Owned=$owned;ProcessPresent=[bool]$process;State=$state
+   TemporalReachable=$reachable
+   Observation=if($name -eq 'temporal'){'TCP_REACHABILITY_ONLY'}else{'PROCESS_LIVENESS_ONLY'}
+   ExecutionProven=$false;Log=if($record){$record.log}else{$null}
+  }
+ }
+}
+
+# A diagnostic read must neither bootstrap directories nor acquire/create mutation state.
+if($Action -eq 'status'){
+ $records=@()
+ if(Test-Path -LiteralPath $taskState){$records=@(Get-Content -Raw -Encoding utf8 -LiteralPath $taskState | ConvertFrom-Json)}
+ Write-WorkflowStatus $records
+ return
+}
 & "$PSScriptRoot\bootstrap-local.ps1" -SkipInstall
 & "$PSScriptRoot\load-local.ps1"
 $taskState=Join-Path $env:FINAI_RUNTIME_ROOT 'workflow-processes.json'
@@ -16,8 +58,8 @@ try {
  )
  foreach($spec in $specs | Where-Object {$Service -eq 'all' -or $_.name -eq $Service}){
   $record=$records | Where-Object name -eq $spec.name | Select-Object -First 1
-  $process=$null; if($record){$process=Get-CimInstance Win32_Process -Filter "ProcessId=$($record.pid)"}
-  $owned=$process -and $process.ExecutablePath -eq $record.exe -and $process.CommandLine -eq $record.command -and $process.CreationDate.ToUniversalTime() -eq ([datetime]$record.created).ToUniversalTime()
+  $process=Get-WorkflowProcess $record
+  $owned=Test-WorkflowOwnership $record $process
   if($process -and -not $owned){throw 'Workflow process ownership changed; refusing mutation'}
   if($Action -eq 'stop'){
    if($owned){Stop-Process -Id $record.pid -Force}
@@ -37,5 +79,5 @@ try {
   }
   $records | ConvertTo-Json -Depth 5 -AsArray | Set-Content -LiteralPath $taskState -Encoding utf8
  }
- foreach($record in $records){[pscustomobject]@{Service=$record.name;Running=[bool](Get-Process -Id $record.pid -ErrorAction SilentlyContinue);Log=$record.log}}
+ Write-WorkflowStatus $records
 } finally {$taskLock.Dispose()}

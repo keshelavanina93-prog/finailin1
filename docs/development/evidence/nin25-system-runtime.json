@@ -1,0 +1,54 @@
+{
+  "release_accepted": false,
+  "repeated_start_reuses_owned_processes": true,
+  "status_read_only": true,
+  "stop_verified": false,
+  "services": [
+    {
+      "service": "postgres",
+      "running": true,
+      "healthy": true,
+      "retainedOnStop": true
+    },
+    {
+      "service": "minio",
+      "running": true,
+      "healthy": true
+    },
+    {
+      "service": "api",
+      "running": true,
+      "healthy": true
+    },
+    {
+      "service": "web",
+      "running": true,
+      "healthy": true
+    },
+    {
+      "Service": "temporal",
+      "Running": true,
+      "Owned": true,
+      "ProcessPresent": true,
+      "State": "RUNNING",
+      "TemporalReachable": true,
+      "Observation": "TCP_REACHABILITY_ONLY",
+      "ExecutionProven": false,
+      "Log": "D:\\FinAI\\finailinear1\\.finai\\workflow-temporal-7efac2eda22f43f7a16b94caaf443cce"
+    },
+    {
+      "Service": "worker",
+      "Running": true,
+      "Owned": true,
+      "ProcessPresent": true,
+      "State": "RUNNING",
+      "TemporalReachable": null,
+      "Observation": "PROCESS_LIVENESS_ONLY",
+      "ExecutionProven": false,
+      "Log": "D:\\FinAI\\finailinear1\\.finai\\workflow-worker-a9b38b4ba0c4441db240facb9914a0c1"
+    }
+  ],
+  "cold_start_verified": false,
+  "browser_verified": false,
+  "verified_at": "2026-09-06T21:10:16.3030877Z"
+}
