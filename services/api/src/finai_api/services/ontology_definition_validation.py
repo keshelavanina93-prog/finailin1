@@ -304,6 +304,17 @@ def validate_definition(
             raise WorkspaceError(
                 422, "Binding identity and display fields must exist in the source schema"
             )
+        if payload["identity_mode"] == "CANONICAL_REFERENCE":
+            identity_spec = source_fields[payload["identity_field"]]
+            if (
+                identity_spec.get("kind") != "reference"
+                or identity_spec.get("target_type") != destination["identity_key"]
+                or not identity_spec.get("required")
+            ):
+                raise WorkspaceError(
+                    422,
+                    "Canonical binding identity must be a required reference to its target type",
+                )
         mapped = set()
         for binding in payload["fields"]:
             a, b = (

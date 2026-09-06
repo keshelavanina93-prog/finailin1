@@ -85,6 +85,7 @@ class BindingField(Definition):
 
 
 class BindingDefinition(Definition):
+    identity_mode: Literal["SOURCE_KEY", "CANONICAL_REFERENCE"] = "SOURCE_KEY"
     identity_field: str = Field(min_length=1, max_length=128)
     display_field: str = Field(min_length=1, max_length=128)
     fields: list[BindingField] = Field(min_length=1, max_length=100)

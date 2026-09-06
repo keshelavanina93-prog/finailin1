@@ -28,6 +28,7 @@ def downstream_impact(
     dependencies: dict[str, list[dict[str, str]]],
 ) -> dict[str, Any]:
     mutations = {str(item.resource_id): item for item in proposal.mutations}
+    proposed_versions = {str(uuid5(proposal.proposal_id, key)) for key in mutations}
     proposed_reverse: dict[str, list[dict[str, Any]]] = {}
     for identifier, refs in dependencies.items():
         mutation = mutations[identifier]
@@ -39,6 +40,12 @@ def downstream_impact(
                     "object_type": mutation.object_type,
                     "display_name": mutation.display_name,
                     "state": "PROPOSED",
+                    "cycle_dependency": any(
+                        not ref["relation"].startswith("BOUND_SOURCE:")
+                        or ref["version_id"] in proposed_versions
+                        for ref in refs
+                        if ref["resource_id"] == target
+                    ),
                 }
             )
     return _traverse(
@@ -113,14 +120,17 @@ def _traverse(
         if visible:
             with conn.cursor(row_factory=dict_row) as cursor:
                 rows = cursor.execute(
-                    "SELECT DISTINCT v.resource_id,v.version_id,v.object_type,"
-                    "v.display_name,v.access_entity "
+                    "SELECT v.resource_id,v.version_id,v.object_type,"
+                    "v.display_name,v.access_entity,"
+                    "bool_or(left(d.relation,13)<>'BOUND_SOURCE:') AS cycle_dependency "
                     "FROM resource_dependencies d JOIN resource_heads h "
                     "ON h.tenant_id=d.tenant_id AND h.version_id=d.version_id "
                     "JOIN resource_versions v ON v.tenant_id=h.tenant_id "
                     "AND v.version_id=h.version_id "
                     "WHERE d.tenant_id=%s AND d.target_resource_id=%s "
                     "AND v.authority_state='APPROVED' "
+                    "GROUP BY v.resource_id,v.version_id,v.object_type,"
+                    "v.display_name,v.access_entity "
                     "ORDER BY v.resource_id,v.version_id LIMIT %s",
                     (principal.scope.tenant_id, UUID(identifier), MAX_RESOURCES + 1),
                 ).fetchall()
@@ -162,7 +172,11 @@ def _traverse(
                 child_id = child["resource_id"]
                 key = (root, child_id, child["version_id"])
                 if key not in affected:
-                    affected[key] = {"root_resource_id": root, **child, "depth": depth + 1}
+                    affected[key] = {
+                        "root_resource_id": root,
+                        **{key: value for key, value in child.items() if key != "cycle_dependency"},
+                        "depth": depth + 1,
+                    }
                 if len(affected) > MAX_RESOURCES:
                     raise WorkspaceError(
                         409, "Dependency impact exceeds the snapshot bound; narrow the change"
@@ -174,8 +188,13 @@ def _traverse(
                         )
                     seen.add(child_id)
                     pending.append((child_id, depth + 1))
-    # Kahn's algorithm rejects real directed cycles while accepting shared diamond descendants.
-    edges = {node: {child["resource_id"] for child in values} for node, values in neighbors.items()}
+    # Retained source versions are immutable provenance, not live feedback edges.
+    # Keep them in impact/security traversal; only live or co-proposed dependencies
+    # participate in the topology cycle check. A FIELD edge is never exempted.
+    edges = {
+        node: {child["resource_id"] for child in values if child.get("cycle_dependency", True)}
+        for node, values in neighbors.items()
+    }
     indegree = {node: 0 for node in unique_resources}
     for targets in edges.values():
         for target in targets:

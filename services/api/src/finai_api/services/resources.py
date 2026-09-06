@@ -265,6 +265,8 @@ def _validate(
     external_heads: dict[str, str] = {}
     schema_versions: dict[str, str | None] = {}
     impact: list[dict[str, Any]] = []
+    canonical_binding_targets: set[str] = set()
+    validation_time = datetime.now(UTC)
 
     def target(identifier: str, source: str, relation: str) -> dict[str, Any]:
         if identifier in mutations:
@@ -464,6 +466,25 @@ def _validate(
                 bound = target(str(source_id), identifier, "BOUND_SOURCE:" + str(source_id))
                 if str(bound["version_id"]) != str(source_version):
                     raise WorkspaceError(409, "Bound source version changed; rebuild the proposal")
+                if (
+                    bound["object_type"] == "ObjectBinding"
+                    and bound["attributes"]["definition"].get("identity_mode")
+                    == "CANONICAL_REFERENCE"
+                ):
+                    if previous is None:
+                        raise WorkspaceError(
+                            409, "Canonical reference bindings cannot create identities"
+                        )
+                    if (
+                        previous["authority_state"] != "APPROVED"
+                        or previous["valid_from"] > validation_time
+                        or (
+                            previous["valid_to"] is not None
+                            and previous["valid_to"] <= validation_time
+                        )
+                    ):
+                        raise WorkspaceError(409, "Canonical binding target is no longer effective")
+                    canonical_binding_targets.add(identifier)
             if (
                 item.object_type == "FiscalPeriod"
                 and item.attributes["ends_on"] < item.attributes["starts_on"]
@@ -664,6 +685,34 @@ def _validate(
     redirects = {
         row["source_id"]: row["target_id"] for row in resolutions.values() if row["active"]
     }
+    if canonical_binding_targets:
+        # A future head cannot hide a currently effective redirect. Recheck inside
+        # the publication transaction because time can advance without a head change.
+        with conn.cursor(row_factory=dict_row) as cursor:
+            effective_rows = cursor.execute(
+                "SELECT DISTINCT ON(resource_id) resource_id,attributes,authority_state "
+                "FROM resource_versions WHERE tenant_id=%s AND object_type='IdentityResolution' "
+                "AND system_from<=%s AND valid_from<=%s AND (valid_to IS NULL OR valid_to>%s) "
+                "ORDER BY resource_id,system_from DESC,version_id",
+                (tenant, validation_time, validation_time, validation_time),
+            ).fetchall()
+        effective_resolutions = {str(row["resource_id"]): row for row in effective_rows}
+        for key, proposed in mutations.items():
+            if (
+                proposed.object_type == "IdentityResolution"
+                and proposed.valid_from <= validation_time
+                and (proposed.valid_to is None or proposed.valid_to > validation_time)
+            ):
+                effective_resolutions[key] = proposed.model_dump(mode="python")
+        redirected = {
+            row["attributes"]["source_id"]
+            for row in effective_resolutions.values()
+            if row["authority_state"] == "APPROVED" and row["attributes"]["active"]
+        }
+        if canonical_binding_targets.intersection(redirected):
+            raise WorkspaceError(
+                409, "Canonical binding target was redirected; rebind the source identity"
+            )
     for origin in redirects:
         visited: set[str] = set()
         current = origin

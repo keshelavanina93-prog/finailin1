@@ -413,20 +413,44 @@ def prepare_binding(
             raise WorkspaceError(
                 422, "Binding identity field must contain a nonempty stable string"
             )
-        object_id = uuid5(resource["resource_id"], business_key)
+        canonical_reference = spec.get("identity_mode", "SOURCE_KEY") == "CANONICAL_REFERENCE"
+        try:
+            object_id = (
+                UUID(business_key)
+                if canonical_reference
+                else uuid5(resource["resource_id"], business_key)
+            )
+        except ValueError as exc:
+            raise WorkspaceError(
+                422, "Binding identity must be a canonical resource reference"
+            ) from exc
         if object_id in lineage:
             raise WorkspaceError(409, "Multiple source objects resolve to the same target identity")
         try:
             current = resources.get_resource(principal, object_id)["resource"]
         except WorkspaceError as exc:
-            if exc.status != 404:
+            if exc.status != 404 or canonical_reference:
                 raise
             current = None
+        if canonical_reference:
+            assert current is not None
+            resolved = resources.resolve_identity(principal, object_id)
+            if (
+                current["object_type"] != target["identity_key"]
+                or resolved["canonical_id"] != str(object_id)
+                or resolved["version_id"] != str(current["version_id"])
+            ):
+                raise WorkspaceError(
+                    409,
+                    "Canonical binding target changed type, effective version or master identity",
+                )
         mutation = ResourceMutation(
             resource_id=object_id,
             expected_version_id=current["version_id"] if current else None,
             object_type=target["identity_key"],
-            identity_key=f"binding:{identity}:{business_key}"[:256],
+            identity_key=current["identity_key"]
+            if canonical_reference and current
+            else f"binding:{identity}:{business_key}"[:256],
             display_name=str(values[spec["display_field"]])[:200],
             attributes={
                 field["target_field"]: values[field["source_field"]]
