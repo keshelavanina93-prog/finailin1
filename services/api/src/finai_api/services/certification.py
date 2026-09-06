@@ -45,7 +45,9 @@ def _digest(value: Any) -> str:
     return sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
-def _current(c: Any, p: Principal, ref: VersionReference) -> dict[str, Any]:
+def _current(
+    c: Any, p: Principal, ref: VersionReference, allow_unavailable: bool = False
+) -> dict[str, Any]:
     # Local import avoids a lifecycle/certification module cycle during integration.
     from finai_api.services.resource_lifecycle import _latest, _version
 
@@ -53,14 +55,19 @@ def _current(c: Any, p: Principal, ref: VersionReference) -> dict[str, Any]:
     event = _latest(c, p, ref.version_id)
     if event and (
         event["payload"]["target_state"] in ("REVOKED", "SUPERSEDED")
-        or event["payload"]["availability_state"] != "AVAILABLE"
+        or (not allow_unavailable and event["payload"]["availability_state"] != "AVAILABLE")
     ):
         raise WorkspaceError(409, "Certification input authority or availability was withdrawn")
     return resource
 
 
-def _proof(c: Any, p: Principal, request: CertificationEvaluationRequest) -> dict[str, Any]:
-    subject = _current(c, p, request.subject)
+def _proof(
+    c: Any,
+    p: Principal,
+    request: CertificationEvaluationRequest,
+    allow_subject_unavailable: bool = False,
+) -> dict[str, Any]:
+    subject = _current(c, p, request.subject, allow_subject_unavailable)
     contract = _current(c, p, request.contract)
     if contract["object_type"] != "CertificationContract":
         raise WorkspaceError(409, "An exact canonical CertificationContract is required")
@@ -113,8 +120,12 @@ def _proof(c: Any, p: Principal, request: CertificationEvaluationRequest) -> dic
     evaluation = validation["evaluation"]
     if not set(spec.definition.required_checks).issubset(evaluation["checks"]):
         raise WorkspaceError(409, "Retained evaluator does not satisfy the declared checks")
-    subject_upstream = upstream_authority(c, p.scope.tenant_id, request.subject.version_id)
-    contract_upstream = upstream_authority(c, p.scope.tenant_id, request.contract.version_id)
+    subject_upstream = upstream_authority(
+        c, p.scope.tenant_id, request.subject.version_id, check_certification=False
+    )
+    contract_upstream = upstream_authority(
+        c, p.scope.tenant_id, request.contract.version_id, check_certification=False
+    )
     if subject["access_entity"] != "__TENANT__" and any(
         ancestor["access_entity"] not in (subject["access_entity"], "__PLATFORM__")
         for ancestor in subject_upstream + contract_upstream
@@ -209,6 +220,8 @@ def receipt_for_current_use(
     receipt_id: UUID,
     subject: VersionReference,
     contract: VersionReference | None = None,
+    *,
+    allow_subject_unavailable: bool = False,
 ) -> dict[str, Any]:
     row = c.execute(
         "SELECT * FROM certification_receipts WHERE tenant_id=%s AND receipt_id=%s",
@@ -230,6 +243,7 @@ def receipt_for_current_use(
             subject=subject,
             contract=VersionReference.model_validate(proof["contract"]),
         ),
+        allow_subject_unavailable=allow_subject_unavailable,
     )
     # Lifecycle events may advance legitimately. Current checks above validate them;
     # retained event observations remain historical evidence, not required current IDs.

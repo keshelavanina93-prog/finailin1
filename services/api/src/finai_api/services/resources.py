@@ -680,6 +680,25 @@ def _validate(
                         raise WorkspaceError(
                             409, "Source-bound status requires retained source evidence"
                         )
+        if (
+            item.attributes.get("minimum_authority_state") == "CERTIFIED"
+            or "certification_requirements" in item.attributes
+        ):
+            from finai_api.domain.resource_lifecycle import VersionReference
+            from finai_api.services.certification_requirements import (
+                validate_requirement_coverage,
+                validate_requirements,
+            )
+
+            requirements = validate_requirements(item, target, schema_versions.get(identifier))
+            validate_requirement_coverage(
+                requirements,
+                [
+                    VersionReference(resource_id=pin["resource_id"], version_id=pin["version_id"])
+                    for pin in dependencies[identifier]
+                ],
+                schema_versions.get(identifier),
+            )
         impact.append(
             {
                 "resource_id": identifier,

@@ -1,0 +1,154 @@
+{
+  "checked_at": "2026-09-06T23:37:17.653325+00:00",
+  "scope": "SYNTHETIC_DEFINITION_CERTIFICATION_RESTART_READBACK",
+  "consumption_id": "eb6ed25c-17c4-4144-8d50-86b5a2f56515",
+  "proof_hash": "a2fa40558c130578f3458c3f4835e5426c793be0a7537557b5b69c5c425959c8",
+  "historical_readback_status": 200,
+  "current_status_response": {
+    "purpose": "CONSUMPTION_ELIGIBILITY_EXPLANATION",
+    "consumption_id": "eb6ed25c-17c4-4144-8d50-86b5a2f56515",
+    "current_use_authorized": false,
+    "proof_hash": "a2fa40558c130578f3458c3f4835e5426c793be0a7537557b5b69c5c425959c8",
+    "status": "BLOCKED",
+    "legacy_proof_requires_recheck": false,
+    "certification_contract_blocked": true,
+    "checks": [
+      {
+        "subject": {
+          "resource_id": "a3fec331-bb7c-5903-a1f4-8a9f6917347b",
+          "version_id": "15567c4e-f186-587b-8884-9ac47148ba3c"
+        },
+        "role": "UPSTREAM",
+        "retained_event_id": null,
+        "current_event_id": null,
+        "authority_state": null,
+        "availability_state": null,
+        "event_changed": false,
+        "blocker": null
+      },
+      {
+        "subject": {
+          "resource_id": "9c55ad6a-e154-4ba0-8cef-5fa21637d62e",
+          "version_id": "30f14fdc-40d6-514a-9486-cc6e41678cb1"
+        },
+        "role": "INPUT",
+        "retained_event_id": "24473c3f-8c1b-4235-8bbc-dcf5afa08677",
+        "current_event_id": "24473c3f-8c1b-4235-8bbc-dcf5afa08677",
+        "authority_state": "AUTHORITATIVE",
+        "availability_state": "AVAILABLE",
+        "event_changed": false,
+        "blocker": "MINIMUM_AUTHORITY_NOT_MET"
+      },
+      {
+        "subject": {
+          "resource_id": "44b6fbda-e867-5462-b7bf-3b177feec4a5",
+          "version_id": "4d62d07b-e18e-552a-a375-6acb8cc6f864"
+        },
+        "role": "UPSTREAM",
+        "retained_event_id": null,
+        "current_event_id": null,
+        "authority_state": null,
+        "availability_state": null,
+        "event_changed": false,
+        "blocker": null
+      },
+      {
+        "subject": {
+          "resource_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+          "version_id": "8996aa14-5d15-583f-ac63-cf271f1c4d68"
+        },
+        "role": "UPSTREAM",
+        "retained_event_id": null,
+        "current_event_id": null,
+        "authority_state": null,
+        "availability_state": null,
+        "event_changed": false,
+        "blocker": null
+      },
+      {
+        "subject": {
+          "resource_id": "c0cc9b12-fe91-45d5-b998-cfcb46011838",
+          "version_id": "94eba060-6fbd-51e3-a920-82efedcbefea"
+        },
+        "role": "INPUT",
+        "retained_event_id": "ae6b26c2-5d2b-424a-bd9a-6cf8273b10e2",
+        "current_event_id": null,
+        "authority_state": null,
+        "availability_state": null,
+        "event_changed": true,
+        "blocker": "VERSION_NOT_CURRENT_OR_ACCESSIBLE"
+      },
+      {
+        "subject": {
+          "resource_id": "665ae7c4-4711-5ee1-a791-4b76d50fa2bf",
+          "version_id": "d64fabb9-6cca-52ed-b268-050616b3965d"
+        },
+        "role": "UPSTREAM",
+        "retained_event_id": null,
+        "current_event_id": null,
+        "authority_state": null,
+        "availability_state": null,
+        "event_changed": false,
+        "blocker": null
+      },
+      {
+        "subject": {
+          "resource_id": "482caed3-c5c9-5ade-bbd0-87d820653c23",
+          "version_id": "e6819266-70a1-5145-913a-3586ac09363a"
+        },
+        "role": "UPSTREAM",
+        "retained_event_id": null,
+        "current_event_id": null,
+        "authority_state": null,
+        "availability_state": null,
+        "event_changed": false,
+        "blocker": null
+      },
+      {
+        "subject": {
+          "resource_id": "8f02d2d9-10cd-4837-acd3-76b9343a8ae2",
+          "version_id": "ea7ad112-eaa4-536e-a2e2-015d256bd7fe"
+        },
+        "role": "INPUT",
+        "retained_event_id": "cafe89f5-8cc5-42a9-b781-4988899cb54a",
+        "current_event_id": "cafe89f5-8cc5-42a9-b781-4988899cb54a",
+        "authority_state": "CERTIFIED",
+        "availability_state": "AVAILABLE",
+        "event_changed": false,
+        "blocker": "CERTIFICATION_UNAVAILABLE"
+      },
+      {
+        "subject": {
+          "resource_id": "8a58e785-98b9-5e86-9d6e-94d894d80a05",
+          "version_id": "ed98a779-217b-5beb-ba7e-42ff1bbbf92d"
+        },
+        "role": "UPSTREAM",
+        "retained_event_id": null,
+        "current_event_id": null,
+        "authority_state": null,
+        "availability_state": null,
+        "event_changed": false,
+        "blocker": null
+      },
+      {
+        "subject": {
+          "resource_id": "08ac954a-e882-40c2-9663-28063c2f2d9b",
+          "version_id": "6c68144e-6117-5a18-8ada-ace404ae7a5e"
+        },
+        "role": "CONSUMER",
+        "retained_event_id": null,
+        "current_event_id": null,
+        "authority_state": null,
+        "availability_state": null,
+        "event_changed": false,
+        "blocker": null
+      }
+    ],
+    "checked_at": "2026-09-06T23:37:17.594468+00:00"
+  },
+  "certification_receipt_id": "fb3dc102-1e33-4d3c-9970-061815d6b7a6",
+  "retained_conformance_proof_hash": "e15a1bbc5dd4745d46caab4312961b6d32777c8f390f02ce89b82bd69b0f916c",
+  "historical_proof_matches_database": true,
+  "financial_or_authentic_source_certification": false,
+  "browser_or_release_acceptance": false
+}

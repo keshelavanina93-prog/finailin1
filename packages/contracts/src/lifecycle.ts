@@ -12,6 +12,8 @@ export interface LifecycleRequest {
   business_state: "PROVISIONAL" | "LIVE" | "RECONCILED";
   availability_state: "AVAILABLE" | "DEGRADED" | "STALE" | "UNAVAILABLE" | "CONFLICTING";
   reason: string;
+  certification_receipt_id?: string | null;
+  certification_contract?: VersionReference | null;
 }
 
 export interface LifecycleReview { decision: "APPROVED" | "REJECTED"; reason: string }
@@ -23,8 +25,17 @@ export interface ConsumptionRequest {
   minimum_state?: AuthorityState;
 }
 
+export interface CertificationBinding {
+  receipt_id: string;
+  contract: VersionReference;
+  proof_hash: string;
+  claim: "CANONICAL_DEFINITION_CONFORMANCE";
+}
+
 export interface GuardedConsumption {
-  contract_version: "guarded-consumption/2";
+  contract_version: "guarded-consumption/2" | "guarded-consumption/3";
+  consumer_certification?: CertificationBinding;
+  certification_requirements?: Record<string, VersionReference>;
   upstream_authority: Array<VersionReference & { content_hash: string; access_entity: string; event_id: string | null }>;
   consumption_id: string;
   proof_hash: string;
@@ -40,6 +51,8 @@ export interface GuardedConsumption {
     event_id: string;
     content_hash: string;
     authority_state: AuthorityState;
+    certification?: CertificationBinding;
+    authority_control?: boolean;
     attributes: Record<string, unknown>;
     access_entity: string;
     epistemic_state: LifecycleRequest["epistemic_state"];
@@ -62,6 +75,7 @@ export interface ConsumptionStatus {
   current_use_authorized: false;
   status: "BLOCKED" | "RECHECK_REQUIRED";
   legacy_proof_requires_recheck: boolean;
+  certification_contract_blocked?: boolean;
   checked_at: string;
   checks: Array<{
     subject: VersionReference;
@@ -71,6 +85,6 @@ export interface ConsumptionStatus {
     authority_state: AuthorityState | null;
     availability_state: LifecycleRequest["availability_state"] | null;
     event_changed: boolean;
-    blocker: "AUTHORITY_WITHDRAWN" | "AVAILABILITY_WITHDRAWN" | "MINIMUM_AUTHORITY_NOT_MET" | "VERSION_NOT_CURRENT_OR_ACCESSIBLE" | null;
+    blocker: "CERTIFICATION_UNAVAILABLE" | "AUTHORITY_WITHDRAWN" | "AVAILABILITY_WITHDRAWN" | "MINIMUM_AUTHORITY_NOT_MET" | "VERSION_NOT_CURRENT_OR_ACCESSIBLE" | null;
   }>;
 }

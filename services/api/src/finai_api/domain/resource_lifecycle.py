@@ -1,7 +1,7 @@
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SerializerFunctionWrapHandler, model_serializer
 
 AuthorityState = Literal[
     "OBSERVED",
@@ -33,6 +33,16 @@ class LifecycleRequest(BaseModel):
     business_state: Literal["PROVISIONAL", "LIVE", "RECONCILED"]
     availability_state: Literal["AVAILABLE", "DEGRADED", "STALE", "UNAVAILABLE", "CONFLICTING"]
     reason: str = Field(min_length=10, max_length=2000)
+    certification_receipt_id: UUID | None = None
+    certification_contract: VersionReference | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_payload(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        for field in ("certification_receipt_id", "certification_contract"):
+            if getattr(self, field) is None:
+                payload.pop(field, None)
+        return payload
 
 
 class LifecycleReview(BaseModel):

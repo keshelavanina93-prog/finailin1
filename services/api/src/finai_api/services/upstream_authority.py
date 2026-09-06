@@ -4,11 +4,15 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
+from psycopg.errors import RaiseException
+
 from finai_api.services.effective_version import retained_with_effective_version
 from finai_api.services.workspace import WorkspaceError
 
 
-def upstream_authority(cursor: Any, tenant: UUID, consumer: UUID) -> list[dict[str, Any]]:
+def upstream_authority(
+    cursor: Any, tenant: UUID, consumer: UUID, *, check_certification: bool = True
+) -> list[dict[str, Any]]:
     pending = [consumer]
     seen = {consumer}
     proof = []
@@ -45,7 +49,8 @@ def upstream_authority(cursor: Any, tenant: UUID, consumer: UUID) -> list[dict[s
             ):
                 raise WorkspaceError(409, "Upstream dependency is unavailable for current use")
             event = cursor.execute(
-                "SELECT event_id,payload FROM resource_lifecycle_events WHERE tenant_id=%s "
+                "SELECT event_id,payload,certification_proof_hash FROM resource_lifecycle_events "
+                "WHERE tenant_id=%s "
                 "AND version_id=%s ORDER BY recorded_at DESC,event_id DESC LIMIT 1",
                 (tenant, version),
             ).fetchone()
@@ -56,6 +61,28 @@ def upstream_authority(cursor: Any, tenant: UUID, consumer: UUID) -> list[dict[s
                 raise WorkspaceError(
                     409, "Upstream dependency authority or availability was withdrawn"
                 )
+            if check_certification and event and event["payload"]["target_state"] == "CERTIFIED":
+                payload = event["payload"]
+                try:
+                    policy = payload["certification_contract"]
+                    checked = cursor.execute(
+                        "SELECT g8_check_certification_receipt(%s,%s,%s,%s,%s,%s) AS proof_hash",
+                        (
+                            tenant,
+                            payload["certification_receipt_id"],
+                            row["resource_id"],
+                            version,
+                            policy["resource_id"],
+                            policy["version_id"],
+                        ),
+                    ).fetchone()
+                    if (
+                        checked is None
+                        or checked["proof_hash"] != event["certification_proof_hash"]
+                    ):
+                        raise WorkspaceError(409, "Upstream certification proof does not match")
+                except (KeyError, TypeError, RaiseException) as exc:
+                    raise WorkspaceError(409, "Upstream certification is unavailable") from exc
             proof.append(
                 {
                     "resource_id": str(row["resource_id"]),

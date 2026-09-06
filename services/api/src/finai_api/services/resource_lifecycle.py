@@ -79,7 +79,7 @@ def _validate(c: Any, p: Principal, r: LifecycleRequest) -> dict[str, Any]:
     )
     amendment = (
         event is not None
-        and prior in ORDER
+        and prior in [*ORDER, "CERTIFIED"]
         and r.target_state == prior
         and any(
             getattr(r, field) != event["payload"][field]
@@ -89,11 +89,51 @@ def _validate(c: Any, p: Principal, r: LifecycleRequest) -> dict[str, Any]:
     if (
         not amendment
         and r.target_state != expected
-        and not (prior in ORDER and r.target_state in ("SUPERSEDED", "REVOKED"))
+        and not (prior == "AUTHORITATIVE" and r.target_state == "CERTIFIED")
+        and not (prior in [*ORDER, "CERTIFIED"] and r.target_state in ("SUPERSEDED", "REVOKED"))
     ):
         raise WorkspaceError(
             409, "Unsupported lifecycle transition; certification requires a certification contract"
         )
+    if prior == "CERTIFIED" or r.target_state == "CERTIFIED":
+        from finai_api.services.certification import _envelope, receipt_for_current_use
+
+        if r.certification_receipt_id is None or r.certification_contract is None:
+            raise WorkspaceError(
+                409, "Certified lifecycle requires exact receipt and contract pins"
+            )
+        if (
+            prior == "CERTIFIED"
+            and event is not None
+            and (
+                event["payload"].get("certification_receipt_id") != str(r.certification_receipt_id)
+                or event["payload"].get("certification_contract")
+                != r.certification_contract.model_dump(mode="json")
+            )
+        ):
+            raise WorkspaceError(
+                409, "Certified amendment or withdrawal must retain its original binding"
+            )
+        if r.target_state in ("SUPERSEDED", "REVOKED"):
+            row = c.execute(
+                "SELECT * FROM certification_receipts WHERE tenant_id=%s AND receipt_id=%s",
+                (p.scope.tenant_id, r.certification_receipt_id),
+            ).fetchone()
+            if row is None:
+                raise WorkspaceError(409, "Original certification evidence unavailable")
+            receipt = _envelope(row)
+        else:
+            receipt = receipt_for_current_use(
+                c,
+                p,
+                r.certification_receipt_id,
+                r.subject,
+                r.certification_contract,
+                allow_subject_unavailable=prior == "CERTIFIED" and amendment,
+            )
+        version["certification_proof_hash"] = receipt["proof_hash"]
+    elif r.certification_receipt_id is not None or r.certification_contract is not None:
+        raise WorkspaceError(409, "Certification binding is only valid for a certified lifecycle")
     return version
 
 
@@ -115,8 +155,8 @@ def request_transition(p: Principal, r: LifecycleRequest) -> dict[str, Any]:
             c.execute(
                 "INSERT INTO "
                 "resource_lifecycle_requests(tenant_id,request_id,resource_id,version_id,"
-                "access_entity,submitted_by,request_hash,payload) "
-                "VALUES(%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *",
+                "access_entity,submitted_by,request_hash,payload,certification_proof_hash) "
+                "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *",
                 (
                     p.scope.tenant_id,
                     r.request_id,
@@ -126,6 +166,7 @@ def request_transition(p: Principal, r: LifecycleRequest) -> dict[str, Any]:
                     p.actor_id,
                     canonical_sha256(r),
                     Jsonb(r.model_dump(mode="json")),
+                    v.get("certification_proof_hash"),
                 ),
             ).fetchone(),
         )
@@ -157,8 +198,10 @@ def review_transition(p: Principal, request_id: UUID, r: LifecycleReview) -> dic
             return dict(old)
         request = LifecycleRequest.model_validate(row["payload"])
         if r.decision == "APPROVED":
-            _validate(c, p, request)
-            if request.target_state == "AUTHORITATIVE":
+            validated = _validate(c, p, request)
+            if validated.get("certification_proof_hash") != row.get("certification_proof_hash"):
+                raise WorkspaceError(409, "Certification proof changed since lifecycle request")
+            if request.target_state in ("AUTHORITATIVE", "CERTIFIED"):
                 require_permission(p, "ontology_admin")
         decision = c.execute(
             "INSERT INTO "
@@ -171,8 +214,8 @@ def review_transition(p: Principal, request_id: UUID, r: LifecycleReview) -> dic
             c.execute(
                 "INSERT INTO "
                 "resource_lifecycle_events(tenant_id,event_id,request_id,resource_id,"
-                "version_id,access_entity,payload) "
-                "VALUES(%s,%s,%s,%s,%s,%s,%s)",
+                "version_id,access_entity,payload,certification_proof_hash) "
+                "VALUES(%s,%s,%s,%s,%s,%s,%s,%s)",
                 (
                     p.scope.tenant_id,
                     uuid4(),
@@ -181,6 +224,7 @@ def review_transition(p: Principal, request_id: UUID, r: LifecycleReview) -> dic
                     row["version_id"],
                     row["access_entity"],
                     Jsonb(row["payload"]),
+                    row.get("certification_proof_hash"),
                 ),
             )
         assert decision is not None
@@ -211,8 +255,11 @@ def history(
 
 
 def consume(p: Principal, r: ConsumptionRequest) -> dict[str, Any]:
+    from finai_api.services.certification_consumption import certified_event, requirements_for_use
+
     require_permission(p, "ontology_read")
-    if r.minimum_state not in ORDER:
+    progression = [*ORDER, "CERTIFIED"]
+    if r.minimum_state not in progression:
         raise WorkspaceError(422, "Minimum state must be a supported progressive authority state")
     with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
         _lock(conn, p)
@@ -224,9 +271,9 @@ def consume(p: Principal, r: ConsumptionRequest) -> dict[str, Any]:
         ):
             raise WorkspaceError(409, "Consumer authority has been withdrawn")
         required = consumer["attributes"].get("minimum_authority_state")
-        if required not in ORDER:
+        if required not in progression:
             raise WorkspaceError(409, "Consumer lacks a supported minimum authority contract")
-        minimum = ORDER[max(ORDER.index(required), ORDER.index(r.minimum_state))]
+        minimum = progression[max(progression.index(required), progression.index(r.minimum_state))]
         pins = c.execute(
             "SELECT target_resource_id,target_version_id FROM resource_dependencies "
             "WHERE tenant_id=%s AND version_id=%s",
@@ -238,18 +285,32 @@ def consume(p: Principal, r: ConsumptionRequest) -> dict[str, Any]:
             raise WorkspaceError(
                 409, "Inputs must exactly match all recorded direct dependency pins"
             )
+        requirements, controls = (
+            requirements_for_use(c, p, consumer, r.inputs)
+            if minimum == "CERTIFIED"
+            else ({}, set())
+        )
+        consumer_certification = None
+        if consumer_event and consumer_event["payload"]["target_state"] == "CERTIFIED":
+            consumer_certification = certified_event(c, p, r.consumer, consumer_event)
         values = []
         for ref in r.inputs:
             version = _version(c, p, ref)
             event = _latest(c, p, ref.version_id)
             state = event["payload"]["target_state"] if event else None
+            input_minimum = "AUTHORITATIVE" if str(ref.resource_id) in controls else minimum
             if (
                 event is None
-                or state not in ORDER
-                or ORDER.index(state) < ORDER.index(minimum)
+                or state not in progression
+                or progression.index(state) < progression.index(input_minimum)
                 or event["payload"]["availability_state"] != "AVAILABLE"
             ):
                 raise WorkspaceError(409, "Input does not meet required authority and availability")
+            certification = None
+            if state == "CERTIFIED":
+                certification = certified_event(
+                    c, p, ref, event, requirements.get(str(ref.resource_id))
+                )
             values.append(
                 {
                     "subject": ref.model_dump(mode="json"),
@@ -261,10 +322,18 @@ def consume(p: Principal, r: ConsumptionRequest) -> dict[str, Any]:
                     "epistemic_state": event["payload"]["epistemic_state"],
                     "business_state": event["payload"]["business_state"],
                     "availability_state": event["payload"]["availability_state"],
+                    **({"certification": certification} if certification else {}),
+                    **({"authority_control": True} if str(ref.resource_id) in controls else {}),
                 }
             )
         proof = {
-            "contract_version": "guarded-consumption/2",
+            "contract_version": "guarded-consumption/3"
+            if (
+                minimum == "CERTIFIED"
+                or consumer_certification
+                or any("certification" in item for item in values)
+            )
+            else "guarded-consumption/2",
             "purpose": "GUARDED_CURRENT_CONSUMPTION",
             "consumption_id": str(r.request_id),
             "consumer": r.consumer.model_dump(mode="json"),
@@ -274,6 +343,18 @@ def consume(p: Principal, r: ConsumptionRequest) -> dict[str, Any]:
             "access_entity": consumer["access_entity"],
             "inputs": sorted(values, key=lambda item: item["subject"]["version_id"]),
             "upstream_authority": upstream_authority(c, p.scope.tenant_id, r.consumer.version_id),
+            **(
+                {"consumer_certification": consumer_certification} if consumer_certification else {}
+            ),
+            **(
+                {
+                    "certification_requirements": {
+                        key: value.model_dump(mode="json") for key, value in requirements.items()
+                    }
+                }
+                if minimum == "CERTIFIED"
+                else {}
+            ),
         }
         proof_hash = _proof_hash(proof)
         previous = c.execute(
@@ -342,6 +423,8 @@ def consumption_receipt(p: Principal, consumption_id: UUID) -> dict[str, Any]:
 
 
 def consumption_status(p: Principal, consumption_id: UUID) -> dict[str, Any]:
+    from finai_api.services.certification_consumption import certified_event, requirements_for_use
+
     retained = consumption_receipt(p, consumption_id)
     proof = retained["proof"]
     checks = []
@@ -362,6 +445,23 @@ def consumption_status(p: Principal, consumption_id: UUID) -> dict[str, Any]:
     }
     with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
         _lock(conn, p)
+        progression = [*ORDER, "CERTIFIED"]
+        requirements: dict[str, VersionReference] = {}
+        controls: set[str] = set()
+        certification_contract_blocked = False
+        if proof["minimum_state"] == "CERTIFIED":
+            try:
+                consumer = _version(c, p, VersionReference.model_validate(proof["consumer"]))
+                requirements, controls = requirements_for_use(
+                    c,
+                    p,
+                    consumer,
+                    [VersionReference.model_validate(item["subject"]) for item in proof["inputs"]],
+                )
+            except WorkspaceError as exc:
+                if exc.status not in (404, 409):
+                    raise
+                certification_contract_blocked = True
         for item in references.values():
             ref = VersionReference(resource_id=item["resource_id"], version_id=item["version_id"])
             reason = None
@@ -379,9 +479,25 @@ def consumption_status(p: Principal, consumption_id: UUID) -> dict[str, Any]:
                 elif item["role"] != "CONSUMER" and current_event and availability != "AVAILABLE":
                     reason = "AVAILABILITY_WITHDRAWN"
                 elif item["role"] == "INPUT" and (
-                    state not in ORDER or ORDER.index(state) < ORDER.index(proof["minimum_state"])
+                    state not in progression
+                    or proof["minimum_state"] not in progression
+                    or progression.index(state)
+                    < progression.index(
+                        "AUTHORITATIVE"
+                        if str(ref.resource_id) in controls
+                        else proof["minimum_state"]
+                    )
                 ):
                     reason = "MINIMUM_AUTHORITY_NOT_MET"
+                if reason is None and state == "CERTIFIED" and current_event:
+                    try:
+                        certified_event(
+                            c, p, ref, current_event, requirements.get(str(ref.resource_id))
+                        )
+                    except WorkspaceError as exc:
+                        if exc.status not in (404, 409):
+                            raise
+                        reason = "CERTIFICATION_UNAVAILABLE"
             except WorkspaceError as exc:
                 if exc.status not in (404, 409):
                     raise
@@ -399,8 +515,8 @@ def consumption_status(p: Principal, consumption_id: UUID) -> dict[str, Any]:
                     "blocker": reason,
                 }
             )
-    legacy = proof.get("contract_version") != "guarded-consumption/2"
-    blocked = legacy or any(item["blocker"] for item in checks)
+    legacy = proof.get("contract_version") not in ("guarded-consumption/2", "guarded-consumption/3")
+    blocked = legacy or certification_contract_blocked or any(item["blocker"] for item in checks)
     return {
         "purpose": "CONSUMPTION_ELIGIBILITY_EXPLANATION",
         "consumption_id": str(consumption_id),
@@ -408,6 +524,7 @@ def consumption_status(p: Principal, consumption_id: UUID) -> dict[str, Any]:
         "proof_hash": retained["proof_hash"],
         "status": "BLOCKED" if blocked else "RECHECK_REQUIRED",
         "legacy_proof_requires_recheck": legacy,
+        "certification_contract_blocked": certification_contract_blocked,
         "checks": checks,
         "checked_at": datetime.now(UTC).isoformat(),
     }

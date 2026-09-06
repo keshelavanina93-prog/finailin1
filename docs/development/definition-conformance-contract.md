@@ -26,9 +26,9 @@ requires the entire migration chain through 036.
 
 The internal current-use verifier rechecks policy and subject state before returning
 a positive conformance result. It is not an independent business-use grant.
-CERTIFIED lifecycle transitions and consumers remain unavailable until their exact
-policy requirements and matching Python/SQL guards are integrated. NIN-27 remains
-open; this contract does not complete NIN-5, Finance, intelligence or release.
+Reviewed CERTIFIED transitions and exact-policy consumers were subsequently
+integrated in `scoped-certified-consumption.md` with migrations 037–038. NIN-27
+remains open; this contract does not complete NIN-5, Finance, intelligence or release.
 
 The replacement G8 shell separately displays definition review and retained material
 authority, business lifecycle, epistemic state and availability. The inspector and
