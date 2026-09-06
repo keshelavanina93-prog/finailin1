@@ -77,8 +77,26 @@ def observe(principal, document_id, sheet, profile, company_id):
         "evidence_id": str(evidence),
         "source_record_id": str(uuid5(evidence, coordinate)),
     }
+    company = resources.current_resources(principal, [company_id]).get(str(company_id))
+    if not direct_company_match(company, parsed["company_label"], str(evidence)):
+        from finai_api.services.source_company_alias import inspect as inspect_company_alias
+
+        match = inspect_company_alias(principal, document_id, sheet, profile, company_id)
+        if match["accepted"]:
+            attrs["company_alias_id"] = str(match["alias"]["resource_id"])
     identity = uuid5(evidence, f"accounting-scope:{company_id}:{sheet}:{profile}")
     return identity, attrs, coordinate, parsed["company_label"]
+
+
+def direct_company_match(company, label, evidence_id):
+    return bool(
+        company
+        and company["authority_state"] == "APPROVED"
+        and company["object_type"] == "LegalEntity"
+        and company["evidence_class"] == "SOURCE_BOUND"
+        and company["display_name"] == label
+        and company["attributes"].get("evidence_id") == evidence_id
+    )
 
 
 def validate_context(principal, item, target):
@@ -94,12 +112,20 @@ def validate_context(principal, item, target):
         company = target(attrs["legal_entity_id"], key, "SOURCE_SCOPE_COMPANY")
         chart = target(attrs["chart_id"], key, "SOURCE_SCOPE_CHART")
         record = target(attrs["source_record_id"], key, "SOURCE_SCOPE_RECORD")
+        company_matches = direct_company_match(company, label, attrs["evidence_id"])
+        if attrs.get("company_alias_id"):
+            alias = target(attrs["company_alias_id"], key, "SOURCE_COMPANY_ALIAS")
+            company_matches = (
+                alias["object_type"] == "Alias"
+                and alias["attributes"].get("source_system") == "RETAINED_ACCOUNTING_COMPANY"
+                and alias["attributes"].get("target_id") == attrs["legal_entity_id"]
+                and alias["display_name"] == label
+            )
         if (
             item.evidence_class != "SOURCE_BOUND"
             or item.resource_id != identity
             or attrs != expected
-            or company["display_name"] != label
-            or company["attributes"].get("evidence_id") != attrs["evidence_id"]
+            or not company_matches
             or chart["attributes"]["legal_entity_id"] != attrs["legal_entity_id"]
             or record["attributes"]
             != {"evidence_id": attrs["evidence_id"], "coordinate": coordinate}
@@ -286,20 +312,18 @@ def validate_active_selection(attrs, scope_attrs, target):
 
 
 def inspect(principal, document_id, sheet, profile, company_id):
+    from finai_api.services.source_company_alias import inspect as inspect_company_alias
+
     identity, attrs, coordinate, label = observe(principal, document_id, sheet, profile, company_id)
     binding_id = uuid5(identity, "accounting-binding")
     heads = resources.current_resources(
         principal, [identity, binding_id, company_id, UUID(attrs["chart_id"])]
     )
     company = heads.get(str(company_id))
+    company_binding = inspect_company_alias(principal, document_id, sheet, profile, company_id)
     unresolved = []
-    if (
-        not company
-        or company["authority_state"] != "APPROVED"
-        or company["object_type"] != "LegalEntity"
-        or company["evidence_class"] != "SOURCE_BOUND"
-        or company["display_name"] != label
-        or company["attributes"].get("evidence_id") != attrs["evidence_id"]
+    if not (
+        direct_company_match(company, label, attrs["evidence_id"]) or company_binding["accepted"]
     ):
         unresolved.append(
             "The source company label needs a reviewed binding to the selected canonical company"
@@ -353,6 +377,7 @@ def inspect(principal, document_id, sheet, profile, company_id):
         "canonical_ready": not unresolved,
         "unresolved": unresolved,
         "source_company_label": label,
+        "company_binding": company_binding,
         "source_observations": source_observations(principal, document_id, sheet, profile),
     }
 

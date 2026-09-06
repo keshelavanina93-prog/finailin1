@@ -35,6 +35,8 @@ def main():
     for spec in platform_definitions(author.scope.tenant_id):
         if spec["object_type"] != "SchemaDefinition" or spec["identity_key"] not in {
             "SourceAccountingBinding",
+            "SourceAccountingScope",
+            "Alias",
             "JournalEntry",
             "JournalLine",
         }:

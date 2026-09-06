@@ -473,6 +473,13 @@ def _validate(
                 from finai_api.services.source_accounting_context import validate_context
 
                 validate_context(principal, item, target)
+            if (
+                item.object_type == "Alias"
+                and item.attributes.get("source_system") == "RETAINED_ACCOUNTING_COMPANY"
+            ):
+                from finai_api.services.source_company_alias import validate_alias
+
+                validate_alias(principal, item, target)
             if item.object_type in {"JournalEntry", "JournalLine"}:
                 from finai_api.services.accounting_promotion import (
                     validate_current_binding,

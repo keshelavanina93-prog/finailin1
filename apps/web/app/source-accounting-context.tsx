@@ -3,7 +3,8 @@ import { useEffect, useId, useRef, useState } from "react";
 
 type Resource = { resource_id: string; version_id: string; display_name: string; attributes: Record<string, string> };
 type SourceObservations = { source_sha256: string; construction_receipt_id?: string; source_snapshot?: { source_use?: string }; row_count: number; granularity?: string; deepest_valid_drill?: string; unresolved?: string[]; sample_rows?: { row: number; numeric_observations: Record<string, { coordinate: string; value: string }> }[] };
-type Context = { scope_id: string; observed: Record<string, string>; source_coordinate?: string; source_company_label?: string; canonical_ready?: boolean; unresolved?: string[]; source_observations?: SourceObservations; scope: Resource | null; binding: Resource | null; candidates: Record<string, Resource[]> };
+type CompanyBinding = { accepted: boolean; can_propose: boolean; company: Pick<Resource, "resource_id" | "display_name"> | null; source_label: string; alias: Resource | null; reason?: string };
+type Context = { scope_id: string; observed: Record<string, string>; source_coordinate?: string; source_company_label?: string; canonical_ready?: boolean; unresolved?: string[]; source_observations?: SourceObservations; company_binding?: CompanyBinding; scope: Resource | null; binding: Resource | null; candidates: Record<string, Resource[]> };
 const fields = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "transaction_currency_id", "reporting_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
 const required = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
 
@@ -14,6 +15,7 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
   const [use, setUse] = useState("");
   const [selection, setSelection] = useState<Record<string, string>>({});
   const [rationale, setRationale] = useState("");
+  const [companyRationale, setCompanyRationale] = useState("");
   const [unresolved, setUnresolved] = useState("");
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -24,7 +26,7 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
   const context = loaded?.key === contextKey ? loaded.value : null;
   useEffect(() => () => pending.current?.abort(), [contextKey]);
 
-  async function run(action: "inspect" | "scope-proposal" | "binding-proposal") {
+  async function run(action: "inspect" | "scope-proposal" | "binding-proposal" | "company-binding-proposal") {
     pending.current?.abort();
     const controller = new AbortController(); pending.current = controller;
     setBusyKey(contextKey); setError("");
@@ -34,6 +36,7 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
         method: "POST", signal: controller.signal,
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ sheet, profile, company_id: companyId,
+          ...(action === "company-binding-proposal" ? { rationale: companyRationale.trim() } : {}),
           ...(action === "binding-proposal" ? { selection: {
             contract_version: "2", source_use: use, rationale: rationale.trim(),
             ...(use === "STRUCTURAL_REFERENCE" ? {} : chosen),
@@ -47,6 +50,7 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
       if (action !== "inspect") onProposal(data.proposal.proposal_id);
       else {
         setLoaded({ key: contextKey, value: data });
+        setCompanyRationale("");
         setUse(data.binding?.attributes.source_use ?? "");
         setRationale(data.binding?.attributes.rationale ?? "");
         setUnresolved(data.binding?.attributes.unresolved_reason ?? "");
@@ -108,6 +112,19 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
         </tbody></table>}
       </details>}
       {!canonicalReady && <div role="status"><p>Source-company or chart binding is unresolved. Scope publication and accounting activation are blocked.</p>{context.unresolved?.map(reason => <p key={reason}>{reason}</p>)}</div>}
+      {context.company_binding && <fieldset><legend>Source company identity</legend>
+        <p>Label recorded in this source: <strong>{context.company_binding.source_label}</strong></p>
+        {context.company_binding.company && <><p>Selected existing company: <strong>{context.company_binding.company.display_name}</strong></p><details><summary>Canonical company reference</summary><code>{context.company_binding.company.resource_id}</code></details></>}
+        {context.company_binding.accepted ? <p>This source label has an accepted company binding. Accounting context and chart requirements remain separate.</p> : <>
+          {context.company_binding.reason && <p>{context.company_binding.reason}</p>}
+          <p>Confirm the relationship from source evidence. Similar names alone do not establish company identity.</p>
+          {canPropose && context.company_binding.can_propose && context.company_binding.company?.resource_id === companyId && <>
+            <label htmlFor={`${prefix}-company-rationale`}>Evidence for binding this label to the selected company</label><textarea id={`${prefix}-company-rationale`} value={companyRationale} onChange={event => setCompanyRationale(event.target.value)} maxLength={2000}/>
+            <button disabled={busy || companyRationale.trim().length < 10} onClick={() => void run("company-binding-proposal")}>Propose company label binding</button>
+            <p>The proposal goes through the existing review process. It does not activate this source for accounting.</p>
+          </>}
+        </>}
+      </fieldset>}
       {profile === "seg_expense_base" && <p>The source amount and annotated Amount have unresolved currency and accounting meanings. Petroleum counterparty labels do not identify the source company.</p>}
       <p>Observed scope: {context.scope ? "Published" : "Awaiting publication"}. Accounting use: {context.binding ? context.binding.attributes.source_use.toLowerCase().replaceAll("_", " ") : "Not selected"}.</p>
       {!context.scope && canPropose && <button disabled={busy || !canonicalReady} onClick={() => void run("scope-proposal")}>Propose observed source scope</button>}

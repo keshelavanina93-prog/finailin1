@@ -81,6 +81,22 @@ class SourceContextWrite(SourceContextRead):
     selection: source_accounting_context.ContextSelection
 
 
+class SourceCompanyBindingWrite(SourceContextRead):
+    rationale: str = Field(min_length=10, max_length=2000)
+
+
+@router.post("/{identity}/accounting-context/company-binding-proposal")
+def propose_source_company_binding(
+    principal: User, identity: str, request: SourceCompanyBindingWrite
+):
+    from finai_api.services import source_company_alias
+
+    require_permission(principal, "ontology_propose")
+    return source_company_alias.propose(
+        principal, identity, request.sheet, request.profile, request.company_id, request.rationale
+    )
+
+
 @router.post("/{identity}/accounting-context/observations")
 def accounting_observations(principal: User, identity: str, request: SourceContextRead):
     return source_accounting_context.source_observations(

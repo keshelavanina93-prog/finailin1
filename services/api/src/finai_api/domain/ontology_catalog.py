@@ -196,7 +196,11 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "jurisdiction": "Text",
         "evidence_id": "@SourceEvidence",
     },
-    "Alias": {"source_system": "Identifier", "external_id": "Identifier", "target_id": "@*"},
+    "Alias": {
+        "source_system": "Identifier", "external_id": "Identifier", "target_id": "@*",
+        "document_id?": "Identifier", "worksheet?": "Text", "source_profile?": "Identifier",
+        "source_record_id?": "@SourceRecord",
+    },
     "IdentityResolution": {
         "source_id": "@*",
         "target_id": "@*",
@@ -217,6 +221,7 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "source_scope_key": "Identifier",
     },
     "SourceAccountingScope": {
+        "company_alias_id?": "@Alias",
         "document_id": "Identifier", "source_record_id": "@SourceRecord",
         "legal_entity_id": "@LegalEntity", "chart_id": "@LocalChartOfAccounts",
         "worksheet": "Text", "source_profile": "Identifier",
