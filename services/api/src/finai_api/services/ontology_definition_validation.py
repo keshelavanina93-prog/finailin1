@@ -31,6 +31,14 @@ def validate_definition(
         raise WorkspaceError(422, f"Invalid {item.object_type} definition: {exc}") from exc
     source = str(item.resource_id)
 
+    if item.object_type == "RegulatoryRule":
+        if item.evidence_class != "SOURCE_BOUND":
+            raise WorkspaceError(422, "Regulatory interpretations require retained source evidence")
+        act = target(str(item.attributes["act_id"]), source, "REGULATORY_ACT")
+        if str(act["attributes"].get("evidence_id")) != str(item.attributes["evidence_id"]):
+            raise WorkspaceError(422, "Rule evidence must match the referenced act version")
+        return
+
     def schema(name: str) -> dict[str, Any]:
         if name not in schemas:
             raise WorkspaceError(422, f"Unknown ontology type: {name}")

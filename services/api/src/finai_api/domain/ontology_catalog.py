@@ -130,6 +130,13 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "period_id": "@FiscalPeriod",
         "metric_id": "@MetricDefinition",
     },
+    "RegulatoryRule": {
+        "act_id": "@RegulatoryAct",
+        "legal_entity_id": "@LegalEntity",
+        "licence_id": "@Licence",
+        "evidence_id": "@SourceEvidence",
+        "definition": "OntologyDefinition",
+    },
     "RegulatoryAct": {
         "reference": "Identifier",
         "jurisdiction": "Text",

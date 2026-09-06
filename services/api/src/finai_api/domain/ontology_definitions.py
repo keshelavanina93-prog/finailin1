@@ -6,9 +6,12 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from finai_api.domain.object_sets import ObjectSetQuery
+from finai_api.domain.regulation import RegulatoryDefinition
 
 Name = Annotated[str, Field(pattern=r"^[a-zA-Z][a-zA-Z0-9_]{0,127}$")]
 TypeName = Annotated[str, Field(pattern=r"^[A-Z][A-Za-z0-9]{1,63}$")]
+
+
 
 
 class Definition(BaseModel):
@@ -123,6 +126,7 @@ DEFINITION_MODELS: dict[str, type[BaseModel]] = {
     "DerivedProperty": DerivedDefinition,
     "ObjectBinding": BindingDefinition,
     "FactContract": FactContract,
+    "RegulatoryRule": RegulatoryDefinition,
 }
 
 

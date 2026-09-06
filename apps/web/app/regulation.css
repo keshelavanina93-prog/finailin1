@@ -1,0 +1,9 @@
+.g8-regulation-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:20px 0}
+.g8-regulation-form label{display:flex;flex-direction:column;gap:7px;font-size:13px}
+.g8-regulation-form input,.g8-regulation-form select,.g8-regulation-form textarea{padding:10px;border:1px solid #cbd5e1;border-radius:6px;background:white;color:#172033;min-width:0}
+.g8-regulation-form input[type=checkbox]{align-self:flex-start}
+.g8-regulation-form button{align-self:end;min-height:40px}
+.g8-regulation-rule{padding:18px 0;border-top:1px solid #dbe2ea}
+.g8-regulation-rule dl{display:grid;grid-template-columns:minmax(100px,160px) minmax(0,1fr);gap:8px;font-size:13px}
+.g8-regulation-rule dd{margin:0;overflow-wrap:anywhere}
+.g8-regulation-rule dt{color:#64748b}
