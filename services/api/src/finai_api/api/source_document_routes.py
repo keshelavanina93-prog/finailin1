@@ -1,8 +1,9 @@
+from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Query, Request, Response
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from finai_api.api.ontology_routes import User
 from finai_api.security import require_permission
@@ -41,6 +42,15 @@ class AccountBinding(AccountSource):
 
 class DimensionQuery(AccountBinding):
     member_id: UUID
+    valid_at: datetime | None = None
+    known_at: datetime | None = None
+
+    @field_validator("valid_at", "known_at")
+    @classmethod
+    def aware(cls, value):
+        if value is not None and value.tzinfo is None:
+            raise ValueError("Query snapshot timestamps must include a timezone")
+        return value
 
 
 @router.post("/{identity}/dimensions/query")
@@ -48,7 +58,14 @@ def dimension_movements(principal: User, identity: str, request: DimensionQuery)
     if request.profile != "1c_journal":
         raise WorkspaceError(422, "This binding requires explicit journal analytical columns")
     return source_dimensions.movements(
-        principal, identity, request.sheet, request.company_id, request.member_id, request.offset
+        principal,
+        identity,
+        request.sheet,
+        request.company_id,
+        request.member_id,
+        request.offset,
+        request.valid_at,
+        request.known_at,
     )
 
 

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 type Page = { offset: number; next_offset: number | null; total_rows: number; new_resources: number; assignments: { source_row: string; dimension: string; value: string | null; member_id?: string; state: string }[] };
-type Movements = { total: number; next_offset: number | null; objects: { resource_id: string; attributes: { source_row_key: string; posting_date: string; document_reference: string; amount: string } }[] };
+type Movements = { total: number; next_offset: number | null; query: { valid_at: string; known_at: string }; objects: { resource_id: string; attributes: { source_row_key: string; posting_date: string; document_reference: string; amount: string } }[] };
 export default function SourceDimensions({ token, documentId, sheet, companyId, canPropose, onProposal }: {
   token: string; documentId: string; sheet: string; companyId: string; canPropose: boolean; onProposal: (id: string) => void;
 }) {
@@ -34,7 +34,10 @@ export default function SourceDimensions({ token, documentId, sheet, companyId, 
       const response = await fetch(`/api/ontology/source-documents/${documentId}/dimensions/query`, {
         method: "POST", signal: controller.signal,
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ sheet, profile: "1c_journal", company_id: companyId, member_id: id, offset }),
+        body: JSON.stringify({ sheet, profile: "1c_journal", company_id: companyId, member_id: id, offset,
+          ...(offset > 0 && member?.id === id && movements ? {
+            valid_at: movements.query.valid_at, known_at: movements.query.known_at,
+          } : {}) }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Movement query unavailable");

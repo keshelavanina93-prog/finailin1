@@ -42,3 +42,8 @@ the selected region to 124 distinct source movements without page errors. An inc
 member was rejected by actual canonical proposal validation before persistence.
 Focused invariant checks, lint and the production web build passed. NIN-26/6/17 and
 the SGG financial/regulatory product remain open beyond this implemented capability.
+
+Movement pagination now retains the initial Object Set effective-time and knowledge-time
+snapshot through the dedicated API and browser requests. Supplied timestamps must include
+a timezone. The browser retrieved two disjoint 50-row pages from the same 124-movement
+set with identical snapshot timestamps; a new first-page query explicitly refreshes it.

@@ -216,7 +216,9 @@ def propose(principal, document_id, sheet, company_id, offset):
     )
 
 
-def movements(principal, document_id, sheet, company_id, member_id, offset):
+def movements(
+    principal, document_id, sheet, company_id, member_id, offset, valid_at=None, known_at=None
+):
     from finai_api.domain.object_sets import ObjectSetQuery, PropertyFilter, Traversal
     from finai_api.services.object_sets import query_objects
 
@@ -243,5 +245,7 @@ def movements(principal, document_id, sheet, company_id, member_id, offset):
             traversal=[Traversal(name="observation_id")],
             offset=offset,
             limit=50,
+            valid_at=valid_at,
+            known_at=known_at,
         ),
     )
