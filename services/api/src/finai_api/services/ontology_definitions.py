@@ -64,7 +64,7 @@ def definition(
                 "AND v.version_id=%s",
                 (principal.scope.tenant_id, identity, version),
             ).fetchone()
-        elif valid_at is not None or known_at is not None:
+        else:
             now = datetime.now(UTC)
             row = cur.execute(
                 "SELECT v.*,i.identity_key FROM resource_versions v JOIN canonical_identities i "
@@ -80,8 +80,6 @@ def definition(
                     valid_at or now,
                 ),
             ).fetchone()
-        else:
-            row = resources._get(conn, principal.scope.tenant_id, identity)
         if (
             not row
             or row["object_type"] not in DEFINITION_MODELS
@@ -103,7 +101,16 @@ def definition(
 
 def prepare_definition(principal: Principal, request: DefinitionWrite) -> ResourceProposal:
     if request.resource_id:
-        current = definition(principal, request.resource_id)
+        # Editing still targets the latest publication head, including scheduled
+        # definitions. Execution above resolves the currently effective version.
+        with resources.resource_connection(principal) as conn:
+            current = resources._get(conn, principal.scope.tenant_id, request.resource_id)
+        if (
+            not current
+            or current["object_type"] not in DEFINITION_MODELS
+            or current["authority_state"] != "APPROVED"
+        ):
+            raise WorkspaceError(404, "Accepted ontology definition unavailable")
         if current["object_type"] != request.kind or current["identity_key"] != request.key:
             raise WorkspaceError(409, "Definition type and business identity are immutable")
         entity = current["access_entity"]

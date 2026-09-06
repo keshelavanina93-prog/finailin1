@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 import pytest
 
 from finai_api.domain.authority import ExactScope
+from finai_api.domain.ontology_definitions import DefinitionWrite
 from finai_api.domain.resources import ResourceMutation, ResourceProposal, ResourceReview
 from finai_api.domain.review import Principal
 from finai_api.services import ontology_definitions as definitions
@@ -191,6 +192,9 @@ def test_future_effective_and_revoked_definitions_do_not_leak_into_asof_executio
     )
     future_row = publish(future)[0]
     with pytest.raises(WorkspaceError) as exc:
+        definitions.definition(reader, future.resource_id)
+    assert exc.value.status == 404
+    with pytest.raises(WorkspaceError) as exc:
         definitions.definition(reader, future.resource_id, valid_at=JAN)
     assert exc.value.status == 404
     # An explicit immutable version is a replay request, independent of the data's effective time.
@@ -212,6 +216,9 @@ def test_future_effective_and_revoked_definitions_do_not_leak_into_asof_executio
     )
     publish(revoked)
     with pytest.raises(WorkspaceError) as exc:
+        definitions.definition(reader, original.resource_id)
+    assert exc.value.status == 404
+    with pytest.raises(WorkspaceError) as exc:
         definitions.run_group(reader, original.resource_id, 0, 10, valid_at=JAN)
     assert exc.value.status == 404
     assert (
@@ -225,6 +232,73 @@ def test_future_effective_and_revoked_definitions_do_not_leak_into_asof_executio
         )
         == first["version_id"]
     )
+
+
+@DB
+@pytest.mark.parametrize("kind", ["ObjectSetDefinition", "ObjectTypeGroup"])
+def test_scheduled_successor_keeps_catalog_and_default_execution_on_current_version(retained, kind):
+    reader, publish = retained
+    company = item("LegalEntity", {})
+    chart = item(
+        "LocalChartOfAccounts", {"code": "SYNTHETIC", "legal_entity_id": str(company.resource_id)}
+    )
+    publish(company, chart)
+
+    def attributes(object_type):
+        return {"definition": (
+            {"object_type": object_type} if kind == "ObjectSetDefinition"
+            else {"types": [object_type]}
+        )}
+
+    original = item(kind, attributes("LegalEntity"))
+    first = publish(original)[0]
+    scheduled = original.model_copy(update={
+        "expected_version_id": UUID(first["version_id"]),
+        "valid_from": datetime.now(UTC) + timedelta(days=30),
+        "attributes": attributes("LocalChartOfAccounts"),
+    })
+    future = publish(scheduled)[0]
+    listed = next(row for row in definitions.definitions(reader)
+                  if row["resource_id"] == original.resource_id)
+    assert str(listed["version_id"]) == first["version_id"]
+
+    def run(version=None):
+        if kind == "ObjectSetDefinition":
+            return definitions.run_set(reader, original.resource_id, version, 0, 10)
+        return definitions.run_group(reader, original.resource_id, 0, 10, version)
+
+    current = run()
+    assert str(current["definition_version_id"]) == first["version_id"]
+    assert [row["resource_id"] for row in current["objects"]] == [str(company.resource_id)]
+    replay = run(UUID(future["version_id"]))
+    assert str(replay["definition_version_id"]) == future["version_id"]
+    assert [row["resource_id"] for row in replay["objects"]] == [str(chart.resource_id)]
+
+    # A scheduled-only identity can still be edited. The execution resolver must
+    # not be reused for editing, and CAS remains against the publication head.
+    scheduled_only = item(kind, attributes("LegalEntity")).model_copy(update={
+        "valid_from": datetime.now(UTC) + timedelta(days=30),
+    })
+    scheduled_only_head = publish(scheduled_only)[0]
+    write = DefinitionWrite(
+        resource_id=scheduled_only.resource_id,
+        expected_version_id=UUID(scheduled_only_head["version_id"]),
+        kind=kind, key=scheduled_only.identity_key, name="Edited scheduled synthetic definition",
+        rationale="Editing remains independent of current effective execution",
+        attributes=attributes("LegalEntity"),
+    )
+    prepared = definitions.prepare_definition(reader, write)
+    assert prepared.mutations[0].expected_version_id == UUID(scheduled_only_head["version_id"])
+    assert prepared.access_entity == reader.scope.legal_entity_id
+    author = reader.model_copy(update={"permissions": (
+        "ontology_read", "ontology_admin", "ontology_propose", "ontology_review",
+    )})
+    stale = write.model_copy(update={
+        "resource_id": original.resource_id,
+        "expected_version_id": UUID(first["version_id"]), "key": original.identity_key,
+    })
+    with pytest.raises(WorkspaceError, match="accepted version changed"):
+        definitions.propose_definition(author, stale)
 
 
 def test_naive_definition_times_rejected_before_database_access():

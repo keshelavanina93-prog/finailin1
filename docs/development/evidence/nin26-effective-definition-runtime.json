@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-09-06T22:38:05.646452+00:00",
+  "web_api_status": 200,
+  "definition_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+  "catalog_and_execution_version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+  "total": 406,
+  "returned": 5,
+  "query": {
+    "object_type": "SourceAccountDefinition",
+    "resource_ids": null,
+    "filters": [
+      {
+        "field": "evidence_id",
+        "value": "0074068a-99ea-5a03-8e61-15f7430b04d4"
+      }
+    ],
+    "traversal": [],
+    "search": "",
+    "limit": 5,
+    "offset": 0,
+    "valid_at": "2026-09-06T22:38:05.456691Z",
+    "known_at": "2026-09-06T22:38:05.456691Z"
+  },
+  "scope": "Retained source account definitions; not activated ledger accounts",
+  "future_scheduling_proof": "Separate native synthetic definition regression",
+  "financial_authority_or_release_acceptance": false
+}
