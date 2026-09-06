@@ -516,13 +516,25 @@ def _validate(
                     )
             if item.evidence_class == "SOURCE_BOUND":
                 if item.object_type == "SourceEvidence":
+                    conn.execute(
+                        "SELECT set_config('finai.exact_scope',%s,true)",
+                        (json.dumps(principal.scope.model_dump(mode="json")),),
+                    )
                     retained = conn.execute(
                         (
                             "SELECT 1 FROM hydration_runs WHERE tenant_id=%s AND "
                             "source_sha256=%s AND exact_scope->>'legal_entity_id'=%s "
-                            "LIMIT 1"
+                            "UNION ALL SELECT 1 FROM source_documents WHERE tenant_id=%s "
+                            "AND source_sha256=%s AND exact_scope->>'legal_entity_id'=%s LIMIT 1"
                         ),
-                        (tenant, item.attributes["sha256"], access_entity),
+                        (
+                            tenant,
+                            item.attributes["sha256"],
+                            access_entity,
+                            tenant,
+                            item.attributes["sha256"],
+                            access_entity,
+                        ),
                     ).fetchone()
                     if not retained:
                         raise WorkspaceError(

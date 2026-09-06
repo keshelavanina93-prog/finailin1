@@ -11,6 +11,7 @@ from finai_api.api.operations_routes import router as operations_router
 from finai_api.api.regulation_routes import router as regulation_router
 from finai_api.api.reporting_routes import router as reporting_router
 from finai_api.api.routes import router
+from finai_api.api.source_document_routes import router as source_document_router
 from finai_api.api.workflow_routes import router as workflow_router
 from finai_api.api.workspace_routes import router as workspace_router
 from finai_api.evidence_objects import EvidenceStoreUnavailable
@@ -32,6 +33,7 @@ app.include_router(lifecycle_router)
 app.include_router(event_time_router)
 app.include_router(operations_router)
 app.include_router(regulation_router)
+app.include_router(source_document_router)
 
 
 @app.exception_handler(WorkspaceError)

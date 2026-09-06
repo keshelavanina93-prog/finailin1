@@ -129,7 +129,7 @@ class SourceStorage(BaseModel):
     bucket: str = Field(min_length=1, max_length=255)
     object_key: str = Field(min_length=1, max_length=1024)
     sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
-    byte_length: int = Field(ge=1, le=16_000_000)
+    byte_length: int = Field(ge=1, le=32_000_000)
     version_id: str | None = Field(default=None, max_length=1024)
     retention: SourceRetention | None = None
 
