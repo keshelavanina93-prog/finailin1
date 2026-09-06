@@ -132,7 +132,15 @@ def search(
     known_at: datetime | None = None,
     offset: int = 0,
     limit: int = 50,
+    sort: str = "name",
 ) -> dict[str, Any]:
+    if sort not in {"name", "recorded_desc"}:
+        raise WorkspaceError(422, "Unsupported historical resource ordering")
+    order_clause = (
+        "system_from DESC,resource_id"
+        if sort == "recorded_desc"
+        else "lower(display_name),resource_id"
+    )
     known_at = known_at or datetime.now(UTC)
     effective_at = effective_at or known_at
     if effective_at.tzinfo is None or known_at.tzinfo is None:
@@ -152,7 +160,7 @@ def search(
         )
         try:
             result = cursor.execute(
-                """WITH RECURSIVE owned(resource_id,version_id) AS (
+                f"""WITH RECURSIVE owned(resource_id,version_id) AS (
                     SELECT resource_id,version_id FROM resource_versions
                     WHERE tenant_id=%(tenant)s AND resource_id=%(company)s
                       AND object_type='LegalEntity' AND system_from<=%(known)s
@@ -189,14 +197,14 @@ def search(
                     WHERE %(kind)s::text IS NULL OR object_type=%(kind)s
                 ), page AS (
                     SELECT * FROM filtered
-                    ORDER BY lower(display_name),resource_id
+                    ORDER BY {order_clause}
                     OFFSET %(offset)s LIMIT %(limit)s
                 ) SELECT
                     EXISTS(SELECT 1 FROM selected WHERE resource_id=%(company)s
                            AND object_type='LegalEntity') AS company_available,
                     (SELECT count(*) FROM filtered) AS matched_count,
                     COALESCE((SELECT jsonb_agg(to_jsonb(page)
-                        ORDER BY lower(display_name),resource_id) FROM page),
+                        ORDER BY {order_clause}) FROM page),
                         '[]'::jsonb) AS resources,
                     COALESCE((SELECT jsonb_agg(to_jsonb(f) ORDER BY object_type) FROM (
                         SELECT object_type,count(*) AS count FROM matches GROUP BY object_type
@@ -238,6 +246,7 @@ def search(
         "company_id": str(company_id),
         "effective_at": effective_at.isoformat(),
         "known_at": known_at.isoformat(),
+        "sort": sort,
         "purpose": "HISTORICAL_DISCOVERY",
         "current_use_authorized": False,
     }

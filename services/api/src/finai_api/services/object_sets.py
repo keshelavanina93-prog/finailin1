@@ -3,6 +3,7 @@
 from datetime import UTC, datetime
 from typing import Any
 
+from psycopg.errors import QueryCanceled
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.object_sets import FilterSchemaVersion, ObjectSetQuery, ObjectSetResult
@@ -25,29 +26,23 @@ def query_objects(
     # One statement gives counts, page and traversal a single database snapshot.
     # Only internal CTE names are interpolated; every caller value is a parameter.
     root_types = types if types is not None else [request.object_type]
-    forward = all(
-        step.kind == "reference" and step.direction == "outgoing" for step in request.traversal
-    )
     args: list[Any] = [principal.scope.tenant_id, request.known_at]
-    materialization = "NOT MATERIALIZED" if forward else "MATERIALIZED"
     ctes = [
-        f"versions AS {materialization} (SELECT v.*,i.identity_key FROM resource_versions v "
+        "versions AS NOT MATERIALIZED (SELECT v.*,i.identity_key FROM resource_versions v "
         "JOIN canonical_identities i USING(tenant_id,resource_id) "
         "WHERE v.tenant_id=%s AND v.system_from<=%s)",
     ]
-    if forward:
-        # Types cannot change for an identity. Filter before temporal selection,
-        # and constrain both sides of the RLS-protected identity/version join.
-        ctes.append(
-            "root_versions AS (SELECT v.*,i.identity_key FROM resource_versions v "
-            "JOIN canonical_identities i USING(tenant_id,resource_id) "
-            "WHERE v.tenant_id=%s AND v.system_from<=%s "
-            "AND v.object_type=ANY(%s::text[]) AND i.object_type=ANY(%s::text[]))"
-        )
-        args += [principal.scope.tenant_id, request.known_at, root_types, root_types]
-    effective_source = "root_versions" if forward else "versions"
+    # Every traversal starts with a typed root. Incoming/link destinations are resolved
+    # by exact dependencies below, never by materializing unrelated tenant history.
+    ctes.append(
+        "root_versions AS (SELECT v.*,i.identity_key FROM resource_versions v "
+        "JOIN canonical_identities i USING(tenant_id,resource_id) "
+        "WHERE v.tenant_id=%s AND v.system_from<=%s "
+        "AND v.object_type=ANY(%s::text[]) AND i.object_type=ANY(%s::text[]))"
+    )
+    args += [principal.scope.tenant_id, request.known_at, root_types, root_types]
     ctes += [
-        f"effective AS (SELECT DISTINCT ON(resource_id) * FROM {effective_source} "
+        "effective AS (SELECT DISTINCT ON(resource_id) * FROM root_versions "
         "WHERE valid_from<=%s AND (valid_to IS NULL OR valid_to>%s) "
         "ORDER BY resource_id,system_from DESC,version_id)",
         "current_objects AS (SELECT * FROM effective WHERE authority_state='APPROVED')",
@@ -72,10 +67,6 @@ def query_objects(
                     "WHERE pinned.tenant_id=d.tenant_id "
                     "AND pinned.resource_id=d.target_resource_id "
                     "AND pinned.version_id=d.target_version_id LIMIT 1) t ON true "
-                    if forward
-                    else "JOIN versions t ON t.tenant_id=d.tenant_id "
-                    "AND t.resource_id=d.target_resource_id "
-                    "AND t.version_id=d.target_version_id "
                 )
                 sql = (
                     f"SELECT DISTINCT t.* FROM {previous} s "
@@ -88,23 +79,41 @@ def query_objects(
                 sql = (
                     f"SELECT DISTINCT t.* FROM {previous} s "
                     "JOIN resource_dependencies d ON d.tenant_id=s.tenant_id "
+                    "AND d.target_resource_id=s.resource_id "
                     "AND d.target_version_id=s.version_id AND d.relation=%s "
-                    "JOIN current_objects t ON t.tenant_id=d.tenant_id "
-                    "AND t.version_id=d.version_id"
+                    "JOIN versions candidate ON candidate.tenant_id=d.tenant_id "
+                    "AND candidate.version_id=d.version_id "
+                    "JOIN LATERAL (SELECT * FROM versions selected "
+                    "WHERE selected.tenant_id=candidate.tenant_id "
+                    "AND selected.resource_id=candidate.resource_id "
+                    "AND selected.valid_from<=%s "
+                    "AND (selected.valid_to IS NULL OR selected.valid_to>%s) "
+                    "ORDER BY selected.system_from DESC,selected.version_id LIMIT 1) t "
+                    "ON t.version_id=d.version_id WHERE t.authority_state='APPROVED'"
                 )
             args.append("FIELD:" + step.name)
+            if step.direction == "incoming":
+                args += [request.valid_at, request.valid_at]
         else:
             source = "source_id" if step.direction == "outgoing" else "target_id"
             target = "target_id" if step.direction == "outgoing" else "source_id"
             sql = (
                 f"SELECT DISTINCT t.* FROM {previous} s "
                 "JOIN resource_dependencies a ON a.tenant_id=s.tenant_id "
+                "AND a.target_resource_id=s.resource_id "
                 f"AND a.target_version_id=s.version_id AND a.relation='FIELD:{source}' "
-                "JOIN current_objects r ON r.tenant_id=a.tenant_id "
-                "AND r.version_id=a.version_id AND r.object_type='Relationship' "
+                "JOIN versions candidate ON candidate.tenant_id=a.tenant_id "
+                "AND candidate.version_id=a.version_id AND candidate.object_type='Relationship' "
+                "JOIN LATERAL (SELECT * FROM versions selected "
+                "WHERE selected.tenant_id=candidate.tenant_id "
+                "AND selected.resource_id=candidate.resource_id AND selected.valid_from<=%s "
+                "AND (selected.valid_to IS NULL OR selected.valid_to>%s) "
+                "ORDER BY selected.system_from DESC,selected.version_id LIMIT 1) r "
+                "ON r.version_id=a.version_id AND r.authority_state='APPROVED' "
                 "JOIN resource_dependencies k ON k.tenant_id=r.tenant_id "
                 "AND k.version_id=r.version_id AND k.relation='FIELD:relation_id' "
                 "JOIN versions kind ON kind.tenant_id=k.tenant_id "
+                "AND kind.resource_id=k.target_resource_id "
                 "AND kind.version_id=k.target_version_id AND kind.object_type='LinkType' "
                 "AND kind.identity_key=%s AND kind.authority_state='APPROVED' "
                 "JOIN resource_dependencies b ON b.tenant_id=r.tenant_id "
@@ -113,7 +122,7 @@ def query_objects(
                 "AND t.resource_id=b.target_resource_id AND t.version_id=b.target_version_id "
                 "WHERE t.authority_state='APPROVED'"
             )
-            args.append(step.name)
+            args += [request.valid_at, request.valid_at, step.name]
         ctes.append(f"s{index} AS ({sql})")
     final = f"s{len(request.traversal)}"
     if request.filters:
@@ -144,7 +153,12 @@ def query_objects(
     )
     with resource_connection(principal) as conn:
         conn.execute("SELECT set_config('statement_timeout','10000',true)")
-        row = conn.execute(sql, args).fetchone()
+        try:
+            row = conn.execute(sql, args).fetchone()
+        except QueryCanceled as exc:
+            raise WorkspaceError(
+                409, "Object traversal exceeded its execution budget; no partial results returned"
+            ) from exc
         assert row is not None  # Aggregate SELECT always returns one row, including empty sets.
         total, counts, objects, filter_schemas = row
     schema_pins = []

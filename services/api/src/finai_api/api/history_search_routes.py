@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Query
@@ -19,5 +20,8 @@ def history_search(
     known_at: datetime | None = None,
     offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     limit: int = Query(default=50, ge=1, le=100),
+    sort: Literal["name", "recorded_desc"] = "name",
 ):
-    return search(principal, company_id, q, object_type, effective_at, known_at, offset, limit)
+    return search(
+        principal, company_id, q, object_type, effective_at, known_at, offset, limit, sort
+    )

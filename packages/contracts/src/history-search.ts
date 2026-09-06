@@ -11,4 +11,5 @@ export interface HistorySearchResult {
   limit: number;
   effective_at: string;
   known_at: string;
+  sort?: "name" | "recorded_desc";
 }

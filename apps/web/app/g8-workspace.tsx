@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent, type CSSPrope
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { House, Buildings, Database, Graph as GraphIcon, GearSix, MagnifyingGlass, ArrowRight, ArrowClockwise, SignOut, ShieldCheck, Tray, UploadSimple, List, X, CaretRight, SidebarSimple, ArrowsOutSimple, ChartLineUp, CalendarBlank, ChartBar, Notebook, MapTrifold, Scales, FlowArrow } from "@phosphor-icons/react";
-import type { OperatorInspection, CanonicalResource, IntakeItem, Principal, ReceiptDetail, ResourceProposalDetail } from "@finai/contracts";
+import type { OperatorInspection, HistorySearchResult, CanonicalResource, IntakeItem, Principal, ReceiptDetail, ResourceProposalDetail } from "@finai/contracts";
 import type { EngineeringView } from "./operator-workspace";
 import { Badge, Brand, Empty, Panel, Signal } from "./g8-ui";
 import { belongsToCompany, emptySnapshot, readable, workItems, type Loadable, type Snapshot, type WorkItem } from "./g8-model";
@@ -169,6 +169,21 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
     return ()=>controller.abort();
   },[selectedCompanyId,token,revision]);
   const resolvedContext=resolvedCompany?.company.resource_id===selectedCompanyId?resolvedCompany:null;
+  const [recentResources,setRecentResources]=useState<{key:string;data:HistorySearchResult|null;error:string}|null>(null);
+  const recentKey=JSON.stringify([token,selectedCompanyId,revision]);
+  const recent=recentResources?.key===recentKey?recentResources:null;
+  useEffect(()=>{
+    if(view!=="home"||!selectedCompanyId)return;
+    const controller=new AbortController();let disposed=false;
+    const timer=setTimeout(()=>controller.abort(),20_000);
+    const params=new URLSearchParams({company_id:selectedCompanyId,sort:"recorded_desc",limit:"12"});
+    void get<HistorySearchResult>(`ontology/history-search?${params}`,token,controller.signal)
+      .then(data=>{if(!disposed&&!controller.signal.aborted)setRecentResources({key:recentKey,data,error:""});})
+      .catch(error=>{if(!disposed)setRecentResources({key:recentKey,data:null,error:controller.signal.aborted?"Recent company resources timed out.":error instanceof Error?error.message:"Recent resources unavailable"});})
+      .finally(()=>clearTimeout(timer));
+    return()=>{disposed=true;clearTimeout(timer);controller.abort();};
+  },[view,selectedCompanyId,token,recentKey]);
+
   const companyDocumentIds=resolvedContext?[...new Set([
     ...resolvedContext.accounting_sources.map(row=>String(row.scope.attributes.document_id)),
     ...resolvedContext.disclosures.map(row=>String(row.observation.attributes.document_id)),
@@ -217,7 +232,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
       {!trace&&<>
       {view === "home" && <><div className="g8-actionbar"><button onClick={()=>{setWorkFilter("pending");workRef.current?.scrollIntoView({behavior:"smooth"});}}><Tray size={23}/><span>Review items<small>{loading ? "Checking…" : `${pending.length} in loaded queues`}</small></span></button><button onClick={()=>{setNyxFolded(false);setRail(true);setNyxTab("interact");}}><ChartLineUp size={23}/><span>Investigate<small>Ask NYX about evidence</small></span></button>{principal.permissions.includes("ingest") && <button onClick={()=>openEngineering("intake")}><UploadSimple size={23}/><span>New data source<small>Retain source evidence</small></span></button>}<button disabled title="Reporting is not connected yet"><ChartLineUp size={23}/><span>Create report<small>Not connected</small></span></button><button disabled title="Planning is not connected yet"><GraphIcon size={23}/><span>New scenario<small>Not connected</small></span></button></div>
       <WorkspaceHealth snapshot={snapshot} loading={loading} onRefresh={refresh} onData={()=>navigate("data")}/>
-      <ExecutiveOverview operationalPanel={<OperationsMap key={currentCompany?.resource_id??"scope"} {...mapProps} compact onOpen={()=>navigate("operations")}/>} company={(currentCompany ? displayName(currentCompany.display_name) : undefined)??"Select company"} period={principal.scope.period} currency={principal.scope.currency} resources={visibleResources} resourcesAvailable={!loading && !!snapshot.graph.data} onData={()=>navigate("data")} onCompanies={()=>navigate("companies")} onOntology={()=>navigate("ontology")}/>
+      <ExecutiveOverview companyId={companyId} canonicalContext={resolvedContext} contextError={companyContextError} recentResult={recent?.data??null} recentError={recent?.error??""} onInspect={(resource,knownAt)=>void inspect(resource,resource.version_id,knownAt)} onTrace={(resource,knownAt)=>setTrace({resource_id:resource.resource_id,version_id:resource.version_id,company_id:companyId,known_at:knownAt})} onHistory={(resource,knownAt)=>setHistory({resource_id:resource.resource_id,version_id:resource.version_id,company_id:companyId,known_at:knownAt})} onRegulation={()=>navigate("regulation")} onAccounting={()=>{navigate("companies");}} operationalPanel={<OperationsMap key={currentCompany?.resource_id??"scope"} {...mapProps} compact onOpen={()=>navigate("operations")}/>} company={(currentCompany ? displayName(currentCompany.display_name) : undefined)??"Select company"} period={principal.scope.period} currency={principal.scope.currency} resources={visibleResources} resourcesAvailable={!loading && !!snapshot.graph.data} onData={()=>navigate("data")} onCompanies={()=>navigate("companies")} onOntology={()=>navigate("ontology")}/>
       <div className="g8-home-bottom"><div ref={workRef}><Panel title="My work" aside={<Badge>{loading?"Checking":`${pending.length} awaiting review`}</Badge>}>{workTable}</Panel></div><Panel title="Recent review activity" aside={<button className="g8-link" onClick={()=>{setWorkFilter("all");workRef.current?.scrollIntoView({behavior:"smooth"});}}>View all</button>}>{[...items].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5).map(item=><Signal key={`${item.kind}:${item.id}`} title={item.title} detail={`${readable(item.state)} · ${date(item.date)} · ${item.reason}`} tone={item.state==="APPROVED"?"good":item.state==="REJECTED"?"bad":"warning"} onClick={()=>{void inspectWork(item);setNyxTab("context");}}/>)}{!items.length&&<Empty title={loading?"Loading review activity…":"No retained review activity"}>Source receipts and proposal decisions appear here.</Empty>}</Panel></div></>}
       {view === "actions" && <ActionWorkbench key={`${companyId}:${actionTarget?.companyId===companyId?actionTarget.workflowId:"saved"}`} initialWorkflowId={actionTarget?.companyId===companyId?actionTarget.workflowId:undefined} token={token} principal={principal} companyId={companyId} onInspect={id=>void inspect({resource_id:id})}/>}
       {view === "regulation" && <RegulationWorkspace key={companyId} viewStateKey={`${contextKey}:regulation:${companyId}`} token={token} companyId={companyId} onInspect={node=>void inspect(node,node.version_id)} onTrace={node=>setTrace({resource_id:node.resource_id,version_id:node.version_id,company_id:companyId})} onHistory={node=>setHistory({resource_id:node.resource_id,version_id:node.version_id,company_id:companyId})} onWorkflow={workflowId=>{setActionTarget({workflowId,companyId});navigate("actions");}} onProposal={id => openEngineering("ontology", undefined, id)} />}

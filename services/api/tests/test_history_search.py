@@ -223,10 +223,21 @@ def test_postgres_knowledge_time_and_tenant_isolation():
     assert latest["current_use_authorized"] is False
     chart_mutation = node(
         "LocalChartOfAccounts",
-        "discovery chart",
+        "ZZZ discovery chart",
         {"legal_entity_id": str(company.resource_id), "code": "SYNTHETIC"},
     )
     chart = accept(actors, [chart_mutation])[0]
+    recent = search(principal, company.resource_id, sort="recorded_desc", limit=1)
+    assert recent["resources"][0]["version_id"] == str(chart.version_id)
+    assert recent["sort"] == "recorded_desc"
+    older = search(
+        principal,
+        company.resource_id,
+        sort="recorded_desc",
+        limit=1,
+        known_at=replacement.system_from,
+    )
+    assert older["resources"][0]["version_id"] == str(replacement.version_id)
     account = accept(
         actors,
         [

@@ -1,0 +1,214 @@
+{
+  "checked_at": "2026-09-07T01:47:37.044771+04:00",
+  "fixed_knowledge_and_effective_cutoff": "2026-09-07T01:47:19.816823+04:00",
+  "capability": "NIN-25 company briefing / NIN-6 exact incoming traversal",
+  "mode": "authenticated running web proxy over retained SOCAR canonical resources",
+  "web_url": "http://127.0.0.1:3062",
+  "companies": [
+    {
+      "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "company_version_id": "72417af7-1f6f-5d11-b6ff-607e96169191",
+      "name": "SOCAR Georgia Gas",
+      "retained_name": "შპს სოკარ ჯორჯია გაზი",
+      "accounting_state": "ACCOUNTING_CONFIGURATION_REQUIRED",
+      "readiness_counts": {
+        "configured_ledgers": 0,
+        "accounting_sources": 0,
+        "reviewed_bindings": 0,
+        "licence_evidence": 1,
+        "relationships": 0,
+        "disclosures": 22,
+        "structural_resources": 1
+      },
+      "current_advisory_binding_states": {},
+      "matched_resources": 4,
+      "type_facets": [
+        {
+          "count": 1,
+          "object_type": "CompanyWorkspace"
+        },
+        {
+          "count": 1,
+          "object_type": "LegalEntity"
+        },
+        {
+          "count": 1,
+          "object_type": "LicenceNoticeBinding"
+        },
+        {
+          "count": 1,
+          "object_type": "RegulatoryRule"
+        }
+      ],
+      "newest_versions_checked": [
+        "123923c7-5ee4-5c53-8ca7-7f4c08432655",
+        "7f4e68f4-b569-5681-8d54-628d19ce4d77",
+        "6df56269-43e1-59bb-978c-7149690f93d4",
+        "72417af7-1f6f-5d11-b6ff-607e96169191"
+      ],
+      "newest_sort_across_pages_verified": true,
+      "same_cutoff_exact_inspection_verified": true,
+      "inspected_resource_id": "f2412b1d-fe1f-423e-966d-95f326d0cc0a",
+      "inspected_version_id": "123923c7-5ee4-5c53-8ca7-7f4c08432655"
+    },
+    {
+      "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "company_version_id": "dd21bd46-3525-535d-89ba-6ffa2e05a6e5",
+      "name": "SOCAR Georgia Petroleum",
+      "retained_name": "სოკარ ჯორჯია პეტროლეუმი // Сокар Джорджия Петролеум",
+      "accounting_state": "ACCOUNTING_CONFIGURATION_REQUIRED",
+      "readiness_counts": {
+        "configured_ledgers": 0,
+        "accounting_sources": 1,
+        "reviewed_bindings": 0,
+        "licence_evidence": 0,
+        "relationships": 0,
+        "disclosures": 5,
+        "structural_resources": 1
+      },
+      "current_advisory_binding_states": {},
+      "matched_resources": 5629,
+      "type_facets": [
+        {
+          "count": 1,
+          "object_type": "CompanyWorkspace"
+        },
+        {
+          "count": 1,
+          "object_type": "LegalEntity"
+        },
+        {
+          "count": 93,
+          "object_type": "LocalAccount"
+        },
+        {
+          "count": 1,
+          "object_type": "LocalChartOfAccounts"
+        },
+        {
+          "count": 1,
+          "object_type": "SourceAccountingScope"
+        },
+        {
+          "count": 5532,
+          "object_type": "SourceTrialBalanceRow"
+        }
+      ],
+      "newest_versions_checked": [
+        "df73f4a6-01e4-571a-baff-0d91bed127aa",
+        "06ec01a4-bb72-5d62-8125-8d5bf31e4bd2",
+        "d06c52f3-6cfc-59f1-9e00-b96022fcda0e",
+        "e5eef8f1-7c43-513e-9389-c3a5a2fa0795"
+      ],
+      "newest_sort_across_pages_verified": true,
+      "same_cutoff_exact_inspection_verified": true,
+      "inspected_resource_id": "f8649207-dcc6-5f85-a149-d2c7dc3c1b4b",
+      "inspected_version_id": "df73f4a6-01e4-571a-baff-0d91bed127aa"
+    }
+  ],
+  "petroleum_incoming": {
+    "total": 5534,
+    "counts_by_type": {
+      "LocalChartOfAccounts": 1,
+      "SourceAccountingScope": 1,
+      "SourceTrialBalanceRow": 5532
+    },
+    "page_size": 1,
+    "seconds": 4.483
+  },
+  "requests": [
+    {
+      "read": "SOCAR Georgia Gas company context",
+      "http_status": 200,
+      "seconds": 0.42
+    },
+    {
+      "read": "SOCAR Georgia Gas newest page one",
+      "http_status": 200,
+      "seconds": 0.08
+    },
+    {
+      "read": "SOCAR Georgia Gas newest page two",
+      "http_status": 200,
+      "seconds": 0.077
+    },
+    {
+      "read": "SOCAR Georgia Gas same-cutoff prefix",
+      "http_status": 200,
+      "seconds": 0.087
+    },
+    {
+      "read": "SOCAR Georgia Gas exact inspection",
+      "http_status": 200,
+      "seconds": 0.076
+    },
+    {
+      "read": "SOCAR Georgia Petroleum company context",
+      "http_status": 200,
+      "seconds": 0.405
+    },
+    {
+      "read": "SOCAR Georgia Petroleum newest page one",
+      "http_status": 200,
+      "seconds": 3.753
+    },
+    {
+      "read": "SOCAR Georgia Petroleum newest page two",
+      "http_status": 200,
+      "seconds": 3.798
+    },
+    {
+      "read": "SOCAR Georgia Petroleum same-cutoff prefix",
+      "http_status": 200,
+      "seconds": 3.694
+    },
+    {
+      "read": "SOCAR Georgia Petroleum exact inspection",
+      "http_status": 200,
+      "seconds": 0.085
+    },
+    {
+      "read": "Petroleum incoming legal entity dependencies",
+      "http_status": 200,
+      "seconds": 4.483
+    }
+  ],
+  "browser_acceptance": false,
+  "financial_calculation_acceptance": false,
+  "full_NIN_6_acceptance": false,
+  "full_NIN_25_acceptance": false,
+  "release_accepted": false,
+  "focused_verification": {
+    "production_build": "PASS",
+    "object_sets": "3 passed, including native temporal, revoked, moved-owner and exact dependency traversal",
+    "history_search": "5 passed, including native recorded ordering and historical isolation",
+    "web_lint": "PASS",
+    "runtime_restart": "API8062 and web3062 healthy",
+    "web_types": "PASS"
+  },
+  "browser_observation": {
+    "limitations": [
+      "Operations map showed unavailable; follow-up required",
+      "Global credential period/currency still shown in shell; follow-up required",
+      "Full product and user visual acceptance remain open"
+    ],
+    "known_at_display": "9/7/2026, 1:46:29 AM",
+    "observed": [
+      "Real company readiness and unresolved source use",
+      "Latest retained versions table",
+      "Inspect opened exact version at same known cutoff"
+    ],
+    "status": "PARTIAL_JOURNEY_PASS",
+    "company": "SOCAR Georgia Petroleum",
+    "screenshots": [
+      {
+        "sha256": "1a1b062c158e4e991994bbf5700687e6bdea4bc765e7d7ea77a61c352796ed04",
+        "path": ".finai/artifacts/browser-shots/g8-company-briefing-petroleum.png"
+      },
+      {
+        "sha256": "ccd28fa5bc4ef6d220b08c8cfe2c8fded0c67cd148fd67fb97d9f45112b92baa",
+        "path": ".finai/artifacts/browser-shots/g8-briefing-inspection.png"
+      }
+    ]
+  }
+}
