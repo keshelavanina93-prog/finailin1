@@ -3,6 +3,7 @@
 import {useEffect,useRef,useState,type FormEvent} from "react";
 import type {Principal} from "@finai/contracts";
 import {Panel} from "./g8-ui";
+import SourceCorporateDisclosure from "./source-corporate-disclosure";
 import SourceAccountBindings from "./source-account-bindings";
 
 type Document = {document_id:string;filename:string;sha256:string;byte_length:number};
@@ -73,6 +74,7 @@ export default function SourceDocuments({token,principal,onProposal}:{token:stri
     </fieldset>
     {preview&&<div><p>Worksheets: {preview.sheets.join(" · ")}</p>{preview.rows&&<><p>{preview.sheet}: {preview.row_count?.toLocaleString()} source rows. Cell values are unclassified; totals, detail, debit and credit are preserved separately.</p><div className="g8-table-scroll"><table><thead><tr><th>Source row</th>{Array.from({length:preview.column_count??0},(_,i)=><th key={i}>Column {i+1}</th>)}</tr></thead><tbody>{preview.rows.map(row=><tr key={row.row}><th>{row.row}</th>{row.cells.map(cell=><td key={cell.coordinate} title={`${cell.coordinate} · XLS cell type ${cell.type}`}>{String(cell.value)}</td>)}</tr>)}</tbody></table></div><button disabled={busy||!preview.offset||preview.sheet!==sheet} onClick={()=>readSource(Math.max(0,(preview.offset??0)-50))}>Previous rows</button><button disabled={busy||preview.next_offset==null||preview.sheet!==sheet} onClick={()=>readSource(preview.next_offset??0)}>Next rows</button></>}</div>}
     {observed&&<><table><thead><tr><th>Source company label</th><th>Observed cells</th><th>First source cell</th></tr></thead><tbody>{observed.companies.map(company=><tr key={company.source_label}><td>{company.source_label}</td><td>{company.row_count}</td><td>{company.first_coordinate}</td></tr>)}</tbody></table><p>{observed.unassigned_row_count} nonempty rows without a company label. Registration, group ownership, licences and chart applicability are not established by these labels.</p>{principal.permissions.includes("ontology_propose")&&<button disabled={busy||!!observed.unassigned_row_count||!observed.companies.length} onClick={()=>inspect(true)}>Propose observed companies for review</button>}</>}
+    <SourceCorporateDisclosure key={`corporate:${reference}:${token}`} token={token} documentId={reference} canPropose={principal.permissions.includes("ontology_propose")} onProposal={onProposal}/>
     <SourceAccountBindings key={`${reference}:${sheet}:${mode}`} token={token} documentId={reference} sheet={sheet} profile={mode==="1c_tb_title"?"1c_tb":"1c_journal"} canPropose={principal.permissions.includes("ontology_propose")} onProposal={onProposal}/>
     {busy&&<p role="status">Processing original source…</p>}{error&&<p role="alert">{error}</p>}
   </Panel>;

@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from finai_api.api.ontology_routes import User
 from finai_api.security import require_permission
 from finai_api.services import (
+    corporate_disclosures,
     source_account_binding,
     source_accounting_context,
     source_accounting_reconciliation,
@@ -20,6 +21,19 @@ from finai_api.services.source_documents import document_bytes, list_documents, 
 from finai_api.services.workspace import WorkspaceError
 
 router = APIRouter(prefix="/v1/ontology/source-documents", tags=["retained source documents"])
+
+
+@router.post("/{identity}/corporate/inspect")
+def inspect_corporate_disclosure(principal: User, identity: str):
+    return corporate_disclosures.inspect(principal, identity)
+
+
+@router.post("/{identity}/corporate/proposal")
+def propose_corporate_disclosure(
+    principal: User, identity: str, request: corporate_disclosures.DisclosureContext
+):
+    require_permission(principal, "ontology_propose")
+    return corporate_disclosures.propose(principal, identity, request)
 
 
 class CompanyColumn(BaseModel):

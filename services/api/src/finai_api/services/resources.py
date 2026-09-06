@@ -427,6 +427,10 @@ def _validate(
             from finai_api.services.ontology_definition_validation import validate_definition
 
             validate_definition(item, schema_by_name, link_by_name, target)
+            if item.object_type in {"SourceCorporateObservation", "CorporateDisclosureBinding"}:
+                from finai_api.services.corporate_disclosures import validate
+
+                validate(principal, item, target)
             if item.object_type in {"SourceAccountingScope", "SourceAccountingBinding"}:
                 from finai_api.services.source_accounting_context import validate_context
 
