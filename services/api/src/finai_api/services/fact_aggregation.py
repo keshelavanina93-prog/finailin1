@@ -10,6 +10,7 @@ from decimal import (
     InvalidOperation,
     localcontext,
 )
+from itertools import pairwise
 from typing import Any
 from uuid import UUID
 
@@ -39,6 +40,7 @@ def aggregate_rows(
     groups: dict[str, dict[str, Any]] = {}
     hierarchy: dict[str, set[str]] = {}
     parents: dict[str, set[str]] = {}
+    intervals: dict[str, list[tuple[date, date]]] = {}
     with localcontext() as context:
         context.prec = 50
         context.traps[Inexact] = True
@@ -74,6 +76,23 @@ def aggregate_rows(
                     409, "Duplicate fact grain; reconcile overlapping sources before aggregation"
                 )
             seen.add(grain)
+            if spec.period_start_field:
+                try:
+                    start = date.fromisoformat(str(values[spec.period_start_field]))
+                    end = date.fromisoformat(str(values[spec.time_field]))
+                except ValueError as exc:
+                    raise WorkspaceError(422, "Fact period requires valid calendar dates") from exc
+                if start > end:
+                    raise WorkspaceError(422, "Fact period starts after its end")
+                coverage_key = json.dumps(
+                    [
+                        values[field]
+                        for field in spec.grain
+                        if field not in {spec.period_start_field, spec.time_field}
+                    ],
+                    sort_keys=True,
+                )
+                intervals.setdefault(coverage_key, []).append((start, end))
             if spec.hierarchy_key_field:
                 scope = json.dumps(
                     [
@@ -127,6 +146,14 @@ def aggregate_rows(
             group["inputs"].append(
                 {"resource_id": row["resource_id"], "version_id": row["version_id"]}
             )
+        for periods in intervals.values():
+            ordered = sorted(periods)
+            if any(current[0] <= prior[1] for prior, current in pairwise(ordered)):
+                raise WorkspaceError(
+                    409,
+                    "Overlapping accounting periods; reconcile monthly, quarterly or "
+                    "cumulative representations before aggregation",
+                )
         if any(
             members.intersection(parents.get(scope, set())) for scope, members in hierarchy.items()
         ):
@@ -198,6 +225,11 @@ def aggregate_facts(
         "contract_version_id": resource["version_id"],
         "query": result.query.model_copy(update={"offset": 0}).model_dump(mode="json"),
         "aggregation": spec.aggregation,
+        "time_basis": {
+            "kind": "CLOSED_CALENDAR_INTERVAL" if spec.period_start_field else "OBSERVATION_TIME",
+            "start_field": spec.period_start_field,
+            "time_or_end_field": spec.time_field,
+        },
         "as_of": as_of,
         "groups": groups,
         "input_count": len(rows),

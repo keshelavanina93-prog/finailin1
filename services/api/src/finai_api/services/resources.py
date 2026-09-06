@@ -95,6 +95,7 @@ def list_resources(
             "JOIN canonical_identities i USING(tenant_id,resource_id) WHERE v.tenant_id=%s "
             "AND v.system_from<=%s AND v.valid_from<=%s AND (v.valid_to IS NULL OR v.valid_to>%s) "
             "AND (%s::text IS NULL OR v.object_type=%s) "
+            "AND (%s::text IS NULL OR i.object_type=%s) "
             "ORDER BY v.resource_id,v.system_from DESC,v.version_id) current "
             "WHERE authority_state<>'REVOKED' "
             "AND position(lower(%s) in lower(display_name || ' ' || identity_key))>0 "
@@ -104,6 +105,8 @@ def list_resources(
                 known_at,
                 valid_at,
                 valid_at,
+                object_type,
+                object_type,
                 object_type,
                 object_type,
                 search,

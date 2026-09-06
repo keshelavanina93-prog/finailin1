@@ -60,7 +60,7 @@ integrity-verified before reuse of parsed content.
 
 ## Persistence work exposed by authentic loading
 
-Migrations 027–030 retain existing review, visibility and version-pin invariants:
+Migrations 027–031 retain existing review, visibility and version-pin invariants:
 
 - Validate one approved dependency pin instead of repeatedly projecting the entire
   proposal for every inserted edge. The helper checks tenant and source visibility.
@@ -70,6 +70,9 @@ Migrations 027–030 retain existing review, visibility and version-pin invarian
   definitions retain the previous checks.
 - Index proposal recency and canonical type; push immutable object-type filtering
   before temporal version selection in typed resource inventories.
+- Use bounded unique-key lookups for the small version lineage instead of scanning
+  the growing tenant version table per visibility decision. Account inspection in
+  the browser improved from a 30-second timeout to 2.1 seconds during source loading.
 
 The existing and updated proposal predicates agreed across 18 retained-proposal
 permission cases, including protected-field histories. The field predicate agreed
@@ -83,3 +86,33 @@ Local publication evidence: `.finai/artifacts/company-account-publication.json`,
 `.finai/artifacts/source-accounting-publication.json`, and
 `.finai/artifacts/sgp-source-facts-publication.json`. Consult the canonical inventory
 and completed job state before claiming the full source load is published.
+
+The completed load was subsequently checked row by row against the accepted canonical
+heads: all 5,532 SGP rows and all 246 Sakorggazi rows matched the complete expected
+attributes, source-bound evidence class and approved state. The check retained each
+resource/version pair in `.finai/artifacts/source-accounting-final-verification.json`.
+The one pending proposal left by an interrupted worker was rejected only after all
+50 of its mutations were verified as already published with identical attributes.
+
+## Retained measure-by-measure source reconciliation
+
+Data now exposes a Source reconciliation action backed by
+`POST /v1/ontology/source-documents/{id}/facts/reconcile`. It reads integrity-verified
+original bytes, checks the accepted source company, and stores a content-addressed
+comparison in the existing append-only calculation store. Source evidence and company
+versions are pinned. Reopening a receipt checks current access and result integrity.
+Input stage is explicitly retained original source, independent of row-publication progress.
+
+SGP produces four repeated-account comparisons: three have different observed measures;
+7410.01 has the same observed measures on two separate outline branches. Of 224
+nonempty parent/child measure comparisons, 137 agree, 85 are incomplete and two differ.
+The differences are turnover debit at TDSheet!5409 (-422143.94) and TDSheet!5453
+(-30191531.06), expressed in the source's unestablished monetary unit. Neither equal
+values nor outline placement chooses financial authority or justifies deduplication.
+Missing cells never become zero, and incomplete child totals are not calculated.
+
+Sakorggazi's 246 November movements include two documents with multiple source rows.
+Document name alone does not establish journal-line identity; every row remains retained.
+Both source comparisons were created and reopened through the database and exercised
+in the mounted browser with no page errors. They remain REVIEW_REQUIRED and do not
+certify a ledger, accounting representation, financial report or regulatory return.

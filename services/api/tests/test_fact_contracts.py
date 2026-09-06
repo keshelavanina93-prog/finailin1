@@ -107,6 +107,23 @@ def revised(**changes):
     return FactContract.model_validate({**contract().model_dump(), **changes})
 
 
+def test_period_flows_reject_overlapping_ytd_even_when_end_dates_differ():
+    spec = revised(
+        grain=["account", "starts_on", "date", "currency"], period_start_field="starts_on"
+    )
+    january = row("A", "2025-01-31", "100")
+    february = row("A", "2025-02-28", "150")
+    january["attributes"]["starts_on"] = "2025-01-01"
+    february["attributes"]["starts_on"] = "2025-02-01"
+    assert aggregate_rows(spec, [january, february], "schema", [], None)[0]["value"] == "250"
+    february["attributes"].update(starts_on="2025-01-01", amount="250")
+    with pytest.raises(WorkspaceError, match="Overlapping accounting periods"):
+        aggregate_rows(spec, [january, february], "schema", [], None)
+    # Another account is another coverage grain; shared dates do not imply overlap.
+    february["attributes"]["account"] = "B"
+    assert aggregate_rows(spec, [january, february], "schema", [], None)[0]["value"] == "350"
+
+
 def test_cumulative_values_are_selected_not_accumulated_again():
     rows = [row("A", "2025-01-31", "100"), row("A", "2025-02-28", "250")]
     spec = revised(aggregation="cumulative_snapshot")

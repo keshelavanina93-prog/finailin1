@@ -98,6 +98,7 @@ class FactContract(Definition):
         "flow_sum", "closing_balance", "cumulative_snapshot", "non_additive", "ratio_of_sums"
     ]
     time_field: Name
+    period_start_field: Name | None = None
     unit_field: Name
     source_family: str = Field(min_length=1, max_length=128)
     source_family_field: Name
@@ -119,6 +120,16 @@ class FactContract(Definition):
             raise ValueError("Grain and dimension fields must be unique")
         if self.time_field not in self.grain or self.unit_field not in self.grain:
             raise ValueError("Grain must include time and currency/unit identity")
+        if self.period_start_field:
+            if (
+                self.period_start_field == self.time_field
+                or self.period_start_field not in self.grain
+            ):
+                raise ValueError("Period start must be a distinct grain field; time is period end")
+            if self.aggregation in {"closing_balance", "non_additive"}:
+                raise ValueError(
+                    "Period coverage applies to flows, component ratios or cumulative values"
+                )
         if not set(self.dimensions).issubset(self.grain):
             raise ValueError("Aggregation dimensions must belong to the fact grain")
         if self.measure in self.grain:

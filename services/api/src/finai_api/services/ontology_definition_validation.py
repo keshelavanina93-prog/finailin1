@@ -57,12 +57,21 @@ def validate_definition(
                 raise WorkspaceError(
                     422, "Reconciliation must preserve the declared reporting period"
                 )
+            if (
+                contract.period_start_field
+                and contract.period_start_field not in definition.group_by
+            ):
+                raise WorkspaceError(
+                    422, "Reconciliation must preserve the complete period interval"
+                )
             if contract.aggregation in {"ratio_of_sums", "non_additive"}:
                 raise WorkspaceError(422, "Reconcile underlying components, not ratios")
         if (
             set(contracts[0].partition_fields) != set(contracts[1].partition_fields)
             or contracts[0].unit_field != contracts[1].unit_field
             or contracts[0].time_field != contracts[1].time_field
+            or contracts[0].period_start_field != contracts[1].period_start_field
+            or contracts[0].aggregation != contracts[1].aggregation
         ):
             raise WorkspaceError(422, "Reconciliation must preserve matching accounting partitions")
         return
@@ -212,6 +221,11 @@ def validate_definition(
                 raise WorkspaceError(422, "Fact grain fields must be scalar identities")
         if fields[definition.time_field]["kind"] not in {"date", "datetime"}:
             raise WorkspaceError(422, "Fact time must be a date or timestamp")
+        if definition.period_start_field and (
+            fields[definition.period_start_field]["kind"] != "date"
+            or fields[definition.time_field]["kind"] != "date"
+        ):
+            raise WorkspaceError(422, "Accounting period bounds must be calendar dates")
         if fields[definition.unit_field]["kind"] not in {"identifier", "reference"}:
             raise WorkspaceError(422, "Currency/unit must be an explicit identity")
         measure = fields.get(definition.measure, {})

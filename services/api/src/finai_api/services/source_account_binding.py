@@ -99,10 +99,12 @@ def inspect(principal: Principal, document_id: str, sheet: str, profile: str) ->
     metadata, content = document_bytes(principal, document_id)
     observed = observe_usage(content, sheet, profile)
     definitions = []
-    for offset in range(0, 10000, 100):
-        page = resources.list_resources(principal, "SourceAccountDefinition", "", offset)
+    for offset in range(0, 10000, 1000):
+        page = resources.list_resources(
+            principal, "SourceAccountDefinition", "", offset, limit=1000
+        )
         definitions.extend(page)
-        if len(page) < 100:
+        if len(page) < 1000:
             break
     else:
         raise WorkspaceError(422, "Account-definition inventory exceeds the supported limit")

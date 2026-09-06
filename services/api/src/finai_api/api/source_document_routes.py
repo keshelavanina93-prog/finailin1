@@ -6,7 +6,11 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from finai_api.api.ontology_routes import User
 from finai_api.security import require_permission
-from finai_api.services import source_account_binding, source_financial_facts
+from finai_api.services import (
+    source_account_binding,
+    source_accounting_reconciliation,
+    source_financial_facts,
+)
 from finai_api.services.company_source import inspect_companies, propose_companies
 from finai_api.services.source_document_preview import preview
 from finai_api.services.source_documents import document_bytes, list_documents, retain_document
@@ -38,6 +42,13 @@ class AccountBinding(AccountSource):
 def inspect_facts(principal: User, identity: str, request: AccountBinding):
     return source_financial_facts.prepare(
         principal, identity, request.sheet, request.profile, request.company_id, request.offset
+    )
+
+
+@router.post("/{identity}/facts/reconcile")
+def reconcile_facts(principal: User, identity: str, request: AccountBinding):
+    return source_accounting_reconciliation.assess(
+        principal, identity, request.sheet, request.profile, request.company_id
     )
 
 

@@ -2,6 +2,15 @@
 
 Shared FactContract execution now supports additive flows, exact-date closing balances, exact-date cumulative snapshots, non-additive values and ratios recalculated from summed components. Ratios retain numerator/denominator and explicit HALF_EVEN rounding; zero denominators remain unavailable. Existing contracts retain their semantics. Cumulative values are not converted to monthly movements without a separate approved transformation.
 
+Period facts can now declare `period_start_field`, with `time_field` as the inclusive
+calendar period end. Both bounds must be required date fields in the declared grain.
+Execution rejects overlapping intervals within the same non-temporal grain, including
+January plus January–February YTD even though their end dates differ. Disjoint monthly
+flows remain additive; no missing period is fabricated. This is overlap protection,
+not proof of a complete requested reporting calendar. Reconciliation definitions must
+preserve both period bounds and compatible aggregation semantics on both sides.
+Existing point-observation contracts are not silently reinterpreted as period facts.
+
 Contracts may declare mandatory accounting partition fields (company, ledger, scenario, balance side, tax/valuation/translation/reporting basis as appropriate). These must belong to the grain and remain in grouping even when omitted by the caller. This mechanism preserves declared distinctions; it does not infer or certify an undeclared accounting basis, determine VAT recoverability, cost inventory or translate currencies.
 
 Source family and duplicate-grain checks remain enforced. Explicit row-role selection rejects other source roles. Optional hierarchy identities reject directly linked parent and child rows selected together within a period/unit/accounting scope; neither parents nor leaves are universally designated authoritative. Missing hierarchy relationships are not inferred.
