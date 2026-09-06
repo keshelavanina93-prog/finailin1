@@ -20,6 +20,13 @@ OWNERSHIP_FIELDS = frozenset(
 )
 
 
+def exact_identity(query: str) -> UUID | None:
+    try:
+        return UUID(query.strip())
+    except ValueError:
+        return None
+
+
 def project(
     rows: list[dict[str, Any]],
     pins: list[dict[str, Any]],
@@ -79,11 +86,20 @@ def project(
                 owned.add(source_version)
                 pending.append(source_version)
     needle = q.strip().lower()
+    identifier = exact_identity(q)
     discovered_matches = [
         row
         for row in latest.values()
         if str(row["version_id"]) in owned
-        and (not needle or needle in row["display_name"].lower())
+        and (
+            str(row["resource_id"]) == str(identifier)
+            if identifier
+            else (
+                not needle
+                or needle in row["display_name"].lower()
+                or needle in row["identity_key"].lower()
+            )
+        )
     ]
     # Facets describe the complete bounded historical result, never just its visible page.
     # Apply the chosen type afterwards so other matching categories remain discoverable.
@@ -164,7 +180,10 @@ def search(
                 ), matches AS MATERIALIZED (
                     SELECT s.* FROM selected s JOIN owned o
                       ON o.resource_id=s.resource_id AND o.version_id=s.version_id
-                    WHERE strpos(lower(s.display_name),lower(%(query)s))>0
+                    WHERE (%(identifier)s::uuid IS NOT NULL AND s.resource_id=%(identifier)s)
+                       OR (%(identifier)s::uuid IS NULL AND (
+                         strpos(lower(s.display_name),lower(%(query)s))>0
+                         OR strpos(lower(s.identity_key),lower(%(query)s))>0))
                 ), filtered AS (
                     SELECT * FROM matches
                     WHERE %(kind)s::text IS NULL OR object_type=%(kind)s
@@ -189,6 +208,7 @@ def search(
                     "effective": effective_at,
                     "fields": ["FIELD:" + field for field in sorted(OWNERSHIP_FIELDS)],
                     "query": q.strip(),
+                    "identifier": exact_identity(q),
                     "kind": object_type,
                     "offset": offset,
                     "limit": limit,

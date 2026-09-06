@@ -1,0 +1,63 @@
+{
+  "live_web_api": "PASS",
+  "loaded_graph_resources": 1000,
+  "retained_journeys": [
+    {
+      "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "company_resources": 4,
+      "resource_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "version_id": "72417af7-1f6f-5d11-b6ff-607e96169191",
+      "known_at": "2026-09-06T21:25:08.955944+00:00",
+      "exact_id_matches": 1,
+      "present_in_loaded_graph": false,
+      "other_company_matches": 0
+    },
+    {
+      "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "company_resources": 5629,
+      "resource_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "version_id": "dd21bd46-3525-535d-89ba-6ffa2e05a6e5",
+      "known_at": "2026-09-06T21:25:12.549210+00:00",
+      "exact_id_matches": 1,
+      "present_in_loaded_graph": false,
+      "other_company_matches": 0
+    }
+  ],
+  "browser_acceptance": false,
+  "release_accepted": false,
+  "focused_native_search_checks": "PASS",
+  "frontend_build_lint_types": "PASS",
+  "authenticated_browser_partial_journeys": [
+    "Company selection and Companies overview/structure",
+    "Company exact-ID search to pinned inspector to knowledge-bounded trace",
+    "Data company history and categories",
+    "Regulation readiness and enabled monitor to retained shared workflow and return"
+  ],
+  "browser_acceptance_note": "These exercised journeys are partial evidence. Required finance/planning/reporting/intelligence journeys and user visual acceptance remain open.",
+  "screenshots": [
+    {
+      "path": ".finai\\artifacts\\browser-shots\\g8-companies.png",
+      "sha256": "69b09aa44cc261b45fe8dbae6609b7fdb206a0b724b44cb1e63242193e482b23"
+    },
+    {
+      "path": ".finai\\artifacts\\browser-shots\\g8-data.png",
+      "sha256": "181eabb23d67104654f55da0d5e5e7b4ce20b99f4a7c1c51b25c0dc18e8e9f71"
+    },
+    {
+      "path": ".finai\\artifacts\\browser-shots\\g8-historical-trace.png",
+      "sha256": "f4425acaf7166ff46ecaf51d91e0a155508fe6663d4996a452d7801ae637f2ae"
+    },
+    {
+      "path": ".finai\\artifacts\\browser-shots\\g8-regulation.png",
+      "sha256": "162baa1d4602c2f69121ee89fa9666de049566c3c77a8979bbb2e7f484b7d878"
+    },
+    {
+      "path": ".finai\\artifacts\\browser-shots\\g8-regulatory-workflow.png",
+      "sha256": "76ba240662f378b57fdc844734a02912e2007240f65f9d27e2f0bbc965c5d5f1"
+    },
+    {
+      "path": ".finai\\artifacts\\browser-shots\\g8-search.png",
+      "sha256": "6c3bbb1b5e3cc9669b628cd327c007cf2875c8a228f3b3e9f3e338c5b2895454"
+    }
+  ]
+}

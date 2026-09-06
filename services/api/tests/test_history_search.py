@@ -246,11 +246,16 @@ def test_postgres_knowledge_time_and_tenant_isolation():
         {"object_type": "LocalChartOfAccounts", "count": 1},
     ]
     assert categorized["resources"][0]["version_id"] == str(account.version_id)
+    for query in (str(account.resource_id).upper(), account.identity_key):
+        exact = search(principal, company.resource_id, q=query)
+        assert exact["matched_count"] == 1
+        assert exact["resources"][0]["version_id"] == str(account.version_id)
     distant_page = search(principal, company.resource_id, q="discovery", offset=5001, limit=1)
     assert distant_page["resources"] == []
     assert distant_page["matched_count"] == 2
     assert distant_page["type_facets"] == categorized["type_facets"]
     other = accept(actors, [node("LegalEntity", "discovery other company", {})])[0]
+    assert search(principal, company.resource_id, q=str(other.resource_id))["matched_count"] == 0
     accept(
         actors,
         [
