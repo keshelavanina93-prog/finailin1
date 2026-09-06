@@ -9,7 +9,7 @@ from psycopg.rows import dict_row
 
 from finai_api.domain.ontology_catalog import canonical_id
 from finai_api.domain.resource_lifecycle import VersionReference
-from finai_api.domain.resources import ResourceMutation, ResourceProposal
+from finai_api.domain.resources import CanonicalResource, ResourceMutation, ResourceProposal
 from finai_api.services import resources
 from finai_api.services.accounting_source_document import read_source
 from finai_api.services.company_source import observe_companies, observe_tb_company
@@ -18,6 +18,24 @@ from finai_api.services.upstream_authority import upstream_authority
 from finai_api.services.workspace import WorkspaceError
 
 SOURCE_SYSTEM = "RETAINED_ACCOUNTING_COMPANY"
+
+
+def _effective_resources(principal, identities):
+    if len(identities) > 100:
+        raise WorkspaceError(422, "Resolve no more than 100 canonical identities per page")
+    at = datetime.now(UTC)
+    with resources.resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cur:
+        rows = cur.execute(
+            "SELECT v.*,i.identity_key FROM resource_versions v "
+            "JOIN canonical_identities i USING(tenant_id,resource_id) "
+            "WHERE v.tenant_id=%s AND v.resource_id=ANY(%s::uuid[]) "
+            "AND v.version_id=g8_effective_version_id(v.tenant_id,v.resource_id,%s)",
+            (principal.scope.tenant_id, identities, at),
+        ).fetchall()
+    return {
+        str(row["resource_id"]): CanonicalResource.model_validate(row).model_dump(mode="json")
+        for row in rows
+    }
 
 
 def observe(principal, document_id, sheet, profile):
@@ -85,15 +103,16 @@ def observe(principal, document_id, sheet, profile):
 
 def inspect(principal, document_id, sheet, profile, company_id):
     observed = observe(principal, document_id, sheet, profile)
-    company = resources.get_resource(principal, company_id)["resource"]
+    effective = _effective_resources(principal, [company_id, UUID(observed["alias_id"])])
+    company = effective.get(str(company_id))
     if (
-        company["object_type"] != "LegalEntity"
+        not company
+        or company["object_type"] != "LegalEntity"
         or company["authority_state"] != "APPROVED"
         or company["evidence_class"] == "REFERENCE_TEMPLATE"
     ):
         raise WorkspaceError(409, "Select an existing accepted canonical legal entity")
-    existing = resources.current_resources(principal, [UUID(observed["alias_id"])])
-    alias = existing.get(observed["alias_id"])
+    alias = effective.get(observed["alias_id"])
     accepted, reason = False, "Review the observed label against the existing company identity"
     can_propose = True
     if alias and alias["attributes"].get("target_id") == str(company_id):
@@ -187,7 +206,11 @@ def propose(principal, document_id, sheet, profile, company_id, rationale):
                     evidence_class="SOURCE_BOUND",
                 )
             )
-    previous = observed["alias"]
+    # Inspect current effective attribution, but edits compare against the latest
+    # publication head, which may already contain a scheduled alias revision.
+    previous = resources.current_resources(principal, [UUID(observed["alias_id"])]).get(
+        observed["alias_id"]
+    )
     attrs = {
         "source_system": SOURCE_SYSTEM,
         "external_id": observed["external_id"],
@@ -198,8 +221,12 @@ def propose(principal, document_id, sheet, profile, company_id, rationale):
             for field in ("document_id", "worksheet", "source_profile", "source_record_id")
         },
     }
-    if previous and previous["authority_state"] == "APPROVED" and previous["attributes"] == attrs:
-        raise WorkspaceError(409, "This reviewed company alias is already current")
+    effective_alias = observed["alias"]
+    if any(
+        row and row["authority_state"] == "APPROVED" and row["attributes"] == attrs
+        for row in (previous, effective_alias)
+    ):
+        raise WorkspaceError(409, "This reviewed company alias is already current or scheduled")
     alias = ResourceMutation(
         resource_id=UUID(observed["alias_id"]),
         object_type="Alias",

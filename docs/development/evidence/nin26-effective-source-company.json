@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-09-06T22:44:32.089246+00:00",
+  "web_api_status": 200,
+  "source": "ir_e630518b23cd9855216cf776fa87e51a5b3d964a912ebc480f47e910b6a073e6",
+  "company_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+  "company_version_id": "928f83fe-09a5-5f73-82ad-83fcfa77af7b",
+  "alias_id": "45a5248a-fee0-5bfe-b689-fb935d2345f1",
+  "alias_version_id": "547799d3-f7c3-5ed4-83a9-8051a2de7031",
+  "identity_binding_accepted": true,
+  "canonical_accounting_ready": false,
+  "remaining_blockers": [
+    "The selected company has no accepted source chart for this accounting scope"
+  ],
+  "accounting_use_authorized": false,
+  "financial_certification_or_release_acceptance": false,
+  "scope": "Existing retained SEG source identity match; read-only inspection"
+}

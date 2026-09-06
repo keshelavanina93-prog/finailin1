@@ -77,7 +77,9 @@ def observe(principal, document_id, sheet, profile, company_id):
         "evidence_id": str(evidence),
         "source_record_id": str(uuid5(evidence, coordinate)),
     }
-    company = resources.current_resources(principal, [company_id]).get(str(company_id))
+    from finai_api.services.source_company_alias import _effective_resources
+
+    company = _effective_resources(principal, [company_id]).get(str(company_id))
     if not direct_company_match(company, parsed["company_label"], str(evidence)):
         from finai_api.services.source_company_alias import inspect as inspect_company_alias
 
@@ -321,10 +323,10 @@ def inspect(principal, document_id, sheet, profile, company_id):
     identity, attrs, coordinate, label = observe(principal, document_id, sheet, profile, company_id)
     binding_id = uuid5(identity, "accounting-binding")
     heads = resources.current_resources(
-        principal, [identity, binding_id, company_id, UUID(attrs["chart_id"])]
+        principal, [identity, binding_id, UUID(attrs["chart_id"])]
     )
-    company = heads.get(str(company_id))
     company_binding = inspect_company_alias(principal, document_id, sheet, profile, company_id)
+    company = company_binding["company"]
     unresolved = []
     if not (
         direct_company_match(company, label, attrs["evidence_id"]) or company_binding["accepted"]

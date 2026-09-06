@@ -35,7 +35,9 @@ def fixture(monkeypatch):
         "attributes": {"evidence_id": str(uuid4())},
         "system_from": datetime.now(UTC).isoformat(),
     }
-    monkeypatch.setattr(aliases.resources, "get_resource", lambda *_: {"resource": company})
+    monkeypatch.setattr(
+        aliases, "_effective_resources", lambda *_: {company["resource_id"]: company}
+    )
     monkeypatch.setattr(aliases.resources, "current_resources", lambda *_: {})
     monkeypatch.setattr(aliases.resources, "propose", lambda _principal, proposal: proposal)
     return principal, company
