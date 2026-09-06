@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent, type CSSPrope
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { House, Buildings, Database, Graph as GraphIcon, GearSix, MagnifyingGlass, ArrowRight, ArrowClockwise, SignOut, ShieldCheck, Tray, UploadSimple, List, X, CaretRight, SidebarSimple, ArrowsOutSimple, ChartLineUp, ChartBar, Notebook, MapTrifold, Scales, FlowArrow } from "@phosphor-icons/react";
-import type { OperatorInspection, HistorySearchResult, CanonicalResource, IntakeItem, Principal, ReceiptDetail, ResourceProposalDetail } from "@finai/contracts";
+import type { ProposalQueuePage, OperatorInspection, HistorySearchResult, CanonicalResource, IntakeItem, Principal, ReceiptDetail, ResourceProposalDetail } from "@finai/contracts";
 import type { EngineeringView } from "./operator-workspace";
 import { Badge, Brand, Empty, Panel, Signal } from "./g8-ui";
 import { belongsToCompany, emptySnapshot, readable, workItems, type Loadable, type Snapshot, type WorkItem } from "./g8-model";
@@ -114,15 +114,20 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
   function toggleNyx(){if(viewport>1000)setNyxFolded(!nyxFolded);else setRail(!rail);}
   function closeNyx(){setNyxFolded(true);setRail(false);}
   const [ontologySection,setOntologySection]=useState("resources");
+  const [queueAnchor,setQueueAnchor]=useState<number|null>(null);
+  const queueGeneration=queueAnchor??revision;
   const [queuesRevision,setQueuesRevision]=useState(-1);
   const [graphRevision,setGraphRevision]=useState(-1);
-  const queuesLoading=queuesRevision!==revision;
+  const [proposalPage,setProposalPage]=useState<{revision:number;page:ProposalQueuePage|null;error:string;loadingMore:boolean}|null>(null);
+  const queueControl=useRef<{revision:number;controller:AbortController;busy:boolean}|null>(null);
+  const paging=proposalPage?.revision===queueGeneration?proposalPage:null;
+  const queuesLoading=queuesRevision!==queueGeneration;
   const graphLoading=graphRevision!==revision;
   const detailRequest = useRef(0); const searchRef = useRef<HTMLInputElement>(null); const workRef = useRef<HTMLDivElement>(null);
   const canOntology = principal.permissions.includes("ontology_read");
-  const refresh = useCallback(() => setRevision(value => value+1),[]);
+  const refresh = useCallback(() => {setQueueAnchor(null);setRevision(value => value+1);},[]);
   useEffect(()=>{
-    const check=()=>{if(document.visibilityState==="visible")refresh();};
+    const check=()=>{if(document.visibilityState==="visible")setRevision(value=>value+1);};
     const interval=window.setInterval(check,60_000);
     document.addEventListener("visibilitychange",check);
     return()=>{window.clearInterval(interval);document.removeEventListener("visibilitychange",check);};
@@ -156,7 +161,14 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
   },[token,canOntology,revision]);
   useEffect(()=>{
     const controller=new AbortController();let disposed=false;
+    const control={revision:queueGeneration,controller,busy:false};queueControl.current=control;
     async function loadQueues(){
+      async function proposals(){
+        try{
+          const page=await get<ProposalQueuePage>("ontology/proposal-queue?limit=25",token,controller.signal);
+          if(!disposed){setSnapshot(previous=>({...previous,proposals:{data:page.proposals,error:null}}));setProposalPage({revision:queueGeneration,page,error:"",loadingMore:false});}
+        }catch(error){if(!disposed){const message=error instanceof Error?error.message:"Change queue unavailable";setSnapshot(previous=>({...previous,proposals:{data:null,error:message}}));setProposalPage({revision:queueGeneration,page:null,error:message,loadingMore:false});}}
+      }
       async function queue<T>(path:string,key:"evidence"|"proposals"):Promise<void>{
         let result:Loadable<T>;
         try{result={data:await get<T>(path,token,controller.signal),error:null};}
@@ -165,12 +177,26 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
       }
       await Promise.all([
         queue<NonNullable<Snapshot["evidence"]["data"]>>("workspace/intake","evidence"),
-        canOntology?queue<NonNullable<Snapshot["proposals"]["data"]>>("ontology/proposals","proposals"):Promise.resolve().then(()=>{if(!disposed)setSnapshot(previous=>({...previous,proposals:{data:null,error:"Your workspace access does not include the change queue."}}));}),
+        canOntology?proposals():Promise.resolve().then(()=>{if(!disposed)setSnapshot(previous=>({...previous,proposals:{data:null,error:"Your workspace access does not include the change queue."}}));}),
       ]);
-      if(!disposed)setQueuesRevision(revision);
+      if(!disposed)setQueuesRevision(queueGeneration);
     }
     void loadQueues();return()=>{disposed=true;controller.abort();};
-  },[token,canOntology,revision]);
+  },[token,canOntology,queueGeneration]);
+  async function loadOlderProposals(){
+    const page=paging?.page;const control=queueControl.current;
+    if(!page?.has_more||!page.next_cursor||!control||control.revision!==queueGeneration||control.busy||control.controller.signal.aborted)return;
+    control.busy=true;setQueueAnchor(queueGeneration);setProposalPage({revision:queueGeneration,page,error:"",loadingMore:true});
+    const params=new URLSearchParams({limit:String(page.limit),snapshot_at:page.snapshot_at,before_created_at:page.next_cursor.created_at,before_proposal_id:page.next_cursor.proposal_id});
+    try{
+      const next=await get<ProposalQueuePage>(`ontology/proposal-queue?${params}`,token,control.controller.signal);
+      if(!control.controller.signal.aborted){
+        setSnapshot(previous=>({...previous,proposals:{data:[...new Map([...(previous.proposals.data??[]),...next.proposals].map(row=>[row.proposal_id,row])).values()],error:null}}));
+        setProposalPage({revision:queueGeneration,page:next,error:"",loadingMore:false});
+      }
+    }catch(error){if(!control.controller.signal.aborted)setProposalPage({revision:queueGeneration,page,error:error instanceof Error?error.message:"Older changes unavailable",loadingMore:false});}
+    finally{control.busy=false;}
+  }
   useEffect(()=>{
     if(view!=="ontology"||ontologySection!=="resources"||!canOntology||graphRevision===revision)return;
     const controller=new AbortController();let disposed=false;
@@ -247,7 +273,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
   const inspectSource = useCallback((source:IntakeItem) => {void inspectWork(workItems([source],[])[0],false);},[inspectWork]);
   const selectMap = (selection:MapSelection|null) => {clearSelection();setMapSelection(selection);if(selection){setNyxTab("context");setNyxFolded(false);setRail(true);}};
   const mapProps={token,selection:mapSelection,companyId:currentCompany?.resource_id,canPropose:principal.permissions.includes("ontology_propose"),state:mapState,onState:setMapState,onSelect:selectMap,onReview:(id:string)=>openEngineering("ontology",undefined,id)};
-  const workTable = <WorkQueue items={items} filter={workFilter} onFilter={setWorkFilter} onInspect={item=>{void inspectWork(item);setNyxTab("context");}} onHistory={()=>openEngineering("history")} loading={queuesLoading} errors={[snapshot.evidence.error?`Evidence queue unavailable: ${snapshot.evidence.error}`:"",snapshot.proposals.error?`Change queue unavailable: ${snapshot.proposals.error}`:""].filter(Boolean)} scope={companyMismatch?"Company exploration; unbound source evidence excluded":"Current authorized scope"}/>;
+  const workTable = <>{queueAnchor!==null&&<p className="g8-subtle">Browsing older changes. Refresh workspace to return to the latest queue.</p>}<WorkQueue onLoadMoreProposals={()=>void loadOlderProposals()} proposalsHaveMore={paging?.page?.has_more??false} proposalsLoadingMore={paging?.loadingMore??false} proposalsPageError={paging?.page?paging.error:""} items={items} filter={workFilter} onFilter={setWorkFilter} onInspect={item=>{void inspectWork(item);setNyxTab("context");}} onHistory={()=>openEngineering("history")} loading={queuesLoading} errors={[snapshot.evidence.error?`Evidence queue unavailable: ${snapshot.evidence.error}`:"",snapshot.proposals.error?`Change queue unavailable: ${snapshot.proposals.error}`:""].filter(Boolean)} scope={companyMismatch?"Company exploration; unbound source evidence excluded":"Current authorized scope"}/></>;
   return <div className={`g8-app ${menu ? "menu-open" : ""} ${rail ? "rail-open" : ""} ${navFolded ? "nav-folded" : ""} ${nyxFolded ? "nyx-folded" : ""}`} style={{"--nyx-width":`${panelWidth}px`} as CSSProperties}><a className="g8-skip" href="#g8-main">Skip to workspace</a>
     <aside className="g8-sidebar"><div className="g8-nav-brand"><Brand /><button className="g8-icon fold-navigation" aria-label={navFolded?"Expand navigation":"Collapse navigation"} aria-expanded={!navFolded} onClick={()=>setNavFolded(!navFolded)}><SidebarSimple size={18}/></button></div><p className="g8-tagline">Enterprise Intelligence</p><nav aria-label="Business navigation">{navigation.map(({id,label,hint,icon:Icon,available})=><button disabled={!available} title={available?label:`${label}: not connected yet`} aria-label={available?label:`${label} — not connected`} aria-current={view===id ? "page" : undefined} className={view===id ? "active" : ""} onClick={()=>navigate(id as View)} key={id}><Icon size={21} weight="regular"/><span>{label}{hint && <small>{hint}</small>}</span></button>)}</nav><div className="g8-nav-bottom"><button aria-label="System / Engineering" title="System / Engineering" className={`g8-system ${view === "system" ? "active" : ""}`} onClick={()=>navigate("system")}><GearSix size={21}/><span>System<small>Engineering access</small></span><CaretRight size={13}/></button><div className="g8-platform"><ShieldCheck size={20}/><span>G8 Platform<small>{loading ? "Checking services…" : ready?.status === "ready" ? "Services ready" : "Readiness unavailable"}</small></span></div></div></aside>
     <header className="g8-topbar"><button className="g8-icon mobile-menu" aria-label="Toggle navigation" onClick={()=>setMenu(!menu)}><List size={21}/></button><div className="g8-search"><MagnifyingGlass size={19}/><input ref={searchRef} aria-label="Search workspace" maxLength={200} placeholder="Search company resources, identities and work…" value={search} onChange={event=>setSearch(event.target.value)}/><kbd>Ctrl K</kbd>{query && <div className="g8-search-results" role="region" aria-label="Search results"><WorkspaceSearchResults key={companyId} token={token} companyId={companyId} companyName={currentCompany?displayName(currentCompany.display_name):""} query={search} onInspect={(resource,knownAt)=>void inspect(resource,resource.version_id,knownAt)} onClose={()=>setSearch("")}/><small>Companies & loaded work</small>{results.map(result=><button key={result.id} onClick={()=>result.resource ? void inspect(result.resource) : result.work && void inspectWork(result.work)}><span>{displayName(result.title)}<small>{result.kind}</small></span><ArrowRight size={15}/></button>)}{!results.length && <p>No matching companies or loaded work.</p>}</div>}</div><button className="g8-icon" aria-label="Refresh workspace" onClick={refresh} disabled={loading}><ArrowClockwise size={19}/></button><div className="g8-user"><span>{principal.display_name.split(" ").map(part=>part[0]).slice(0,2).join("")}</span><div>{principal.display_name}<small>Governed workspace</small></div></div><button className="g8-icon" aria-label="Sign out" onClick={onSignOut}><SignOut size={19}/></button><button className="g8-icon nyx-toggle" aria-label="Toggle NYX assistant" aria-expanded={viewport>1000?!nyxFolded:rail} onClick={toggleNyx}><Image src="/brand/nyx-core-transparent.png" alt="" width={25} height={25}/></button></header>
@@ -262,7 +288,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
       {view === "home" && <><div className="g8-actionbar"><button onClick={()=>{setWorkFilter("pending");workRef.current?.scrollIntoView({behavior:"smooth"});}}><Tray size={23}/><span>Review items<small>{queuesLoading ? "Checking…" : `${pending.length} in loaded queues`}</small></span></button><button onClick={()=>{setNyxFolded(false);setRail(true);setNyxTab("interact");}}><ChartLineUp size={23}/><span>Investigate<small>Ask NYX about evidence</small></span></button>{principal.permissions.includes("ingest") && <button onClick={()=>openEngineering("intake")}><UploadSimple size={23}/><span>New data source<small>Retain source evidence</small></span></button>}<button disabled title="Reporting is not connected yet"><ChartLineUp size={23}/><span>Create report<small>Not connected</small></span></button><button disabled title="Planning is not connected yet"><GraphIcon size={23}/><span>New scenario<small>Not connected</small></span></button></div>
       <WorkspaceHealth snapshot={snapshot} loading={loading} onRefresh={refresh} onData={()=>navigate("data")}/>
       <ExecutiveOverview companyId={companyId} canonicalContext={resolvedContext} contextError={companyContextError} recentResult={recent?.data??null} recentError={recent?.error??""} onInspect={(resource,knownAt)=>void inspect(resource,resource.version_id,knownAt)} onTrace={(resource,knownAt)=>setTrace({resource_id:resource.resource_id,version_id:resource.version_id,company_id:companyId,known_at:knownAt})} onHistory={(resource,knownAt)=>setHistory({resource_id:resource.resource_id,version_id:resource.version_id,company_id:companyId,known_at:knownAt})} onRegulation={()=>navigate("regulation")} onAccounting={()=>{navigate("companies");setCompanyInitialTab("accounting");}} operationalPanel={<OperationsMap key={currentCompany?.resource_id??"scope"} {...mapProps} compact onOpen={()=>navigate("operations")}/>} company={(currentCompany ? displayName(currentCompany.display_name) : undefined)??"Select company"} period={principal.scope.period} currency={principal.scope.currency} resources={visibleResources} resourcesAvailable={!loading && !!snapshot.graph.data} onData={()=>navigate("data")} onCompanies={()=>navigate("companies")} onOntology={()=>navigate("ontology")}/>
-      <div className="g8-home-bottom"><div ref={workRef}><Panel title="My work" aside={<Badge>{queuesLoading?"Checking":snapshot.evidence.error||snapshot.proposals.error?"Partial queue":`${pending.length} awaiting review`}</Badge>}>{workTable}</Panel></div><Panel title="Recent review activity" aside={<button className="g8-link" onClick={()=>{setWorkFilter("all");workRef.current?.scrollIntoView({behavior:"smooth"});}}>View all</button>}>{[...items].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5).map(item=><Signal key={`${item.kind}:${item.id}`} title={item.title} detail={`${readable(item.state)} · ${date(item.date)} · ${item.reason}`} tone={item.state==="APPROVED"?"good":item.state==="REJECTED"?"bad":"warning"} onClick={()=>{void inspectWork(item);setNyxTab("context");}}/>)}{!items.length&&<Empty title={queuesLoading?"Loading review activity…":snapshot.evidence.error||snapshot.proposals.error?"Review activity partially unavailable":"No retained review activity"}>Source receipts and proposal decisions appear here.</Empty>}</Panel></div></>}
+      <div className="g8-home-bottom"><div ref={workRef}><Panel title="My work" aside={<Badge>{queuesLoading?"Checking":snapshot.evidence.error||snapshot.proposals.error?"Partial queue":`${pending.length} loaded awaiting review`}</Badge>}>{workTable}</Panel></div><Panel title="Recent review activity" aside={<button className="g8-link" onClick={()=>{setWorkFilter("all");workRef.current?.scrollIntoView({behavior:"smooth"});}}>View all</button>}>{[...items].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5).map(item=><Signal key={`${item.kind}:${item.id}`} title={item.title} detail={`${readable(item.state)} · ${date(item.date)} · ${item.reason}`} tone={item.state==="APPROVED"?"good":item.state==="REJECTED"?"bad":"warning"} onClick={()=>{void inspectWork(item);setNyxTab("context");}}/>)}{!items.length&&<Empty title={queuesLoading?"Loading review activity…":snapshot.evidence.error||snapshot.proposals.error?"Review activity partially unavailable":"No retained review activity"}>Source receipts and proposal decisions appear here.</Empty>}</Panel></div></>}
       {view === "actions" && <ActionWorkbench key={`${companyId}:${actionTarget?.companyId===companyId?actionTarget.workflowId:"saved"}`} initialWorkflowId={actionTarget?.companyId===companyId?actionTarget.workflowId:undefined} token={token} principal={principal} companyId={companyId} onInspect={id=>void inspect({resource_id:id})}/>}
       {view === "regulation" && <RegulationWorkspace key={companyId} viewStateKey={`${contextKey}:regulation:${companyId}`} token={token} companyId={companyId} onInspect={node=>void inspect(node,node.version_id)} onTrace={node=>setTrace({resource_id:node.resource_id,version_id:node.version_id,company_id:companyId})} onHistory={node=>setHistory({resource_id:node.resource_id,version_id:node.version_id,company_id:companyId})} onWorkflow={workflowId=>{setActionTarget({workflowId,companyId});navigate("actions");}} onProposal={id => openEngineering("ontology", undefined, id)} />}
       {view === "operations" && <OperationsMap key={currentCompany?.resource_id??"scope"} {...mapProps}/>}

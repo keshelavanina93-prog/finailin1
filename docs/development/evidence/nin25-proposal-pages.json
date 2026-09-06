@@ -1,0 +1,64 @@
+{
+  "checked_at": "2026-09-07T02:21:37.280973+04:00",
+  "snapshot_at": "2026-09-07T02:21:26.555266+04:00",
+  "mode": "authenticated read-only running G8 proxy over retained proposals",
+  "observations": [
+    {
+      "page": 1,
+      "seconds": 1.325,
+      "http_status": 200,
+      "rows": 25,
+      "has_more": true
+    },
+    {
+      "page": 2,
+      "seconds": 2.419,
+      "http_status": 200,
+      "rows": 25,
+      "has_more": true
+    },
+    {
+      "page": 3,
+      "seconds": 2.316,
+      "http_status": 200,
+      "rows": 25,
+      "has_more": true
+    },
+    {
+      "page": 4,
+      "seconds": 2.42,
+      "http_status": 200,
+      "rows": 25,
+      "has_more": true
+    },
+    {
+      "page": 5,
+      "seconds": 2.356,
+      "http_status": 200,
+      "rows": 25,
+      "has_more": true
+    }
+  ],
+  "distinct_proposals": 125,
+  "beyond_previous_100_row_ceiling": true,
+  "ordered_without_duplicates": true,
+  "decision_mode": "CURRENT_RETAINED_DECISION",
+  "browser_acceptance": false,
+  "full_NIN_28_acceptance": false,
+  "release_accepted": false,
+  "frontend_verification": {
+    "after_load_older": 77,
+    "browser": "PARTIAL_JOURNEY_PASS",
+    "screenshot": {
+      "path": ".finai/artifacts/browser-shots/g8-older-proposal-pages.png",
+      "sha256": "89fb35246a03652ef8bc990cb19467a9dd95df5a83bc847b31016ca451aa1571"
+    },
+    "contracts_and_web_types": "PASS",
+    "production_build": "PASS",
+    "note": "27 source receipts plus 25 then 50 canonical proposals; counts explicitly describe loaded items",
+    "lint": "PASS",
+    "initial_loaded_items": 52,
+    "after_explicit_refresh": 52,
+    "after_background_refresh": 77
+  }
+}
