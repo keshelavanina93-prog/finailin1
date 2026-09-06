@@ -1,22 +1,139 @@
 """Regulatory workspace over the shared reviewed, bitemporal ontology authority."""
 
-from datetime import UTC, datetime
+import asyncio
+from contextlib import suppress
+from datetime import UTC, datetime, timedelta
 from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel, ConfigDict, Field
+from temporalio.client import (
+    Schedule,
+    ScheduleActionStartWorkflow,
+    ScheduleAlreadyRunningError,
+    ScheduleIntervalSpec,
+    ScheduleOverlapPolicy,
+    SchedulePolicy,
+    ScheduleSpec,
+)
 
 from finai_api.api.ontology_routes import User
+from finai_api.api.workflow_routes import client
 from finai_api.domain.regulation import RegulatoryDefinition, assess_rule
 from finai_api.domain.resources import ResourceMutation, ResourceProposal
+from finai_api.regulatory_workflow import RegulatorySourceCheck
 from finai_api.security import require_permission
-from finai_api.services import regulatory_sources, resources
+from finai_api.services import regulatory_monitors, regulatory_sources, resources
+from finai_api.services import report_workflows as records
 from finai_api.services.fact_runs import read_run, retain_run
 from finai_api.services.regulatory_licence_context import bind_assessment, licence_bindings
 from finai_api.services.workspace import WorkspaceError
 
 router = APIRouter(prefix="/v1/ontology/regulation", tags=["regulation"])
+
+
+@router.post("/monitors")
+async def start_monitor(principal: User, request: regulatory_monitors.MonitorRequest):
+    identity = await asyncio.to_thread(regulatory_monitors.retain, principal, request)
+    runtime = await client()
+    with suppress(ScheduleAlreadyRunningError):
+        await runtime.create_schedule(
+            identity,
+            Schedule(
+                action=ScheduleActionStartWorkflow(
+                    RegulatorySourceCheck.run,
+                    {
+                        "workflow_id": identity,
+                        "actor_id": principal.actor_id,
+                        "scope": principal.scope.model_dump(mode="json"),
+                    },
+                    id=identity + "-check",
+                    task_queue="g8-report-source-v1",
+                    execution_timeout=timedelta(minutes=15),
+                ),
+                spec=ScheduleSpec(
+                    intervals=[ScheduleIntervalSpec(every=timedelta(hours=request.cadence_hours))]
+                ),
+                policy=SchedulePolicy(
+                    overlap=ScheduleOverlapPolicy.SKIP, catchup_window=timedelta(hours=1)
+                ),
+            ),
+            trigger_immediately=True,
+        )
+    return {"workflow_id": identity}
+
+
+@router.get("/monitors")
+def list_monitors(principal: User):
+    return regulatory_monitors.listing(principal)
+
+
+@router.get("/monitors/{identity}")
+async def read_monitor(identity: str, principal: User):
+    result = await asyncio.to_thread(regulatory_monitors.read, principal, identity)
+    successes = [e for e in result["events"] if "signature" in e]
+    checks = [e for e in result["events"] if e.get("check_id")]
+    result["last_success"] = successes[-1] if successes else None
+    changed = [e for e in successes if e["state"] != "UNCHANGED"]
+    result["last_new_item"] = changed[-1] if changed else None
+    result["source_health"] = checks[-1]["state"] if checks else "NOT_CHECKED"
+    last_check = datetime.fromisoformat(
+        successes[-1]["checked_at"] if successes else result["created_at"]
+    )
+    result["freshness"] = (
+        "OVERDUE"
+        if datetime.now(UTC) - last_check > timedelta(hours=result["request"]["cadence_hours"] + 1)
+        else "WITHIN_CHECK_WINDOW"
+    )
+    try:
+        runtime = await client()
+        description = await runtime.get_schedule_handle(identity).describe()
+        result["runtime"] = {
+            "state": "PAUSED" if description.schedule.state.paused else "ENABLED",
+            "next_checks": [value.isoformat() for value in description.info.next_action_times],
+            "running_checks": len(description.info.running_actions),
+            "started_actions": description.info.num_actions,
+        }
+        if description.info.recent_actions:
+            latest = description.info.recent_actions[-1].action
+            execution = await runtime.get_workflow_handle(latest.workflow_id).describe()
+            status = execution.status.name if execution.status else "UNKNOWN"
+            result["runtime"]["latest_execution"] = status
+            if status in {"FAILED", "TIMED_OUT", "TERMINATED", "CANCELED"}:
+                result["source_health"] = "CHECK_FAILED"
+            elif status == "RUNNING":
+                result["source_health"] = "CHECKING"
+    except Exception:
+        result["runtime"] = {"state": "UNOBSERVABLE", "next_checks": []}
+    return result
+
+
+class MonitorControl(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    command: Literal["pause", "resume"]
+    reason: str = Field(min_length=10, max_length=2000)
+    idempotency_key: UUID
+
+
+@router.post("/monitors/{identity}/control")
+async def control_monitor(identity: str, principal: User, request: MonitorControl):
+    require_permission(principal, "ingest")
+    record = await asyncio.to_thread(regulatory_monitors.read, principal, identity)
+    key = "control:" + str(request.idempotency_key)
+    payload = {"command": request.command, "reason": request.reason, "actor_id": principal.actor_id}
+    # Persist intent first. Reusing a key with altered content is rejected by shared storage.
+    await asyncio.to_thread(records.event, principal, identity, key, payload)
+    if any(e["event_id"] == key + ":applied" for e in record["events"]):
+        return {"workflow_id": identity, "state": "ALREADY_APPLIED"}
+    runtime = await client()
+    handle = runtime.get_schedule_handle(identity)
+    if request.command == "pause":
+        await handle.pause(note=request.reason)
+    else:
+        await handle.unpause(note=request.reason)
+    await asyncio.to_thread(records.event, principal, identity, key + ":applied", payload)
+    return {"workflow_id": identity, "state": "APPLIED"}
 
 
 @router.post("/sources/capture")

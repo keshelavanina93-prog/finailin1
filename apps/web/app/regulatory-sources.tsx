@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Panel } from "./g8-ui";
+import RegulatoryMonitors from "./regulatory-monitors";
 
 type Observation = { matsne_id: string; title: string; publication: number | null; advertised_publications: number[]; metadata: Record<string,string>; text_sha256: string; text: string; completeness: string; attachments_retained: boolean; current_law_verified: boolean };
 type Capture = { document: { document_id: string; sha256: string }; observation: Observation; source_url: string };
@@ -73,6 +74,7 @@ export default function RegulatorySources({ token, onProposal }: { token: string
     <label>Matsne document ID<input value={number} onChange={event => setNumber(event.target.value)} inputMode="numeric"/></label>
     <label>Publication number<input type="number" min={0} max={10000} value={publication} onChange={event => setPublication(Number(event.target.value))}/></label>
     <button disabled={busy || !/^[1-9][0-9]{0,11}$/.test(number)} onClick={() => void act(false)}>Capture official publication</button>
+    <RegulatoryMonitors token={token} documentNumber={number} publication={publication} onInspect={id => void inspect(id)}/>
     {captured && <section aria-label="Captured regulatory publication"><h3>{captured.observation.title}</h3>
       <p>{captured.observation.completeness.replaceAll("_", " ")}. Annexes have not been retained; current-law completeness remains unverified.</p>
       <p>Served publication: {captured.observation.publication ?? "Unknown"}. Advertised publications: {captured.observation.advertised_publications.join(", ") || "None identified"}.</p>
