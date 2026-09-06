@@ -1,0 +1,38 @@
+{
+  "issue": "NIN-25",
+  "dependency": "NIN-29",
+  "workflow_id": "wfr_ccd6a19603ce2ddd56d1b5834ccfb824241637658f3ca47d35eb1d6c2930ccaf",
+  "definition_version": "report-source-process/2",
+  "node_ids": [
+    "hierarchy",
+    "coverage",
+    "review"
+  ],
+  "edges": [
+    {
+      "source": "hierarchy",
+      "target": "coverage"
+    },
+    {
+      "source": "coverage",
+      "target": "review"
+    }
+  ],
+  "retained_event_ids": [
+    "hierarchy:0:1:started",
+    "hierarchy:0:1:completed",
+    "coverage:0:1:started",
+    "coverage:0:1:completed",
+    "control:d485db33-b385-4b98-aa52-2814b49327ae"
+  ],
+  "runtime_state": "UNOBSERVABLE",
+  "external_effect_claimed": false,
+  "focused_checks": "2 passed",
+  "authentic_retained_projection": "PASS",
+  "production_build": "PASS",
+  "browser_acceptance": {
+    "state": "BLOCKED",
+    "reason": "Automatic approval review rejected isolated web3072 launch: blocked by policy"
+  },
+  "nin25_complete": false
+}
