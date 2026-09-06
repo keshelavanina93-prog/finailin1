@@ -17,6 +17,7 @@ from finai_api.domain.ontology_definitions import (
 from finai_api.domain.resources import ResourceMutation, ResourceProposal
 from finai_api.domain.review import Principal
 from finai_api.services import resources
+from finai_api.services.binding_identity import source_identity_key
 from finai_api.services.object_sets import query_objects
 from finai_api.services.workspace import WorkspaceError
 
@@ -449,8 +450,8 @@ def prepare_binding(
             expected_version_id=current["version_id"] if current else None,
             object_type=target["identity_key"],
             identity_key=current["identity_key"]
-            if canonical_reference and current
-            else f"binding:{identity}:{business_key}"[:256],
+            if current
+            else source_identity_key(identity, business_key),
             display_name=str(values[spec["display_field"]])[:200],
             attributes={
                 field["target_field"]: values[field["source_field"]]

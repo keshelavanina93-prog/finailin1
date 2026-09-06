@@ -54,3 +54,13 @@ validation and impact modules; including `resources.py` reports five pre-existin
 untyped domain-validation calls. The same diagnostics were reproduced from its
 HEAD baseline under D:; no new mypy diagnostics were introduced. These results are
 local contract/integration evidence, not authentic-source or browser acceptance.
+
+## Long source keys
+
+New source-key bindings preserve the readable key when it fits the 256-character
+contract. Longer values use a separate SHA-256 key namespace rather than truncating
+the distinguishing characters. Canonical UUID derivation still uses the complete
+source key. Updates preserve existing accepted identity keys, including legacy
+truncated keys; no history migration or renaming is performed. Three focused
+regressions cover distinct long Unicode keys, preservation of accepted keys, and
+separation from literal digest-looking source values. Ruff and mypy passed.
