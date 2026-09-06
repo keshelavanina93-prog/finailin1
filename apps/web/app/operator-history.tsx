@@ -10,7 +10,7 @@ import "./operator-history.css";
 
 const timestamp=(v:string)=>new Date(v).toLocaleString();
 const identity=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
-function Value({entry,onInspect}:{entry:HistoryValue;onInspect:(id:string)=>void}) {
+export function Value({entry,onInspect}:{entry:HistoryValue;onInspect:(id:string)=>void}) {
   if(!entry.present)return <span className="g8-subtle">Not returned</span>;
   if(entry.value===null)return <span className="g8-subtle">Not set</span>;
   if(typeof entry.value==="string"&&identity.test(entry.value))return <button className="g8-link" onClick={()=>onInspect(entry.value as string)}>Inspect linked object</button>;

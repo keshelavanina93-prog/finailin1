@@ -73,6 +73,13 @@ def listing(principal: User) -> list[dict[str, Any]]:
         return [{"workflow_id": row[0], "created_at": row[1].isoformat()} for row in rows]
 
 
+@router.get("/workbench")
+def workbench(principal: User, company_id: UUID | None = None, include_unbound: bool = False):
+    from finai_api.services.operator_workbench import listing as workbench_listing
+
+    return workbench_listing(principal, company_id, include_unbound)
+
+
 @router.get("/{identity}")
 async def read(identity: str, principal: User) -> dict[str, Any]:
     require_permission(principal, "read")

@@ -1,0 +1,37 @@
+{
+  "company": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+  "action": "opa_009dbb9483f0499e2b974a77db17d7191f98e4a5614db5644626af9f77388097",
+  "monitor": "rgm_d52ab5c3c5ecba17e83e1823d2936435aec2f2c23407a57dc16e228b3f7f60a8",
+  "company_filter": true,
+  "unbound_explicit": true,
+  "existing_approved_proposal_inspected": true,
+  "navigation_and_relogin_restoration": true,
+  "read_only_no_control": true,
+  "unauthenticated_status": 401,
+  "pause_and_resume_readback": true,
+  "schedule_restored": "ENABLED",
+  "original_official_source_download": true,
+  "narrow_no_overflow": true,
+  "page_errors": [],
+  "retained_before_after": true,
+  "readonly_server_control_status": 403,
+  "unavailable_company_status": 404,
+  "simulated_runtime_failure_hides_controls": true,
+  "verification": {
+    "typescript": "PASS",
+    "focused_eslint": "PASS",
+    "ruff": "PASS",
+    "mypy_operator_projection": "PASS",
+    "python_projection_tests": 2,
+    "typescript_command_invariants": 2
+  },
+  "runtime": {
+    "web": "http://127.0.0.1:3062",
+    "api": "http://127.0.0.1:8062",
+    "source_of_truth": "existing scoped PostgreSQL and Temporal"
+  },
+  "limits": [
+    "Existing approved proposal inspected; no new authentic proposal approval performed.",
+    "No external financial effect, Finance, shared Investigation, production or release acceptance claimed."
+  ]
+}
