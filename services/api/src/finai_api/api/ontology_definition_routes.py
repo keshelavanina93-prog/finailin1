@@ -15,6 +15,7 @@ from finai_api.services import resources
 from finai_api.services.account_ontology import inspect_accounts, propose_accounts
 from finai_api.services.fact_aggregation import aggregate_facts
 from finai_api.services.fact_reconciliation import reconcile_facts
+from finai_api.services.fact_runs import read_run, retain_run
 from finai_api.services.object_sets import query_objects
 
 router = APIRouter(prefix="/v1/ontology/model", tags=["ontology model and execution"])
@@ -65,12 +66,22 @@ class ReconcileRun(BaseModel):
 
 @router.post("/facts/{identity}/reconcile")
 def reconcile(principal: User, identity: UUID, request: ReconcileRun) -> dict[str, Any]:
-    return reconcile_facts(principal, identity, request.left, request.right, request.as_of)
+    return retain_run(
+        principal, reconcile_facts(principal, identity, request.left, request.right, request.as_of)
+    )
+
+
+@router.get("/fact-runs/{run_id}")
+def calculation_run(principal: User, run_id: str) -> dict[str, Any]:
+    return read_run(principal, run_id)
 
 
 @router.post("/facts/{identity}/aggregate")
 def aggregate(principal: User, identity: UUID, request: AggregateRun) -> dict[str, Any]:
-    return aggregate_facts(principal, identity, request.query, request.group_by, request.as_of)
+    return retain_run(
+        principal,
+        aggregate_facts(principal, identity, request.query, request.group_by, request.as_of),
+    )
 
 
 @router.get("/definitions")
