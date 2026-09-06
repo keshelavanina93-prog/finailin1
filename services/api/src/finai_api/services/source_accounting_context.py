@@ -9,27 +9,45 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from finai_api.domain.ontology_catalog import canonical_id
 from finai_api.domain.resources import ResourceMutation, ResourceProposal
 from finai_api.services import resources
-from finai_api.services.source_documents import document_bytes
 from finai_api.services.source_financial_facts import read_rows
 from finai_api.services.workspace import WorkspaceError
 
 
 class ContextSelection(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    source_use: Literal["STRUCTURAL_REFERENCE", "ACCOUNTING_INPUT"]
+    source_use: Literal["STRUCTURAL_REFERENCE", "REVIEW_CANDIDATE", "ACCOUNTING_INPUT"]
+    contract_version: Literal["2"] | None = None
     ledger_id: UUID | None = None
     book_id: UUID | None = None
     period_id: UUID | None = None
     currency_id: UUID | None = None
     currency_role: Literal["FUNCTIONAL", "TRANSACTION", "PRESENTATION"] | None = None
+    functional_currency_id: UUID | None = None
+    transaction_currency_id: UUID | None = None
+    reporting_currency_id: UUID | None = None
+    currency_policy: Literal["SOURCE_AMOUNT_ONLY", "MULTI_CURRENCY"] | None = None
+    account_mapping_id: UUID | None = None
+    dimension_mapping_id: UUID | None = None
+    granularity: Literal["SOURCE_ROW", "PERIOD_ACCOUNT"] | None = None
+    deepest_valid_drill: Literal["SOURCE_CELL", "SOURCE_ROW", "PERIOD_ACCOUNT"] | None = None
+    amount_field: str | None = Field(default=None, min_length=1, max_length=128)
+    amount_semantics: Literal["DEBIT_CREDIT", "SIGNED_MOVEMENT", "PERIOD_BALANCE"] | None = None
+    unresolved_reason: str | None = Field(default=None, min_length=10, max_length=2000)
     rationale: str = Field(min_length=10, max_length=2000)
 
 
 def observe(principal, document_id, sheet, profile, company_id):
-    if profile not in {"1c_tb", "1c_journal"}:
+    if profile not in {"1c_tb", "1c_journal", "seg_expense_base"}:
         raise WorkspaceError(422, "Unsupported accounting source profile")
-    metadata, content = document_bytes(principal, document_id)
-    parsed = read_rows(content, sheet, profile)
+    from finai_api.services.accounting_source_document import read_source
+
+    metadata, content = read_source(principal, document_id)
+    if profile == "seg_expense_base":
+        from finai_api.services.seg_expense_source import read_base
+
+        parsed = read_base(content, sheet)
+    else:
+        parsed = read_rows(content, sheet, profile)
     rows = parsed["rows"]
     if not rows:
         raise WorkspaceError(422, "An accounting source scope requires observed rows")
@@ -106,11 +124,38 @@ def validate_context(principal, item, target):
         raise WorkspaceError(422, "Invalid source accounting selection") from exc
     context_fields = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role"]
     if selection.source_use == "STRUCTURAL_REFERENCE":
-        if any(attrs.get(field) is not None for field in context_fields):
+        if any(
+            value is not None
+            for field, value in selection.model_dump().items()
+            if field not in {"source_use", "rationale", "contract_version"}
+        ):
             raise WorkspaceError(
                 422, "Structural references cannot carry active accounting context"
             )
         return
+    if selection.source_use == "REVIEW_CANDIDATE":
+        if not selection.unresolved_reason:
+            raise WorkspaceError(
+                422, "Review candidates must retain the unresolved accounting meaning"
+            )
+        return
+    required = [
+        "contract_version",
+        "functional_currency_id",
+        "currency_policy",
+        "account_mapping_id",
+        "dimension_mapping_id",
+        "granularity",
+        "deepest_valid_drill",
+        "amount_field",
+        "amount_semantics",
+    ]
+    if any(not attrs.get(field) for field in required) or selection.unresolved_reason:
+        raise WorkspaceError(
+            422,
+            "Accounting input requires a complete version 2 interpretation; "
+            "unresolved meaning must remain a review candidate",
+        )
     if any(not attrs.get(field) for field in context_fields):
         raise WorkspaceError(
             422, "Accounting input requires explicit ledger, book, period and currency role"
@@ -142,6 +187,51 @@ def validate_context(principal, item, target):
         raise WorkspaceError(
             422, "Source company, chart, ledger, book, period and currency role disagree"
         )
+    extra = {}
+    for field in [
+        "functional_currency_id",
+        "transaction_currency_id",
+        "reporting_currency_id",
+        "account_mapping_id",
+        "dimension_mapping_id",
+    ]:
+        if attrs.get(field):
+            extra[field] = target(attrs[field], key, "SOURCE_CONTEXT:" + field)
+            expected_type = "MappingVersion" if field.endswith("mapping_id") else "Currency"
+            if (
+                extra[field]["object_type"] != expected_type
+                or extra[field]["evidence_class"] == "REFERENCE_TEMPLATE"
+            ):
+                raise WorkspaceError(
+                    422,
+                    "Accounting interpretation requires canonical non-template "
+                    "currency and mapping versions",
+                )
+    role_field = {
+        "FUNCTIONAL": "functional_currency_id",
+        "TRANSACTION": "transaction_currency_id",
+        "PRESENTATION": "reporting_currency_id",
+    }[selection.currency_role]
+    if (
+        attrs["functional_currency_id"] != ledger_attrs["currency_id"]
+        or attrs.get(role_field) != attrs["currency_id"]
+        or (
+            selection.currency_policy == "MULTI_CURRENCY"
+            and not all(
+                attrs.get(field) for field in ["transaction_currency_id", "reporting_currency_id"]
+            )
+        )
+    ):
+        raise WorkspaceError(
+            422, "Explicit source amount currency must agree with its selected accounting role"
+        )
+    depth = {"PERIOD_ACCOUNT": 0, "SOURCE_ROW": 1, "SOURCE_CELL": 2}
+    if (selection.granularity == "PERIOD_ACCOUNT" and depth[selection.deepest_valid_drill] > 0) or (
+        source_attrs["source_profile"] == "1c_tb" and selection.granularity != "PERIOD_ACCOUNT"
+    ):
+        raise WorkspaceError(
+            422, "Accounting drill cannot claim finer transaction evidence than the source"
+        )
 
 
 def published_context(principal, evidence_id, sheet, profile, company_id):
@@ -168,6 +258,33 @@ def published_context(principal, evidence_id, sheet, profile, company_id):
     }
 
 
+def validate_active_selection(attrs, scope_attrs, target):
+    """Use the publication contract against a consumption's immutable dependency pins."""
+    if attrs.get("source_use") != "ACCOUNTING_INPUT" or attrs.get("contract_version") != "2":
+        raise WorkspaceError(
+            409, "Accounting use requires an accepted version 2 accounting binding"
+        )
+    scope_id = attrs["scope_id"]
+    item = ResourceMutation(
+        resource_id=uuid5(UUID(scope_id), "accounting-binding"),
+        object_type="SourceAccountingBinding",
+        identity_key="accounting-binding-validation",
+        display_name="Accounting interpretation",
+        evidence_class="USER_ASSERTED",
+        valid_from=datetime.now(UTC),
+        attributes=attrs,
+    )
+    validate_context(
+        None,
+        item,
+        lambda identity, *_: (
+            {"attributes": scope_attrs, "evidence_class": "SOURCE_BOUND"}
+            if identity == scope_id
+            else target(identity)
+        ),
+    )
+
+
 def inspect(principal, document_id, sheet, profile, company_id):
     identity, attrs, coordinate, label = observe(principal, document_id, sheet, profile, company_id)
     binding_id = uuid5(identity, "accounting-binding")
@@ -175,6 +292,7 @@ def inspect(principal, document_id, sheet, profile, company_id):
         principal, [identity, binding_id, company_id, UUID(attrs["chart_id"])]
     )
     company = heads.get(str(company_id))
+    unresolved = []
     if (
         not company
         or company["authority_state"] != "APPROVED"
@@ -183,16 +301,24 @@ def inspect(principal, document_id, sheet, profile, company_id):
         or company["display_name"] != label
         or company["attributes"].get("evidence_id") != attrs["evidence_id"]
     ):
-        raise WorkspaceError(409, "Select the reviewed company from this retained source")
+        unresolved.append(
+            "The source company label needs a reviewed binding to the selected canonical company"
+        )
     chart = heads.get(attrs["chart_id"])
-    if not chart or chart["authority_state"] != "APPROVED" or (
-        chart["object_type"] != "LocalChartOfAccounts"
-        or chart["attributes"].get("legal_entity_id") != str(company_id)
+    if (
+        not chart
+        or chart["authority_state"] != "APPROVED"
+        or (
+            chart["object_type"] != "LocalChartOfAccounts"
+            or chart["attributes"].get("legal_entity_id") != str(company_id)
+        )
     ):
-        raise WorkspaceError(409, "Publish the source company chart before accounting context")
+        unresolved.append(
+            "The selected company has no accepted source chart for this accounting scope"
+        )
     candidates = {}
     snapshot = datetime.now(UTC)
-    for kind in ["Ledger", "AccountingBook", "FiscalPeriod", "Currency"]:
+    for kind in ["Ledger", "AccountingBook", "FiscalPeriod", "Currency", "MappingVersion"]:
         candidates[kind] = []
         offset = 0
         while True:
@@ -224,11 +350,17 @@ def inspect(principal, document_id, sheet, profile, company_id):
         "binding": heads.get(str(binding_id)),
         "candidates": candidates,
         "financial_eligibility": "NOT_CERTIFIED",
+        "canonical_ready": not unresolved,
+        "unresolved": unresolved,
+        "source_company_label": label,
+        "source_observations": source_observations(principal, document_id, sheet, profile),
     }
 
 
 def propose_scope(principal, document_id, sheet, profile, company_id):
     result = inspect(principal, document_id, sheet, profile, company_id)
+    if not result["canonical_ready"]:
+        raise WorkspaceError(409, "; ".join(result["unresolved"]))
     attrs = result["observed"]
     if result["scope"]:
         if result["scope"]["attributes"] != attrs:
@@ -277,6 +409,8 @@ def propose_scope(principal, document_id, sheet, profile, company_id):
 
 def propose_binding(principal, document_id, sheet, profile, company_id, selection):
     result = inspect(principal, document_id, sheet, profile, company_id)
+    if not result["canonical_ready"]:
+        raise WorkspaceError(409, "; ".join(result["unresolved"]))
     if not result["scope"] or result["scope"]["authority_state"] != "APPROVED":
         raise WorkspaceError(409, "Publish observed source scope before choosing accounting use")
     prior = result["binding"]
@@ -303,3 +437,38 @@ def propose_binding(principal, document_id, sheet, profile, company_id, selectio
             ],
         ),
     )
+
+
+def source_observations(principal, document_id, sheet, profile):
+    """Expose retained evidence before canonical accounting choices are established."""
+    from finai_api.services.accounting_source_document import read_source
+
+    metadata, content = read_source(principal, document_id)
+    if profile == "seg_expense_base":
+        from finai_api.services.seg_expense_source import read_base
+
+        parsed = read_base(content, sheet)
+        return {
+            "document_id": document_id,
+            "source_sha256": metadata["source_sha256"],
+            "construction_receipt_id": metadata.get("construction_receipt_id"),
+            "source_snapshot": metadata.get("source_snapshot"),
+            "source_company_label": parsed["company_label"],
+            "row_count": len(parsed["rows"]),
+            "observed_from": parsed["observed_from"],
+            "observed_through": parsed["observed_through"],
+            "granularity": parsed["evidence_granularity"],
+            "deepest_valid_drill": parsed["deepest_valid_drill"],
+            "currency_observations": parsed["currency_observations"],
+            "unresolved": parsed["unresolved"],
+            "accounting_mapping_available": False,
+            "sample_rows": parsed["rows"][:3],
+        }
+    parsed = read_rows(content, sheet, profile)
+    return {
+        "document_id": document_id,
+        "source_sha256": metadata["source_sha256"],
+        "source_company_label": parsed["company_label"],
+        "row_count": len(parsed["rows"]),
+        "unresolved": ["Source monetary currency, ledger and book require reviewed interpretation"],
+    }

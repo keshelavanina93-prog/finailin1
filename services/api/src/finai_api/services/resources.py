@@ -473,6 +473,14 @@ def _validate(
                 from finai_api.services.source_accounting_context import validate_context
 
                 validate_context(principal, item, target)
+            if item.object_type in {"JournalEntry", "JournalLine"}:
+                from finai_api.services.accounting_promotion import (
+                    validate_current_binding,
+                    validate_journal,
+                )
+
+                binding = validate_journal(item, target)
+                validate_current_binding(conn, principal, binding)
             if item.object_type == "SourceDimensionAssignment":
                 from finai_api.services.source_dimensions import validate_assignment
 
@@ -679,6 +687,9 @@ def _validate(
                 ),
             }
         )
+    from finai_api.services.accounting_consumption import validate_accounting_proposal
+
+    validate_accounting_proposal(conn, principal, proposal, dependencies)
     # Evaluate the whole proposed redirect graph, including existing decisions, to prohibit cycles.
     with conn.cursor(row_factory=dict_row) as cursor:
         existing_resolutions = cursor.execute(

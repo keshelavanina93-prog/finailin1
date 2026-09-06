@@ -4,7 +4,8 @@ type Context = { params: Promise<{ path: string[] }> };
 async function forward(request: NextRequest, context: Context) {
   const { path } = await context.params;
   const route = path.join("/");
-  const documents = /^source-documents(?:\/doc_[a-f0-9]{64}\/(?:content|preview|(?:companies|accounts|facts|dimensions|corporate|licence)\/(?:inspect|proposal)|facts\/reconcile|dimensions\/query|accounting-context\/(?:inspect|scope-proposal|binding-proposal)))?$/.test(route);
+  const documents = /^source-documents(?:\/doc_[a-f0-9]{64}\/(?:content|preview|(?:companies|accounts|facts|dimensions|corporate|licence)\/(?:inspect|proposal)|facts\/reconcile|dimensions\/query|accounting-context\/(?:inspect|observations|scope-proposal|binding-proposal)))?$/.test(route)
+    || /^source-documents\/ir_[a-f0-9]{64}\/accounting-context\/(?:inspect|observations|scope-proposal|binding-proposal)$/.test(route);
   const lifecycle = /^lifecycle\/(?:requests(?:\/[a-fA-F0-9-]+\/review)?|versions\/[a-fA-F0-9-]+|consumptions\/[a-fA-F0-9-]+(?:\/status)?|consume)$/.test(route);
   const eventTime = /^event-time\/(?:events|streams\/[a-fA-F0-9-]+\/replay)$/.test(route);
   const model = /^model\/(?:fact-runs\/fcr_[a-f0-9]{64}(?:\/authority)?|definitions(?:\/(?:preview|contracts|[a-fA-F0-9-]+))?|proposals\/[a-fA-F0-9-]+\/decision|(?:sets|groups)\/[a-fA-F0-9-]+\/objects|bindings\/[a-fA-F0-9-]+\/proposal|facts\/[a-fA-F0-9-]+\/(?:aggregate(?:\/guarded)?|reconcile)|sources\/ir_[a-f0-9]{64}\/accounts(?:\/proposal)?|derived\/query)$/.test(route);

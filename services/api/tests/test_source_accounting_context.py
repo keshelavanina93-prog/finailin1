@@ -14,11 +14,21 @@ from finai_api.services.workspace import WorkspaceError
 def context():
     ids = {
         key: str(uuid4())
-        for key in ["scope", "company", "chart", "ledger", "book", "period", "calendar", "currency"]
+        for key in [
+            "scope",
+            "company",
+            "chart",
+            "ledger",
+            "book",
+            "period",
+            "calendar",
+            "currency",
+            "mapping",
+        ]
     }
 
     def node(**attrs):
-        return {"attributes": attrs, "evidence_class": "USER_ASSERTED"}
+        return {"attributes": attrs, "evidence_class": "USER_ASSERTED", "object_type": "Currency"}
 
     nodes = {
         ids["scope"]: node(
@@ -26,6 +36,7 @@ def context():
             chart_id=ids["chart"],
             observed_from="2025-11-01",
             observed_through="2025-11-30",
+            source_profile="1c_journal",
         ),
         ids["ledger"]: node(
             legal_entity_id=ids["company"],
@@ -38,6 +49,7 @@ def context():
             calendar_id=ids["calendar"], starts_on="2025-11-01", ends_on="2025-11-30"
         ),
         ids["currency"]: node(code="GEL"),
+        ids["mapping"]: {**node(), "object_type": "MappingVersion"},
     }
     nodes[ids["scope"]]["evidence_class"] = "SOURCE_BOUND"
     from uuid import UUID
@@ -51,6 +63,15 @@ def context():
         attributes={
             "scope_id": ids["scope"],
             "source_use": "ACCOUNTING_INPUT",
+            "contract_version": "2",
+            "functional_currency_id": ids["currency"],
+            "currency_policy": "SOURCE_AMOUNT_ONLY",
+            "account_mapping_id": ids["mapping"],
+            "dimension_mapping_id": ids["mapping"],
+            "granularity": "SOURCE_ROW",
+            "deepest_valid_drill": "SOURCE_ROW",
+            "amount_field": "amount",
+            "amount_semantics": "SIGNED_MOVEMENT",
             **{key + "_id": ids[key] for key in ["ledger", "book", "period", "currency"]},
             "currency_role": "FUNCTIONAL",
             "rationale": "Explicit accounting configuration",
@@ -91,8 +112,60 @@ def test_reference_cannot_be_an_accounting_input():
             item.model_copy(update={"attributes": attrs}),
             lambda identity, *_: nodes[identity],
         )
-    for key in ["ledger_id", "book_id", "period_id", "currency_id", "currency_role"]:
-        del attrs[key]
+    attrs = {
+        key: value
+        for key, value in attrs.items()
+        if key in {"scope_id", "source_use", "rationale", "contract_version"}
+    }
     validate_context(
         None, item.model_copy(update={"attributes": attrs}), lambda identity, *_: nodes[identity]
     )
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "contract_version",
+        "functional_currency_id",
+        "account_mapping_id",
+        "dimension_mapping_id",
+        "amount_field",
+        "amount_semantics",
+        "granularity",
+        "deepest_valid_drill",
+        "currency_policy",
+    ],
+)
+def test_incomplete_interpretation_cannot_activate(field):
+    item, nodes, _ = context()
+    del item.attributes[field]
+    with pytest.raises(WorkspaceError):
+        validate_context(None, item, lambda identity, *_: nodes[identity])
+
+
+def test_unresolved_context_is_reviewable_but_cannot_activate():
+    item, nodes, _ = context()
+    attrs = {
+        "scope_id": item.attributes["scope_id"],
+        "source_use": "REVIEW_CANDIDATE",
+        "contract_version": "2",
+        "rationale": "Preserve the unresolved source interpretation",
+        "unresolved_reason": "Ledger and source amount currency are not established",
+    }
+    validate_context(
+        None, item.model_copy(update={"attributes": attrs}), lambda identity, *_: nodes[identity]
+    )
+    attrs["source_use"] = "ACCOUNTING_INPUT"
+    with pytest.raises(WorkspaceError):
+        validate_context(
+            None,
+            item.model_copy(update={"attributes": attrs}),
+            lambda identity, *_: nodes[identity],
+        )
+
+
+def test_tb_cannot_claim_transaction_drill():
+    item, nodes, ids = context()
+    nodes[ids["scope"]]["attributes"]["source_profile"] = "1c_tb"
+    with pytest.raises(WorkspaceError):
+        validate_context(None, item, lambda identity, *_: nodes[identity])

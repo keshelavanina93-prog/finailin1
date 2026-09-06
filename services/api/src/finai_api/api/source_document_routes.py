@@ -69,19 +69,34 @@ class AccountBinding(AccountSource):
     offset: int = Field(default=0, ge=0, le=10000)
 
 
-class SourceContextWrite(AccountBinding):
+class SourceContextRead(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    sheet: str = Field(min_length=1, max_length=128)
+    profile: Literal["1c_tb", "1c_journal", "seg_expense_base"]
+    company_id: UUID
+    offset: int = Field(default=0, ge=0, le=10000)
+
+
+class SourceContextWrite(SourceContextRead):
     selection: source_accounting_context.ContextSelection
 
 
+@router.post("/{identity}/accounting-context/observations")
+def accounting_observations(principal: User, identity: str, request: SourceContextRead):
+    return source_accounting_context.source_observations(
+        principal, identity, request.sheet, request.profile
+    )
+
+
 @router.post("/{identity}/accounting-context/inspect")
-def inspect_accounting_context(principal: User, identity: str, request: AccountBinding):
+def inspect_accounting_context(principal: User, identity: str, request: SourceContextRead):
     return source_accounting_context.inspect(
         principal, identity, request.sheet, request.profile, request.company_id
     )
 
 
 @router.post("/{identity}/accounting-context/scope-proposal")
-def propose_source_scope(principal: User, identity: str, request: AccountBinding):
+def propose_source_scope(principal: User, identity: str, request: SourceContextRead):
     require_permission(principal, "ontology_propose")
     return source_accounting_context.propose_scope(
         principal, identity, request.sheet, request.profile, request.company_id

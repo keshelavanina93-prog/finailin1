@@ -165,12 +165,14 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "group_account_id": "@GroupAccount",
     },
     "JournalEntry": {
+        "accounting_binding_id?": "@SourceAccountingBinding",
         "legal_entity_id": "@LegalEntity",
         "ledger_id": "@Ledger",
         "period_id": "@FiscalPeriod",
         "reference": "Identifier",
     },
     "JournalLine": {
+        "accounting_binding_id?": "@SourceAccountingBinding",
         "journal_id": "@JournalEntry",
         "account_id": "@LocalAccount",
         "amount": "Money",
@@ -226,6 +228,12 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "ledger_id?": "@Ledger", "book_id?": "@AccountingBook",
         "period_id?": "@FiscalPeriod", "currency_id?": "@Currency",
         "currency_role?": "Identifier", "rationale": "Text",
+        "contract_version?": "Identifier", "functional_currency_id?": "@Currency",
+        "transaction_currency_id?": "@Currency", "reporting_currency_id?": "@Currency",
+        "currency_policy?": "Identifier", "account_mapping_id?": "@MappingVersion",
+        "dimension_mapping_id?": "@MappingVersion", "granularity?": "Identifier",
+        "deepest_valid_drill?": "Identifier", "amount_field?": "Text",
+        "amount_semantics?": "Identifier", "unresolved_reason?": "Text",
     },
 }
 

@@ -9,6 +9,7 @@ from psycopg.rows import dict_row
 from finai_api.domain.object_sets import ObjectSetQuery
 from finai_api.domain.resource_lifecycle import ConsumptionRequest, VersionReference
 from finai_api.domain.review import Principal
+from finai_api.services.accounting_consumption import require_accounting_bindings
 from finai_api.services.fact_aggregation import aggregate_facts
 from finai_api.services.fact_runs import read_run, retain_run
 from finai_api.services.resource_lifecycle import consume, consumption_status
@@ -79,6 +80,7 @@ def aggregate_guarded(
         )
     if len(pins) > 1000:
         raise WorkspaceError(422, "Guarded calculation supports 1000 dependency pins; narrow scope")
+    accounting_bindings = require_accounting_bindings(principal, used, pins)
     # The guard rechecks current versions and lifecycle under the canonical tenant lock.
     # Every accepted direct dependency is checked, including dependencies beyond this query.
     # OBSERVED is only the protocol floor; the accepted consumer sets the actual minimum.
@@ -108,6 +110,7 @@ def aggregate_guarded(
         {
             **result,
             "authority_check": authority_check,
+            "accounting_bindings": accounting_bindings,
             "current_use_authorized": False,
             "evidence_purpose": "HISTORICAL_GUARDED_CALCULATION",
         },
