@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { CanonicalResource, SchemaField } from "@finai/contracts";
+import ObjectBindingAction from "./object-binding-action";
 
 type Query = {
   object_type: string; search: string; filters: { field: string; value: string | number | boolean }[];
@@ -137,6 +138,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       {!result.total && <p className="empty-state">No objects match this query. Try another type, value or relationship.</p>}
       <div className="toolbar"><button className="quiet" disabled={busy || result.query.offset === 0} onClick={() => goToPage(Math.max(0, result.query.offset - result.query.limit))}>Previous</button><span>{result.total ? result.query.offset + 1 : 0}–{Math.min(result.query.offset + result.objects.length, result.total)} of {result.total}</span><button className="quiet" disabled={busy || result.next_offset === null} onClick={() => goToPage(result.next_offset ?? 0)}>Next</button></div>
       <details><summary>Reusable query contract</summary><p>Time is fixed across pages. Run Explore objects again to refresh.</p><pre>{JSON.stringify(result.query, null, 2)}</pre></details>
+      {executionFamily !== "groups" && <ObjectBindingAction key={JSON.stringify(result.query)} token={token} bindings={definitions.filter(item => item.object_type === "ObjectBinding")} query={result.query} count={result.total} onProposal={onProposal}/>}
       {executionFamily !== "groups" && <details><summary>Save this Object Set for shared use</summary><form className="resource-form" onSubmit={publish}><label>Set name<input name="setName" required maxLength={200}/></label><label>Purpose and review rationale<input name="rationale" required minLength={10} maxLength={2000}/></label><label><input type="checkbox" name="fixed"/>Keep this exact query time</label><button disabled={busy}>Propose publication</button></form><p>Without a fixed time, the accepted definition returns effective objects when it is run. Publication uses the shared change-review process.</p></details>}
     </>}
     {publication && <p role="status">Object Set proposed for review. {onProposal ? <button onClick={() => onProposal(publication)}>Open change review</button> : <span>Proposal: {publication}</span>}</p>}

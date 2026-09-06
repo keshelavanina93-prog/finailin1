@@ -283,10 +283,15 @@ def run_group(
     }
 
 
-def run_binding(
-    principal: Principal, identity: UUID, source_query: ObjectSetQuery, rationale: str
-) -> Any:
-    resource = definition(principal, identity)
+def prepare_binding(
+    principal: Principal,
+    identity: UUID,
+    source_query: ObjectSetQuery,
+    rationale: str,
+    version: UUID | None = None,
+    proposal_id: UUID | None = None,
+) -> ResourceProposal:
+    resource = definition(principal, identity, version)
     if resource["object_type"] != "ObjectBinding":
         raise WorkspaceError(422, "Resource is not an Object Binding")
     pins = {pin["relation"]: pin for pin in resource["dependencies"]}
@@ -345,13 +350,19 @@ def run_binding(
             resource["resource_id"]: resource["version_id"],
         }
         lineage[object_id][target["resource_id"]] = target["version_id"]
+    return ResourceProposal(
+        proposal_id=proposal_id or uuid4(),
+        title="Apply ontology binding: " + resource["display_name"][:160],
+        rationale=rationale,
+        access_entity=principal.scope.legal_entity_id,
+        mutations=mutations,
+        source_versions=lineage,
+    )
+
+
+def run_binding(
+    principal: Principal, identity: UUID, source_query: ObjectSetQuery, rationale: str
+) -> Any:
     return resources.propose(
-        principal,
-        ResourceProposal(
-            title="Apply ontology binding: " + resource["display_name"][:160],
-            rationale=rationale,
-            access_entity=principal.scope.legal_entity_id,
-            mutations=mutations,
-            source_versions=lineage,
-        ),
+        principal, prepare_binding(principal, identity, source_query, rationale)
     )

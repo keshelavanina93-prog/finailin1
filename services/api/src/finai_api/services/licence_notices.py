@@ -147,9 +147,10 @@ def inspect(principal, document_id):
     }
 
 
-def propose(principal, document_id, selection):
+def prepare(principal, document_id, selection):
     identity, attrs, metadata = observed(principal, document_id)
     company = resources.get_resource(principal, selection.company_id)["resource"]
+    source_versions = {selection.company_id: UUID(str(company["version_id"]))}
     identity_binding = None
     if company["attributes"].get("registration_code") is None:
         for offset in range(0, 5000, 100):
@@ -165,6 +166,7 @@ def propose(principal, document_id, selection):
             )
             if match:
                 identity_binding = str(match.resource_id)
+                source_versions[match.resource_id] = match.version_id
                 break
             if len(page) < 100:
                 break
@@ -234,6 +236,8 @@ def propose(principal, document_id, selection):
             prior = resources.get_resource(principal, identifier)["resource"]
             if prior["object_type"] != kind:
                 raise WorkspaceError(409, "Licence source identity conflicts with existing type")
+            if kind != "LicenceNoticeBinding":
+                source_versions[identifier] = UUID(str(prior["version_id"]))
             if prior["attributes"] == attributes:
                 continue
             # Additional notices reuse the accepted identity without replacing its evidence.
@@ -262,12 +266,18 @@ def propose(principal, document_id, selection):
         )
     if not mutations:
         raise WorkspaceError(409, "Licence notice and company binding are already published")
-    return resources.propose(
-        principal,
-        ResourceProposal(
-            title="Publish original licence issuance evidence",
-            rationale=selection.rationale,
-            access_entity=principal.scope.legal_entity_id,
-            mutations=mutations,
-        ),
+    return ResourceProposal(
+        title="Publish original licence issuance evidence",
+        rationale=selection.rationale,
+        access_entity=principal.scope.legal_entity_id,
+        mutations=mutations,
+        source_versions={
+            item.resource_id: source_versions
+            for item in mutations
+            if item.object_type == "LicenceNoticeBinding"
+        },
     )
+
+
+def propose(principal, document_id, selection):
+    return resources.propose(principal, prepare(principal, document_id, selection))
