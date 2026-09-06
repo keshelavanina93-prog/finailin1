@@ -41,8 +41,50 @@ def downstream_impact(
                     "state": "PROPOSED",
                 }
             )
+    return _traverse(
+        conn,
+        principal,
+        {
+            identifier: item.expected_version_id is not None
+            for identifier, item in mutations.items()
+        },
+        proposed_reverse,
+        proposal.access_entity,
+    )
+
+
+def current_impact(
+    conn: psycopg.Connection[Any], principal: Principal, root_versions: dict[str, str]
+) -> dict[str, Any]:
+    """Trace accepted dependencies without constructing or publishing a change proposal."""
+    if not root_versions or len(root_versions) > MAX_RESOURCES:
+        raise WorkspaceError(422, "Select a bounded set of accepted root versions")
+    for identity, version in root_versions.items():
+        row = conn.execute(
+            "SELECT 1 FROM resource_heads h JOIN resource_versions v "
+            "USING(tenant_id,resource_id,version_id) WHERE h.tenant_id=%s "
+            "AND h.resource_id=%s AND h.version_id=%s AND v.authority_state='APPROVED'",
+            (principal.scope.tenant_id, UUID(identity), UUID(version)),
+        ).fetchone()
+        if not row:
+            raise WorkspaceError(409, "Impact root is not an accepted current version")
+    result = _traverse(conn, principal, dict.fromkeys(root_versions, True), {}, "__TENANT__")
+    result["selection"] = "CURRENT_ACCEPTED_HEADS"
+    result["roots"] = [
+        {"resource_id": key, "version_id": value} for key, value in sorted(root_versions.items())
+    ]
+    return result
+
+
+def _traverse(
+    conn: psycopg.Connection[Any],
+    principal: Principal,
+    expected_roots: dict[str, bool],
+    proposed_reverse: dict[str, list[dict[str, Any]]],
+    access_entity: str,
+) -> dict[str, Any]:
     neighbors: dict[str, list[dict[str, Any]]] = {}
-    unique_resources: set[str] = set(mutations)
+    unique_resources: set[str] = set(expected_roots)
     restricted = False
 
     def children(identifier: str) -> list[dict[str, Any]]:
@@ -63,7 +105,7 @@ def downstream_impact(
                     "Complete dependency impact requires an authorized "
                     "tenant steward; proposal cannot be accepted",
                 )
-        elif identifier not in mutations or mutations[identifier].expected_version_id is not None:
+        elif identifier not in expected_roots or expected_roots[identifier]:
             raise WorkspaceError(409, "Complete dependency impact is unavailable in this context")
         # A new identity has no accepted version for any current resource to reference.
         # Traverse its proposed dependents below without scanning persisted dependencies.
@@ -86,8 +128,8 @@ def downstream_impact(
             raise WorkspaceError(
                 409, "Dependency impact exceeds the resource bound; narrow the change"
             )
-        if proposal.access_entity != "__TENANT__" and any(
-            row["access_entity"] not in (proposal.access_entity, "__PLATFORM__") for row in rows
+        if access_entity != "__TENANT__" and any(
+            row["access_entity"] not in (access_entity, "__PLATFORM__") for row in rows
         ):
             restricted = True
         for row in rows:
@@ -111,7 +153,7 @@ def downstream_impact(
         return result
 
     affected: dict[tuple[str, str, str], dict[str, Any]] = {}
-    for root in sorted(mutations):
+    for root in sorted(expected_roots):
         pending = deque([(root, 0)])
         seen = {root}
         while pending:

@@ -24,7 +24,7 @@ from finai_api.domain.regulation import RegulatoryDefinition, assess_rule
 from finai_api.domain.resources import ResourceMutation, ResourceProposal
 from finai_api.regulatory_workflow import RegulatorySourceCheck
 from finai_api.security import require_permission
-from finai_api.services import regulatory_monitors, regulatory_sources, resources
+from finai_api.services import regulatory_impact, regulatory_monitors, regulatory_sources, resources
 from finai_api.services import report_workflows as records
 from finai_api.services.fact_runs import read_run, retain_run
 from finai_api.services.regulatory_licence_context import bind_assessment, licence_bindings
@@ -139,6 +139,19 @@ async def control_monitor(identity: str, principal: User, request: MonitorContro
 @router.post("/sources/capture")
 def capture_source(principal: User, request: regulatory_sources.Capture):
     return regulatory_sources.capture(principal, request)
+
+
+@router.post("/sources/impact")
+def source_impact(principal: User, request: regulatory_impact.ImpactRequest):
+    return regulatory_impact.assess(principal, request)
+
+
+@router.get("/impacts/{identity}")
+def read_impact(principal: User, identity: str):
+    result = read_run(principal, identity)
+    if result.get("contract") != "regulatory-dependency-impact/1":
+        raise WorkspaceError(404, "Regulatory impact unavailable")
+    return result
 
 
 @router.post("/sources/proposals")

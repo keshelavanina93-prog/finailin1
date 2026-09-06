@@ -35,8 +35,10 @@ HEAD_SELECT = (
 
 
 @contextmanager
-def resource_connection(principal: Principal) -> Iterator[psycopg.Connection[Any]]:
-    with connection(principal.scope) as conn:
+def resource_connection(
+    principal: Principal, *, repeatable_read: bool = False
+) -> Iterator[psycopg.Connection[Any]]:
+    with connection(principal.scope, repeatable_read=repeatable_read) as conn:
         conn.execute(
             (
                 "SELECT "
@@ -442,6 +444,7 @@ def _validate(
                 validate_licence_notice(principal, item, target)
             if item.object_type == "SourceRegulatoryPublication":
                 from finai_api.services.regulatory_sources import validate as validate_publication
+
                 validate_publication(principal, item, target)
             if item.object_type in {"SourceCorporateObservation", "CorporateDisclosureBinding"}:
                 from finai_api.services.corporate_disclosures import validate

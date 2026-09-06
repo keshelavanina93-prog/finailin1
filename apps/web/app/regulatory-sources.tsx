@@ -7,6 +7,8 @@ import RegulatoryMonitors from "./regulatory-monitors";
 type Observation = { matsne_id: string; title: string; publication: number | null; advertised_publications: number[]; metadata: Record<string,string>; text_sha256: string; text: string; completeness: string; attachments_retained: boolean; current_law_verified: boolean };
 type Capture = { document: { document_id: string; sha256: string }; observation: Observation; source_url: string };
 type Publication = { resource_id: string; version_id: string; attributes: { document_id: string; act_id: string; observation: Observation } };
+type ImpactObject = { resource_id: string; version_id: string; object_type: string; display_name: string; depth?: number; relation?: string };
+type Impact = { run_id: string; act: ImpactObject; observed_at: string; dependency_impact: { affected: ImpactObject[] }; rule_contexts: { rule: ImpactObject; references: ImpactObject[] }[]; financial_impact: { state: string; reason: string }; limitations: string[] };
 
 export default function RegulatorySources({ token, onProposal }: { token: string; onProposal: (id: string) => void }) {
   const [number, setNumber] = useState("");
@@ -20,6 +22,8 @@ export default function RegulatorySources({ token, onProposal }: { token: string
   const [before, setBefore] = useState("");
   const [after, setAfter] = useState("");
   const [comparison, setComparison] = useState<{ run_id: string; state: string; diff: string[]; diff_truncated: boolean } | null>(null);
+  const [impact, setImpact] = useState<Impact | null>(null);
+  const [impactId, setImpactId] = useState("");
   useEffect(() => {
     const controller = new AbortController();
     async function load() {
@@ -69,6 +73,19 @@ export default function RegulatorySources({ token, onProposal }: { token: string
     } catch (failure) { setError(failure instanceof Error ? failure.message : "Source unavailable"); }
     finally { setBusy(false); }
   }
+  async function traceImpact(reopen: boolean) {
+    setBusy(true); setError("");
+    try {
+      const response = await fetch(reopen ? `/api/ontology/regulation/impacts/${impactId}` : "/api/ontology/regulation/sources/impact", {
+        method: reopen ? "GET" : "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: reopen ? undefined : JSON.stringify({ document_id: captured!.document.document_id }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(typeof result.detail === "string" ? result.detail : "Impact trace unavailable");
+      setImpact(result); setImpactId(result.run_id);
+    } catch (failure) { setError(failure instanceof Error ? failure.message : "Impact trace failed"); }
+    finally { setBusy(false); }
+  }
   return <Panel title="Official regulatory sources">
     <p>Capture an exact Matsne publication and review its act identity. Capture does not establish current law or activate obligations.</p>
     <label>Matsne document ID<input value={number} onChange={event => setNumber(event.target.value)} inputMode="numeric"/></label>
@@ -82,6 +99,19 @@ export default function RegulatorySources({ token, onProposal }: { token: string
       <p><a href={captured.source_url} target="_blank" rel="noreferrer">Open official publication</a></p>
       <label>Regulatory source review rationale<textarea value={rationale} onChange={event => setRationale(event.target.value)} maxLength={2000}/></label>
       <button disabled={busy || rationale.trim().length < 10} onClick={() => void act(true)}>Propose act and publication binding</button>
+      <button disabled={busy} onClick={() => void traceImpact(false)}>Trace affected ontology</button>
+    </section>}
+    <label>Retained regulatory impact ID<input value={impactId} onChange={event => setImpactId(event.target.value)}/></label>
+    <button disabled={busy || !/^fcr_[a-f0-9]{64}$/.test(impactId)} onClick={() => void traceImpact(true)}>Reopen impact trace</button>
+    {impact && <section aria-label="Regulatory ontology impact"><h3>Potential dependency impact</h3>
+      <p>{impact.act.display_name} · Snapshot {impact.observed_at}</p>
+      <p>Financial impact: {impact.financial_impact.state}. {impact.financial_impact.reason}.</p>
+      {impact.dependency_impact.affected.map(object => <p key={object.version_id}>{object.object_type}: {object.display_name} · dependency depth {object.depth}<br/><small>Object {object.resource_id} · version {object.version_id}</small></p>)}
+      {!impact.dependency_impact.affected.length && <p>No registered downstream dependencies found. This does not establish no business impact.</p>}
+      {impact.rule_contexts.map(context => <details key={context.rule.version_id}><summary>{context.rule.display_name}: exact company, licence and evidence references</summary>
+        {context.references.map(reference => <p key={`${reference.relation}:${reference.version_id}`}>{reference.relation}: {reference.display_name} ({reference.object_type})<br/><small>{reference.resource_id} · version {reference.version_id}</small></p>)}
+      </details>)}
+      <ul>{impact.limitations.map(limit => <li key={limit}>{limit}</li>)}</ul>
     </section>}
     {error && <p role="alert">{error}</p>}
     <h3>Reviewed publication history</h3><button onClick={() => setRevision(value => value + 1)}>Refresh publications</button>
