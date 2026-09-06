@@ -1,0 +1,31 @@
+{
+  "focused_lint": "PASS",
+  "capability": "NIN25 selected canonical context in NYX evidence commands",
+  "production_build": "PASS",
+  "steps": [
+    "Selected retained regulatory rule from Home",
+    "Explain selected described the actual canonical inspection",
+    "Selected different licence binding",
+    "Original reply Trace retained original rule and cutoff",
+    "Original reply History reopened the rule"
+  ],
+  "limits": [
+    "Deterministic metadata presentation only",
+    "No causal inference or financial calculation",
+    "Conversation references are session-local; saved shared investigations remain open"
+  ],
+  "full_NIN45_acceptance": false,
+  "browser_journey": "PASS",
+  "web_url": "http://127.0.0.1:3062",
+  "version_id": "123923c7-5ee4-5c53-8ca7-7f4c08432655",
+  "release_accepted": false,
+  "full_NIN41_acceptance": false,
+  "web_types": "PASS",
+  "known_at": "2026-09-06T21:59:30.021133+00:00",
+  "resource_id": "f2412b1d-fe1f-423e-966d-95f326d0cc0a",
+  "full_NIN25_acceptance": false,
+  "screenshot": {
+    "path": ".finai/artifacts/browser-shots/g8-nyx-retained-trace.png",
+    "sha256": "fd9cefdfa922ad8669351f96e1e7b12fad6132b751291cc76e9ea152f177b3f8"
+  }
+}
