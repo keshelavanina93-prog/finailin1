@@ -208,6 +208,22 @@ def test_asof_root_and_exact_old_dependencies_survive_correction_and_revocation(
         params={"valid_at": effective.isoformat(), "known_at": corrected.system_from.isoformat()},
     ).json()["root_version_id"] == str(corrected.version_id)
     assert client.get(path, params={"valid_at": "2026-08-15T00:00:00"}).status_code == 422
+    operator_path = f"/v1/ontology/operator/trace/{account.resource_id}"
+    operator_params = {
+        "version_id": str(account.version_id),
+        "known_at": account.system_from.isoformat(),
+    }
+    recorded = client.get(operator_path, params=operator_params)
+    assert recorded.status_code == 200
+    assert recorded.json()["root_version_id"] == str(account.version_id)
+    assert datetime.fromisoformat(recorded.json()["known_at"]) == account.system_from
+    # A pinned version cannot leak into an investigation before it was recorded.
+    assert client.get(
+        operator_path, params={**operator_params, "known_at": entity.system_from.isoformat()}
+    ).status_code == 404
+    assert client.get(
+        operator_path, params={**operator_params, "known_at": "2026-08-15T00:00:00"}
+    ).status_code == 422
     assert TestClient(app).get(path).status_code == 401
     blocked = TestClient(app, headers={"Authorization": "Bearer outsider"}).get(path)
     assert blocked.status_code == 404 and "SYNTHETIC" not in blocked.text

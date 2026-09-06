@@ -4,7 +4,7 @@ import {useEffect, useRef, useState} from "react";
 import {displayName} from "./display-name";
 import "./operator-trace.css";
 
-export type TraceSelection = {resource_id:string; version_id:string; company_id:string};
+export type TraceSelection = {resource_id:string; version_id:string; company_id:string; known_at?:string};
 type Node = {resource_id:string;version_id:string;object_type:string;display_name:string;authority_state:string;system_from:string;valid_from:string;source_document_id?:string|null};
 type Edge = {source_version_id:string;target_version_id:string;relation:string};
 type Graph = {root_version_id:string;known_at:string;nodes:Node[];edges:Edge[]};
@@ -22,8 +22,8 @@ export default function OperatorTrace({token,root,onClose,onInspect}:{token:stri
   return()=>{observer.disconnect();element.removeEventListener("scroll",update);};
  },[graph]);
  useEffect(()=>{const controller=new AbortController();
-  void fetch(`/api/ontology/operator/trace/${root.resource_id}?version_id=${root.version_id}`,{headers:{Authorization:`Bearer ${token}`},signal:controller.signal}).then(async response=>{const result=await response.json();if(!response.ok)throw Error(typeof result.detail==="string"?result.detail:"Trace unavailable");if(!controller.signal.aborted)setGraph(result);}).catch(e=>{if(!controller.signal.aborted)setError(String(e));});return()=>controller.abort();
- },[token,root.resource_id,root.version_id]);
+  void fetch(`/api/ontology/operator/trace/${root.resource_id}?version_id=${root.version_id}${root.known_at?`&known_at=${encodeURIComponent(root.known_at)}`:""}`,{headers:{Authorization:`Bearer ${token}`},signal:controller.signal}).then(async response=>{const result=await response.json();if(!response.ok)throw Error(typeof result.detail==="string"?result.detail:"Trace unavailable");if(!controller.signal.aborted)setGraph(result);}).catch(e=>{if(!controller.signal.aborted)setError(String(e));});return()=>controller.abort();
+ },[token,root.resource_id,root.version_id,root.known_at]);
  const depth=new Map<string,number>([[root.version_id,0]]);
  if(graph){const queue=[root.version_id];for(let i=0;i<queue.length;i++){for(const edge of graph.edges.filter(e=>e.source_version_id===queue[i]))if(!depth.has(edge.target_version_id)){depth.set(edge.target_version_id,depth.get(queue[i])!+1);queue.push(edge.target_version_id);}}}
  const matching=graph?.nodes.filter(n=>(technical||!["SchemaDefinition","SemanticContract","LinkType"].includes(n.object_type))&&`${n.display_name} ${n.object_type}`.toLowerCase().includes(filter.toLowerCase()))??[];
@@ -44,7 +44,7 @@ export default function OperatorTrace({token,root,onClose,onInspect}:{token:stri
  function fit(){const element=viewport.current;if(!element)return;setZoom(Math.max(.01,Math.min(1,(element.clientWidth-16)/width,(element.clientHeight-16)/height)));element.scrollTo(0,0);}
  async function download(node:Node){try{const response=await fetch(`/api/ontology/source-documents/${node.source_document_id}/content`,{headers:{Authorization:`Bearer ${token}`}});if(!response.ok)throw Error("Original source unavailable in this context");const url=URL.createObjectURL(await response.blob());const anchor=document.createElement("a");anchor.href=url;anchor.download=node.source_document_id!;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){setError(String(e));}}
  return <section className="g8-trace" aria-label="System trace">
-  <header><div><strong>System trace</strong><p>Recorded dependency versions · changes require a separate reviewed action</p></div><button onClick={onClose}>Close trace</button></header>
+  <header><div><strong>System trace</strong><p>Recorded dependency versions · changes require a separate reviewed action</p>{graph&&<p>Known by G8 at <time dateTime={graph.known_at}>{new Date(graph.known_at).toLocaleString()}</time></p>}</div><button onClick={onClose}>Close trace</button></header>
   <div className="g8-trace-toolbar"><label>Find in trace<input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Company, rule, source…"/></label><label><input type="checkbox" checked={technical} onChange={e=>setTechnical(e.target.checked)}/>Include schema mechanics</label><button onClick={()=>setZoom(z=>Math.max(.01,z/1.25))} aria-label="Zoom out">−</button><span aria-label="Canvas zoom">{Math.round(zoom*100)}%</span><button onClick={()=>setZoom(z=>Math.min(2,z*1.25))} aria-label="Zoom in">+</button><button disabled={!nodes.length} onClick={fit}>Fit visible graph</button><button disabled={!selected} onClick={()=>revealNode(focus)}>Fit selected object</button><button onClick={()=>{setZoom(1);viewport.current?.scrollTo(0,0);}}>Reset canvas</button></div>
   {error&&<p role="alert">{error}</p>}{!graph&&!error&&<p role="status">Resolving recorded version dependencies…</p>}
   {graph&&<><p>{nodes.length} of {graph.nodes.length} recorded versions visible{matching.length>200?" · narrow the filter to see additional matches":""}. Arrows point to dependencies. Drag the canvas or use its scrollbars.</p><div className="g8-trace-body">

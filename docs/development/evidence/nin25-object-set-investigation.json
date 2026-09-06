@@ -1,0 +1,68 @@
+{
+  "capability": "NIN-25 ontology result to exact-version investigation",
+  "mode": "authenticated native API over retained company resources",
+  "journeys": [
+    {
+      "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "object_type": "LicenceNoticeBinding",
+      "resource_id": "ba373aa4-0047-5c25-8508-27800c3ecc0e",
+      "version_id": "7f4e68f4-b569-5681-8d54-628d19ce4d77",
+      "query": {
+        "object_type": "LicenceNoticeBinding",
+        "resource_ids": [
+          "ba373aa4-0047-5c25-8508-27800c3ecc0e"
+        ],
+        "filters": [],
+        "traversal": [],
+        "search": "",
+        "limit": 1,
+        "offset": 0,
+        "valid_at": "2026-09-06T20:45:48.275276Z",
+        "known_at": "2026-09-06T20:45:48.275276Z"
+      },
+      "replay_equal": true,
+      "trace_nodes": 17,
+      "trace_edges": 34,
+      "knowledge_cutoff_verified": true
+    },
+    {
+      "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "object_type": "LocalAccount",
+      "resource_id": "25c1939a-e256-5027-b743-27f79e7462fd",
+      "version_id": "9b7a1d00-7f16-5558-aa5a-7023f3cd9b93",
+      "query": {
+        "object_type": "LocalAccount",
+        "resource_ids": [
+          "25c1939a-e256-5027-b743-27f79e7462fd"
+        ],
+        "filters": [],
+        "traversal": [],
+        "search": "",
+        "limit": 1,
+        "offset": 0,
+        "valid_at": "2026-09-06T20:45:52.987416Z",
+        "known_at": "2026-09-06T20:45:52.987416Z"
+      },
+      "replay_equal": true,
+      "trace_nodes": 17,
+      "trace_edges": 27,
+      "knowledge_cutoff_verified": true
+    }
+  ],
+  "browser_acceptance": false,
+  "release_accepted": false,
+  "live_web_api_readback": [
+    {
+      "resource_id": "ba373aa4-0047-5c25-8508-27800c3ecc0e",
+      "status": 200,
+      "known_at_preserved": true
+    },
+    {
+      "resource_id": "25c1939a-e256-5027-b743-27f79e7462fd",
+      "status": 200,
+      "known_at_preserved": true
+    }
+  ],
+  "native_temporal_route_regression": "passed",
+  "build_pass": true
+}
