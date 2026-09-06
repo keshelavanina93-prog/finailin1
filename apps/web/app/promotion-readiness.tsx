@@ -1,20 +1,21 @@
 "use client";
 import {useEffect,useRef,useState, type FormEvent} from "react";
-import type {PromotionCheck} from "@finai/contracts";
+import type {PromotionCheck, ResourceProposalDetail} from "@finai/contracts";
 import {Badge} from "./g8-ui";
 
-type Props = {token:string;proposalId:string};
+type Props = {token:string;proposalId:string;onDecision?:(detail:ResourceProposalDetail)=>void};
 type Checked = PromotionCheck & {change_names:string[]};
 export default function PromotionReadiness(props:Props) {
   return <PromotionPanel key={`${props.proposalId}:${props.token}`} {...props}/>;
 }
-function PromotionPanel({token,proposalId}:Props) {
+function PromotionPanel({token,proposalId,onDecision}:Props) {
   const [result,setResult]=useState<Checked|null>(null);
   const [error,setError]=useState("");
   const [revision,setRevision]=useState(0);
   const [busy,setBusy]=useState(true);
   const [submitting,setSubmitting]=useState(false);
   const [rationale,setRationale]=useState("");
+  const [decision,setDecision]=useState<"APPROVED"|"REJECTED">("APPROVED");
   const [receipt,setReceipt]=useState("");
   const active=useRef(true);
   useEffect(()=>{active.current=true;return()=>{active.current=false;};},[]);
@@ -38,21 +39,25 @@ function PromotionPanel({token,proposalId}:Props) {
     }
     void load();return()=>{cancelled=true;controller.abort();};
   },[token,proposalId,revision]);
-  async function approve(event:FormEvent<HTMLFormElement>) {
+  async function recordDecision(event:FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if(submitting || busy || result?.status!=="ELIGIBLE")return;
+    if(submitting || busy || !result || result.status==="DECIDED" || (decision==="APPROVED" && result.status!=="ELIGIBLE"))return;
     setSubmitting(true);setError("");setReceipt("");
     try {
       const response=await fetch(`/api/ontology/proposals/${proposalId}/decision`,{
         method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
-        body:JSON.stringify({decision:"APPROVED",rationale})
+        body:JSON.stringify({decision,rationale})
       });
       const data=await response.json();
       if(!active.current)return;
-      if(!response.ok)throw new Error(typeof data.detail === "string" ? data.detail : "Approval could not be recorded");
-      setReceipt(`Approved ${data.proposal.mutations.length} changes together. The review and accepted versions are retained.`);
+      if(!response.ok)throw new Error(typeof data.detail === "string" ? data.detail : "The decision could not be recorded");
+      if(data.decision!=="APPROVED" && data.decision!=="REJECTED")throw new Error("No retained decision was returned. Refresh the proposal before retrying.");
+      setReceipt(data.decision==="APPROVED"
+        ? `Approved ${data.proposal.mutations.length} changes together. The review and accepted versions are retained.`
+        : "Proposal rejected. The reason is retained; accepted business records were not changed.");
+      onDecision?.(data as ResourceProposalDetail);
       setRationale("");
-    } catch(error) {if(active.current)setError(error instanceof Error ? error.message : "Approval could not be recorded");}
+    } catch(error) {if(active.current)setError(error instanceof Error ? error.message : "The decision could not be recorded");}
     finally {if(active.current){setSubmitting(false);setRevision(value=>value+1);}}
   }
   return <section className="g8-promotion" aria-label="Current promotion eligibility">
@@ -68,11 +73,15 @@ function PromotionPanel({token,proposalId}:Props) {
       </> : <p>No evaluation was retained for this proposal. Submit a refreshed proposal before promotion.</p>}
     </section>}
     {receipt && <p role="status">{receipt}</p>}
-    {result?.status === "ELIGIBLE" && <form className="resource-form" onSubmit={approve}>
+    {result && result.status!=="DECIDED" && <form className="resource-form" onSubmit={recordDecision}>
       <details><summary>{result.change_names.length} changes reviewed together</summary><ul>{result.change_names.map((name,index)=><li key={index}>{name}</li>)}</ul></details>
+      <label>Decision<select value={decision} disabled={submitting} onChange={event=>setDecision(event.target.value as "APPROVED"|"REJECTED")}>
+        <option value="APPROVED" disabled={result.status!=="ELIGIBLE"}>Approve changes</option>
+        <option value="REJECTED">Reject proposal</option>
+      </select></label>
       <label>Review rationale<textarea value={rationale} onChange={event=>setRationale(event.target.value)} minLength={10} maxLength={2000} required disabled={submitting}/></label>
-      <button disabled={busy || submitting || rationale.trim().length<10}>{submitting ? "Recording review..." : `Approve ${result.change_names.length} changes together`}</button>
-      <small>All changes are promoted in one transaction. Changed dependencies or failed evaluations block the entire approval.</small>
+      <button disabled={busy || submitting || rationale.trim().length<10 || (decision==="APPROVED" && result.status!=="ELIGIBLE")}>{submitting ? "Recording review..." : decision==="REJECTED" ? "Reject this proposal" : `Approve ${result.change_names.length} changes together`}</button>
+      <small>{decision==="REJECTED" ? "Rejection closes this proposal and retains your reason. A correction requires a new proposal." : "All changes are promoted in one transaction. Changed dependencies or failed evaluations block the entire approval."}</small>
     </form>}
     {result?.decision && <p>Recorded decision: {result.decision.toLowerCase()}</p>}
     {result && <small>Checked {new Date(result.checked_at).toLocaleTimeString()} · advisory; this check does not approve</small>}
