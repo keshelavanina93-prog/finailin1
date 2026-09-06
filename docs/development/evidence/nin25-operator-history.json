@@ -1,0 +1,17 @@
+{
+  "root": "c4547714-fcb5-5a1b-b4de-908dd40da5d5",
+  "version": "5dd48c9f-3c99-5837-be5f-c360e61ffbbe",
+  "company": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+  "nodes": 17,
+  "edges": 36,
+  "authentic_source": "Retained SGG 2024 filing",
+  "history": true,
+  "single_version_boundary": true,
+  "evidence_download": true,
+  "navigation_restored": true,
+  "relogin_restored": true,
+  "narrow_viewport": true,
+  "unauthenticated_status": 401,
+  "simulated_permission_loss_clears_values": true,
+  "page_errors": []
+}
