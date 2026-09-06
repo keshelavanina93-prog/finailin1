@@ -54,3 +54,36 @@ reason for each blocker. Evidence buttons open the existing canonical trace with
 resource/version and company context preserved. Refresh re-inspects current state without
 rerunning arithmetic. The focused PostgreSQL/API test covers before/after withdrawal,
 unchanged historical evidence, no new receipt, authentication and company isolation.
+
+## Real storage, HTTP and API-restart integration — 2026-09-06
+
+Run `scripts/verify-guarded-calculation.py` after `scripts/load-local.ps1` for an opt-in,
+isolated retained-source journey. It uses real MinIO bytes, CSV parsing, canonical schemas,
+source records, ObjectBinding publication, FactContract arithmetic, reviewed lifecycle events,
+HTTP API execution and PostgreSQL evidence. No calculation, source reader, lifecycle guard or
+persistence function is mocked. Its source is explicitly synthetic; it does not modify existing
+business identities or establish authentic financial authority.
+
+Observed acceptance:
+
+- Two retained source rows with `0.1` and `0.2` produced exactly `0.3` in `FIXTURE_UNITS`.
+- The first HTTP execution was refused before observed authority existed.
+- The accepted consumer's minimum was explicitly `OBSERVED`; financial certification stayed null.
+- API process 43584 stopped; process 12468 reopened the exact same content-addressed result.
+- Revoking one fixture input blocked another execution and current-use inspection, while the
+  historical result remained byte-for-byte equivalent as JSON.
+- Both owned API processes stopped. Existing API/web processes and business data were preserved.
+
+Evidence: `.finai/artifacts/guarded-journey/b5e26c6024e443f1b8059488918629ba/evidence.json`.
+Retained run: `fcr_c8e7d6178d84b760c59e7c3bb19b6dfcdef839fab26be8b649cd5195f3027509`.
+Source SHA-256: `0533694567052e0ce31416ac9edfeb891a266b2767152968c63c23b39f120f28`.
+Authority receipt: `b216b1e4-56df-4fb7-9ac6-7c22231bb562`.
+
+This closes the combined local integration demonstration for this path. It is an API restart
+proof, not a database restart or production release. `AUTHENTIC_SOURCE_PASS` and browser
+acceptance remain false. A read-only registry check found two non-synthetic source accounting
+scopes with `coverage_state=UNESTABLISHED` and no accepted non-synthetic SourceAccountingBinding,
+FactContract, Ledger, AccountingBook or Currency configuration for this run. Authentic execution
+requires an explicit source-use/ledger/book/period/currency binding; no unit, coverage or accounting
+authority has been invented. NIN-22 remains reference-only and the withdrawn January target is
+not used.
