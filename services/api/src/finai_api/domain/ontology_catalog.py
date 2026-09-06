@@ -110,6 +110,15 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
     "GroupAccount": {"account_code": "AccountCode"},
     "DimensionDefinition": {"code": "Identifier"},
     "DimensionMember": {"dimension_id": "@DimensionDefinition", "code": "Identifier"},
+    "CompanyDimension": {
+        "legal_entity_id": "@LegalEntity", "dimension_id": "@DimensionDefinition",
+        "source_record_id": "@SourceRecord", "source_column": "Identifier",
+        "source_header": "Text",
+    },
+    "SourceDimensionAssignment": {
+        "observation_id": "@SourceJournalMovement", "company_dimension_id": "@CompanyDimension",
+        "member_id": "@DimensionMember", "source_record_id": "@SourceRecord",
+    },
     "AccountDimensionRule": {
         "account_id": "@LocalAccount",
         "dimension_id": "@DimensionDefinition",

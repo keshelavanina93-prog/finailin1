@@ -408,6 +408,10 @@ def _validate(
             from finai_api.services.ontology_definition_validation import validate_definition
 
             validate_definition(item, schema_by_name, link_by_name, target)
+            if item.object_type == "SourceDimensionAssignment":
+                from finai_api.services.source_dimensions import validate_assignment
+
+                validate_assignment(item, target)
             for source_id, source_version in proposal.source_versions.get(
                 item.resource_id, {}
             ).items():

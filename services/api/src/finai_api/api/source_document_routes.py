@@ -9,6 +9,7 @@ from finai_api.security import require_permission
 from finai_api.services import (
     source_account_binding,
     source_accounting_reconciliation,
+    source_dimensions,
     source_financial_facts,
 )
 from finai_api.services.company_source import inspect_companies, propose_companies
@@ -36,6 +37,39 @@ class AccountSource(BaseModel):
 class AccountBinding(AccountSource):
     company_id: UUID
     offset: int = Field(default=0, ge=0, le=10000)
+
+
+class DimensionQuery(AccountBinding):
+    member_id: UUID
+
+
+@router.post("/{identity}/dimensions/query")
+def dimension_movements(principal: User, identity: str, request: DimensionQuery):
+    if request.profile != "1c_journal":
+        raise WorkspaceError(422, "This binding requires explicit journal analytical columns")
+    return source_dimensions.movements(
+        principal, identity, request.sheet, request.company_id, request.member_id, request.offset
+    )
+
+
+@router.post("/{identity}/dimensions/inspect")
+def inspect_dimensions(principal: User, identity: str, request: AccountBinding):
+    if request.profile != "1c_journal":
+        raise WorkspaceError(422, "This binding requires explicit journal analytical columns")
+    result = source_dimensions.inspect(
+        principal, identity, request.sheet, request.company_id, request.offset
+    )
+    return {k: v for k, v in result.items() if k not in {"mutations", "source_versions"}}
+
+
+@router.post("/{identity}/dimensions/proposal")
+def propose_dimensions(principal: User, identity: str, request: AccountBinding):
+    require_permission(principal, "ontology_propose")
+    if request.profile != "1c_journal":
+        raise WorkspaceError(422, "This binding requires explicit journal analytical columns")
+    return source_dimensions.propose(
+        principal, identity, request.sheet, request.company_id, request.offset
+    )
 
 
 @router.post("/{identity}/facts/inspect")

@@ -38,6 +38,8 @@ def main() -> None:
         "SourceAccountDefinition",
         "SourceJournalMovement",
         "SourceTrialBalanceRow",
+        "CompanyDimension",
+        "SourceDimensionAssignment",
     }
     mutations = []
     for spec in platform_definitions(author.scope.tenant_id):
