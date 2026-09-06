@@ -9,6 +9,7 @@ from finai_api.api.ontology_routes import User
 from finai_api.security import require_permission
 from finai_api.services import (
     source_account_binding,
+    source_accounting_context,
     source_accounting_reconciliation,
     source_dimensions,
     source_financial_facts,
@@ -38,6 +39,33 @@ class AccountSource(BaseModel):
 class AccountBinding(AccountSource):
     company_id: UUID
     offset: int = Field(default=0, ge=0, le=10000)
+
+
+class SourceContextWrite(AccountBinding):
+    selection: source_accounting_context.ContextSelection
+
+
+@router.post("/{identity}/accounting-context/inspect")
+def inspect_accounting_context(principal: User, identity: str, request: AccountBinding):
+    return source_accounting_context.inspect(
+        principal, identity, request.sheet, request.profile, request.company_id
+    )
+
+
+@router.post("/{identity}/accounting-context/scope-proposal")
+def propose_source_scope(principal: User, identity: str, request: AccountBinding):
+    require_permission(principal, "ontology_propose")
+    return source_accounting_context.propose_scope(
+        principal, identity, request.sheet, request.profile, request.company_id
+    )
+
+
+@router.post("/{identity}/accounting-context/binding-proposal")
+def propose_source_context(principal: User, identity: str, request: SourceContextWrite):
+    require_permission(principal, "ontology_propose")
+    return source_accounting_context.propose_binding(
+        principal, identity, request.sheet, request.profile, request.company_id, request.selection
+    )
 
 
 class DimensionQuery(AccountBinding):

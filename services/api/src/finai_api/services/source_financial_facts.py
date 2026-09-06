@@ -264,7 +264,10 @@ def prepare(
             )
         )
         row["published_version_id"] = accepted["version_id"] if accepted else None
+    from finai_api.services.source_accounting_context import published_context
+
     return {
+        "accounting_context": published_context(principal, evidence, sheet, profile, company_id),
         "document_id": document_id,
         "source_sha256": metadata["source_sha256"],
         "object_type": parsed["object_type"],

@@ -192,6 +192,19 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "currency_id": "@Currency",
         "source_scope_key": "Identifier",
     },
+    "SourceAccountingScope": {
+        "document_id": "Identifier", "source_record_id": "@SourceRecord",
+        "legal_entity_id": "@LegalEntity", "chart_id": "@LocalChartOfAccounts",
+        "worksheet": "Text", "source_profile": "Identifier",
+        "observed_from": "Date", "observed_through": "Date", "date_basis": "Identifier",
+        "coverage_state": "Identifier", "evidence_id": "@SourceEvidence",
+    },
+    "SourceAccountingBinding": {
+        "scope_id": "@SourceAccountingScope", "source_use": "Identifier",
+        "ledger_id?": "@Ledger", "book_id?": "@AccountingBook",
+        "period_id?": "@FiscalPeriod", "currency_id?": "@Currency",
+        "currency_role?": "Identifier", "rationale": "Text",
+    },
 }
 
 # Spatial fields are optional extensions; accepted versions retain their original schema.

@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState} from "react";
 import SourceReconciliation from "./source-reconciliation";
 import SourceDimensions from "./source-dimensions";
+import SourceAccountingContext from "./source-accounting-context";
 type Page={object_type:string;total_rows:number;offset:number;next_offset:number|null;rows:{resource_id:string;coordinate:string;publication_state:string;published_version_id:string|null;attributes:Record<string,unknown>}[];duplicate_account_rows:Record<string,number[]>;financial_publication_status:string};
 export default function SourceFactPublication({token,documentId,sheet,profile,companyId,canPropose,onProposal}:{token:string;documentId:string;sheet:string;profile:string;companyId:string;canPropose:boolean;onProposal:(id:string)=>void}){
   const [page,setPage]=useState<Page|null>(null);const [busy,setBusy]=useState(false);const [error,setError]=useState("");const pending=useRef<AbortController|null>(null);
@@ -15,6 +16,7 @@ export default function SourceFactPublication({token,documentId,sheet,profile,co
     {page&&<><p>{page.total_rows.toLocaleString()} source rows · {page.object_type}. Currency and ledger authority are unestablished.</p>{Object.entries(page.duplicate_account_rows).map(([code,rows])=><p key={code}>Reconciliation required: account {code} appears on source rows {rows.join(", ")}.</p>)}<div className="g8-table-scroll"><table><thead><tr><th>Source coordinate</th><th>Period / date</th><th>Row meaning</th><th>Publication</th><th>Retained amounts</th></tr></thead><tbody>{page.rows.map(row=><tr key={row.resource_id}><td>{row.coordinate}</td><td>{String(row.attributes.posting_date??`${row.attributes.period_start} → ${row.attributes.period_end}`)}</td><td>{String(row.attributes.source_row_role??"Journal movement")}</td><td>{row.publication_state}</td><td>{Object.entries(row.attributes).filter(([key])=>key==="amount"||/^(opening|turnover|closing)_/.test(key)).map(([key,value])=><div key={key}>{key.replaceAll("_"," ")}: {String(value)}</div>)}</td></tr>)}</tbody></table></div><button disabled={busy||page.offset===0} onClick={()=>void run(Math.max(0,page.offset-25))}>Previous rows</button><button disabled={busy||page.next_offset===null} onClick={()=>void run(page.next_offset??0)}>Next rows</button>{canPropose&&<button disabled={busy||!page.rows.length} onClick={()=>void run(page.offset,true)}>Propose this fact page for review</button>}</>}
     {busy&&<p role="status">Binding source rows to accepted identities…</p>}{error&&<p role="alert">{error}</p>}
     <SourceReconciliation key={`${documentId}:${sheet}:${profile}:${companyId}`} token={token} documentId={documentId} sheet={sheet} profile={profile} companyId={companyId}/>
+    <SourceAccountingContext key={`context:${documentId}:${sheet}:${profile}:${companyId}`} token={token} documentId={documentId} sheet={sheet} profile={profile} companyId={companyId} canPropose={canPropose} onProposal={onProposal}/>
     {profile==="1c_journal"&&<SourceDimensions key={`${documentId}:${sheet}:${companyId}`} token={token} documentId={documentId} sheet={sheet} companyId={companyId} canPropose={canPropose} onProposal={onProposal}/>}
   </section>;
 }

@@ -168,6 +168,25 @@ def current_resources(principal: Principal, identities: list[UUID]) -> dict[str,
     }
 
 
+def version_references(principal: Principal, version_id: UUID) -> dict[str, dict[str, str]]:
+    """Read the exact typed field dependencies retained by an authorized resource version."""
+    with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
+        rows = cursor.execute(
+            "SELECT d.relation,d.target_resource_id,d.target_version_id "
+            "FROM resource_dependencies d JOIN resource_versions v "
+            "ON v.tenant_id=d.tenant_id AND v.version_id=d.version_id "
+            "WHERE d.tenant_id=%s AND d.version_id=%s AND d.relation LIKE 'FIELD:%%'",
+            (principal.scope.tenant_id, version_id),
+        ).fetchall()
+    return {
+        row["relation"].removeprefix("FIELD:"): {
+            "resource_id": str(row["target_resource_id"]),
+            "version_id": str(row["target_version_id"]),
+        }
+        for row in rows
+    }
+
+
 def _check_scalar(kind: str, value: Any) -> bool:
     if kind == "definition":
         try:
@@ -408,6 +427,10 @@ def _validate(
             from finai_api.services.ontology_definition_validation import validate_definition
 
             validate_definition(item, schema_by_name, link_by_name, target)
+            if item.object_type in {"SourceAccountingScope", "SourceAccountingBinding"}:
+                from finai_api.services.source_accounting_context import validate_context
+
+                validate_context(principal, item, target)
             if item.object_type == "SourceDimensionAssignment":
                 from finai_api.services.source_dimensions import validate_assignment
 
