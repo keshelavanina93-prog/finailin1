@@ -17,7 +17,7 @@ from finai_api.services.account_ontology import inspect_accounts, propose_accoun
 from finai_api.services.fact_aggregation import aggregate_facts
 from finai_api.services.fact_reconciliation import reconcile_facts
 from finai_api.services.fact_runs import read_run, retain_run
-from finai_api.services.guarded_fact_runs import aggregate_guarded
+from finai_api.services.guarded_fact_runs import aggregate_guarded, inspect_authority
 
 router = APIRouter(prefix="/v1/ontology/model", tags=["ontology model and execution"])
 User = Annotated[Principal, Depends(authenticated_principal)]
@@ -89,6 +89,11 @@ def reconcile(principal: User, identity: UUID, request: ReconcileRun) -> dict[st
 @router.get("/fact-runs/{run_id}")
 def calculation_run(principal: User, run_id: str) -> dict[str, Any]:
     return read_run(principal, run_id)
+
+
+@router.get("/fact-runs/{run_id}/authority")
+def calculation_authority(principal: User, run_id: str) -> dict[str, Any]:
+    return inspect_authority(principal, run_id)
 
 
 @router.post("/facts/{identity}/aggregate")

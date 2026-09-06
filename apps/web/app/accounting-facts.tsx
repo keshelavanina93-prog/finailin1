@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { Panel } from "./g8-ui";
+import CalculationAuthority from "./calculation-authority";
 
 type Definition = {resource_id:string;display_name:string;object_type:string;attributes:{schema_id?:string;left_contract_id?:string;right_contract_id?:string;definition:{source_family_field:string;source_family:string;dimensions:string[];partition_fields?:string[];row_role_field?:string;included_row_role?:string;time_field:string;aggregation:string}}};
 type Schema = {resource_id:string;identity_key:string};
@@ -9,7 +10,7 @@ type Group = {dimensions:Record<string,unknown>;value:string|null;state?:string;
 type Result = {run_id?:string;state:string;groups?:Group[];comparisons?:{dimensions:Record<string,unknown>;state:string;difference:string|null;left:Group|null;right:Group|null}[];contract_version_id:string;authority_check?:{minimum_state:string;checked_at:string;consumption_id:string;proof_hash:string};current_use_authorized?:false};
 type AuthorityConsumer = {resource_id:string;version_id:string;display_name:string};
 
-export default function AccountingFacts({token,authorityConsumer}:{token:string;authorityConsumer?:AuthorityConsumer}) {
+export default function AccountingFacts({token,authorityConsumer,onTrace}:{token:string;authorityConsumer?:AuthorityConsumer;onTrace?:(reference:{resource_id:string;version_id:string})=>void}) {
   const [definitions,setDefinitions]=useState<Definition[]>([]);
   const [schemas,setSchemas]=useState<Schema[]>([]);
   const [selected,setSelected]=useState("");const [error,setError]=useState("");
@@ -60,6 +61,6 @@ export default function AccountingFacts({token,authorityConsumer}:{token:string;
     {result&&<><p>{result.state} · Contract version {result.contract_version_id}</p>{result.authority_check&&<p role="status">Input authority checked: {result.authority_check.minimum_state} · {new Date(result.authority_check.checked_at).toLocaleString()}. This retained check is historical evidence; a new use requires another check. Financial certification remains unestablished.</p>}{result.run_id&&<details><summary>Retained calculation reference</summary><code>{result.run_id}</code>{result.authority_check&&<p>Authority receipt: {result.authority_check.consumption_id}<br/>Proof: {result.authority_check.proof_hash}</p>}</details>}<div className="g8-table-scroll"><table><thead><tr><th>Coordinates</th><th>Value / difference</th><th>Evidence</th></tr></thead><tbody>
       {result.groups?.map((g,i)=><tr key={i}><td>{Object.entries(g.dimensions).map(([k,v])=>`${k}: ${String(v)}`).join(" · ")}</td><td>{g.value??g.reason??"Unavailable"}{g.components&&<small> ({g.components.numerator} / {g.components.denominator})</small>}</td><td><details><summary>{g.inputs.length} source versions</summary>{g.inputs.map(p=><p key={p.version_id}>{p.resource_id} · {p.version_id}</p>)}</details></td></tr>)}
       {result.comparisons?.map((g,i)=><tr key={i}><td>{Object.entries(g.dimensions).map(([k,v])=>`${k}: ${String(v)}`).join(" · ")}</td><td>{g.state} · {g.difference??"Unavailable"}</td><td>Left {g.left?.value??"missing"} · Right {g.right?.value??"missing"}</td></tr>)}
-    </tbody></table></div></>}
+    </tbody></table></div>{result.run_id&&result.authority_check&&<CalculationAuthority key={`${result.run_id}:${token}`} token={token} runId={result.run_id} onTrace={onTrace}/>}</>}
   </Panel>;
 }

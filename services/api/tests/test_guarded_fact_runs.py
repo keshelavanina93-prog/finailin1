@@ -340,10 +340,34 @@ def test_guarded_aggregate_requires_all_consumer_pins_and_retains_proof_after_wi
         receipt = lifecycle.consumption_receipt(operator, UUID(proof["consumption_id"]))
         assert receipt["proof_hash"] == proof["proof_hash"]
         assert fact_runs.read_run(operator, retained["run_id"]) == retained
+        status_path = f"/v1/ontology/model/fact-runs/{retained['run_id']}/authority"
+        assert client.get(status_path).status_code == 401
+        before = client.get(status_path, headers=headers)
+        assert before.status_code == 200, before.text
+        assert before.json()["status"] == "RECHECK_REQUIRED"
+        assert before.json()["current_use_authorized"] is False
+        assert before.json()["run_id"] == retained["run_id"]
         advance(fact_ref, "REVOKED")
         refused = client.post(path, json=request, headers=headers)
         assert refused.status_code == 409, refused.text
         assert fact_runs.read_run(operator, retained["run_id"]) == retained
+        after = client.get(status_path, headers=headers)
+        assert after.status_code == 200, after.text
+        assert after.json()["status"] == "BLOCKED"
+        assert after.json()["current_use_authorized"] is False
+        blocked_fact = next(
+            item for item in after.json()["checks"]
+            if item["subject"]["resource_id"] == str(fact_ref.resource_id)
+        )
+        assert blocked_fact["blocker"] == "AUTHORITY_WITHDRAWN"
+        assert blocked_fact["display_name"] == fact.display_name
+        with resources.resource_connection(operator) as conn:
+            count = conn.execute(
+                "SELECT count(*) FROM guarded_consumption_receipts "
+                "WHERE tenant_id=%s AND consumer_version_id=%s",
+                (tenant, consumer_ref.version_id),
+            ).fetchone()[0]
+        assert count == 1  # Inspections never create additional consumption authority.
         assert (
             lifecycle.consumption_status(operator, UUID(proof["consumption_id"]))["status"]
             == "BLOCKED"
@@ -353,6 +377,8 @@ def test_guarded_aggregate_requires_all_consumer_pins_and_retains_proof_after_wi
         )
         with pytest.raises(WorkspaceError):
             fact_runs.read_run(other, retained["run_id"])
+        with pytest.raises(WorkspaceError):
+            guarded.inspect_authority(other, retained["run_id"])
     finally:
         client.close()
         get_settings.cache_clear()

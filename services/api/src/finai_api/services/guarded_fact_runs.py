@@ -10,10 +10,41 @@ from finai_api.domain.object_sets import ObjectSetQuery
 from finai_api.domain.resource_lifecycle import ConsumptionRequest, VersionReference
 from finai_api.domain.review import Principal
 from finai_api.services.fact_aggregation import aggregate_facts
-from finai_api.services.fact_runs import retain_run
-from finai_api.services.resource_lifecycle import consume
+from finai_api.services.fact_runs import read_run, retain_run
+from finai_api.services.resource_lifecycle import consume, consumption_status
 from finai_api.services.resources import resource_connection
 from finai_api.services.workspace import WorkspaceError
+
+
+def inspect_authority(principal: Principal, run_id: str) -> dict[str, Any]:
+    retained = read_run(principal, run_id)
+    reference = retained.get("authority_check")
+    if not reference:
+        raise WorkspaceError(422, "This calculation has no retained authority check")
+    status = consumption_status(principal, UUID(reference["consumption_id"]))
+    if status["proof_hash"] != reference["proof_hash"]:
+        raise WorkspaceError(409, "Calculation authority reference failed integrity verification")
+    with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
+        rows = cursor.execute(
+            "SELECT version_id,display_name FROM resource_versions WHERE tenant_id=%s "
+            "AND version_id=ANY(%s::uuid[])",
+            (
+                principal.scope.tenant_id,
+                [item["subject"]["version_id"] for item in status["checks"]],
+            ),
+        ).fetchall()
+    names = {str(row["version_id"]): row["display_name"] for row in rows}
+    return {
+        **status,
+        "run_id": run_id,
+        "checks": [
+            {
+                **item,
+                "display_name": names.get(item["subject"]["version_id"], "Unavailable resource"),
+            }
+            for item in status["checks"]
+        ],
+    }
 
 
 def aggregate_guarded(

@@ -40,3 +40,17 @@ test supplies synthetic aggregation output; it is not authentic-source calculati
 Separate deterministic fact contract tests cover arithmetic and source-use refusal. Web
 TypeScript, focused ESLint and isolated production build pass. Browser interaction and premium
 visual acceptance remain unverified; this does not complete NIN-25, NIN-27 or the product.
+
+## Current authority inspection
+
+`GET /v1/ontology/model/fact-runs/{run_id}/authority` first checks access to the retained
+calculation, validates its receipt hash and then evaluates current dependency status through
+the same lifecycle service. It creates no new consumption receipt and never changes the run.
+It returns `BLOCKED` or `RECHECK_REQUIRED`, always with `current_use_authorized: false`.
+Exploratory calculations without a retained check cannot acquire authority through inspection.
+
+Opening a guarded calculation in G8 shows current status, named affected resources and the
+reason for each blocker. Evidence buttons open the existing canonical trace with the recorded
+resource/version and company context preserved. Refresh re-inspects current state without
+rerunning arithmetic. The focused PostgreSQL/API test covers before/after withdrawal,
+unchanged historical evidence, no new receipt, authentication and company isolation.
