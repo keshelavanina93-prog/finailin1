@@ -1,0 +1,49 @@
+{
+  "recorded_at": "2026-09-06T12:12:15.280400+00:00",
+  "issue": "NIN-25",
+  "dependency": "NIN-35",
+  "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+  "effective_at": "2026-09-06T12:12:15.174264+00:00",
+  "known_at": "2026-09-06T12:12:15.174264+00:00",
+  "resources": [
+    {
+      "resource_id": "ba373aa4-0047-5c25-8508-27800c3ecc0e",
+      "version_id": "7f4e68f4-b569-5681-8d54-628d19ce4d77",
+      "object_type": "LicenceNoticeBinding",
+      "evidence_class": "USER_ASSERTED"
+    },
+    {
+      "resource_id": "f2412b1d-fe1f-423e-966d-95f326d0cc0a",
+      "version_id": "123923c7-5ee4-5c53-8ca7-7f4c08432655",
+      "object_type": "RegulatoryRule",
+      "evidence_class": "SOURCE_BOUND"
+    },
+    {
+      "resource_id": "1bea772d-dd9c-5473-b1f3-cacefb6d0db7",
+      "version_id": "6df56269-43e1-59bb-978c-7149690f93d4",
+      "object_type": "CompanyWorkspace",
+      "evidence_class": "USER_ASSERTED"
+    },
+    {
+      "resource_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "version_id": "72417af7-1f6f-5d11-b6ff-607e96169191",
+      "object_type": "LegalEntity",
+      "evidence_class": "SOURCE_BOUND"
+    }
+  ],
+  "http_status": 200,
+  "anonymous_http_status": 401,
+  "elapsed_ms": 318,
+  "has_more": false,
+  "focused_tests": "3 passed",
+  "typecheck": "PASS",
+  "focused_lint": "PASS",
+  "production_build": "PASS (.next-history)",
+  "browser_acceptance": {
+    "state": "BLOCKED",
+    "reason": "Automatic approval review: blocked by policy",
+    "denied_command": ". .\\scripts\\load-local.ps1; $env:G8_BUILD_DIRECTORY='.next-history'; $env:FINAI_API_URL='http://127.0.0.1:8072'; pnpm --filter @finai/web exec next start --port 3072"
+  },
+  "current_use_authorized": false,
+  "nin25_complete": false
+}

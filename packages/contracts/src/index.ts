@@ -1,3 +1,4 @@
+export type { HistorySearchResult } from "./history-search.js";
 export const epistemicStates = [
   "OBSERVED",
   "DERIVED",
