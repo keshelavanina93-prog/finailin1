@@ -353,7 +353,9 @@ def _validate(
             raise WorkspaceError(
                 403, "Schema, semantic and link definitions belong to the shared platform registry"
             )
-        if access_entity == "__PLATFORM__" and item.object_type not in meta_types:
+        if access_entity == "__PLATFORM__" and item.object_type not in (
+            meta_types | {"CertificationContract"}
+        ):
             raise WorkspaceError(403, "Enterprise facts cannot use platform-public policy")
         with conn.cursor(row_factory=dict_row) as cursor:
             previous = cursor.execute(
@@ -448,6 +450,10 @@ def _validate(
             from finai_api.services.ontology_definition_validation import validate_definition
 
             validate_definition(item, schema_by_name, link_by_name, target)
+            if item.object_type == "CertificationContract":
+                from finai_api.services.certification import validate_contract
+
+                validate_contract(item, target)
             if item.object_type == "CompanyWorkspace":
                 for field in ("company_id", "enterprise_id", "domain_pack_id"):
                     dependency = target(

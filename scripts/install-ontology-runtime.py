@@ -34,6 +34,7 @@ def main() -> None:
         and {"ontology_admin", "ontology_review"}.issubset(p.permissions)
     )
     kinds = {
+        "CertificationContract",
         "SourceRegulatoryPublication",
         *DEFINITION_MODELS,
         "SourceAccountDefinition",

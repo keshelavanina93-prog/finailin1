@@ -1,0 +1,154 @@
+{
+  "checked_at": "2026-09-06T23:24:18.789589+00:00",
+  "evaluation_http_status": 200,
+  "readback_http_status": 200,
+  "request": {
+    "request_id": "5cfa9910-3757-51be-8d00-9cf449e1a9b8",
+    "subject": {
+      "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+      "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27"
+    },
+    "contract": {
+      "resource_id": "4a8223d4-0956-5ee8-8c13-e2b908786933",
+      "version_id": "628e8eea-1494-5dc0-a7de-e06a0b11b0de"
+    }
+  },
+  "receipt": {
+    "receipt_id": "5cfa9910-3757-51be-8d00-9cf449e1a9b8",
+    "proof_hash": "0714ec64e0a44091d00b8890eb6b072c3602c24c893cf8c08e41b40af093c5a5",
+    "proof": {
+      "status": "PASS",
+      "purpose": "CANONICAL_DEFINITION_CONFORMANCE",
+      "subject": {
+        "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+        "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087"
+      },
+      "contract": {
+        "version_id": "628e8eea-1494-5dc0-a7de-e06a0b11b0de",
+        "resource_id": "4a8223d4-0956-5ee8-8c13-e2b908786933"
+      },
+      "evaluator": "canonical-structural-contract/v1",
+      "access_entity": "entity-ge-001",
+      "subject_schema": {
+        "version_id": "4d62d07b-e18e-552a-a375-6acb8cc6f864",
+        "resource_id": "44b6fbda-e867-5462-b7bf-3b177feec4a5"
+      },
+      "subject_upstream": [
+        {
+          "event_id": null,
+          "version_id": "17d46adc-89e0-5a46-a144-9eeaa288297d",
+          "resource_id": "1a6427fc-0944-5405-89ea-7662aabecf61",
+          "content_hash": "b8d8839b82f4c69562e3f936537cac1e5b77d26e1d842d0eb077207bd129077d",
+          "access_entity": "__PLATFORM__"
+        },
+        {
+          "event_id": null,
+          "version_id": "4d62d07b-e18e-552a-a375-6acb8cc6f864",
+          "resource_id": "44b6fbda-e867-5462-b7bf-3b177feec4a5",
+          "content_hash": "92609dc26ef713e83d8d673dfd7a4158bf67769c4fb3bb91fe2567eb870ffb46",
+          "access_entity": "__PLATFORM__"
+        },
+        {
+          "event_id": null,
+          "version_id": "7b3b7d6f-2063-52b5-80be-697587e5c028",
+          "resource_id": "0f94bed0-1580-5f4c-b27a-d0be9c258533",
+          "content_hash": "67d71ffcbc287f36dac61dad410436f0487ec3ca4d063cdeed1ddd3fd94b48c6",
+          "access_entity": "__PLATFORM__"
+        },
+        {
+          "event_id": null,
+          "version_id": "8996aa14-5d15-583f-ac63-cf271f1c4d68",
+          "resource_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+          "content_hash": "427ed5a7691d471cffa703b29f17f86df8b5836a81a3d2bc94cbb0697107a372",
+          "access_entity": "__PLATFORM__"
+        },
+        {
+          "event_id": null,
+          "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+          "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+          "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854",
+          "access_entity": "__PLATFORM__"
+        },
+        {
+          "event_id": null,
+          "version_id": "d64fabb9-6cca-52ed-b268-050616b3965d",
+          "resource_id": "665ae7c4-4711-5ee1-a791-4b76d50fa2bf",
+          "content_hash": "8aca44f0ed6c7ab1270d525e3edd79de262a59b81955fe849fbe140a2d07a1b3",
+          "access_entity": "__PLATFORM__"
+        }
+      ],
+      "contract_upstream": [
+        {
+          "event_id": null,
+          "version_id": "4d62d07b-e18e-552a-a375-6acb8cc6f864",
+          "resource_id": "44b6fbda-e867-5462-b7bf-3b177feec4a5",
+          "content_hash": "92609dc26ef713e83d8d673dfd7a4158bf67769c4fb3bb91fe2567eb870ffb46",
+          "access_entity": "__PLATFORM__"
+        },
+        {
+          "event_id": null,
+          "version_id": "8996aa14-5d15-583f-ac63-cf271f1c4d68",
+          "resource_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+          "content_hash": "427ed5a7691d471cffa703b29f17f86df8b5836a81a3d2bc94cbb0697107a372",
+          "access_entity": "__PLATFORM__"
+        },
+        {
+          "event_id": null,
+          "version_id": "d64fabb9-6cca-52ed-b268-050616b3965d",
+          "resource_id": "665ae7c4-4711-5ee1-a791-4b76d50fa2bf",
+          "content_hash": "8aca44f0ed6c7ab1270d525e3edd79de262a59b81955fe849fbe140a2d07a1b3",
+          "access_entity": "__PLATFORM__"
+        },
+        {
+          "event_id": null,
+          "version_id": "ed98a779-217b-5beb-ba7e-42ff1bbbf92d",
+          "resource_id": "8a58e785-98b9-5e86-9d6e-94d894d80a05",
+          "content_hash": "4c0815ccdebb01a725c7e26fcb0fd49b2c6e54031ee6c8f3e0484dc94e251947",
+          "access_entity": "__PLATFORM__"
+        }
+      ],
+      "contract_attributes": {
+        "definition": {
+          "claim": "CANONICAL_DEFINITION_CONFORMANCE",
+          "meaning": "The exact saved query definition passed retained structural review checks.",
+          "evaluator": "canonical-structural-contract/v1",
+          "limitations": "Does not establish source authenticity, accounting accuracy, financial certification or business-use authority.",
+          "subject_type": "ObjectSetDefinition",
+          "required_checks": [
+            "schema compatibility",
+            "identity cycles",
+            "dependency version pins",
+            "impact"
+          ]
+        },
+        "subject_schema_id": "44b6fbda-e867-5462-b7bf-3b177feec4a5"
+      },
+      "promotion_evaluation": {
+        "scope": "Structural contract checks; domain evaluations are not certified.",
+        "checks": [
+          "schema compatibility",
+          "identity cycles",
+          "dependency version pins",
+          "impact"
+        ],
+        "status": "PASS",
+        "evaluator": "canonical-structural-contract/v1",
+        "recorded_at": "2026-09-05T23:34:02.893487+00:00",
+        "binding_hash": "fbf00ff13b8e76947060cb3c165c1122d8da4c559b728d9c3b87cba9e38c8da6",
+        "expectations": [],
+        "proposal_hash": "3729dc677f4a93832f16a862d57b40afa0b52f0ff72a615a02b32aa976e38ba1"
+      },
+      "subject_content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146",
+      "contract_content_hash": "b1c67e5afd8b5527a72fbb3ff62ba67a2d4001a01d9a6b54bd127f7c42e8ad41",
+      "promotion_proposal_id": "4f97a81c-f392-4920-802e-1b3bb14f84a7"
+    },
+    "recorded_at": "2026-09-07T03:23:35.848576+04:00",
+    "current_use_authorized": false
+  },
+  "idempotent_repeat_equal": true,
+  "retained_readback_equal": true,
+  "scope": "Structural conformance of an actual saved source-account Object Set definition",
+  "financial_certification": false,
+  "current_use_authorized": false,
+  "browser_or_release_acceptance": false
+}

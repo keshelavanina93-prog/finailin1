@@ -1,4 +1,5 @@
 export type { HistorySearchResult } from "./history-search.js";
+export type { CertificationDefinition, CertificationContract, CertificationEvaluationRequest, DefinitionConformanceReceipt } from "./certification.js";
 export type { ProposalQueuePage, ProposalQueueCursor } from "./proposal-queue.js";
 export const epistemicStates = [
   "OBSERVED",
