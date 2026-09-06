@@ -34,11 +34,11 @@ function restoreView(key:string|undefined,companyId:string):ViewState {
  } catch {return fallback;}
 }
 
-export default function CompanyWorkspace({token,index,companyId,onSelect,onInspect,onNavigate,onHistory,onTrace,viewStateKey}:{token:string;index:CompanyIndex|null;companyId:string;onSelect:(node:Node)=>void;onInspect:(node:Node)=>void;onNavigate?:(destination:CompanyDestination)=>void;onHistory?:(node:Node)=>void;onTrace?:(node:Node)=>void;viewStateKey?:string}) {
+export default function CompanyWorkspace({token,index,companyId,onSelect,onInspect,onNavigate,onHistory,onTrace,viewStateKey,initialTab}:{token:string;index:CompanyIndex|null;companyId:string;onSelect:(node:Node)=>void;onInspect:(node:Node)=>void;onNavigate?:(destination:CompanyDestination)=>void;onHistory?:(node:Node)=>void;onTrace?:(node:Node)=>void;viewStateKey?:string;initialTab?:Tab}) {
  const [loaded,setLoaded]=useState<{key:string;context:Context|null;error:string}|null>(null);
  const [refresh,setRefresh]=useState(0);
  const [restored]=useState(()=>restoreView(viewStateKey,companyId));
- const [tab,setTab]=useState<Tab>(restored.tab);
+ const [tab,setTab]=useState<Tab>(initialTab??restored.tab);
  const [search,setSearch]=useState(restored.search);
  const [choice,setChoice]=useState({companyId,ledgerId:restored.ledgerId,bookId:restored.bookId,periodId:restored.periodId});
  const [directoryPage,setDirectoryPage]=useState(0);

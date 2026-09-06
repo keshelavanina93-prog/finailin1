@@ -222,15 +222,100 @@ def test_bounded_snapshot_and_visible_feature_truncation(actors, monkeypatch):
     ]
     monkeypatch.setattr(maps, "SCAN_LIMIT", 100)
     monkeypatch.setattr(
-        resources,
-        "list_resources",
-        lambda principal, kind, search, offset, valid, known: rows[offset : offset + 100],
+        maps,
+        "snapshot",
+        lambda principal, valid, known, company=None: (
+            rows[:100],
+            True,
+            valid or datetime.now(UTC),
+            known or datetime.now(UTC),
+        ),
     )
     result = maps.map_view(proposer, limit=3)
     assert len(result["features"]) == 3
     assert result["counts"]["mapped_in_bounds"] == 100
     assert result["completeness"]["snapshot_bounded"] is True
     assert result["completeness"]["features_truncated"] is True
+
+
+def test_typed_snapshot_scopes_before_cap_and_respects_ownership_corrections(actors, monkeypatch):
+    proposer, _ = actors
+    company, other = node("LegalEntity", {}), node("LegalEntity", {})
+    accepted(actors, [company, other])
+    asset = node(
+        "PressureZone",
+        {
+            "code": "Z",
+            "legal_entity_id": str(company.resource_id),
+            "geometry": {"type": "Point", "coordinates": [44, 42]},
+        },
+    )
+    unrelated = node(
+        "PressureZone",
+        {
+            "code": "OTHER",
+            "legal_entity_id": str(other.resource_id),
+            "geometry": {"type": "Point", "coordinates": [45, 43]},
+        },
+    )
+    accepted(actors, [asset, unrelated])
+    before_noise, _, _, _ = maps.snapshot(proposer, None, None, company.resource_id)
+    accepted(actors, [node("Party", {}) for _ in range(5)])
+    after_noise, bounded, _, _ = maps.snapshot(proposer, None, None, company.resource_id)
+    assert bounded is False
+    assert {r.resource_id for r in before_noise} == {r.resource_id for r in after_noise}
+    assert all(r.object_type != "Party" for r in after_noise)
+    assert other.resource_id not in {r.resource_id for r in after_noise}
+    assert unrelated.resource_id not in {r.resource_id for r in after_noise}
+    original = resources.get_resource(proposer, asset.resource_id)["resource"]
+    historical_time = datetime.now(UTC)
+    accepted(
+        actors,
+        [
+            asset.model_copy(
+                update={
+                    "expected_version_id": UUID(original["version_id"]),
+                    "valid_from": datetime(2026, 3, 1, tzinfo=UTC),
+                    "attributes": {**asset.attributes, "legal_entity_id": str(other.resource_id)},
+                }
+            )
+        ],
+    )
+    assert maps.map_view(proposer, company_id=company.resource_id)["counts"]["assets"] == 0
+    assert maps.map_view(proposer, company_id=other.resource_id)["counts"]["assets"] == 2
+    assert (
+        maps.map_view(proposer, company_id=company.resource_id, known_at=historical_time)["counts"][
+            "assets"
+        ]
+        == 1
+    )
+    assert (
+        maps.map_view(
+            proposer, company_id=company.resource_id, valid_at=datetime(2026, 2, 1, tzinfo=UTC)
+        )["counts"]["assets"]
+        == 1
+    )
+    moved = resources.get_resource(proposer, asset.resource_id)["resource"]
+    accepted(
+        actors,
+        [
+            asset.model_copy(
+                update={
+                    "expected_version_id": UUID(moved["version_id"]),
+                    "authority_state": "REVOKED",
+                    "attributes": {**asset.attributes, "legal_entity_id": str(other.resource_id)},
+                }
+            )
+        ],
+    )
+    assert maps.map_view(proposer, company_id=other.resource_id)["counts"]["assets"] == 1
+    monkeypatch.setattr(maps, "SCAN_LIMIT", 1)
+    capped, bounded, _, _ = maps.snapshot(proposer, None, None, company.resource_id)
+    assert bounded is True
+    assert len(capped) == 1 and capped[0].resource_id == company.resource_id
+    view = maps.map_view(proposer, company_id=company.resource_id)
+    assert view["completeness"]["snapshot_bounded"] is True
+    assert view["completeness"]["snapshot_scope"] == "COMPANY_SPATIAL_TYPES"
 
 
 def test_depth_bound_not_claimed_complete(actors):

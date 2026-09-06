@@ -1,0 +1,151 @@
+{
+  "checked_at": "2026-09-07T01:54:33.928163+04:00",
+  "fixed_cutoff": "2026-09-07T01:54:33.108955+04:00",
+  "capability": "NIN-25 existing Operations canonical spatial projection",
+  "mode": "authenticated running web proxy over retained canonical company identities",
+  "observations": [
+    {
+      "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "name": "SOCAR Georgia Gas",
+      "lens": "enterprise_assets",
+      "http_status": 200,
+      "seconds": 0.205,
+      "counts": {
+        "assets": 0,
+        "mapped_in_bounds": 0,
+        "outside_bounds": 0,
+        "unmapped": 0
+      },
+      "completeness": {
+        "snapshot_bounded": false,
+        "scan_limit": 5000,
+        "snapshot_scope": "COMPANY_SPATIAL_TYPES",
+        "features_truncated": false,
+        "unmapped_truncated": false,
+        "limit": 1,
+        "spatial_filter": "GEOMETRY_BOUNDING_BOX_INTERSECTION"
+      },
+      "operational_state": {
+        "telemetry": "NOT_CONNECTED",
+        "hydraulics": "NOT_IMPLEMENTED",
+        "financial_exposure": "NOT_CONNECTED"
+      }
+    },
+    {
+      "company_id": "a5f221e2-17a1-5903-9f3f-e2d896b3fc9d",
+      "name": "SOCAR Georgia Gas",
+      "lens": "gas_network",
+      "http_status": 200,
+      "seconds": 0.123,
+      "counts": {
+        "assets": 0,
+        "mapped_in_bounds": 0,
+        "outside_bounds": 0,
+        "unmapped": 0
+      },
+      "completeness": {
+        "snapshot_bounded": false,
+        "scan_limit": 5000,
+        "snapshot_scope": "COMPANY_SPATIAL_TYPES",
+        "features_truncated": false,
+        "unmapped_truncated": false,
+        "limit": 1,
+        "spatial_filter": "GEOMETRY_BOUNDING_BOX_INTERSECTION"
+      },
+      "operational_state": {
+        "telemetry": "NOT_CONNECTED",
+        "hydraulics": "NOT_IMPLEMENTED",
+        "financial_exposure": "NOT_CONNECTED"
+      }
+    },
+    {
+      "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "name": "SOCAR Georgia Petroleum",
+      "lens": "enterprise_assets",
+      "http_status": 200,
+      "seconds": 0.12,
+      "counts": {
+        "assets": 0,
+        "mapped_in_bounds": 0,
+        "outside_bounds": 0,
+        "unmapped": 0
+      },
+      "completeness": {
+        "snapshot_bounded": false,
+        "scan_limit": 5000,
+        "snapshot_scope": "COMPANY_SPATIAL_TYPES",
+        "features_truncated": false,
+        "unmapped_truncated": false,
+        "limit": 1,
+        "spatial_filter": "GEOMETRY_BOUNDING_BOX_INTERSECTION"
+      },
+      "operational_state": {
+        "telemetry": "NOT_CONNECTED",
+        "hydraulics": "NOT_IMPLEMENTED",
+        "financial_exposure": "NOT_CONNECTED"
+      }
+    },
+    {
+      "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+      "name": "SOCAR Georgia Petroleum",
+      "lens": "gas_network",
+      "http_status": 200,
+      "seconds": 0.12,
+      "counts": {
+        "assets": 0,
+        "mapped_in_bounds": 0,
+        "outside_bounds": 0,
+        "unmapped": 0
+      },
+      "completeness": {
+        "snapshot_bounded": false,
+        "scan_limit": 5000,
+        "snapshot_scope": "COMPANY_SPATIAL_TYPES",
+        "features_truncated": false,
+        "unmapped_truncated": false,
+        "limit": 1,
+        "spatial_filter": "GEOMETRY_BOUNDING_BOX_INTERSECTION"
+      },
+      "operational_state": {
+        "telemetry": "NOT_CONNECTED",
+        "hydraulics": "NOT_IMPLEMENTED",
+        "financial_exposure": "NOT_CONNECTED"
+      }
+    }
+  ],
+  "interpretation": "Zero assets means no accepted spatial assets in this scoped snapshot",
+  "browser_acceptance": false,
+  "telemetry_acceptance": false,
+  "full_NIN_36_acceptance": false,
+  "release_accepted": false,
+  "focused_verification": {
+    "runtime": "API8062 and web3062 restarted healthy",
+    "mypy": "PASS",
+    "ruff": "PASS",
+    "native_spatial": "13 focused checks passed",
+    "production_build_and_types": "PASS",
+    "web_lint": "PASS"
+  },
+  "browser_observation": {
+    "observed": [
+      "Home accounting action opens selected company Accounting section",
+      "Header has no credential currency or period",
+      "Gas Operations & Maps responds with explicit zero assets and telemetry not connected"
+    ],
+    "screenshots": [
+      {
+        "path": ".finai/artifacts/browser-shots/g8-home-accounting-navigation.png",
+        "sha256": "ab620e2a8bc08e27bde9079f06ff6b472994d8281cc86ebaa60e8d74e322cb99"
+      },
+      {
+        "path": ".finai/artifacts/browser-shots/g8-operations-recovered.png",
+        "sha256": "18ca5584c3519aeb1a850bb4c2d45a1c2e650bbd1c37adc11c8a708eb5fb5804"
+      },
+      {
+        "path": ".finai/artifacts/browser-shots/g8-home-context.png",
+        "sha256": "f04c13c4577ea2eede7915b676ca71ca96dbf2d9f0ec10b52eb31f901bc22f21"
+      }
+    ],
+    "status": "PARTIAL_JOURNEY_PASS"
+  }
+}

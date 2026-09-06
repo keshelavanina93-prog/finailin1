@@ -4,6 +4,9 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
+from psycopg.errors import QueryCanceled
+from psycopg.rows import dict_row
+
 from finai_api.domain.resources import CanonicalResource
 from finai_api.domain.review import Principal
 from finai_api.domain.spatial import geometry_bounds, validate_geometry
@@ -39,18 +42,90 @@ PHYSICAL_LINKS = frozenset({"CONNECTS", "FEEDS", "SUPPLIES", "CONTROLS_OR_MEASUR
 
 
 def snapshot(
-    principal: Principal, valid_at: datetime | None, known_at: datetime | None
+    principal: Principal,
+    valid_at: datetime | None,
+    known_at: datetime | None,
+    company_id: UUID | None = None,
 ) -> tuple[list[CanonicalResource], bool, datetime, datetime]:
     now = datetime.now(UTC)
     valid, known = valid_at or now, known_at or now
     if valid.tzinfo is None or known.tzinfo is None:
         raise WorkspaceError(422, "Historical timestamps must include a timezone")
-    rows: list[CanonicalResource] = []
-    for offset in range(0, SCAN_LIMIT + 100, 100):
-        page = resources.list_resources(principal, None, "", offset, valid, known)
-        rows.extend(page)
-        if len(page) < 100 or len(rows) > SCAN_LIMIT:
-            break
+    kinds = sorted(ASSET_TYPES | {"LegalEntity", "SpatialImport", "Relationship", "LinkType"})
+    with resources.resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cur:
+        cur.execute("SELECT set_config('statement_timeout','10000',true)")
+        try:
+            # Filter immutable types before temporal selection. Scope and counts must not
+            # depend on where finance rows happen to sort in an unrelated tenant inventory.
+            result = cur.execute(
+                """WITH RECURSIVE selected AS MATERIALIZED (
+                    SELECT DISTINCT ON(v.resource_id) v.*,i.identity_key
+                    FROM resource_versions v JOIN canonical_identities i
+                      USING(tenant_id,resource_id)
+                    WHERE v.tenant_id=%(tenant)s AND v.object_type=ANY(%(kinds)s)
+                      AND i.object_type=ANY(%(kinds)s) AND v.system_from<=%(known)s
+                      AND v.valid_from<=%(valid)s AND (v.valid_to IS NULL OR v.valid_to>%(valid)s)
+                    ORDER BY v.resource_id,v.system_from DESC,v.version_id
+                ), approved AS MATERIALIZED (
+                    SELECT * FROM selected WHERE authority_state='APPROVED'
+                ), roots AS (
+                    SELECT resource_id::text AS resource_id FROM approved
+                    WHERE resource_id=%(company)s::uuid AND object_type='LegalEntity'
+                    UNION
+                    SELECT r.attributes->>'target_id' FROM approved r JOIN approved kind
+                      ON kind.resource_id::text=r.attributes->>'relation_id'
+                    WHERE r.object_type='Relationship' AND kind.object_type='LinkType'
+                      AND kind.identity_key='OPERATES'
+                      AND r.attributes->>'source_id'=%(company)s::text
+                ), scoped(resource_id) AS (
+                    SELECT resource_id FROM roots
+                    UNION
+                    SELECT a.resource_id::text FROM scoped parent JOIN approved a
+                      ON parent.resource_id IN (a.attributes->>'legal_entity_id',
+                         a.attributes->>'system_id',a.attributes->>'network_id',
+                         a.attributes->>'facility_id')
+                    WHERE a.object_type=ANY(%(owned_kinds)s)
+                ), included AS (
+                    SELECT resource_id FROM scoped
+                    UNION
+                    SELECT location.resource_id::text FROM scoped owner JOIN approved a
+                      ON a.resource_id::text=owner.resource_id JOIN approved location
+                      ON location.resource_id::text=a.attributes->>'location_id'
+                    WHERE location.object_type='Location'
+                ), visible AS (
+                    SELECT a.* FROM approved a WHERE %(company)s::uuid IS NULL
+                      OR a.resource_id::text IN (SELECT resource_id FROM included)
+                      OR a.object_type='LinkType'
+                      OR (a.object_type='Relationship'
+                          AND a.attributes->>'source_id' IN (SELECT resource_id FROM included)
+                          AND a.attributes->>'target_id' IN (SELECT resource_id FROM included))
+                ), page AS (
+                    SELECT * FROM visible
+                    ORDER BY (resource_id=%(company)s::uuid) DESC NULLS LAST,
+                             display_name,resource_id LIMIT %(limit)s
+                ) SELECT EXISTS(SELECT 1 FROM approved WHERE resource_id=%(company)s::uuid
+                                AND object_type='LegalEntity') AS company_available,
+                    COALESCE((SELECT jsonb_agg(to_jsonb(page)
+                        ORDER BY (resource_id=%(company)s::uuid) DESC NULLS LAST,
+                                 display_name,resource_id) FROM page),'[]'::jsonb) AS rows""",
+                {
+                    "tenant": principal.scope.tenant_id,
+                    "kinds": kinds,
+                    "known": known,
+                    "valid": valid,
+                    "company": company_id,
+                    "limit": SCAN_LIMIT + 1,
+                    "owned_kinds": sorted(ASSET_TYPES | {"SpatialImport"}),
+                },
+            ).fetchone()
+        except QueryCanceled as exc:
+            raise WorkspaceError(
+                409,
+                "Spatial snapshot exceeded its execution budget; no partial projection returned",
+            ) from exc
+    if company_id is not None and (not result or not result["company_available"]):
+        raise WorkspaceError(404, "Company unavailable in authorized snapshot")
+    rows = [CanonicalResource.model_validate(row) for row in result["rows"]] if result else []
     return rows[:SCAN_LIMIT], len(rows) > SCAN_LIMIT, valid, known
 
 
@@ -160,8 +235,7 @@ def map_view(
     if lens not in {"enterprise_assets", "gas_network"} or not 1 <= limit <= 1000:
         raise WorkspaceError(422, "Unsupported lens or map limit")
     bounds = bbox_value(bbox)
-    rows, bounded, valid, known = snapshot(principal, valid_at, known_at)
-    rows = company_scope(rows, company_id)
+    rows, bounded, valid, known = snapshot(principal, valid_at, known_at, company_id)
     by_id = {str(row.resource_id): row for row in rows}
     features: list[dict[str, Any]] = []
     unmapped: list[dict[str, Any]] = []
@@ -209,6 +283,7 @@ def map_view(
         "completeness": {
             "snapshot_bounded": bounded,
             "scan_limit": SCAN_LIMIT,
+            "snapshot_scope": "COMPANY_SPATIAL_TYPES" if company_id else "AUTHORIZED_SPATIAL_TYPES",
             "features_truncated": len(features) > limit,
             "unmapped_truncated": len(unmapped) > limit,
             "limit": limit,
@@ -232,9 +307,7 @@ def connections(
 ) -> dict[str, Any]:
     if not 1 <= depth <= 5:
         raise WorkspaceError(422, "Traversal depth must be between 1 and 5")
-    rows, bounded, valid, known = snapshot(principal, valid_at, known_at)
-    by_id = {str(row.resource_id): row for row in rows}
-    rows = company_scope(rows, company_id)
+    rows, bounded, valid, known = snapshot(principal, valid_at, known_at, company_id)
     by_id = {str(row.resource_id): row for row in rows}
     root = str(resource_id)
     if root not in by_id:
