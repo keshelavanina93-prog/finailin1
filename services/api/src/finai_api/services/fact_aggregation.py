@@ -223,6 +223,8 @@ def aggregate_facts(
     return {
         "contract_id": identity,
         "contract_version_id": resource["version_id"],
+        "schema_id": schema["resource_id"],
+        "schema_version_id": schema["version_id"],
         "query": result.query.model_copy(update={"offset": 0}).model_dump(mode="json"),
         "aggregation": spec.aggregation,
         "time_basis": {

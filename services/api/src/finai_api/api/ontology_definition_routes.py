@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from finai_api.domain.object_sets import ObjectSetQuery
 from finai_api.domain.ontology_definitions import DEFINITION_MODELS, DefinitionWrite
+from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.domain.resources import ResourceReview
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal
@@ -16,6 +17,7 @@ from finai_api.services.account_ontology import inspect_accounts, propose_accoun
 from finai_api.services.fact_aggregation import aggregate_facts
 from finai_api.services.fact_reconciliation import reconcile_facts
 from finai_api.services.fact_runs import read_run, retain_run
+from finai_api.services.guarded_fact_runs import aggregate_guarded
 
 router = APIRouter(prefix="/v1/ontology/model", tags=["ontology model and execution"])
 User = Annotated[Principal, Depends(authenticated_principal)]
@@ -62,6 +64,19 @@ class ReconcileRun(BaseModel):
     left: ObjectSetQuery
     right: ObjectSetQuery
     as_of: date | None = None
+
+
+class GuardedAggregateRun(AggregateRun):
+    consumer: VersionReference
+
+
+@router.post("/facts/{identity}/aggregate/guarded")
+def guarded_aggregate(
+    principal: User, identity: UUID, request: GuardedAggregateRun
+) -> dict[str, Any]:
+    return aggregate_guarded(
+        principal, identity, request.consumer, request.query, request.group_by, request.as_of
+    )
 
 
 @router.post("/facts/{identity}/reconcile")
