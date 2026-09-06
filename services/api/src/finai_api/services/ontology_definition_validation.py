@@ -187,6 +187,12 @@ def validate_definition(
     elif item.object_type == "FactContract":
         assert isinstance(definition, FactContract)
         contract = target(item.attributes["schema_id"], source, "FACT_SCHEMA")
+        if contract.get("identity_key") in {"SourceJournalMovement", "SourceTrialBalanceRow"}:
+            raise WorkspaceError(
+                409,
+                "Bind source observations to ledger, unit and an authoritative fact "
+                "representation before defining financial aggregation",
+            )
         fields = contract["attributes"]["fields"]
         family = fields.get(definition.source_family_field, {})
         if family.get("kind") != "identifier" or not family.get("required"):

@@ -1,10 +1,12 @@
 from typing import Annotated, Literal
+from uuid import UUID
 
 from fastapi import APIRouter, Query, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
 
 from finai_api.api.ontology_routes import User
 from finai_api.security import require_permission
+from finai_api.services import source_account_binding, source_financial_facts
 from finai_api.services.company_source import inspect_companies, propose_companies
 from finai_api.services.source_document_preview import preview
 from finai_api.services.source_documents import document_bytes, list_documents, retain_document
@@ -19,6 +21,45 @@ class CompanyColumn(BaseModel):
     sheet: str = Field(min_length=1, max_length=128)
     header_row: int = Field(default=1, ge=1, le=100000)
     column: int = Field(default=1, ge=1, le=256)
+
+
+class AccountSource(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    sheet: str = Field(min_length=1, max_length=128)
+    profile: Literal["1c_tb", "1c_journal"]
+
+
+class AccountBinding(AccountSource):
+    company_id: UUID
+    offset: int = Field(default=0, ge=0, le=10000)
+
+
+@router.post("/{identity}/facts/inspect")
+def inspect_facts(principal: User, identity: str, request: AccountBinding):
+    return source_financial_facts.prepare(
+        principal, identity, request.sheet, request.profile, request.company_id, request.offset
+    )
+
+
+@router.post("/{identity}/facts/proposal")
+def propose_facts(principal: User, identity: str, request: AccountBinding):
+    require_permission(principal, "ontology_propose")
+    return source_financial_facts.propose(
+        principal, identity, request.sheet, request.profile, request.company_id, request.offset
+    )
+
+
+@router.post("/{identity}/accounts/inspect")
+def inspect_accounts(principal: User, identity: str, request: AccountSource):
+    return source_account_binding.inspect(principal, identity, request.sheet, request.profile)
+
+
+@router.post("/{identity}/accounts/proposal")
+def propose_accounts(principal: User, identity: str, request: AccountBinding):
+    require_permission(principal, "ontology_propose")
+    return source_account_binding.propose(
+        principal, identity, request.sheet, request.profile, request.company_id, request.offset
+    )
 
 
 @router.get("")

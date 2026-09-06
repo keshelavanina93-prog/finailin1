@@ -94,8 +94,9 @@ def list_resources(
             "v.*,i.identity_key FROM resource_versions v "
             "JOIN canonical_identities i USING(tenant_id,resource_id) WHERE v.tenant_id=%s "
             "AND v.system_from<=%s AND v.valid_from<=%s AND (v.valid_to IS NULL OR v.valid_to>%s) "
+            "AND (%s::text IS NULL OR v.object_type=%s) "
             "ORDER BY v.resource_id,v.system_from DESC,v.version_id) current "
-            "WHERE authority_state<>'REVOKED' AND (%s::text IS NULL OR object_type=%s) "
+            "WHERE authority_state<>'REVOKED' "
             "AND position(lower(%s) in lower(display_name || ' ' || identity_key))>0 "
             "ORDER BY display_name,resource_id LIMIT %s OFFSET %s",
             (
@@ -145,6 +146,23 @@ def get_resource(principal: Principal, resource_id: UUID) -> dict[str, Any]:
             ],
             "dependents": dependents,
         }
+
+
+def current_resources(principal: Principal, identities: list[UUID]) -> dict[str, dict[str, Any]]:
+    """Resolve a bounded set of current heads in one authorized query, without history expansion."""
+    if len(identities) > 100:
+        raise WorkspaceError(422, "Resolve no more than 100 canonical identities per page")
+    if not identities:
+        return {}
+    with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
+        rows = cursor.execute(
+            HEAD_SELECT + "WHERE h.tenant_id=%s AND h.resource_id=ANY(%s::uuid[])",
+            (principal.scope.tenant_id, identities),
+        ).fetchall()
+    return {
+        str(row["resource_id"]): CanonicalResource.model_validate(row).model_dump(mode="json")
+        for row in rows
+    }
 
 
 def _check_scalar(kind: str, value: Any) -> bool:

@@ -33,7 +33,12 @@ def main() -> None:
         and p.scope.tenant_id == author.scope.tenant_id
         and {"ontology_admin", "ontology_review"}.issubset(p.permissions)
     )
-    kinds = {*DEFINITION_MODELS, "SourceAccountDefinition"}
+    kinds = {
+        *DEFINITION_MODELS,
+        "SourceAccountDefinition",
+        "SourceJournalMovement",
+        "SourceTrialBalanceRow",
+    }
     mutations = []
     for spec in platform_definitions(author.scope.tenant_id):
         if not (

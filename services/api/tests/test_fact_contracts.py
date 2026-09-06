@@ -50,6 +50,13 @@ def test_flow_aggregation_preserves_currency_and_rejects_overlap():
         aggregate_rows(contract(), [*rows, rows[0]], "schema", [], None)
 
 
+def test_source_observations_cannot_masquerade_as_bound_financial_facts():
+    observation = row("001", "2025-01-31", "10")
+    observation["object_type"] = "SourceJournalMovement"
+    with pytest.raises(WorkspaceError, match="require ledger, unit and representation"):
+        aggregate_rows(contract(), [observation], "schema", [], None)
+
+
 def test_balances_cannot_be_summed_across_months():
     rows = [row("001", "2025-01-31", "100"), row("001", "2025-02-28", "120")]
     with pytest.raises(WorkspaceError, match="snapshot date"):

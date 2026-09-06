@@ -43,6 +43,12 @@ def aggregate_rows(
         context.prec = 50
         context.traps[Inexact] = True
         for row in rows:
+            if row.get("object_type") in {"SourceJournalMovement", "SourceTrialBalanceRow"}:
+                raise WorkspaceError(
+                    409,
+                    "Source accounting observations require ledger, unit and representation "
+                    "bindings before financial aggregation",
+                )
             if str(row["schema_version_id"]) != schema_version:
                 raise WorkspaceError(409, "Fact schema differs from the contract's pinned version")
             if row["evidence_class"] != "SOURCE_BOUND":

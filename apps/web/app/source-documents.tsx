@@ -3,6 +3,7 @@
 import {useEffect,useRef,useState,type FormEvent} from "react";
 import type {Principal} from "@finai/contracts";
 import {Panel} from "./g8-ui";
+import SourceAccountBindings from "./source-account-bindings";
 
 type Document = {document_id:string;filename:string;sha256:string;byte_length:number};
 type Observation = {companies:{source_label:string;row_count:number;first_coordinate:string}[];unassigned_row_count:number};
@@ -61,9 +62,9 @@ export default function SourceDocuments({token,principal,onProposal}:{token:stri
     {principal.permissions.includes("ingest")&&<form onSubmit={upload}><label>Original document (maximum 32 MB)<input type="file" name="file" required disabled={busy}/></label><button disabled={busy}>Retain original</button></form>}
     {document&&<p role="status">Retained {document.filename} · {document.byte_length.toLocaleString()} bytes · SHA-256 {document.sha256}</p>}
     <fieldset disabled={busy}><legend>Inspect retained company evidence</legend>
-      <label>Retained sources<select value={reference} onChange={e=>{setReference(e.target.value);setDocument(documents.find(d=>d.document_id===e.target.value)??null);setPreview(null);setSheet("");change();}}><option value="">Select an original source</option>{documents.map(d=><option key={d.document_id} value={d.document_id}>{d.filename}</option>)}</select></label>
+      <label htmlFor="retained-document-select">Retained sources</label><select id="retained-document-select" value={reference} onChange={e=>{setReference(e.target.value);setDocument(documents.find(d=>d.document_id===e.target.value)??null);setPreview(null);setSheet("");change();}}><option value="">Select an original source</option>{documents.map(d=><option key={d.document_id} value={d.document_id}>{d.filename}</option>)}</select>
       <label>Retained document reference<input value={reference} onChange={e=>{setReference(e.target.value);setDocument(null);setPreview(null);change();}} placeholder="doc_…"/></label>
-      <label>Source format<select value={mode} onChange={e=>{setMode(e.target.value);change();}}><option value="company_column">Company column in XLS</option><option value="1c_tb_title">1C trial balance title in XLS</option></select></label>
+      <label htmlFor="retained-source-format">Source format</label><select id="retained-source-format" value={mode} onChange={e=>{setMode(e.target.value);change();}}><option value="company_column">Company column in XLS</option><option value="1c_tb_title">1C trial balance title in XLS</option></select>
       <label>Worksheet name<input value={sheet} list="source-worksheet-names" onChange={e=>{setSheet(e.target.value);change();}}/></label><datalist id="source-worksheet-names">{preview?.sheets.map(name=><option key={name} value={name}/>)}</datalist>
       <button disabled={!/^doc_[a-f0-9]{64}$/.test(reference)} onClick={()=>readSource()}>Read source cells / list worksheets</button>
       {principal.permissions.includes("export")&&<button disabled={!/^doc_[a-f0-9]{64}$/.test(reference)} onClick={download}>Download verified original</button>}
@@ -72,6 +73,7 @@ export default function SourceDocuments({token,principal,onProposal}:{token:stri
     </fieldset>
     {preview&&<div><p>Worksheets: {preview.sheets.join(" · ")}</p>{preview.rows&&<><p>{preview.sheet}: {preview.row_count?.toLocaleString()} source rows. Cell values are unclassified; totals, detail, debit and credit are preserved separately.</p><div className="g8-table-scroll"><table><thead><tr><th>Source row</th>{Array.from({length:preview.column_count??0},(_,i)=><th key={i}>Column {i+1}</th>)}</tr></thead><tbody>{preview.rows.map(row=><tr key={row.row}><th>{row.row}</th>{row.cells.map(cell=><td key={cell.coordinate} title={`${cell.coordinate} · XLS cell type ${cell.type}`}>{String(cell.value)}</td>)}</tr>)}</tbody></table></div><button disabled={busy||!preview.offset||preview.sheet!==sheet} onClick={()=>readSource(Math.max(0,(preview.offset??0)-50))}>Previous rows</button><button disabled={busy||preview.next_offset==null||preview.sheet!==sheet} onClick={()=>readSource(preview.next_offset??0)}>Next rows</button></>}</div>}
     {observed&&<><table><thead><tr><th>Source company label</th><th>Observed cells</th><th>First source cell</th></tr></thead><tbody>{observed.companies.map(company=><tr key={company.source_label}><td>{company.source_label}</td><td>{company.row_count}</td><td>{company.first_coordinate}</td></tr>)}</tbody></table><p>{observed.unassigned_row_count} nonempty rows without a company label. Registration, group ownership, licences and chart applicability are not established by these labels.</p>{principal.permissions.includes("ontology_propose")&&<button disabled={busy||!!observed.unassigned_row_count||!observed.companies.length} onClick={()=>inspect(true)}>Propose observed companies for review</button>}</>}
+    <SourceAccountBindings key={`${reference}:${sheet}:${mode}`} token={token} documentId={reference} sheet={sheet} profile={mode==="1c_tb_title"?"1c_tb":"1c_journal"} canPropose={principal.permissions.includes("ontology_propose")} onProposal={onProposal}/>
     {busy&&<p role="status">Processing original source…</p>}{error&&<p role="alert">{error}</p>}
   </Panel>;
 }

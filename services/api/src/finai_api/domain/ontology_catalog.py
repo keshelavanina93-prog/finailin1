@@ -42,6 +42,23 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "left_contract_id": "@FactContract", "right_contract_id": "@FactContract",
         "definition": "OntologyDefinition",
     },
+    "SourceJournalMovement": {
+        "legal_entity_id": "@LegalEntity", "debit_account_id": "@LocalAccount",
+        "credit_account_id": "@LocalAccount", "source_record_id": "@SourceRecord",
+        "posting_date": "Date", "document_reference": "Text", "amount": "Amount",
+        "source_family": "Identifier", "source_row_key": "Identifier",
+        "unit_status": "Identifier", "source_details": "OntologyDefinition",
+    },
+    "SourceTrialBalanceRow": {
+        "legal_entity_id": "@LegalEntity", "account_id?": "@LocalAccount",
+        "source_record_id": "@SourceRecord", "period_start": "Date", "period_end": "Date",
+        "source_row_role": "Identifier", "source_row_key": "Identifier",
+        "parent_source_row_key?": "Identifier", "source_family": "Identifier",
+        "unit_status": "Identifier", "source_details": "OntologyDefinition",
+        "opening_debit?": "Amount", "opening_credit?": "Amount",
+        "turnover_debit?": "Amount", "turnover_credit?": "Amount",
+        "closing_debit?": "Amount", "closing_credit?": "Amount",
+    },
     "ObjectSetDefinition": {"definition": "OntologyDefinition"},
     "ObjectInterface": {"definition": "OntologyDefinition"},
     "ObjectTypeImplementation": {
