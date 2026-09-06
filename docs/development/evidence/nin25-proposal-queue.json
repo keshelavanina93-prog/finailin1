@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-09-06T22:14:02.478669+00:00",
+  "capability": "NIN-25 / NIN-28 retained proposal queue",
+  "mode": "authenticated running web proxy; read-only retained records",
+  "http_status": 200,
+  "seconds": 7.701,
+  "rows": 100,
+  "decision_counts": {
+    "APPROVED": 100
+  },
+  "stable_recency_order": true,
+  "response_fields_preserved": true,
+  "implementation": {
+    "page_before_decision_join": true,
+    "existing_recency_index": "resource_proposal_recency",
+    "planner_preference": "transaction-local enable_sort=off",
+    "reason": "RLS cardinality underestimation selected a full policy scan before LIMIT",
+    "statement_budget_ms": 10000,
+    "timeout_behavior": "409 without a partial queue",
+    "rls_unchanged": true
+  },
+  "native_verification": "test_proposal_list.py: varied limits, decisions, isolation, empty tenant",
+  "browser_acceptance": false,
+  "full_NIN_28_acceptance": false,
+  "scale_acceptance": false,
+  "release_accepted": false
+}

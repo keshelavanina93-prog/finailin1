@@ -1,0 +1,30 @@
+{
+  "queue_failure_injection": "Attempted browser route abort; no explicit failure observed, not claimed",
+  "web_types": "PASS",
+  "browser_journey": "PASS",
+  "home": {
+    "intake_ms": 702,
+    "state": "Updated",
+    "core_completed_ms": {
+      "readiness": 282,
+      "summary": 139,
+      "company_context": 917,
+      "context": 259
+    },
+    "global_graph_requests": 0
+  },
+  "capability": "NIN25 independent company/core, review-queue and ontology loading",
+  "ontology": {
+    "bounded_resources_rendered": true,
+    "global_graph_requests_after_opening": 1
+  },
+  "full_browser_acceptance": false,
+  "web_url": "http://127.0.0.1:3062",
+  "release_accepted": false,
+  "screenshot": {
+    "path": ".finai/artifacts/browser-shots/g8-deferred-ontology.png",
+    "sha256": "06008f1cc273324be5471894e4cdf29c98e7de18143a84763797991de9b27ed6"
+  },
+  "production_build": "PASS",
+  "lint": "PASS"
+}

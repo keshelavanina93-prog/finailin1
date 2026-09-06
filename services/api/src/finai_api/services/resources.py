@@ -870,19 +870,35 @@ def proposal_detail(principal: Principal, proposal_id: UUID) -> ProposalDetail:
         )
 
 
-def proposals(principal: Principal) -> list[dict[str, Any]]:
+def proposals(principal: Principal, limit: int = 100) -> list[dict[str, Any]]:
+    if not 1 <= limit <= 100:
+        raise WorkspaceError(422, "Proposal queue limit must be between 1 and 100")
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
-        return cursor.execute(
-            (
-                "SELECT "
-                "p.proposal_id,p.title,p.rationale,p.submitted_by,p.created_a"
-                "t,p.access_entity,coalesce(d.decision,'PENDING') AS decision "
-                "FROM resource_proposals p LEFT JOIN resource_decisions d "
-                "USING(tenant_id,proposal_id) WHERE p.tenant_id=%s ORDER BY "
-                "p.created_at DESC LIMIT 100"
-            ),
-            (principal.scope.tenant_id,),
-        ).fetchall()
+        # RLS selectivity is underestimated as one row. Prefer the existing recency index
+        # over evaluating expensive policy predicates for every proposal and then sorting.
+        # This preference is transaction-local; all proposal and decision policies still run.
+        cursor.execute(
+            "SELECT set_config('enable_sort','off',true), "
+            "set_config('statement_timeout','10000',true)"
+        )
+        try:
+            return cursor.execute(
+                "WITH page AS MATERIALIZED ("
+                "SELECT tenant_id,proposal_id,title,rationale,submitted_by,"
+                "created_at,access_entity "
+                "FROM resource_proposals WHERE tenant_id=%s "
+                "ORDER BY created_at DESC,proposal_id LIMIT %s) "
+                "SELECT p.proposal_id,p.title,p.rationale,p.submitted_by,p.created_at,"
+                "p.access_entity,coalesce(d.decision,'PENDING') AS decision "
+                "FROM page p LEFT JOIN LATERAL (SELECT decision FROM resource_decisions "
+                "WHERE tenant_id=p.tenant_id AND proposal_id=p.proposal_id LIMIT 1) d ON true "
+                "ORDER BY p.created_at DESC,p.proposal_id",
+                (principal.scope.tenant_id, limit),
+            ).fetchall()
+        except psycopg.errors.QueryCanceled as exc:
+            raise WorkspaceError(
+                409, "Proposal queue exceeded its execution budget; no partial queue returned"
+            ) from exc
 
 
 def _promotion_validation(
