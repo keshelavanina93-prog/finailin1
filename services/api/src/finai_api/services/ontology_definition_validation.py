@@ -12,7 +12,10 @@ from finai_api.domain.ontology_definitions import (
     DerivedDefinition,
     Expression,
     FactContract,
+    FactReconciliation,
+    InterfaceDefinition,
 )
+from finai_api.domain.regulation import RegulatoryDefinition
 from finai_api.domain.resources import ResourceMutation
 from finai_api.services.workspace import WorkspaceError
 
@@ -33,6 +36,7 @@ def validate_definition(
     source = str(item.resource_id)
 
     if item.object_type == "RegulatoryRule":
+        assert isinstance(definition, RegulatoryDefinition)
         if item.evidence_class != "SOURCE_BOUND":
             raise WorkspaceError(422, "Regulatory interpretations require retained source evidence")
         act = target(str(item.attributes["act_id"]), source, "REGULATORY_ACT")
@@ -54,6 +58,7 @@ def validate_definition(
         return
 
     if item.object_type == "FactReconciliation":
+        assert isinstance(definition, FactReconciliation)
         contracts = [
             FactContract.model_validate(
                 target(str(item.attributes[side + "_contract_id"]), source, "RECONCILE:" + side)[
@@ -64,21 +69,21 @@ def validate_definition(
         ]
         if item.attributes["left_contract_id"] == item.attributes["right_contract_id"]:
             raise WorkspaceError(422, "Reconciliation needs two distinct fact contracts")
-        for contract in contracts:
-            if not set(definition.group_by).issubset(contract.dimensions):
+        for fact_contract in contracts:
+            if not set(definition.group_by).issubset(fact_contract.dimensions):
                 raise WorkspaceError(422, "Reconciliation grain must be shared declared dimensions")
-            if contract.time_field not in definition.group_by:
+            if fact_contract.time_field not in definition.group_by:
                 raise WorkspaceError(
                     422, "Reconciliation must preserve the declared reporting period"
                 )
             if (
-                contract.period_start_field
-                and contract.period_start_field not in definition.group_by
+                fact_contract.period_start_field
+                and fact_contract.period_start_field not in definition.group_by
             ):
                 raise WorkspaceError(
                     422, "Reconciliation must preserve the complete period interval"
                 )
-            if contract.aggregation in {"ratio_of_sums", "non_additive"}:
+            if fact_contract.aggregation in {"ratio_of_sums", "non_additive"}:
                 raise WorkspaceError(422, "Reconcile underlying components, not ratios")
         if (
             set(contracts[0].partition_fields) != set(contracts[1].partition_fields)
@@ -149,13 +154,28 @@ def validate_definition(
             selected = target(identifier, source, "SET_ROOT:" + identifier)
             if selected["object_type"] != payload["object_type"]:
                 raise WorkspaceError(422, "Object Set root identity has a different object type")
+    elif item.object_type == "ObjectInterface":
+        for name, spec in definition.model_dump(mode="json")["fields"].items():
+            if spec.get("semantic_id"):
+                semantic = target(spec["semantic_id"], source, "INTERFACE_SEMANTIC:" + name)
+                if (
+                    semantic["object_type"] != "SemanticContract"
+                    or semantic["attributes"].get("kind") != spec["kind"]
+                ):
+                    raise WorkspaceError(
+                        422, f"Interface property {name} does not match its semantic contract"
+                    )
+            if spec.get("target_type"):
+                schema(spec["target_type"])
     elif item.object_type == "ObjectTypeGroup":
         for name in definition.model_dump()["types"]:
             schema(name)
     elif item.object_type == "ObjectTypeImplementation":
         interface = target(item.attributes["interface_id"], source, "IMPLEMENTS")
         contract = target(item.attributes["schema_id"], source, "IMPLEMENTATION_SCHEMA")
-        required = interface["attributes"]["definition"]["fields"]
+        required = InterfaceDefinition.model_validate(
+            interface["attributes"]["definition"]
+        ).model_dump(mode="json")["fields"]
         mapping = definition.model_dump()["fields"]
         fields = contract["attributes"]["fields"]
         if set(mapping) != set(required):
@@ -168,6 +188,13 @@ def validate_definition(
                 raise WorkspaceError(
                     422, f"Interface property {name} requires a required source field"
                 )
+            for key in ("semantic_id", "target_type"):
+                if required[name].get(key) is not None and str(spec.get(key)) != str(
+                    required[name][key]
+                ):
+                    raise WorkspaceError(
+                        422, f"Interface property {name} has an incompatible {key} mapping"
+                    )
     elif item.object_type == "DerivedProperty":
         assert isinstance(definition, DerivedDefinition)
         contract = target(item.attributes["schema_id"], source, "DERIVED_SCHEMA")

@@ -57,6 +57,14 @@ class InterfaceField(Definition):
         "quantity",
     ]
     required: bool = True
+    semantic_id: UUID | None = None
+    target_type: TypeName | None = None
+
+    @model_validator(mode="after")
+    def reference_target(self) -> "InterfaceField":
+        if self.target_type is not None and self.kind != "reference":
+            raise ValueError("Only reference properties can declare an endpoint type")
+        return self
 
 
 class InterfaceDefinition(Definition):
