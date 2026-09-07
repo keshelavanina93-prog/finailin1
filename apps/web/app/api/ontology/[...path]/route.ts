@@ -10,7 +10,7 @@ async function forward(request: NextRequest, context: Context) {
   const lifecycle = /^lifecycle\/(?:requests(?:\/[a-fA-F0-9-]+\/review)?|versions\/[a-fA-F0-9-]+|consumptions\/[a-fA-F0-9-]+(?:\/status)?|consume)$/.test(route);
   const eventTime = /^event-time\/(?:events|streams\/[a-fA-F0-9-]+\/replay)$/.test(route);
   const certification = /^certifications\/(?:evaluations|receipts\/[a-fA-F0-9-]+)$/.test(route);
-  const transformations = /^transformations(?:\/runs(?:\/[a-fA-F0-9-]+(?:\/control)?)?)?$/.test(route);
+  const transformations = /^transformations(?:\/runs(?:\/[a-fA-F0-9-]+(?:\/(?:control|publication-review))?)?)?$/.test(route);
   const functions = /^functions(?:\/(?:implementation|invocations(?:\/[a-fA-F0-9-]+)?))?$/.test(route);
   const runtimeObservations = request.method === "GET" && /^runtime-observations(?:\/[a-fA-F0-9-]+)?$/.test(route);
   const retention = /^retention\/(?:inspect|history|policies|evaluations|receipts\/[a-fA-F0-9-]+)$/.test(route);

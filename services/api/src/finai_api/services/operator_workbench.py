@@ -75,6 +75,25 @@ def listing(principal: Principal, company_id: UUID | None, include_unbound: bool
                 "ontology_read" in principal.permissions,
             ),
         ).fetchall()
+        review_ids = [
+            row[0] for row in rows[:100]
+            if row[1].get("compiled_plan", {}).get("publication_review") is not None
+        ]
+        review_states = {}
+        if review_ids:
+            for identity, cancelled, has_task, decision in conn.execute(
+                "SELECT workflow_id,bool_or(payload->>'command'='cancel'),"
+                "bool_or(event_id='publication-review:task'),"
+                "max(CASE WHEN event_id='publication-review:decision' THEN payload->>'state' END) "
+                "FROM workflow_events WHERE tenant_id=%s AND exact_scope=%s "
+                "AND workflow_id=ANY(%s) GROUP BY workflow_id",
+                (principal.scope.tenant_id, Jsonb(scope), review_ids),
+            ):
+                review_states[identity] = (
+                    "CANCELLED" if cancelled else decision
+                    if decision in ("APPROVED", "REJECTED") else "PENDING"
+                    if has_task else "NOT_REQUESTED"
+                )
     titles = {}
     pins = [
         r[1].get("compiled_plan", {}).get("transformation", {})
@@ -99,7 +118,14 @@ def listing(principal: Principal, company_id: UUID | None, include_unbound: bool
         return titles.get((pin.get("resource_id"), pin.get("version_id"), pin.get("content_hash")))
 
     return {
-        "items": [summarize(r[0], r[1], r[2].isoformat(), title(r[1])) for r in rows[:100]],
+        "items": [
+            {
+                **summarize(r[0], r[1], r[2].isoformat(), title(r[1])),
+                **({"publication_review_state": review_states.get(r[0], "NOT_REQUESTED")}
+                   if r[0] in review_ids else {}),
+            }
+            for r in rows[:100]
+        ],
         "truncated": len(rows) > 100,
         "scope": scope,
     }

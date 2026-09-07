@@ -172,5 +172,7 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
     }
     if any(node.input_binding for node in definition.definition.nodes):
         result["input_semantics"] = "EXPLICIT_RETAINED_RESULT"
+    if definition.publication_review is not None:
+        result["publication_review"] = definition.publication_review.model_dump(mode="json")
     result["plan_hash"] = function_execution._digest(result)
     return result

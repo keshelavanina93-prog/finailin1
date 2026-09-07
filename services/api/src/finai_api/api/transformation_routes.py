@@ -102,6 +102,43 @@ class Control(BaseModel):
         return value
 
 
+class ReviewDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    decision_id: UUID
+    decision: Literal["APPROVED", "REJECTED"]
+    reason: str = Field(min_length=10, max_length=2000)
+
+    @field_validator("reason")
+    @classmethod
+    def meaningful_reason(cls, value: str) -> str:
+        value = value.strip()
+        if len(value) < 10:
+            raise ValueError("Review reason requires ten non-padding characters")
+        return value
+
+
+@router.post("/runs/{request_id}/publication-review")
+async def decide_review(principal: User, request_id: UUID, request: ReviewDecision) -> dict:
+    identity = f"transformation:{request_id}"
+    review = await asyncio.to_thread(
+        transformation_runs.decide_review,
+        principal,
+        identity,
+        request.decision_id,
+        request.decision,
+        request.reason,
+    )
+    notified = False
+    try:
+        runtime = await client()
+        await runtime.get_workflow_handle(identity).signal(TransformationWorkflow.review_changed)
+        notified = True
+    except Exception:
+        # Retained decision remains authoritative; durable polling recovers notification.
+        pass
+    return {"publication_review": review, "runtime_notified": notified}
+
+
 @router.post("/runs/{request_id}/control")
 async def control(principal: User, request_id: UUID, request: Control) -> dict[str, Any]:
     require_permission(principal, "ontology_read")

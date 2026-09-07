@@ -18,12 +18,20 @@ def retain_run(
 ) -> dict:
     require_permission(principal, "ontology_read")
     scope = principal.scope.model_dump(mode="json")
+    read_permissions = set(principal.permissions)
+    read_contract = {}
+    if runtime == "shared-functions/1":
+        read_permissions.intersection_update(
+            {"read", "ontology_read", "ontology_admin", "restricted_read"}
+        )
+        read_contract = {"read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1"}
     payload = jsonable_encoder(
         {
             **result,
             "scope": scope,
             "calculation_runtime": runtime,
-            "read_permissions": sorted(principal.permissions),
+            "read_permissions": sorted(read_permissions),
+            **read_contract,
         }
     )
     encoded = json.dumps(

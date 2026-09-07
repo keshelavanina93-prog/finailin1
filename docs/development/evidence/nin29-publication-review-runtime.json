@@ -1,0 +1,1859 @@
+{
+  "checked_at": "2026-09-07T04:27:04.550110+00:00",
+  "request": {
+    "request_id": "d60106cc-c121-4cc7-a201-7062d0a51087",
+    "transformation": {
+      "resource_id": "80031d1f-c5a2-5495-ac25-b7dbf9c0480d",
+      "version_id": "4d2700cc-6002-5405-99f5-bcaf8c622424"
+    },
+    "valid_at": "2026-09-07T08:19:31.598474+04:00",
+    "known_at": "2026-09-07T08:19:31.598474+04:00"
+  },
+  "result": {
+    "workflow_id": "transformation:d60106cc-c121-4cc7-a201-7062d0a51087",
+    "request": {
+      "definition": {
+        "nodes": [
+          {
+            "node_id": "source_accounts",
+            "function": {
+              "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+              "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473",
+              "content_hash": "6490d65d5c81ce1067157f9084875d81d30ade701283a4946ad2d9f1583c8b23"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 3,
+              "offset": 0,
+              "function": {
+                "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+                "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473"
+              },
+              "known_at": "2026-09-07T04:19:31.598474Z",
+              "valid_at": "2026-09-07T04:19:31.598474Z",
+              "request_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 3,
+                "offset": 0,
+                "function": {
+                  "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+                  "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473"
+                },
+                "known_at": "2026-09-07T04:19:31.598474Z",
+                "valid_at": "2026-09-07T04:19:31.598474Z",
+                "request_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+                "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473",
+                "content_hash": "6490d65d5c81ce1067157f9084875d81d30ade701283a4946ad2d9f1583c8b23"
+              },
+              "plan_hash": "7811b1c0fc7cb3566b48f47ef516003da30e2847f1d50afadb28e7b20d9eafb8",
+              "object_set": {
+                "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+                "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+                "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "derived_properties": 8,
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "10e92c5546be94dd2f0379b9a2f4cce975c75a7f6c58d606929fd878f23c31d9",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [
+                {
+                  "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                  "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                  "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+                }
+              ],
+              "static_dependencies": [
+                {
+                  "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                  "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                  "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+                },
+                {
+                  "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+                  "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+                  "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                }
+              ]
+            }
+          },
+          {
+            "node_id": "retained_labels",
+            "function": {
+              "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+              "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681",
+              "content_hash": "5dfc9e3f7c620703ffbda01846823b7225d112e065b54f278bf39fecc38edad2"
+            },
+            "depends_on": [
+              "source_accounts"
+            ],
+            "invocation": {
+              "limit": 3,
+              "offset": 0,
+              "function": {
+                "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+                "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681"
+              },
+              "known_at": "2026-09-07T04:19:31.598474Z",
+              "valid_at": "2026-09-07T04:19:31.598474Z",
+              "request_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+              "input_result": {
+                "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+              }
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 3,
+                "offset": 0,
+                "function": {
+                  "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+                  "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681"
+                },
+                "known_at": "2026-09-07T04:19:31.598474Z",
+                "valid_at": "2026-09-07T04:19:31.598474Z",
+                "request_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+                "input_result": {
+                  "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+                }
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+                "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681",
+                "content_hash": "5dfc9e3f7c620703ffbda01846823b7225d112e065b54f278bf39fecc38edad2"
+              },
+              "plan_hash": "51ce6a3e0323b83b5c472ca21b28194060d14c3cf5a38326ae68b8631a071ff7",
+              "object_set": {
+                "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+                "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+                "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "derived_properties": 8,
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "10e92c5546be94dd2f0379b9a2f4cce975c75a7f6c58d606929fd878f23c31d9",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [
+                {
+                  "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                  "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                  "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+                }
+              ],
+              "static_dependencies": [
+                {
+                  "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                  "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                  "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+                },
+                {
+                  "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+                  "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+                  "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                }
+              ]
+            },
+            "input_binding": {
+              "upstream_node_id": "source_accounts"
+            }
+          }
+        ],
+        "outputs": {
+          "retained_labels": "function-invocation/1",
+          "source_accounts": "function-invocation/1"
+        },
+        "version": "transformation-functions/1"
+      },
+      "request_hash": "14c356fc6bc167399926104b52952f746e6a43766fa508806d9184410459da9f",
+      "compiled_plan": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "nodes": [
+          {
+            "node_id": "source_accounts",
+            "function": {
+              "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+              "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473",
+              "content_hash": "6490d65d5c81ce1067157f9084875d81d30ade701283a4946ad2d9f1583c8b23"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 3,
+              "offset": 0,
+              "function": {
+                "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+                "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473"
+              },
+              "known_at": "2026-09-07T04:19:31.598474Z",
+              "valid_at": "2026-09-07T04:19:31.598474Z",
+              "request_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 3,
+                "offset": 0,
+                "function": {
+                  "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+                  "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473"
+                },
+                "known_at": "2026-09-07T04:19:31.598474Z",
+                "valid_at": "2026-09-07T04:19:31.598474Z",
+                "request_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+                "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473",
+                "content_hash": "6490d65d5c81ce1067157f9084875d81d30ade701283a4946ad2d9f1583c8b23"
+              },
+              "plan_hash": "7811b1c0fc7cb3566b48f47ef516003da30e2847f1d50afadb28e7b20d9eafb8",
+              "object_set": {
+                "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+                "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+                "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "derived_properties": 8,
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "10e92c5546be94dd2f0379b9a2f4cce975c75a7f6c58d606929fd878f23c31d9",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [
+                {
+                  "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                  "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                  "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+                }
+              ],
+              "static_dependencies": [
+                {
+                  "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                  "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                  "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+                },
+                {
+                  "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+                  "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+                  "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                }
+              ]
+            }
+          },
+          {
+            "node_id": "retained_labels",
+            "function": {
+              "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+              "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681",
+              "content_hash": "5dfc9e3f7c620703ffbda01846823b7225d112e065b54f278bf39fecc38edad2"
+            },
+            "depends_on": [
+              "source_accounts"
+            ],
+            "invocation": {
+              "limit": 3,
+              "offset": 0,
+              "function": {
+                "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+                "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681"
+              },
+              "known_at": "2026-09-07T04:19:31.598474Z",
+              "valid_at": "2026-09-07T04:19:31.598474Z",
+              "request_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+              "input_result": {
+                "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+              }
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 3,
+                "offset": 0,
+                "function": {
+                  "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+                  "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681"
+                },
+                "known_at": "2026-09-07T04:19:31.598474Z",
+                "valid_at": "2026-09-07T04:19:31.598474Z",
+                "request_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+                "input_result": {
+                  "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+                }
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+                "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681",
+                "content_hash": "5dfc9e3f7c620703ffbda01846823b7225d112e065b54f278bf39fecc38edad2"
+              },
+              "plan_hash": "51ce6a3e0323b83b5c472ca21b28194060d14c3cf5a38326ae68b8631a071ff7",
+              "object_set": {
+                "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+                "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+                "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "derived_properties": 8,
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "10e92c5546be94dd2f0379b9a2f4cce975c75a7f6c58d606929fd878f23c31d9",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [
+                {
+                  "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                  "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                  "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+                }
+              ],
+              "static_dependencies": [
+                {
+                  "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                  "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                  "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+                },
+                {
+                  "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+                  "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+                  "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                }
+              ]
+            },
+            "input_binding": {
+              "upstream_node_id": "source_accounts"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "node_id": "source_accounts",
+            "output_id": "source_accounts"
+          },
+          {
+            "node_id": "retained_labels",
+            "output_id": "retained_labels"
+          }
+        ],
+        "request": {
+          "known_at": "2026-09-07T04:19:31.598474Z",
+          "valid_at": "2026-09-07T04:19:31.598474Z",
+          "request_id": "d60106cc-c121-4cc7-a201-7062d0a51087",
+          "transformation": {
+            "version_id": "4d2700cc-6002-5405-99f5-bcaf8c622424",
+            "resource_id": "80031d1f-c5a2-5495-ac25-b7dbf9c0480d"
+          }
+        },
+        "contract": "transformation-plan/1",
+        "coverage": "DECLARED_QUERY_PAGES_ONLY",
+        "plan_hash": "3a030ee070c5e5afa1034cecf56bcfc653291dd91b9a6b4e8c02807390f02628",
+        "node_order": [
+          "source_accounts",
+          "retained_labels"
+        ],
+        "exact_scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "estimated_work": {
+          "returned_rows": 6,
+          "derived_evaluations": 6
+        },
+        "transformation": {
+          "version_id": "4d2700cc-6002-5405-99f5-bcaf8c622424",
+          "resource_id": "80031d1f-c5a2-5495-ac25-b7dbf9c0480d",
+          "content_hash": "379b0653e629489fa16ef6e4aa0d993f2b3fff7fcb7a9993516d718f9dd6c7b9"
+        },
+        "input_semantics": "EXPLICIT_RETAINED_RESULT",
+        "resource_budget": {
+          "max_returned_rows": 6,
+          "max_derived_evaluations": 6,
+          "max_published_result_bytes": 1000000
+        },
+        "publication_review": {
+          "question": "Do the retained source account objects and derived labels support publishing this observation-only evidence build?"
+        },
+        "dependency_semantics": "COMPLETION_BARRIER_ONLY",
+        "current_use_authorized": false,
+        "result_bytes_accounting": "POSTGRES_JSONB_TEXT_UTF8_V1",
+        "business_effect_authorized": false
+      }
+    },
+    "actor_id": "bootstrap-e9c67bab62119cae3b026aa3",
+    "created_at": "2026-09-07T08:19:32.151414+04:00",
+    "definition": {
+      "nodes": [
+        {
+          "node_id": "source_accounts",
+          "function": {
+            "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+            "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473",
+            "content_hash": "6490d65d5c81ce1067157f9084875d81d30ade701283a4946ad2d9f1583c8b23"
+          },
+          "depends_on": [],
+          "invocation": {
+            "limit": 3,
+            "offset": 0,
+            "function": {
+              "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+              "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473"
+            },
+            "known_at": "2026-09-07T04:19:31.598474Z",
+            "valid_at": "2026-09-07T04:19:31.598474Z",
+            "request_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+          },
+          "function_plan": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "request": {
+              "limit": 3,
+              "offset": 0,
+              "function": {
+                "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+                "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473"
+              },
+              "known_at": "2026-09-07T04:19:31.598474Z",
+              "valid_at": "2026-09-07T04:19:31.598474Z",
+              "request_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+            },
+            "contract": "function-plan/1",
+            "function": {
+              "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+              "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473",
+              "content_hash": "6490d65d5c81ce1067157f9084875d81d30ade701283a4946ad2d9f1583c8b23"
+            },
+            "plan_hash": "7811b1c0fc7cb3566b48f47ef516003da30e2847f1d50afadb28e7b20d9eafb8",
+            "object_set": {
+              "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+              "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+              "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+            },
+            "exact_scope": {
+              "period": "2026-08",
+              "currency": "GEL",
+              "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+              "legal_entity_id": "entity-ge-001"
+            },
+            "implementation": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+              "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+              "capabilities": {
+                "cdc": false,
+                "read": true,
+                "query": true,
+                "write": false,
+                "delete": false,
+                "limits": {
+                  "coverage": "QUERY_PAGE_ONLY",
+                  "returned_rows": 200,
+                  "derived_properties": 8,
+                  "database_scan_limit": null
+                },
+                "stream": false,
+                "update": false,
+                "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "reversal": false,
+                "snapshot": true,
+                "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                "simulation": false,
+                "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                "incremental": false,
+                "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                "formula_execution": false,
+                "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                "source_write_exactly_once": false
+              },
+              "maximum_rows": 200,
+              "dependency_sha256": "10e92c5546be94dd2f0379b9a2f4cce975c75a7f6c58d606929fd878f23c31d9",
+              "implementation_id": "ontology.object-set-derived/v1",
+              "maximum_properties": 8
+            },
+            "derived_properties": [
+              {
+                "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+              }
+            ],
+            "static_dependencies": [
+              {
+                "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+              },
+              {
+                "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+                "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+                "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+              },
+              {
+                "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+              }
+            ]
+          }
+        },
+        {
+          "node_id": "retained_labels",
+          "function": {
+            "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+            "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681",
+            "content_hash": "5dfc9e3f7c620703ffbda01846823b7225d112e065b54f278bf39fecc38edad2"
+          },
+          "depends_on": [
+            "source_accounts"
+          ],
+          "invocation": {
+            "limit": 3,
+            "offset": 0,
+            "function": {
+              "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+              "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681"
+            },
+            "known_at": "2026-09-07T04:19:31.598474Z",
+            "valid_at": "2026-09-07T04:19:31.598474Z",
+            "request_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+            "input_result": {
+              "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+            }
+          },
+          "function_plan": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "request": {
+              "limit": 3,
+              "offset": 0,
+              "function": {
+                "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+                "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681"
+              },
+              "known_at": "2026-09-07T04:19:31.598474Z",
+              "valid_at": "2026-09-07T04:19:31.598474Z",
+              "request_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+              "input_result": {
+                "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+              }
+            },
+            "contract": "function-plan/1",
+            "function": {
+              "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+              "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681",
+              "content_hash": "5dfc9e3f7c620703ffbda01846823b7225d112e065b54f278bf39fecc38edad2"
+            },
+            "plan_hash": "51ce6a3e0323b83b5c472ca21b28194060d14c3cf5a38326ae68b8631a071ff7",
+            "object_set": {
+              "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+              "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+              "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+            },
+            "exact_scope": {
+              "period": "2026-08",
+              "currency": "GEL",
+              "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+              "legal_entity_id": "entity-ge-001"
+            },
+            "implementation": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+              "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+              "capabilities": {
+                "cdc": false,
+                "read": true,
+                "query": true,
+                "write": false,
+                "delete": false,
+                "limits": {
+                  "coverage": "QUERY_PAGE_ONLY",
+                  "returned_rows": 200,
+                  "derived_properties": 8,
+                  "database_scan_limit": null
+                },
+                "stream": false,
+                "update": false,
+                "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "reversal": false,
+                "snapshot": true,
+                "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                "simulation": false,
+                "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                "incremental": false,
+                "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                "formula_execution": false,
+                "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                "source_write_exactly_once": false
+              },
+              "maximum_rows": 200,
+              "dependency_sha256": "10e92c5546be94dd2f0379b9a2f4cce975c75a7f6c58d606929fd878f23c31d9",
+              "implementation_id": "ontology.object-set-derived/v1",
+              "maximum_properties": 8
+            },
+            "derived_properties": [
+              {
+                "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+              }
+            ],
+            "static_dependencies": [
+              {
+                "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+                "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+                "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+              },
+              {
+                "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+                "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+                "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+              },
+              {
+                "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+              }
+            ]
+          },
+          "input_binding": {
+            "upstream_node_id": "source_accounts"
+          }
+        }
+      ],
+      "outputs": {
+        "retained_labels": "function-invocation/1",
+        "source_accounts": "function-invocation/1"
+      },
+      "version": "transformation-functions/1"
+    },
+    "events": [
+      {
+        "event_id": "node:source_accounts:started",
+        "node": "source_accounts",
+        "state": "RUNNING",
+        "created_at": "2026-09-07T08:19:34.078813+04:00"
+      },
+      {
+        "event_id": "node:source_accounts:terminal",
+        "node": "source_accounts",
+        "state": "COMPLETED",
+        "usage": {
+          "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+          "returned_rows": 3,
+          "derived_evaluations": 3,
+          "published_result_bytes": 11212
+        },
+        "output": {
+          "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082",
+          "receipt_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+          "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+        },
+        "new_run_required": false,
+        "created_at": "2026-09-07T08:19:35.593740+04:00"
+      },
+      {
+        "event_id": "output:d3b82803f96c6c7d12d1d9f893e987bae36f33203769e72400f4ac9f10e13e17",
+        "node": "source_accounts",
+        "state": "STAGED",
+        "value": {
+          "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082",
+          "receipt_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+          "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+        },
+        "sha256": "f48eec67d7c4ddd5b402d8e420dddeea077290fd0a421355006096f16a45bc6c",
+        "generation": 0,
+        "artifact_type": "function-invocation/1",
+        "created_at": "2026-09-07T08:19:35.715418+04:00"
+      },
+      {
+        "event_id": "node:retained_labels:started",
+        "node": "retained_labels",
+        "state": "RUNNING",
+        "created_at": "2026-09-07T08:19:36.040203+04:00"
+      },
+      {
+        "event_id": "node:retained_labels:terminal",
+        "node": "retained_labels",
+        "state": "COMPLETED",
+        "usage": {
+          "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+          "returned_rows": 3,
+          "derived_evaluations": 3,
+          "published_result_bytes": 11462
+        },
+        "output": {
+          "run_id": "fcr_5ed33b9db8c149090030c59413e72467c618c4b494c3bf72b3b3b6f7cbe2cf41",
+          "receipt_hash": "d72cb5be089a0bc8e35f80cc484a1f7ca46cffe6c128e707cffc19c83b130262",
+          "invocation_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b"
+        },
+        "new_run_required": false,
+        "created_at": "2026-09-07T08:19:38.273837+04:00"
+      },
+      {
+        "event_id": "output:d3babe428488e22c7a370dae3a8dec01910f728b19f86b04e0bfb39aa821e44a",
+        "node": "retained_labels",
+        "state": "STAGED",
+        "value": {
+          "run_id": "fcr_5ed33b9db8c149090030c59413e72467c618c4b494c3bf72b3b3b6f7cbe2cf41",
+          "receipt_hash": "d72cb5be089a0bc8e35f80cc484a1f7ca46cffe6c128e707cffc19c83b130262",
+          "invocation_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b"
+        },
+        "sha256": "77d32b2edfc41a7f52d90dbbdbd6f64a5d062f9d22bed05e41f0f064d4cbd0b1",
+        "generation": 0,
+        "artifact_type": "function-invocation/1",
+        "created_at": "2026-09-07T08:19:38.409798+04:00"
+      },
+      {
+        "event_id": "publication-review:task",
+        "state": "PENDING",
+        "outputs": [
+          {
+            "run_id": "fcr_5ed33b9db8c149090030c59413e72467c618c4b494c3bf72b3b3b6f7cbe2cf41",
+            "node_id": "retained_labels",
+            "output_id": "retained_labels",
+            "receipt_hash": "d72cb5be089a0bc8e35f80cc484a1f7ca46cffe6c128e707cffc19c83b130262",
+            "invocation_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b"
+          },
+          {
+            "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082",
+            "node_id": "source_accounts",
+            "output_id": "source_accounts",
+            "receipt_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+            "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+          }
+        ],
+        "task_id": "b96bb91e-f860-53ff-b831-d37b8400d28d",
+        "question": "Do the retained source account objects and derived labels support publishing this observation-only evidence build?",
+        "created_at": "2026-09-07T08:19:38.564997+04:00"
+      },
+      {
+        "event_id": "publication-review:decision",
+        "state": "APPROVED",
+        "reason": "Reviewed the three retained source account objects, original labels and exact upstream provenance. Approve observation-only evidence publication.",
+        "task_id": "b96bb91e-f860-53ff-b831-d37b8400d28d",
+        "actor_id": "local-reviewer",
+        "decision_id": "dfe68875-29a6-4bcf-90f0-a220d2d57de8",
+        "created_at": "2026-09-07T08:26:37.406725+04:00"
+      },
+      {
+        "event_id": "publication:0",
+        "node": "publication",
+        "state": "PUBLISHED",
+        "manifest": {
+          "outputs": [
+            {
+              "slot": "retained_labels",
+              "value": {
+                "run_id": "fcr_5ed33b9db8c149090030c59413e72467c618c4b494c3bf72b3b3b6f7cbe2cf41",
+                "receipt_hash": "d72cb5be089a0bc8e35f80cc484a1f7ca46cffe6c128e707cffc19c83b130262",
+                "invocation_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b"
+              },
+              "sha256": "77d32b2edfc41a7f52d90dbbdbd6f64a5d062f9d22bed05e41f0f064d4cbd0b1",
+              "event_id": "output:d3babe428488e22c7a370dae3a8dec01910f728b19f86b04e0bfb39aa821e44a",
+              "artifact_type": "function-invocation/1"
+            },
+            {
+              "slot": "source_accounts",
+              "value": {
+                "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082",
+                "receipt_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+                "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+              },
+              "sha256": "f48eec67d7c4ddd5b402d8e420dddeea077290fd0a421355006096f16a45bc6c",
+              "event_id": "output:d3b82803f96c6c7d12d1d9f893e987bae36f33203769e72400f4ac9f10e13e17",
+              "artifact_type": "function-invocation/1"
+            }
+          ],
+          "protocol": "execution-publication/1",
+          "authority": "EXECUTION_ONLY",
+          "generation": 0,
+          "workflow_id": "transformation:d60106cc-c121-4cc7-a201-7062d0a51087",
+          "publication_id": "pub_e82c8a5d934a899f2cd02f993539f6f562484417d81612d8154771cdb8c605ea",
+          "definition_sha256": "28fc428be007bf09847126b7a4a417724a40a5e5bb3dadd3347fd196a20eed1b"
+        },
+        "created_at": "2026-09-07T08:26:37.807367+04:00"
+      }
+    ],
+    "publications": [
+      {
+        "outputs": [
+          {
+            "slot": "retained_labels",
+            "value": {
+              "run_id": "fcr_5ed33b9db8c149090030c59413e72467c618c4b494c3bf72b3b3b6f7cbe2cf41",
+              "receipt_hash": "d72cb5be089a0bc8e35f80cc484a1f7ca46cffe6c128e707cffc19c83b130262",
+              "invocation_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b"
+            },
+            "sha256": "77d32b2edfc41a7f52d90dbbdbd6f64a5d062f9d22bed05e41f0f064d4cbd0b1",
+            "event_id": "output:d3babe428488e22c7a370dae3a8dec01910f728b19f86b04e0bfb39aa821e44a",
+            "artifact_type": "function-invocation/1"
+          },
+          {
+            "slot": "source_accounts",
+            "value": {
+              "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082",
+              "receipt_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+              "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+            },
+            "sha256": "f48eec67d7c4ddd5b402d8e420dddeea077290fd0a421355006096f16a45bc6c",
+            "event_id": "output:d3b82803f96c6c7d12d1d9f893e987bae36f33203769e72400f4ac9f10e13e17",
+            "artifact_type": "function-invocation/1"
+          }
+        ],
+        "protocol": "execution-publication/1",
+        "authority": "EXECUTION_ONLY",
+        "generation": 0,
+        "workflow_id": "transformation:d60106cc-c121-4cc7-a201-7062d0a51087",
+        "publication_id": "pub_e82c8a5d934a899f2cd02f993539f6f562484417d81612d8154771cdb8c605ea",
+        "definition_sha256": "28fc428be007bf09847126b7a4a417724a40a5e5bb3dadd3347fd196a20eed1b"
+      }
+    ],
+    "publication_review": {
+      "task_id": "b96bb91e-f860-53ff-b831-d37b8400d28d",
+      "question": "Do the retained source account objects and derived labels support publishing this observation-only evidence build?",
+      "state": "APPROVED",
+      "outputs": [
+        {
+          "run_id": "fcr_5ed33b9db8c149090030c59413e72467c618c4b494c3bf72b3b3b6f7cbe2cf41",
+          "node_id": "retained_labels",
+          "output_id": "retained_labels",
+          "receipt_hash": "d72cb5be089a0bc8e35f80cc484a1f7ca46cffe6c128e707cffc19c83b130262",
+          "invocation_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b"
+        },
+        {
+          "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082",
+          "node_id": "source_accounts",
+          "output_id": "source_accounts",
+          "receipt_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+          "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+        }
+      ],
+      "decision": {
+        "event_id": "publication-review:decision",
+        "state": "APPROVED",
+        "reason": "Reviewed the three retained source account objects, original labels and exact upstream provenance. Approve observation-only evidence publication.",
+        "task_id": "b96bb91e-f860-53ff-b831-d37b8400d28d",
+        "actor_id": "local-reviewer",
+        "decision_id": "dfe68875-29a6-4bcf-90f0-a220d2d57de8",
+        "created_at": "2026-09-07T08:26:37.406725+04:00"
+      },
+      "run_actor_id": "bootstrap-e9c67bab62119cae3b026aa3"
+    },
+    "current_use_authorized": false,
+    "business_effect_authorized": false,
+    "runtime_status": "COMPLETED",
+    "execution": {
+      "cancel_requested": false,
+      "pause_requested": false,
+      "result": {
+        "publication": {
+          "generation": 0,
+          "publication_id": "pub_e82c8a5d934a899f2cd02f993539f6f562484417d81612d8154771cdb8c605ea"
+        },
+        "publication_review": {
+          "decision": {
+            "actor_id": "local-reviewer",
+            "created_at": "2026-09-07T08:26:37.406725+04:00",
+            "decision_id": "dfe68875-29a6-4bcf-90f0-a220d2d57de8",
+            "event_id": "publication-review:decision",
+            "reason": "Reviewed the three retained source account objects, original labels and exact upstream provenance. Approve observation-only evidence publication.",
+            "state": "APPROVED",
+            "task_id": "b96bb91e-f860-53ff-b831-d37b8400d28d"
+          },
+          "outputs": [
+            {
+              "invocation_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+              "node_id": "retained_labels",
+              "output_id": "retained_labels",
+              "receipt_hash": "d72cb5be089a0bc8e35f80cc484a1f7ca46cffe6c128e707cffc19c83b130262",
+              "run_id": "fcr_5ed33b9db8c149090030c59413e72467c618c4b494c3bf72b3b3b6f7cbe2cf41"
+            },
+            {
+              "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7",
+              "node_id": "source_accounts",
+              "output_id": "source_accounts",
+              "receipt_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+              "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082"
+            }
+          ],
+          "question": "Do the retained source account objects and derived labels support publishing this observation-only evidence build?",
+          "run_actor_id": "bootstrap-e9c67bab62119cae3b026aa3",
+          "state": "APPROVED",
+          "task_id": "b96bb91e-f860-53ff-b831-d37b8400d28d"
+        },
+        "retained_labels": {
+          "new_run_required": false,
+          "node": "retained_labels",
+          "output": {
+            "invocation_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+            "receipt_hash": "d72cb5be089a0bc8e35f80cc484a1f7ca46cffe6c128e707cffc19c83b130262",
+            "run_id": "fcr_5ed33b9db8c149090030c59413e72467c618c4b494c3bf72b3b3b6f7cbe2cf41"
+          },
+          "state": "COMPLETED",
+          "usage": {
+            "derived_evaluations": 3,
+            "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+            "published_result_bytes": 11462,
+            "returned_rows": 3
+          }
+        },
+        "source_accounts": {
+          "new_run_required": false,
+          "node": "source_accounts",
+          "output": {
+            "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7",
+            "receipt_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+            "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082"
+          },
+          "state": "COMPLETED",
+          "usage": {
+            "derived_evaluations": 3,
+            "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+            "published_result_bytes": 11212,
+            "returned_rows": 3
+          }
+        }
+      },
+      "state": "COMPLETED"
+    }
+  },
+  "expected_state": "COMPLETED",
+  "read_only_verification": true,
+  "financial_authority_established": false,
+  "restart_performed_by_this_script": false,
+  "decision_request": {
+    "reason": "Reviewed the three retained source account objects, original labels and exact upstream provenance. Approve observation-only evidence publication.",
+    "decision_id": "dfe68875-29a6-4bcf-90f0-a220d2d57de8",
+    "decision": "APPROVED"
+  },
+  "browser_approval_verified": true,
+  "restart_at_wait": {
+    "retained_readback_verified": true,
+    "services": [
+      "api",
+      "worker",
+      "temporal"
+    ],
+    "task_id": "b96bb91e-f860-53ff-b831-d37b8400d28d"
+  },
+  "chain": {
+    "invocations": {
+      "retained_labels": {
+        "invocation_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+        "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+        "status": "SUCCEEDED",
+        "receipt_hash": "d72cb5be089a0bc8e35f80cc484a1f7ca46cffe6c128e707cffc19c83b130262",
+        "receipt": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "run_id": "fcr_5ed33b9db8c149090030c59413e72467c618c4b494c3bf72b3b3b6f7cbe2cf41",
+          "status": "SUCCEEDED",
+          "request": {
+            "limit": 3,
+            "offset": 0,
+            "function": {
+              "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+              "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681"
+            },
+            "known_at": "2026-09-07T04:19:31.598474Z",
+            "valid_at": "2026-09-07T04:19:31.598474Z",
+            "request_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+            "input_result": {
+              "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+            }
+          },
+          "function": {
+            "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+            "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681",
+            "content_hash": "5dfc9e3f7c620703ffbda01846823b7225d112e065b54f278bf39fecc38edad2"
+          },
+          "plan_hash": "51ce6a3e0323b83b5c472ca21b28194060d14c3cf5a38326ae68b8631a071ff7",
+          "request_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+          "started_at": "2026-09-07T04:19:37.142813+00:00",
+          "exact_scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "completed_at": "2026-09-07T04:19:37.934776+00:00",
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": true,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "coverage": "QUERY_PAGE_ONLY",
+                "returned_rows": 200,
+                "derived_properties": 8,
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+              "source_write_exactly_once": false
+            },
+            "maximum_rows": 200,
+            "dependency_sha256": "10e92c5546be94dd2f0379b9a2f4cce975c75a7f6c58d606929fd878f23c31d9",
+            "implementation_id": "ontology.object-set-derived/v1",
+            "maximum_properties": 8
+          },
+          "current_use_authorized": false,
+          "business_effect_authorized": false,
+          "proof_hash": "d72cb5be089a0bc8e35f80cc484a1f7ca46cffe6c128e707cffc19c83b130262",
+          "recorded_at": "2026-09-07T08:19:37.993829+04:00"
+        },
+        "output": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "query": {
+            "limit": 3,
+            "offset": 0,
+            "search": "",
+            "filters": [
+              {
+                "field": "evidence_id",
+                "value": "0074068a-99ea-5a03-8e61-15f7430b04d4"
+              }
+            ],
+            "known_at": "2026-09-07T04:19:31.598474Z",
+            "valid_at": "2026-09-07T04:19:31.598474Z",
+            "traversal": [],
+            "object_type": "SourceAccountDefinition",
+            "resource_ids": null
+          },
+          "scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "total": 406,
+          "run_id": "fcr_5ed33b9db8c149090030c59413e72467c618c4b494c3bf72b3b3b6f7cbe2cf41",
+          "objects": [
+            {
+              "valid_to": null,
+              "attributes": {
+                "definition": {
+                  "analytics": [],
+                  "coordinate": "Sheet1!B50",
+                  "source_row": 50,
+                  "source_name": "დამხმარე ანგარიში // Вспомогательный счет",
+                  "account_code": "000",
+                  "quick_selection": "000",
+                  "financial_mapping": "UNESTABLISHED",
+                  "off_balance_source": "არა",
+                  "balance_behavior_source": "АП",
+                  "currency_tracking_source": "არა",
+                  "quantity_tracking_source": "არა",
+                  "required_dimension_policy": "UNESTABLISHED"
+                },
+                "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+                "source_name": "დამხმარე ანგარიში // Вспомогательный счет",
+                "account_code": "000",
+                "source_record_id": "5ab2979a-b793-5ba3-b851-dd12b3c01d62"
+              },
+              "valid_from": "2026-09-06T03:08:01.533793+04:00",
+              "version_id": "e31924e1-5fd9-5606-8c46-7ecc9ef7b6ed",
+              "object_type": "SourceAccountDefinition",
+              "proposal_id": "51f650ab-56a2-4c36-86b3-edc3ad3590d2",
+              "resource_id": "d6945731-ac92-5220-9678-7a70fd94645b",
+              "system_from": "2026-09-06T03:08:22.403266+04:00",
+              "content_hash": "d3aa8fa1672741b7ac208effd6b0eb14690071cc77d6552aee14a47ed74aeada",
+              "display_name": "000 · დამხმარე ანგარიში // Вспомогательный счет",
+              "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B50:account",
+              "access_entity": "entity-ge-001",
+              "evidence_class": "SOURCE_BOUND",
+              "authority_state": "APPROVED",
+              "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+            },
+            {
+              "valid_to": null,
+              "attributes": {
+                "definition": {
+                  "analytics": [],
+                  "coordinate": "Sheet1!B39",
+                  "source_row": 39,
+                  "source_name": "არამატერიალური აქტივები (გარესაბალანსო) ჩამოწერა // Списание нематериальные активы забаланс",
+                  "account_code": "0007",
+                  "quick_selection": "",
+                  "financial_mapping": "UNESTABLISHED",
+                  "off_balance_source": "დიახ",
+                  "balance_behavior_source": "АП",
+                  "currency_tracking_source": "არა",
+                  "quantity_tracking_source": "არა",
+                  "required_dimension_policy": "UNESTABLISHED"
+                },
+                "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+                "source_name": "არამატერიალური აქტივები (გარესაბალანსო) ჩამოწერა // Списание нематериальные активы забаланс",
+                "account_code": "0007",
+                "source_record_id": "0ef35ff6-d56d-5dca-8589-da734ad239f7"
+              },
+              "valid_from": "2026-09-06T03:03:08.466765+04:00",
+              "version_id": "a31960b4-1e6b-5a10-a33f-3462187218a3",
+              "object_type": "SourceAccountDefinition",
+              "proposal_id": "6fef4d2b-0fee-461e-ad54-665750d2a3ff",
+              "resource_id": "4bbee7d8-9bd5-5b7a-b409-065b2c915ba0",
+              "system_from": "2026-09-06T03:05:09.02371+04:00",
+              "content_hash": "b34bace64b88ce2584b29376c4ee1d7b0a77c7054257fbe89e312aa2f2b8b250",
+              "display_name": "0007 · არამატერიალური აქტივები (გარესაბალანსო) ჩამოწერა // Списание нематериальные активы забаланс",
+              "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B39:account",
+              "access_entity": "entity-ge-001",
+              "evidence_class": "SOURCE_BOUND",
+              "authority_state": "APPROVED",
+              "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+            },
+            {
+              "valid_to": null,
+              "attributes": {
+                "definition": {
+                  "analytics": [],
+                  "coordinate": "Sheet1!B46",
+                  "source_row": 46,
+                  "source_name": "არამატერიალური აქტივები (გარესაბალანსო) მიღება // Принатие нематериальные активы забаланс",
+                  "account_code": "0008",
+                  "quick_selection": "",
+                  "financial_mapping": "UNESTABLISHED",
+                  "off_balance_source": "დიახ",
+                  "balance_behavior_source": "АП",
+                  "currency_tracking_source": "არა",
+                  "quantity_tracking_source": "არა",
+                  "required_dimension_policy": "UNESTABLISHED"
+                },
+                "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+                "source_name": "არამატერიალური აქტივები (გარესაბალანსო) მიღება // Принатие нематериальные активы забаланс",
+                "account_code": "0008",
+                "source_record_id": "3ef7d86a-61f8-5285-a3c2-5169598c4408"
+              },
+              "valid_from": "2026-09-06T03:08:01.533793+04:00",
+              "version_id": "e7f1c5d4-5a82-5c2d-9c65-d6fcbc313373",
+              "object_type": "SourceAccountDefinition",
+              "proposal_id": "51f650ab-56a2-4c36-86b3-edc3ad3590d2",
+              "resource_id": "71a79f0a-85eb-5804-9c39-b94f6011d0db",
+              "system_from": "2026-09-06T03:08:15.918883+04:00",
+              "content_hash": "10ef455775d890d09fa2bc829a6009da33cc9efbe60142b9a7834286824a95dd",
+              "display_name": "0008 · არამატერიალური აქტივები (გარესაბალანსო) მიღება // Принатие нематериальные активы забаланс",
+              "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B46:account",
+              "access_entity": "entity-ge-001",
+              "evidence_class": "SOURCE_BOUND",
+              "authority_state": "APPROVED",
+              "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+            }
+          ],
+          "contract": "function-result/1",
+          "coverage": "RETAINED_INPUT_PAGE_ONLY",
+          "function": {
+            "version_id": "47a6cf33-bb09-57d2-afd2-3f3a24029e7e",
+            "resource_id": "ff9ef3b7-2a58-5e49-bc6d-9ecbbb56e681",
+            "content_hash": "5dfc9e3f7c620703ffbda01846823b7225d112e065b54f278bf39fecc38edad2"
+          },
+          "plan_hash": "51ce6a3e0323b83b5c472ca21b28194060d14c3cf5a38326ae68b8631a071ff7",
+          "next_offset": 3,
+          "input_result": {
+            "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082",
+            "receipt_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+            "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+          },
+          "definition_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+          "used_versions": [
+            {
+              "known_at": "2026-09-07T04:19:31.598474+00:00",
+              "version_id": "e31924e1-5fd9-5606-8c46-7ecc9ef7b6ed",
+              "resource_id": "d6945731-ac92-5220-9678-7a70fd94645b",
+              "content_hash": "d3aa8fa1672741b7ac208effd6b0eb14690071cc77d6552aee14a47ed74aeada",
+              "material_state": "UNESTABLISHED"
+            },
+            {
+              "known_at": "2026-09-07T04:19:31.598474+00:00",
+              "version_id": "a31960b4-1e6b-5a10-a33f-3462187218a3",
+              "resource_id": "4bbee7d8-9bd5-5b7a-b409-065b2c915ba0",
+              "content_hash": "b34bace64b88ce2584b29376c4ee1d7b0a77c7054257fbe89e312aa2f2b8b250",
+              "material_state": "UNESTABLISHED"
+            },
+            {
+              "known_at": "2026-09-07T04:19:31.598474+00:00",
+              "version_id": "e7f1c5d4-5a82-5c2d-9c65-d6fcbc313373",
+              "resource_id": "71a79f0a-85eb-5804-9c39-b94f6011d0db",
+              "content_hash": "10ef455775d890d09fa2bc829a6009da33cc9efbe60142b9a7834286824a95dd",
+              "material_state": "UNESTABLISHED"
+            }
+          ],
+          "counts_by_type": {
+            "SourceAccountDefinition": 406
+          },
+          "derived_values": [
+            {
+              "kind": "text",
+              "name": "original_account_label",
+              "value": "000 — დამხმარე ანგარიში // Вспомогательный счет",
+              "status": "AVAILABLE",
+              "object_id": "d6945731-ac92-5220-9678-7a70fd94645b",
+              "definition_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+              "epistemic_state": "DERIVED",
+              "object_version_id": "e31924e1-5fd9-5606-8c46-7ecc9ef7b6ed",
+              "definition_version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255"
+            },
+            {
+              "kind": "text",
+              "name": "original_account_label",
+              "value": "0007 — არამატერიალური აქტივები (გარესაბალანსო) ჩამოწერა // Списание нематериальные активы забаланс",
+              "status": "AVAILABLE",
+              "object_id": "4bbee7d8-9bd5-5b7a-b409-065b2c915ba0",
+              "definition_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+              "epistemic_state": "DERIVED",
+              "object_version_id": "a31960b4-1e6b-5a10-a33f-3462187218a3",
+              "definition_version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255"
+            },
+            {
+              "kind": "text",
+              "name": "original_account_label",
+              "value": "0008 — არამატერიალური აქტივები (გარესაბალანსო) მიღება // Принатие нематериальные активы забаланс",
+              "status": "AVAILABLE",
+              "object_id": "71a79f0a-85eb-5804-9c39-b94f6011d0db",
+              "definition_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+              "epistemic_state": "DERIVED",
+              "object_version_id": "e7f1c5d4-5a82-5c2d-9c65-d6fcbc313373",
+              "definition_version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255"
+            }
+          ],
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": true,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "coverage": "QUERY_PAGE_ONLY",
+                "returned_rows": 200,
+                "derived_properties": 8,
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+              "source_write_exactly_once": false
+            },
+            "maximum_rows": 200,
+            "dependency_sha256": "10e92c5546be94dd2f0379b9a2f4cce975c75a7f6c58d606929fd878f23c31d9",
+            "implementation_id": "ontology.object-set-derived/v1",
+            "maximum_properties": 8
+          },
+          "read_permissions": [
+            "ontology_read",
+            "read"
+          ],
+          "calculation_runtime": "shared-functions/1",
+          "static_dependencies": [
+            {
+              "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+              "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+              "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+            },
+            {
+              "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+              "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+              "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+            },
+            {
+              "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+              "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+              "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+            }
+          ],
+          "invocation_plan_hash": "51ce6a3e0323b83b5c472ca21b28194060d14c3cf5a38326ae68b8631a071ff7",
+          "definition_version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+          "invocation_request_id": "3d59b94e-38b9-5527-a9ee-ba77ff0dd84b",
+          "current_use_authorized": false,
+          "filter_schema_versions": [
+            {
+              "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+              "object_type": "SourceAccountDefinition",
+              "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa"
+            }
+          ],
+          "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+          "business_effect_authorized": false
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      "source_accounts": {
+        "invocation_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7",
+        "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+        "status": "SUCCEEDED",
+        "receipt_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+        "receipt": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082",
+          "status": "SUCCEEDED",
+          "request": {
+            "limit": 3,
+            "offset": 0,
+            "function": {
+              "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+              "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473"
+            },
+            "known_at": "2026-09-07T04:19:31.598474Z",
+            "valid_at": "2026-09-07T04:19:31.598474Z",
+            "request_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7"
+          },
+          "function": {
+            "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+            "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473",
+            "content_hash": "6490d65d5c81ce1067157f9084875d81d30ade701283a4946ad2d9f1583c8b23"
+          },
+          "plan_hash": "7811b1c0fc7cb3566b48f47ef516003da30e2847f1d50afadb28e7b20d9eafb8",
+          "request_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7",
+          "started_at": "2026-09-07T04:19:34.704406+00:00",
+          "exact_scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "completed_at": "2026-09-07T04:19:35.255891+00:00",
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": true,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "coverage": "QUERY_PAGE_ONLY",
+                "returned_rows": 200,
+                "derived_properties": 8,
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+              "source_write_exactly_once": false
+            },
+            "maximum_rows": 200,
+            "dependency_sha256": "10e92c5546be94dd2f0379b9a2f4cce975c75a7f6c58d606929fd878f23c31d9",
+            "implementation_id": "ontology.object-set-derived/v1",
+            "maximum_properties": 8
+          },
+          "current_use_authorized": false,
+          "business_effect_authorized": false,
+          "proof_hash": "c1492ddeaf281ed27ec753f755965a20f57546c8af5a520fa0204523f61b1871",
+          "recorded_at": "2026-09-07T08:19:35.312853+04:00"
+        },
+        "output": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "query": {
+            "limit": 3,
+            "offset": 0,
+            "search": "",
+            "filters": [
+              {
+                "field": "evidence_id",
+                "value": "0074068a-99ea-5a03-8e61-15f7430b04d4"
+              }
+            ],
+            "known_at": "2026-09-07T04:19:31.598474Z",
+            "valid_at": "2026-09-07T04:19:31.598474Z",
+            "traversal": [],
+            "object_type": "SourceAccountDefinition",
+            "resource_ids": null
+          },
+          "scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "total": 406,
+          "run_id": "fcr_90e9507659f6eab810d8cd66ce164b26c4c2b34767150312a05e3fdf0eff0082",
+          "objects": [
+            {
+              "valid_to": null,
+              "attributes": {
+                "definition": {
+                  "analytics": [],
+                  "coordinate": "Sheet1!B50",
+                  "source_row": 50,
+                  "source_name": "დამხმარე ანგარიში // Вспомогательный счет",
+                  "account_code": "000",
+                  "quick_selection": "000",
+                  "financial_mapping": "UNESTABLISHED",
+                  "off_balance_source": "არა",
+                  "balance_behavior_source": "АП",
+                  "currency_tracking_source": "არა",
+                  "quantity_tracking_source": "არა",
+                  "required_dimension_policy": "UNESTABLISHED"
+                },
+                "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+                "source_name": "დამხმარე ანგარიში // Вспомогательный счет",
+                "account_code": "000",
+                "source_record_id": "5ab2979a-b793-5ba3-b851-dd12b3c01d62"
+              },
+              "valid_from": "2026-09-06T03:08:01.533793+04:00",
+              "version_id": "e31924e1-5fd9-5606-8c46-7ecc9ef7b6ed",
+              "object_type": "SourceAccountDefinition",
+              "proposal_id": "51f650ab-56a2-4c36-86b3-edc3ad3590d2",
+              "resource_id": "d6945731-ac92-5220-9678-7a70fd94645b",
+              "system_from": "2026-09-06T03:08:22.403266+04:00",
+              "content_hash": "d3aa8fa1672741b7ac208effd6b0eb14690071cc77d6552aee14a47ed74aeada",
+              "display_name": "000 · დამხმარე ანგარიში // Вспомогательный счет",
+              "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B50:account",
+              "access_entity": "entity-ge-001",
+              "evidence_class": "SOURCE_BOUND",
+              "authority_state": "APPROVED",
+              "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+            },
+            {
+              "valid_to": null,
+              "attributes": {
+                "definition": {
+                  "analytics": [],
+                  "coordinate": "Sheet1!B39",
+                  "source_row": 39,
+                  "source_name": "არამატერიალური აქტივები (გარესაბალანსო) ჩამოწერა // Списание нематериальные активы забаланс",
+                  "account_code": "0007",
+                  "quick_selection": "",
+                  "financial_mapping": "UNESTABLISHED",
+                  "off_balance_source": "დიახ",
+                  "balance_behavior_source": "АП",
+                  "currency_tracking_source": "არა",
+                  "quantity_tracking_source": "არა",
+                  "required_dimension_policy": "UNESTABLISHED"
+                },
+                "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+                "source_name": "არამატერიალური აქტივები (გარესაბალანსო) ჩამოწერა // Списание нематериальные активы забаланс",
+                "account_code": "0007",
+                "source_record_id": "0ef35ff6-d56d-5dca-8589-da734ad239f7"
+              },
+              "valid_from": "2026-09-06T03:03:08.466765+04:00",
+              "version_id": "a31960b4-1e6b-5a10-a33f-3462187218a3",
+              "object_type": "SourceAccountDefinition",
+              "proposal_id": "6fef4d2b-0fee-461e-ad54-665750d2a3ff",
+              "resource_id": "4bbee7d8-9bd5-5b7a-b409-065b2c915ba0",
+              "system_from": "2026-09-06T03:05:09.02371+04:00",
+              "content_hash": "b34bace64b88ce2584b29376c4ee1d7b0a77c7054257fbe89e312aa2f2b8b250",
+              "display_name": "0007 · არამატერიალური აქტივები (გარესაბალანსო) ჩამოწერა // Списание нематериальные активы забаланс",
+              "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B39:account",
+              "access_entity": "entity-ge-001",
+              "evidence_class": "SOURCE_BOUND",
+              "authority_state": "APPROVED",
+              "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+            },
+            {
+              "valid_to": null,
+              "attributes": {
+                "definition": {
+                  "analytics": [],
+                  "coordinate": "Sheet1!B46",
+                  "source_row": 46,
+                  "source_name": "არამატერიალური აქტივები (გარესაბალანსო) მიღება // Принатие нематериальные активы забаланс",
+                  "account_code": "0008",
+                  "quick_selection": "",
+                  "financial_mapping": "UNESTABLISHED",
+                  "off_balance_source": "დიახ",
+                  "balance_behavior_source": "АП",
+                  "currency_tracking_source": "არა",
+                  "quantity_tracking_source": "არა",
+                  "required_dimension_policy": "UNESTABLISHED"
+                },
+                "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+                "source_name": "არამატერიალური აქტივები (გარესაბალანსო) მიღება // Принатие нематериальные активы забаланс",
+                "account_code": "0008",
+                "source_record_id": "3ef7d86a-61f8-5285-a3c2-5169598c4408"
+              },
+              "valid_from": "2026-09-06T03:08:01.533793+04:00",
+              "version_id": "e7f1c5d4-5a82-5c2d-9c65-d6fcbc313373",
+              "object_type": "SourceAccountDefinition",
+              "proposal_id": "51f650ab-56a2-4c36-86b3-edc3ad3590d2",
+              "resource_id": "71a79f0a-85eb-5804-9c39-b94f6011d0db",
+              "system_from": "2026-09-06T03:08:15.918883+04:00",
+              "content_hash": "10ef455775d890d09fa2bc829a6009da33cc9efbe60142b9a7834286824a95dd",
+              "display_name": "0008 · არამატერიალური აქტივები (გარესაბალანსო) მიღება // Принатие нематериальные активы забаланс",
+              "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B46:account",
+              "access_entity": "entity-ge-001",
+              "evidence_class": "SOURCE_BOUND",
+              "authority_state": "APPROVED",
+              "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+            }
+          ],
+          "contract": "function-result/1",
+          "coverage": "QUERY_PAGE_ONLY",
+          "function": {
+            "version_id": "56d7d944-8864-5945-8f82-a23d10570d1b",
+            "resource_id": "2bd9dc83-249b-5d61-93e3-80d2bd1cd473",
+            "content_hash": "6490d65d5c81ce1067157f9084875d81d30ade701283a4946ad2d9f1583c8b23"
+          },
+          "plan_hash": "7811b1c0fc7cb3566b48f47ef516003da30e2847f1d50afadb28e7b20d9eafb8",
+          "next_offset": 3,
+          "definition_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+          "used_versions": [
+            {
+              "known_at": "2026-09-07T04:19:31.598474+00:00",
+              "version_id": "e31924e1-5fd9-5606-8c46-7ecc9ef7b6ed",
+              "resource_id": "d6945731-ac92-5220-9678-7a70fd94645b",
+              "content_hash": "d3aa8fa1672741b7ac208effd6b0eb14690071cc77d6552aee14a47ed74aeada",
+              "material_state": "UNESTABLISHED"
+            },
+            {
+              "known_at": "2026-09-07T04:19:31.598474+00:00",
+              "version_id": "a31960b4-1e6b-5a10-a33f-3462187218a3",
+              "resource_id": "4bbee7d8-9bd5-5b7a-b409-065b2c915ba0",
+              "content_hash": "b34bace64b88ce2584b29376c4ee1d7b0a77c7054257fbe89e312aa2f2b8b250",
+              "material_state": "UNESTABLISHED"
+            },
+            {
+              "known_at": "2026-09-07T04:19:31.598474+00:00",
+              "version_id": "e7f1c5d4-5a82-5c2d-9c65-d6fcbc313373",
+              "resource_id": "71a79f0a-85eb-5804-9c39-b94f6011d0db",
+              "content_hash": "10ef455775d890d09fa2bc829a6009da33cc9efbe60142b9a7834286824a95dd",
+              "material_state": "UNESTABLISHED"
+            }
+          ],
+          "counts_by_type": {
+            "SourceAccountDefinition": 406
+          },
+          "derived_values": [
+            {
+              "kind": "text",
+              "name": "original_account_label",
+              "value": "000 — დამხმარე ანგარიში // Вспомогательный счет",
+              "status": "AVAILABLE",
+              "object_id": "d6945731-ac92-5220-9678-7a70fd94645b",
+              "definition_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+              "epistemic_state": "DERIVED",
+              "object_version_id": "e31924e1-5fd9-5606-8c46-7ecc9ef7b6ed",
+              "definition_version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255"
+            },
+            {
+              "kind": "text",
+              "name": "original_account_label",
+              "value": "0007 — არამატერიალური აქტივები (გარესაბალანსო) ჩამოწერა // Списание нематериальные активы забаланс",
+              "status": "AVAILABLE",
+              "object_id": "4bbee7d8-9bd5-5b7a-b409-065b2c915ba0",
+              "definition_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+              "epistemic_state": "DERIVED",
+              "object_version_id": "a31960b4-1e6b-5a10-a33f-3462187218a3",
+              "definition_version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255"
+            },
+            {
+              "kind": "text",
+              "name": "original_account_label",
+              "value": "0008 — არამატერიალური აქტივები (გარესაბალანსო) მიღება // Принатие нематериальные активы забаланс",
+              "status": "AVAILABLE",
+              "object_id": "71a79f0a-85eb-5804-9c39-b94f6011d0db",
+              "definition_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+              "epistemic_state": "DERIVED",
+              "object_version_id": "e7f1c5d4-5a82-5c2d-9c65-d6fcbc313373",
+              "definition_version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255"
+            }
+          ],
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": true,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "coverage": "QUERY_PAGE_ONLY",
+                "returned_rows": 200,
+                "derived_properties": 8,
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+              "source_write_exactly_once": false
+            },
+            "maximum_rows": 200,
+            "dependency_sha256": "10e92c5546be94dd2f0379b9a2f4cce975c75a7f6c58d606929fd878f23c31d9",
+            "implementation_id": "ontology.object-set-derived/v1",
+            "maximum_properties": 8
+          },
+          "read_permissions": [
+            "ontology_read",
+            "read"
+          ],
+          "calculation_runtime": "shared-functions/1",
+          "static_dependencies": [
+            {
+              "version_id": "004d96fa-4d75-5ea3-9f83-19669cd69255",
+              "resource_id": "b9fbde64-2cc8-4c4e-bf44-fe8fbb38c13a",
+              "content_hash": "65ba5db3f3c7e26ab7ae709000fb4766a92cc1c0606af2808e085fb4edb5e758"
+            },
+            {
+              "version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+              "resource_id": "bbbe95f6-a0d0-4313-ab3e-6ebc73177087",
+              "content_hash": "0c335d057043e2b0a9f7e27f2072d63f25cee91c48a4f42672cdd0e6f2fc2146"
+            },
+            {
+              "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+              "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+              "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+            }
+          ],
+          "invocation_plan_hash": "7811b1c0fc7cb3566b48f47ef516003da30e2847f1d50afadb28e7b20d9eafb8",
+          "definition_version_id": "1391e560-f2f0-54fe-83db-fcb2b3341a27",
+          "invocation_request_id": "7597a834-9b56-5cfa-b6d7-eae00270d7e7",
+          "current_use_authorized": false,
+          "filter_schema_versions": [
+            {
+              "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+              "object_type": "SourceAccountDefinition",
+              "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa"
+            }
+          ],
+          "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+          "business_effect_authorized": false
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      }
+    },
+    "exact_input_object_pins": [
+      {
+        "resource_id": "d6945731-ac92-5220-9678-7a70fd94645b",
+        "version_id": "e31924e1-5fd9-5606-8c46-7ecc9ef7b6ed",
+        "content_hash": "d3aa8fa1672741b7ac208effd6b0eb14690071cc77d6552aee14a47ed74aeada"
+      },
+      {
+        "resource_id": "4bbee7d8-9bd5-5b7a-b409-065b2c915ba0",
+        "version_id": "a31960b4-1e6b-5a10-a33f-3462187218a3",
+        "content_hash": "b34bace64b88ce2584b29376c4ee1d7b0a77c7054257fbe89e312aa2f2b8b250"
+      },
+      {
+        "resource_id": "71a79f0a-85eb-5804-9c39-b94f6011d0db",
+        "version_id": "e7f1c5d4-5a82-5c2d-9c65-d6fcbc313373",
+        "content_hash": "10ef455775d890d09fa2bc829a6009da33cc9efbe60142b9a7834286824a95dd"
+      }
+    ],
+    "input_receipt_and_object_versions_verified": true,
+    "mid_step_crash_recovery_demonstrated": false
+  },
+  "same_decision_replay_verified": true
+}

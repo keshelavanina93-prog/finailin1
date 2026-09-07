@@ -192,6 +192,7 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
     "FunctionDefinition": {"object_set_id?": "@ObjectSetDefinition", "definition": "OntologyDefinition"},
     "TransformationDefinition": {
         "definition": "OntologyDefinition", "resource_budget?": "OntologyDefinition",
+        "publication_review?": "OntologyDefinition",
     },
     "MetricDefinition": {"code": "Identifier", "function_reference": "Identifier"},
     "ReportSnapshot": {

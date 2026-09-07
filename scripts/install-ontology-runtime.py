@@ -118,15 +118,20 @@ def main() -> None:
             if (
                 spec["object_type"] == "SchemaDefinition"
                 and spec["identity_key"] == "TransformationDefinition"
-                and "resource_budget" not in previous["attributes"]["fields"]
+                and any(
+                    field not in previous["attributes"]["fields"]
+                    for field in ("resource_budget", "publication_review")
+                )
             ):
                 attributes = {
                     **previous["attributes"],
                     "fields": {
                         **previous["attributes"]["fields"],
-                        "resource_budget": spec["attributes"]["fields"][
-                            "resource_budget"
-                        ],
+                        **{
+                            field: spec["attributes"]["fields"][field]
+                            for field in ("resource_budget", "publication_review")
+                            if field not in previous["attributes"]["fields"]
+                        },
                     },
                 }
                 mutations.append(

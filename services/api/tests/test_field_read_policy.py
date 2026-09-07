@@ -14,7 +14,7 @@ from finai_api.domain.resource_lifecycle import (
 )
 from finai_api.domain.resources import ResourceMutation, ResourceProposal, ResourceReview
 from finai_api.domain.review import Principal
-from finai_api.services import resource_lifecycle, resources
+from finai_api.services import fact_runs, resource_lifecycle, resources
 from finai_api.services.workspace import WorkspaceError
 
 
@@ -123,6 +123,18 @@ def test_restricted_field_propagates_through_derived_resources_and_proofs() -> N
     for item in (source, derived):
         with pytest.raises(WorkspaceError):
             resources.get_resource(uncleared, item.resource_id)
+    # Even a receipt with a reduced capability envelope cannot bypass canonical RLS.
+    # This deliberately narrow fixture records protected pins with uncleared read flags.
+    evidence = fact_runs.retain_run(
+        uncleared,
+        {
+            "fixture": "SYNTHETIC canonical visibility check",
+            "inputs": [{"version_id": str(uuid5(proposal.proposal_id, str(source.resource_id)))}],
+        },
+        runtime="shared-functions/1",
+    )
+    with pytest.raises(WorkspaceError, match="inputs are unavailable"):
+        fact_runs.read_run(uncleared, evidence["run_id"])
     refs = [
         VersionReference(
             resource_id=item.resource_id,

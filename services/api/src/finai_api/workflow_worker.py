@@ -146,6 +146,7 @@ async def main() -> None:
                 transformation_runs.load,
                 transformation_runs.execute_node,
                 transformation_runs.publish,
+                transformation_runs.publication_review,
             ],
             activity_executor=executor,
         )

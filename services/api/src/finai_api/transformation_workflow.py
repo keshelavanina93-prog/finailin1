@@ -1,5 +1,6 @@
 """Deterministic completion barriers; Functions own computation and output identity."""
 
+from contextlib import suppress
 from datetime import timedelta
 from typing import Any
 
@@ -16,6 +17,11 @@ class TransformationWorkflow:
         self.cancelled = False
         self.seen: set[str] = set()
         self.result: dict = {}
+        self.review_notification = 0
+
+    @workflow.signal
+    def review_changed(self) -> None:
+        self.review_notification += 1
 
     @workflow.signal
     def control(self, message: dict[str, str]) -> None:
@@ -73,6 +79,34 @@ class TransformationWorkflow:
                 completed.add(node_id)
             if not await self._boundary():
                 return self.result
+            if workflow.patched("transformation-publication-review-v1") and topology.get(
+                "publication_review"
+            ):
+                while True:
+                    notification = self.review_notification
+                    review = await workflow.execute_activity(
+                        "transformation_publication_review", context, **options
+                    )
+                    self.result["publication_review"] = review
+                    if review["state"] == "APPROVED":
+                        break
+                    if review["state"] in ("REJECTED", "CANCELLED"):
+                        self.state = review["state"]
+                        return self.result
+                    self.state = "AWAITING_REVIEW"
+
+                    def notified(notification: int = notification) -> bool:
+                        return self.review_notification != notification or self.cancelled
+
+                    with suppress(TimeoutError):
+                        await workflow.wait_condition(
+                            notified,
+                            timeout=timedelta(seconds=30),
+                        )
+                    if not await self._boundary():
+                        return self.result
+                if not await self._boundary():
+                    return self.result
             self.result["publication"] = await workflow.execute_activity(
                 "transformation_publish", context, **options
             )

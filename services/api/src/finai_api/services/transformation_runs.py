@@ -1,6 +1,6 @@
 """Durable orchestration references over existing workflow and Function evidence."""
 
-from uuid import uuid5
+from uuid import UUID, uuid5
 
 from psycopg.types.json import Jsonb
 from temporalio import activity
@@ -152,9 +152,155 @@ def read(principal: Principal, identity: str) -> dict:
     return {
         **result,
         "publications": manifests,
+        "publication_review": review_projection(result),
         "current_use_authorized": False,
         "business_effect_authorized": False,
     }
+
+
+def review_projection(retained: dict) -> dict | None:
+    compiled = retained["request"]["compiled_plan"]
+    spec = compiled.get("publication_review")
+    if spec is None:
+        return None
+    events = {event["event_id"]: event for event in retained["events"]}
+    task = events.get("publication-review:task")
+    decision = events.get("publication-review:decision")
+    task_id = str(uuid5(UUID(compiled["request"]["request_id"]), "publication"))
+    completed = {
+        event.get("node"): event
+        for event in retained["events"]
+        if event.get("state") == "COMPLETED"
+    }
+    if task:
+        expected = [
+            {
+                "output_id": output["output_id"],
+                "node_id": output["node_id"],
+                **completed.get(output["node_id"], {}).get("output", {}),
+            }
+            for output in sorted(compiled["outputs"], key=lambda output: output["output_id"])
+        ]
+        if (
+            task.get("task_id") != task_id
+            or task.get("question") != spec["question"]
+            or task.get("outputs") != expected
+            or set(completed) != set(compiled["node_order"])
+        ):
+            raise WorkspaceError(409, "Publication review task integrity failed")
+    if decision and (
+        not task
+        or decision.get("task_id") != task_id
+        or decision.get("state") not in ("APPROVED", "REJECTED")
+        or decision.get("actor_id") == retained["actor_id"]
+    ):
+        raise WorkspaceError(409, "Publication review decision integrity failed")
+    cancelled = any(event.get("command") == "cancel" for event in retained["events"])
+    return {
+        "task_id": task_id,
+        "question": spec["question"],
+        "state": "CANCELLED"
+        if cancelled
+        else decision["state"]
+        if decision
+        else "PENDING"
+        if task
+        else "NOT_REQUESTED",
+        "outputs": task["outputs"] if task else [],
+        "decision": decision,
+        "run_actor_id": retained["actor_id"],
+    }
+
+
+def decide_review(
+    principal: Principal, identity: str, decision_id: UUID, decision: str, reason: str
+) -> dict:
+    require_permission(principal, "ontology_read")
+    require_permission(principal, "review")
+    if decision not in ("APPROVED", "REJECTED") or not 10 <= len(reason.strip()) <= 2000:
+        raise WorkspaceError(422, "Publication review requires a decision and meaningful reason")
+    retained = read(principal, identity)
+    review = retained["publication_review"]
+    if principal.actor_id == retained["actor_id"]:
+        raise WorkspaceError(403, "Run maker cannot decide its publication review")
+    if review is None:
+        raise WorkspaceError(409, "Publication review is not pending")
+    payload = {
+        "task_id": review["task_id"],
+        "state": decision,
+        "decision_id": str(decision_id),
+        "actor_id": principal.actor_id,
+        "reason": reason,
+    }
+    with resource_connection(principal) as conn:
+        scope = records.set_scope(conn, principal)
+        conn.execute("SELECT set_config('finai.actor_id',%s,true)", (principal.actor_id,))
+        conn.execute(
+            "SELECT pg_advisory_xact_lock(hashtextextended(%s,0))",
+            (f"transformation-review:{principal.scope.tenant_id}:{identity}",),
+        )
+        previous = conn.execute(
+            "SELECT payload FROM workflow_events WHERE tenant_id=%s AND workflow_id=%s "
+            "AND event_id='publication-review:decision'",
+            (principal.scope.tenant_id, identity),
+        ).fetchone()
+        if previous is not None and previous[0] != payload:
+            raise WorkspaceError(409, "Publication review decision identity conflicts")
+        if previous is None:
+            current_events = conn.execute(
+                "SELECT event_id,payload FROM workflow_events "
+                "WHERE tenant_id=%s AND workflow_id=%s",
+                (principal.scope.tenant_id, identity),
+            ).fetchall()
+            current = review_projection(
+                {**retained, "events": [{"event_id": row[0], **row[1]} for row in current_events]}
+            )
+            if current is None or current["state"] != "PENDING":
+                raise WorkspaceError(409, "Publication review is not pending")
+            conn.execute(
+                "INSERT INTO workflow_events(tenant_id,workflow_id,exact_scope,event_id,payload) "
+                "VALUES(%s,%s,%s,'publication-review:decision',%s)",
+                (principal.scope.tenant_id, identity, Jsonb(scope), Jsonb(payload)),
+            )
+    return read(principal, identity)["publication_review"]
+
+
+@activity.defn(name="transformation_publication_review")
+def publication_review(context: dict) -> dict:
+    principal, retained = _context(context)
+    review = retained["publication_review"]
+    if review is None:
+        return {"state": "NOT_REQUIRED"}
+    if review["state"] != "NOT_REQUESTED":
+        return review
+    compiled = retained["request"]["compiled_plan"]
+    completed = {
+        event.get("node"): event
+        for event in retained["events"]
+        if event.get("state") == "COMPLETED"
+    }
+    if set(completed) != set(compiled["node_order"]):
+        raise WorkspaceError(409, "Publication review requires every completed node")
+    outputs = [
+        {
+            "output_id": output["output_id"],
+            "node_id": output["node_id"],
+            **completed[output["node_id"]]["output"],
+        }
+        for output in sorted(compiled["outputs"], key=lambda output: output["output_id"])
+    ]
+    records.event(
+        principal,
+        context["workflow_id"],
+        "publication-review:task",
+        {
+            "task_id": review["task_id"],
+            "state": "PENDING",
+            "question": review["question"],
+            "outputs": outputs,
+        },
+    )
+    return read(principal, context["workflow_id"])["publication_review"]
 
 
 def _context(context: dict) -> tuple[Principal, dict]:
@@ -173,6 +319,7 @@ def load(context: dict) -> dict:
     return {
         "node_order": compiled["node_order"],
         "dependencies": {node["node_id"]: node["depends_on"] for node in compiled["nodes"]},
+        **({"publication_review": True} if compiled.get("publication_review") else {}),
     }
 
 
@@ -274,6 +421,13 @@ def publish(context: dict) -> dict:
     if completed != set(retained["request"]["compiled_plan"]["node_order"]):
         raise WorkspaceError(409, "Transformation is incomplete; publication refused")
     compiled = retained["request"]["compiled_plan"]
+    review = retained["publication_review"]
+    if review is not None and review["state"] != "APPROVED":
+        raise WorkspaceError(409, "Publication requires its retained independent approval")
+    if review is not None and not retained["publications"]:
+        checker = records.current_principal(review["decision"]["actor_id"], context["scope"])
+        require_permission(checker, "ontology_read")
+        require_permission(checker, "review")
     if compiled.get("resource_budget") is not None:
         usage_events = [event for event in retained["events"] if event.get("state") == "COMPLETED"]
         if any("usage" not in event for event in usage_events) or exceeded_budget(

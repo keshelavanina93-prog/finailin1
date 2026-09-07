@@ -91,11 +91,27 @@ class TransformationResourceBudget(BaseModel):
     max_published_result_bytes: int = Field(strict=True, ge=1, le=16000000)
 
 
+class PublicationReview(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    question: str = Field(min_length=10, max_length=2000)
+
+    @field_validator("question")
+    @classmethod
+    def meaningful_question(cls, value: str) -> str:
+        value = value.strip()
+        if len(value) < 10:
+            raise ValueError("Publication review question requires ten non-padding characters")
+        return value
+
+
 class TransformationDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     definition: TransformationGraph
     resource_budget: TransformationResourceBudget
     evidence_id: UUID | None = None
+    publication_review: PublicationReview | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
 
 class TransformationRunRequest(BaseModel):
