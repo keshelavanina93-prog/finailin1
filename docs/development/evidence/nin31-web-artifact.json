@@ -1,0 +1,23 @@
+{
+  "kind": "COMMITTED_WEB_ARTIFACT",
+  "source_commit": "bec2202e62c9c7544eaa0766d9cd9e1118ca6940",
+  "source_archive_sha256": "a6b0913ae10b4221ee5abf643d315a8718008b22342f5ada76d9a40c1c4a2916",
+  "web_archive_sha256": "ade943af07956152608738fafeea94241913f2e82011aacf3209c8e4131de77a",
+  "manifest_sha256": "04db1ddc091c8b67f7335a91aa3c922d0bb544db3d82d858009f7651832f8e63",
+  "artifact_directory": "D:\\FinAI\\finailinear1\\.finai\\artifacts\\web-builds\\web-artifact-u_ta58wy",
+  "files": 19687,
+  "payload_bytes": 453704482,
+  "tracked_source_files_verified": 589,
+  "entrypoint": "apps/web/server.js",
+  "node_version": "22.22.2",
+  "pnpm_version": "9.15.4",
+  "offline_frozen_dependency_install": true,
+  "dependency_downloads": 0,
+  "contracts_build_exit_code": 0,
+  "next_build_exit_code": 0,
+  "build_invocation_independently_verified": false,
+  "runtime_verified": false,
+  "release_accepted": false,
+  "frontend_acceptance": false,
+  "sbom_complete": false
+}
