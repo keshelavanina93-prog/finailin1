@@ -9,6 +9,21 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from finai_api.domain.resource_lifecycle import VersionReference
 
 
+class GroupCount(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    schema_id: UUID
+    fields: list[str] = Field(min_length=1, max_length=4)
+
+    @field_validator("fields")
+    @classmethod
+    def unique_fields(cls, value: list[str]) -> list[str]:
+        if len(set(value)) != len(value) or any(
+            not name.strip() or len(name) > 128 for name in value
+        ):
+            raise ValueError("Grouping fields must be unique bounded canonical property names")
+        return value
+
+
 class FunctionImplementation(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     implementation_id: Literal["ontology.object-set-derived/v1"]
@@ -16,6 +31,7 @@ class FunctionImplementation(BaseModel):
     code_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     dependency_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     derived_property_ids: list[UUID] = Field(default_factory=list, max_length=8)
+    group_count: GroupCount | None = Field(default=None, exclude_if=lambda value: value is None)
 
     @model_validator(mode="after")
     def unique_properties(self) -> "FunctionImplementation":

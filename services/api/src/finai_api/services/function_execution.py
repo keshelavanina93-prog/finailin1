@@ -92,6 +92,7 @@ def _disk_manifest() -> dict[str, Any]:
         "capabilities": {
             "read": True,
             "query": True,
+            "grouped_observation_counts": True,
             "snapshot": True,
             "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
             "incremental": False,
@@ -112,6 +113,9 @@ def _disk_manifest() -> dict[str, Any]:
             "limits": {
                 "returned_rows": 200,
                 "derived_properties": 8,
+                "grouping_fields": 4,
+                "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
                 "coverage": "QUERY_PAGE_ONLY",
                 "database_scan_limit": None,
             },
@@ -145,6 +149,7 @@ def manifest(implementation_id: str = IMPLEMENTATION_ID) -> dict[str, Any]:
             capabilities={
                 **result["capabilities"],
                 "query": False,
+                "grouped_observation_counts": False,
                 "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
                 "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
                 "limits": {
@@ -193,6 +198,12 @@ def validate_function(item: ResourceMutation, target: Callable[[str, str, str], 
         prop = target(str(identity), str(item.resource_id), "FUNCTION_DERIVED_PROPERTY")
         if prop["object_type"] != "DerivedProperty":
             raise WorkspaceError(409, "Function property input must be a canonical DerivedProperty")
+    if spec.definition.group_count is not None:
+        from finai_api.services.grouped_observations import validate_schema
+
+        grouping = spec.definition.group_count
+        schema = target(str(grouping.schema_id), str(item.resource_id), "FUNCTION_GROUP_SCHEMA")
+        validate_schema(schema, grouping.fields)
 
 
 def _pin(row: dict) -> dict:
@@ -256,6 +267,17 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
     }
     if source is not None:
         result["source_document"] = source
+    if not isinstance(spec.definition, WorksheetImplementation) and spec.definition.group_count:
+        from finai_api.services.grouped_observations import validate_schema
+
+        grouping = spec.definition.group_count
+        schema = by_id.get(str(grouping.schema_id))
+        if schema is None:
+            raise WorkspaceError(409, "Grouping schema exact dependency is unavailable")
+        validate_schema(schema, grouping.fields)
+        if request.offset != 0:
+            raise WorkspaceError(422, "Grouping requires a complete Object Set starting at zero")
+        result["group_count"] = {"schema": _pin(schema), "fields": grouping.fields}
     if request.input_result is not None:
         if selected is None or source is not None:
             raise WorkspaceError(409, "Retained input requires the ontology Object Set adapter")
@@ -362,6 +384,25 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
         )
     )
     query_known_at = datetime.fromisoformat(result["query"]["known_at"])
+    grouped = {}
+    if retained_plan.get("group_count"):
+        from finai_api.services.grouped_observations import count_observations
+
+        grouping = retained_plan["group_count"]
+        with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
+            schema = c.execute(
+                "SELECT v.*,i.identity_key FROM resource_versions v "
+                "JOIN canonical_identities i USING(tenant_id,resource_id) "
+                "WHERE v.tenant_id=%s AND v.resource_id=%s AND v.version_id=%s",
+                (
+                    p.scope.tenant_id,
+                    grouping["schema"]["resource_id"],
+                    grouping["schema"]["version_id"],
+                ),
+            ).fetchone()
+        if schema is None or _pin(schema) != grouping["schema"]:
+            raise WorkspaceError(409, "Grouping schema pin is unavailable")
+        grouped = {"group_counts": count_observations(result, grouping, schema)}
     properties = retained_plan["derived_properties"]
     derived = ontology_definitions.derived_values(
         p,
@@ -387,6 +428,7 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
             )
     return {
         **result,
+        **grouped,
         "contract": "function-result/1",
         "function": retained_plan["function"],
         "implementation": retained_plan["implementation"],
