@@ -1,5 +1,6 @@
 """Workspace intent gates over a synthetic retained posted result, with no new execution."""
 
+from contextlib import nullcontext
 from copy import deepcopy
 from uuid import NAMESPACE_DNS, uuid5
 
@@ -97,6 +98,9 @@ def case(monkeypatch):
     )
 
     class Resolver:
+        def read_session(self):
+            return nullcontext(self)
+
         def version(self, ref):
             return records[str(ref["resource_id"])]
 

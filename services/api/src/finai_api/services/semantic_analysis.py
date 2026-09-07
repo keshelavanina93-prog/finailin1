@@ -65,7 +65,8 @@ def project(principal, request: ProjectionRequest):
             422,
             "This retained result has no supported analytical measure contract; inspect its source",
         )
-    descriptor, rows, contributors = build(history, plan, resolver, request.company_id)
+    with resolver.read_session():
+        descriptor, rows, contributors = build(history, plan, resolver, request.company_id)
     if descriptor.company.resource_id != request.company_id:
         raise WorkspaceError(404, "Analysis unavailable for this company")
     revision = digest(

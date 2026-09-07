@@ -44,3 +44,11 @@ construction cells including formulas and tampered hashes. These checks do not
 establish full ontology, intelligence, financial-report or release acceptance.
 Product browser and independent unfamiliar-shape acceptance require their own
 frozen integrated evidence.
+
+The first integrated object projection passed its source and authority checks but
+took 22–28 seconds per request. The successor keeps one scoped, read-only database
+transaction for the exact dependency reads within a projection. It closes on
+success and failure; separate requests have separate permission contexts and no
+shared result cache. In an isolated direct-service check, the same 38-object result
+and descriptor hash returned in 2.798 seconds. Mounted HTTP timing is a separate
+gate; this is not a production percentile or scale claim.
