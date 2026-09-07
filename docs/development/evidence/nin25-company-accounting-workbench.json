@@ -1,0 +1,44 @@
+{
+  "base_commit": "1e8ba50",
+  "checked_at": "2026-09-07T07:09:07.8349093Z",
+  "http": {
+    "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+    "http_status": 200,
+    "accounting_state": "ACCOUNTING_CONFIGURATION_REQUIRED",
+    "accepted_ledger_count": 0,
+    "sources": [
+      {
+        "document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434",
+        "worksheet": "TDSheet",
+        "source_profile": "1c_tb",
+        "legal_entity_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+        "observed_from": "2025-01-01",
+        "observed_through": "2025-12-31",
+        "coverage_state": "UNESTABLISHED",
+        "scope_id": "ce23428f-c700-577c-a23c-77078c7db673",
+        "scope_version": "06ec01a4-bb72-5d62-8125-8d5bf31e4bd2",
+        "binding_count": 0
+      }
+    ],
+    "financial_configuration_accepted": false
+  },
+  "browser": {
+    "url": "http://127.0.0.1:3062/",
+    "actor": "local-steward",
+    "company_workspace": "Companies / Accounting",
+    "source_selected_explicitly": true,
+    "source_scope_inspector_opened": true,
+    "scope_id": "ce23428f-c700-577c-a23c-77078c7db673",
+    "scope_version": "06ec01a4-bb72-5d62-8125-8d5bf31e4bd2",
+    "company_and_scope_preserved_through_data_navigation": true,
+    "setup_opens_in_companies": true,
+    "currency_calendar_period_initially_empty": true,
+    "no_proposal_created": true,
+    "screenshot": "nin25-company-accounting-workbench.png"
+  },
+  "focused_lint_and_types": "PASS",
+  "production_build": "PASS",
+  "complete_nin25_acceptance": false,
+  "authentic_accounting_accepted": false,
+  "release_accepted": false
+}

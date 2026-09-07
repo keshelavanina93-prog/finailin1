@@ -11,8 +11,8 @@ type Context = { chart?: Resource|null; scope_id: string; observed: Record<strin
 const fields = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "transaction_currency_id", "reporting_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
 const required = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
 
-export default function SourceAccountingContext({ token, documentId, sheet, profile, companyId, canPropose, onProposal, onInspectResource, onTraceResource }: {
-  token: string; documentId: string; sheet: string; profile: string; companyId: string; canPropose: boolean; onProposal: (id: string) => void;
+export default function SourceAccountingContext({ token, documentId, sheet, profile, companyId, canPropose, onProposal, onInspectResource, onTraceResource, compactCompanyIdentity = false }: {
+  compactCompanyIdentity?: boolean; token: string; documentId: string; sheet: string; profile: string; companyId: string; canPropose: boolean; onProposal: (id: string) => void;
 } & SourceAccountNavigation) {
   const [loaded, setLoaded] = useState<{ key: string; value: Context } | null>(null);
   const [use, setUse] = useState("");
@@ -115,7 +115,7 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
         </tbody></table>}
       </details>}
       {!canonicalReady && <div role="status"><p>Source-company or chart binding is unresolved. Scope publication and accounting activation are blocked.</p>{context.unresolved?.map(reason => <p key={reason}>{reason}</p>)}</div>}
-      {context.company_binding && <fieldset><legend>Source company identity</legend>
+      {context.company_binding && <details open={!compactCompanyIdentity || !context.company_binding.accepted}><summary>Source company identity{context.company_binding.accepted ? " · accepted binding" : " · unresolved"}</summary><fieldset><legend>Source company identity</legend>
         <p>Label recorded in this source: <strong>{context.company_binding.source_label}</strong></p>
         {context.company_binding.company && <><p>Selected existing company: <strong>{context.company_binding.company.display_name}</strong></p><details><summary>Canonical company reference</summary><code>{context.company_binding.company.resource_id}</code></details></>}
         {context.company_binding.accepted ? <p>This source label has an accepted company binding. Accounting context and chart requirements remain separate.</p> : <>
@@ -127,7 +127,7 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
             <p>The proposal goes through the existing review process. It does not activate this source for accounting.</p>
           </>}
         </>}
-      </fieldset>}
+      </fieldset></details>}
       {profile === "seg_expense_base" && <p>The source amount and annotated Amount have unresolved currency and accounting meanings. Petroleum counterparty labels do not identify the source company.</p>}
       {profile === "seg_expense_base" && context.company_binding?.accepted && <SegAccountObservations key={`${documentId}:${sheet}:${companyId}`} token={token} documentId={documentId} sheet={sheet} profile={profile} companyId={companyId} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>}
       {canonicalReady&&<SourceAccountingSetup key={contextKey} token={token} documentId={documentId} sheet={sheet} profile={profile} companyId={companyId} companyName={context.company_binding?.company?.display_name??""} chartId={context.observed.chart_id} chartName={context.chart?.display_name} candidates={context.candidates} canPropose={canPropose} refreshing={busy} onRefresh={()=>void run("inspect")} onProposal={onProposal} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>}

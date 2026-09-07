@@ -6,6 +6,8 @@ import {ArrowRight, Buildings, ClockCounterClockwise, Database, MagnifyingGlass,
 import {Badge} from "./g8-ui";
 import {displayName} from "./display-name";
 import "./company-workspace.css";
+import type {SourceAccountNavigation} from "./seg-account-observations";
+import CompanySourceAccountingWorkbench from "./company-source-accounting-workbench";
 import CompanyStructureGraph from "./company-structure-graph";
 
 type Node = CanonicalResource;
@@ -34,7 +36,7 @@ function restoreView(key:string|undefined,companyId:string):ViewState {
  } catch {return fallback;}
 }
 
-export default function CompanyWorkspace({token,index,companyId,onSelect,onInspect,onNavigate,onHistory,onTrace,viewStateKey,initialTab}:{token:string;index:CompanyIndex|null;companyId:string;onSelect:(node:Node)=>void;onInspect:(node:Node)=>void;onNavigate?:(destination:CompanyDestination)=>void;onHistory?:(node:Node)=>void;onTrace?:(node:Node)=>void;viewStateKey?:string;initialTab?:Tab}) {
+export default function CompanyWorkspace({token,index,companyId,onSelect,onInspect,onNavigate,onHistory,onTrace,viewStateKey,initialTab,onProposal,canPropose=false,onInspectResource,onTraceResource}:{token:string;index:CompanyIndex|null;companyId:string;onSelect:(node:Node)=>void;onInspect:(node:Node)=>void;onNavigate?:(destination:CompanyDestination)=>void;onHistory?:(node:Node)=>void;onTrace?:(node:Node)=>void;viewStateKey?:string;initialTab?:Tab;onProposal?:(id:string)=>void;canPropose?:boolean}&SourceAccountNavigation) {
  const [loaded,setLoaded]=useState<{key:string;context:Context|null;error:string}|null>(null);
  const [refresh,setRefresh]=useState(0);
  const [restored]=useState(()=>restoreView(viewStateKey,companyId));
@@ -133,7 +135,7 @@ export default function CompanyWorkspace({token,index,companyId,onSelect,onInspe
        {ledger&&<div className="c360-ledger-context"><dl className="c360-coverage"><div><dt>Chart of accounts</dt><dd>{ledger.chart_id?displayName(ledger.chart_id.display_name):"Unresolved"}</dd></div><div><dt>Fiscal calendar</dt><dd>{ledger.calendar_id?displayName(ledger.calendar_id.display_name):"Unresolved"}</dd></div><div><dt>Currency context</dt><dd>{ledger.currency_id?displayName(ledger.currency_id.display_name):"Unresolved"}</dd></div></dl>{actions(ledger.ledger)}</div>}
        {validating&&<p className="c360-message" role="status">Validating the selected company, ledger, book and period…</p>}{selection?.error&&<p className="c360-error" role="alert">{selection.error}</p>}
        {selection?.pins&&<div className="c360-message"><p><ShieldCheck size={15}/> Selected accounting context validated by the server.</p><details><summary>Exact canonical version references</summary><dl>{Object.entries(selection.pins).map(([field,pin])=><div key={field}><dt>{readable(field)}</dt><dd><code>{pin.resource_id} · {pin.version_id}</code></dd></div>)}</dl></details></div>}
-      </section><section className="c360-section"><header><h3>Company-bound source accounting</h3>{route("data","Open source review")}</header>{sourceRows()}<footer className="c360-section-foot">A declared accounting input is rechecked at execution. Financial certification is not implied.</footer></section>
+      </section><CompanySourceAccountingWorkbench token={token} context={context} viewStateKey={viewStateKey} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onInspect={inspect} onTrace={onTrace} onHistory={onHistory} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>
       <section className="c360-section"><header><h3>Analytical dimensions</h3></header>{context.dimensions.length?context.dimensions.map(node=><div className="c360-resource-row" key={node.resource_id}><div><strong>{displayName(node.display_name)}</strong>{Boolean(node.attributes.source_header)&&<small>Source label: {String(node.attributes.source_header)}</small>}</div>{actions(node)}</div>):<p className="c360-message">No source analytical dimension model is bound to this company.</p>}</section>
      </>}
      {tab==="evidence"&&<>
