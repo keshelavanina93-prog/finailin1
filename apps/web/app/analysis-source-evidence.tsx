@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useRef,useState} from "react";
 import type {CanonicalResource,HistoricalGraph,OperatorInspection} from "@finai/contracts";
+import {restorationInstant} from "./definition-restoration-time";
 
 export default function AnalysisSourceEvidence({token,movement,knownAt,onClose,onTrace}:{token:string;movement:CanonicalResource;knownAt:string;onClose:()=>void;onTrace:()=>void}){
   const [source,setSource]=useState<CanonicalResource|null>(null);const [error,setError]=useState("");const [revision,setRevision]=useState(0);
@@ -15,12 +16,12 @@ export default function AnalysisSourceEvidence({token,movement,knownAt,onClose,o
     }
     async function load(){try{
       const graph=await read<HistoricalGraph>(`trace/${movement.resource_id}?version_id=${movement.version_id}&known_at=${encodeURIComponent(knownAt)}`);
-      if(graph.root_version_id!==movement.version_id)throw Error("Evidence did not match the selected movement version.");
+      if(graph.root_resource_id!==movement.resource_id||graph.root_version_id!==movement.version_id||!restorationInstant(knownAt)||restorationInstant(graph.known_at)!==restorationInstant(knownAt))throw Error("Evidence did not match the selected movement version and retained query time.");
       const edges=graph.edges.filter(edge=>edge.source_version_id===movement.version_id&&edge.relation==="FIELD:source_record_id");
       const pin=graph.nodes.find(node=>node.object_type==="SourceRecord"&&node.resource_id===movement.attributes.source_record_id&&edges.some(edge=>edge.target_version_id===node.version_id));
       if(!pin)throw Error("The exact source-row relationship is unavailable. No substitute evidence is shown.");
       const detail=await read<OperatorInspection>(`resources/${pin.resource_id}?version_id=${pin.version_id}&known_at=${encodeURIComponent(knownAt)}`);
-      if(detail.resource.resource_id!==pin.resource_id||detail.resource.version_id!==pin.version_id)throw Error("Source evidence version changed unexpectedly.");
+      if(detail.resource.resource_id!==pin.resource_id||detail.resource.version_id!==pin.version_id||detail.selection_mode!=="EXACT_VERSION"||restorationInstant(detail.known_at)!==restorationInstant(knownAt))throw Error("Source evidence version or retained query time changed unexpectedly.");
       if(!controller.signal.aborted)setSource(detail.resource);
     }catch(cause){if(!controller.signal.aborted)setError(String(cause));}}
     void load();return()=>controller.abort();
