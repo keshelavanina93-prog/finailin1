@@ -1,0 +1,42 @@
+{
+  "mode": "APPLIED",
+  "company_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+  "source_sha256": "45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d",
+  "object_set_id": "957ada1b-92ed-5949-9a50-aa5393ccca91",
+  "function_id": "e27a988b-54e7-502b-af69-a81cab9ace54",
+  "observations": [
+    {
+      "resource_id": "2bd64825-e320-5039-b163-2064a1a71c82",
+      "version_id": "be4e133b-4b38-5c53-b830-b22e80d6f259",
+      "content_hash": "40384f2b2c0cd9763c6f686c435c3e3738b7c5fa7e798290ca1e15f8bee20c07"
+    },
+    {
+      "resource_id": "2cc5e885-54f5-5b58-9359-29fd06bf8eac",
+      "version_id": "04968d1d-d74a-556c-a54a-5d1be27212b6",
+      "content_hash": "f4f8bc4a5f359bc2895a7e4953a9e05c85f42d74a83e0e952addf2a2c90c5e07"
+    },
+    {
+      "resource_id": "7959af7f-a1bb-5573-8006-d1fc14f58681",
+      "version_id": "62b8c68e-fc16-59b5-a483-04d7d1b28561",
+      "content_hash": "0d8f9dd26239b24abb6f7af75ceca5f59b1e519ffd896288c4dd71a9eae15e4c"
+    }
+  ],
+  "grouping_fields": [
+    "source_header"
+  ],
+  "expected_observation_count": 3,
+  "measure_authority": "OBSERVATION_COUNTS_ONLY",
+  "financial_authority_established": false,
+  "publication_proposals": [],
+  "requires_frozen_source_before_apply": true,
+  "invocation": {
+    "invocation_id": "39bbb1ea-cc53-55f1-b901-cc4675ecb7f2",
+    "receipt_hash": "2b6925f22ca513238fa4f87ca5547e0cf3319e0a2c2d6895cdbe204eefea9730",
+    "run_id": "fcr_62f33d686fb312244f530c362520fc077f8fc72dbf4699e38d1ee0dd1afb0c11",
+    "function": {
+      "version_id": "a94b091a-1276-5cb4-894b-90dcb65e2814",
+      "resource_id": "e27a988b-54e7-502b-af69-a81cab9ace54",
+      "content_hash": "db8d5a927b175539e40ee5f04f9f27480b1427d31195e93435181130eedd541b"
+    }
+  }
+}

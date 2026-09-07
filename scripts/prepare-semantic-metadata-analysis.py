@@ -38,6 +38,9 @@ checker = next(
     and p.scope == maker.scope
     and {"ontology_admin", "ontology_review"} <= set(p.permissions)
 )
+operator = next(
+    p for p in grants if p.scope == maker.scope and "ingest" in p.permissions
+)
 company_id = UUID("c6f87828-9609-5b35-afa6-e894a0acfe41")
 source_evidence_id = "71f45f39-35fb-56c1-b4b7-61e7edc56368"
 source_sha256 = "45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d"
@@ -181,7 +184,8 @@ if args.apply:
     frozen_at = datetime.fromisoformat(str(function["system_from"]))
     invocation = FunctionInvocation(
         request_id=uuid5(
-            UUID(str(function["version_id"])), "semantic-metadata-analysis/1"
+            UUID(str(function["version_id"])),
+            "semantic-metadata-analysis/operator-v1:" + operator.actor_id,
         ),
         function={"resource_id": function_id, "version_id": function["version_id"]},
         valid_at=frozen_at,
@@ -192,13 +196,13 @@ if args.apply:
     from finai_api.services.workspace import WorkspaceError
 
     try:
-        history = function_invocations.history(maker, invocation.request_id)
+        history = function_invocations.history(operator, invocation.request_id)
     except WorkspaceError as exc:
         if exc.status != 404:
             raise
-        history = function_invocations.invoke(maker, invocation)
+        history = function_invocations.invoke(operator, invocation)
     if history["status"] == "INTENT_RETAINED":
-        history = function_invocations.invoke(maker, invocation)
+        history = function_invocations.invoke(operator, invocation)
     assert history["status"] == "SUCCEEDED", history["receipt"].get("failure_code")
     counts = history["output"]["group_counts"]
     assert counts["object_count"] == 3 and len(counts["groups"]) == 3

@@ -1,0 +1,112 @@
+{
+  "state": "LOCAL_INTEGRATED_HTTP_PASS",
+  "recorded_at": "2026-09-07T19:04:00.797253+00:00",
+  "api": "http://127.0.0.1:8062",
+  "writes_performed": false,
+  "posted": {
+    "invocation_id": "c631bb9c-f92e-5dd9-a693-233c1b3b7925",
+    "receipt_hash": "1cb82d90e0945947feb5aee646d8dc3ce076a4c2311b4b2eea17a41dfe2350d7",
+    "run_id": "fcr_86a6a3f4e4b8511c86b8068771f6a19474e1279c694561e2e2861ef1fd8ce7a9",
+    "descriptor_sha256": "5a9701895198d03153ea7c306110adb0b4cf969c383dc1b369c554b58985c47e",
+    "groups": 59,
+    "selected_exact_amount": "58988.95",
+    "selected_contributors": 6,
+    "original_cell": {
+      "coordinate": "Base!S2",
+      "value": "731.97"
+    },
+    "excluded_coordinate": "Base!S288"
+  },
+  "metadata": {
+    "invocation_id": "39bbb1ea-cc53-55f1-b901-cc4675ecb7f2",
+    "descriptor_sha256": "8cee8fa139d7b8dc0b2bd450880b36ef8ae5424322f622030724433247056843",
+    "receipt_hash": "2b6925f22ca513238fa4f87ca5547e0cf3319e0a2c2d6895cdbe204eefea9730",
+    "run_id": "fcr_62f33d686fb312244f530c362520fc077f8fc72dbf4699e38d1ee0dd1afb0c11",
+    "function": {
+      "resource_id": "e27a988b-54e7-502b-af69-a81cab9ace54",
+      "version_id": "a94b091a-1276-5cb4-894b-90dcb65e2814",
+      "content_hash": "db8d5a927b175539e40ee5f04f9f27480b1427d31195e93435181130eedd541b"
+    },
+    "original_cells": [
+      {
+        "label": "TR!Z2 · Original XLS value",
+        "value": "Budget Article New",
+        "coordinate": "TR!Z2",
+        "formula": null
+      },
+      {
+        "label": "TR!AA2 · Original XLS value",
+        "value": "Department",
+        "coordinate": "TR!AA2",
+        "formula": null
+      },
+      {
+        "label": "TR!Y2 · Original XLS value",
+        "value": "Region",
+        "coordinate": "TR!Y2",
+        "formula": null
+      }
+    ],
+    "non_posting_source_metadata": true,
+    "financial_authority": false
+  },
+  "requests": [
+    {
+      "path": "analysis/project",
+      "status": 200,
+      "seconds": 4.257
+    },
+    {
+      "path": "analysis/project",
+      "status": 200,
+      "seconds": 4.191
+    },
+    {
+      "path": "analysis/project",
+      "status": 401,
+      "seconds": 0.004
+    },
+    {
+      "path": "analysis/project",
+      "status": 422,
+      "seconds": 0.016
+    },
+    {
+      "path": "analysis/project",
+      "status": 409,
+      "seconds": 4.429
+    },
+    {
+      "path": "analysis/project",
+      "status": 404,
+      "seconds": 0.546
+    },
+    {
+      "path": "functions/invocations/c631bb9c-f92e-5dd9-a693-233c1b3b7925",
+      "status": 200,
+      "seconds": 0.501
+    },
+    {
+      "path": "analysis/project",
+      "status": 200,
+      "seconds": 1.906
+    },
+    {
+      "path": "analysis/project",
+      "status": 200,
+      "seconds": 2.209
+    },
+    {
+      "path": "analysis/project",
+      "status": 200,
+      "seconds": 2.478
+    },
+    {
+      "path": "analysis/project",
+      "status": 200,
+      "seconds": 2.062
+    }
+  ],
+  "browser_acceptance": "PENDING",
+  "release_accepted": false
+}

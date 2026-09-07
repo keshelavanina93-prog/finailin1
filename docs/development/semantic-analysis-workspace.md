@@ -54,8 +54,31 @@ the existing separate-review path and executes or reopens one deterministic
 invocation per Function version. The headers describe available source dimensions,
 not transaction totals or complete source coverage.
 
-Integrated HTTP/browser, original-header readback and independent held-out checks
-are pending at this source checkpoint. Full semantic evolution, reviewed correction
+The integrated API and production frontend are frozen at implementation commit
+24fd9cc; [the manifest](evidence/nin59-integrated-manifest.json) records migration
+62, actual runtime and web-input fingerprints, and preserved unrelated worktree
+changes. The [HTTP proof](evidence/nin59-semantic-http.json) passed 11 requests:
+both subjects use the same projection route; SEG preserves 59 original groups,
+58988.95 with six contributors, Base!S2=731.97 and excluded Base!S288; metadata
+preserves three original headers and literal cells TR!Y2/Z2/AA2. Anonymous,
+unsupported aggregation, stale revision and foreign-company requests are refused.
+No verification request recalculated or changed a retained result.
+
+The operator metadata invocation is 39bbb1ea-cc53-55f1-b901-cc4675ecb7f2, receipt
+2b6925f22ca513238fa4f87ca5547e0cf3319e0a2c2d6895cdbe204eefea9730. The first
+preparation used the steward's read capabilities and correctly returned 404 to
+the normal operator. The helper now executes as the existing operator and reuses
+one invocation per exact Function version and actor; the earlier steward-only
+receipt remains retained. No authentication grants were changed.
+
+The local production build and targeted typing/lint pass; the two backend focused
+sets passed 17 checks each, and the product state set passed three checks. API,
+worker and web restarted; this checkpoint does not add a new interrupted-workflow
+recovery proof. Observed projection request times were 1.906–4.429 seconds in this
+small local workload; no p95 or scale claim is established.
+
+Authenticated browser and independent held-out checks are pending at this
+integration checkpoint. Full semantic evolution, reviewed correction
 and later compatible-source reuse, general adaptive projection, full financial
 statements, Metrics/Findings/Investigations, model reasoning and release acceptance
 remain open. No new authentic later SEG snapshot has been supplied.
