@@ -3,3 +3,6 @@
 @media(max-width:1150px){.semantic-panes{grid-template-columns:minmax(0,1fr)}.semantic-inspector{max-height:400px}.semantic-grid{max-height:440px}.semantic-chart{max-height:240px}.semantic-context{gap:10px}.semantic-toolbar select{max-width:220px}}
 
 .semantic-controls{border:0;padding:0;margin:0;min-width:0}.semantic-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+
+/* Retained labels stay readable without painting over adjacent values. */
+.semantic-grid table{table-layout:fixed;min-width:620px}.semantic-grid th:first-child{width:190px}.semantic-grid th button{white-space:normal;overflow-wrap:anywhere;min-width:0}.semantic-row-label,.semantic-cell-value{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;overflow-wrap:anywhere}.semantic-number .semantic-cell-value{display:block;white-space:nowrap;overflow:visible}.semantic-bar>span:first-child{white-space:normal;overflow-wrap:anywhere}
