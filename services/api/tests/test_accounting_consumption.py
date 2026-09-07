@@ -136,3 +136,47 @@ def test_canonical_money_uses_currency_identity():
     rows[source]["attributes"]["amount"] = amount
     rows[next(iter(used))]["attributes"]["amount"] = amount
     assert validate_bindings(rows, edges, used, direct)
+
+
+@pytest.mark.parametrize("posting_date", ["2026-01-16", "2030-12-31"])
+def test_derived_fact_cannot_relabel_source_posting_date(posting_date):
+    rows, edges, used, direct, _, _ = fixture_graph()
+    rows[next(iter(used))]["attributes"]["posting_date"] = posting_date
+    with pytest.raises(WorkspaceError, match="posting date disagrees"):
+        validate_bindings(rows, edges, used, direct)
+
+
+def test_derived_fact_preserves_exact_source_date_and_bound_period():
+    rows, edges, used, direct, source, binding = fixture_graph()
+    attrs = rows[next(iter(used))]["attributes"]
+    attrs["posting_date"] = rows[source]["attributes"]["posting_date"]
+    attrs["period_id"] = rows[binding]["attributes"]["period_id"]
+    assert validate_bindings(rows, edges, used, direct)
+    attrs["period_id"] = str(uuid4())
+    with pytest.raises(WorkspaceError, match="derived accounting context"):
+        validate_bindings(rows, edges, used, direct)
+
+
+def test_source_explicit_period_cannot_disagree_with_binding():
+    rows, edges, used, direct, source, _ = fixture_graph()
+    rows[source]["attributes"]["period_id"] = str(uuid4())
+    with pytest.raises(WorkspaceError, match="incompatible active bindings"):
+        validate_bindings(rows, edges, used, direct)
+
+
+def test_multi_date_aggregate_preserves_period_without_fabricated_posting_date():
+    from copy import deepcopy
+
+    rows, edges, used, direct, source, binding = fixture_graph()
+    other = (uuid4(), uuid4())
+    rows[other] = deepcopy(rows[source])
+    rows[other]["attributes"]["posting_date"] = "2026-01-16"
+    derived = next(iter(used))
+    edges.append((derived, other, "SOURCE"))
+    rows[derived]["attributes"].update(
+        amount="24", period_id=rows[binding]["attributes"]["period_id"]
+    )
+    assert validate_bindings(rows, edges, used, direct)
+    rows[derived]["attributes"]["posting_date"] = "2026-01-15"
+    with pytest.raises(WorkspaceError, match="posting date disagrees"):
+        validate_bindings(rows, edges, used, direct)

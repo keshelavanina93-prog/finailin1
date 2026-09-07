@@ -151,7 +151,7 @@ def validate_bindings(
                 continue
             if any(
                 attrs.get(field) is not None and attrs[field] != binding[field]
-                for field in ("ledger_id", "book_id", "currency_id")
+                for field in ("ledger_id", "book_id", "currency_id", "period_id")
             ):
                 continue
             if kind == "SourceAccountingScope" and str(key[0]) != binding["scope_id"]:
@@ -200,9 +200,23 @@ def validate_bindings(
             "ledger_id": binding["ledger_id"],
             "book_id": binding["book_id"],
             "currency_id": binding["currency_id"],
+            "period_id": binding["period_id"],
         }.items():
             if values.get(field) is not None and str(values[field]) != str(expected):
                 _deny("derived accounting context disagrees with the source interpretation")
+        # A source scope describes available coverage, not permission to move an
+        # individual fact to another date inside that coverage. Preserve actual
+        # contributing accounting dates; a multi-date aggregate need not pretend
+        # it has one posting date.
+        if values.get("posting_date") is not None:
+            source_dates = {
+                rows[ancestor]["attributes"].get("posting_date")
+                for ancestor in ancestry({key})
+                if ancestor in source_bindings
+                and rows[ancestor]["object_type"] != "SourceAccountingScope"
+            }
+            if source_dates != {values["posting_date"]}:
+                _deny("derived accounting posting date disagrees with its source dates")
         if binding["amount_field"] not in values:
             _deny("derived accounting measure has no compatible source amount interpretation")
         amount = values[binding["amount_field"]]
@@ -403,6 +417,7 @@ def validate_accounting_proposal(
                         "ledger_id": config["ledger_id"],
                         "book_id": config["book_id"],
                         "currency_id": config["currency_id"],
+                        "period_id": config["period_id"],
                     }.items():
                         if item.attributes.get(field) is not None and str(
                             item.attributes[field]
