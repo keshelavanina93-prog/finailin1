@@ -202,8 +202,13 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "amount": "Money",
         "source_record_id": "@SourceRecord",
     },
-    "FunctionDefinition": {"object_set_id?": "@ObjectSetDefinition", "definition": "OntologyDefinition"},
+    "FunctionDefinition": {
+        "object_set_id?": "@ObjectSetDefinition", "definition": "OntologyDefinition",
+        "accounting_binding_id?": "@SourceAccountingBinding",
+        "source_scope_id?": "@SourceAccountingScope", "minimum_authority_state?": "Identifier",
+    },
     "TransformationDefinition": {
+        "minimum_authority_state?": "Identifier",
         "definition": "OntologyDefinition", "resource_budget?": "OntologyDefinition",
         "publication_review?": "OntologyDefinition",
         "binding_review?": "OntologyDefinition",

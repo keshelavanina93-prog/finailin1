@@ -193,6 +193,12 @@ def validate_bindings(
             continue
         if len(bound) != 1:
             _deny("derived accounting representation spans ambiguous source interpretations")
+        if rows[key]["object_type"] in {"FunctionDefinition", "TransformationDefinition"}:
+            node_pins = {target for source, target, _ in edges if source == key}
+            if _calculation_consumer(rows, edges, key, node_pins):
+                # Validated computation definitions carry no amounts. Their output
+                # is separately checked by the shared invocation/SQL result guards.
+                continue
         _, binding, scope, currency = next(item for item in active if item[0] in bound)
         values = rows[key]["attributes"]
         for field, expected in {
@@ -287,6 +293,31 @@ def _calculation_consumer(rows, edges, key, pins) -> bool:
     from finai_api.services.resource_lifecycle import ORDER
 
     attrs = rows[key]["attributes"]
+    if rows[key]["object_type"] == "TransformationDefinition":
+        from finai_api.domain.transformation import TransformationDefinition
+
+        try:
+            graph = TransformationDefinition.model_validate(attrs)
+        except ValueError:
+            return False
+        # Orchestration carries no monetary values. Direct binding pins are still
+        # mandatory for every accounting scope in the Function ancestry below.
+        return graph.minimum_authority_state is not None
+    if rows[key]["object_type"] == "FunctionDefinition":
+        from finai_api.domain.function_execution import (
+            FunctionDefinition,
+            PostedMovementsImplementation,
+        )
+
+        try:
+            function = FunctionDefinition.model_validate(attrs)
+        except ValueError:
+            return False
+        if isinstance(function.definition, PostedMovementsImplementation):
+            # A validated installed adapter is a measure-free calculation contract.
+            # Its exact scope/binding/source inputs are checked by the same ancestry
+            # validation below; this does not exempt it from accounting authority.
+            return True
     schemas = [
         rows[target]["attributes"]
         for source, target, relation in edges

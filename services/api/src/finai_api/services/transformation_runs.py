@@ -26,8 +26,9 @@ def measured_usage(principal: Principal, run_id: str) -> dict:
     with records.scope_connection(principal) as conn:
         records.set_scope(conn, principal)
         row = conn.execute(
-            "SELECT CASE WHEN payload->'implementation'->>'implementation_id'="
-            "'source.retained-xls-worksheet/v1' THEN jsonb_array_length(payload->'source_rows') "
+            "SELECT CASE WHEN payload->'implementation'->>'implementation_id' IN ("
+            "'source.retained-xls-worksheet/v1','accounting.retained-posted-movements/v1') "
+            "THEN jsonb_array_length(payload->'source_rows') "
             "ELSE jsonb_array_length(payload->'objects') END,"
             "jsonb_array_length(payload->'derived_values'),"
             "octet_length(convert_to(payload::text,'UTF8')) FROM fact_calculation_runs "

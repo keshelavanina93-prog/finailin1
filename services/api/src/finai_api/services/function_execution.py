@@ -15,7 +15,9 @@ from psycopg.rows import dict_row
 
 from finai_api.domain.function_execution import (
     FunctionDefinition,
+    FunctionImplementation,
     FunctionInvocation,
+    PostedMovementsImplementation,
     WorksheetImplementation,
 )
 from finai_api.domain.resources import ResourceMutation
@@ -29,6 +31,7 @@ from finai_api.services.workspace import WorkspaceError
 
 IMPLEMENTATION_ID = "ontology.object-set-derived/v1"
 WORKSHEET_IMPLEMENTATION_ID = "source.retained-xls-worksheet/v1"
+POSTED_MOVEMENTS_IMPLEMENTATION_ID = "accounting.retained-posted-movements/v1"
 
 
 def _digest(value: Any) -> str:
@@ -145,9 +148,27 @@ def manifest(implementation_id: str = IMPLEMENTATION_ID) -> dict[str, Any]:
         ) from exc
     if current != _STARTUP_MANIFEST:
         raise WorkspaceError(503, "Function package changed; restart the runtime before execution")
-    if implementation_id not in (IMPLEMENTATION_ID, WORKSHEET_IMPLEMENTATION_ID):
+    if implementation_id not in (
+        IMPLEMENTATION_ID,
+        WORKSHEET_IMPLEMENTATION_ID,
+        POSTED_MOVEMENTS_IMPLEMENTATION_ID,
+    ):
         raise WorkspaceError(422, "Function implementation is not installed")
     result = deepcopy(_STARTUP_MANIFEST)
+    if implementation_id == POSTED_MOVEMENTS_IMPLEMENTATION_ID:
+        result.update(
+            implementation_id=implementation_id,
+            maximum_rows=1000,
+            maximum_properties=0,
+            capabilities={
+                "posted_account_movements": True,
+                "partial_coverage": "EXPLICIT_ROW_QUARANTINE",
+                "financial_statement_classification": False,
+                "exact_binding_required": True,
+                "vat": "AS_POSTED_ONLY",
+                "business_effects": False,
+            },
+        )
     if implementation_id == WORKSHEET_IMPLEMENTATION_ID:
         result.pop("maximum_materialized_rows")
         result.pop("maximum_materialized_pages")
@@ -194,6 +215,13 @@ def _check_implementation(spec: FunctionDefinition) -> dict:
 def validate_function(item: ResourceMutation, target: Callable[..., dict]) -> None:
     spec = FunctionDefinition.model_validate(item.attributes)
     _check_implementation(spec)
+    if isinstance(spec.definition, PostedMovementsImplementation):
+        from finai_api.services.posted_movements_function import validate_definition
+
+        validate_definition(
+            spec, lambda identity: target(identity, str(item.resource_id), "POSTED_MOVEMENT_INPUT")
+        )
+        return
     if isinstance(spec.definition, WorksheetImplementation):
         selected = target(str(spec.evidence_id), str(item.resource_id), "FIELD:evidence_id")
         if (
@@ -313,7 +341,11 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
         by_id = {str(row["resource_id"]): row for row in pins}
         selected = by_id.get(str(spec.object_set_id))
         source = None
-        if isinstance(spec.definition, WorksheetImplementation):
+        if isinstance(spec.definition, PostedMovementsImplementation):
+            from finai_api.services.posted_movements_function import source_plan
+
+            source = source_plan(p, request, spec, by_id)
+        elif isinstance(spec.definition, WorksheetImplementation):
             from finai_api.services.worksheet_function import source_plan
 
             source = source_plan(p, request, spec, by_id)
@@ -364,7 +396,7 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
         result["retained_properties"] = _retained_property_contract(retained_properties, graph)
     if source is not None:
         result["source_document"] = source
-    if not isinstance(spec.definition, WorksheetImplementation) and spec.definition.group_count:
+    if isinstance(spec.definition, FunctionImplementation) and spec.definition.group_count:
         from finai_api.services.grouped_observations import validate_schema
 
         grouping = spec.definition.group_count
@@ -375,7 +407,7 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
         if request.offset != 0:
             raise WorkspaceError(422, "Grouping requires a complete Object Set starting at zero")
         result["group_count"] = {"schema": _pin(schema), "fields": grouping.fields}
-    if not isinstance(spec.definition, WorksheetImplementation) and spec.definition.temporal_extent:
+    if isinstance(spec.definition, FunctionImplementation) and spec.definition.temporal_extent:
         from finai_api.services.temporal_observations import validate_schema as temporal_schema
 
         extent = spec.definition.temporal_extent
@@ -388,7 +420,7 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
                 422, "Temporal extent requires a complete Object Set starting at zero"
             )
         result["temporal_extent"] = {"schema": _pin(schema), "field": extent.field, "kind": kind}
-    if not isinstance(spec.definition, WorksheetImplementation) and spec.definition.materialization:
+    if isinstance(spec.definition, FunctionImplementation) and spec.definition.materialization:
         if request.offset != 0:
             raise WorkspaceError(422, "Materialization starts at offset zero")
         result["materialization"] = spec.definition.materialization.model_dump()
@@ -686,6 +718,10 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
         raise WorkspaceError(
             409, "Function plan no longer matches installed implementation and exact context"
         )
+    if retained_plan["implementation"]["implementation_id"] == POSTED_MOVEMENTS_IMPLEMENTATION_ID:
+        from finai_api.services.posted_movements_function import execute
+
+        return execute(p, request, retained_plan)
     if retained_plan["implementation"]["implementation_id"] == WORKSHEET_IMPLEMENTATION_ID:
         from finai_api.services.worksheet_function import execute
 

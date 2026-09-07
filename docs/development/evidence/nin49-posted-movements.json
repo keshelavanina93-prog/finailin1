@@ -1,0 +1,230 @@
+{
+  "source": {
+    "scope": {
+      "version_id": "411938a2-8c64-5b57-86e1-c633ab150087",
+      "resource_id": "23558068-046d-5fed-8582-3211ea2f2199",
+      "content_hash": "7dcbb84f9d719e292106766cea3997f3b2682dcc9f363c9eff3fd192e6c5110f"
+    },
+    "sheet": "Base",
+    "sha256": "d7c7e67c093b40b6f9209b301ca8fab7e4febc85c27d735babb95fa2028a8f0a",
+    "binding": {
+      "version_id": "e8c68d4b-e69f-5e21-9bd5-256420146404",
+      "resource_id": "f4cf95a5-9552-519c-8e59-96ee06bd4308",
+      "content_hash": "1747069ae729cb82a80ff7ace0a36c6d12d25b5fb13e57ee815d42dfbbf741aa"
+    },
+    "context": {
+      "book_id": "305f1f70-24bd-5b55-8891-66631090b178",
+      "ledger_id": "70f2a840-09d4-56af-9e5c-b7ac4b51ccbb",
+      "period_id": "54e030e4-662d-545c-b9b9-991383faea94",
+      "currency_id": "299a3497-aaee-5d63-bd3f-c4bd43c52aad",
+      "amount_field": "source_amount",
+      "vat_treatment": "AS_POSTED",
+      "amount_semantics": "DEBIT_CREDIT",
+      "functional_currency_id": "299a3497-aaee-5d63-bd3f-c4bd43c52aad"
+    },
+    "accounts": {
+      "1210": {
+        "version_id": "cb398e0c-b24f-5282-bfa1-a1c2072c2d6a",
+        "resource_id": "509b173e-0883-52e9-8603-02fccda048c8"
+      },
+      "1220": {
+        "version_id": "7f30bd6c-cd9f-5705-b57e-2f704d2c9aaf",
+        "resource_id": "77921505-f5ce-576b-8a31-eec6d1c025f2"
+      },
+      "1297": {
+        "version_id": "bca3f8ad-c1a4-51a6-9873-c05b55b0446d",
+        "resource_id": "6946db8c-1e98-5e9f-a141-d0ffd3a9cc3a"
+      },
+      "1410": {
+        "version_id": "7b496117-d0e7-5152-8c19-3f2e01971282",
+        "resource_id": "064ba711-deb7-555e-b7cc-29976a2aa21b"
+      },
+      "1430": {
+        "version_id": "3f5f39ee-b9f6-5e6e-8e44-ec72335ec92a",
+        "resource_id": "804a1dd4-441c-5639-a970-44d30e0c3e26"
+      },
+      "1496": {
+        "version_id": "14e7d5b3-5fe1-5015-b343-a343777bf461",
+        "resource_id": "1cb38c93-ca27-5e92-825f-e4135589ce3e"
+      },
+      "1622": {
+        "version_id": "b5472f55-e56e-5dca-9433-7ff2e85a7507",
+        "resource_id": "7515018b-8999-560f-8b77-d13736a374fd"
+      },
+      "1810": {
+        "version_id": "11561dc1-78fe-5822-a3cf-6eeb9c309abe",
+        "resource_id": "ba29e9b2-c034-5119-938a-8bf6df3e69ff"
+      },
+      "1820": {
+        "version_id": "33c691f7-8273-5582-ba76-01e585af2999",
+        "resource_id": "04b40111-3014-5003-9a67-e1b2660c547f"
+      },
+      "1821": {
+        "version_id": "78cbbefc-7dbe-52f5-8bde-664fb5cb4900",
+        "resource_id": "5ae0079d-6a40-58c3-b0be-d8f1645b0168"
+      },
+      "2120": {
+        "version_id": "3ef6970b-5c3e-5709-9157-ad9a7d0b1b22",
+        "resource_id": "289341b2-424e-5a99-8cfb-beaf2b539b4a"
+      },
+      "2130": {
+        "version_id": "6be57c0c-3b62-516f-b109-7056bdbf2225",
+        "resource_id": "1d8759d6-0771-58ab-9eb5-42fee478f19e"
+      },
+      "2160": {
+        "version_id": "1a6a1e33-8d7e-52c2-94ff-8d45b129bc5e",
+        "resource_id": "588382f0-1852-5caa-81cb-b9c61b6c8a37"
+      },
+      "2230": {
+        "version_id": "a2c32b6a-75f3-5519-8afc-99056ca72051",
+        "resource_id": "f5fe56ea-2928-5236-91e6-5575cb6928eb"
+      },
+      "2231": {
+        "version_id": "90c49d46-cdaf-5b1d-8644-906a17251246",
+        "resource_id": "97ac1dc7-8930-5bee-b9e9-de1bb3b44565"
+      },
+      "2610": {
+        "version_id": "ee29f8b8-a8d5-5fe2-82c4-a234e5486f99",
+        "resource_id": "adf5934c-1fdc-53f3-9349-c6d7a8d69ac0"
+      },
+      "3110": {
+        "version_id": "4fc17bb6-4244-53c6-b734-1cf598b73889",
+        "resource_id": "d95ead4b-97ed-5adc-a808-853a8677bd67"
+      },
+      "3111": {
+        "version_id": "a5481683-6808-556e-a8fa-3853a750ad1c",
+        "resource_id": "de1986c5-1ae8-577d-bf0c-5448870fbc9b"
+      },
+      "3130": {
+        "version_id": "dbf7199c-6491-5cea-bc60-c8979e27d565",
+        "resource_id": "836446dc-7be9-55e4-95b6-6618e555713d"
+      },
+      "3199": {
+        "version_id": "28d09b16-502c-521c-9a56-ac85c441032a",
+        "resource_id": "7599a90f-5dc7-560a-9969-860247e856b2"
+      },
+      "3320": {
+        "version_id": "fd897458-d3ce-50a4-b558-496f84664283",
+        "resource_id": "d21a7c32-8985-5322-b58e-e0f424dac800"
+      },
+      "3330": {
+        "version_id": "1d4cb40a-3f17-510f-915a-da7045af4162",
+        "resource_id": "c8365185-ee82-5373-81bd-340066b55c15"
+      },
+      "3390": {
+        "version_id": "65e2f2e8-cb7b-5791-93c9-1f21404f2a85",
+        "resource_id": "1de8e0f2-3792-52de-a665-01a1d809bb8e"
+      },
+      "3411": {
+        "version_id": "2a97ff37-1f43-5eec-8e55-9fd9fe3d9c37",
+        "resource_id": "19292957-4058-5664-ae9f-48bcb968b610"
+      },
+      "4141": {
+        "version_id": "14c98f7d-0a3f-5267-b40d-3f463eb3a12a",
+        "resource_id": "59389afb-fdcc-5093-b314-97db47b4df82"
+      },
+      "4170": {
+        "version_id": "4a770a59-5c23-514e-9208-f360aace16e8",
+        "resource_id": "0220c597-f22e-5c34-9284-fdf2ffab7816"
+      },
+      "6110": {
+        "version_id": "19462d53-8048-59ed-a3a6-12a37e7c0716",
+        "resource_id": "7f607759-1b5f-5eb9-871a-8096fe8c53d1"
+      },
+      "7410": {
+        "version_id": "463eb5c4-e3b8-5489-b9ce-73337e22d196",
+        "resource_id": "de977816-8a94-5035-a893-7a2116dc076a"
+      },
+      "8110": {
+        "version_id": "8504004a-20bb-5a3e-b4e3-9bdcb5883690",
+        "resource_id": "9ac4387c-5b0d-5fd6-bf4e-1463ecaf7039"
+      },
+      "9210": {
+        "version_id": "6b70c658-45d8-58d6-ad7a-4b982fcd66c6",
+        "resource_id": "39217acf-ba3e-51a7-9012-b63ddea60970"
+      },
+      "3340.01": {
+        "version_id": "2b7adcdd-f9a1-52bd-88eb-c175b9c636c2",
+        "resource_id": "2b5a67b5-b120-5f1a-bb37-7e5ecff3f695"
+      },
+      "3340.03": {
+        "version_id": "da587c04-784f-554b-84ae-360d6be8e26f",
+        "resource_id": "a2385842-8217-5ed9-a09b-4d508a5f1f0f"
+      },
+      "3340.04": {
+        "version_id": "b63b1dd7-170a-5b75-8c1c-0cbb1f9758e6",
+        "resource_id": "8bb98e62-e7e1-5f8d-8c12-ae138526dda9"
+      },
+      "3370.01": {
+        "version_id": "e3830bcb-52f1-51cf-ba6c-9d4008b895f4",
+        "resource_id": "43d004f7-dba0-5b26-9ee2-253388f22d7c"
+      },
+      "7410.01": {
+        "version_id": "476202b0-afe5-56b5-9ff4-1a8646300acf",
+        "resource_id": "8986906c-5386-58d5-9737-1cb3f20430b3"
+      },
+      "3310.01.1": {
+        "version_id": "c2166bb9-44b3-5137-bfa2-3b85f1c0070c",
+        "resource_id": "a869f7eb-117c-5627-8ebc-744014239745"
+      },
+      "7310.02.1": {
+        "version_id": "1527baef-1ada-5216-a840-302212cef2e9",
+        "resource_id": "aafb50fb-40b0-53a1-958c-8a202af2211e"
+      },
+      "8220.01.1": {
+        "version_id": "6b006fd7-71e5-53b9-8fbe-24061475795c",
+        "resource_id": "4618215f-699b-5f64-9bf7-82bf7a6edba6"
+      }
+    },
+    "evidence": {
+      "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+      "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+      "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+    },
+    "filename": "Report- January 2025.xlsx",
+    "row_count": 596,
+    "company_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+    "document_id": "ir_e630518b23cd9855216cf776fa87e51a5b3d964a912ebc480f47e910b6a073e6",
+    "observed_from": "2025-01-01",
+    "max_source_rows": 1000,
+    "observed_through": "2025-01-31"
+  },
+  "function": {
+    "version_id": "aa17de9f-16a8-5b1a-b2c7-a6ae33baedea",
+    "resource_id": "94c26511-53bf-5dd4-97e8-b89a11334bd3",
+    "content_hash": "f3e4a8a7af0d84aec2bbd5c30c3c12cf68b86a0871f4d36a19866e5035b27ebc"
+  },
+  "invocation_id": "c3f68247-7e04-5934-9e27-041754bd9168",
+  "receipt_hash": "57487bcc420a121c5e6bb470d9ce7b2b6068582dd49d73a9c4699a34b8a71b14",
+  "run_id": "fcr_0428075847db0d5996125d60ecbec7e9f114a2a8c3aaee78dc7205d341a540fa",
+  "coverage": {
+    "source_rows": 596,
+    "excluded_rows": 1,
+    "included_rows": 595,
+    "ledger_completeness": "UNESTABLISHED"
+  },
+  "excluded_rows": [
+    {
+      "row": 288,
+      "reason": "MISSING_LITERAL_POSTED_AMOUNT",
+      "coordinate": "Base!S288"
+    }
+  ],
+  "account_side_groups": 59,
+  "posted_side_control_totals": {
+    "debit": "12502967.2300000000006576",
+    "credit": "12502967.2300000000006576"
+  },
+  "currency": "GEL",
+  "workflow_id": "transformation:6dd2188a-72eb-4550-ae8e-e98004a91493",
+  "publication_id": "pub_7d7e10adf9a5174a5d11009db4ab72bb6287efbab091e35655641501c0486477",
+  "worker_mode": "SHARED_ACTIVITY_SERVICES_DIRECT; TEMPORAL_WORKER_UNPROVEN",
+  "negative_checks": [
+    "reopen_same_receipt",
+    "foreign_company_404",
+    "wrong_total_SQL_refused",
+    "wrong_currency_SQL_refused",
+    "missing_exclusion_SQL_refused",
+    "missing_authority_SQL_refused"
+  ]
+}
