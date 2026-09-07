@@ -3,6 +3,7 @@ import {useEffect,useRef,useState, type FormEvent} from "react";
 import type {PromotionCheck, ResourceProposalDetail} from "@finai/contracts";
 import {Badge} from "./g8-ui";
 import JournalProposalReview from "./journal-proposal-review";
+import AccountingSetupProposalReview from "./accounting-setup-proposal-review";
 
 type Props = {token:string;proposalId:string;onDecision?:(detail:ResourceProposalDetail)=>void};
 type Checked = PromotionCheck & {change_names:string[];proposal_detail:ResourceProposalDetail};
@@ -74,6 +75,7 @@ function PromotionPanel({token,proposalId,onDecision}:Props) {
       </> : <p>No evaluation was retained for this proposal. Submit a refreshed proposal before promotion.</p>}
     </section>}
     {result && <JournalProposalReview detail={result.proposal_detail}/>}
+    {result && <AccountingSetupProposalReview detail={result.proposal_detail}/>}
     {receipt && <p role="status">{receipt}</p>}
     {result && result.status!=="DECIDED" && <form className="resource-form" onSubmit={recordDecision}>
       <details><summary>{result.change_names.length} changes reviewed together</summary><ul>{result.change_names.map((name,index)=><li key={index}>{name}</li>)}</ul></details>

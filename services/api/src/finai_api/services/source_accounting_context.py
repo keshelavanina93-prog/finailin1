@@ -323,9 +323,7 @@ def inspect(principal, document_id, sheet, profile, company_id):
 
     identity, attrs, coordinate, label = observe(principal, document_id, sheet, profile, company_id)
     binding_id = uuid5(identity, "accounting-binding")
-    effective = _effective_resources(
-        principal, [identity, binding_id, UUID(attrs["chart_id"])]
-    )
+    effective = _effective_resources(principal, [identity, binding_id, UUID(attrs["chart_id"])])
     company_binding = inspect_company_alias(principal, document_id, sheet, profile, company_id)
     company = company_binding["company"]
     unresolved = []
@@ -349,7 +347,14 @@ def inspect(principal, document_id, sheet, profile, company_id):
         )
     candidates = {}
     snapshot = datetime.now(UTC)
-    for kind in ["Ledger", "AccountingBook", "FiscalPeriod", "Currency", "MappingVersion"]:
+    for kind in [
+        "Ledger",
+        "AccountingBook",
+        "FiscalCalendar",
+        "FiscalPeriod",
+        "Currency",
+        "MappingVersion",
+    ]:
         candidates[kind] = []
         offset = 0
         while True:
@@ -380,6 +385,7 @@ def inspect(principal, document_id, sheet, profile, company_id):
         "scope": effective.get(str(identity)),
         "binding": effective.get(str(binding_id)),
         "candidates": candidates,
+        "chart": chart,
         "financial_eligibility": "NOT_CERTIFIED",
         "canonical_ready": not unresolved,
         "unresolved": unresolved,
@@ -458,8 +464,9 @@ def propose_binding(principal, document_id, sheet, profile, company_id, selectio
             displayed["version_id"] if displayed else None
         ):
             raise WorkspaceError(
-                409, "Source accounting context has a newer or scheduled publication; "
-                "review that publication before replacing the current selection"
+                409,
+                "Source accounting context has a newer or scheduled publication; "
+                "review that publication before replacing the current selection",
             )
     prior = result["binding"]
     attrs = {"scope_id": result["scope_id"], **selection.model_dump(mode="json", exclude_none=True)}

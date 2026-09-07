@@ -18,6 +18,8 @@ export interface ResourceMutation {
   evidence_class?: string;
 }
 export interface ResourceProposal {
+  request_binding?: {operation: "source-accounting-setup/1"; content_sha256: string} | null;
+  source_versions?: Record<string, Record<string, string>>;
   expectations?: Array<{name: string; resource_id: string; attribute_path: string[]; expected: unknown}>;
   restores_versions?: Record<string, string>;
   proposal_id: string; title: string; rationale: string; access_entity: string; mutations: ResourceMutation[];

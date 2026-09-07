@@ -5,8 +5,8 @@ type Context = { params: Promise<{ path: string[] }> };
 async function forward(request: NextRequest, context: Context) {
   const { path } = await context.params;
   const route = path.join("/");
-  const documents = /^source-documents(?:\/doc_[a-f0-9]{64}\/(?:content|preview|(?:companies|accounts|facts|dimensions|corporate|licence)\/(?:inspect|proposal)|facts\/reconcile|dimensions\/query|accounting-context\/(?:inspect|observations|account-observations|scope-proposal|binding-proposal|company-binding-proposal)))?$/.test(route)
-    || /^source-documents\/ir_[a-f0-9]{64}\/accounting-context\/(?:inspect|observations|account-observations|scope-proposal|binding-proposal|company-binding-proposal)$/.test(route);
+  const documents = /^source-documents(?:\/doc_[a-f0-9]{64}\/(?:content|preview|(?:companies|accounts|facts|dimensions|corporate|licence)\/(?:inspect|proposal)|facts\/reconcile|dimensions\/query|accounting-context\/(?:inspect|observations|account-observations|scope-proposal|binding-proposal|company-binding-proposal|setup-proposal)))?$/.test(route)
+    || /^source-documents\/ir_[a-f0-9]{64}\/accounting-context\/(?:inspect|observations|account-observations|scope-proposal|binding-proposal|company-binding-proposal|setup-proposal)$/.test(route);
   const lifecycle = /^lifecycle\/(?:requests(?:\/[a-fA-F0-9-]+\/review)?|versions\/[a-fA-F0-9-]+|consumptions\/[a-fA-F0-9-]+(?:\/status)?|consume)$/.test(route);
   const eventTime = /^event-time\/(?:events|streams\/[a-fA-F0-9-]+\/replay)$/.test(route);
   const certification = /^certifications\/(?:evaluations|receipts\/[a-fA-F0-9-]+)$/.test(route);

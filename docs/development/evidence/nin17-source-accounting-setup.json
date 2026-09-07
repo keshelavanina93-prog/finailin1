@@ -1,0 +1,197 @@
+{
+  "contract": "source-accounting-setup/1",
+  "checked_at": "2026-09-07T06:54:04.9278661Z",
+  "linear_issue": "NIN-17",
+  "base_commit": "b798844",
+  "source_sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8",
+  "http_before_review": {
+    "checked_at": "2026-09-07T10:45:05.883181+04:00",
+    "proposal_id": "0d5a9a34-997b-4c7f-bbd5-dff419d8cf39",
+    "repeat_status": 200,
+    "changed_request_status": 409,
+    "response": {
+      "proposal_id": "0d5a9a34-997b-4c7f-bbd5-dff419d8cf39",
+      "planned": {
+        "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+        "chart_id": "53a371be-fd80-5ac8-a8ef-ef4492bbdfa6",
+        "ledger_id": "80183e40-2e99-5eca-b505-8bc3687e8dad",
+        "book_id": "dac71fbc-122f-5ef7-a6e0-c7adb2e2cbca",
+        "calendar_id": "84b442f4-8619-5135-83c2-64e302f81c0b",
+        "period_id": "2c6f1e6e-3d3a-510c-8ee9-c82e02fec33f",
+        "currency_id": "0b66316f-45dc-5d86-8afb-50c426adf34c"
+      },
+      "created": [
+        {
+          "resource_id": "0b66316f-45dc-5d86-8afb-50c426adf34c",
+          "object_type": "Currency"
+        },
+        {
+          "resource_id": "84b442f4-8619-5135-83c2-64e302f81c0b",
+          "object_type": "FiscalCalendar"
+        },
+        {
+          "resource_id": "2c6f1e6e-3d3a-510c-8ee9-c82e02fec33f",
+          "object_type": "FiscalPeriod"
+        },
+        {
+          "resource_id": "80183e40-2e99-5eca-b505-8bc3687e8dad",
+          "object_type": "Ledger"
+        },
+        {
+          "resource_id": "dac71fbc-122f-5ef7-a6e0-c7adb2e2cbca",
+          "object_type": "AccountingBook"
+        }
+      ],
+      "reused": [
+        {
+          "resource_id": "53a371be-fd80-5ac8-a8ef-ef4492bbdfa6",
+          "version_id": "f0860c42-2dae-5fe0-905b-defc9f216fdb"
+        },
+        {
+          "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+          "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd"
+        },
+        {
+          "resource_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+          "version_id": "dd21bd46-3525-535d-89ba-6ffa2e05a6e5"
+        }
+      ],
+      "authority": "USER_ASSERTED_PROPOSAL",
+      "decision": null,
+      "review_required": true
+    },
+    "exact_context_pins": {
+      "53a371be-fd80-5ac8-a8ef-ef4492bbdfa6": "f0860c42-2dae-5fe0-905b-defc9f216fdb",
+      "86271832-cbef-5593-a95b-3d326dd1d643": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+      "dc706c30-a8fb-57dc-b098-8a6bf2c2309d": "dd21bd46-3525-535d-89ba-6ffa2e05a6e5"
+    },
+    "planned_resources_published": {
+      "Currency": false,
+      "FiscalCalendar": false,
+      "FiscalPeriod": false,
+      "Ledger": false,
+      "AccountingBook": false
+    },
+    "source_binding_unchanged": true,
+    "retained_proposal_unchanged": true,
+    "source_document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434",
+    "verification_inputs_only": true,
+    "financial_configuration_accepted": false,
+    "review_performed": false,
+    "release_accepted": false
+  },
+  "http_after_rejection": {
+    "checked_at": "2026-09-07T10:52:56.095868+04:00",
+    "proposal_id": "0d5a9a34-997b-4c7f-bbd5-dff419d8cf39",
+    "repeat_status": 200,
+    "changed_request_status": 409,
+    "response": {
+      "proposal_id": "0d5a9a34-997b-4c7f-bbd5-dff419d8cf39",
+      "planned": {
+        "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+        "chart_id": "53a371be-fd80-5ac8-a8ef-ef4492bbdfa6",
+        "ledger_id": "80183e40-2e99-5eca-b505-8bc3687e8dad",
+        "book_id": "dac71fbc-122f-5ef7-a6e0-c7adb2e2cbca",
+        "calendar_id": "84b442f4-8619-5135-83c2-64e302f81c0b",
+        "period_id": "2c6f1e6e-3d3a-510c-8ee9-c82e02fec33f",
+        "currency_id": "0b66316f-45dc-5d86-8afb-50c426adf34c"
+      },
+      "created": [
+        {
+          "resource_id": "0b66316f-45dc-5d86-8afb-50c426adf34c",
+          "object_type": "Currency"
+        },
+        {
+          "resource_id": "84b442f4-8619-5135-83c2-64e302f81c0b",
+          "object_type": "FiscalCalendar"
+        },
+        {
+          "resource_id": "2c6f1e6e-3d3a-510c-8ee9-c82e02fec33f",
+          "object_type": "FiscalPeriod"
+        },
+        {
+          "resource_id": "80183e40-2e99-5eca-b505-8bc3687e8dad",
+          "object_type": "Ledger"
+        },
+        {
+          "resource_id": "dac71fbc-122f-5ef7-a6e0-c7adb2e2cbca",
+          "object_type": "AccountingBook"
+        }
+      ],
+      "reused": [
+        {
+          "resource_id": "53a371be-fd80-5ac8-a8ef-ef4492bbdfa6",
+          "version_id": "f0860c42-2dae-5fe0-905b-defc9f216fdb"
+        },
+        {
+          "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+          "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd"
+        },
+        {
+          "resource_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+          "version_id": "dd21bd46-3525-535d-89ba-6ffa2e05a6e5"
+        }
+      ],
+      "authority": "USER_ASSERTED_PROPOSAL",
+      "decision": "REJECTED",
+      "review_required": false
+    },
+    "exact_context_pins": {
+      "53a371be-fd80-5ac8-a8ef-ef4492bbdfa6": "f0860c42-2dae-5fe0-905b-defc9f216fdb",
+      "86271832-cbef-5593-a95b-3d326dd1d643": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+      "dc706c30-a8fb-57dc-b098-8a6bf2c2309d": "dd21bd46-3525-535d-89ba-6ffa2e05a6e5"
+    },
+    "planned_resources_published": {
+      "Currency": false,
+      "FiscalCalendar": false,
+      "FiscalPeriod": false,
+      "Ledger": false,
+      "AccountingBook": false
+    },
+    "source_binding_unchanged": true,
+    "retained_proposal_unchanged": true,
+    "source_document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434",
+    "verification_inputs_only": true,
+    "financial_configuration_accepted": false,
+    "review_performed": false,
+    "release_accepted": false
+  },
+  "browser": {
+    "url": "http://127.0.0.1:3062/",
+    "proposer": "local-steward",
+    "reviewer": "local-reviewer",
+    "source_form_submitted": true,
+    "draft_preserved_across_disclosure_toggle": true,
+    "default_currency_and_calendar_blank": true,
+    "review_in_workflows_and_actions": true,
+    "retained_setup_values_visible": true,
+    "rejected_via_browser": true,
+    "return_to_home_preserved_company": true,
+    "initial_engineering_review_routing_defect_fixed": true,
+    "native_date_input_automation_used_dom_input_events": true,
+    "screenshots": [
+      "nin17-accounting-setup-form.png",
+      "nin17-accounting-setup-review.png",
+      "nin17-accounting-setup-rejected.png"
+    ]
+  },
+  "verification": {
+    "native_contract": "2 focused native database tests passed; synthetic source parsing",
+    "lint": "Focused Python and frontend lint passed",
+    "typing": "Focused Python typing and web TypeScript passed",
+    "web_build": "Production build passed after stopping owned standalone web process to release Windows directory lock"
+  },
+  "gates": {
+    "code_present": true,
+    "local_contract_pass": true,
+    "local_integrated_pass": true,
+    "authentic_source_context_pass": true,
+    "browser_bounded_setup_review_pass": true,
+    "authentic_accounting_configuration_accepted": false,
+    "financial_amount_meaning_established": false,
+    "source_accounting_activated": false,
+    "nin17_complete": false,
+    "nin25_complete": false,
+    "release_accepted": false
+  }
+}

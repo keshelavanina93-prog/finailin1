@@ -56,6 +56,12 @@ class ProposalExpectation(BaseModel):
     expected: Any
 
 
+class ProposalRequestBinding(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    operation: Literal["source-accounting-setup/1"]
+    content_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
 class ResourceProposal(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     proposal_id: UUID = Field(default_factory=uuid4)
@@ -66,6 +72,7 @@ class ResourceProposal(BaseModel):
     expectations: list[ProposalExpectation] = Field(default_factory=list, max_length=100)
     restores_versions: dict[UUID, UUID] = Field(default_factory=dict, max_length=100)
     source_versions: dict[UUID, dict[UUID, UUID]] = Field(default_factory=dict, max_length=100)
+    request_binding: ProposalRequestBinding | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_proposal(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
@@ -76,6 +83,8 @@ class ResourceProposal(BaseModel):
             payload.pop("restores_versions", None)
         if not self.source_versions:
             payload.pop("source_versions", None)
+        if self.request_binding is None:
+            payload.pop("request_binding", None)
         return payload
 
     @model_validator(mode="after")

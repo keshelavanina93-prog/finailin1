@@ -12,7 +12,7 @@ import {Value} from "./operator-history";
 const label=(s:string)=>s.toLowerCase().replaceAll("_"," ");
 const commandLabel=(s:string)=>({complete:"Acknowledge source review",resume:"Resume",pause:"Pause",retry:"Retry processing",cancel:"Cancel process"}[s]??s);
 type Queue={items:ActionItem[];truncated:boolean};
-export default function ActionWorkbench({token,principal,companyId,onInspect,initialWorkflowId,onOpenBuild}:{token:string;principal:Principal;companyId:string;initialWorkflowId?:string;onOpenBuild?:(requestId:string,transformation:{resource_id:string;version_id:string})=>void;onInspect:(id:string)=>void}){
+export default function ActionWorkbench({token,principal,companyId,onInspect,initialWorkflowId,onOpenBuild,initialProposalId,onReturnFromProposal,onProposalDecision}:{token:string;principal:Principal;companyId:string;initialWorkflowId?:string;initialProposalId?:string;onReturnFromProposal?:()=>void;onProposalDecision?:()=>void;onOpenBuild?:(requestId:string,transformation:{resource_id:string;version_id:string})=>void;onInspect:(id:string)=>void}){
  const commandPanel=useRef<HTMLElement>(null);
  const contextKey=`g8-actions:${principal.actor_id}:${JSON.stringify(principal.scope)}:${companyId}`;
  const [saved]=useState(()=>{try{return JSON.parse(sessionStorage.getItem(contextKey)??"{}");}catch{return {};}});
@@ -50,6 +50,12 @@ export default function ActionWorkbench({token,principal,companyId,onInspect,ini
  async function download(id:string,source:boolean,expectedHash?:string,filename?:string){try{const path=source?`workspace/constructions/${id}/source`:`ontology/source-documents/${id}/content`;const response=await fetch(`/api/${path}`,{headers:{Authorization:`Bearer ${token}`}});if(!response.ok)throw Error("Evidence unavailable for this identity");const blob=await response.blob();const expected=expectedHash??response.headers.get("x-content-sha256");if(expected){const hash=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",await blob.arrayBuffer())),b=>b.toString(16).padStart(2,"0")).join("");if(hash!==expected)throw Error("Evidence integrity check failed; download withheld");}const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename??(source?"retained-source":"original-evidence");a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){setError(String(e));}}
  const visible=queue?.items.filter(i=>`${i.title} ${i.family}`.toLowerCase().includes(filter.toLowerCase()))??[];
  const available=active&&current?commands(active.family,current,principal.permissions,principal.actor_id):[];
+ if(initialProposalId)return <section className="g8-actions" aria-label="Business change review">
+   <header><h2>Review proposed business changes</h2><p>This is the retained proposal selected from your workspace. The company remains your navigation context; the server checks the proposal scope and review authority.</p></header>
+   {onReturnFromProposal&&<button type="button" onClick={onReturnFromProposal}>Return to previous workspace</button>}
+   <PromotionReadiness key={initialProposalId} token={token} proposalId={initialProposalId} onDecision={()=>onProposalDecision?.()}/>
+   <details><summary>Exact proposal reference</summary><p>{initialProposalId}</p></details>
+ </section>;
  return <section className="g8-actions" aria-label="Governed workbench"><div className="g8-actions-toolbar"><label>Find work<input maxLength={128} value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Name or process family"/></label>{companyId&&<label className="g8-actions-check"><input type="checkbox" disabled={busy||!!pending} checked={unbound} onChange={e=>{setUnbound(e.target.checked);choose("");}}/>Include work without company binding</label>}<button disabled={busy} onClick={()=>setRevision(r=>r+1)}>Refresh work</button></div>
  <p>Source checks, regulatory monitoring and reviewed business changes share retained requests and receipts. This workbench does not execute external financial postings.</p>
  {queueError&&<p role="alert">{queueError}</p>}{queue?.truncated&&<p>Showing the latest 100 requests in this scope.</p>}

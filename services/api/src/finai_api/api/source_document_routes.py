@@ -13,6 +13,7 @@ from finai_api.services import (
     source_account_binding,
     source_accounting_context,
     source_accounting_reconciliation,
+    source_accounting_setup,
     source_dimensions,
     source_financial_facts,
 )
@@ -79,6 +80,23 @@ class SourceContextRead(BaseModel):
 
 class SourceContextWrite(SourceContextRead):
     selection: source_accounting_context.ContextSelection
+
+
+class SourceSetupWrite(SourceContextRead):
+    setup: source_accounting_setup.SetupSelection
+
+
+@router.post("/{identity}/accounting-context/setup-proposal")
+def propose_accounting_setup(principal: User, identity: str, request: SourceSetupWrite):
+    return source_accounting_setup.propose(
+        principal,
+        identity,
+        request.sheet,
+        request.profile,
+        request.company_id,
+        request.setup,
+        request.offset,
+    )
 
 
 class SourceCompanyBindingWrite(SourceContextRead):
