@@ -4,6 +4,7 @@ export type {
   ObjectSetTraversalSchemaVersion, ObjectSetResult, ObjectSetInterfacePin,
   ObjectSetInterfaceRoot, ObjectSetInterfaceField, ObjectSetInterfaceBindings,
   ObjectSetInterfaceValue,
+  ObjectSetTypeGroupRoot, ObjectSetTypeGroupBindings, ObjectSetTypeGroupValue,
 } from "./object-sets.js";
 export type { AccountDimensionPolicyResponse, AccountDimensionPolicyProposalRequest, AccountDimensionPolicyProposalResponse, JournalDimensionReadback, JournalDimensionProvenance } from "./account-dimension-policy.js";
 export type { CompanyJournalListResponse, CompanyJournalDetailResponse, JournalSelection, JournalPin } from "./company-journals.js";

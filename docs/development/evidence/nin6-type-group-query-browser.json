@@ -1,0 +1,71 @@
+{
+  "url": "http://127.0.0.1:3062/",
+  "query": {
+    "object_type": "ObjectTypeGroup",
+    "resource_ids": [
+      "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+      "01603366-ac6b-5871-b56e-0b1703b52241"
+    ],
+    "filters": [
+      {
+        "field": "evidence_id",
+        "value": "0074068a-99ea-5a03-8e61-15f7430b04d4"
+      }
+    ],
+    "traversal": [
+      {
+        "kind": "reference",
+        "name": "source_record_id",
+        "direction": "outgoing"
+      }
+    ],
+    "search": "",
+    "limit": 50,
+    "offset": 0,
+    "valid_at": "2026-09-07T09:50:01.58449Z",
+    "known_at": "2026-09-07T09:50:01.58449Z",
+    "type_group": {
+      "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+      "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54"
+    }
+  },
+  "tables": [
+    "OBJECT\tTYPE\tAUTHORITY & INVESTIGATION\tVALUES & PROVENANCE\nSheet1!B235607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235\tSource Record\tAPPROVED - SOURCE BOUND\nInspect\nHistory\nTrace evidence\n\t\nInspect returned version"
+  ],
+  "errors": [],
+  "restored": {
+    "query": {
+      "object_type": "ObjectTypeGroup",
+      "resource_ids": [
+        "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "01603366-ac6b-5871-b56e-0b1703b52241"
+      ],
+      "filters": [
+        {
+          "field": "evidence_id",
+          "value": "0074068a-99ea-5a03-8e61-15f7430b04d4"
+        }
+      ],
+      "traversal": [
+        {
+          "kind": "reference",
+          "name": "source_record_id",
+          "direction": "outgoing"
+        }
+      ],
+      "search": "",
+      "limit": 50,
+      "offset": 0,
+      "valid_at": "2026-09-07T09:50:01.58449Z",
+      "known_at": "2026-09-07T09:50:01.58449Z",
+      "type_group": {
+        "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+        "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54"
+      }
+    },
+    "tables": [
+      "OBJECT\tTYPE\tAUTHORITY & INVESTIGATION\tVALUES & PROVENANCE\nSheet1!B235607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235\tSource Record\tAPPROVED - SOURCE BOUND\nInspect\nHistory\nTrace evidence\n\t\nInspect returned version"
+    ],
+    "errors": []
+  }
+}

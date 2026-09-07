@@ -294,7 +294,7 @@ def _validate(
         )
         if exact_version is not None:
             if source_item.object_type != "ObjectSetDefinition" or not relation.startswith(
-                "INTERFACE_QUERY:"
+                ("INTERFACE_QUERY:", "TYPE_GROUP_QUERY:")
             ):
                 raise WorkspaceError(422, "Exact query dependency is not supported here")
             head = _get(conn, tenant, UUID(identifier))
@@ -307,7 +307,7 @@ def _validate(
                     (tenant, identifier, exact_version),
                 ).fetchone()
                 if exact is None:
-                    raise WorkspaceError(404, "Exact interface query dependency is unavailable")
+                    raise WorkspaceError(404, "Exact ontology query dependency is unavailable")
                 exact["dependencies"] = cursor.execute(
                     "SELECT d.relation,v.*,i.identity_key FROM resource_dependencies d "
                     "JOIN resource_versions v ON v.tenant_id=d.tenant_id "

@@ -115,7 +115,7 @@ def _stage_contracts(conn, principal, request, root_types, binding=None):
                 spec = binding["fields"].get(step.name, {})
                 if spec.get("kind") != "reference" or spec.get("target_type") in (None, "*"):
                     raise WorkspaceError(
-                        422, "First interface traversal requires a typed reference alias"
+                        422, "First definition-root traversal requires a common typed reference"
                     )
                 outputs.add(spec["target_type"])
             for name in current:
@@ -170,7 +170,11 @@ def query_objects(
 ) -> ObjectSetResult:
     with resource_connection(principal) as conn:
         conn.execute("SELECT set_config('statement_timeout','10000',true)")
-        if request.interface is not None or any(step.filters for step in request.traversal):
+        if (
+            request.interface is not None
+            or request.type_group is not None
+            or any(step.filters for step in request.traversal)
+        ):
             conn.execute(
                 "SELECT pg_advisory_xact_lock_shared(hashtextextended(%s,0))",
                 (f"canonical:{principal.scope.tenant_id}",),
@@ -197,6 +201,19 @@ def _query_objects(
     # Only internal CTE names are interpolated; every caller value is a parameter.
     root_types = types if types is not None else [request.object_type]
     binding = None
+    group_binding = None
+    if request.type_group is not None:
+        from finai_api.services.type_group_query import compiler_binding
+        from finai_api.services.type_group_query import resolve as resolve_group
+
+        if types is not None:
+            raise WorkspaceError(422, "A type group query has explicitly pinned concrete types")
+        group_binding = resolve_group(
+            principal, request.type_group, request.valid_at, request.known_at
+        )
+        binding = compiler_binding(group_binding)
+        root_types = [item["object_type"] for item in group_binding["schemas"]]
+        validate_filters(request.filters, binding["fields"])
     if request.interface is not None:
         from finai_api.services.interface_query import resolve
 
@@ -446,8 +463,12 @@ def _query_objects(
         if 0 in invalid_stages:
             raise WorkspaceError(
                 409,
-                "Interface root schema differs from its exact implementation; "
-                "filtering or traversal cannot reinterpret this object",
+                (
+                    "Type group root schema differs from its exact definition; "
+                    if group_binding
+                    else "Interface root schema differs from its exact implementation; "
+                )
+                + "filtering or traversal cannot reinterpret this object",
             )
         raise WorkspaceError(
             409,
@@ -507,7 +528,12 @@ def _query_objects(
                     422, "Grouped range filters require the same declared field kind"
                 )
     projected = None
-    if binding:
+    group_values = None
+    if group_binding:
+        from finai_api.services.type_group_query import values as type_group_values
+
+        group_values = type_group_values(group_binding, objects) if not request.traversal else []
+    if binding and group_binding is None:
         from finai_api.services.interface_query import values
 
         projected = values(binding, objects) if not request.traversal else []
@@ -520,8 +546,10 @@ def _query_objects(
         if request.offset + request.limit < total
         else None,
         filter_schema_versions=schema_pins,
-        interface_bindings=binding,
+        interface_bindings=binding if group_binding is None else None,
         interface_values=projected,
+        type_group_bindings=group_binding,
+        type_group_values=group_values,
         traversal_schema_versions=[
             TraversalSchemaVersion(
                 step=index,

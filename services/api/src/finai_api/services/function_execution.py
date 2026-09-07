@@ -94,6 +94,7 @@ def _disk_manifest() -> dict[str, Any]:
             "query": True,
             "typed_relationship_filters": True,
             "versioned_interface_inputs": True,
+            "versioned_type_group_inputs": True,
             "grouped_observation_counts": True,
             "snapshot": True,
             "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
@@ -155,6 +156,7 @@ def manifest(implementation_id: str = IMPLEMENTATION_ID) -> dict[str, Any]:
                 "query": False,
                 "typed_relationship_filters": False,
                 "versioned_interface_inputs": False,
+                "versioned_type_group_inputs": False,
                 "grouped_observation_counts": False,
                 "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
                 "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
@@ -352,6 +354,7 @@ def _retained_input(p: Principal, request: FunctionInvocation, compiled: dict) -
             for key in (
                 "filter_schema_versions", "traversal_schema_versions",
                 "interface_bindings", "interface_values",
+                "type_group_bindings", "type_group_values",
             )
             if key in source
         },

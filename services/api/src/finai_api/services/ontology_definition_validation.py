@@ -106,6 +106,7 @@ def validate_definition(
     if item.object_type == "ObjectSetDefinition":
         payload = definition.model_dump(mode="json")
         interface = payload.get("interface")
+        type_group = payload.get("type_group")
         if interface is not None:
             from finai_api.services.interface_query import resolve_with_loader
 
@@ -119,6 +120,19 @@ def validate_definition(
             )
             fields = bindings["fields"]
             root_types = {row["object_type"] for row in bindings["implementations"]}
+        elif type_group is not None:
+            from finai_api.services.type_group_query import resolve_with_loader
+
+            group_selection = ObjectSetQuery.model_validate(payload).type_group
+            assert group_selection is not None
+            bindings = resolve_with_loader(
+                group_selection,
+                lambda identity, version: target(
+                    str(identity), source, "TYPE_GROUP_QUERY:" + str(identity), str(version)
+                ),
+            )
+            fields = bindings["fields"]
+            root_types = {row["object_type"] for row in bindings["schemas"]}
         else:
             root = schema(payload["object_type"])
             fields = root["attributes"]["fields"]
@@ -149,7 +163,7 @@ def validate_definition(
                 outputs = set()
                 selected_fields = (
                     [bindings["fields"]]
-                    if interface is not None and index == 0
+                    if (interface is not None or type_group is not None) and index == 0
                     else [schema(name)["attributes"]["fields"] for name in current_types]
                 )
                 for source_fields in selected_fields:
@@ -208,7 +222,10 @@ def validate_definition(
             if spec.get("target_type"):
                 schema(spec["target_type"])
     elif item.object_type == "ObjectTypeGroup":
-        for name in definition.model_dump()["types"]:
+        selected_types = definition.model_dump()["types"]
+        if len(set(selected_types)) != len(selected_types):
+            raise WorkspaceError(422, "Type group members must be unique object types")
+        for name in selected_types:
             schema(name)
     elif item.object_type == "ObjectTypeImplementation":
         interface = target(item.attributes["interface_id"], source, "IMPLEMENTS")

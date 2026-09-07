@@ -1,0 +1,1939 @@
+{
+  "checked_at": "2026-09-07T09:48:45.250432+00:00",
+  "prepared": {
+    "type_group": {
+      "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+      "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54"
+    },
+    "object_set": {
+      "resource_id": "8c6612ee-c577-5542-9715-09e60d8bbe5f",
+      "version_id": "068e4a96-0ad6-5524-bd6b-25d7fd265194"
+    },
+    "function": {
+      "resource_id": "0c0b9c28-4a36-5b39-9597-071d55a04a4f",
+      "version_id": "f54b64ec-06cd-5f96-bf4f-f2c73703169d"
+    },
+    "query": {
+      "object_type": "ObjectTypeGroup",
+      "resource_ids": [
+        "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "01603366-ac6b-5871-b56e-0b1703b52241"
+      ],
+      "type_group": {
+        "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+        "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54"
+      }
+    }
+  },
+  "requests": [
+    {
+      "request_id": "53886e36-a4f0-4711-b592-aaca356cdfe1",
+      "function": {
+        "resource_id": "0c0b9c28-4a36-5b39-9597-071d55a04a4f",
+        "version_id": "f54b64ec-06cd-5f96-bf4f-f2c73703169d"
+      },
+      "valid_at": "2026-09-07T09:47:18.293855+00:00",
+      "known_at": "2026-09-07T09:47:18.293855+00:00",
+      "offset": 0,
+      "limit": 2
+    },
+    {
+      "request_id": "e70b8df4-08d5-4bd9-b067-6efa65d0f7d0",
+      "function": {
+        "resource_id": "0c0b9c28-4a36-5b39-9597-071d55a04a4f",
+        "version_id": "f54b64ec-06cd-5f96-bf4f-f2c73703169d"
+      },
+      "valid_at": "2026-09-07T09:47:18.293855+00:00",
+      "known_at": "2026-09-07T09:47:18.293855+00:00",
+      "offset": 0,
+      "limit": 2,
+      "input_result": {
+        "invocation_id": "53886e36-a4f0-4711-b592-aaca356cdfe1"
+      }
+    }
+  ],
+  "query": {
+    "contract": "ontology-object-set/1",
+    "query": {
+      "object_type": "ObjectTypeGroup",
+      "resource_ids": [
+        "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "01603366-ac6b-5871-b56e-0b1703b52241"
+      ],
+      "filters": [],
+      "traversal": [],
+      "search": "",
+      "limit": 10,
+      "offset": 0,
+      "valid_at": "2026-09-07T09:47:18.293855Z",
+      "known_at": "2026-09-07T09:47:18.293855Z",
+      "type_group": {
+        "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+        "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54"
+      }
+    },
+    "total": 2,
+    "counts_by_type": {
+      "SourceJournalMovement": 1,
+      "SourceAccountDefinition": 1
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "definition": {
+            "analytics": [
+              {
+                "position": 1,
+                "coordinate": "Sheet1!I235",
+                "source_label": "Контрагенты"
+              },
+              {
+                "position": 2,
+                "coordinate": "Sheet1!J235",
+                "source_label": "Договоры"
+              }
+            ],
+            "coordinate": "Sheet1!B235",
+            "source_row": 235,
+            "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+            "account_code": "3212",
+            "quick_selection": "6603",
+            "financial_mapping": "UNESTABLISHED",
+            "off_balance_source": "არა",
+            "balance_behavior_source": "П",
+            "currency_tracking_source": "არა",
+            "quantity_tracking_source": "არა",
+            "required_dimension_policy": "UNESTABLISHED"
+          },
+          "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+          "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+          "account_code": "3212",
+          "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+        },
+        "valid_from": "2026-09-06T03:22:44.088415+04:00",
+        "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "object_type": "SourceAccountDefinition",
+        "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+        "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "system_from": "2026-09-06T03:23:28.54828+04:00",
+        "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+        "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+        "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "517.8",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-30",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "30"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "30.11.2025 12:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Требование-накладная SAG00027468 from 30.11.2025 12:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7410.01"
+              },
+              "L": {
+                "type": 1,
+                "value": "SOG ექსპლუატაციის სამსახური - გორი"
+              },
+              "M": {
+                "type": 1,
+                "value": "საწვავის ხარჯი (ადმინისტრაცია) Топливо_адм.и хоз."
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "1610.01"
+              },
+              "R": {
+                "type": 1,
+                "value": "ევრო დიზელი"
+              },
+              "S": {
+                "type": 1,
+                "value": "დისტილატების საწყობი ქართლი"
+              },
+              "T": {
+                "type": 2,
+                "value": "210"
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "517.8"
+              },
+              "X": {
+                "type": 1,
+                "value": "Списание в производство "
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Kartli"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Fuel"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!207",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "c1f29252-babb-5be3-acda-b0d2c6aeb397",
+          "source_record_id": "830aa111-3c59-5fac-887b-47700a24b842",
+          "credit_account_id": "c47b4461-1d68-595b-a39a-07989c64f2f9",
+          "document_reference": "Требование-накладная SAG00027468 from 30.11.2025 12:00:00"
+        },
+        "valid_from": "2026-09-06T10:02:28.541738+04:00",
+        "version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "56331418-8906-45b9-9601-c08966589a48",
+        "resource_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+        "system_from": "2026-09-06T10:02:34.697862+04:00",
+        "content_hash": "a18841114c3b33a7e6fc234ce060a16ccefd09e0a148c570bff41e9dee5875ec",
+        "display_name": "TR!row:207",
+        "identity_key": "source-fact:01603366-ac6b-5871-b56e-0b1703b52241",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [],
+    "type_group_bindings": {
+      "group": {
+        "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+        "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54",
+        "content_hash": "c68e6a8a01d5d6119c60b4e196a1c8701674c0d7411d2ddfd72fe5c7798da98e"
+      },
+      "schemas": [
+        {
+          "object_type": "SourceAccountDefinition",
+          "schema": {
+            "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+            "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+            "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+          }
+        },
+        {
+          "object_type": "SourceJournalMovement",
+          "schema": {
+            "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+            "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+            "content_hash": "1853baae71b01eab602e3cb8e49421ffcd9fbaba7dae7de0486a30c585120e42"
+          }
+        }
+      ],
+      "fields": {
+        "evidence_id": {
+          "kind": "reference",
+          "required": false,
+          "deprecated": false,
+          "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+          "target_type": "SourceEvidence"
+        },
+        "source_record_id": {
+          "kind": "reference",
+          "required": true,
+          "deprecated": false,
+          "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+          "target_type": "SourceRecord"
+        }
+      }
+    },
+    "type_group_values": [
+      {
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+        "status": "AVAILABLE"
+      },
+      {
+        "object_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+        "object_version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+        "status": "AVAILABLE"
+      }
+    ]
+  },
+  "filtered": {
+    "contract": "ontology-object-set/1",
+    "query": {
+      "object_type": "ObjectTypeGroup",
+      "resource_ids": [
+        "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "01603366-ac6b-5871-b56e-0b1703b52241"
+      ],
+      "filters": [
+        {
+          "field": "evidence_id",
+          "value": "0074068a-99ea-5a03-8e61-15f7430b04d4"
+        }
+      ],
+      "traversal": [],
+      "search": "",
+      "limit": 10,
+      "offset": 0,
+      "valid_at": "2026-09-07T09:47:18.293855Z",
+      "known_at": "2026-09-07T09:47:18.293855Z",
+      "type_group": {
+        "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+        "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54"
+      }
+    },
+    "total": 1,
+    "counts_by_type": {
+      "SourceAccountDefinition": 1
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "definition": {
+            "analytics": [
+              {
+                "position": 1,
+                "coordinate": "Sheet1!I235",
+                "source_label": "Контрагенты"
+              },
+              {
+                "position": 2,
+                "coordinate": "Sheet1!J235",
+                "source_label": "Договоры"
+              }
+            ],
+            "coordinate": "Sheet1!B235",
+            "source_row": 235,
+            "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+            "account_code": "3212",
+            "quick_selection": "6603",
+            "financial_mapping": "UNESTABLISHED",
+            "off_balance_source": "არა",
+            "balance_behavior_source": "П",
+            "currency_tracking_source": "არა",
+            "quantity_tracking_source": "არა",
+            "required_dimension_policy": "UNESTABLISHED"
+          },
+          "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+          "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+          "account_code": "3212",
+          "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+        },
+        "valid_from": "2026-09-06T03:22:44.088415+04:00",
+        "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "object_type": "SourceAccountDefinition",
+        "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+        "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "system_from": "2026-09-06T03:23:28.54828+04:00",
+        "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+        "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+        "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [
+      {
+        "object_type": "SourceAccountDefinition",
+        "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+        "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+      },
+      {
+        "object_type": "SourceJournalMovement",
+        "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+        "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      }
+    ],
+    "type_group_bindings": {
+      "group": {
+        "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+        "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54",
+        "content_hash": "c68e6a8a01d5d6119c60b4e196a1c8701674c0d7411d2ddfd72fe5c7798da98e"
+      },
+      "schemas": [
+        {
+          "object_type": "SourceAccountDefinition",
+          "schema": {
+            "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+            "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+            "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+          }
+        },
+        {
+          "object_type": "SourceJournalMovement",
+          "schema": {
+            "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+            "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+            "content_hash": "1853baae71b01eab602e3cb8e49421ffcd9fbaba7dae7de0486a30c585120e42"
+          }
+        }
+      ],
+      "fields": {
+        "evidence_id": {
+          "kind": "reference",
+          "required": false,
+          "deprecated": false,
+          "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+          "target_type": "SourceEvidence"
+        },
+        "source_record_id": {
+          "kind": "reference",
+          "required": true,
+          "deprecated": false,
+          "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+          "target_type": "SourceRecord"
+        }
+      }
+    },
+    "type_group_values": [
+      {
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+        "status": "AVAILABLE"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "contract": "ontology-object-set/1",
+      "query": {
+        "object_type": "ObjectTypeGroup",
+        "resource_ids": [
+          "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+          "01603366-ac6b-5871-b56e-0b1703b52241"
+        ],
+        "filters": [],
+        "traversal": [],
+        "search": "",
+        "limit": 1,
+        "offset": 0,
+        "valid_at": "2026-09-07T09:47:18.293855Z",
+        "known_at": "2026-09-07T09:47:18.293855Z",
+        "type_group": {
+          "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+          "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54"
+        }
+      },
+      "total": 2,
+      "counts_by_type": {
+        "SourceJournalMovement": 1,
+        "SourceAccountDefinition": 1
+      },
+      "objects": [
+        {
+          "valid_to": null,
+          "attributes": {
+            "definition": {
+              "analytics": [
+                {
+                  "position": 1,
+                  "coordinate": "Sheet1!I235",
+                  "source_label": "Контрагенты"
+                },
+                {
+                  "position": 2,
+                  "coordinate": "Sheet1!J235",
+                  "source_label": "Договоры"
+                }
+              ],
+              "coordinate": "Sheet1!B235",
+              "source_row": 235,
+              "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+              "account_code": "3212",
+              "quick_selection": "6603",
+              "financial_mapping": "UNESTABLISHED",
+              "off_balance_source": "არა",
+              "balance_behavior_source": "П",
+              "currency_tracking_source": "არა",
+              "quantity_tracking_source": "არა",
+              "required_dimension_policy": "UNESTABLISHED"
+            },
+            "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+            "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+            "account_code": "3212",
+            "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+          },
+          "valid_from": "2026-09-06T03:22:44.088415+04:00",
+          "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+          "object_type": "SourceAccountDefinition",
+          "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+          "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+          "system_from": "2026-09-06T03:23:28.54828+04:00",
+          "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+          "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+          "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+          "access_entity": "entity-ge-001",
+          "evidence_class": "SOURCE_BOUND",
+          "authority_state": "APPROVED",
+          "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+        }
+      ],
+      "next_offset": 1,
+      "filter_schema_versions": [],
+      "type_group_bindings": {
+        "group": {
+          "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+          "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54",
+          "content_hash": "c68e6a8a01d5d6119c60b4e196a1c8701674c0d7411d2ddfd72fe5c7798da98e"
+        },
+        "schemas": [
+          {
+            "object_type": "SourceAccountDefinition",
+            "schema": {
+              "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+              "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+              "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+            }
+          },
+          {
+            "object_type": "SourceJournalMovement",
+            "schema": {
+              "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+              "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+              "content_hash": "1853baae71b01eab602e3cb8e49421ffcd9fbaba7dae7de0486a30c585120e42"
+            }
+          }
+        ],
+        "fields": {
+          "evidence_id": {
+            "kind": "reference",
+            "required": false,
+            "deprecated": false,
+            "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+            "target_type": "SourceEvidence"
+          },
+          "source_record_id": {
+            "kind": "reference",
+            "required": true,
+            "deprecated": false,
+            "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+            "target_type": "SourceRecord"
+          }
+        }
+      },
+      "type_group_values": [
+        {
+          "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+          "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+          "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+          "status": "AVAILABLE"
+        }
+      ]
+    },
+    {
+      "contract": "ontology-object-set/1",
+      "query": {
+        "object_type": "ObjectTypeGroup",
+        "resource_ids": [
+          "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+          "01603366-ac6b-5871-b56e-0b1703b52241"
+        ],
+        "filters": [],
+        "traversal": [],
+        "search": "",
+        "limit": 1,
+        "offset": 1,
+        "valid_at": "2026-09-07T09:47:18.293855Z",
+        "known_at": "2026-09-07T09:47:18.293855Z",
+        "type_group": {
+          "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+          "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54"
+        }
+      },
+      "total": 2,
+      "counts_by_type": {
+        "SourceJournalMovement": 1,
+        "SourceAccountDefinition": 1
+      },
+      "objects": [
+        {
+          "valid_to": null,
+          "attributes": {
+            "amount": "517.8",
+            "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+            "unit_status": "UNESTABLISHED",
+            "posting_date": "2025-11-30",
+            "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+            "source_details": {
+              "cells": {
+                "A": {
+                  "type": 0,
+                  "value": ""
+                },
+                "B": {
+                  "type": 1,
+                  "value": "SOG"
+                },
+                "C": {
+                  "type": 1,
+                  "value": "November"
+                },
+                "D": {
+                  "type": 2,
+                  "value": "30"
+                },
+                "E": {
+                  "type": 2,
+                  "value": "11"
+                },
+                "F": {
+                  "type": 2,
+                  "value": "2025"
+                },
+                "G": {
+                  "type": 1,
+                  "value": "30.11.2025 12:00:00"
+                },
+                "H": {
+                  "type": 2,
+                  "value": "1"
+                },
+                "I": {
+                  "type": 1,
+                  "value": "Требование-накладная SAG00027468 from 30.11.2025 12:00:00"
+                },
+                "J": {
+                  "type": 1,
+                  "value": "სს. საქორგგაზი // АО Сакорггаз"
+                },
+                "K": {
+                  "type": 1,
+                  "value": "7410.01"
+                },
+                "L": {
+                  "type": 1,
+                  "value": "SOG ექსპლუატაციის სამსახური - გორი"
+                },
+                "M": {
+                  "type": 1,
+                  "value": "საწვავის ხარჯი (ადმინისტრაცია) Топливо_адм.и хоз."
+                },
+                "N": {
+                  "type": 6,
+                  "value": ""
+                },
+                "O": {
+                  "type": 6,
+                  "value": ""
+                },
+                "P": {
+                  "type": 6,
+                  "value": ""
+                },
+                "Q": {
+                  "type": 1,
+                  "value": "1610.01"
+                },
+                "R": {
+                  "type": 1,
+                  "value": "ევრო დიზელი"
+                },
+                "S": {
+                  "type": 1,
+                  "value": "დისტილატების საწყობი ქართლი"
+                },
+                "T": {
+                  "type": 2,
+                  "value": "210"
+                },
+                "U": {
+                  "type": 6,
+                  "value": ""
+                },
+                "V": {
+                  "type": 6,
+                  "value": ""
+                },
+                "W": {
+                  "type": 2,
+                  "value": "517.8"
+                },
+                "X": {
+                  "type": 1,
+                  "value": "Списание в производство "
+                },
+                "Y": {
+                  "type": 1,
+                  "value": "SOG-Kartli"
+                },
+                "Z": {
+                  "type": 1,
+                  "value": "Fuel"
+                },
+                "AA": {
+                  "type": 1,
+                  "value": "Auto Park"
+                }
+              },
+              "parser": "source-accounting/1",
+              "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+              "currency_authority": "UNESTABLISHED",
+              "same_account_source_rows": []
+            },
+            "source_row_key": "TR!207",
+            "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+            "debit_account_id": "c1f29252-babb-5be3-acda-b0d2c6aeb397",
+            "source_record_id": "830aa111-3c59-5fac-887b-47700a24b842",
+            "credit_account_id": "c47b4461-1d68-595b-a39a-07989c64f2f9",
+            "document_reference": "Требование-накладная SAG00027468 from 30.11.2025 12:00:00"
+          },
+          "valid_from": "2026-09-06T10:02:28.541738+04:00",
+          "version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b",
+          "object_type": "SourceJournalMovement",
+          "proposal_id": "56331418-8906-45b9-9601-c08966589a48",
+          "resource_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+          "system_from": "2026-09-06T10:02:34.697862+04:00",
+          "content_hash": "a18841114c3b33a7e6fc234ce060a16ccefd09e0a148c570bff41e9dee5875ec",
+          "display_name": "TR!row:207",
+          "identity_key": "source-fact:01603366-ac6b-5871-b56e-0b1703b52241",
+          "access_entity": "entity-ge-001",
+          "evidence_class": "SOURCE_BOUND",
+          "authority_state": "APPROVED",
+          "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+        }
+      ],
+      "next_offset": null,
+      "filter_schema_versions": [],
+      "type_group_bindings": {
+        "group": {
+          "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+          "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54",
+          "content_hash": "c68e6a8a01d5d6119c60b4e196a1c8701674c0d7411d2ddfd72fe5c7798da98e"
+        },
+        "schemas": [
+          {
+            "object_type": "SourceAccountDefinition",
+            "schema": {
+              "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+              "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+              "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+            }
+          },
+          {
+            "object_type": "SourceJournalMovement",
+            "schema": {
+              "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+              "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+              "content_hash": "1853baae71b01eab602e3cb8e49421ffcd9fbaba7dae7de0486a30c585120e42"
+            }
+          }
+        ],
+        "fields": {
+          "evidence_id": {
+            "kind": "reference",
+            "required": false,
+            "deprecated": false,
+            "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+            "target_type": "SourceEvidence"
+          },
+          "source_record_id": {
+            "kind": "reference",
+            "required": true,
+            "deprecated": false,
+            "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+            "target_type": "SourceRecord"
+          }
+        }
+      },
+      "type_group_values": [
+        {
+          "object_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+          "object_version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b",
+          "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+          "status": "AVAILABLE"
+        }
+      ]
+    }
+  ],
+  "traversal": {
+    "contract": "ontology-object-set/1",
+    "query": {
+      "object_type": "ObjectTypeGroup",
+      "resource_ids": [
+        "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "01603366-ac6b-5871-b56e-0b1703b52241"
+      ],
+      "filters": [],
+      "traversal": [
+        {
+          "kind": "reference",
+          "name": "source_record_id",
+          "direction": "outgoing"
+        }
+      ],
+      "search": "",
+      "limit": 10,
+      "offset": 0,
+      "valid_at": "2026-09-07T09:47:18.293855Z",
+      "known_at": "2026-09-07T09:47:18.293855Z",
+      "type_group": {
+        "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+        "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54"
+      }
+    },
+    "total": 2,
+    "counts_by_type": {
+      "SourceRecord": 2
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "coordinate": "Sheet1!B235",
+          "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4"
+        },
+        "valid_from": "2026-09-06T03:22:44.088415+04:00",
+        "version_id": "711f420e-ed2d-5847-9db1-965960a28282",
+        "object_type": "SourceRecord",
+        "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+        "resource_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3",
+        "system_from": "2026-09-06T03:23:28.071908+04:00",
+        "content_hash": "47860efbedb0b30ff1d4a2370a3bc13839220ec46b93be9e7c97663dd771a492",
+        "display_name": "Sheet1!B235",
+        "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "556519c2-1efd-53c2-8411-371d07823640"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "coordinate": "TR!row:207",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+        },
+        "valid_from": "2026-09-06T10:02:28.487802+04:00",
+        "version_id": "3553ab18-0311-51e8-becb-9ef87a7f5efe",
+        "object_type": "SourceRecord",
+        "proposal_id": "56331418-8906-45b9-9601-c08966589a48",
+        "resource_id": "830aa111-3c59-5fac-887b-47700a24b842",
+        "system_from": "2026-09-06T10:02:34.611989+04:00",
+        "content_hash": "003c590d43a0e83e2c4ad68e8480265699ac93afc472b8053cd66ff415299c5a",
+        "display_name": "TR!row:207",
+        "identity_key": "source-fact:830aa111-3c59-5fac-887b-47700a24b842",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "556519c2-1efd-53c2-8411-371d07823640"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [],
+    "type_group_bindings": {
+      "group": {
+        "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+        "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54",
+        "content_hash": "c68e6a8a01d5d6119c60b4e196a1c8701674c0d7411d2ddfd72fe5c7798da98e"
+      },
+      "schemas": [
+        {
+          "object_type": "SourceAccountDefinition",
+          "schema": {
+            "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+            "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+            "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+          }
+        },
+        {
+          "object_type": "SourceJournalMovement",
+          "schema": {
+            "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+            "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+            "content_hash": "1853baae71b01eab602e3cb8e49421ffcd9fbaba7dae7de0486a30c585120e42"
+          }
+        }
+      ],
+      "fields": {
+        "evidence_id": {
+          "kind": "reference",
+          "required": false,
+          "deprecated": false,
+          "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+          "target_type": "SourceEvidence"
+        },
+        "source_record_id": {
+          "kind": "reference",
+          "required": true,
+          "deprecated": false,
+          "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+          "target_type": "SourceRecord"
+        }
+      }
+    },
+    "type_group_values": []
+  },
+  "exact_provenance": [
+    {
+      "source": {
+        "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944"
+      },
+      "field": "source_record_id",
+      "target": {
+        "resource_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3",
+        "version_id": "711f420e-ed2d-5847-9db1-965960a28282"
+      },
+      "content_hash": "47860efbedb0b30ff1d4a2370a3bc13839220ec46b93be9e7c97663dd771a492"
+    },
+    {
+      "source": {
+        "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944"
+      },
+      "field": "evidence_id",
+      "target": {
+        "resource_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+        "version_id": "9e20b9e2-1ca1-533f-9739-4cfbd53d5e60"
+      },
+      "content_hash": "5b6329facc5b7d2024af5a875458112101a9d503895ace61454903c9bc44643d"
+    },
+    {
+      "source": {
+        "resource_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+        "version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b"
+      },
+      "field": "source_record_id",
+      "target": {
+        "resource_id": "830aa111-3c59-5fac-887b-47700a24b842",
+        "version_id": "3553ab18-0311-51e8-becb-9ef87a7f5efe"
+      },
+      "content_hash": "003c590d43a0e83e2c4ad68e8480265699ac93afc472b8053cd66ff415299c5a"
+    },
+    {
+      "source": {
+        "resource_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+        "version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b"
+      },
+      "field": "evidence_id",
+      "target": {
+        "resource_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+        "version_id": "01578cee-e347-5cd5-ad29-2b2e1bc9c932"
+      },
+      "content_hash": "8893189ec3895afcb3619d6908cf5ee108a164c127c48c7b91a991eccde9db5d"
+    }
+  ],
+  "invocations": [
+    {
+      "invocation_id": "53886e36-a4f0-4711-b592-aaca356cdfe1",
+      "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+      "status": "SUCCEEDED",
+      "receipt_hash": "5b4906d03404739835d1d8669a098d54672ecbde75657ecca57309b87ccd2bd0",
+      "receipt": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "run_id": "fcr_0e8850b3e7ca8cd2c2dfe736b94ce62a7d990280d613d6224ab90ecc99ea91a0",
+        "status": "SUCCEEDED",
+        "request": {
+          "limit": 2,
+          "offset": 0,
+          "function": {
+            "version_id": "f54b64ec-06cd-5f96-bf4f-f2c73703169d",
+            "resource_id": "0c0b9c28-4a36-5b39-9597-071d55a04a4f"
+          },
+          "known_at": "2026-09-07T09:47:18.293855Z",
+          "valid_at": "2026-09-07T09:47:18.293855Z",
+          "request_id": "53886e36-a4f0-4711-b592-aaca356cdfe1"
+        },
+        "function": {
+          "version_id": "f54b64ec-06cd-5f96-bf4f-f2c73703169d",
+          "resource_id": "0c0b9c28-4a36-5b39-9597-071d55a04a4f",
+          "content_hash": "20a82070692587e17b1d121ca8cc000417c1de60c904ca9a6334b16cf52797e0"
+        },
+        "plan_hash": "c07376c9299901d7804fbe8d98262c901764aba5d624419e530c7d652cb596b8",
+        "request_id": "53886e36-a4f0-4711-b592-aaca356cdfe1",
+        "started_at": "2026-09-07T09:47:24.964657+00:00",
+        "exact_scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "completed_at": "2026-09-07T09:47:25.840847+00:00",
+        "implementation": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "code_sha256": "3c2c82f00deb3776965baff758d8c187aaa7799754575feb7dbaa291974ce2c7",
+          "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+          "capabilities": {
+            "cdc": false,
+            "read": true,
+            "query": true,
+            "write": false,
+            "delete": false,
+            "limits": {
+              "coverage": "QUERY_PAGE_ONLY",
+              "returned_rows": 200,
+              "grouping_fields": 4,
+              "traversal_steps": 4,
+              "query_predicates": 20,
+              "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+              "derived_properties": 8,
+              "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+              "database_scan_limit": null
+            },
+            "stream": false,
+            "update": false,
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": false,
+            "snapshot": true,
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "simulation": false,
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "incremental": false,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "formula_execution": false,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "source_write_exactly_once": false,
+            "grouped_observation_counts": true,
+            "typed_relationship_filters": true,
+            "versioned_interface_inputs": true,
+            "versioned_type_group_inputs": true
+          },
+          "maximum_rows": 200,
+          "dependency_sha256": "201131fb070cb72cc1512e5773558cbf352c87ff25022b17cc5d3f45cbc6c639",
+          "implementation_id": "ontology.object-set-derived/v1",
+          "maximum_properties": 8
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false,
+        "proof_hash": "5b4906d03404739835d1d8669a098d54672ecbde75657ecca57309b87ccd2bd0",
+        "recorded_at": "2026-09-07T13:47:25.900937+04:00"
+      },
+      "output": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "query": {
+          "limit": 2,
+          "offset": 0,
+          "search": "",
+          "filters": [],
+          "known_at": "2026-09-07T09:47:18.293855Z",
+          "valid_at": "2026-09-07T09:47:18.293855Z",
+          "traversal": [],
+          "type_group": {
+            "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54",
+            "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e"
+          },
+          "object_type": "ObjectTypeGroup",
+          "resource_ids": [
+            "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+            "01603366-ac6b-5871-b56e-0b1703b52241"
+          ]
+        },
+        "scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "total": 2,
+        "run_id": "fcr_0e8850b3e7ca8cd2c2dfe736b94ce62a7d990280d613d6224ab90ecc99ea91a0",
+        "objects": [
+          {
+            "valid_to": null,
+            "attributes": {
+              "definition": {
+                "analytics": [
+                  {
+                    "position": 1,
+                    "coordinate": "Sheet1!I235",
+                    "source_label": "Контрагенты"
+                  },
+                  {
+                    "position": 2,
+                    "coordinate": "Sheet1!J235",
+                    "source_label": "Договоры"
+                  }
+                ],
+                "coordinate": "Sheet1!B235",
+                "source_row": 235,
+                "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+                "account_code": "3212",
+                "quick_selection": "6603",
+                "financial_mapping": "UNESTABLISHED",
+                "off_balance_source": "არა",
+                "balance_behavior_source": "П",
+                "currency_tracking_source": "არა",
+                "quantity_tracking_source": "არა",
+                "required_dimension_policy": "UNESTABLISHED"
+              },
+              "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+              "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+              "account_code": "3212",
+              "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+            },
+            "valid_from": "2026-09-06T03:22:44.088415+04:00",
+            "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+            "object_type": "SourceAccountDefinition",
+            "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+            "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+            "system_from": "2026-09-06T03:23:28.54828+04:00",
+            "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+            "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+            "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+            "access_entity": "entity-ge-001",
+            "evidence_class": "SOURCE_BOUND",
+            "authority_state": "APPROVED",
+            "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+          },
+          {
+            "valid_to": null,
+            "attributes": {
+              "amount": "517.8",
+              "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+              "unit_status": "UNESTABLISHED",
+              "posting_date": "2025-11-30",
+              "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+              "source_details": {
+                "cells": {
+                  "A": {
+                    "type": 0,
+                    "value": ""
+                  },
+                  "B": {
+                    "type": 1,
+                    "value": "SOG"
+                  },
+                  "C": {
+                    "type": 1,
+                    "value": "November"
+                  },
+                  "D": {
+                    "type": 2,
+                    "value": "30"
+                  },
+                  "E": {
+                    "type": 2,
+                    "value": "11"
+                  },
+                  "F": {
+                    "type": 2,
+                    "value": "2025"
+                  },
+                  "G": {
+                    "type": 1,
+                    "value": "30.11.2025 12:00:00"
+                  },
+                  "H": {
+                    "type": 2,
+                    "value": "1"
+                  },
+                  "I": {
+                    "type": 1,
+                    "value": "Требование-накладная SAG00027468 from 30.11.2025 12:00:00"
+                  },
+                  "J": {
+                    "type": 1,
+                    "value": "სს. საქორგგაზი // АО Сакорггаз"
+                  },
+                  "K": {
+                    "type": 1,
+                    "value": "7410.01"
+                  },
+                  "L": {
+                    "type": 1,
+                    "value": "SOG ექსპლუატაციის სამსახური - გორი"
+                  },
+                  "M": {
+                    "type": 1,
+                    "value": "საწვავის ხარჯი (ადმინისტრაცია) Топливо_адм.и хоз."
+                  },
+                  "N": {
+                    "type": 6,
+                    "value": ""
+                  },
+                  "O": {
+                    "type": 6,
+                    "value": ""
+                  },
+                  "P": {
+                    "type": 6,
+                    "value": ""
+                  },
+                  "Q": {
+                    "type": 1,
+                    "value": "1610.01"
+                  },
+                  "R": {
+                    "type": 1,
+                    "value": "ევრო დიზელი"
+                  },
+                  "S": {
+                    "type": 1,
+                    "value": "დისტილატების საწყობი ქართლი"
+                  },
+                  "T": {
+                    "type": 2,
+                    "value": "210"
+                  },
+                  "U": {
+                    "type": 6,
+                    "value": ""
+                  },
+                  "V": {
+                    "type": 6,
+                    "value": ""
+                  },
+                  "W": {
+                    "type": 2,
+                    "value": "517.8"
+                  },
+                  "X": {
+                    "type": 1,
+                    "value": "Списание в производство "
+                  },
+                  "Y": {
+                    "type": 1,
+                    "value": "SOG-Kartli"
+                  },
+                  "Z": {
+                    "type": 1,
+                    "value": "Fuel"
+                  },
+                  "AA": {
+                    "type": 1,
+                    "value": "Auto Park"
+                  }
+                },
+                "parser": "source-accounting/1",
+                "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+                "currency_authority": "UNESTABLISHED",
+                "same_account_source_rows": []
+              },
+              "source_row_key": "TR!207",
+              "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+              "debit_account_id": "c1f29252-babb-5be3-acda-b0d2c6aeb397",
+              "source_record_id": "830aa111-3c59-5fac-887b-47700a24b842",
+              "credit_account_id": "c47b4461-1d68-595b-a39a-07989c64f2f9",
+              "document_reference": "Требование-накладная SAG00027468 from 30.11.2025 12:00:00"
+            },
+            "valid_from": "2026-09-06T10:02:28.541738+04:00",
+            "version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b",
+            "object_type": "SourceJournalMovement",
+            "proposal_id": "56331418-8906-45b9-9601-c08966589a48",
+            "resource_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+            "system_from": "2026-09-06T10:02:34.697862+04:00",
+            "content_hash": "a18841114c3b33a7e6fc234ce060a16ccefd09e0a148c570bff41e9dee5875ec",
+            "display_name": "TR!row:207",
+            "identity_key": "source-fact:01603366-ac6b-5871-b56e-0b1703b52241",
+            "access_entity": "entity-ge-001",
+            "evidence_class": "SOURCE_BOUND",
+            "authority_state": "APPROVED",
+            "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+          }
+        ],
+        "contract": "function-result/1",
+        "coverage": "QUERY_PAGE_ONLY",
+        "function": {
+          "version_id": "f54b64ec-06cd-5f96-bf4f-f2c73703169d",
+          "resource_id": "0c0b9c28-4a36-5b39-9597-071d55a04a4f",
+          "content_hash": "20a82070692587e17b1d121ca8cc000417c1de60c904ca9a6334b16cf52797e0"
+        },
+        "plan_hash": "c07376c9299901d7804fbe8d98262c901764aba5d624419e530c7d652cb596b8",
+        "next_offset": null,
+        "definition_id": "8c6612ee-c577-5542-9715-09e60d8bbe5f",
+        "used_versions": [
+          {
+            "known_at": "2026-09-07T09:47:18.293855+00:00",
+            "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+            "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+            "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+            "material_state": "UNESTABLISHED"
+          },
+          {
+            "known_at": "2026-09-07T09:47:18.293855+00:00",
+            "version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b",
+            "resource_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+            "content_hash": "a18841114c3b33a7e6fc234ce060a16ccefd09e0a148c570bff41e9dee5875ec",
+            "material_state": "UNESTABLISHED"
+          }
+        ],
+        "counts_by_type": {
+          "SourceJournalMovement": 1,
+          "SourceAccountDefinition": 1
+        },
+        "derived_values": [],
+        "implementation": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "code_sha256": "3c2c82f00deb3776965baff758d8c187aaa7799754575feb7dbaa291974ce2c7",
+          "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+          "capabilities": {
+            "cdc": false,
+            "read": true,
+            "query": true,
+            "write": false,
+            "delete": false,
+            "limits": {
+              "coverage": "QUERY_PAGE_ONLY",
+              "returned_rows": 200,
+              "grouping_fields": 4,
+              "traversal_steps": 4,
+              "query_predicates": 20,
+              "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+              "derived_properties": 8,
+              "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+              "database_scan_limit": null
+            },
+            "stream": false,
+            "update": false,
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": false,
+            "snapshot": true,
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "simulation": false,
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "incremental": false,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "formula_execution": false,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "source_write_exactly_once": false,
+            "grouped_observation_counts": true,
+            "typed_relationship_filters": true,
+            "versioned_interface_inputs": true,
+            "versioned_type_group_inputs": true
+          },
+          "maximum_rows": 200,
+          "dependency_sha256": "201131fb070cb72cc1512e5773558cbf352c87ff25022b17cc5d3f45cbc6c639",
+          "implementation_id": "ontology.object-set-derived/v1",
+          "maximum_properties": 8
+        },
+        "read_permissions": [
+          "ontology_admin",
+          "ontology_read",
+          "read"
+        ],
+        "type_group_values": [
+          {
+            "status": "AVAILABLE",
+            "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+            "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+            "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+          },
+          {
+            "status": "AVAILABLE",
+            "object_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+            "object_version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b",
+            "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+          }
+        ],
+        "calculation_runtime": "shared-functions/1",
+        "static_dependencies": [
+          {
+            "version_id": "068e4a96-0ad6-5524-bd6b-25d7fd265194",
+            "resource_id": "8c6612ee-c577-5542-9715-09e60d8bbe5f",
+            "content_hash": "8c584f27493f92e5b966b69b3918e0a1c3eb41e5d23fa7412f9bc56054d2916f"
+          },
+          {
+            "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+            "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+            "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+          }
+        ],
+        "type_group_bindings": {
+          "group": {
+            "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54",
+            "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+            "content_hash": "c68e6a8a01d5d6119c60b4e196a1c8701674c0d7411d2ddfd72fe5c7798da98e"
+          },
+          "fields": {
+            "evidence_id": {
+              "kind": "reference",
+              "required": false,
+              "deprecated": false,
+              "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+              "target_type": "SourceEvidence"
+            },
+            "source_record_id": {
+              "kind": "reference",
+              "required": true,
+              "deprecated": false,
+              "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+              "target_type": "SourceRecord"
+            }
+          },
+          "schemas": [
+            {
+              "schema": {
+                "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+              },
+              "object_type": "SourceAccountDefinition"
+            },
+            {
+              "schema": {
+                "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+                "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+                "content_hash": "1853baae71b01eab602e3cb8e49421ffcd9fbaba7dae7de0486a30c585120e42"
+              },
+              "object_type": "SourceJournalMovement"
+            }
+          ]
+        },
+        "invocation_plan_hash": "c07376c9299901d7804fbe8d98262c901764aba5d624419e530c7d652cb596b8",
+        "definition_version_id": "068e4a96-0ad6-5524-bd6b-25d7fd265194",
+        "invocation_request_id": "53886e36-a4f0-4711-b592-aaca356cdfe1",
+        "current_use_authorized": false,
+        "filter_schema_versions": [],
+        "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+        "business_effect_authorized": false
+      },
+      "current_use_authorized": false,
+      "business_effect_authorized": false
+    },
+    {
+      "invocation_id": "e70b8df4-08d5-4bd9-b067-6efa65d0f7d0",
+      "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+      "status": "SUCCEEDED",
+      "receipt_hash": "ff20f13d6014bf490d2ecab5a4f5d4241889c45bd27f861f309a181a7bd3bd53",
+      "receipt": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "run_id": "fcr_7739542ae74940acb8d4f8ecf2845653d74f22e13939b66f5f4834e513321aca",
+        "status": "SUCCEEDED",
+        "request": {
+          "limit": 2,
+          "offset": 0,
+          "function": {
+            "version_id": "f54b64ec-06cd-5f96-bf4f-f2c73703169d",
+            "resource_id": "0c0b9c28-4a36-5b39-9597-071d55a04a4f"
+          },
+          "known_at": "2026-09-07T09:47:18.293855Z",
+          "valid_at": "2026-09-07T09:47:18.293855Z",
+          "request_id": "e70b8df4-08d5-4bd9-b067-6efa65d0f7d0",
+          "input_result": {
+            "invocation_id": "53886e36-a4f0-4711-b592-aaca356cdfe1"
+          }
+        },
+        "function": {
+          "version_id": "f54b64ec-06cd-5f96-bf4f-f2c73703169d",
+          "resource_id": "0c0b9c28-4a36-5b39-9597-071d55a04a4f",
+          "content_hash": "20a82070692587e17b1d121ca8cc000417c1de60c904ca9a6334b16cf52797e0"
+        },
+        "plan_hash": "15f7bcba88d1bc77b302dbd484a7598510cabd1d5cf5da8084b0bbbfb6c8ecbc",
+        "request_id": "e70b8df4-08d5-4bd9-b067-6efa65d0f7d0",
+        "started_at": "2026-09-07T09:47:27.037803+00:00",
+        "exact_scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "completed_at": "2026-09-07T09:47:27.936655+00:00",
+        "implementation": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "code_sha256": "3c2c82f00deb3776965baff758d8c187aaa7799754575feb7dbaa291974ce2c7",
+          "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+          "capabilities": {
+            "cdc": false,
+            "read": true,
+            "query": true,
+            "write": false,
+            "delete": false,
+            "limits": {
+              "coverage": "QUERY_PAGE_ONLY",
+              "returned_rows": 200,
+              "grouping_fields": 4,
+              "traversal_steps": 4,
+              "query_predicates": 20,
+              "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+              "derived_properties": 8,
+              "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+              "database_scan_limit": null
+            },
+            "stream": false,
+            "update": false,
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": false,
+            "snapshot": true,
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "simulation": false,
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "incremental": false,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "formula_execution": false,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "source_write_exactly_once": false,
+            "grouped_observation_counts": true,
+            "typed_relationship_filters": true,
+            "versioned_interface_inputs": true,
+            "versioned_type_group_inputs": true
+          },
+          "maximum_rows": 200,
+          "dependency_sha256": "201131fb070cb72cc1512e5773558cbf352c87ff25022b17cc5d3f45cbc6c639",
+          "implementation_id": "ontology.object-set-derived/v1",
+          "maximum_properties": 8
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false,
+        "proof_hash": "ff20f13d6014bf490d2ecab5a4f5d4241889c45bd27f861f309a181a7bd3bd53",
+        "recorded_at": "2026-09-07T13:47:28.007113+04:00"
+      },
+      "output": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "query": {
+          "limit": 2,
+          "offset": 0,
+          "search": "",
+          "filters": [],
+          "known_at": "2026-09-07T09:47:18.293855Z",
+          "valid_at": "2026-09-07T09:47:18.293855Z",
+          "traversal": [],
+          "type_group": {
+            "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54",
+            "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e"
+          },
+          "object_type": "ObjectTypeGroup",
+          "resource_ids": [
+            "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+            "01603366-ac6b-5871-b56e-0b1703b52241"
+          ]
+        },
+        "scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "total": 2,
+        "run_id": "fcr_7739542ae74940acb8d4f8ecf2845653d74f22e13939b66f5f4834e513321aca",
+        "objects": [
+          {
+            "valid_to": null,
+            "attributes": {
+              "definition": {
+                "analytics": [
+                  {
+                    "position": 1,
+                    "coordinate": "Sheet1!I235",
+                    "source_label": "Контрагенты"
+                  },
+                  {
+                    "position": 2,
+                    "coordinate": "Sheet1!J235",
+                    "source_label": "Договоры"
+                  }
+                ],
+                "coordinate": "Sheet1!B235",
+                "source_row": 235,
+                "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+                "account_code": "3212",
+                "quick_selection": "6603",
+                "financial_mapping": "UNESTABLISHED",
+                "off_balance_source": "არა",
+                "balance_behavior_source": "П",
+                "currency_tracking_source": "არა",
+                "quantity_tracking_source": "არა",
+                "required_dimension_policy": "UNESTABLISHED"
+              },
+              "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+              "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+              "account_code": "3212",
+              "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+            },
+            "valid_from": "2026-09-06T03:22:44.088415+04:00",
+            "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+            "object_type": "SourceAccountDefinition",
+            "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+            "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+            "system_from": "2026-09-06T03:23:28.54828+04:00",
+            "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+            "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+            "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+            "access_entity": "entity-ge-001",
+            "evidence_class": "SOURCE_BOUND",
+            "authority_state": "APPROVED",
+            "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+          },
+          {
+            "valid_to": null,
+            "attributes": {
+              "amount": "517.8",
+              "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+              "unit_status": "UNESTABLISHED",
+              "posting_date": "2025-11-30",
+              "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+              "source_details": {
+                "cells": {
+                  "A": {
+                    "type": 0,
+                    "value": ""
+                  },
+                  "B": {
+                    "type": 1,
+                    "value": "SOG"
+                  },
+                  "C": {
+                    "type": 1,
+                    "value": "November"
+                  },
+                  "D": {
+                    "type": 2,
+                    "value": "30"
+                  },
+                  "E": {
+                    "type": 2,
+                    "value": "11"
+                  },
+                  "F": {
+                    "type": 2,
+                    "value": "2025"
+                  },
+                  "G": {
+                    "type": 1,
+                    "value": "30.11.2025 12:00:00"
+                  },
+                  "H": {
+                    "type": 2,
+                    "value": "1"
+                  },
+                  "I": {
+                    "type": 1,
+                    "value": "Требование-накладная SAG00027468 from 30.11.2025 12:00:00"
+                  },
+                  "J": {
+                    "type": 1,
+                    "value": "სს. საქორგგაზი // АО Сакорггаз"
+                  },
+                  "K": {
+                    "type": 1,
+                    "value": "7410.01"
+                  },
+                  "L": {
+                    "type": 1,
+                    "value": "SOG ექსპლუატაციის სამსახური - გორი"
+                  },
+                  "M": {
+                    "type": 1,
+                    "value": "საწვავის ხარჯი (ადმინისტრაცია) Топливо_адм.и хоз."
+                  },
+                  "N": {
+                    "type": 6,
+                    "value": ""
+                  },
+                  "O": {
+                    "type": 6,
+                    "value": ""
+                  },
+                  "P": {
+                    "type": 6,
+                    "value": ""
+                  },
+                  "Q": {
+                    "type": 1,
+                    "value": "1610.01"
+                  },
+                  "R": {
+                    "type": 1,
+                    "value": "ევრო დიზელი"
+                  },
+                  "S": {
+                    "type": 1,
+                    "value": "დისტილატების საწყობი ქართლი"
+                  },
+                  "T": {
+                    "type": 2,
+                    "value": "210"
+                  },
+                  "U": {
+                    "type": 6,
+                    "value": ""
+                  },
+                  "V": {
+                    "type": 6,
+                    "value": ""
+                  },
+                  "W": {
+                    "type": 2,
+                    "value": "517.8"
+                  },
+                  "X": {
+                    "type": 1,
+                    "value": "Списание в производство "
+                  },
+                  "Y": {
+                    "type": 1,
+                    "value": "SOG-Kartli"
+                  },
+                  "Z": {
+                    "type": 1,
+                    "value": "Fuel"
+                  },
+                  "AA": {
+                    "type": 1,
+                    "value": "Auto Park"
+                  }
+                },
+                "parser": "source-accounting/1",
+                "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+                "currency_authority": "UNESTABLISHED",
+                "same_account_source_rows": []
+              },
+              "source_row_key": "TR!207",
+              "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+              "debit_account_id": "c1f29252-babb-5be3-acda-b0d2c6aeb397",
+              "source_record_id": "830aa111-3c59-5fac-887b-47700a24b842",
+              "credit_account_id": "c47b4461-1d68-595b-a39a-07989c64f2f9",
+              "document_reference": "Требование-накладная SAG00027468 from 30.11.2025 12:00:00"
+            },
+            "valid_from": "2026-09-06T10:02:28.541738+04:00",
+            "version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b",
+            "object_type": "SourceJournalMovement",
+            "proposal_id": "56331418-8906-45b9-9601-c08966589a48",
+            "resource_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+            "system_from": "2026-09-06T10:02:34.697862+04:00",
+            "content_hash": "a18841114c3b33a7e6fc234ce060a16ccefd09e0a148c570bff41e9dee5875ec",
+            "display_name": "TR!row:207",
+            "identity_key": "source-fact:01603366-ac6b-5871-b56e-0b1703b52241",
+            "access_entity": "entity-ge-001",
+            "evidence_class": "SOURCE_BOUND",
+            "authority_state": "APPROVED",
+            "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+          }
+        ],
+        "contract": "function-result/1",
+        "coverage": "RETAINED_INPUT_PAGE_ONLY",
+        "function": {
+          "version_id": "f54b64ec-06cd-5f96-bf4f-f2c73703169d",
+          "resource_id": "0c0b9c28-4a36-5b39-9597-071d55a04a4f",
+          "content_hash": "20a82070692587e17b1d121ca8cc000417c1de60c904ca9a6334b16cf52797e0"
+        },
+        "plan_hash": "15f7bcba88d1bc77b302dbd484a7598510cabd1d5cf5da8084b0bbbfb6c8ecbc",
+        "next_offset": null,
+        "input_result": {
+          "run_id": "fcr_0e8850b3e7ca8cd2c2dfe736b94ce62a7d990280d613d6224ab90ecc99ea91a0",
+          "receipt_hash": "5b4906d03404739835d1d8669a098d54672ecbde75657ecca57309b87ccd2bd0",
+          "invocation_id": "53886e36-a4f0-4711-b592-aaca356cdfe1"
+        },
+        "definition_id": "8c6612ee-c577-5542-9715-09e60d8bbe5f",
+        "used_versions": [
+          {
+            "known_at": "2026-09-07T09:47:18.293855+00:00",
+            "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+            "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+            "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+            "material_state": "UNESTABLISHED"
+          },
+          {
+            "known_at": "2026-09-07T09:47:18.293855+00:00",
+            "version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b",
+            "resource_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+            "content_hash": "a18841114c3b33a7e6fc234ce060a16ccefd09e0a148c570bff41e9dee5875ec",
+            "material_state": "UNESTABLISHED"
+          }
+        ],
+        "counts_by_type": {
+          "SourceJournalMovement": 1,
+          "SourceAccountDefinition": 1
+        },
+        "derived_values": [],
+        "implementation": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "code_sha256": "3c2c82f00deb3776965baff758d8c187aaa7799754575feb7dbaa291974ce2c7",
+          "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+          "capabilities": {
+            "cdc": false,
+            "read": true,
+            "query": true,
+            "write": false,
+            "delete": false,
+            "limits": {
+              "coverage": "QUERY_PAGE_ONLY",
+              "returned_rows": 200,
+              "grouping_fields": 4,
+              "traversal_steps": 4,
+              "query_predicates": 20,
+              "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+              "derived_properties": 8,
+              "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+              "database_scan_limit": null
+            },
+            "stream": false,
+            "update": false,
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": false,
+            "snapshot": true,
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "simulation": false,
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "incremental": false,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "formula_execution": false,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "source_write_exactly_once": false,
+            "grouped_observation_counts": true,
+            "typed_relationship_filters": true,
+            "versioned_interface_inputs": true,
+            "versioned_type_group_inputs": true
+          },
+          "maximum_rows": 200,
+          "dependency_sha256": "201131fb070cb72cc1512e5773558cbf352c87ff25022b17cc5d3f45cbc6c639",
+          "implementation_id": "ontology.object-set-derived/v1",
+          "maximum_properties": 8
+        },
+        "read_permissions": [
+          "ontology_admin",
+          "ontology_read",
+          "read"
+        ],
+        "type_group_values": [
+          {
+            "status": "AVAILABLE",
+            "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+            "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+            "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+          },
+          {
+            "status": "AVAILABLE",
+            "object_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+            "object_version_id": "e669a2c4-6903-5e6f-911a-b14407308a8b",
+            "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+          }
+        ],
+        "calculation_runtime": "shared-functions/1",
+        "static_dependencies": [
+          {
+            "version_id": "068e4a96-0ad6-5524-bd6b-25d7fd265194",
+            "resource_id": "8c6612ee-c577-5542-9715-09e60d8bbe5f",
+            "content_hash": "8c584f27493f92e5b966b69b3918e0a1c3eb41e5d23fa7412f9bc56054d2916f"
+          },
+          {
+            "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+            "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+            "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+          }
+        ],
+        "type_group_bindings": {
+          "group": {
+            "version_id": "41171d3a-75cb-52dd-8f2f-31e091560a54",
+            "resource_id": "1d48e5ea-3382-597f-9be4-d318219a720e",
+            "content_hash": "c68e6a8a01d5d6119c60b4e196a1c8701674c0d7411d2ddfd72fe5c7798da98e"
+          },
+          "fields": {
+            "evidence_id": {
+              "kind": "reference",
+              "required": false,
+              "deprecated": false,
+              "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+              "target_type": "SourceEvidence"
+            },
+            "source_record_id": {
+              "kind": "reference",
+              "required": true,
+              "deprecated": false,
+              "semantic_id": "5d336b77-e7fd-5aaf-996e-29f8ceac7fc7",
+              "target_type": "SourceRecord"
+            }
+          },
+          "schemas": [
+            {
+              "schema": {
+                "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+              },
+              "object_type": "SourceAccountDefinition"
+            },
+            {
+              "schema": {
+                "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+                "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+                "content_hash": "1853baae71b01eab602e3cb8e49421ffcd9fbaba7dae7de0486a30c585120e42"
+              },
+              "object_type": "SourceJournalMovement"
+            }
+          ]
+        },
+        "invocation_plan_hash": "15f7bcba88d1bc77b302dbd484a7598510cabd1d5cf5da8084b0bbbfb6c8ecbc",
+        "definition_version_id": "068e4a96-0ad6-5524-bd6b-25d7fd265194",
+        "invocation_request_id": "e70b8df4-08d5-4bd9-b067-6efa65d0f7d0",
+        "current_use_authorized": false,
+        "filter_schema_versions": [],
+        "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+        "business_effect_authorized": false
+      },
+      "current_use_authorized": false,
+      "business_effect_authorized": false
+    }
+  ],
+  "financial_authority_established": false,
+  "read_only_verification": false,
+  "replayed_existing_receipts": true
+}

@@ -63,9 +63,14 @@ class ObjectSetQuery(BaseModel):
     valid_at: datetime | None = None
     known_at: datetime | None = None
     interface: InterfaceRoot | None = Field(default=None, exclude_if=lambda value: value is None)
+    type_group: InterfacePin | None = Field(default=None, exclude_if=lambda value: value is None)
 
     @model_validator(mode="after")
     def predicate_budget(self):
+        if self.type_group is not None and (
+            self.interface is not None or self.object_type != "ObjectTypeGroup"
+        ):
+            raise ValueError("A pinned type group requires ObjectTypeGroup and excludes interface")
         if self.interface is not None and self.object_type != "ObjectInterface":
             raise ValueError("A pinned interface root requires object_type ObjectInterface")
         if len(self.filters) + sum(len(step.filters) for step in self.traversal) > 20:
@@ -105,5 +110,11 @@ class ObjectSetResult(BaseModel):
         default=None, exclude_if=lambda value: value is None
     )
     interface_values: list[dict[str, Any]] | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    type_group_bindings: dict[str, Any] | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    type_group_values: list[dict[str, Any]] | None = Field(
         default=None, exclude_if=lambda value: value is None
     )

@@ -1,4 +1,4 @@
-import type { CanonicalResource } from './ontology.js';
+import type { CanonicalResource, SchemaField } from './ontology.js';
 
 /** Portable queries over canonical resources; scalar values keep their declared type. */
 export interface ObjectSetFilter {
@@ -45,9 +45,24 @@ export interface ObjectSetInterfaceValue {
   values: Record<string, unknown> | null;
 }
 
+export interface ObjectSetTypeGroupRoot { resource_id: string; version_id: string; }
+export interface ObjectSetTypeGroupBindings {
+  group: ObjectSetTypeGroupRoot & {content_hash: string};
+  schemas: Array<{object_type: string; schema: ObjectSetTypeGroupRoot & {content_hash: string}}>;
+  fields: Record<string, Omit<SchemaField, 'field_id'>>;
+}
+export interface ObjectSetTypeGroupValue {
+  object_id: string;
+  object_version_id: string;
+  /** Expected schema pinned by the group; original object retains its actual schema. */
+  schema_version_id: string;
+  status: 'AVAILABLE' | 'SCHEMA_CHANGED';
+}
+
 export interface ObjectSetQuery {
   object_type: string;
   interface?: ObjectSetInterfaceRoot;
+  type_group?: ObjectSetTypeGroupRoot;
   resource_ids?: string[] | null;
   search: string;
   filters: ObjectSetFilter[];
@@ -81,4 +96,6 @@ export interface ObjectSetResult {
   traversal_schema_versions?: ObjectSetTraversalSchemaVersion[];
   interface_bindings?: ObjectSetInterfaceBindings;
   interface_values?: ObjectSetInterfaceValue[];
+  type_group_bindings?: ObjectSetTypeGroupBindings;
+  type_group_values?: ObjectSetTypeGroupValue[];
 }

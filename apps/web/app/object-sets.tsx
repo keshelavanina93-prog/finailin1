@@ -22,7 +22,11 @@ type FilterRow={field:string;operator:FilterOperator;value:string|null};
 type StepRow={kind:"reference"|"link";name:string;direction:"outgoing"|"incoming";filters:FilterRow[]};
 const restoreFilters=(filters:Query["filters"])=>filters.map(filter=>({field:filter.field,operator:filter.operator??"eq",value:filter.value===null?null:String(filter.value)}));
 const restoreSteps=(steps:Query["traversal"]):StepRow[]=>steps.map(step=>({...step,filters:restoreFilters(step.filters??[])}));
-function validateInterfaceResult(result:Result,expected?:Query["interface"]){
+function validateInterfaceResult(result:Result,expected?:Query["interface"],expectedGroup?:Query["type_group"]){
+ const group=result.query.type_group;
+ if(result.query.interface&&group)throw Error("A query cannot combine interface and type-group roots.");
+ if(expectedGroup&&(!group||group.resource_id!==expectedGroup.resource_id||group.version_id!==expectedGroup.version_id))throw Error("The response did not preserve the exact type-group selection.");
+ if(group&&(result.query.object_type!=="ObjectTypeGroup"||!result.type_group_bindings||result.type_group_bindings.group.resource_id!==group.resource_id||result.type_group_bindings.group.version_id!==group.version_id||!result.type_group_bindings.fields))throw Error("Exact type-group schema bindings are unavailable.");
  const root=result.query.interface;
  if(expected&&(!root||root.resource_id!==expected.resource_id||root.version_id!==expected.version_id||root.implementations.length!==expected.implementations.length||expected.implementations.some(pin=>!root.implementations.some(actual=>actual.resource_id===pin.resource_id&&actual.version_id===pin.version_id))))throw Error("The response did not preserve the exact interface and implementation selection.");
  if(!root)return;
@@ -46,6 +50,7 @@ function restoreExecution(key?:string):SavedExecution|null {
     const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
     if(data.family&&(!uuid.test(data.definition_id??"")||!uuid.test(data.definition_version_id??"")))return null;
     if(query.interface&&(query.object_type!=="ObjectInterface"||!uuid.test(query.interface.resource_id)||!uuid.test(query.interface.version_id)||!Array.isArray(query.interface.implementations)||query.interface.implementations.length<1||query.interface.implementations.length>100||query.interface.implementations.some(pin=>!pin||!uuid.test(pin.resource_id)||!uuid.test(pin.version_id))||new Set(query.interface.implementations.map(pin=>pin.resource_id)).size!==query.interface.implementations.length))return null;
+    if(query.type_group&&(query.interface||query.object_type!=="ObjectTypeGroup"||!uuid.test(query.type_group.resource_id)||!uuid.test(query.type_group.version_id)))return null;
     return data;
   } catch{return null;}
 }
@@ -57,6 +62,8 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
   const schemas = catalog.filter(item => item.object_type === "SchemaDefinition");
   const [kind, setKind] = useState(restored?.query.object_type??"LegalEntity");
   const [filterRows,setFilterRows]=useState<FilterRow[]>(()=>restoreFilters(restored?.query.filters??[]));
+  const [groupRoot,setGroupRoot]=useState<Query["type_group"]>(restored?.query.type_group);
+  const [groupBindings,setGroupBindings]=useState<Result["type_group_bindings"]>();
   const [interfaceRoot,setInterfaceRoot]=useState<Query["interface"]>(restored?.query.interface);
   const [interfaceBindings,setInterfaceBindings]=useState<Result["interface_bindings"]>();
   const [rootIds,setRootIds]=useState<string[]|null|undefined>(restored?.query.resource_ids);
@@ -76,10 +83,10 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
     if(!restored)return;
     const controller=new AbortController();const request=++generation.current;
     const params=new URLSearchParams({offset:String(restored.query.offset),limit:String(restored.query.limit),version:restored.definition_version_id??"",valid_at:restored.query.valid_at!,known_at:restored.query.known_at!});
-    const replayDefinition=Boolean(restored.family&&!restored.query.interface);
+    const replayDefinition=Boolean(restored.family&&!restored.query.interface&&!restored.query.type_group);
     const url=replayDefinition?`/api/ontology/model/${restored.family}/${restored.definition_id}/objects?${params}`:"/api/ontology/object-sets/query";
     void fetch(url,{method:replayDefinition?"GET":"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:replayDefinition?undefined:JSON.stringify(restored.query),cache:"no-store",signal:controller.signal})
-      .then(async response=>{const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:"The saved query could not be replayed.");validateInterfaceResult(data,restored.query.interface);if(!controller.signal.aborted&&generation.current===request){setResult({...data,...restored.definition_id?{definition_id:restored.definition_id,definition_version_id:restored.definition_version_id}:{}});setExecutionFamily(restored.family);setLibraryId(restored.definition_id??"");setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);}})
+      .then(async response=>{const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:"The saved query could not be replayed.");validateInterfaceResult(data,restored.query.interface,restored.query.type_group);if(!controller.signal.aborted&&generation.current===request){setResult({...data,...restored.definition_id?{definition_id:restored.definition_id,definition_version_id:restored.definition_version_id}:{}});setExecutionFamily(restored.family);setLibraryId(restored.definition_id??"");setKind(data.query.object_type);setFilterRows(restoreFilters(data.query.filters));setFormSearch(data.query.search);setRootIds(data.query.resource_ids);setSteps(restoreSteps(data.query.traversal));setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings);}})
       .catch(cause=>{if(!controller.signal.aborted&&generation.current===request)setError(cause instanceof Error?cause.message:"Query replay failed");})
       .finally(()=>{if(!controller.signal.aborted&&generation.current===request)setBusy(false);});
     return()=>controller.abort();
@@ -124,12 +131,12 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       .catch(cause => { if (!controller.signal.aborted) setError(cause.message); });
     return () => controller.abort();
   }, [token, suppliedCatalog]);
-  const fields = interfaceRoot ? interfaceBindings?.fields??{} : (schemas.find(item => item.identity_key === kind)?.attributes.fields ?? {}) as Record<string, FilterSchema>;
+  const fields = interfaceRoot ? interfaceBindings?.fields??{} : groupRoot?groupBindings?.fields??{}: (schemas.find(item => item.identity_key === kind)?.attributes.fields ?? {}) as Record<string, FilterSchema>;
   const links = catalog.filter(item => item.object_type === "LinkType");
-  const schemaFields=(type:string)=>type==="ObjectInterface"&&interfaceRoot?(interfaceBindings?.fields??{}):(schemas.find(schema=>schema.identity_key===type)?.attributes.fields??{}) as Record<string,FilterSchema>;
+  const schemaFields=(type:string)=>type==="ObjectInterface"&&interfaceRoot?(interfaceBindings?.fields??{}):type==="ObjectTypeGroup"&&groupRoot?(groupBindings?.fields??{}):(schemas.find(schema=>schema.identity_key===type)?.attributes.fields??{}) as Record<string,FilterSchema>;
   const names=(value:unknown):string[]=>Array.isArray(value)?value.filter((item):item is string=>typeof item==="string"):[];
   function choices(types:string[],direction:StepRow["direction"],firstStep=false){
-    const concreteTypes=firstStep&&interfaceRoot?(interfaceBindings?.implementations.map(binding=>binding.object_type)??[]):types;
+    const concreteTypes=firstStep&&interfaceRoot?(interfaceBindings?.implementations.map(binding=>binding.object_type)??[]):firstStep&&groupRoot?(groupBindings?.schemas.map(binding=>binding.object_type)??[]):types;
     const result=new Map<string,{kind:StepRow["kind"];name:string;targets:string[]}>();
     if(direction==="outgoing"){for(const type of types)for(const [name,spec] of Object.entries(schemaFields(type)))if(spec.kind==="reference"){
       const key=`reference:${name}`;result.set(key,{kind:"reference",name,targets:[...new Set([...(result.get(key)?.targets??[]),spec.target_type??"*"])]});
@@ -183,16 +190,17 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       const response = await fetch(`/api/ontology/model/${family}/${page?.definition_id ?? selected!.resource_id}/objects?${params}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
       const data = await response.json();
       if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Published query failed");
-      validateInterfaceResult(data,page?.query.interface);
+      validateInterfaceResult(data,page?.query.interface,page?.query.type_group);
       if(!page&&selected?.object_type==="ObjectInterface"&&(!data.query.interface||data.query.interface.resource_id!==selected.resource_id||data.query.interface.version_id!==selected.version_id))throw Error("The published interface did not return its exact executable query root.");
-      if (generation.current === request) { setResult(data); setExecutionFamily(family); setKind(data.query.object_type); setFormSearch(data.query.search); setFilterRows(restoreFilters(data.query.filters)); setRootIds(data.query.resource_ids); setInterfaceRoot(data.query.interface); setInterfaceBindings(data.interface_bindings); setSteps(restoreSteps(data.query.traversal)); }
+      if(!page&&selected?.object_type==="ObjectTypeGroup"&&(!data.query.type_group||data.query.type_group.resource_id!==selected.resource_id||data.query.type_group.version_id!==selected.version_id))throw Error("The published type group did not return its exact executable query root.");
+      if (generation.current === request) { setResult(data); setExecutionFamily(family); setKind(data.query.object_type); setFormSearch(data.query.search); setFilterRows(restoreFilters(data.query.filters)); setRootIds(data.query.resource_ids); setInterfaceRoot(data.query.interface); setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings); setSteps(restoreSteps(data.query.traversal)); }
     } catch (cause) { if (generation.current === request) setError(cause instanceof Error ? cause.message : "Query failed"); }
     finally { if (generation.current === request) setBusy(false); }
   }
 
   async function publish(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!result || executionFamily === "groups"&&!result.query.interface) return;
+    if (!result || executionFamily === "groups"&&!result.query.interface&&!result.query.type_group) return;
     const fields = new FormData(event.currentTarget);
     const name = String(fields.get("setName") ?? "").trim();
     const rationale = String(fields.get("rationale") ?? "").trim();
@@ -215,15 +223,15 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(query) });
       const data = await response.json();
       if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "The object query could not be evaluated.");
-      validateInterfaceResult(data,query.interface);
-      if (request === generation.current) { setResult({...data,...retainedDefinition?.definition_id?{definition_id:retainedDefinition.definition_id,definition_version_id:retainedDefinition.definition_version_id}:{}}); if(!retainedDefinition)setExecutionFamily(null); setInterfaceRoot(data.query.interface); setInterfaceBindings(data.interface_bindings); }
+      validateInterfaceResult(data,query.interface,query.type_group);
+      if (request === generation.current) { setResult({...data,...retainedDefinition?.definition_id?{definition_id:retainedDefinition.definition_id,definition_version_id:retainedDefinition.definition_version_id}:{}}); if(!retainedDefinition)setExecutionFamily(null); setInterfaceRoot(data.query.interface); setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings); }
     } catch (cause) { if (request === generation.current) setError(cause instanceof Error ? cause.message : "Query failed"); }
     finally { if (request === generation.current) setBusy(false); }
   }
 
   function goToPage(offset: number) {
     if (!result) return;
-    if (result.query.interface) void run({...result.query,offset},result);
+    if (result.query.interface||result.query.type_group) void run({...result.query,offset},result);
     else if (result.definition_id) void openPublished(result, offset);
     else void run({ ...result.query, offset });
   }
@@ -232,7 +240,9 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     try{
-      if(kind==="ObjectInterface"&&!interfaceRoot)throw Error("Open a published executable interface or choose a concrete object type. Type-group listings cannot be rerun as literal interface records.");
+      if(kind==="ObjectInterface"&&!interfaceRoot)throw Error("Open a published executable interface or choose a concrete object type. Choose the exact shared query root first.");
+      if(kind==="ObjectTypeGroup"&&!groupRoot)throw Error("Open a published type group before rerunning; do not query group definition records as group members.");
+      if(groupRoot&&!groupBindings)throw Error("Exact type-group field bindings are unavailable; reopen the published group before editing.");
       if(interfaceRoot&&!interfaceBindings)throw Error("Exact interface field bindings are unavailable; reopen the published interface before editing.");
       if(steps.length>4||predicateCount>20)throw Error("A query supports at most four relationship steps and twenty property filters in total.");
       const traversal:Query["traversal"]=steps.map((step,index)=>{
@@ -240,7 +250,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
         const filters=parseFilters(step.filters,stages[index].fields);
         return {kind:step.kind,name:step.name,direction:step.direction,...(filters.length?{filters}:{})};
       });
-      void run({object_type:kind,...(interfaceRoot?{interface:interfaceRoot}:{}),...(rootIds!==undefined?{resource_ids:rootIds}:{}),search:String(data.get("search")??""),filters:parseFilters(filterRows,fields),traversal,offset:0,limit:50});
+      void run({object_type:kind,...(interfaceRoot?{interface:interfaceRoot}:{}),...(groupRoot?{type_group:groupRoot}:{}),...(rootIds!==undefined?{resource_ids:rootIds}:{}),search:String(data.get("search")??""),filters:parseFilters(filterRows,fields),traversal,offset:0,limit:50});
     }catch(cause){setError(cause instanceof Error?cause.message:"Query choices are unavailable.");}
   }
 
@@ -249,8 +259,10 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
     <details className="object-set-studio"><summary>Ontology Studio  -  define shared query contracts</summary><OntologyDefinitionEditor token={token} definitions={definitions} onProposal={onProposal}/></details>
     <div className="resource-form"><label>Published sets and type groups<select value={libraryId} onChange={event => setLibraryId(event.target.value)}><option value="">Choose a published definition</option>{definitions.filter(item => ["ObjectSetDefinition", "ObjectInterface", "ObjectTypeGroup"].includes(item.object_type)).map(item => <option key={item.resource_id} value={item.resource_id}>{item.display_name} · {label(item.object_type)}</option>)}</select></label><button type="button" disabled={busy || !libraryId} onClick={() => void openPublished()}>Open published set</button></div>
     <form className="resource-form" onSubmit={submit}>
-      <label>Object type<select value={kind} onChange={event => { setKind(event.target.value); setFilterRows([]);setSteps([]);setRootIds(undefined);setInterfaceRoot(undefined);setInterfaceBindings(undefined); }}>{schemas.map(schema => <option key={schema.resource_id} value={schema.identity_key}>{label(schema.identity_key)}</option>)}</select></label>
+      <label>Object type<select value={kind} onChange={event => { setKind(event.target.value); setFilterRows([]);setSteps([]);setRootIds(undefined);setInterfaceRoot(undefined);setInterfaceBindings(undefined);setGroupRoot(undefined);setGroupBindings(undefined); }}>{schemas.map(schema => <option key={schema.resource_id} value={schema.identity_key}>{label(schema.identity_key)}</option>)}</select></label>
       {interfaceRoot&&<section className="object-set-interface-context"><h4>Executable shared interface</h4><p>{definitions.find(item=>item.resource_id===interfaceRoot.resource_id&&item.version_id===interfaceRoot.version_id)?.display_name??"Exact published interface"} · {interfaceRoot.implementations.length} pinned implementations. Changing the root object type explicitly clears this interface context.</p><details><summary>Exact interface and implementation bindings</summary><p>Interface: {interfaceRoot.resource_id} · {interfaceRoot.version_id}</p>{interfaceBindings?.implementations.map(binding=><div key={binding.implementation.version_id}><p>{label(binding.object_type)} · implementation {binding.implementation.resource_id} · {binding.implementation.version_id}</p><p>Schema: {binding.schema.resource_id} · {binding.schema.version_id}</p>{Object.entries(binding.fields).map(([alias,field])=><p key={alias}>{label(alias)} → {label(field)}</p>)}</div>)}</details></section>}
+      {groupRoot&&<section className="object-set-interface-context"><h4>Executable type group</h4><p>{definitions.find(item=>item.resource_id===groupRoot.resource_id&&item.version_id===groupRoot.version_id)?.display_name??"Exact published type group"} · {groupBindings?.schemas.map(binding=>label(binding.object_type)).join(", ")??"Reading schema bindings"}. Filters use properties common to the exact member schemas. Change the root object type explicitly to clear this group context.</p><details><summary>Exact group and schema bindings</summary><p>Group: {groupRoot.resource_id} · {groupRoot.version_id}</p>{groupBindings?.schemas.map(binding=><p key={binding.schema.version_id}>{label(binding.object_type)} · {binding.schema.resource_id} · {binding.schema.version_id}</p>)}</details></section>}
+      {kind==="ObjectTypeGroup"&&!groupRoot&&<p role="status">Open a published executable type group or choose a concrete type before querying.</p>}
       {kind==="ObjectInterface"&&!interfaceRoot&&<p role="status">This listing is not an executable interface query. Open a published interface or explicitly choose a concrete root type before rerunning or publishing.</p>}
       <label>Name or business key<input name="search" value={formSearch} onChange={event=>setFormSearch(event.target.value)} maxLength={128} placeholder="Search this object type" /></label>
       {rootIds!==undefined&&rootIds!==null&&<details><summary>{rootIds.length} explicit starting object IDs retained</summary><p>This query remains constrained to these canonical roots. Clearing them broadens the starting selection.</p>{rootIds.map(id=><p key={id}><code>{id}</code></p>)}<button type="button" onClick={()=>setRootIds(undefined)}>Clear explicit starting objects</button></details>}
@@ -267,7 +279,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
         <button type="button" disabled={steps.length>=4} onClick={()=>setSteps(previous=>[...previous,{kind:"reference",name:"",direction:"outgoing",filters:[]}])}>Add relationship step</button>
       </fieldset>
       <p className="muted">{predicateCount} of 20 total property conditions. Decimal and timezone timestamp text remains exact. Returned objects are endpoints; per-hop path receipts are not provided.</p>
-      <button disabled={busy || !schemas.length || kind==="ObjectInterface"&&!interfaceRoot}>{busy ? "Querying…" : "Explore objects"}</button>
+      <button disabled={busy || !schemas.length || (kind==="ObjectInterface"&&!interfaceRoot||kind==="ObjectTypeGroup"&&!groupRoot)}>{busy ? "Querying…" : "Explore objects"}</button>
     </form>
     {busy&&<p role="status">{restored&&!result?"Replaying the saved request against current authorized access at its retained query time - ":"Querying shared object authority - "}</p>}
     {error && <p className="error-banner" role="alert">{error}</p>}
@@ -281,6 +293,11 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       {!!result.query.traversal.length&&<section aria-label="Applied relationship steps"><h4>Applied relationship steps</h4>{result.query.traversal.map((step,index)=><div key={index}><p>Step {index+1} · {label(step.name)} · {step.direction} {step.kind}</p>{step.filters?.map((filter,i)=><p key={i}>{label(filter.field)} · {operators[filter.operator??"eq"]} · <code>{String(filter.value)}</code></p>)}</div>)}</section>}
       {!!result.traversal_schema_versions?.length&&<details><summary>Reached-object query-time schema versions</summary>{result.traversal_schema_versions.map(schema=><p key={`${schema.step}:${schema.version_id}`}>Step {schema.step} · {label(schema.object_type)} · <code>{schema.resource_id} · {schema.version_id}</code></p>)}</details>}
       {!!result.filter_schema_versions?.length && <details><summary>Property filters validated against the query-time schema</summary>{result.filter_schema_versions.map(schema=><p key={schema.version_id}>{label(schema.object_type)} · Schema version <code>{schema.version_id}</code></p>)}</details>}
+      {result.query.type_group&&<section className="object-set-interface-values" aria-label="Type-group schema compatibility"><h4>Type-group member compatibility</h4><p>Member records keep their original business identities. Compatibility is checked against the schemas retained by the exact group definition.</p>{result.query.traversal.length?<p>The result contains reached endpoints. Starting-group compatibility receipts are not assigned to these endpoint objects.</p>:<div className="data-scroll"><table><thead><tr><th>Original member</th><th>Schema compatibility</th><th>Retained schema references</th></tr></thead><tbody>{result.type_group_values?.map(value=>{
+        const source=result.objects.find(object=>object.resource_id===value.object_id&&object.version_id===value.object_version_id);
+        const binding=result.type_group_bindings?.schemas.find(item=>item.schema.version_id===value.schema_version_id&&item.object_type===source?.object_type);
+        return <tr key={value.object_version_id}><th scope="row">{source?.display_name??"Original member unavailable"}{source&&investigate(source)}</th><td>{binding&&source?label(value.status):"Retained schema binding unavailable"}</td><td><details><summary>{source?label(source.object_type):"Member schema"} · exact references</summary><p>Expected schema: {value.schema_version_id}</p><p>Actual object schema: {source?.schema_version_id??"Unavailable"}</p><p>Object: {value.object_id} · {value.object_version_id}</p></details></td></tr>;
+      })}</tbody></table>{!result.type_group_values?.length&&result.objects.length>0&&<p role="status">Member compatibility receipts were not returned; no compatibility claim is inferred.</p>}</div>}</section>}
       {result.query.interface&&<section className="object-set-interface-values" aria-label="Shared interface values"><h4>Shared interface fields</h4><p>Values retain original object identities and exact implementation/schema bindings. They do not create replacement business objects.</p>{result.query.traversal.length?<p>The result contains reached endpoints. Interface values describe starting objects only and are not projected onto these endpoints.</p>:<div className="data-scroll"><table><thead><tr><th>Original object</th><th>Shared values</th><th>Mapping state</th></tr></thead><tbody>{result.interface_values?.map(value=>{
         const source=result.objects.find(object=>object.resource_id===value.object_id&&object.version_id===value.object_version_id);
         const binding=result.interface_bindings?.implementations.find(item=>item.implementation.resource_id===value.implementation_resource_id&&item.implementation.version_id===value.implementation_version_id&&item.schema.version_id===value.schema_version_id);
@@ -290,9 +307,9 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       {!result.total && <p className="empty-state">No objects match this query. Try another type, value or relationship.</p>}
       <div className="toolbar"><button className="quiet" disabled={busy || result.query.offset === 0} onClick={() => goToPage(Math.max(0, result.query.offset - result.query.limit))}>Previous</button><span>{result.total ? result.query.offset + 1 : 0}–{Math.min(result.query.offset + result.objects.length, result.total)} of {result.total}</span><button className="quiet" disabled={busy || result.next_offset === null} onClick={() => goToPage(result.next_offset ?? 0)}>Next</button></div>
       <details><summary>Reusable query contract</summary><p>Time is fixed across pages. Run Explore objects again to refresh.</p><pre>{JSON.stringify(result.query, null, 2)}</pre></details>
-      {(executionFamily!=="groups"||Boolean(result.query.interface))&&<DerivedPropertyRun key={`derived:${JSON.stringify(result.query)}`} token={token} definitions={definitions.filter(item => item.object_type === "DerivedProperty")} query={result.query}/>}
+      {(executionFamily!=="groups"||Boolean(result.query.interface||result.query.type_group))&&<DerivedPropertyRun key={`derived:${JSON.stringify(result.query)}`} token={token} definitions={definitions.filter(item => item.object_type === "DerivedProperty")} query={result.query}/>}
       {executionFamily !== "groups" && <ObjectBindingAction key={JSON.stringify(result.query)} token={token} bindings={definitions.filter(item => item.object_type === "ObjectBinding")} query={result.query} count={result.total} onProposal={onProposal}/>}
-      {(executionFamily !== "groups" || Boolean(result.query.interface)) && <details><summary>Save this Object Set for shared use</summary><form className="resource-form" onSubmit={publish}><label>Set name<input name="setName" required maxLength={200}/></label><label>Purpose and review rationale<input name="rationale" required minLength={10} maxLength={2000}/></label><label><input type="checkbox" name="fixed"/>Keep this exact query time</label><button disabled={busy}>Propose publication</button></form><p>Without a fixed time, the accepted definition returns effective objects when it is run. Publication uses the shared change-review process.</p></details>}
+      {(executionFamily !== "groups" || Boolean(result.query.interface||result.query.type_group)) && <details><summary>Save this Object Set for shared use</summary><form className="resource-form" onSubmit={publish}><label>Set name<input name="setName" required maxLength={200}/></label><label>Purpose and review rationale<input name="rationale" required minLength={10} maxLength={2000}/></label><label><input type="checkbox" name="fixed"/>Keep this exact query time</label><button disabled={busy}>Propose publication</button></form><p>Without a fixed time, the accepted definition returns effective objects when it is run. Publication uses the shared change-review process.</p></details>}
     </>}
     {publication && <p role="status">Object Set proposed for review. {onProposal ? <button onClick={() => onProposal(publication)}>Open change review</button> : <span>Proposal: {publication}</span>}</p>}
   </section>;

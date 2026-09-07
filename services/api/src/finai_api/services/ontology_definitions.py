@@ -359,7 +359,16 @@ def run_group(
         principal, identity, version, valid_at=query.valid_at, known_at=query.known_at
     )
     if resource["object_type"] == "ObjectTypeGroup":
-        types = resource["attributes"]["definition"]["types"]
+        query = ObjectSetQuery.model_validate(
+            {
+                **query.model_dump(),
+                "object_type": "ObjectTypeGroup",
+                "type_group": {
+                    "resource_id": str(resource["resource_id"]),
+                    "version_id": str(resource["version_id"]),
+                },
+            }
+        )
     elif resource["object_type"] == "ObjectInterface":
         types = []
         selected_implementations = []
@@ -409,10 +418,9 @@ def run_group(
         }
     else:
         raise WorkspaceError(422, "Resource is not an interface or type group")
-    result = query_objects(principal, query, types)
+    result = query_objects(principal, query)
     return {
         **result.model_dump(mode="json"),
-        "interface_values": [],
         "definition_id": identity,
         "definition_version_id": resource["version_id"],
     }
