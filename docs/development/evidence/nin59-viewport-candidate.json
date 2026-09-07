@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "issue": "NIN-59",
+  "state": "FROZEN_PRODUCT_CANDIDATE_NOT_ACCEPTED",
+  "recorded_at": "2026-09-07T22:03:52.532848+00:00",
+  "owner_thread": "01a07c98-5b6e-7402-afc9-5acfca7ffe19",
+  "worktree": "D:\\FinAI\\g8-adaptive-workspace",
+  "branch": "development/nin59-adaptive-workspace",
+  "base_sha": "c95d1e797020083f27971dde817b59d995ce5966",
+  "code_sha": "dca2c9380f9092fd5408aa4b919ef92b5a4d0313",
+  "scope": [
+    "viewport-sized analyst worksheet",
+    "virtual row window with sticky headers",
+    "descriptor-column resize, reorder, pin and visibility",
+    "row/cell keyboard navigation",
+    "collapsible side/bottom Evidence and Trace inspector",
+    "independent side/bottom NYX dimensions",
+    "reference-only saved column, pane, selection, focus and scroll preferences",
+    "generic low-information visual suppression"
+  ],
+  "source_files": [
+    {
+      "path": "apps/web/app/g8-workspace.tsx",
+      "sha256": "bc35b736cc6cdbd2f2ec65b68b915546cdd167d7f81cd445f4ff3f753d2306df"
+    },
+    {
+      "path": "apps/web/app/semantic-analysis-state.ts",
+      "sha256": "9a3cfbbaa47a981e716c33b469a6c7699ae0375a9226544af5791bd0cd109635"
+    },
+    {
+      "path": "apps/web/app/semantic-analysis-workspace.css",
+      "sha256": "018435e7a408d643d894f81de03838439517c921b089e6eef0ca826311cb1b2e"
+    },
+    {
+      "path": "apps/web/app/semantic-analysis-workspace.tsx",
+      "sha256": "a90c048bd41e4693443a83e4719ee8f508ef3a7d991ecbede0a328f39279d69e"
+    },
+    {
+      "path": "apps/web/app/semantic-worksheet.tsx",
+      "sha256": "2dd24e7137d78d59f6155c18a3895b613d6e7597f6837e181aadb9b3cfc0b1a2"
+    },
+    {
+      "path": "apps/web/tests/semantic-analysis-state.test.mjs",
+      "sha256": "d9a8e3e53518f13f8d9ac8cc521fb7a5b82aef4eaae60fd5d0f9f6a959954591"
+    }
+  ],
+  "authority": {
+    "backend_semantics_changed": false,
+    "shared_ci_harness_changed": false,
+    "frontend_financial_calculations_added": false,
+    "canonical_runtime_3062_restarted": false,
+    "query_contract": "existing semantic-analysis/1 and semantic-analysis/2; unchanged canonical projection endpoint"
+  },
+  "checks": {
+    "typecheck": "PASS",
+    "focused_eslint": "PASS",
+    "semantic_state_tests": {
+      "passed": 10,
+      "failed": 0
+    },
+    "production_build": "PASS",
+    "production_build_id": "WVW7SeSsJCcn3w-Yt5wlw"
+  },
+  "browser": {
+    "runtime": "http://127.0.0.1:3071",
+    "runtime_kind": "isolated Next development frontend on frozen source",
+    "backend": "existing http://127.0.0.1:8062",
+    "identity": "existing Local operator; no grant changes",
+    "geometry": [
+      {
+        "requestedWidth": 1920,
+        "dock": "right",
+        "documentWidth": 1920,
+        "expanded": "true",
+        "focus": "account",
+        "grid": {
+          "bottom": 922.1400451660156,
+          "height": 604.2828979492188,
+          "left": 74.87444305419922,
+          "right": 1543.6663131713867,
+          "top": 317.8571472167969,
+          "width": 1468.7918701171875,
+          "x": 74.87444305419922,
+          "y": 317.8571472167969
+        },
+        "scroll": 1563.392822265625,
+        "selectedVisible": true,
+        "width": 1920
+      },
+      {
+        "requestedWidth": 1440,
+        "dock": "right",
+        "documentWidth": 1440,
+        "expanded": "true",
+        "focus": "account",
+        "grid": {
+          "bottom": 922.1400451660156,
+          "height": 604.2828979492188,
+          "left": 74.87444305419922,
+          "right": 1063.3091354370115,
+          "top": 317.8571472167969,
+          "width": 988.4346923828124,
+          "x": 74.87444305419922,
+          "y": 317.8571472167969
+        },
+        "scroll": 1542.857177734375,
+        "selectedVisible": true,
+        "width": 1440
+      },
+      {
+        "requestedWidth": 1280,
+        "dock": "right",
+        "documentWidth": 1280,
+        "expanded": "true",
+        "focus": "account",
+        "grid": {
+          "bottom": 922.1400451660156,
+          "height": 604.2828979492188,
+          "left": 74.87444305419922,
+          "right": 903.4877243041992,
+          "top": 317.8571472167969,
+          "width": 828.61328125,
+          "x": 74.87444305419922,
+          "y": 317.8571472167969
+        },
+        "scroll": 1542.857177734375,
+        "selectedVisible": true,
+        "width": 1280
+      },
+      {
+        "requestedWidth": 768,
+        "dock": "bottom",
+        "documentWidth": 769,
+        "expanded": "true",
+        "focus": "account",
+        "grid": {
+          "bottom": 630.7896118164062,
+          "height": 251.68804931640625,
+          "left": 74.87444305419922,
+          "right": 757.6311569213867,
+          "top": 379.1015625,
+          "width": 682.7567138671875,
+          "x": 74.87444305419922,
+          "y": 379.1015625
+        },
+        "scroll": 1736.607177734375,
+        "selectedVisible": true,
+        "width": 769
+      }
+    ],
+    "screenshots_visually_reviewed": true,
+    "viewport_note": "768 requested produced 769 CSS pixels under browser scaling; document width equals actual viewport."
+  },
+  "journeys": [
+    {
+      "subject": "SEG January posted movements",
+      "invocation_id": "c631bb9c-f92e-5dd9-a693-233c1b3b7925",
+      "descriptor_sha256": "5a9701895198d03153ea7c306110adb0b4cf969c383dc1b369c554b58985c47e",
+      "retained_rows": 59,
+      "selected_account": "7310.02.1",
+      "posted_display": "58,988.95",
+      "contributors": 6,
+      "source_cell": "Base!S2",
+      "source_literal": "731.97",
+      "checks": [
+        "business Account filter executes canonical request",
+        "Account plus Credit produces genuine empty selection",
+        "S288 remains excluded with no literal value",
+        "Trace opens same retained evidence version",
+        "column order/pin/hide and resize exercised",
+        "ArrowRight focuses Account cell",
+        "clear selection returns row focus",
+        "saved view restores exact row, columns, focus and scroll"
+      ]
+    },
+    {
+      "subject": "SEG reviewed account definitions",
+      "invocation_id": "c77e06cd-7b47-5f8d-9157-18619827cbe2",
+      "descriptor_sha256": "dc57ccc8d8702134cf1bdd3be0212b88c97950942f042a28acc2aabbfbcde450",
+      "contract": "semantic-analysis/2",
+      "retained_rows": 38,
+      "selected_account": "1210",
+      "source_cell": "Sheet1!B189",
+      "source_literal": "1210",
+      "chart_count": 0,
+      "checks": [
+        "same worksheet renderer",
+        "no approved measure disclosure",
+        "canonical resource labels in cells",
+        "NYX exact inspection callback with independent bottom resize"
+      ]
+    },
+    {
+      "subject": "SOG source dimension header counts",
+      "invocation_id": "39bbb1ea-cc53-55f1-b901-cc4675ecb7f2",
+      "retained_rows": 3,
+      "retained_values": [
+        1,
+        1,
+        1
+      ],
+      "chart_count": 0,
+      "checks": [
+        "saved visual:true does not force low-information chart"
+      ]
+    }
+  ],
+  "state_checks": {
+    "loading": "observed exact restoration/loading status and disabled execution controls",
+    "empty": "canonical Account=7310.02.1 plus Credit returned 0 of 59; explicitly not a zero result",
+    "degraded": "no approved measure and excluded missing source value remain explicit",
+    "permission_error": "existing restricted invocation refused for Local operator; no result exposed; terminal error clears pending restoration notice",
+    "revision_guards": "10 focused tests include exact company/query/pin/time and stale selection checks; prior live 409 evidence preserved, new independent changed-schema challenge remains pending"
+  },
+  "nyx_resize": {
+    "bottom_after_keyboard": 380,
+    "right_remembered": 340,
+    "bottom_restored": 380,
+    "natural_language_reasoning": "existing runtime remains explicitly unconnected"
+  },
+  "limitations": [
+    "This is builder evidence, not NIN-50 or NIN-25 acceptance.",
+    "Root reports NIN-61 green at 18d18f1. Combined runtime integration and NIN-50 acceptance remain with their owners; no product rebase, merge or runtime restart performed.",
+    "Production build passed, but a separate production-server launch on 3073 was rejected by automatic approval review with only blocked by policy; browser proof uses existing isolated dev frontend.",
+    "Largest authentic result exercised this run is 59 rows. Virtualization is implemented; large-result, unfamiliar and changed-schema challenge remain independent QA gates.",
+    "Named screenshots cover the expanded workspace; entry context remains reachable through Return to entry context.",
+    "NYX currently provides governed context; no new intelligence or financial authority is claimed."
+  ],
+  "artifact_root": "D:\\FinAI\\g8-adaptive-workspace\\artifacts\\nin59-browser",
+  "artifacts": [
+    {
+      "path": "candidate-1920.png",
+      "bytes": 167019,
+      "sha256": "51abd203d8fa981dcab7aeadf797e7a94db09315ed5d792f4bda85763474cd8e"
+    },
+    {
+      "path": "candidate-1440.png",
+      "bytes": 155118,
+      "sha256": "904b42e7b4fb80b5a7d06c762f68664cb2ce6c02ac95c3dc0bab9ab244c632e5"
+    },
+    {
+      "path": "candidate-1280.png",
+      "bytes": 151313,
+      "sha256": "8d6c8aca1a1708da54594e505a51db258198fb0e20c9ce6901c953328e5e103e"
+    },
+    {
+      "path": "candidate-768.png",
+      "bytes": 90940,
+      "sha256": "dc640b4fd6a77583e170360d7d0b708833d3d7c441e4472bc37503189dee5316"
+    },
+    {
+      "path": "candidate-geometry.json",
+      "bytes": 1971,
+      "sha256": "d6ca18f2644ad1451eef85c4fe923cdd9a569b38aa7c416da28d8c20e8945c1c"
+    },
+    {
+      "path": "candidate-final-dom.txt",
+      "bytes": 51979,
+      "sha256": "d21c292850f18c02ae58a6993a2da74d3b3ab94a96e5fe051e2fd36bd268e3e5"
+    },
+    {
+      "path": "viewport-restored.json",
+      "bytes": 791,
+      "sha256": "3260fc864b9cea94d785b3304612bc246cabbe2bcaa5fd87d7d68e36beead0b9"
+    },
+    {
+      "path": "viewport-trace.txt",
+      "bytes": 55039,
+      "sha256": "8e8b9d518fff5c994aa5d4b03942a4bf5936769198283965a09c50ddfbb73193"
+    },
+    {
+      "path": "frozen-canonical-request.json",
+      "bytes": 702,
+      "sha256": "25b471968b7b1c1121a20287f426d6aa408dca0ce4907072cf41e42098d30835"
+    },
+    {
+      "path": "frozen-empty.txt",
+      "bytes": 11420,
+      "sha256": "34176e5dbb17f1069718125a8b708d2abc98178a213185cdc711ba793e348e9f"
+    },
+    {
+      "path": "frozen-excluded.txt",
+      "bytes": 20238,
+      "sha256": "fa82c84bd30075d510c5017fd4bc2bd59e9c86328659efc4b0136b5f897f6c7f"
+    },
+    {
+      "path": "frozen-objects.txt",
+      "bytes": 94532,
+      "sha256": "55f78798e276c9564854a55033f3c2cabac7de4901c8ea81bbaefb9b5ee4d299"
+    },
+    {
+      "path": "frozen-equal-values.json",
+      "bytes": 299,
+      "sha256": "de4cecf13e10bdce81ef34f195d4739df7fce4ea3a5311e83642dd8fa9fdc6f0"
+    },
+    {
+      "path": "frozen-equal-values.txt",
+      "bytes": 4576,
+      "sha256": "ab124646a5721d1b12132d3b472030fa6329b288dbcac6fc00c01a51263d5c15"
+    },
+    {
+      "path": "frozen-access-denied.txt",
+      "bytes": 2115,
+      "sha256": "09c9fa1fde968a7512832f34d49f42e1fc7d18fdc7f06f026490d6b0fb47d56b"
+    },
+    {
+      "path": "frozen-nyx.txt",
+      "bytes": 97202,
+      "sha256": "af531caf54e345015db4e4e9aec3b8cf83c021eeb0a1f555b53e3ea152e2959a"
+    },
+    {
+      "path": "frozen-nyx-dock.png",
+      "bytes": 132037,
+      "sha256": "6de3c945d72ea3193438d397736e19a9685778a05a7eefd414afc1ad280c3090"
+    }
+  ],
+  "next": "Root integrates this frozen candidate with its green bootstrap/finance candidates, publishes one runtime manifest, then NIN-50 independently validates the operator journey and challenge cases.",
+  "integration_update": {
+    "source": "live integration-owner message",
+    "canonical_green_sha": "18d18f1",
+    "github_run": "34164536061",
+    "coverage_percent": 90.4,
+    "combined_runtime": "awaiting root integration manifest; mounted3062/API still old30a6948 per owner"
+  }
+}
