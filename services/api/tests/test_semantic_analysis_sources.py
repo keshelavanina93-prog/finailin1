@@ -32,7 +32,9 @@ def source(monkeypatch):
     }
 
     class Cursor:
-        def execute(self, query, params):
+        def execute(self, query, params=None):
+            if query == "SET TRANSACTION READ ONLY":
+                return self
             state["queries"].append((query, params))
             assert "tenant_id=%s" in query and "exact_scope=%s" in query
             assert params[0] == scope["tenant_id"] and params[1].obj == scope

@@ -2,14 +2,13 @@
 
 import json
 import re
+from contextlib import contextmanager
 from hashlib import sha256
 from uuid import UUID
 
-from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.semantic_analysis import Pin, Value
-from finai_api.services.resources import resource_connection
 from finai_api.services.workspace import WorkspaceError
 
 
@@ -55,6 +54,30 @@ class Resolver:
         self.dependency_cache = {}
         self.source_cache = {}
         self.construction_sources = {}
+        self._cursor = None
+
+    @contextmanager
+    def read_session(self):
+        """One authorized read transaction per projection; never shared between requests."""
+        from finai_api.services.function_invocations import _database
+
+        if self._cursor is not None:
+            raise RuntimeError("Analysis read session is already active")
+        with _database(self.principal) as cursor:
+            cursor.execute("SET TRANSACTION READ ONLY")
+            self._cursor = cursor
+            try:
+                yield self
+            finally:
+                self._cursor = None
+
+    @contextmanager
+    def database(self):
+        if self._cursor is not None:
+            yield self._cursor
+        else:
+            with self.read_session():
+                yield self._cursor
 
     def version(self, reference):
         if isinstance(reference, Pin):
@@ -64,10 +87,7 @@ class Resolver:
         if key not in self.cache:
             if len(self.cache) >= 2000:
                 raise WorkspaceError(422, "Analysis definition read budget exceeded")
-            with (
-                resource_connection(self.principal) as conn,
-                conn.cursor(row_factory=dict_row) as c,
-            ):
+            with self.database() as c:
                 row = c.execute(
                     "SELECT v.*,i.identity_key FROM resource_versions v "
                     "JOIN canonical_identities i "
@@ -97,10 +117,7 @@ class Resolver:
         row = self.version(reference)
         key = str(row["version_id"])
         if key not in self.dependency_cache:
-            with (
-                resource_connection(self.principal) as conn,
-                conn.cursor(row_factory=dict_row) as c,
-            ):
+            with self.database() as c:
                 rows = c.execute(
                     "SELECT d.relation,v.*,i.identity_key FROM resource_dependencies d "
                     "JOIN resource_versions v ON v.tenant_id=d.tenant_id "
@@ -129,7 +146,6 @@ class Resolver:
 
     def source_cells(self, evidence_pin, coordinate):
         """Resolve original evidence by exact hash and scope, never a guessed document ID."""
-        from finai_api.services.function_invocations import _database
         from finai_api.services.source_document_preview import preview
 
         evidence = self.version(evidence_pin)
@@ -145,7 +161,7 @@ class Resolver:
         if cache_key not in self.source_cache:
             if len(self.source_cache) >= 1000:
                 raise WorkspaceError(422, "Original cell inspection budget exceeded")
-            with _database(self.principal) as c:
+            with self.database() as c:
                 matches = c.execute(
                     "SELECT document_id FROM source_documents WHERE tenant_id=%s "
                     "AND exact_scope=%s AND source_sha256=%s LIMIT 2",
@@ -199,13 +215,12 @@ class Resolver:
     def _construction_cells(self, source_sha256, sheet, number):
         """Read an existing construction's OOXML bytes through the shared source authority."""
         from finai_api.services.accounting_source_document import read_source
-        from finai_api.services.function_invocations import _database
         from finai_api.services.workbook_source import read_workbook
 
         if source_sha256 not in self.construction_sources:
             if len(self.construction_sources) >= 8:
                 raise WorkspaceError(422, "Narrow original evidence to at most eight workbooks")
-            with _database(self.principal) as c:
+            with self.database() as c:
                 retained = c.execute(
                     "SELECT receipt_id FROM hydration_runs WHERE tenant_id=%s AND exact_scope=%s "
                     "AND source_sha256=%s ORDER BY ingested_at,receipt_id LIMIT 1",

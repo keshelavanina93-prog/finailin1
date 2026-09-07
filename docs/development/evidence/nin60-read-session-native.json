@@ -1,0 +1,9 @@
+{
+  "method": "ISOLATED_DIRECT_SERVICE_READ",
+  "seconds": 2.798,
+  "descriptor_sha256": "dc57ccc8d8702134cf1bdd3be0212b88c97950942f042a28acc2aabbfbcde450",
+  "rows": 38,
+  "source_value_and_result_revision_unchanged": true,
+  "database_transaction": "READ_ONLY",
+  "http_candidate_not_mounted": true
+}
