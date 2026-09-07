@@ -738,6 +738,9 @@ def _validate(
     from finai_api.services.accounting_consumption import validate_accounting_proposal
 
     validate_accounting_proposal(conn, principal, proposal, dependencies)
+    from finai_api.services.journal_balance import validate_bundle
+
+    journal_balances = validate_bundle(conn, principal, proposal)
     # Evaluate the whole proposed redirect graph, including existing decisions, to prohibit cycles.
     with conn.cursor(row_factory=dict_row) as cursor:
         existing_resolutions = cursor.execute(
@@ -806,6 +809,7 @@ def _validate(
         "resource_scopes": mutation_scopes,
         "compatibility": "PASS",
         "identity_cycles": "NONE",
+        "journal_balances": journal_balances,
     }
 
 

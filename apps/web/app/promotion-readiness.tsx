@@ -2,9 +2,10 @@
 import {useEffect,useRef,useState, type FormEvent} from "react";
 import type {PromotionCheck, ResourceProposalDetail} from "@finai/contracts";
 import {Badge} from "./g8-ui";
+import JournalProposalReview from "./journal-proposal-review";
 
 type Props = {token:string;proposalId:string;onDecision?:(detail:ResourceProposalDetail)=>void};
-type Checked = PromotionCheck & {change_names:string[]};
+type Checked = PromotionCheck & {change_names:string[];proposal_detail:ResourceProposalDetail};
 export default function PromotionReadiness(props:Props) {
   return <PromotionPanel key={`${props.proposalId}:${props.token}`} {...props}/>;
 }
@@ -32,8 +33,8 @@ function PromotionPanel({token,proposalId,onDecision}:Props) {
         const data=await response.json();
         if(!response.ok)throw new Error(typeof data.detail === "string" ? data.detail : "Promotion check unavailable");
         if(!proposalResponse.ok)throw new Error("The complete change set is unavailable; approval is disabled.");
-        const detail=await proposalResponse.json();
-        if(!cancelled)setResult({...data,change_names:detail.proposal.mutations.map((item:{display_name:string})=>item.display_name)});
+        const detail:ResourceProposalDetail=await proposalResponse.json();
+        if(!cancelled)setResult({...data,proposal_detail:detail,change_names:detail.proposal.mutations.map((item:{display_name:string})=>item.display_name)});
       } catch(error) {if(!cancelled)setError(error instanceof Error ? error.message : "Promotion check unavailable");}
       finally {if(!cancelled)setBusy(false);}
     }
@@ -72,6 +73,7 @@ function PromotionPanel({token,proposalId,onDecision}:Props) {
         <details><summary>Evidence trace</summary><p>{result.evaluation.evaluator}</p><p className="full-hash">Proposal: {result.evaluation.proposal_hash}</p><p className="full-hash">Evaluation binding: {result.evaluation.binding_hash}</p></details>
       </> : <p>No evaluation was retained for this proposal. Submit a refreshed proposal before promotion.</p>}
     </section>}
+    {result && <JournalProposalReview detail={result.proposal_detail}/>}
     {receipt && <p role="status">{receipt}</p>}
     {result && result.status!=="DECIDED" && <form className="resource-form" onSubmit={recordDecision}>
       <details><summary>{result.change_names.length} changes reviewed together</summary><ul>{result.change_names.map((name,index)=><li key={index}>{name}</li>)}</ul></details>

@@ -1,0 +1,13 @@
+{
+  "function": {
+    "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+    "version_id": "5627c0c6-acda-5b57-b496-d0a949390bd6",
+    "proposal_id": "9d30b339-276a-4f63-8cee-34366dca8358"
+  },
+  "build": {
+    "resource_id": "5b45554d-4968-52ed-ad06-d974d6196b08",
+    "version_id": "4fd7fe29-3bf6-568d-bd2d-e076fa3824a4",
+    "proposal_id": "1eaa68a0-1d4f-47d1-bc10-ff2aed9ebfd3"
+  },
+  "source_sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8"
+}

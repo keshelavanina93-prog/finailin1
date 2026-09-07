@@ -172,6 +172,7 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "group_account_id": "@GroupAccount",
     },
     "JournalEntry": {
+        "definition?": "OntologyDefinition",
         "accounting_binding_id?": "@SourceAccountingBinding",
         "legal_entity_id": "@LegalEntity",
         "ledger_id": "@Ledger",
@@ -179,6 +180,7 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "reference": "Identifier",
     },
     "JournalLine": {
+        "side?": "Identifier",
         "accounting_binding_id?": "@SourceAccountingBinding",
         "journal_id": "@JournalEntry",
         "account_id": "@LocalAccount",

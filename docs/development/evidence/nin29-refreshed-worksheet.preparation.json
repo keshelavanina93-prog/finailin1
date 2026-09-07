@@ -1,0 +1,13 @@
+{
+  "function": {
+    "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+    "version_id": "cd07d10a-9257-506f-9a68-ae9d639063ee",
+    "proposal_id": "34c8b4ab-7dde-4813-85c6-e93f9bf14cb8"
+  },
+  "build": {
+    "resource_id": "5b45554d-4968-52ed-ad06-d974d6196b08",
+    "version_id": "1374961c-f62b-5212-8bbc-4647a3c3d779",
+    "proposal_id": "4f36352b-913d-474c-90bb-bed13958ea4a"
+  },
+  "source_sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8"
+}

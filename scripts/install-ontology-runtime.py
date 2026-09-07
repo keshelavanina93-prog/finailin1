@@ -35,6 +35,8 @@ def main() -> None:
         and {"ontology_admin", "ontology_review"}.issubset(p.permissions)
     )
     kinds = {
+        "JournalEntry",
+        "JournalLine",
         "DeploymentTarget",
         "RuntimeAgent",
         "DesiredState",
@@ -84,6 +86,32 @@ def main() -> None:
                 )
             )
         else:
+            journal_field = {"JournalEntry": "definition", "JournalLine": "side"}.get(
+                spec["identity_key"]
+            )
+            if (
+                spec["object_type"] == "SchemaDefinition"
+                and journal_field
+                and journal_field not in previous["attributes"]["fields"]
+            ):
+                mutations.append(
+                    ResourceMutation(
+                        resource_id=identity,
+                        expected_version_id=UUID(previous["version_id"]),
+                        valid_from=datetime.now(UTC),
+                        **{
+                            **spec,
+                            "display_name": previous["display_name"],
+                            "attributes": {
+                                **previous["attributes"],
+                                "fields": {
+                                    **previous["attributes"]["fields"],
+                                    journal_field: spec["attributes"]["fields"][journal_field],
+                                },
+                            },
+                        },
+                    )
+                )
             # Extend only this schema, through normal review/CAS. Existing definitions
             # keep their accepted schema pin; new executions require a reviewed budget.
             if (
