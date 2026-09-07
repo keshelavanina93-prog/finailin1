@@ -92,6 +92,7 @@ def _disk_manifest() -> dict[str, Any]:
         "capabilities": {
             "read": True,
             "query": True,
+            "typed_relationship_filters": True,
             "grouped_observation_counts": True,
             "snapshot": True,
             "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
@@ -112,6 +113,8 @@ def _disk_manifest() -> dict[str, Any]:
             "formula_execution": False,
             "limits": {
                 "returned_rows": 200,
+                "query_predicates": 20,
+                "traversal_steps": 4,
                 "derived_properties": 8,
                 "grouping_fields": 4,
                 "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
@@ -149,6 +152,7 @@ def manifest(implementation_id: str = IMPLEMENTATION_ID) -> dict[str, Any]:
             capabilities={
                 **result["capabilities"],
                 "query": False,
+                "typed_relationship_filters": False,
                 "grouped_observation_counts": False,
                 "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
                 "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
@@ -341,11 +345,11 @@ def _retained_input(p: Principal, request: FunctionInvocation, compiled: dict) -
                 "definition_version_id",
             )
         },
-        **(
-            {"filter_schema_versions": source["filter_schema_versions"]}
-            if "filter_schema_versions" in source
-            else {}
-        ),
+        **{
+            key: source[key]
+            for key in ("filter_schema_versions", "traversal_schema_versions")
+            if key in source
+        },
         "input_result": {
             "invocation_id": retained["invocation_id"],
             "receipt_hash": retained["receipt_hash"],

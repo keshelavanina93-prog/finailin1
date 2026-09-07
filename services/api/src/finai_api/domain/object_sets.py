@@ -4,7 +4,16 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StrictBool,
+    StrictInt,
+    StrictStr,
+    field_validator,
+    model_validator,
+)
 
 
 class PropertyFilter(BaseModel):
@@ -21,6 +30,9 @@ class Traversal(BaseModel):
     kind: Literal["reference", "link"] = "reference"
     name: str = Field(min_length=1, max_length=128)
     direction: Literal["outgoing", "incoming"] = "outgoing"
+    filters: list[PropertyFilter] = Field(
+        default_factory=list, max_length=20, exclude_if=lambda value: not value
+    )
 
 
 class ObjectSetQuery(BaseModel):
@@ -34,6 +46,12 @@ class ObjectSetQuery(BaseModel):
     offset: int = Field(default=0, ge=0, le=1000000)
     valid_at: datetime | None = None
     known_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def predicate_budget(self):
+        if len(self.filters) + sum(len(step.filters) for step in self.traversal) > 20:
+            raise ValueError("Object Set root and traversal filters share a 20-predicate limit")
+        return self
 
     @field_validator("valid_at", "known_at")
     @classmethod
@@ -49,6 +67,10 @@ class FilterSchemaVersion(BaseModel):
     version_id: UUID
 
 
+class TraversalSchemaVersion(FilterSchemaVersion):
+    step: int = Field(ge=1, le=4)
+
+
 class ObjectSetResult(BaseModel):
     contract: Literal["ontology-object-set/1"] = "ontology-object-set/1"
     query: ObjectSetQuery
@@ -57,3 +79,6 @@ class ObjectSetResult(BaseModel):
     objects: list[dict[str, Any]]
     next_offset: int | None
     filter_schema_versions: list[FilterSchemaVersion] = Field(default_factory=list)
+    traversal_schema_versions: list[TraversalSchemaVersion] = Field(
+        default_factory=list, exclude_if=lambda value: not value
+    )

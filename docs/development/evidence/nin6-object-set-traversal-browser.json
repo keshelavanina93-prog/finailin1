@@ -1,0 +1,44 @@
+{
+  "url": "http://127.0.0.1:3062/",
+  "viewport": {
+    "width": 1264,
+    "height": 625
+  },
+  "rows": [
+    "TR!row:5source-fact:bb3f5efc-459e-5c46-999b-f50329285136\tSource Journal Movement\tAPPROVED - SOURCE BOUND\nInspect\nHistory\nTrace evidence\n\t\nInspect returned version",
+    "TR!row:6source-fact:ffbad914-9b0c-5220-b7c5-1bd41e1d7a71\tSource Journal Movement\tAPPROVED - SOURCE BOUND\nInspect\nHistory\nTrace evidence\n\t\nInspect returned version"
+  ],
+  "steps": [
+    {
+      "heading": "Step 1",
+      "selects": [
+        "incoming",
+        "reference:member_id",
+        "evidence_id",
+        "eq"
+      ],
+      "inputs": [
+        "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+      ]
+    },
+    {
+      "heading": "Step 2",
+      "selects": [
+        "outgoing",
+        "reference:observation_id",
+        "posting_date",
+        "gte",
+        "posting_date",
+        "lt"
+      ],
+      "inputs": [
+        "2025-11-03",
+        "2025-11-04"
+      ]
+    }
+  ],
+  "roots": [
+    "1 explicit starting object IDs retained"
+  ],
+  "errors": []
+}

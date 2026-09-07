@@ -312,6 +312,12 @@ def _validate(
                 resolved[identifier] = _get(conn, tenant, UUID(identifier))
             result = resolved[identifier]
             external_heads[identifier] = str(result["version_id"])
+        if (source_item.object_type == "ObjectSetDefinition"
+            and relation.startswith("TRAVERSAL_CANDIDATE:")):
+            # Discovery reads remain RLS-visible, temporally resolved and head-fenced.
+            # Only matching endpoints are subsequently bound as DEFINITION_TYPE;
+            # unrelated inspected schemas are not semantic inputs to this query.
+            return result
         if result["authority_state"] != "APPROVED":
             raise WorkspaceError(409, "Dependency is revoked")
         if (

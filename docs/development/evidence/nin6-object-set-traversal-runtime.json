@@ -1,0 +1,3411 @@
+{
+  "checked_at": "2026-09-07T08:59:11.090282+00:00",
+  "request": {
+    "request_id": "60f73e17-5d33-42c5-bc8a-06a232196c8c",
+    "function": {
+      "resource_id": "83c58f5c-31bd-566b-b092-fa0283094069",
+      "version_id": "b9d5f8d8-a9ae-5cce-9631-b792fc9caf98"
+    },
+    "valid_at": "2026-09-07T08:58:11.750090+00:00",
+    "known_at": "2026-09-07T08:58:11.750090+00:00",
+    "offset": 0,
+    "limit": 200
+  },
+  "window": {
+    "contract": "ontology-object-set/1",
+    "query": {
+      "object_type": "DimensionMember",
+      "resource_ids": [
+        "07e796c0-2051-529f-ab3c-025199457f98"
+      ],
+      "filters": [],
+      "traversal": [
+        {
+          "kind": "reference",
+          "name": "member_id",
+          "direction": "incoming",
+          "filters": [
+            {
+              "field": "evidence_id",
+              "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+            }
+          ]
+        },
+        {
+          "kind": "reference",
+          "name": "observation_id",
+          "direction": "outgoing",
+          "filters": [
+            {
+              "field": "posting_date",
+              "value": "2025-11-03",
+              "operator": "gte"
+            },
+            {
+              "field": "posting_date",
+              "value": "2025-11-04",
+              "operator": "lt"
+            }
+          ]
+        }
+      ],
+      "search": "",
+      "limit": 200,
+      "offset": 0,
+      "valid_at": "2026-09-07T08:58:11.750090Z",
+      "known_at": "2026-09-07T08:58:11.750090Z"
+    },
+    "total": 2,
+    "counts_by_type": {
+      "SourceJournalMovement": 2
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "312.29",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-03",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "3"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "03.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG ადიგენის სერვის ცენტრი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს ტოიოტა ცენტრი თეგეტა"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან(ავტოტექმომსახურება)"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "312.29"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Kartli"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!5",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "74d01a8b-95a9-5dca-b08e-7b3b98189ab1",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:39.437262+04:00",
+        "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+        "system_from": "2026-09-06T09:56:47.868316+04:00",
+        "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc",
+        "display_name": "TR!row:5",
+        "identity_key": "source-fact:bb3f5efc-459e-5c46-999b-f50329285136",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "938.95",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-03",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "3"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "03.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG ცენტრალური რეგიონალური ოფისი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს თეგეტა მოტორსი"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "938.95"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Kartli"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!6",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "492b0b11-d980-5f97-94ad-15e8a72e60f7",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:39.539745+04:00",
+        "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+        "system_from": "2026-09-06T09:56:49.086973+04:00",
+        "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b",
+        "display_name": "TR!row:6",
+        "identity_key": "source-fact:ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [],
+    "traversal_schema_versions": [
+      {
+        "object_type": "SourceDimensionAssignment",
+        "resource_id": "ca3afb33-3cc9-5d9b-9187-33865333ed33",
+        "version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695",
+        "step": 1
+      },
+      {
+        "object_type": "SourceJournalMovement",
+        "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+        "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+        "step": 2
+      }
+    ]
+  },
+  "account_traversal": {
+    "contract": "ontology-object-set/1",
+    "query": {
+      "object_type": "DimensionMember",
+      "resource_ids": [
+        "07e796c0-2051-529f-ab3c-025199457f98"
+      ],
+      "filters": [],
+      "traversal": [
+        {
+          "kind": "reference",
+          "name": "member_id",
+          "direction": "incoming",
+          "filters": [
+            {
+              "field": "evidence_id",
+              "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+            }
+          ]
+        },
+        {
+          "kind": "reference",
+          "name": "observation_id",
+          "direction": "outgoing",
+          "filters": [
+            {
+              "field": "posting_date",
+              "value": "2025-11-03",
+              "operator": "gte"
+            },
+            {
+              "field": "posting_date",
+              "value": "2025-11-04",
+              "operator": "lt"
+            }
+          ]
+        },
+        {
+          "kind": "reference",
+          "name": "debit_account_id",
+          "direction": "outgoing"
+        }
+      ],
+      "search": "",
+      "limit": 200,
+      "offset": 0,
+      "valid_at": "2026-09-07T08:58:11.750090Z",
+      "known_at": "2026-09-07T08:58:11.750090Z"
+    },
+    "total": 1,
+    "counts_by_type": {
+      "LocalAccount": 1
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "chart_id": "89b27ec1-8dd0-528c-ba96-e4580e6e9244",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "account_code": "7310.02.1"
+        },
+        "valid_from": "2026-09-06T09:51:37.616365+04:00",
+        "version_id": "02be57e2-1148-5596-bbcb-9b95cca9dd7a",
+        "object_type": "LocalAccount",
+        "proposal_id": "9ac2774e-2771-4651-a671-3161f10e0db3",
+        "resource_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+        "system_from": "2026-09-06T09:51:41.758182+04:00",
+        "content_hash": "154173c9ef69c447fc71d013fbe74229aee266e970c917ae2d50f4ea6cd548d6",
+        "display_name": "7310.02.1 · Коммерческие расходы в организациях, осуществляющих производственную деятельность (по деятельности, не облагаемой ЕНВД)",
+        "identity_key": "source-chart:3ba3c8cc-51a1-5566-86f1-5457949db896",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "cfcb4150-7780-5c28-8465-09864c2539e6"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [],
+    "traversal_schema_versions": [
+      {
+        "object_type": "SourceDimensionAssignment",
+        "resource_id": "ca3afb33-3cc9-5d9b-9187-33865333ed33",
+        "version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695",
+        "step": 1
+      },
+      {
+        "object_type": "SourceJournalMovement",
+        "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+        "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+        "step": 2
+      }
+    ]
+  },
+  "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+  "member": {
+    "contract": "ontology-object-set/1",
+    "query": {
+      "object_type": "DimensionMember",
+      "resource_ids": [
+        "07e796c0-2051-529f-ab3c-025199457f98"
+      ],
+      "filters": [],
+      "traversal": [],
+      "search": "",
+      "limit": 200,
+      "offset": 0,
+      "valid_at": "2026-09-07T08:58:11.750090Z",
+      "known_at": "2026-09-07T08:58:11.750090Z"
+    },
+    "total": 1,
+    "counts_by_type": {
+      "DimensionMember": 1
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "code": "SOG-Kartli",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "dimension_id": "e241052e-4f47-56b6-b1ea-fab72d17f0a7"
+        },
+        "valid_from": "2026-09-06T11:12:51.691974+04:00",
+        "version_id": "893f7b84-236c-5671-95dd-3f3d2aa6bd33",
+        "object_type": "DimensionMember",
+        "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3",
+        "resource_id": "07e796c0-2051-529f-ab3c-025199457f98",
+        "system_from": "2026-09-06T11:12:53.39508+04:00",
+        "content_hash": "2383bb674181e313f61b6ac6750feafcff34ebdacc8172f03c4eda840597171a",
+        "display_name": "SOG-Kartli",
+        "identity_key": "source-dimension:07e796c0-2051-529f-ab3c-025199457f98",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "96595781-938d-5c33-9544-0aff3afc000e"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": []
+  },
+  "evidence_filtered_assignments": {
+    "contract": "ontology-object-set/1",
+    "query": {
+      "object_type": "DimensionMember",
+      "resource_ids": [
+        "07e796c0-2051-529f-ab3c-025199457f98"
+      ],
+      "filters": [],
+      "traversal": [
+        {
+          "kind": "reference",
+          "name": "member_id",
+          "direction": "incoming",
+          "filters": [
+            {
+              "field": "evidence_id",
+              "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+            }
+          ]
+        }
+      ],
+      "search": "",
+      "limit": 200,
+      "offset": 0,
+      "valid_at": "2026-09-07T08:58:11.750090Z",
+      "known_at": "2026-09-07T08:58:11.750090Z"
+    },
+    "total": 75,
+    "counts_by_type": {
+      "SourceDimensionAssignment": 75
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "f889073f-2e5f-5aa6-a6ce-63f4e6d29b6d",
+          "source_record_id": "9c4fad4a-60e9-5c50-8c42-ab58e33a3333",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:55.460549+04:00",
+        "version_id": "7336c36f-fd52-56ce-87d9-db763371ff37",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "b37c7bc0-982b-4729-b376-2418b62643db",
+        "resource_id": "00f6b879-a8d9-5f71-90c1-7050df67b1d0",
+        "system_from": "2026-09-06T11:17:56.259803+04:00",
+        "content_hash": "96280ba7a16fa082907863270425f901c73124bc8e49ae16d1da09708418aa5a",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:00f6b879-a8d9-5f71-90c1-7050df67b1d0",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "d7cf51dc-8692-566f-9b2b-695e5334342b",
+          "source_record_id": "cb02a74f-741a-5036-a038-eb788ce8583b",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:46.347084+04:00",
+        "version_id": "0c0718af-e18d-56ac-a8d3-686d77cbc474",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3475454d-a1be-4973-aced-7327ad672d78",
+        "resource_id": "08f10b32-a6f2-5142-bd42-c1cf60112635",
+        "system_from": "2026-09-06T11:17:47.549307+04:00",
+        "content_hash": "8dfb02d102d103b15bf2f1403dc84f29b1b49d2680da3584e403e20da07542a4",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:08f10b32-a6f2-5142-bd42-c1cf60112635",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "e36b9457-595b-5727-88eb-8017072958ea",
+          "source_record_id": "ad0316bf-b687-512e-86a2-035525dce08a",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:30.999116+04:00",
+        "version_id": "e23c41e6-95aa-5536-94e7-8d79890c254a",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "f1e413ef-bd6d-4d53-87db-bc549d028659",
+        "resource_id": "0d017bac-1fca-53b0-826e-39658c5bb628",
+        "system_from": "2026-09-06T11:14:32.831957+04:00",
+        "content_hash": "d6c36f6a2364edef7d086c98aa12d38fbe70d87e218221a93ae2c7b9a93381f1",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:0d017bac-1fca-53b0-826e-39658c5bb628",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "aaae9515-cf7c-5634-b266-7d31bc520c16",
+          "source_record_id": "3bb75744-851c-5fb5-9529-1b07adaaa34b",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:36.662446+04:00",
+        "version_id": "01d876ef-0af4-5b9f-9920-cd49af9d7d69",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2710b5dc-a9fc-4357-8051-563981ad40cd",
+        "resource_id": "0f712d3e-82ad-5de2-94dd-b5ad86938b4b",
+        "system_from": "2026-09-06T11:17:38.013846+04:00",
+        "content_hash": "3e2bafd31a27af26e56a3bfe6c9a3b925219edf2586e516f7d24799edebc5bcd",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:0f712d3e-82ad-5de2-94dd-b5ad86938b4b",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "02beed58-b031-54c5-ac65-152fe930a269",
+          "source_record_id": "42aa29f5-dada-5432-8e85-1de2558c301f",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:36.662446+04:00",
+        "version_id": "912e4bd5-90cb-5355-8ae2-eabd951d99fd",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2710b5dc-a9fc-4357-8051-563981ad40cd",
+        "resource_id": "14c9f565-231c-532d-8087-37cf90d2c8c8",
+        "system_from": "2026-09-06T11:17:38.587506+04:00",
+        "content_hash": "70c4519df5442de8ef36fa7f24f1aea9c5a7cb71dd70b87a5aafd4dbd7b1e931",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:14c9f565-231c-532d-8087-37cf90d2c8c8",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "37652bc1-8fd3-5fcd-be4f-2f7e9a4a40e4",
+          "source_record_id": "344bf2e9-6bbe-5d34-9ce9-42ae74fa040f",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:40.362748+04:00",
+        "version_id": "55b6a1c6-a6f8-5c8a-a967-db506737f640",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "d6f0a996-1f06-447c-bf41-76f6eefb6124",
+        "resource_id": "184418cc-08ac-590f-a46c-9b6717b09bd4",
+        "system_from": "2026-09-06T11:14:41.329071+04:00",
+        "content_hash": "047ee9658d6ee3b15a8babe83359088776cc6357859b5df75e01268e03dd66e6",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:184418cc-08ac-590f-a46c-9b6717b09bd4",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "885c6102-674c-522f-bf9c-c1830acdf95c",
+          "source_record_id": "cdec9389-cd26-5fe1-b09b-43a3f0dac528",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:55.460549+04:00",
+        "version_id": "4995604a-c775-5958-be62-959eb6b0f561",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "b37c7bc0-982b-4729-b376-2418b62643db",
+        "resource_id": "19165855-9178-56b9-983b-94c97aa66aa9",
+        "system_from": "2026-09-06T11:17:57.013989+04:00",
+        "content_hash": "0e40d46d15651aacae9715a1198a16d493d812b56271fcf512b0d380362b543d",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:19165855-9178-56b9-983b-94c97aa66aa9",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "5a3feb6f-762c-5d0d-8f1d-308a42986525",
+          "source_record_id": "3adfdaa4-b9b5-5052-b8eb-6c7e656c585e",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:39.626583+04:00",
+        "version_id": "86bbb955-afa9-5fa9-8a86-abfcbc34ef70",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "6b974fab-7f9f-4d1e-a9e3-e998a084f150",
+        "resource_id": "19b1df38-a754-5743-a71e-ec5af8c84930",
+        "system_from": "2026-09-06T11:15:41.143354+04:00",
+        "content_hash": "8c7f70e9e42863ceb6ae5467a44bc0823fd4c6d286b37710ea25bc9fb31679d0",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:19b1df38-a754-5743-a71e-ec5af8c84930",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "de7a9d2b-975f-50d5-a01c-e626e21a46b3",
+          "source_record_id": "ee2c77b0-32aa-527b-aa90-99a672d12d32",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:46.347084+04:00",
+        "version_id": "78be3303-280a-5ae1-8ccb-064d98ddff7a",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3475454d-a1be-4973-aced-7327ad672d78",
+        "resource_id": "1df292ce-b512-5967-99e1-d71c5ad6b05f",
+        "system_from": "2026-09-06T11:17:48.298077+04:00",
+        "content_hash": "8aa9afeb7fa9a3b78b3c569727da8f217377f35e16294394c874652ceb358fd4",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:1df292ce-b512-5967-99e1-d71c5ad6b05f",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "dc56de49-136e-501b-bfe4-5994044c5332",
+          "source_record_id": "28c16b9a-d60c-5233-b99a-03528b02ff4f",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:49.051672+04:00",
+        "version_id": "fb65d99c-05ed-59fa-865e-32481f8fbc63",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "33ab15db-bad9-4016-bf52-702da7824351",
+        "resource_id": "1f502281-79d6-59bc-b4d3-eaf287b16da6",
+        "system_from": "2026-09-06T11:15:50.423593+04:00",
+        "content_hash": "8ef08e9c1d311702bb2fc1c73428b96cdc18742028c3677aab6f5021f1323886",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:1f502281-79d6-59bc-b4d3-eaf287b16da6",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "5d56cce3-5b80-5991-a200-36740cc8d97b",
+          "source_record_id": "f74c136d-88b6-5237-9972-39955c1906d9",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:55.460549+04:00",
+        "version_id": "83bd3fa5-4fed-5181-897a-0a9c1e2256f8",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "b37c7bc0-982b-4729-b376-2418b62643db",
+        "resource_id": "2420b391-b760-5eff-95bf-ae97ecf92d67",
+        "system_from": "2026-09-06T11:17:57.193754+04:00",
+        "content_hash": "fa487dfc8a3387918e5b156966a6975b1acc94c2906f30a64490a80f4a52229d",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:2420b391-b760-5eff-95bf-ae97ecf92d67",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "59ffa43a-df75-5f6d-8605-11a0bfc35922",
+          "source_record_id": "ba771c44-d62f-5b02-a7fc-8be74e4cb7d4",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:58.611223+04:00",
+        "version_id": "d526bbd7-b19b-5c4f-bc5a-a4ef16a5a107",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "1f88b245-49b2-40dd-af91-eae84016f1a5",
+        "resource_id": "24a45cae-b57d-599e-a95e-9c526e9b77c8",
+        "system_from": "2026-09-06T11:16:01.046295+04:00",
+        "content_hash": "13f7bb9b5f15dbbd58362b0d51b57dee3605ea3ff1edd7eb2d8405ca064e5320",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:24a45cae-b57d-599e-a95e-9c526e9b77c8",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "97afbf67-665d-5446-a135-5c80bab05ac1",
+          "source_record_id": "0aae98c8-2618-5097-8119-d83f366bd679",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:36.662446+04:00",
+        "version_id": "6436ac22-de07-59bc-b2fc-a7e25992c759",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2710b5dc-a9fc-4357-8051-563981ad40cd",
+        "resource_id": "2b6a2526-5d23-5129-ad4b-860c8b1ee003",
+        "system_from": "2026-09-06T11:17:38.94904+04:00",
+        "content_hash": "d97c9c87e386c9b4ab26622276f6d00c0987c3d40ad340bea27c0f8902a1226a",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:2b6a2526-5d23-5129-ad4b-860c8b1ee003",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "6dd5bf52-d6f9-55af-ab33-3eeb12b009fb",
+          "source_record_id": "582dc6cb-10f7-58e3-bce6-8568e9c45f3e",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:39.626583+04:00",
+        "version_id": "b5958b79-8753-5c1c-8b17-e91222c77f74",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "6b974fab-7f9f-4d1e-a9e3-e998a084f150",
+        "resource_id": "2e543159-05d0-5877-9dea-263ea2b361d6",
+        "system_from": "2026-09-06T11:15:41.50697+04:00",
+        "content_hash": "318b325a47b08ffcee4c6a88a432987ae4b3c63f7b08ea73f5f080c754be0f82",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:2e543159-05d0-5877-9dea-263ea2b361d6",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "5658e103-df55-5671-aa47-5e75c7b3e56c",
+          "source_record_id": "860793f8-0961-5468-8fb7-1aac16321cc1",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:46.347084+04:00",
+        "version_id": "d06f43a4-23f3-5acb-83b1-74c61d723480",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3475454d-a1be-4973-aced-7327ad672d78",
+        "resource_id": "2fc35465-7b86-5456-bb0c-7cf639512607",
+        "system_from": "2026-09-06T11:17:48.852885+04:00",
+        "content_hash": "31037337100d96c122bc0dd7a9846c1aea741b7c9f11c4d89a2107e3ab9d54f0",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:2fc35465-7b86-5456-bb0c-7cf639512607",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "6613d0e6-0b04-55f4-a50a-47296f88714a",
+          "source_record_id": "9d819ba2-ca10-593c-86a5-800534aef4ee",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:49.051672+04:00",
+        "version_id": "360a8b79-2900-5e73-9ffe-047ec2d1f965",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "33ab15db-bad9-4016-bf52-702da7824351",
+        "resource_id": "31047487-72fa-593d-9ae5-ab5db283e46a",
+        "system_from": "2026-09-06T11:15:50.611528+04:00",
+        "content_hash": "b38e1ef941c2f27071b482d705690a976e68f11dddf6ab8e39eb9147e62711e9",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:31047487-72fa-593d-9ae5-ab5db283e46a",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "c124020b-7a86-53cb-820c-71aa05102606",
+          "source_record_id": "c5a46fa0-7bbb-5839-b97a-503080761adb",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:55.460549+04:00",
+        "version_id": "3c10c283-bf85-5a5a-acef-07b6d5829441",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "b37c7bc0-982b-4729-b376-2418b62643db",
+        "resource_id": "36be84d1-6f0d-5318-89c9-13fdb42bf3e1",
+        "system_from": "2026-09-06T11:17:56.65487+04:00",
+        "content_hash": "32e14b77393299bbdf8ff1a1e7cbe9d4dd3353cde9d4ce8e210873ae49a0956e",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:36be84d1-6f0d-5318-89c9-13fdb42bf3e1",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "db58de46-455b-5bf5-ae0e-81f303e38830",
+          "source_record_id": "989853cb-5fc2-5222-b4f9-44eb7657832f",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:49.051672+04:00",
+        "version_id": "fca07f49-3c76-5fa1-b940-a5daf0ef56cd",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "33ab15db-bad9-4016-bf52-702da7824351",
+        "resource_id": "3bf6c8a1-602c-55ea-bfcf-08ae5e09e33c",
+        "system_from": "2026-09-06T11:15:50.036319+04:00",
+        "content_hash": "e205ee1bf25b445ccc056f1924c4aa93cc3a78568edeb94a5eb5a430e981e52a",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:3bf6c8a1-602c-55ea-bfcf-08ae5e09e33c",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "fb87cb27-de0e-57f3-bfbc-dc541c54b5d7",
+          "source_record_id": "d7a8bbea-9195-5fe0-96fd-c0194da3d7e1",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:46.347084+04:00",
+        "version_id": "2b952645-2e3b-58e5-9ee5-8c5c44cc3e50",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3475454d-a1be-4973-aced-7327ad672d78",
+        "resource_id": "3e16d63a-7898-5def-9e5a-182dd80b1474",
+        "system_from": "2026-09-06T11:17:48.669411+04:00",
+        "content_hash": "9bdc07f789d7c57eb40dcae87347f15cdde806dc86c5c1c968d2e7d390c3aa5d",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:3e16d63a-7898-5def-9e5a-182dd80b1474",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "d257436e-0b7e-50c7-a621-52501cf4c3b6",
+          "source_record_id": "bbc5ccc6-896c-59f5-a35c-527046cbe7c5",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:58.864354+04:00",
+        "version_id": "e6832cdb-0401-5a3a-992b-aee07fcbaead",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "17e8f913-6a6d-43f6-b8f7-9f5f7a4d09fd",
+        "resource_id": "45f7d403-075a-528f-8603-aa3a6ada17a8",
+        "system_from": "2026-09-06T11:15:01.086728+04:00",
+        "content_hash": "c85aea36067a353912ecefc80201cadfbcf02b8cf204ef3fd822bdad1671edd9",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:45f7d403-075a-528f-8603-aa3a6ada17a8",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "36d781b7-f179-5719-9d29-2392e2131282",
+          "source_record_id": "c40585df-440d-5474-95d0-db9187e490f9",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:16:08.318019+04:00",
+        "version_id": "5ebaccd2-cefd-5eb0-8efa-f3545f0b6736",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "73562c0f-47fb-47a1-81df-8a5e7ec3b7ff",
+        "resource_id": "46fdc2a1-cb50-50a5-8e14-1311151b6f2b",
+        "system_from": "2026-09-06T11:16:09.419935+04:00",
+        "content_hash": "0dd4ed98a15cd5b04c4be90e53eb6f83dff5ea5ac420eed202fe2302513f4f20",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:46fdc2a1-cb50-50a5-8e14-1311151b6f2b",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "10f3bf1a-6fbb-52f0-8867-0aa8b15f1369",
+          "source_record_id": "9c82adf6-c352-5864-8f2f-7c7f7b99fc93",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:28.336807+04:00",
+        "version_id": "7bcde67c-c9f3-5da4-bae5-2df9642c5678",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "832e42e4-270b-475b-96f7-1731d7060020",
+        "resource_id": "4e46b06b-990d-5160-9249-66b1527087c5",
+        "system_from": "2026-09-06T11:15:31.168135+04:00",
+        "content_hash": "2d1b701e661a20e233a490a80313f2c2dc38fb0f6ee9114022c49140676ded88",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:4e46b06b-990d-5160-9249-66b1527087c5",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "b816412c-b55e-53de-bf0e-f85910e9a1aa",
+          "source_record_id": "9abfee51-f460-5ef8-aaea-8811fff67e1d",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:26.538754+04:00",
+        "version_id": "7d7a4c71-23b9-5dad-9847-624c39b9f273",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "51b171db-7494-4c4c-bac6-cedb7557049c",
+        "resource_id": "4ead9d13-807f-530a-8463-c52868ec6a12",
+        "system_from": "2026-09-06T11:17:28.784712+04:00",
+        "content_hash": "a6e75c99c8ad6a49396cba5e0dfd7e63c3c2ab696df58fb4121cd582165f11c3",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:4ead9d13-807f-530a-8463-c52868ec6a12",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "6012a3d7-97bb-5b35-8d75-57aa119e8051",
+          "source_record_id": "ebc68936-46a0-5422-b183-d744a6c48c1d",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:49.051672+04:00",
+        "version_id": "bf19269c-a5ca-5faf-88d5-ef46acc75d02",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "33ab15db-bad9-4016-bf52-702da7824351",
+        "resource_id": "4f28d0a1-812a-5060-b79f-70c537db0629",
+        "system_from": "2026-09-06T11:15:51.175296+04:00",
+        "content_hash": "d063b624c1502caeb62401b3b174545f911f82a96135ea81d9abc1cecb60a30c",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:4f28d0a1-812a-5060-b79f-70c537db0629",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "aabab150-774c-564f-8699-be86c8cbc72b",
+          "source_record_id": "150fd83f-5c55-5255-8b2c-0a9a7590e315",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:49.23729+04:00",
+        "version_id": "d4a01153-124a-5083-89a7-87441a92e10a",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2564e213-2892-4092-ad66-d14019c0ac80",
+        "resource_id": "51442ad4-32df-5a4d-8554-58a9bf9baad6",
+        "system_from": "2026-09-06T11:14:51.830399+04:00",
+        "content_hash": "2e0118a0c97ed1367e35aace3c2d26f961abf029678b3b1cbe4f912dc549e093",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:51442ad4-32df-5a4d-8554-58a9bf9baad6",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "16521c94-56e3-5e52-b000-7db42d50ec2d",
+          "source_record_id": "2a6e4cd6-7a8f-5b4b-b450-5da71587e961",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:55.460549+04:00",
+        "version_id": "40dafe2b-05c8-5c55-80c4-f138449b9858",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "b37c7bc0-982b-4729-b376-2418b62643db",
+        "resource_id": "5a3f1322-60ea-510b-9458-ed444fb02a7d",
+        "system_from": "2026-09-06T11:17:56.836138+04:00",
+        "content_hash": "9c9e980ce247dacce6fe2ef097e97ca1311288bc593e720906eadd74e8c8ba90",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:5a3f1322-60ea-510b-9458-ed444fb02a7d",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "8e3e90d2-4e1a-58e9-b0bd-94fb8652c9b1",
+          "source_record_id": "0bf7d208-5eea-59ca-b431-dd52fdb300be",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:12:51.691974+04:00",
+        "version_id": "c2260ebd-ce68-5e88-b6e4-eca7f5764891",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3",
+        "resource_id": "5a47dd40-d740-5d9b-9c4c-af730cccc5b2",
+        "system_from": "2026-09-06T11:12:55.281918+04:00",
+        "content_hash": "e0cd84e404af0618d33a5d478a8db53498b64802c0a4c52237e8e0051fa8c5ef",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:5a47dd40-d740-5d9b-9c4c-af730cccc5b2",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "62d25123-78d4-517d-97c4-25b7aac5d46f",
+          "source_record_id": "cbe76e2b-8bd2-5430-aa36-3e282def4eb8",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:46.347084+04:00",
+        "version_id": "15f9803b-61cf-590a-b6ba-147a5c7fc661",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3475454d-a1be-4973-aced-7327ad672d78",
+        "resource_id": "5b6926b2-847e-5fa9-a084-a5fe6406af1f",
+        "system_from": "2026-09-06T11:17:47.146327+04:00",
+        "content_hash": "d0aeb599d8bb04b7bd79ded833a28b2402e791307725798b0f4cb2c9d1a536bd",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:5b6926b2-847e-5fa9-a084-a5fe6406af1f",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "2649c248-d0f9-56c0-8799-76b308caf2c3",
+          "source_record_id": "928867a0-abdd-5d66-9dd9-eda4bccc52d9",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:26.538754+04:00",
+        "version_id": "6553991b-da7a-5956-8268-8eb805628a31",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "51b171db-7494-4c4c-bac6-cedb7557049c",
+        "resource_id": "5da8a4e9-c27a-5c4b-ac91-c8c52e28ffdb",
+        "system_from": "2026-09-06T11:17:29.388316+04:00",
+        "content_hash": "0248cb5fcacf7667c6b06893ef40f8d46280a9d3f1da2d0fe03b1ea2aa985d73",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:5da8a4e9-c27a-5c4b-ac91-c8c52e28ffdb",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "f6328104-f70d-5e61-b0a4-fa784340792f",
+          "source_record_id": "0f8a2aae-03a0-54be-80e9-2c127f13e757",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:46.347084+04:00",
+        "version_id": "7b8b799e-7305-51d1-89c7-318cc3151f82",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3475454d-a1be-4973-aced-7327ad672d78",
+        "resource_id": "60114b71-c06f-5fb7-ab1c-6728cdb6c009",
+        "system_from": "2026-09-06T11:17:47.926987+04:00",
+        "content_hash": "e5bb3c447c8e6dea18eb8e1e221839267ee4fd84bbfcba829b3a297174cd797a",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:60114b71-c06f-5fb7-ab1c-6728cdb6c009",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "ba8b9909-2cb2-5600-81eb-83c8f000bf8f",
+          "source_record_id": "903e570e-d797-53fa-b474-8584db8c4afb",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:08.473354+04:00",
+        "version_id": "ec427a47-dd33-5179-9958-5bd1c58c7147",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "d74bfaed-bc80-4057-ae2c-8476f468680d",
+        "resource_id": "6925908b-0c6f-5986-bb8f-c11d45f8ed68",
+        "system_from": "2026-09-06T11:15:10.636665+04:00",
+        "content_hash": "50c0aa0197319a75e93d5eec2104fbbff8d448158718771b14a07e1be97063ae",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:6925908b-0c6f-5986-bb8f-c11d45f8ed68",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "0975a737-9823-58c5-b4cc-eeff83e7e7d1",
+          "source_record_id": "ea120816-f9cf-5cc0-ba3f-65e087fd188a",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:36.662446+04:00",
+        "version_id": "4e399d6f-f801-540f-877c-b1aefaf43c40",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2710b5dc-a9fc-4357-8051-563981ad40cd",
+        "resource_id": "6aaa338e-041c-5773-be23-892132fd73fc",
+        "system_from": "2026-09-06T11:17:38.767591+04:00",
+        "content_hash": "f5393a4f07a2fe8f903510185dcce0ec2cc094d82010a0e892e859b5e487555b",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:6aaa338e-041c-5773-be23-892132fd73fc",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "11176298-a940-5a52-9522-0aa2b6955a60",
+          "source_record_id": "9ae2c4c1-e48c-5921-8a4e-0ecc7db72453",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:26.538754+04:00",
+        "version_id": "94be2a92-80bf-5fdc-bac0-3d1bc6b16b22",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "51b171db-7494-4c4c-bac6-cedb7557049c",
+        "resource_id": "74d5a018-e688-56ea-8142-e4e4f4bb8131",
+        "system_from": "2026-09-06T11:17:28.996349+04:00",
+        "content_hash": "09a0083961a46cdc5018e6b0bd43d4554921e69bee5fb0a7b37c35fc141843b3",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:74d5a018-e688-56ea-8142-e4e4f4bb8131",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "4c4b43bc-8cea-558f-83b4-4f860a50946e",
+          "source_record_id": "21b6d859-2c2f-5be7-8835-0df69d7bd988",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:39.626583+04:00",
+        "version_id": "d801580f-0f2b-57ca-b4c1-b3786e6d8154",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "6b974fab-7f9f-4d1e-a9e3-e998a084f150",
+        "resource_id": "7f2545e3-85e5-5460-83ab-8b289202a44c",
+        "system_from": "2026-09-06T11:15:41.325833+04:00",
+        "content_hash": "e2ff0da6fa06c9e0c02760952f64cbbe799a9cf69d9e365b8113be2c253e2092",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:7f2545e3-85e5-5460-83ab-8b289202a44c",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "e90e83cd-2d43-5355-a8fb-67f2983de1b5",
+          "source_record_id": "96887907-b73d-55a4-8ea0-4d8ca4c1577b",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:49.23729+04:00",
+        "version_id": "0d5bf109-5844-50a8-863c-c2e0f8b64562",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2564e213-2892-4092-ad66-d14019c0ac80",
+        "resource_id": "817b2f27-0557-5e47-8c52-a1658e5f4823",
+        "system_from": "2026-09-06T11:14:50.548296+04:00",
+        "content_hash": "f096f146172faa73170a960e4cebad6f5d1161869c2ea9b74de9de0054dfe886",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:817b2f27-0557-5e47-8c52-a1658e5f4823",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "cf8546a3-3f4f-54d7-9c8b-96fa7c48aac2",
+          "source_record_id": "f0497018-9457-512a-b2bd-f8ee633ed727",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:58.864354+04:00",
+        "version_id": "7c50540a-c9c5-5626-b880-658e3d6b254a",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "17e8f913-6a6d-43f6-b8f7-9f5f7a4d09fd",
+        "resource_id": "81ff6cb3-9655-5713-a0b6-aefd5c459de1",
+        "system_from": "2026-09-06T11:15:00.155949+04:00",
+        "content_hash": "3359468314efa2964e4c63c6dcfae78bd67c53cab77808eb3f40e410b76f6534",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:81ff6cb3-9655-5713-a0b6-aefd5c459de1",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "bab13833-cc93-58b0-99f9-62bcecb71eaa",
+          "source_record_id": "bd842b35-890b-55e8-a90e-f085e055f033",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:12:51.691974+04:00",
+        "version_id": "f5f06a0c-db2b-5398-ad08-00098088ca77",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3",
+        "resource_id": "8693652a-1206-5d48-baf6-b57a319588e6",
+        "system_from": "2026-09-06T11:12:53.660326+04:00",
+        "content_hash": "22bb4c2aa07057bd54881f78b52a0be2bd13025c0f0de739be44203399aa1a96",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:8693652a-1206-5d48-baf6-b57a319588e6",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "9784f427-faba-5572-b841-926387f708bb",
+          "source_record_id": "0504d440-adf2-51ae-9ff3-3601fcaf325b",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:46.347084+04:00",
+        "version_id": "0da2ea98-4465-5a31-9a05-14bcec481cb7",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3475454d-a1be-4973-aced-7327ad672d78",
+        "resource_id": "88ed724b-d619-5c81-b555-ee819a8a2c0f",
+        "system_from": "2026-09-06T11:17:47.740646+04:00",
+        "content_hash": "ab1eb47ad6879ffca2a11d4381e25476cca25b7b5fac3da3a98ed109cbc0ad77",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:88ed724b-d619-5c81-b555-ee819a8a2c0f",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "01603366-ac6b-5871-b56e-0b1703b52241",
+          "source_record_id": "0d886568-6fcf-5775-9d30-0e9e2a18a5fe",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:36.662446+04:00",
+        "version_id": "1ed72c28-d5ff-5881-bc29-529615fab4c2",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2710b5dc-a9fc-4357-8051-563981ad40cd",
+        "resource_id": "8c930085-98f4-548a-8b03-ee526f85c896",
+        "system_from": "2026-09-06T11:17:38.401809+04:00",
+        "content_hash": "e0e487613222a4699dfa04b6f5c2126d615a71e4bc988546d795ea812cf689f5",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:8c930085-98f4-548a-8b03-ee526f85c896",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "866ab1ed-4082-5617-8046-9753963b6b1c",
+          "source_record_id": "a001687c-5c2f-5269-b8df-1e53708defd8",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:55.460549+04:00",
+        "version_id": "bdb85ee9-b9ff-5894-a4d5-881172e14fcb",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "b37c7bc0-982b-4729-b376-2418b62643db",
+        "resource_id": "8f4e9931-ee73-5e02-a288-21a0e3d0a277",
+        "system_from": "2026-09-06T11:17:56.466805+04:00",
+        "content_hash": "347624449667073243355e8418e149b0007ae8f2c05c497205f33804cbf9766a",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:8f4e9931-ee73-5e02-a288-21a0e3d0a277",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "15bd0a6a-a645-5293-8cbc-7f2f6cea7d1f",
+          "source_record_id": "79547f96-6d23-5f41-a759-f53de9b0aa8d",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:46.347084+04:00",
+        "version_id": "ecefd72a-1957-59c6-a3c6-10698d938ffb",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3475454d-a1be-4973-aced-7327ad672d78",
+        "resource_id": "93f78338-e972-5942-817b-9f857166f6ab",
+        "system_from": "2026-09-06T11:17:48.113896+04:00",
+        "content_hash": "27fe2c295d042cb539faa9bbd9fdb48d8568d1240f0d57dc9f478963f1062be4",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:93f78338-e972-5942-817b-9f857166f6ab",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "4c5a808f-439a-5100-a1c9-2e6e756bac61",
+          "source_record_id": "192dc543-5f16-5baa-8381-a23826b6d993",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:40.362748+04:00",
+        "version_id": "500f475a-1164-5fad-9dd7-d3f529b09ead",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "d6f0a996-1f06-447c-bf41-76f6eefb6124",
+        "resource_id": "9437194e-2eb7-5499-a186-efb7fdf8d665",
+        "system_from": "2026-09-06T11:14:41.68511+04:00",
+        "content_hash": "e2b03729caf13b0dc1981861fd88ba1461370060b241e4cfd5712137e92dbed9",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:9437194e-2eb7-5499-a186-efb7fdf8d665",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "cae1ff54-3cf3-5af6-94fe-8b9555ab402c",
+          "source_record_id": "a38b9db8-9f9d-5b32-85d1-27b8bc6e5cfc",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:36.662446+04:00",
+        "version_id": "7e3d26ce-2ba2-51bd-832e-0b082451a5f5",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2710b5dc-a9fc-4357-8051-563981ad40cd",
+        "resource_id": "94c0c8aa-bc6c-59c8-aeff-35742d5c2cf3",
+        "system_from": "2026-09-06T11:17:38.212188+04:00",
+        "content_hash": "36e364afcff32bd0aefd71ad9f7ea0b3d5f8e67c63c21e550d924b2dc1210af8",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:94c0c8aa-bc6c-59c8-aeff-35742d5c2cf3",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "d9dfcfb6-160c-5dff-9fee-a05ccf2443fb",
+          "source_record_id": "4751f99f-2668-571d-a617-ca199e80574d",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:08.473354+04:00",
+        "version_id": "0709198b-5946-5904-a05e-73cf298fc28e",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "d74bfaed-bc80-4057-ae2c-8476f468680d",
+        "resource_id": "967da1ee-7083-53d7-8967-e3edaec1ca90",
+        "system_from": "2026-09-06T11:15:10.817348+04:00",
+        "content_hash": "1cc872ea7127575ac0361d69f9e422b5b569555dd256a6807487e0fc5b0074f3",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:967da1ee-7083-53d7-8967-e3edaec1ca90",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "d7c8ee68-e844-51c6-a177-ee2d7304cf9f",
+          "source_record_id": "ebd4cacd-d28d-5ea7-8a63-586169880ea1",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:30.999116+04:00",
+        "version_id": "476fa896-7865-5564-a387-4eb9f326f952",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "f1e413ef-bd6d-4d53-87db-bc549d028659",
+        "resource_id": "97179fe6-a616-5180-86ee-504c6b6412ce",
+        "system_from": "2026-09-06T11:14:32.629734+04:00",
+        "content_hash": "b3f0909c3f6e81cc1a425c158b96bae74b0d5307f69d1e48288905d2051aa061",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:97179fe6-a616-5180-86ee-504c6b6412ce",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "f85131b0-46f9-5f0b-bc96-c74e2e687a36",
+          "source_record_id": "7c34f97d-2f3b-50bd-8ca2-1a32c91f34f0",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:55.460549+04:00",
+        "version_id": "521066d1-58f4-544b-889d-5a3ed710b448",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "b37c7bc0-982b-4729-b376-2418b62643db",
+        "resource_id": "984269d9-d45d-53f9-9053-c5d2b9f4fae0",
+        "system_from": "2026-09-06T11:17:57.555255+04:00",
+        "content_hash": "81cbb7f45480d7014ba3f550c1a1092e8f0fc056d457d2aa4f1067a2d40cc493",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:984269d9-d45d-53f9-9053-c5d2b9f4fae0",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "a1c5294d-a5b1-55e3-b8b3-0bbe71ba26d4",
+          "source_record_id": "722f185d-d73b-5f55-8b62-56cb90498104",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:26.538754+04:00",
+        "version_id": "5d9a033e-5d00-5a46-b322-c5d744e07402",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "51b171db-7494-4c4c-bac6-cedb7557049c",
+        "resource_id": "a33c1017-5d77-5d25-a418-9d19ac79a6b2",
+        "system_from": "2026-09-06T11:17:28.142911+04:00",
+        "content_hash": "27b00e7b853e5fe9ec1e89f85c2aea6705efeb3d2abf59ed4c2d23dae4a07599",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:a33c1017-5d77-5d25-a418-9d19ac79a6b2",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "7938031d-4097-5f74-a756-92e5fedbfb90",
+          "source_record_id": "c5a87c77-24ca-58c3-8b0d-df551305f741",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:26.538754+04:00",
+        "version_id": "bbc2f77c-d6b6-5284-81b1-1440bdfeadd8",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "51b171db-7494-4c4c-bac6-cedb7557049c",
+        "resource_id": "a35165b3-550e-5364-bdc6-790ac17d74be",
+        "system_from": "2026-09-06T11:17:27.908048+04:00",
+        "content_hash": "b1ad7185523856c4b4ee8b0b953526b9a548b061fe87bca2d513ce017dc3dd1f",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:a35165b3-550e-5364-bdc6-790ac17d74be",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "255a1fc6-d7ef-597d-ac95-e8c74a672843",
+          "source_record_id": "a0ccc4d3-883d-5d9e-a43b-1b332d35e7b7",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:36.662446+04:00",
+        "version_id": "b9905c2e-c1af-52f7-a799-2926fb76a8dd",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2710b5dc-a9fc-4357-8051-563981ad40cd",
+        "resource_id": "a4bdbad0-970d-53aa-a3c9-f7e08f7d11ae",
+        "system_from": "2026-09-06T11:17:39.324165+04:00",
+        "content_hash": "a6118ba281985b0fe37f6944adcee45097e2889c688a7c20a2d21242e377a8a3",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:a4bdbad0-970d-53aa-a3c9-f7e08f7d11ae",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+          "source_record_id": "f9f5434d-eb54-5a74-8917-d49d5b3dbf50",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:12:51.691974+04:00",
+        "version_id": "25d054d2-acde-507f-aecd-699f3d160cac",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3",
+        "resource_id": "a58d6995-c751-5280-adf5-b03ab6bec3c2",
+        "system_from": "2026-09-06T11:12:54.200615+04:00",
+        "content_hash": "163d14a6555ecf1768dcce0669d607feadeffb60d887d46bbb66aba352078969",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:a58d6995-c751-5280-adf5-b03ab6bec3c2",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "0fb6e260-df7f-5102-8cdb-0b2530eb388d",
+          "source_record_id": "0a7b9c82-cff5-55ab-b68a-d30f0b0cf6a6",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:12:51.691974+04:00",
+        "version_id": "2ae5ebbd-6157-5abf-8a93-610a83eb5086",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3",
+        "resource_id": "a8970859-a1e7-5c27-b321-e106f58240f6",
+        "system_from": "2026-09-06T11:12:55.548687+04:00",
+        "content_hash": "3251421610da2ddbc15b43105f1fb7fa58f26bd33cea4dc791a831374d67ec58",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:a8970859-a1e7-5c27-b321-e106f58240f6",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "b180c16c-7fd9-57a2-b1a1-d103c7430299",
+          "source_record_id": "5851266f-78c6-51b9-b226-a610a091a0e4",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:36.662446+04:00",
+        "version_id": "2b6518e2-4d8c-5613-a618-dd354c963160",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2710b5dc-a9fc-4357-8051-563981ad40cd",
+        "resource_id": "a8aa4490-0d82-5ecf-a766-056b465b49bb",
+        "system_from": "2026-09-06T11:17:37.606705+04:00",
+        "content_hash": "fb920440534c15f128c9ade5b4104ea6e39bf1b7f6e099bc38ba889a895959d5",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:a8aa4490-0d82-5ecf-a766-056b465b49bb",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "50d8b28a-ecd7-5d07-b1d7-e368d0b65b7d",
+          "source_record_id": "cc89d4a9-1532-5e58-a594-2a2106808ca8",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:16:08.318019+04:00",
+        "version_id": "4e8707e1-0be9-57da-a485-439527cf5bc7",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "73562c0f-47fb-47a1-81df-8a5e7ec3b7ff",
+        "resource_id": "aa26c32e-5917-513f-9555-08c7a43499f6",
+        "system_from": "2026-09-06T11:16:09.613123+04:00",
+        "content_hash": "7813eb5561584173c7779e9684f3103ca72a2d8441e268a619766f6435024f16",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:aa26c32e-5917-513f-9555-08c7a43499f6",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "647caeeb-44cd-5204-ab4b-c8aca1d6f857",
+          "source_record_id": "166e4c21-7186-5ca5-995e-ab8784fdce4e",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:39.626583+04:00",
+        "version_id": "7369153e-dec8-5a25-a2aa-7375b3e68168",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "6b974fab-7f9f-4d1e-a9e3-e998a084f150",
+        "resource_id": "ac72811a-d8e6-5726-8221-66a5b51f1be8",
+        "system_from": "2026-09-06T11:15:40.959782+04:00",
+        "content_hash": "aff3a523a634efca0bba5e34038aaa3f2a8aae7d5aaff834799e6f4ef96ee3ab",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:ac72811a-d8e6-5726-8221-66a5b51f1be8",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "2314374e-5f11-5f4d-befe-a19edc191856",
+          "source_record_id": "e2de9cc0-c619-5436-8475-4f4c12ebcb6e",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:18.286531+04:00",
+        "version_id": "eb9486bc-ac75-59f3-8a8e-5f5b462490b2",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "98b6e7f0-2cda-492b-ba59-75f42a64dc40",
+        "resource_id": "b7109eb7-3b89-5a34-8597-b421818d133f",
+        "system_from": "2026-09-06T11:15:21.141412+04:00",
+        "content_hash": "ba5bea1f4410c638d79d53541e48b3e3c3e0477c3d3bb030b3cabb023f531a49",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:b7109eb7-3b89-5a34-8597-b421818d133f",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "8b16154c-372e-5211-8e7b-89670fbb20f5",
+          "source_record_id": "21d4fdb5-d1aa-5fed-9f82-7f62256dbad5",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:36.662446+04:00",
+        "version_id": "9f97f3fa-af51-52f2-a556-40d1860e1634",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2710b5dc-a9fc-4357-8051-563981ad40cd",
+        "resource_id": "be2a8ade-1b44-5eba-b51a-ef67d0cb8b09",
+        "system_from": "2026-09-06T11:17:37.817417+04:00",
+        "content_hash": "d16d4774946c70410842bb0a31e7738811ab9ba35536f467ef45631674b303b4",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:be2a8ade-1b44-5eba-b51a-ef67d0cb8b09",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "7e4a6b56-3972-59f4-94be-c7e2cb411e39",
+          "source_record_id": "64c4370f-d198-506e-b8a7-1d51357fcd9f",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:18.286531+04:00",
+        "version_id": "3cd2d8fa-7cf0-5d57-ba01-5814b5680db7",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "98b6e7f0-2cda-492b-ba59-75f42a64dc40",
+        "resource_id": "bfdcacce-5bba-5e3a-a428-6515fbe03d1d",
+        "system_from": "2026-09-06T11:15:20.945938+04:00",
+        "content_hash": "40bd8c6f272ad1fadc3a9ff6dbf6098be90470cab280c760285b02db5918679c",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:bfdcacce-5bba-5e3a-a428-6515fbe03d1d",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "24c22fee-e341-5f5e-90bc-2018bc769da6",
+          "source_record_id": "fb2757dc-64f8-5723-b90f-6194f582cd56",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:46.347084+04:00",
+        "version_id": "427e2669-9703-52aa-bb2c-44bb95a7a1a2",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3475454d-a1be-4973-aced-7327ad672d78",
+        "resource_id": "c3912387-2d4c-558c-8838-5e0862513a2a",
+        "system_from": "2026-09-06T11:17:48.486908+04:00",
+        "content_hash": "4999f7769fe6d7fcdcfea6b7536cb9fcce30935eeb5c8c62220a337e353f7888",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:c3912387-2d4c-558c-8838-5e0862513a2a",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "99fec337-9b86-5751-878a-1d91b2d899d2",
+          "source_record_id": "20c411c4-06c3-5a44-8a99-8aef19bd5bb4",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:26.538754+04:00",
+        "version_id": "8bb4584c-538a-5d91-abd7-e0624961dd5c",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "51b171db-7494-4c4c-bac6-cedb7557049c",
+        "resource_id": "d0934f50-398b-5dc6-9007-723abbc3280c",
+        "system_from": "2026-09-06T11:17:28.575276+04:00",
+        "content_hash": "4c88baf9ca54396d49e4ca7e8e92febc5583a55b30eedb56e7ec14a02f222731",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:d0934f50-398b-5dc6-9007-723abbc3280c",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "4f4607ea-3367-5462-9252-ecfd86106909",
+          "source_record_id": "85ca0d05-1c0b-5bab-a953-612529b91bf3",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:18.286531+04:00",
+        "version_id": "4b018452-8354-5722-87e0-92a72903c3b9",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "98b6e7f0-2cda-492b-ba59-75f42a64dc40",
+        "resource_id": "d318d540-cb28-5aa8-a365-a36379c8ee47",
+        "system_from": "2026-09-06T11:15:20.324094+04:00",
+        "content_hash": "10a0ddba85a7624a0ec760570c8ea97fafcde6b7f973a11d2d10340086e3577d",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:d318d540-cb28-5aa8-a365-a36379c8ee47",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "73976917-de16-5136-982b-c80e93d4024d",
+          "source_record_id": "7675c675-8846-5552-956a-1800ca5994e9",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:36.662446+04:00",
+        "version_id": "d5639636-76ac-56e2-8e5b-ad80a4c13ccb",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "2710b5dc-a9fc-4357-8051-563981ad40cd",
+        "resource_id": "d5882fa0-9a92-5e3c-aa03-e787a599b65a",
+        "system_from": "2026-09-06T11:17:39.136746+04:00",
+        "content_hash": "9f649b41c141cb780b9988e80bd0257d428d277c0d29749cef64f8d8a89f5647",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:d5882fa0-9a92-5e3c-aa03-e787a599b65a",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "25bdc668-0271-588d-aa11-f2515afdc153",
+          "source_record_id": "91cabcb8-72e1-5b7f-ba7d-668b7f6a062d",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:46.347084+04:00",
+        "version_id": "93eba516-4b0c-5d6d-8721-c12f3096c260",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3475454d-a1be-4973-aced-7327ad672d78",
+        "resource_id": "d9909eaf-1072-5f9f-8d9a-8fd69a580758",
+        "system_from": "2026-09-06T11:17:47.359025+04:00",
+        "content_hash": "10d4f2a4a7b52fa17f4abee52d14de935c67f3224c11940cfa1ea02ba6d41fe3",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:d9909eaf-1072-5f9f-8d9a-8fd69a580758",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "53e4b3ee-3922-5bf8-8911-f4bc5cc34f4e",
+          "source_record_id": "12bb5050-14d5-5bcf-9b62-2f1c9e1f015f",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:39.626583+04:00",
+        "version_id": "e2e43a8a-c348-5c37-9c97-ecc05443984a",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "6b974fab-7f9f-4d1e-a9e3-e998a084f150",
+        "resource_id": "da4e6cc0-4320-51ed-802b-d2ddd6b98f36",
+        "system_from": "2026-09-06T11:15:42.052036+04:00",
+        "content_hash": "6401de453fb0b296da15355cd92aa94b1b06e0076cd4eeb0647ec4469f79f61b",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:da4e6cc0-4320-51ed-802b-d2ddd6b98f36",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "99de5b4c-2e62-5b48-a4d5-af567aa45582",
+          "source_record_id": "6c94e59f-62e8-5c8a-a0ad-7120397207f9",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:55.460549+04:00",
+        "version_id": "e3ce5d5d-c573-52d3-aa3f-4c2cfaf51502",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "b37c7bc0-982b-4729-b376-2418b62643db",
+        "resource_id": "da80a2de-a35d-58b9-8f1d-14573f67c4f1",
+        "system_from": "2026-09-06T11:17:57.37365+04:00",
+        "content_hash": "99f074e2420b76d431dd04c6d1aab7f3c5736d3aaa8046bfcfeb91cc982b350d",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:da80a2de-a35d-58b9-8f1d-14573f67c4f1",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "274e32e0-38a1-58b5-a2e6-d9acc70e651b",
+          "source_record_id": "a35ceff4-05fd-53fd-a172-18e574f2c4a1",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:58.864354+04:00",
+        "version_id": "b69edc75-be2b-52fa-a5ba-48b7c0648efb",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "17e8f913-6a6d-43f6-b8f7-9f5f7a4d09fd",
+        "resource_id": "db9b7d4a-4939-5a44-add0-572fac8ae5e5",
+        "system_from": "2026-09-06T11:14:59.951807+04:00",
+        "content_hash": "f18d787a8d59f4de61f35b6b0c66f527146c4a0a9d1244c7d948922b624bf570",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:db9b7d4a-4939-5a44-add0-572fac8ae5e5",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "dd8c6cd7-2cdb-589b-a837-c1a49822abb4",
+          "source_record_id": "038d47ec-c719-5fce-b6a5-16ac4868fc60",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:40.362748+04:00",
+        "version_id": "055d054d-04af-5813-a18e-f7de272d55c1",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "d6f0a996-1f06-447c-bf41-76f6eefb6124",
+        "resource_id": "dd37b08f-3c07-551f-bcab-221605f7ff76",
+        "system_from": "2026-09-06T11:14:41.126524+04:00",
+        "content_hash": "697a9a2c04c2638d0171f5a75cc9aaabdc38a242960ffb98a719b312657c24c4",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:dd37b08f-3c07-551f-bcab-221605f7ff76",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "6ac80cdc-0abc-5f24-98bc-8dead82e038b",
+          "source_record_id": "85088e97-7ae3-5e85-9fe9-502b137069bb",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:18.286531+04:00",
+        "version_id": "2f7860b0-519f-512c-9379-bd63c4a99bcc",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "98b6e7f0-2cda-492b-ba59-75f42a64dc40",
+        "resource_id": "e1a62a1f-d56c-5f10-bcc4-a462a66ac6b8",
+        "system_from": "2026-09-06T11:15:20.121833+04:00",
+        "content_hash": "14b6cd12b618c528e89863ad0b9973dfa3ce7b4e0b6b716664b2c0c6972ffd44",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:e1a62a1f-d56c-5f10-bcc4-a462a66ac6b8",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "2905eb0a-923e-5cab-a986-85d4cd99f01a",
+          "source_record_id": "c05c8820-c61e-542c-86c8-c00a77f5a763",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:26.538754+04:00",
+        "version_id": "4e4d1726-2633-59c6-b42f-4add24925c15",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "51b171db-7494-4c4c-bac6-cedb7557049c",
+        "resource_id": "e7bd61c8-c5d8-513e-b73e-2122c3192474",
+        "system_from": "2026-09-06T11:17:29.193335+04:00",
+        "content_hash": "f9431343cc44f3d918df2f64272999c7a3e336f2ee7cdbddfea808bbfc63e47a",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:e7bd61c8-c5d8-513e-b73e-2122c3192474",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "11670ce3-e6a6-5a8a-97de-09549e4c0ae6",
+          "source_record_id": "6b3817d0-8c09-5e02-845d-28d639b1d45a",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:55.460549+04:00",
+        "version_id": "dc13cd75-e306-536d-a6e8-79d4af70098b",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "b37c7bc0-982b-4729-b376-2418b62643db",
+        "resource_id": "ea186bc7-c4f9-5c35-a6d5-c48c17d4c11d",
+        "system_from": "2026-09-06T11:17:57.735447+04:00",
+        "content_hash": "727bc20b84458f6b3259cfa04a6a62cbccc54f467dd8d0edb2fc510e22860d4c",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:ea186bc7-c4f9-5c35-a6d5-c48c17d4c11d",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "fc997c3d-7182-502a-a879-b59358f32da8",
+          "source_record_id": "7552cc3c-3a8e-56a5-8285-8b728ba0e5f6",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:15:28.336807+04:00",
+        "version_id": "03f28806-a7a5-5d97-95aa-c581f7207e2f",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "832e42e4-270b-475b-96f7-1731d7060020",
+        "resource_id": "f3f13c6e-189b-5f8b-adc5-5d2ee85f9678",
+        "system_from": "2026-09-06T11:15:30.92201+04:00",
+        "content_hash": "3f30701e15cf437664b2f3cda8f8c1711679101355c882468fc9a4bca1449a9e",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:f3f13c6e-189b-5f8b-adc5-5d2ee85f9678",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+          "source_record_id": "28513f4f-9d93-5d48-996a-cce993c41587",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:12:51.691974+04:00",
+        "version_id": "458d5251-8645-59c4-89e7-417339671869",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3",
+        "resource_id": "f63d2c54-f0ea-573f-bd1c-a270230539fd",
+        "system_from": "2026-09-06T11:12:53.925364+04:00",
+        "content_hash": "329d2add15284ed0cdaea72325e92911178fcf43bc103bb2d92d276309ff471e",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:f63d2c54-f0ea-573f-bd1c-a270230539fd",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "9d635c03-6557-56b1-a198-aa881ed69eba",
+          "source_record_id": "7747bdcd-1efc-5679-a4d1-d42540eefcc9",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:58.864354+04:00",
+        "version_id": "c44ff147-a93e-5fe2-bd76-ee0a6d1e3d98",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "17e8f913-6a6d-43f6-b8f7-9f5f7a4d09fd",
+        "resource_id": "f6c79558-f7c0-5eff-b34a-a2bd3d6137eb",
+        "system_from": "2026-09-06T11:15:00.898237+04:00",
+        "content_hash": "5b92a0745f9a779eff5877a05edc29112546eaeab353969a548e9a8aa309a4fd",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:f6c79558-f7c0-5eff-b34a-a2bd3d6137eb",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "cae670e9-e45e-5caf-91af-5e0b508d267a",
+          "source_record_id": "b8bc936f-f54e-5c83-8cb0-88f7cd60232a",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:16:08.318019+04:00",
+        "version_id": "2b70c91d-aa14-572f-80e6-c5bafa6bbd65",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "73562c0f-47fb-47a1-81df-8a5e7ec3b7ff",
+        "resource_id": "f92cd0f4-6a5e-5667-847b-5564ff1fdc8b",
+        "system_from": "2026-09-06T11:16:10.743471+04:00",
+        "content_hash": "60f900f21cc9cde35fd63827b3932b9fc02e851f3052870ef93e1024a46ee62d",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:f92cd0f4-6a5e-5667-847b-5564ff1fdc8b",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "0f0ce220-b87d-543e-b502-813c840f1cc1",
+          "source_record_id": "76944d31-e798-5915-98b3-4646d2d8092e",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:17:26.538754+04:00",
+        "version_id": "865df86b-7d2b-5b4d-a791-f99853569f16",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "51b171db-7494-4c4c-bac6-cedb7557049c",
+        "resource_id": "fb2a6eb4-b03f-508c-8359-c910b3c04fc4",
+        "system_from": "2026-09-06T11:17:28.349762+04:00",
+        "content_hash": "dd8255d7cf2728392adb10dd63b73dc93edb36df565257a517b3096a046dd57d",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:fb2a6eb4-b03f-508c-8359-c910b3c04fc4",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "member_id": "07e796c0-2051-529f-ab3c-025199457f98",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "observation_id": "167a53c3-1263-5628-b466-ab847f291631",
+          "source_record_id": "97231d67-f7f7-5c03-8056-20ff65ed7c92",
+          "company_dimension_id": "7959af7f-a1bb-5573-8006-d1fc14f58681"
+        },
+        "valid_from": "2026-09-06T11:14:30.999116+04:00",
+        "version_id": "7ed16b7d-2973-5c7a-a8d2-aaee2fabfc4c",
+        "object_type": "SourceDimensionAssignment",
+        "proposal_id": "f1e413ef-bd6d-4d53-87db-bc549d028659",
+        "resource_id": "fdf41667-8d39-5e17-b3cd-790913d399ff",
+        "system_from": "2026-09-06T11:14:32.430605+04:00",
+        "content_hash": "7dad81a39ba485e89aeb73e3e42f7cf04797812a10b7fcab9e6ae77a5ee35f4b",
+        "display_name": "Region: SOG-Kartli",
+        "identity_key": "source-dimension:fdf41667-8d39-5e17-b3cd-790913d399ff",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [],
+    "traversal_schema_versions": [
+      {
+        "object_type": "SourceDimensionAssignment",
+        "resource_id": "ca3afb33-3cc9-5d9b-9187-33865333ed33",
+        "version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695",
+        "step": 1
+      }
+    ]
+  },
+  "invocation": {
+    "invocation_id": "60f73e17-5d33-42c5-bc8a-06a232196c8c",
+    "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+    "status": "SUCCEEDED",
+    "receipt_hash": "5e976fb857bd68a59a865458af2c6d46d45d91a57febd23836d8f08d97b52880",
+    "receipt": {
+      "mode": "EVIDENCE_ANALYSIS_ONLY",
+      "run_id": "fcr_ec96d3edc20ef9f7e45cbbb900e4bd509bbcf468813beb46d7575b26ffa91383",
+      "status": "SUCCEEDED",
+      "request": {
+        "limit": 200,
+        "offset": 0,
+        "function": {
+          "version_id": "b9d5f8d8-a9ae-5cce-9631-b792fc9caf98",
+          "resource_id": "83c58f5c-31bd-566b-b092-fa0283094069"
+        },
+        "known_at": "2026-09-07T08:58:11.750090Z",
+        "valid_at": "2026-09-07T08:58:11.750090Z",
+        "request_id": "60f73e17-5d33-42c5-bc8a-06a232196c8c"
+      },
+      "function": {
+        "version_id": "b9d5f8d8-a9ae-5cce-9631-b792fc9caf98",
+        "resource_id": "83c58f5c-31bd-566b-b092-fa0283094069",
+        "content_hash": "964f1c313373e7ce5260d78843fceb3d3d7ff8572e7beef05de21220083ad65e"
+      },
+      "plan_hash": "eab26aaae94687deb8c0cd3f13ea1cbbef50c247c4d1ceaf60fdb4bbd3b6b9f5",
+      "request_id": "60f73e17-5d33-42c5-bc8a-06a232196c8c",
+      "started_at": "2026-09-07T08:58:13.800296+00:00",
+      "exact_scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "completed_at": "2026-09-07T08:58:14.743306+00:00",
+      "implementation": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "code_sha256": "72307da730a7b281521b1d116d4066ec753f592da500ab743519253f7ed900f9",
+        "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+        "capabilities": {
+          "cdc": false,
+          "read": true,
+          "query": true,
+          "write": false,
+          "delete": false,
+          "limits": {
+            "coverage": "QUERY_PAGE_ONLY",
+            "returned_rows": 200,
+            "grouping_fields": 4,
+            "traversal_steps": 4,
+            "query_predicates": 20,
+            "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "derived_properties": 8,
+            "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+            "database_scan_limit": null
+          },
+          "stream": false,
+          "update": false,
+          "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+          "reversal": false,
+          "snapshot": true,
+          "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+          "simulation": false,
+          "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+          "incremental": false,
+          "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+          "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+          "formula_execution": false,
+          "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+          "source_write_exactly_once": false,
+          "grouped_observation_counts": true,
+          "typed_relationship_filters": true
+        },
+        "maximum_rows": 200,
+        "dependency_sha256": "6421da01eb2f3865dc3defbf11875bc418c93813ffde6a4451e52baf9cbc2783",
+        "implementation_id": "ontology.object-set-derived/v1",
+        "maximum_properties": 8
+      },
+      "current_use_authorized": false,
+      "business_effect_authorized": false,
+      "proof_hash": "5e976fb857bd68a59a865458af2c6d46d45d91a57febd23836d8f08d97b52880",
+      "recorded_at": "2026-09-07T12:58:14.806111+04:00"
+    },
+    "output": {
+      "mode": "EVIDENCE_ANALYSIS_ONLY",
+      "query": {
+        "limit": 200,
+        "offset": 0,
+        "search": "",
+        "filters": [],
+        "known_at": "2026-09-07T08:58:11.750090Z",
+        "valid_at": "2026-09-07T08:58:11.750090Z",
+        "traversal": [
+          {
+            "kind": "reference",
+            "name": "member_id",
+            "filters": [
+              {
+                "field": "evidence_id",
+                "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+              }
+            ],
+            "direction": "incoming"
+          },
+          {
+            "kind": "reference",
+            "name": "observation_id",
+            "filters": [
+              {
+                "field": "posting_date",
+                "value": "2025-11-03",
+                "operator": "gte"
+              },
+              {
+                "field": "posting_date",
+                "value": "2025-11-04",
+                "operator": "lt"
+              }
+            ],
+            "direction": "outgoing"
+          }
+        ],
+        "object_type": "DimensionMember",
+        "resource_ids": [
+          "07e796c0-2051-529f-ab3c-025199457f98"
+        ]
+      },
+      "scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "total": 2,
+      "run_id": "fcr_ec96d3edc20ef9f7e45cbbb900e4bd509bbcf468813beb46d7575b26ffa91383",
+      "objects": [
+        {
+          "valid_to": null,
+          "attributes": {
+            "amount": "312.29",
+            "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+            "unit_status": "UNESTABLISHED",
+            "posting_date": "2025-11-03",
+            "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+            "source_details": {
+              "cells": {
+                "A": {
+                  "type": 0,
+                  "value": ""
+                },
+                "B": {
+                  "type": 1,
+                  "value": "SOG"
+                },
+                "C": {
+                  "type": 1,
+                  "value": "November"
+                },
+                "D": {
+                  "type": 2,
+                  "value": "3"
+                },
+                "E": {
+                  "type": 2,
+                  "value": "11"
+                },
+                "F": {
+                  "type": 2,
+                  "value": "2025"
+                },
+                "G": {
+                  "type": 1,
+                  "value": "03.11.2025 0:00:00"
+                },
+                "H": {
+                  "type": 2,
+                  "value": "1"
+                },
+                "I": {
+                  "type": 1,
+                  "value": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+                },
+                "J": {
+                  "type": 1,
+                  "value": "სს. საქორგგაზი // АО Сакорггаз"
+                },
+                "K": {
+                  "type": 1,
+                  "value": "7310.02.1"
+                },
+                "L": {
+                  "type": 1,
+                  "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+                },
+                "M": {
+                  "type": 1,
+                  "value": "SOG ადიგენის სერვის ცენტრი"
+                },
+                "N": {
+                  "type": 6,
+                  "value": ""
+                },
+                "O": {
+                  "type": 6,
+                  "value": ""
+                },
+                "P": {
+                  "type": 6,
+                  "value": ""
+                },
+                "Q": {
+                  "type": 1,
+                  "value": "3110"
+                },
+                "R": {
+                  "type": 1,
+                  "value": "შპს ტოიოტა ცენტრი თეგეტა"
+                },
+                "S": {
+                  "type": 1,
+                  "value": "ხელშეკრულება გამყიდველთან(ავტოტექმომსახურება)"
+                },
+                "T": {
+                  "type": 6,
+                  "value": ""
+                },
+                "U": {
+                  "type": 6,
+                  "value": ""
+                },
+                "V": {
+                  "type": 6,
+                  "value": ""
+                },
+                "W": {
+                  "type": 2,
+                  "value": "312.29"
+                },
+                "X": {
+                  "type": 1,
+                  "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+                },
+                "Y": {
+                  "type": 1,
+                  "value": "SOG-Kartli"
+                },
+                "Z": {
+                  "type": 1,
+                  "value": "Service"
+                },
+                "AA": {
+                  "type": 1,
+                  "value": "Auto Park"
+                }
+              },
+              "parser": "source-accounting/1",
+              "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+              "currency_authority": "UNESTABLISHED",
+              "same_account_source_rows": []
+            },
+            "source_row_key": "TR!5",
+            "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+            "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+            "source_record_id": "74d01a8b-95a9-5dca-b08e-7b3b98189ab1",
+            "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+            "document_reference": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+          },
+          "valid_from": "2026-09-06T09:56:39.437262+04:00",
+          "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+          "object_type": "SourceJournalMovement",
+          "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+          "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+          "system_from": "2026-09-06T09:56:47.868316+04:00",
+          "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc",
+          "display_name": "TR!row:5",
+          "identity_key": "source-fact:bb3f5efc-459e-5c46-999b-f50329285136",
+          "access_entity": "entity-ge-001",
+          "evidence_class": "SOURCE_BOUND",
+          "authority_state": "APPROVED",
+          "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+        },
+        {
+          "valid_to": null,
+          "attributes": {
+            "amount": "938.95",
+            "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+            "unit_status": "UNESTABLISHED",
+            "posting_date": "2025-11-03",
+            "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+            "source_details": {
+              "cells": {
+                "A": {
+                  "type": 0,
+                  "value": ""
+                },
+                "B": {
+                  "type": 1,
+                  "value": "SOG"
+                },
+                "C": {
+                  "type": 1,
+                  "value": "November"
+                },
+                "D": {
+                  "type": 2,
+                  "value": "3"
+                },
+                "E": {
+                  "type": 2,
+                  "value": "11"
+                },
+                "F": {
+                  "type": 2,
+                  "value": "2025"
+                },
+                "G": {
+                  "type": 1,
+                  "value": "03.11.2025 0:00:00"
+                },
+                "H": {
+                  "type": 2,
+                  "value": "1"
+                },
+                "I": {
+                  "type": 1,
+                  "value": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+                },
+                "J": {
+                  "type": 1,
+                  "value": "სს. საქორგგაზი // АО Сакорггаз"
+                },
+                "K": {
+                  "type": 1,
+                  "value": "7310.02.1"
+                },
+                "L": {
+                  "type": 1,
+                  "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+                },
+                "M": {
+                  "type": 1,
+                  "value": "SOG ცენტრალური რეგიონალური ოფისი"
+                },
+                "N": {
+                  "type": 6,
+                  "value": ""
+                },
+                "O": {
+                  "type": 6,
+                  "value": ""
+                },
+                "P": {
+                  "type": 6,
+                  "value": ""
+                },
+                "Q": {
+                  "type": 1,
+                  "value": "3110"
+                },
+                "R": {
+                  "type": 1,
+                  "value": "შპს თეგეტა მოტორსი"
+                },
+                "S": {
+                  "type": 1,
+                  "value": "ხელშეკრულება გამყიდველთან"
+                },
+                "T": {
+                  "type": 6,
+                  "value": ""
+                },
+                "U": {
+                  "type": 6,
+                  "value": ""
+                },
+                "V": {
+                  "type": 6,
+                  "value": ""
+                },
+                "W": {
+                  "type": 2,
+                  "value": "938.95"
+                },
+                "X": {
+                  "type": 1,
+                  "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+                },
+                "Y": {
+                  "type": 1,
+                  "value": "SOG-Kartli"
+                },
+                "Z": {
+                  "type": 1,
+                  "value": "Service"
+                },
+                "AA": {
+                  "type": 1,
+                  "value": "Auto Park"
+                }
+              },
+              "parser": "source-accounting/1",
+              "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+              "currency_authority": "UNESTABLISHED",
+              "same_account_source_rows": []
+            },
+            "source_row_key": "TR!6",
+            "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+            "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+            "source_record_id": "492b0b11-d980-5f97-94ad-15e8a72e60f7",
+            "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+            "document_reference": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+          },
+          "valid_from": "2026-09-06T09:56:39.539745+04:00",
+          "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+          "object_type": "SourceJournalMovement",
+          "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+          "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+          "system_from": "2026-09-06T09:56:49.086973+04:00",
+          "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b",
+          "display_name": "TR!row:6",
+          "identity_key": "source-fact:ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+          "access_entity": "entity-ge-001",
+          "evidence_class": "SOURCE_BOUND",
+          "authority_state": "APPROVED",
+          "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+        }
+      ],
+      "contract": "function-result/1",
+      "coverage": "QUERY_PAGE_ONLY",
+      "function": {
+        "version_id": "b9d5f8d8-a9ae-5cce-9631-b792fc9caf98",
+        "resource_id": "83c58f5c-31bd-566b-b092-fa0283094069",
+        "content_hash": "964f1c313373e7ce5260d78843fceb3d3d7ff8572e7beef05de21220083ad65e"
+      },
+      "plan_hash": "eab26aaae94687deb8c0cd3f13ea1cbbef50c247c4d1ceaf60fdb4bbd3b6b9f5",
+      "next_offset": null,
+      "definition_id": "c90dedc1-0e04-5d3f-bcf3-52df8a60ac4c",
+      "used_versions": [
+        {
+          "known_at": "2026-09-07T08:58:11.750090+00:00",
+          "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+          "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+          "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc",
+          "material_state": "UNESTABLISHED"
+        },
+        {
+          "known_at": "2026-09-07T08:58:11.750090+00:00",
+          "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+          "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+          "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b",
+          "material_state": "UNESTABLISHED"
+        }
+      ],
+      "counts_by_type": {
+        "SourceJournalMovement": 2
+      },
+      "derived_values": [],
+      "implementation": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "code_sha256": "72307da730a7b281521b1d116d4066ec753f592da500ab743519253f7ed900f9",
+        "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+        "capabilities": {
+          "cdc": false,
+          "read": true,
+          "query": true,
+          "write": false,
+          "delete": false,
+          "limits": {
+            "coverage": "QUERY_PAGE_ONLY",
+            "returned_rows": 200,
+            "grouping_fields": 4,
+            "traversal_steps": 4,
+            "query_predicates": 20,
+            "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "derived_properties": 8,
+            "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+            "database_scan_limit": null
+          },
+          "stream": false,
+          "update": false,
+          "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+          "reversal": false,
+          "snapshot": true,
+          "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+          "simulation": false,
+          "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+          "incremental": false,
+          "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+          "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+          "formula_execution": false,
+          "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+          "source_write_exactly_once": false,
+          "grouped_observation_counts": true,
+          "typed_relationship_filters": true
+        },
+        "maximum_rows": 200,
+        "dependency_sha256": "6421da01eb2f3865dc3defbf11875bc418c93813ffde6a4451e52baf9cbc2783",
+        "implementation_id": "ontology.object-set-derived/v1",
+        "maximum_properties": 8
+      },
+      "read_permissions": [
+        "ontology_admin",
+        "ontology_read",
+        "read"
+      ],
+      "calculation_runtime": "shared-functions/1",
+      "static_dependencies": [
+        {
+          "version_id": "5304817d-64a9-5fdc-b8c3-94984534b428",
+          "resource_id": "c90dedc1-0e04-5d3f-bcf3-52df8a60ac4c",
+          "content_hash": "a8dd9fe38470a5f3a7329583113ede93abef324233f46b31ac3bd584917f40d0"
+        },
+        {
+          "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+          "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+          "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+        }
+      ],
+      "invocation_plan_hash": "eab26aaae94687deb8c0cd3f13ea1cbbef50c247c4d1ceaf60fdb4bbd3b6b9f5",
+      "definition_version_id": "5304817d-64a9-5fdc-b8c3-94984534b428",
+      "invocation_request_id": "60f73e17-5d33-42c5-bc8a-06a232196c8c",
+      "current_use_authorized": false,
+      "filter_schema_versions": [],
+      "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+      "traversal_schema_versions": [
+        {
+          "step": 1,
+          "version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695",
+          "object_type": "SourceDimensionAssignment",
+          "resource_id": "ca3afb33-3cc9-5d9b-9187-33865333ed33"
+        },
+        {
+          "step": 2,
+          "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+          "object_type": "SourceJournalMovement",
+          "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282"
+        }
+      ],
+      "business_effect_authorized": false
+    },
+    "current_use_authorized": false,
+    "business_effect_authorized": false
+  },
+  "consumer_request": {
+    "request_id": "95fdabf3-c077-4da4-84a3-b4715b0da69f",
+    "function": {
+      "resource_id": "83c58f5c-31bd-566b-b092-fa0283094069",
+      "version_id": "b9d5f8d8-a9ae-5cce-9631-b792fc9caf98"
+    },
+    "valid_at": "2026-09-07T08:58:11.750090+00:00",
+    "known_at": "2026-09-07T08:58:11.750090+00:00",
+    "offset": 0,
+    "limit": 200,
+    "input_result": {
+      "invocation_id": "60f73e17-5d33-42c5-bc8a-06a232196c8c"
+    }
+  },
+  "consumer": {
+    "invocation_id": "95fdabf3-c077-4da4-84a3-b4715b0da69f",
+    "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+    "status": "SUCCEEDED",
+    "receipt_hash": "5515852a0358aed150aaab634ca539bcd0fc47802a1a5ce3eb07385c6d4d6f85",
+    "receipt": {
+      "mode": "EVIDENCE_ANALYSIS_ONLY",
+      "run_id": "fcr_1f30ac56a721c8a7fc5e9c44882d67e843f34b0cccc88fa4b4cbfc2dc2f7e950",
+      "status": "SUCCEEDED",
+      "request": {
+        "limit": 200,
+        "offset": 0,
+        "function": {
+          "version_id": "b9d5f8d8-a9ae-5cce-9631-b792fc9caf98",
+          "resource_id": "83c58f5c-31bd-566b-b092-fa0283094069"
+        },
+        "known_at": "2026-09-07T08:58:11.750090Z",
+        "valid_at": "2026-09-07T08:58:11.750090Z",
+        "request_id": "95fdabf3-c077-4da4-84a3-b4715b0da69f",
+        "input_result": {
+          "invocation_id": "60f73e17-5d33-42c5-bc8a-06a232196c8c"
+        }
+      },
+      "function": {
+        "version_id": "b9d5f8d8-a9ae-5cce-9631-b792fc9caf98",
+        "resource_id": "83c58f5c-31bd-566b-b092-fa0283094069",
+        "content_hash": "964f1c313373e7ce5260d78843fceb3d3d7ff8572e7beef05de21220083ad65e"
+      },
+      "plan_hash": "b7ef3ee15f4ebb1b7b37a20f809443bcfb489eeb5ca49e750720573374d65e68",
+      "request_id": "95fdabf3-c077-4da4-84a3-b4715b0da69f",
+      "started_at": "2026-09-07T08:58:15.964265+00:00",
+      "exact_scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "completed_at": "2026-09-07T08:58:16.797516+00:00",
+      "implementation": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "code_sha256": "72307da730a7b281521b1d116d4066ec753f592da500ab743519253f7ed900f9",
+        "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+        "capabilities": {
+          "cdc": false,
+          "read": true,
+          "query": true,
+          "write": false,
+          "delete": false,
+          "limits": {
+            "coverage": "QUERY_PAGE_ONLY",
+            "returned_rows": 200,
+            "grouping_fields": 4,
+            "traversal_steps": 4,
+            "query_predicates": 20,
+            "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "derived_properties": 8,
+            "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+            "database_scan_limit": null
+          },
+          "stream": false,
+          "update": false,
+          "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+          "reversal": false,
+          "snapshot": true,
+          "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+          "simulation": false,
+          "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+          "incremental": false,
+          "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+          "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+          "formula_execution": false,
+          "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+          "source_write_exactly_once": false,
+          "grouped_observation_counts": true,
+          "typed_relationship_filters": true
+        },
+        "maximum_rows": 200,
+        "dependency_sha256": "6421da01eb2f3865dc3defbf11875bc418c93813ffde6a4451e52baf9cbc2783",
+        "implementation_id": "ontology.object-set-derived/v1",
+        "maximum_properties": 8
+      },
+      "current_use_authorized": false,
+      "business_effect_authorized": false,
+      "proof_hash": "5515852a0358aed150aaab634ca539bcd0fc47802a1a5ce3eb07385c6d4d6f85",
+      "recorded_at": "2026-09-07T12:58:16.866202+04:00"
+    },
+    "output": {
+      "mode": "EVIDENCE_ANALYSIS_ONLY",
+      "query": {
+        "limit": 200,
+        "offset": 0,
+        "search": "",
+        "filters": [],
+        "known_at": "2026-09-07T08:58:11.750090Z",
+        "valid_at": "2026-09-07T08:58:11.750090Z",
+        "traversal": [
+          {
+            "kind": "reference",
+            "name": "member_id",
+            "filters": [
+              {
+                "field": "evidence_id",
+                "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+              }
+            ],
+            "direction": "incoming"
+          },
+          {
+            "kind": "reference",
+            "name": "observation_id",
+            "filters": [
+              {
+                "field": "posting_date",
+                "value": "2025-11-03",
+                "operator": "gte"
+              },
+              {
+                "field": "posting_date",
+                "value": "2025-11-04",
+                "operator": "lt"
+              }
+            ],
+            "direction": "outgoing"
+          }
+        ],
+        "object_type": "DimensionMember",
+        "resource_ids": [
+          "07e796c0-2051-529f-ab3c-025199457f98"
+        ]
+      },
+      "scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "total": 2,
+      "run_id": "fcr_1f30ac56a721c8a7fc5e9c44882d67e843f34b0cccc88fa4b4cbfc2dc2f7e950",
+      "objects": [
+        {
+          "valid_to": null,
+          "attributes": {
+            "amount": "312.29",
+            "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+            "unit_status": "UNESTABLISHED",
+            "posting_date": "2025-11-03",
+            "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+            "source_details": {
+              "cells": {
+                "A": {
+                  "type": 0,
+                  "value": ""
+                },
+                "B": {
+                  "type": 1,
+                  "value": "SOG"
+                },
+                "C": {
+                  "type": 1,
+                  "value": "November"
+                },
+                "D": {
+                  "type": 2,
+                  "value": "3"
+                },
+                "E": {
+                  "type": 2,
+                  "value": "11"
+                },
+                "F": {
+                  "type": 2,
+                  "value": "2025"
+                },
+                "G": {
+                  "type": 1,
+                  "value": "03.11.2025 0:00:00"
+                },
+                "H": {
+                  "type": 2,
+                  "value": "1"
+                },
+                "I": {
+                  "type": 1,
+                  "value": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+                },
+                "J": {
+                  "type": 1,
+                  "value": "სს. საქორგგაზი // АО Сакорггаз"
+                },
+                "K": {
+                  "type": 1,
+                  "value": "7310.02.1"
+                },
+                "L": {
+                  "type": 1,
+                  "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+                },
+                "M": {
+                  "type": 1,
+                  "value": "SOG ადიგენის სერვის ცენტრი"
+                },
+                "N": {
+                  "type": 6,
+                  "value": ""
+                },
+                "O": {
+                  "type": 6,
+                  "value": ""
+                },
+                "P": {
+                  "type": 6,
+                  "value": ""
+                },
+                "Q": {
+                  "type": 1,
+                  "value": "3110"
+                },
+                "R": {
+                  "type": 1,
+                  "value": "შპს ტოიოტა ცენტრი თეგეტა"
+                },
+                "S": {
+                  "type": 1,
+                  "value": "ხელშეკრულება გამყიდველთან(ავტოტექმომსახურება)"
+                },
+                "T": {
+                  "type": 6,
+                  "value": ""
+                },
+                "U": {
+                  "type": 6,
+                  "value": ""
+                },
+                "V": {
+                  "type": 6,
+                  "value": ""
+                },
+                "W": {
+                  "type": 2,
+                  "value": "312.29"
+                },
+                "X": {
+                  "type": 1,
+                  "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+                },
+                "Y": {
+                  "type": 1,
+                  "value": "SOG-Kartli"
+                },
+                "Z": {
+                  "type": 1,
+                  "value": "Service"
+                },
+                "AA": {
+                  "type": 1,
+                  "value": "Auto Park"
+                }
+              },
+              "parser": "source-accounting/1",
+              "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+              "currency_authority": "UNESTABLISHED",
+              "same_account_source_rows": []
+            },
+            "source_row_key": "TR!5",
+            "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+            "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+            "source_record_id": "74d01a8b-95a9-5dca-b08e-7b3b98189ab1",
+            "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+            "document_reference": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+          },
+          "valid_from": "2026-09-06T09:56:39.437262+04:00",
+          "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+          "object_type": "SourceJournalMovement",
+          "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+          "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+          "system_from": "2026-09-06T09:56:47.868316+04:00",
+          "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc",
+          "display_name": "TR!row:5",
+          "identity_key": "source-fact:bb3f5efc-459e-5c46-999b-f50329285136",
+          "access_entity": "entity-ge-001",
+          "evidence_class": "SOURCE_BOUND",
+          "authority_state": "APPROVED",
+          "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+        },
+        {
+          "valid_to": null,
+          "attributes": {
+            "amount": "938.95",
+            "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+            "unit_status": "UNESTABLISHED",
+            "posting_date": "2025-11-03",
+            "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+            "source_details": {
+              "cells": {
+                "A": {
+                  "type": 0,
+                  "value": ""
+                },
+                "B": {
+                  "type": 1,
+                  "value": "SOG"
+                },
+                "C": {
+                  "type": 1,
+                  "value": "November"
+                },
+                "D": {
+                  "type": 2,
+                  "value": "3"
+                },
+                "E": {
+                  "type": 2,
+                  "value": "11"
+                },
+                "F": {
+                  "type": 2,
+                  "value": "2025"
+                },
+                "G": {
+                  "type": 1,
+                  "value": "03.11.2025 0:00:00"
+                },
+                "H": {
+                  "type": 2,
+                  "value": "1"
+                },
+                "I": {
+                  "type": 1,
+                  "value": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+                },
+                "J": {
+                  "type": 1,
+                  "value": "სს. საქორგგაზი // АО Сакорггаз"
+                },
+                "K": {
+                  "type": 1,
+                  "value": "7310.02.1"
+                },
+                "L": {
+                  "type": 1,
+                  "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+                },
+                "M": {
+                  "type": 1,
+                  "value": "SOG ცენტრალური რეგიონალური ოფისი"
+                },
+                "N": {
+                  "type": 6,
+                  "value": ""
+                },
+                "O": {
+                  "type": 6,
+                  "value": ""
+                },
+                "P": {
+                  "type": 6,
+                  "value": ""
+                },
+                "Q": {
+                  "type": 1,
+                  "value": "3110"
+                },
+                "R": {
+                  "type": 1,
+                  "value": "შპს თეგეტა მოტორსი"
+                },
+                "S": {
+                  "type": 1,
+                  "value": "ხელშეკრულება გამყიდველთან"
+                },
+                "T": {
+                  "type": 6,
+                  "value": ""
+                },
+                "U": {
+                  "type": 6,
+                  "value": ""
+                },
+                "V": {
+                  "type": 6,
+                  "value": ""
+                },
+                "W": {
+                  "type": 2,
+                  "value": "938.95"
+                },
+                "X": {
+                  "type": 1,
+                  "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+                },
+                "Y": {
+                  "type": 1,
+                  "value": "SOG-Kartli"
+                },
+                "Z": {
+                  "type": 1,
+                  "value": "Service"
+                },
+                "AA": {
+                  "type": 1,
+                  "value": "Auto Park"
+                }
+              },
+              "parser": "source-accounting/1",
+              "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+              "currency_authority": "UNESTABLISHED",
+              "same_account_source_rows": []
+            },
+            "source_row_key": "TR!6",
+            "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+            "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+            "source_record_id": "492b0b11-d980-5f97-94ad-15e8a72e60f7",
+            "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+            "document_reference": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+          },
+          "valid_from": "2026-09-06T09:56:39.539745+04:00",
+          "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+          "object_type": "SourceJournalMovement",
+          "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+          "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+          "system_from": "2026-09-06T09:56:49.086973+04:00",
+          "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b",
+          "display_name": "TR!row:6",
+          "identity_key": "source-fact:ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+          "access_entity": "entity-ge-001",
+          "evidence_class": "SOURCE_BOUND",
+          "authority_state": "APPROVED",
+          "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+        }
+      ],
+      "contract": "function-result/1",
+      "coverage": "RETAINED_INPUT_PAGE_ONLY",
+      "function": {
+        "version_id": "b9d5f8d8-a9ae-5cce-9631-b792fc9caf98",
+        "resource_id": "83c58f5c-31bd-566b-b092-fa0283094069",
+        "content_hash": "964f1c313373e7ce5260d78843fceb3d3d7ff8572e7beef05de21220083ad65e"
+      },
+      "plan_hash": "b7ef3ee15f4ebb1b7b37a20f809443bcfb489eeb5ca49e750720573374d65e68",
+      "next_offset": null,
+      "input_result": {
+        "run_id": "fcr_ec96d3edc20ef9f7e45cbbb900e4bd509bbcf468813beb46d7575b26ffa91383",
+        "receipt_hash": "5e976fb857bd68a59a865458af2c6d46d45d91a57febd23836d8f08d97b52880",
+        "invocation_id": "60f73e17-5d33-42c5-bc8a-06a232196c8c"
+      },
+      "definition_id": "c90dedc1-0e04-5d3f-bcf3-52df8a60ac4c",
+      "used_versions": [
+        {
+          "known_at": "2026-09-07T08:58:11.750090+00:00",
+          "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+          "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+          "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc",
+          "material_state": "UNESTABLISHED"
+        },
+        {
+          "known_at": "2026-09-07T08:58:11.750090+00:00",
+          "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+          "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+          "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b",
+          "material_state": "UNESTABLISHED"
+        }
+      ],
+      "counts_by_type": {
+        "SourceJournalMovement": 2
+      },
+      "derived_values": [],
+      "implementation": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "code_sha256": "72307da730a7b281521b1d116d4066ec753f592da500ab743519253f7ed900f9",
+        "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+        "capabilities": {
+          "cdc": false,
+          "read": true,
+          "query": true,
+          "write": false,
+          "delete": false,
+          "limits": {
+            "coverage": "QUERY_PAGE_ONLY",
+            "returned_rows": 200,
+            "grouping_fields": 4,
+            "traversal_steps": 4,
+            "query_predicates": 20,
+            "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "derived_properties": 8,
+            "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+            "database_scan_limit": null
+          },
+          "stream": false,
+          "update": false,
+          "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+          "reversal": false,
+          "snapshot": true,
+          "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+          "simulation": false,
+          "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+          "incremental": false,
+          "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+          "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+          "formula_execution": false,
+          "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+          "source_write_exactly_once": false,
+          "grouped_observation_counts": true,
+          "typed_relationship_filters": true
+        },
+        "maximum_rows": 200,
+        "dependency_sha256": "6421da01eb2f3865dc3defbf11875bc418c93813ffde6a4451e52baf9cbc2783",
+        "implementation_id": "ontology.object-set-derived/v1",
+        "maximum_properties": 8
+      },
+      "read_permissions": [
+        "ontology_admin",
+        "ontology_read",
+        "read"
+      ],
+      "calculation_runtime": "shared-functions/1",
+      "static_dependencies": [
+        {
+          "version_id": "5304817d-64a9-5fdc-b8c3-94984534b428",
+          "resource_id": "c90dedc1-0e04-5d3f-bcf3-52df8a60ac4c",
+          "content_hash": "a8dd9fe38470a5f3a7329583113ede93abef324233f46b31ac3bd584917f40d0"
+        },
+        {
+          "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+          "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+          "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+        }
+      ],
+      "invocation_plan_hash": "b7ef3ee15f4ebb1b7b37a20f809443bcfb489eeb5ca49e750720573374d65e68",
+      "definition_version_id": "5304817d-64a9-5fdc-b8c3-94984534b428",
+      "invocation_request_id": "95fdabf3-c077-4da4-84a3-b4715b0da69f",
+      "current_use_authorized": false,
+      "filter_schema_versions": [],
+      "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+      "traversal_schema_versions": [
+        {
+          "step": 1,
+          "version_id": "642f750e-ab59-548c-9b13-2c55ccfb3695",
+          "object_type": "SourceDimensionAssignment",
+          "resource_id": "ca3afb33-3cc9-5d9b-9187-33865333ed33"
+        },
+        {
+          "step": 2,
+          "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+          "object_type": "SourceJournalMovement",
+          "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282"
+        }
+      ],
+      "business_effect_authorized": false
+    },
+    "current_use_authorized": false,
+    "business_effect_authorized": false
+  },
+  "source_sha256": "45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d",
+  "source_evidence_pins": [
+    {
+      "resource_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+      "version_id": "01578cee-e347-5cd5-ad29-2b2e1bc9c932",
+      "content_hash": "8893189ec3895afcb3619d6908cf5ee108a164c127c48c7b91a991eccde9db5d"
+    }
+  ],
+  "source_evidence_bindings": [
+    {
+      "object_resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+      "object_version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+      "evidence_version_id": "01578cee-e347-5cd5-ad29-2b2e1bc9c932"
+    },
+    {
+      "object_resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+      "object_version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+      "evidence_version_id": "01578cee-e347-5cd5-ad29-2b2e1bc9c932"
+    }
+  ],
+  "exact_object_readback_equal": true,
+  "financial_authority_established": false,
+  "read_only_verification": false,
+  "replayed_existing_receipts": true
+}

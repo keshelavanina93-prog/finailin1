@@ -156,8 +156,19 @@ def validate_definition(
                         422, "No declared incoming reference matches the traversal"
                     )
                 current_types = outputs
+            stage_filters = [
+                PropertyFilter.model_validate(value) for value in step.get("filters", [])
+            ]
+            stage_fields = []
             for name in current_types:
-                schema(name)
+                fields = schema(name)["attributes"]["fields"]
+                validate_filters(stage_filters, fields)
+                stage_fields.append(fields)
+            for condition in stage_filters:
+                if len({fields[condition.field]["kind"] for fields in stage_fields}) != 1:
+                    raise WorkspaceError(
+                        422, "Traversal filters require compatible destination field kinds"
+                    )
         for identifier in payload.get("resource_ids") or []:
             selected = target(identifier, source, "SET_ROOT:" + identifier)
             if selected["object_type"] != payload["object_type"]:
