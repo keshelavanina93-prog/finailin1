@@ -20,6 +20,12 @@ RANGE_PATTERNS = {
 RANGE_OPERATORS = {"lt", "lte", "gt", "gte"}
 
 
+def filter_leaves(context):
+    return context.filters + (
+        context.filter_expression.leaves() if context.filter_expression else []
+    )
+
+
 def validate_filters(filters: list[PropertyFilter], fields: dict[str, Any]) -> None:
     for condition in filters:
         spec = fields.get(condition.field)

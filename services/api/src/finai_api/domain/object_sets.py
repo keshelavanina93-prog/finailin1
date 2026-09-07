@@ -1,5 +1,7 @@
 """Portable ontology queries; no SQL or application-specific joins in callers."""
 
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -44,6 +46,42 @@ class PropertyFilter(BaseModel):
         return self
 
 
+class FilterExpression(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    op: Literal["all", "any"]
+    conditions: list[PropertyFilter | FilterExpression] = Field(min_length=2, max_length=20)
+
+    @model_validator(mode="before")
+    @classmethod
+    def bounded_tree(cls, value):
+        pending = [(value, 1)]
+        leaves = 0
+        while pending:
+            node, depth = pending.pop()
+            group = isinstance(node, cls) or (
+                isinstance(node, dict) and ("op" in node or "conditions" in node)
+            )
+            if group:
+                if depth > 3:
+                    raise ValueError("Filter expressions support at most three group levels")
+                children = node.conditions if isinstance(node, cls) else node.get("conditions")
+                if not isinstance(children, list) or not 2 <= len(children) <= 20:
+                    raise ValueError("Filter groups require two to twenty conditions")
+                pending.extend((child, depth + 1) for child in children)
+            else:
+                leaves += 1
+                if leaves > 20:
+                    raise ValueError("Filter expressions share a twenty-predicate limit")
+        return value
+
+    def leaves(self) -> list[PropertyFilter]:
+        return [
+            leaf
+            for node in self.conditions
+            for leaf in ([node] if isinstance(node, PropertyFilter) else node.leaves())
+        ]
+
+
 class Traversal(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     kind: Literal["reference", "link"] = "reference"
@@ -51,6 +89,9 @@ class Traversal(BaseModel):
     direction: Literal["outgoing", "incoming"] = "outgoing"
     filters: list[PropertyFilter] = Field(
         default_factory=list, max_length=20, exclude_if=lambda value: not value
+    )
+    filter_expression: FilterExpression | None = Field(
+        default=None, exclude_if=lambda value: value is None
     )
 
 
@@ -75,6 +116,9 @@ class ObjectSetQuery(BaseModel):
     object_type: str = Field(pattern=r"^[A-Z][A-Za-z0-9]{1,63}$")
     resource_ids: list[UUID] | None = Field(default=None, max_length=100)
     filters: list[PropertyFilter] = Field(default_factory=list, max_length=20)
+    filter_expression: FilterExpression | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     traversal: list[Traversal] = Field(default_factory=list, max_length=4)
     search: str = Field(default="", max_length=128)
     limit: int = Field(default=50, ge=1, le=200)
@@ -92,11 +136,14 @@ class ObjectSetQuery(BaseModel):
             raise ValueError("A pinned type group requires ObjectTypeGroup and excludes interface")
         if self.interface is not None and self.object_type != "ObjectInterface":
             raise ValueError("A pinned interface root requires object_type ObjectInterface")
-        if len(self.filters) + sum(len(step.filters) for step in self.traversal) > 20:
-            raise ValueError("Object Set root and traversal filters share a 20-predicate limit")
         conditions = self.filters + [
             condition for step in self.traversal for condition in step.filters
         ]
+        for context in [self, *self.traversal]:
+            if context.filter_expression:
+                conditions += context.filter_expression.leaves()
+        if len(conditions) > 20:
+            raise ValueError("Object Set root and traversal filters share a 20-predicate limit")
         if sum(len(c.value) for c in conditions if isinstance(c.value, list)) > 100:
             raise ValueError(
                 "Object Set root and traversal membership values share a 100-value limit"

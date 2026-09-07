@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import type { CanonicalResource, SchemaField, ObjectSetQuery, ObjectSetResult } from "@finai/contracts";
+import type { CanonicalResource, SchemaField, ObjectSetQuery, ObjectSetResult, FilterExpression } from "@finai/contracts";
 import {createOntologyClient} from "@g8/ontology-client";
 import ObjectBindingAction from "./object-binding-action";
 import DerivedPropertyRun from "./derived-property-run";
@@ -22,14 +22,34 @@ export type ObjectSetInvestigationContext = {valid_at?:string;known_at?:string;d
 type InvestigationAction = (node:CanonicalResource, context:ObjectSetInvestigationContext)=>void;
 type FilterSchema=Pick<SchemaField,"kind"|"target_type">;
 type FilterRow={field:string;operator:FilterOperator;value:string|null;retained?:Query["filters"][number]["value"]};
-type StepRow={kind:"reference"|"link";name:string;direction:"outgoing"|"incoming";filters:FilterRow[]};
+type ExpressionRow={op:"all"|"any";conditions:(FilterRow|ExpressionRow)[]};
+type StepRow={expression?:ExpressionRow;kind:"reference"|"link";name:string;direction:"outgoing"|"incoming";filters:FilterRow[]};
 const restoreFilters=(filters:Query["filters"])=>filters.map(filter=>({field:filter.field,operator:filter.operator??"eq",value:filter.value===null?null:Array.isArray(filter.value)?filter.value.map(String).join("\n"):String(filter.value),...(membership(filter.operator??"eq")?{retained:filter.value}:{})}));
-const restoreSteps=(steps:Query["traversal"]):StepRow[]=>steps.map(step=>({...step,filters:restoreFilters(step.filters??[])}));
+const restoreSteps=(steps:Query["traversal"]):StepRow[]=>steps.map(step=>({...step,filters:restoreFilters(step.filters??[]),expression:restoreExpression(step.filter_expression)}));
 function validFilter(filter:Query["filters"][number]):boolean {
  if(!filter||typeof filter.field!=="string"||filter.field.length>128||!Object.hasOwn(operators,filter.operator??"eq"))return false;
  const scalar=(value:unknown)=>typeof value==="string"||typeof value==="boolean"||typeof value==="number"&&Number.isSafeInteger(value);
  if(membership(filter.operator??"eq"))return Array.isArray(filter.value)?filter.value.length>=1&&filter.value.length<=100&&filter.value.every(scalar)&&new Set(filter.value.map(value=>typeof value)).size===1&&new Set(filter.value.map(value=>JSON.stringify(value))).size===filter.value.length:false;
  return !Array.isArray(filter.value)&&(filter.value===null||["string","boolean"].includes(typeof filter.value)||typeof filter.value==="number"&&Number.isFinite(filter.value));
+}
+
+function restoreExpression(expression?:FilterExpression|null):ExpressionRow|undefined {
+ return expression?{op:expression.op,conditions:expression.conditions.map(condition=>"op" in condition?restoreExpression(condition)!:restoreFilters([condition])[0])}:undefined;
+}
+function expressionLeaves(expression:unknown,depth=1):Query["filters"]|null {
+ if(!expression||typeof expression!=="object"||!("op" in expression)||!["all","any"].includes(String(expression.op))||!("conditions" in expression)||!Array.isArray(expression.conditions)||expression.conditions.length<2||expression.conditions.length>20||depth>3)return null;
+ const leaves:Query["filters"]=[];
+ for(const condition of expression.conditions){
+  if(condition&&typeof condition==="object"&&"op" in condition){const nested=expressionLeaves(condition,depth+1);if(!nested)return null;leaves.push(...nested);}
+  else {if(!validFilter(condition))return null;leaves.push(condition);}
+  if(leaves.length>20)return null;
+ }
+ return leaves;
+}
+const draftLeaves=(expression?:ExpressionRow):number=>expression?expression.conditions.reduce((count,condition)=>count+("op" in condition?draftLeaves(condition):1),0):0;
+const newExpression=():ExpressionRow=>({op:"any",conditions:[{field:"",operator:"eq",value:""},{field:"",operator:"eq",value:""}]});
+function ExpressionSummary({expression}:{expression:FilterExpression}) {
+ return <section className="object-set-expression-summary"><strong>{expression.op==="all"?"All of these conditions":"Any of these conditions"}</strong><ul>{expression.conditions.map((condition,index)=><li key={index}>{"op" in condition?<ExpressionSummary expression={condition}/>:<>{label(condition.field)} · {operators[condition.operator??"eq"]} · <code style={{whiteSpace:"pre-wrap"}}>{Array.isArray(condition.value)?condition.value.map(value=>JSON.stringify(value)).join(", "):String(condition.value)}</code></>}</li>)}</ul></section>;
 }
 
 type SavedExecution = {query:Query;family:"sets"|"groups"|null;definition_id?:string;definition_version_id?:string};
@@ -42,7 +62,10 @@ function restoreExecution(key?:string):SavedExecution|null {
     if(!query||typeof query.object_type!=="string"||typeof query.search!=="string"||!Array.isArray(query.filters)||!Array.isArray(query.traversal)||!Number.isInteger(query.offset)||query.offset<0||!Number.isInteger(query.limit)||query.limit<1||query.limit>200||!query.valid_at||!query.known_at||!Number.isFinite(Date.parse(query.valid_at))||!Number.isFinite(Date.parse(query.known_at)))return null;
     if(query.filters.length>20||query.filters.some(filter=>!validFilter(filter)))return null;
     if(query.traversal.length>4||query.traversal.some(step=>!step||!["reference","link"].includes(step.kind)||!["outgoing","incoming"].includes(step.direction)||typeof step.name!=="string"||step.name.length>128||step.filters!==undefined&&!Array.isArray(step.filters)))return null;
-    const allFilters=[...query.filters,...query.traversal.flatMap(step=>step.filters??[])];
+    const expressions=[query.filter_expression,...query.traversal.map(step=>step.filter_expression)].filter(expression=>expression!==undefined&&expression!==null);
+    const expressionFilters=expressions.map(expression=>expressionLeaves(expression));
+    if(expressionFilters.some(filters=>filters===null))return null;
+    const allFilters=[...query.filters,...query.traversal.flatMap(step=>step.filters??[]),...expressionFilters.flatMap(filters=>filters??[])];
     if(allFilters.length>20||allFilters.some(filter=>!validFilter(filter))||allFilters.reduce((count,filter)=>count+(membership(filter.operator??"eq")?(Array.isArray(filter.value)?filter.value.length:1):0),0)>100)return null;
     if(query.resource_ids!==undefined&&query.resource_ids!==null&&(!Array.isArray(query.resource_ids)||query.resource_ids.length>100||query.resource_ids.some(id=>typeof id!=="string"||!/^[a-f0-9-]{36}$/i.test(id))))return null;
     if(![null,"sets","groups"].includes(data.family))return null;
@@ -62,6 +85,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
   const catalog = suppliedCatalog ?? loadedCatalog;
   const schemas = catalog.filter(item => item.object_type === "SchemaDefinition");
   const [kind, setKind] = useState(restored?.query.object_type??"LegalEntity");
+  const [rootExpression,setRootExpression]=useState<ExpressionRow|undefined>(()=>restoreExpression(restored?.query.filter_expression));
   const [filterRows,setFilterRows]=useState<FilterRow[]>(()=>restoreFilters(restored?.query.filters??[]));
   const [groupRoot,setGroupRoot]=useState<Query["type_group"]>(restored?.query.type_group);
   const [groupBindings,setGroupBindings]=useState<Result["type_group_bindings"]>();
@@ -88,7 +112,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
     const replayDefinition=Boolean(restored.family&&!restored.query.interface&&!restored.query.type_group);
     const exactPin={resource_id:restored.definition_id!,version_id:restored.definition_version_id!};
     const execution=replayDefinition?(restored.family==="sets"?client.runSavedSet(exactPin,options):client.runGroup(exactPin,options)):client.query(restored.query,{signal:controller.signal});
-    void execution.then(data=>{if(!controller.signal.aborted&&generation.current===request){setResult({...data,...restored.definition_id?{definition_id:restored.definition_id,definition_version_id:restored.definition_version_id}:{}});setExecutionFamily(restored.family);setLibraryId(restored.definition_id??"");setKind(data.query.object_type);setFilterRows(restoreFilters(data.query.filters));setFormSearch(data.query.search);setRootIds(data.query.resource_ids);setSteps(restoreSteps(data.query.traversal));setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings);}})
+    void execution.then(data=>{if(!controller.signal.aborted&&generation.current===request){setResult({...data,...restored.definition_id?{definition_id:restored.definition_id,definition_version_id:restored.definition_version_id}:{}});setExecutionFamily(restored.family);setLibraryId(restored.definition_id??"");setKind(data.query.object_type);setFilterRows(restoreFilters(data.query.filters));setRootExpression(restoreExpression(data.query.filter_expression));setFormSearch(data.query.search);setRootIds(data.query.resource_ids);setSteps(restoreSteps(data.query.traversal));setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings);}})
       .catch(cause=>{if(!controller.signal.aborted&&generation.current===request)setError(cause instanceof Error?cause.message:"Query replay failed");})
       .finally(()=>{if(!controller.signal.aborted&&generation.current===request)setBusy(false);});
     return()=>controller.abort();
@@ -157,14 +181,33 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
     const typed=usable?Object.fromEntries(Object.entries(schemaFields(targets[0])).filter(([name,spec])=>targets.every(type=>schemaFields(type)[name]?.kind===spec.kind))):{};
     return [...previous,{available,targets,fields:typed,usable}];
   },[]);
-  const predicateCount=filterRows.length+steps.reduce((count,step)=>count+step.filters.length,0);
-  function filterEditor(rows:FilterRow[],specs:Record<string,FilterSchema>,update:(rows:FilterRow[])=>void,scope:string){return <fieldset className="object-set-filters"><legend>{scope} · all conditions must match</legend>{rows.map((row,index)=><div className="object-set-filter-row" key={index}>
+  const predicateCount=filterRows.length+draftLeaves(rootExpression)+steps.reduce((count,step)=>count+step.filters.length+draftLeaves(step.expression),0);
+  function filterEditor(rows:FilterRow[],specs:Record<string,FilterSchema>,update:(rows:FilterRow[])=>void,scope:string,leaf=false,canRemove=true){return <fieldset className="object-set-filters"><legend>{scope}{!leaf&&" · all conditions must match"}</legend>{rows.map((row,index)=><div className="object-set-filter-row" key={index}>
     <label>Property<select value={row.field} onChange={event=>update(rows.map((item,i)=>i===index?{field:event.target.value,operator:"eq",value:specs[event.target.value]?.kind==="boolean"?"true":""}:item))}><option value="">Choose property</option>{row.field&&!specs[row.field]&&<option value={row.field}>{label(row.field)} · schema unavailable</option>}{Object.entries(specs).filter(([,spec])=>!["money","quantity","geometry","geojson","definition"].includes(spec.kind)).map(([name])=><option key={name} value={name}>{label(name)}</option>)}</select></label>
     <label>Comparison<select value={row.operator} onChange={event=>update(rows.map((item,i)=>i===index?{...item,operator:event.target.value as FilterOperator,retained:membership(item.operator)&&membership(event.target.value)?item.retained:undefined,value:membership(item.operator)&&!membership(event.target.value)||item.value===null&&membership(event.target.value)?"":item.value}:item))}>{(Object.keys(operators) as FilterOperator[]).filter(item=>item==="eq"||item===row.operator||(membership(item)?membershipKinds.has(specs[row.field]?.kind):rangeKinds.has(specs[row.field]?.kind))).map(item=><option key={item} value={item}>{operators[item]}</option>)}</select></label>
     <label>{membership(row.operator)?"Values — one per line":"Value"}{membership(row.operator)?<><textarea required rows={3} maxLength={25700} value={row.value??""} placeholder={specs[row.field]?.kind==="boolean"?"true\nfalse":"One exact value per line"} onChange={event=>update(rows.map((item,i)=>i===index?{...item,value:event.target.value,retained:undefined}:item))}/><small>1–100 unique values; 100 across the whole query. Blank lines are rejected. Null/missing source values never match. Text spaces are preserved; one final newline is allowed.</small>{row.retained!==undefined&&<details><summary>Exact retained membership values</summary>{(Array.isArray(row.retained)?row.retained:[row.retained]).map((value,i)=><pre key={i}>{JSON.stringify(value)}</pre>)}</details>}</>:row.value===null?<input readOnly value="Null"/>:specs[row.field]?.kind==="boolean"?<select value={row.value} onChange={event=>update(rows.map((item,i)=>i===index?{...item,value:event.target.value}:item))}><option value="true">True</option><option value="false">False</option></select>:<input required maxLength={256} value={row.value} type={specs[row.field]?.kind==="date"?"date":"text"} placeholder={specs[row.field]?.kind==="datetime"?"YYYY-MM-DDTHH:mm:ss+04:00":specs[row.field]?.kind==="decimal"?"Exact decimal text":"Exact value"} onChange={event=>update(rows.map((item,i)=>i===index?{...item,value:event.target.value}:item))}/>}</label>
     <button type="button" disabled={row.operator!=="eq"} onClick={()=>update(rows.map((item,i)=>i===index?{...item,value:item.value===null?"":null}:item))}>{row.value===null?"Use a value":"Match null"}</button>
-    <button type="button" onClick={()=>update(rows.filter((_,i)=>i!==index))} aria-label={`Remove ${scope} filter ${index+1}`}>Remove</button>
-  </div>)}<button type="button" disabled={predicateCount>=20||!Object.keys(specs).length} onClick={()=>update([...rows,{field:"",operator:"eq",value:""}])}>Add property filter</button></fieldset>;}
+    <button type="button" disabled={!canRemove} onClick={()=>update(rows.filter((_,i)=>i!==index))} aria-label={`Remove ${scope} filter ${index+1}`}>Remove</button>
+  </div>)}{!leaf&&<button type="button" disabled={predicateCount>=20||!Object.keys(specs).length} onClick={()=>update([...rows,{field:"",operator:"eq",value:""}])}>Add property filter</button>}</fieldset>;}
+  function expressionEditor(expression:ExpressionRow,specs:Record<string,FilterSchema>,update:(expression:ExpressionRow)=>void,scope:string,depth=1){
+    const replace=(index:number,condition:FilterRow|ExpressionRow)=>update({...expression,conditions:expression.conditions.map((current,i)=>i===index?condition:current)});
+    return <fieldset className="object-set-expression"><legend>{scope} · condition group</legend>
+      <label>Match<select value={expression.op} onChange={event=>update({...expression,op:event.target.value as "all"|"any"})}><option value="all">All of these conditions</option><option value="any">Any of these conditions</option></select></label>
+      {expression.conditions.map((condition,index)=><div key={index}>{"op" in condition?<>
+        {expressionEditor(condition,specs,next=>replace(index,next),`${scope} / group ${index+1}`,depth+1)}
+        <button type="button" disabled={expression.conditions.length<=2} onClick={()=>update({...expression,conditions:expression.conditions.filter((_,i)=>i!==index)})}>Remove group {index+1}</button>
+      </>:filterEditor([condition],specs,rows=>rows.length?replace(index,rows[0]):update({...expression,conditions:expression.conditions.filter((_,i)=>i!==index)}),`Condition ${index+1}`,true,expression.conditions.length>2)}</div>)}
+      <div className="object-set-expression-actions"><button type="button" disabled={predicateCount>=20||expression.conditions.length>=20||!Object.keys(specs).length} onClick={()=>update({...expression,conditions:[...expression.conditions,{field:"",operator:"eq",value:""}]})}>Add condition</button>
+      <button type="button" disabled={depth>=3||predicateCount>18||expression.conditions.length>=20||!Object.keys(specs).length} onClick={()=>update({...expression,conditions:[...expression.conditions,newExpression()]})}>Add nested group</button></div>
+    </fieldset>;
+  }
+  function expressionControl(expression:ExpressionRow|undefined,specs:Record<string,FilterSchema>,update:(value:ExpressionRow|undefined)=>void,scope:string){
+    return <section className="object-set-expression-control"><p>Condition groups must match in addition to the property filters above. All/Any applies only within its group.</p>{expression?<>{expressionEditor(expression,specs,update,scope)}<button type="button" onClick={()=>update(undefined)}>Remove this condition group</button></>:<button type="button" disabled={predicateCount>18||!Object.keys(specs).length} onClick={()=>update(newExpression())}>Add All/Any condition group</button>}</section>;
+  }
+  function parseExpression(expression:ExpressionRow,specs:Record<string,FilterSchema>,depth=1):FilterExpression {
+    if(depth>3||expression.conditions.length<2||expression.conditions.length>20)throw Error("Condition groups require 2–20 children and at most three group levels.");
+    return {op:expression.op,conditions:expression.conditions.map(condition=>"op" in condition?parseExpression(condition,specs,depth+1):parseFilters([condition],specs)[0])};
+  }
   function parseFilters(rows:FilterRow[],specs:Record<string,FilterSchema>):Query["filters"]{
     return rows.map(row=>{
       const {field,operator}=row;const spec=specs[field];
@@ -209,7 +252,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       const exactPin={resource_id:selected.resource_id,version_id:selected.version_id};
       const options={offset:0,limit:50,signal:controller.signal};
       const data=await (family==="sets"?client.runSavedSet(exactPin,options):client.runGroup(exactPin,options));
-      if(generation.current===request&&!controller.signal.aborted){setResult(data);setExecutionFamily(family);setKind(data.query.object_type);setFormSearch(data.query.search);setFilterRows(restoreFilters(data.query.filters));setRootIds(data.query.resource_ids);setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings);setSteps(restoreSteps(data.query.traversal));}
+      if(generation.current===request&&!controller.signal.aborted){setResult(data);setExecutionFamily(family);setKind(data.query.object_type);setFormSearch(data.query.search);setFilterRows(restoreFilters(data.query.filters));setRootExpression(restoreExpression(data.query.filter_expression));setRootIds(data.query.resource_ids);setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings);setSteps(restoreSteps(data.query.traversal));}
     }catch(cause){if(generation.current===request&&!controller.signal.aborted)setError(cause instanceof Error?cause.message:"Query failed");}
     finally{if(generation.current===request)setBusy(false);}
   }
@@ -267,12 +310,13 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       const traversal:Query["traversal"]=steps.map((step,index)=>{
         if(!step.name)throw Error(`Choose a relationship for step ${index+1}.`);
         const filters=parseFilters(step.filters,stages[index].fields);
-        return {kind:step.kind,name:step.name,direction:step.direction,...(filters.length?{filters}:{})};
+        return {kind:step.kind,name:step.name,direction:step.direction,...(filters.length?{filters}:{}),...(step.expression?{filter_expression:parseExpression(step.expression,stages[index].fields)}:{})};
       });
       const rootFilters=parseFilters(filterRows,fields);
-      const membershipCount=[...rootFilters,...traversal.flatMap(step=>step.filters??[])].reduce((count,filter)=>count+(membership(filter.operator??"eq")?(Array.isArray(filter.value)?filter.value.length:1):0),0);
+      const filterExpression=rootExpression?parseExpression(rootExpression,fields):undefined;
+      const membershipCount=[...rootFilters,...traversal.flatMap(step=>step.filters??[]),...(filterExpression?expressionLeaves(filterExpression)??[]:[]),...traversal.flatMap(step=>step.filter_expression?expressionLeaves(step.filter_expression)??[]:[])].reduce((count,filter)=>count+(membership(filter.operator??"eq")?(Array.isArray(filter.value)?filter.value.length:1):0),0);
       if(membershipCount>100)throw Error("Membership filters support at most 100 values across starting objects and all relationship steps.");
-      void run({object_type:kind,...(interfaceRoot?{interface:interfaceRoot}:{}),...(groupRoot?{type_group:groupRoot}:{}),...(rootIds!==undefined?{resource_ids:rootIds}:{}),search:String(data.get("search")??""),filters:rootFilters,traversal,offset:0,limit:50});
+      void run({object_type:kind,...(interfaceRoot?{interface:interfaceRoot}:{}),...(groupRoot?{type_group:groupRoot}:{}),...(rootIds!==undefined?{resource_ids:rootIds}:{}),search:String(data.get("search")??""),filters:rootFilters,...(filterExpression?{filter_expression:filterExpression}:{}),traversal,offset:0,limit:50});
     }catch(cause){setError(cause instanceof Error?cause.message:"Query choices are unavailable.");}
   }
 
@@ -281,7 +325,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
     <details className="object-set-studio"><summary>Ontology Studio  -  define shared query contracts</summary><OntologyDefinitionEditor token={token} definitions={definitions} onProposal={onProposal}/></details>
     <div className="resource-form"><label>Published sets and type groups<select value={libraryId} onChange={event => setLibraryId(event.target.value)}><option value="">Choose a published definition</option>{definitions.filter(item => ["ObjectSetDefinition", "ObjectInterface", "ObjectTypeGroup"].includes(item.object_type)).map(item => <option key={item.resource_id} value={item.resource_id}>{item.display_name} · {label(item.object_type)}</option>)}</select></label><button type="button" disabled={busy || !libraryId} onClick={() => void openPublished()}>Open published set</button></div>
     <form className="resource-form" onSubmit={submit}>
-      <label>Object type<select value={kind} onChange={event => { setKind(event.target.value); setFilterRows([]);setSteps([]);setRootIds(undefined);setInterfaceRoot(undefined);setInterfaceBindings(undefined);setGroupRoot(undefined);setGroupBindings(undefined); }}>{schemas.map(schema => <option key={schema.resource_id} value={schema.identity_key}>{label(schema.identity_key)}</option>)}</select></label>
+      <label>Object type<select value={kind} onChange={event => { setKind(event.target.value); setFilterRows([]);setRootExpression(undefined);setSteps([]);setRootIds(undefined);setInterfaceRoot(undefined);setInterfaceBindings(undefined);setGroupRoot(undefined);setGroupBindings(undefined); }}>{schemas.map(schema => <option key={schema.resource_id} value={schema.identity_key}>{label(schema.identity_key)}</option>)}</select></label>
       {interfaceRoot&&<section className="object-set-interface-context"><h4>Executable shared interface</h4><p>{definitions.find(item=>item.resource_id===interfaceRoot.resource_id&&item.version_id===interfaceRoot.version_id)?.display_name??"Exact published interface"} · {interfaceRoot.implementations.length} pinned implementations. Changing the root object type explicitly clears this interface context.</p><details><summary>Exact interface and implementation bindings</summary><p>Interface: {interfaceRoot.resource_id} · {interfaceRoot.version_id}</p>{interfaceBindings?.implementations.map(binding=><div key={binding.implementation.version_id}><p>{label(binding.object_type)} · implementation {binding.implementation.resource_id} · {binding.implementation.version_id}</p><p>Schema: {binding.schema.resource_id} · {binding.schema.version_id}</p>{Object.entries(binding.fields).map(([alias,field])=><p key={alias}>{label(alias)} → {label(field)}</p>)}</div>)}</details></section>}
       {groupRoot&&<section className="object-set-interface-context"><h4>Executable type group</h4><p>{definitions.find(item=>item.resource_id===groupRoot.resource_id&&item.version_id===groupRoot.version_id)?.display_name??"Exact published type group"} · {groupBindings?.schemas.map(binding=>label(binding.object_type)).join(", ")??"Reading schema bindings"}. Filters use properties common to the exact member schemas. Change the root object type explicitly to clear this group context.</p><details><summary>Exact group and schema bindings</summary><p>Group: {groupRoot.resource_id} · {groupRoot.version_id}</p>{groupBindings?.schemas.map(binding=><p key={binding.schema.version_id}>{label(binding.object_type)} · {binding.schema.resource_id} · {binding.schema.version_id}</p>)}</details></section>}
       {kind==="ObjectTypeGroup"&&!groupRoot&&<p role="status">Open a published executable type group or choose a concrete type before querying.</p>}
@@ -289,6 +333,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       <label>Name or business key<input name="search" value={formSearch} onChange={event=>setFormSearch(event.target.value)} maxLength={128} placeholder="Search this object type" /></label>
       {rootIds!==undefined&&rootIds!==null&&<details><summary>{rootIds.length} explicit starting object IDs retained</summary><p>This query remains constrained to these canonical roots. Clearing them broadens the starting selection.</p>{rootIds.map(id=><p key={id}><code>{id}</code></p>)}<button type="button" onClick={()=>setRootIds(undefined)}>Clear explicit starting objects</button></details>}
       {filterEditor(filterRows,fields,setFilterRows,"Starting objects")}
+      {expressionControl(rootExpression,fields,setRootExpression,"Starting objects")}
       <fieldset className="object-set-traversal"><legend>Follow relationships · up to four steps</legend>
         {steps.map((step,index)=><section key={index} className="object-set-step"><h4>Step {index+1}</h4><div className="object-set-step-controls">
           <label>Direction<select value={step.direction} onChange={event=>setSteps(previous=>previous.map((item,i)=>i===index?{...item,direction:event.target.value as StepRow["direction"]}:item))}><option value="outgoing">From matching objects</option><option value="incoming">Into matching objects</option></select></label>
@@ -297,6 +342,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
         </div><p>Reached types: {stages[index].targets.map(label).join(", ")||"Unresolved"}. Filters apply before the next step.</p>
         {!stages[index].usable&&<p role="status">The reached schema is ambiguous or unavailable. New typed filters cannot be inferred; retained comparisons remain visible and require a resolvable schema.</p>}
         {filterEditor(step.filters,stages[index].fields,filters=>setSteps(previous=>previous.map((item,i)=>i===index?{...item,filters}:item)),`Step ${index+1} reached objects`)}
+        {expressionControl(step.expression,stages[index].fields,expression=>setSteps(previous=>previous.map((item,i)=>i===index?{...item,expression}:item)),`Step ${index+1} reached objects`)}
         </section>)}
         <button type="button" disabled={steps.length>=4} onClick={()=>setSteps(previous=>[...previous,{kind:"reference",name:"",direction:"outgoing",filters:[]}])}>Add relationship step</button>
       </fieldset>
@@ -312,7 +358,8 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       <div className="toolbar"><h3>{result.total.toLocaleString()} matching object versions</h3><span>{Object.entries(result.counts_by_type).map(([type, count]) => `${label(type)}: ${count}`).join(" · ")}</span></div>
       <p className="muted">{result.query.traversal.length ? "Relationships return the exact versions they reference, which may differ from today's values. " : "Effective objects at the query time. "}Counts cover the full result, not just this page.</p>
       {!!result.query.filters.length&&<section aria-label="Applied property comparisons"><h4>Applied comparisons</h4>{result.query.filters.map((filter,index)=><p key={index}>{label(filter.field)} · {operators[filter.operator??"eq"]} · <code style={{whiteSpace:"pre-wrap"}}>{Array.isArray(filter.value)?filter.value.map(value=>JSON.stringify(value)).join("\n"):String(filter.value)}</code></p>)}</section>}
-      {!!result.query.traversal.length&&<section aria-label="Applied relationship steps"><h4>Applied relationship steps</h4>{result.query.traversal.map((step,index)=><div key={index}><p>Step {index+1} · {label(step.name)} · {step.direction} {step.kind}</p>{step.filters?.map((filter,i)=><p key={i}>{label(filter.field)} · {operators[filter.operator??"eq"]} · <code style={{whiteSpace:"pre-wrap"}}>{Array.isArray(filter.value)?filter.value.map(value=>JSON.stringify(value)).join("\n"):String(filter.value)}</code></p>)}</div>)}</section>}
+      {result.query.filter_expression&&<section aria-label="Applied starting-object condition groups"><h4>Applied starting-object groups</h4><ExpressionSummary expression={result.query.filter_expression}/></section>}
+      {!!result.query.traversal.length&&<section aria-label="Applied relationship steps"><h4>Applied relationship steps</h4>{result.query.traversal.map((step,index)=><div key={index}><p>Step {index+1} · {label(step.name)} · {step.direction} {step.kind}</p>{step.filters?.map((filter,i)=><p key={i}>{label(filter.field)} · {operators[filter.operator??"eq"]} · <code style={{whiteSpace:"pre-wrap"}}>{Array.isArray(filter.value)?filter.value.map(value=>JSON.stringify(value)).join("\n"):String(filter.value)}</code></p>)}{step.filter_expression&&<ExpressionSummary expression={step.filter_expression}/>}</div>)}</section>}
       {!!result.traversal_schema_versions?.length&&<details><summary>Reached-object query-time schema versions</summary>{result.traversal_schema_versions.map(schema=><p key={`${schema.step}:${schema.version_id}`}>Step {schema.step} · {label(schema.object_type)} · <code>{schema.resource_id} · {schema.version_id}</code></p>)}</details>}
       {!!result.filter_schema_versions?.length && <details><summary>Property filters validated against the query-time schema</summary>{result.filter_schema_versions.map(schema=><p key={schema.version_id}>{label(schema.object_type)} · Schema version <code>{schema.version_id}</code></p>)}</details>}
       {result.query.type_group&&<section className="object-set-interface-values" aria-label="Type-group schema compatibility"><h4>Type-group member compatibility</h4><p>Member records keep their original business identities. Compatibility is checked against the schemas retained by the exact group definition.</p>{result.query.traversal.length?<p>The result contains reached endpoints. Starting-group compatibility receipts are not assigned to these endpoint objects.</p>:<div className="data-scroll"><table><thead><tr><th>Original member</th><th>Schema compatibility</th><th>Retained schema references</th></tr></thead><tbody>{result.type_group_values?.map(value=>{

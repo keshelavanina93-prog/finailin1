@@ -1,0 +1,345 @@
+{
+  "any_initial": {
+    "query": {
+      "object_type": "SourceJournalMovement",
+      "resource_ids": null,
+      "filters": [
+        {
+          "field": "evidence_id",
+          "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+        },
+        {
+          "field": "source_family",
+          "value": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-11-01",
+          "operator": "gte"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-12-01",
+          "operator": "lt"
+        }
+      ],
+      "filter_expression": {
+        "op": "any",
+        "conditions": [
+          {
+            "field": "debit_account_id",
+            "value": "3ba3c8cc-51a1-5566-86f1-5457949db896"
+          },
+          {
+            "field": "credit_account_id",
+            "value": "1d3bb778-9f59-5f21-ae02-34961db3a633"
+          }
+        ]
+      },
+      "traversal": [],
+      "search": "",
+      "limit": 50,
+      "offset": 0,
+      "valid_at": "2026-09-07T15:50:00.527228Z",
+      "known_at": "2026-09-07T15:50:00.527228Z"
+    },
+    "pagination": "1–50 of 150"
+  },
+  "all_intersection": {
+    "query": {
+      "object_type": "SourceJournalMovement",
+      "resource_ids": null,
+      "filters": [
+        {
+          "field": "evidence_id",
+          "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+        },
+        {
+          "field": "source_family",
+          "value": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-11-01",
+          "operator": "gte"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-12-01",
+          "operator": "lt"
+        }
+      ],
+      "filter_expression": {
+        "op": "all",
+        "conditions": [
+          {
+            "field": "debit_account_id",
+            "value": "3ba3c8cc-51a1-5566-86f1-5457949db896"
+          },
+          {
+            "field": "credit_account_id",
+            "value": "1d3bb778-9f59-5f21-ae02-34961db3a633"
+          }
+        ]
+      },
+      "traversal": [],
+      "search": "",
+      "limit": 50,
+      "offset": 0,
+      "valid_at": "2026-09-07T15:51:00.810301Z",
+      "known_at": "2026-09-07T15:51:00.810301Z"
+    },
+    "pagination": "1–50 of 93"
+  },
+  "any_restored": {
+    "query": {
+      "object_type": "SourceJournalMovement",
+      "resource_ids": null,
+      "filters": [
+        {
+          "field": "evidence_id",
+          "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+        },
+        {
+          "field": "source_family",
+          "value": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-11-01",
+          "operator": "gte"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-12-01",
+          "operator": "lt"
+        }
+      ],
+      "filter_expression": {
+        "op": "any",
+        "conditions": [
+          {
+            "field": "debit_account_id",
+            "value": "3ba3c8cc-51a1-5566-86f1-5457949db896"
+          },
+          {
+            "field": "credit_account_id",
+            "value": "1d3bb778-9f59-5f21-ae02-34961db3a633"
+          }
+        ]
+      },
+      "traversal": [],
+      "search": "",
+      "limit": 50,
+      "offset": 0,
+      "valid_at": "2026-09-07T15:51:22.611423Z",
+      "known_at": "2026-09-07T15:51:22.611423Z"
+    },
+    "pagination": "1–50 of 150"
+  },
+  "next_page": {
+    "query": {
+      "object_type": "SourceJournalMovement",
+      "resource_ids": null,
+      "filters": [
+        {
+          "field": "evidence_id",
+          "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+        },
+        {
+          "field": "source_family",
+          "value": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-11-01",
+          "operator": "gte"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-12-01",
+          "operator": "lt"
+        }
+      ],
+      "filter_expression": {
+        "op": "any",
+        "conditions": [
+          {
+            "field": "debit_account_id",
+            "value": "3ba3c8cc-51a1-5566-86f1-5457949db896"
+          },
+          {
+            "field": "credit_account_id",
+            "value": "1d3bb778-9f59-5f21-ae02-34961db3a633"
+          }
+        ]
+      },
+      "traversal": [],
+      "search": "",
+      "limit": 50,
+      "offset": 50,
+      "valid_at": "2026-09-07T15:51:22.611423Z",
+      "known_at": "2026-09-07T15:51:22.611423Z"
+    },
+    "pagination": "51–100 of 150"
+  },
+  "build_request_id": "e9b594f8-eea7-4dc5-a927-782cf3364434",
+  "build_valid_known_at": "2026-09-07T15:52:50.425000Z",
+  "build_result": {
+    "groups": [
+      {
+        "key": "posting date: 2025-11-01",
+        "count": 2
+      },
+      {
+        "key": "posting date: 2025-11-03",
+        "count": 2
+      },
+      {
+        "key": "posting date: 2025-11-04",
+        "count": 6
+      },
+      {
+        "key": "posting date: 2025-11-05",
+        "count": 1
+      },
+      {
+        "key": "posting date: 2025-11-06",
+        "count": 6
+      },
+      {
+        "key": "posting date: 2025-11-07",
+        "count": 6
+      },
+      {
+        "key": "posting date: 2025-11-08",
+        "count": 1
+      },
+      {
+        "key": "posting date: 2025-11-10",
+        "count": 4
+      },
+      {
+        "key": "posting date: 2025-11-11",
+        "count": 7
+      },
+      {
+        "key": "posting date: 2025-11-12",
+        "count": 1
+      },
+      {
+        "key": "posting date: 2025-11-13",
+        "count": 4
+      },
+      {
+        "key": "posting date: 2025-11-14",
+        "count": 7
+      },
+      {
+        "key": "posting date: 2025-11-15",
+        "count": 1
+      },
+      {
+        "key": "posting date: 2025-11-17",
+        "count": 10
+      },
+      {
+        "key": "posting date: 2025-11-18",
+        "count": 9
+      },
+      {
+        "key": "posting date: 2025-11-19",
+        "count": 8
+      },
+      {
+        "key": "posting date: 2025-11-20",
+        "count": 4
+      },
+      {
+        "key": "posting date: 2025-11-21",
+        "count": 8
+      },
+      {
+        "key": "posting date: 2025-11-24",
+        "count": 3
+      },
+      {
+        "key": "posting date: 2025-11-25",
+        "count": 5
+      },
+      {
+        "key": "posting date: 2025-11-26",
+        "count": 3
+      },
+      {
+        "key": "posting date: 2025-11-27",
+        "count": 4
+      },
+      {
+        "key": "posting date: 2025-11-28",
+        "count": 2
+      },
+      {
+        "key": "posting date: 2025-11-29",
+        "count": 2
+      },
+      {
+        "key": "posting date: 2025-11-30",
+        "count": 44
+      }
+    ],
+    "groupText": "Grouped source observations\n\n150 source observations in the complete bounded Object Set. These are observation counts, not journal, transaction or financial totals.\n\nGrouped by posting date.\n\nGROUP\tSOURCE OBSERVATIONS\tCONTRIBUTING EVIDENCE\n\n\nposting date: 2025-11-01\n\n\t2\t\nInspect group contributions\n\n\n\nposting date: 2025-11-03\n\n\t2\t\nInspect group contributions\n\n\n\nposting date: 2025-11-04\n\n\t6\t\nInspect group contributions\n\n\n\nposting date: 2025-11-05\n\n\t1\t\nInspect group contributions\n\n\n\nposting date: 2025-11-06\n\n\t6\t\nInspect group contributions\n\n\n\nposting date: 2025-11-07\n\n\t6\t\nInspect group contributions\n\n\n\nposting date: 2025-11-08\n\n\t1\t\nInspect group contributions\n\n\n\nposting date: 2025-11-10\n\n\t4\t\nInspect group contributions\n\n\n\nposting date: 2025-11-11\n\n\t7\t\nInspect group contributions\n\n\n\nposting date: 2025-11-12\n\n\t1\t\nInspect group contributions\n\n\n\nposting date: 2025-11-13\n\n\t4\t\nInspect group contributions\n\n\n\nposting date: 2025-11-14\n\n\t7\t\nInspect group contributions\n\n\n\nposting date: 2025-11-15\n\n\t1\t\nInspect group contributions\n\n\n\nposting date: 2025-11-17\n\n\t10\t\nInspect group contributions\n\n\n\nposting date: 2025-11-18\n\n\t9\t\nInspect group contributions\n\n\n\nposting date: 2025-11-19\n\n\t8\t\nInspect group contributions\n\n\n\nposting date: 2025-11-20\n\n\t4\t\nInspect group contributions\n\n\n\nposting date: 2025-11-21\n\n\t8\t\nInspect group contributions\n\n\n\nposting date: 2025-11-24\n\n\t3\t\nInspect group contributions\n\n\n\nposting date: 2025-11-25\n\n\t5\t\nInspect group contributions\n\n\n\nposting date: 2025-11-26\n\n\t3\t\nInspect group contributions\n\n\n\nposting date: 2025-11-27\n\n\t4\t\nInspect group contributions\n\n\n\nposting date: 2025-11-28\n\n\t2\t\nInspect group contributions\n\n\n\nposting date: 2025-11-29\n\n\t2\t\nInspect group contributions\n\n\n\nposting date: 2025-11-30\n\n\t44\t\nInspect group contributions\nGrouping fields & exact schema provenance",
+    "coverage": "Complete selected source coverage\n\n150 objects retained across 1 pages. The reviewed limits are 300 objects and 2 pages.\n\nThis is the complete bounded result of the reviewed saved Object Set at the retained time cutoffs. It does not establish coverage of every company record, an accounting period, or financial authority.\n\nRetained pages and query provenance",
+    "sourceRows": 150
+  },
+  "restart_query_equal": true,
+  "reload_query": {
+    "query": {
+      "object_type": "SourceJournalMovement",
+      "resource_ids": null,
+      "filters": [
+        {
+          "field": "evidence_id",
+          "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+        },
+        {
+          "field": "source_family",
+          "value": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-11-01",
+          "operator": "gte"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-12-01",
+          "operator": "lt"
+        }
+      ],
+      "filter_expression": {
+        "op": "any",
+        "conditions": [
+          {
+            "field": "debit_account_id",
+            "value": "3ba3c8cc-51a1-5566-86f1-5457949db896"
+          },
+          {
+            "field": "credit_account_id",
+            "value": "1d3bb778-9f59-5f21-ae02-34961db3a633"
+          }
+        ]
+      },
+      "traversal": [],
+      "search": "",
+      "limit": 50,
+      "offset": 50,
+      "valid_at": "2026-09-07T15:51:22.611423Z",
+      "known_at": "2026-09-07T15:51:22.611423Z"
+    },
+    "pagination": "51–100 of 150",
+    "editorOp": "any"
+  },
+  "restart_build_equal": true,
+  "restart_verified_at": "2026-09-07T15:57:54.8756029Z"
+}

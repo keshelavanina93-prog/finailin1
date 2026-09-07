@@ -4,7 +4,9 @@
 
 export const ontologyQueryWireVersion = "ontology-object-set/1";
 
-export const ontologyQuerySchemaSha256 = "48e3cf41ea7f44db64e83a1b6f9fa30cf81194779cfadc1daac37db60a91ed27";
+export const ontologyQuerySchemaSha256 = "a8870d41d5ef57d659ead2911027029bd853c0b72f9beb03324aecb724d86b5d";
+
+export type WireFilterExpression = { "op" : "all" | "any"; "conditions" : Array<(WirePropertyFilter | WireFilterExpression)>; };
 
 export type WireInterfacePin = { "resource_id" : string; "version_id" : string; };
 
@@ -12,9 +14,9 @@ export type WireInterfaceRoot = { "resource_id" : string; "version_id" : string;
 
 export type WirePropertyFilter = { "field" : string; "value" : (string | number | boolean | Array<(string | number | boolean)> | null); "operator"?: "eq" | "lt" | "lte" | "gt" | "gte" | "in" | "not_in"; };
 
-export type WireTraversal = { "kind"?: "reference" | "link"; "name" : string; "direction"?: "outgoing" | "incoming"; "filters"?: Array<WirePropertyFilter>; };
+export type WireTraversal = { "kind"?: "reference" | "link"; "name" : string; "direction"?: "outgoing" | "incoming"; "filters"?: Array<WirePropertyFilter>; "filter_expression"?: (WireFilterExpression | null); };
 
-export type WireObjectSetQuery = { "object_type" : string; "resource_ids"?: (Array<string> | null); "filters"?: Array<WirePropertyFilter>; "traversal"?: Array<WireTraversal>; "search"?: string; "limit"?: number; "offset"?: number; "valid_at"?: (string | null); "known_at"?: (string | null); "interface"?: (WireInterfaceRoot | null); "type_group"?: (WireInterfacePin | null); };
+export type WireObjectSetQuery = { "object_type" : string; "resource_ids"?: (Array<string> | null); "filters"?: Array<WirePropertyFilter>; "filter_expression"?: (WireFilterExpression | null); "traversal"?: Array<WireTraversal>; "search"?: string; "limit"?: number; "offset"?: number; "valid_at"?: (string | null); "known_at"?: (string | null); "interface"?: (WireInterfaceRoot | null); "type_group"?: (WireInterfacePin | null); };
 
 export type WireFilterSchemaVersion = { "object_type" : string; "resource_id" : string; "version_id" : string; [key: string]: unknown; };
 
@@ -30,7 +32,7 @@ export type WireInterfaceValue = { "object_id" : string; "object_version_id" : s
 
 export type WireQueryResource = { "resource_id" : string; "version_id" : string; "object_type" : string; "identity_key" : string; "display_name" : string; "access_entity" : string; "schema_version_id" : (string | null); "attributes" : { [key: string]: unknown; }; "content_hash" : string; "valid_from" : string; "valid_to" : (string | null); "system_from" : string; "authority_state" : "APPROVED" | "REVOKED"; "evidence_class" : string; "proposal_id" : (string | null); [key: string]: unknown; };
 
-export type WireResolvedQuery = { "object_type" : string; "resource_ids"?: (Array<string> | null); "filters"?: Array<WirePropertyFilter>; "traversal"?: Array<WireTraversal>; "search"?: string; "limit"?: number; "offset"?: number; "valid_at" : string; "known_at" : string; "interface"?: (WireInterfaceRoot | null); "type_group"?: (WireInterfacePin | null); };
+export type WireResolvedQuery = { "object_type" : string; "resource_ids"?: (Array<string> | null); "filters"?: Array<WirePropertyFilter>; "filter_expression"?: (WireFilterExpression | null); "traversal"?: Array<WireTraversal>; "search"?: string; "limit"?: number; "offset"?: number; "valid_at" : string; "known_at" : string; "interface"?: (WireInterfaceRoot | null); "type_group"?: (WireInterfacePin | null); };
 
 export type WireSharedField = { "kind" : string; "required" : boolean; "semantic_id"?: (string | null); "target_type"?: (string | null); [key: string]: unknown; };
 
@@ -47,6 +49,41 @@ export type WireDefinedObjectSetResponse = { "contract" : "ontology-object-set/1
 export const querySchema = {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {
+    "FilterExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "enum": [
+            "all",
+            "any"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "conditions": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PropertyFilter"
+              },
+              {
+                "$ref": "#/$defs/FilterExpression"
+              }
+            ]
+          },
+          "maxItems": 20,
+          "minItems": 2,
+          "title": "Conditions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "op",
+        "conditions"
+      ],
+      "title": "FilterExpression",
+      "type": "object"
+    },
     "InterfacePin": {
       "additionalProperties": false,
       "properties": {
@@ -199,6 +236,17 @@ export const querySchema = {
           "maxItems": 20,
           "title": "Filters",
           "type": "array"
+        },
+        "filter_expression": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FilterExpression"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -239,6 +287,17 @@ export const querySchema = {
       "maxItems": 20,
       "title": "Filters",
       "type": "array"
+    },
+    "filter_expression": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FilterExpression"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "traversal": {
       "items": {
@@ -327,6 +386,41 @@ export const querySchema = {
 export const responseSchema = {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {
+    "FilterExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "enum": [
+            "all",
+            "any"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "conditions": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PropertyFilter"
+              },
+              {
+                "$ref": "#/$defs/FilterExpression"
+              }
+            ]
+          },
+          "maxItems": 20,
+          "minItems": 2,
+          "title": "Conditions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "op",
+        "conditions"
+      ],
+      "title": "FilterExpression",
+      "type": "object"
+    },
     "FilterSchemaVersion": {
       "properties": {
         "object_type": {
@@ -780,6 +874,17 @@ export const responseSchema = {
           "title": "Filters",
           "type": "array"
         },
+        "filter_expression": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FilterExpression"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "traversal": {
           "items": {
             "$ref": "#/$defs/Traversal"
@@ -927,6 +1032,17 @@ export const responseSchema = {
           "maxItems": 20,
           "title": "Filters",
           "type": "array"
+        },
+        "filter_expression": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FilterExpression"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -1153,6 +1269,41 @@ export const responseSchema = {
 export const definedResponseSchema = {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {
+    "FilterExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "enum": [
+            "all",
+            "any"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "conditions": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PropertyFilter"
+              },
+              {
+                "$ref": "#/$defs/FilterExpression"
+              }
+            ]
+          },
+          "maxItems": 20,
+          "minItems": 2,
+          "title": "Conditions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "op",
+        "conditions"
+      ],
+      "title": "FilterExpression",
+      "type": "object"
+    },
     "FilterSchemaVersion": {
       "properties": {
         "object_type": {
@@ -1606,6 +1757,17 @@ export const definedResponseSchema = {
           "title": "Filters",
           "type": "array"
         },
+        "filter_expression": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FilterExpression"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "traversal": {
           "items": {
             "$ref": "#/$defs/Traversal"
@@ -1753,6 +1915,17 @@ export const definedResponseSchema = {
           "maxItems": 20,
           "title": "Filters",
           "type": "array"
+        },
+        "filter_expression": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FilterExpression"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [

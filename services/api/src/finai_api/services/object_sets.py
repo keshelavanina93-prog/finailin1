@@ -8,6 +8,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.object_sets import (
+    FilterExpression,
     FilterSchemaVersion,
     ObjectSetQuery,
     ObjectSetResult,
@@ -17,6 +18,7 @@ from finai_api.domain.review import Principal
 from finai_api.services.object_filter_contract import (
     RANGE_OPERATORS,
     RANGE_PATTERNS,
+    filter_leaves,
     validate_filters,
 )
 from finai_api.services.resources import resource_connection
@@ -90,9 +92,26 @@ def _filter_sql(filters, alias, schema_cte, args, exact_schema=False):
     return predicate
 
 
+def _expression_sql(expression, alias, schema_cte, args, exact_schema=False, fields=None):
+    if expression is None:
+        return ""
+    predicates = []
+    for child in expression.conditions:
+        if isinstance(child, FilterExpression):
+            sql = _expression_sql(child, alias, schema_cte, args, exact_schema, fields)
+        else:
+            condition = child.model_copy(update={"field": fields[child.field]}) if fields else child
+            sql = _filter_sql([condition], alias, schema_cte, args, exact_schema)
+        predicates.append("(" + sql.removeprefix(" AND ") + ")")
+    joiner = " AND " if expression.op == "all" else " OR "
+    return " AND (" + joiner.join(predicates) + ")"
+
+
 def _stage_contracts(conn, principal, request, root_types, binding=None):
     """Resolve typed destinations even when the requested root has no instances."""
-    if not any(step.filters for step in request.traversal) and not (binding and request.traversal):
+    if not any(filter_leaves(step) for step in request.traversal) and not (
+        binding and request.traversal
+    ):
         return {}
     with conn.cursor(row_factory=dict_row) as cursor:
         rows = cursor.execute(
@@ -152,11 +171,11 @@ def _stage_contracts(conn, principal, request, root_types, binding=None):
         if not outputs or not outputs.issubset(schemas):
             raise WorkspaceError(422, "Traversal destination schema is unavailable")
         current = outputs
-        if step.filters:
+        if filter_leaves(step):
             selected = [schemas[name] for name in sorted(current)]
             for schema in selected:
-                validate_filters(step.filters, schema["attributes"]["fields"])
-            for condition in step.filters:
+                validate_filters(filter_leaves(step), schema["attributes"]["fields"])
+            for condition in filter_leaves(step):
                 if len({s["attributes"]["fields"][condition.field]["kind"] for s in selected}) != 1:
                     raise WorkspaceError(
                         422, "Traversal filters require compatible destination field kinds"
@@ -190,7 +209,7 @@ def query_objects(
         if (
             request.interface is not None
             or request.type_group is not None
-            or any(step.filters for step in request.traversal)
+            or any(filter_leaves(step) for step in request.traversal)
         ):
             conn.execute(
                 "SELECT pg_advisory_xact_lock_shared(hashtextextended(%s,0))",
@@ -216,6 +235,7 @@ def _query_objects(
     )
     # One statement gives counts, page and traversal a single database snapshot.
     # Only internal CTE names are interpolated; every caller value is a parameter.
+    root_filters = filter_leaves(request)
     root_types = types if types is not None else [request.object_type]
     binding = None
     group_binding = None
@@ -230,7 +250,7 @@ def _query_objects(
         )
         binding = compiler_binding(group_binding)
         root_types = [item["object_type"] for item in group_binding["schemas"]]
-        validate_filters(request.filters, binding["fields"])
+        validate_filters(root_filters, binding["fields"])
     if request.interface is not None:
         from finai_api.services.interface_query import resolve
 
@@ -238,7 +258,7 @@ def _query_objects(
             raise WorkspaceError(422, "An interface query has explicitly pinned concrete types")
         binding = resolve(principal, request.interface, request.valid_at, request.known_at)
         root_types = [item["object_type"] for item in binding["implementations"]]
-        validate_filters(request.filters, binding["fields"])
+        validate_filters(root_filters, binding["fields"])
     stage_schemas = _stage_contracts(conn, principal, request, root_types, binding)
     args: list[Any] = [principal.scope.tenant_id, request.known_at]
     ctes = [
@@ -263,7 +283,7 @@ def _query_objects(
                 ]
             )
         )
-    if request.filters and binding:
+    if root_filters and binding:
         ctes.append(
             "filter_schema_candidates AS (SELECT v.*,i.identity_key FROM resource_versions v "
             "JOIN canonical_identities i USING(tenant_id,resource_id) "
@@ -275,7 +295,7 @@ def _query_objects(
                 [item["schema"]["version_id"] for item in binding["implementations"]],
             ]
         )
-    elif request.filters:
+    elif root_filters:
         ctes.append(
             "filter_schema_candidates AS (SELECT DISTINCT ON(resource_id) * FROM versions "
             "WHERE object_type='SchemaDefinition' AND identity_key=ANY(%s::text[]) "
@@ -308,7 +328,7 @@ def _query_objects(
         predicate += " AND position(lower(%s) in lower(display_name || ' ' || identity_key))>0"
         args.append(request.search)
         ctes.append("interface_roots AS (SELECT * FROM current_objects WHERE " + predicate + ")")
-        if request.filters or request.traversal:
+        if root_filters or request.traversal:
             ctes.append(
                 "invalid_interface_root AS (SELECT 1 FROM interface_roots r "
                 "JOIN interface_mappings m ON m.object_type=r.object_type "
@@ -325,6 +345,13 @@ def _query_objects(
             predicates.append(
                 "(object_type=%s"
                 + _filter_sql(mapped, "current_objects", "filter_schema_candidates", args)
+                + _expression_sql(
+                    request.filter_expression,
+                    "current_objects",
+                    "filter_schema_candidates",
+                    args,
+                    fields=implementation["fields"],
+                )
                 + ")"
             )
         ctes.append(
@@ -335,6 +362,9 @@ def _query_objects(
     else:
         predicate += _filter_sql(
             request.filters, "current_objects", "filter_schema_candidates", args
+        )
+        predicate += _expression_sql(
+            request.filter_expression, "current_objects", "filter_schema_candidates", args
         )
         predicate += " AND position(lower(%s) in lower(display_name || ' ' || identity_key))>0"
         args.append(request.search)
@@ -414,7 +444,7 @@ def _query_objects(
                 "WHERE t.authority_state='APPROVED'"
             )
             args += [request.valid_at, request.valid_at, step.name]
-        if step.filters:
+        if filter_leaves(step):
             ctes.append(f"unfiltered{index} AS ({sql})")
             schema_cte = f"hop_schema{index}"
             ctes.append(
@@ -423,7 +453,7 @@ def _query_objects(
             args.append([s["version_id"] for s in stage_schemas[index]])
             checks = [
                 _schema_compat_sql("candidate", schema_cte, field, args)
-                for field in sorted({condition.field for condition in step.filters})
+                for field in sorted({condition.field for condition in filter_leaves(step)})
             ]
             invalid = f"invalid_hop{index}"
             ctes.append(
@@ -433,6 +463,9 @@ def _query_objects(
             )
             invalid_stage_ctes.append((index, invalid))
             predicate = _filter_sql(step.filters, "destination", schema_cte, args, True)
+            predicate += _expression_sql(
+                step.filter_expression, "destination", schema_cte, args, True
+            )
             ctes.append(
                 f"s{index} AS (SELECT * FROM unfiltered{index} destination WHERE true {predicate})"
             )
@@ -453,7 +486,7 @@ def _query_objects(
         + (
             "coalesce((SELECT jsonb_agg(to_jsonb(s)) FROM filter_schema_candidates s "
             "WHERE authority_state='APPROVED'),'[]'::jsonb)"
-            if request.filters
+            if root_filters
             else "'[]'::jsonb"
         )
     )
@@ -492,7 +525,7 @@ def _query_objects(
             "Reached object schema is unavailable or its property semantics "
             "differ at traversal step " + ", ".join(map(str, invalid_stages)),
         )
-    for condition in request.filters:
+    for condition in root_filters:
         kinds = {
             schema["attributes"]["fields"].get(condition.field, {}).get("kind")
             for schema in filter_schemas
@@ -515,14 +548,14 @@ def _query_objects(
             if representable is None or representable[0] is not True:
                 raise WorkspaceError(422, "Range threshold exceeds supported exact representation")
     schema_pins = []
-    if request.filters:
+    if root_filters:
         schemas = {schema["identity_key"]: schema for schema in filter_schemas}
         if set(schemas) != set(root_types):
             raise WorkspaceError(422, "Query filter schema unavailable at the requested time")
         for kind in sorted(schemas):
             schema = schemas[kind]
             if not binding:
-                validate_filters(request.filters, schema["attributes"]["fields"])
+                validate_filters(root_filters, schema["attributes"]["fields"])
             schema_pins.append(
                 FilterSchemaVersion(
                     object_type=kind,
@@ -530,7 +563,7 @@ def _query_objects(
                     version_id=schema["version_id"],
                 )
             )
-        for condition in request.filters if not binding else []:
+        for condition in root_filters if not binding else []:
             if (
                 condition.operator in RANGE_OPERATORS
                 and len(

@@ -210,3 +210,49 @@ test('membership rejects ambiguous scalar lists and shared budget overflow befor
   assert.equal(auth, 0);
   assert.equal(calls.length, 0);
 });
+
+test('compound root and reached filters stay exact through capture and saved paging', async () => {
+  const expression = {op: 'all', conditions: [
+    {op: 'any', conditions: [{field: 'debit_account_id', value: id(20)}, {field: 'credit_account_id', value: id(21)}]},
+    {field: 'source_column', operator: 'in', value: ['Y', 'AA']},
+  ]};
+  const q = query({filter_expression: expression, traversal: [{name: 'source_record_id',
+    filter_expression: {op: 'any', conditions: [{field: 'sheet', value: 'TR'}, {field: 'sheet', value: 'Base'}]}}]});
+  const expected = structuredClone(q);
+  const {sdk, calls} = client((url, init) => json(init.method === 'GET'
+    ? {...result(expected), definition_id: reference.resource_id, definition_version_id: reference.version_id}
+    : result(JSON.parse(init.body))), async () => {
+    expression.conditions[0].op = 'all';
+    expression.conditions[1].value.push('changed');
+    q.traversal[0].filter_expression.conditions[0].value = 'changed';
+    return 'token';
+  });
+  assert.deepEqual((await sdk.query(q)).query, expected);
+  assert.deepEqual(JSON.parse(calls[0].init.body), expected);
+  const saved = await sdk.runSavedSet(reference, {limit: 1, valid_at: time, known_at: time});
+  assert.deepEqual((await sdk.nextPage(saved)).query, {...expected, offset: 1});
+  const equivalent = structuredClone(expected);
+  equivalent.filter_expression.conditions[0].conditions[0].operator = 'eq';
+  await client(() => json(result(equivalent))).sdk.query(expected);
+  const changed = structuredClone(expected);
+  changed.traversal[0].filter_expression.op = 'all';
+  await rejects(() => client(() => json(result(changed))).sdk.query(expected));
+});
+
+test('compound depth and shared leaf or membership limits fail before authentication', async () => {
+  let auth = 0;
+  const {sdk, calls} = client(() => {throw Error('must not fetch');}, () => {auth++; return 'token';});
+  const leaf = {field: 'code', value: 'A'};
+  const group = child => ({op: 'any', conditions: [leaf, child]});
+  const cycle = group(leaf); cycle.conditions[1] = cycle;
+  for (const filter_expression of [group(group(group(group(leaf)))), cycle,
+    {op: 'any', conditions: [leaf]}, {op: 'not', conditions: [leaf, leaf]},
+    {op: 'any', conditions: [leaf, {field: 'code', operator: 'in', value: ['A', true]}]},
+  ]) await rejects(() => sdk.query(query({filter_expression})), 400);
+  await rejects(() => sdk.query(query({filters: Array.from({length: 19}, () => leaf), filter_expression: group(leaf)})), 400);
+  await rejects(() => sdk.query(query({filter_expression: group({field: 'code', operator: 'in',
+    value: Array.from({length: 60}, (_, i) => String(i))}), traversal: [{name: 'source_record_id',
+      filter_expression: group({field: 'code', operator: 'not_in', value: Array.from({length: 41}, (_, i) => String(i))})}]})), 400);
+  assert.equal(auth, 0);
+  assert.equal(calls.length, 0);
+});

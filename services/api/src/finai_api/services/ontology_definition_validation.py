@@ -7,7 +7,7 @@ from uuid import UUID, uuid5
 
 from pydantic import ValidationError
 
-from finai_api.domain.object_sets import ObjectSetQuery, PropertyFilter
+from finai_api.domain.object_sets import ObjectSetQuery, Traversal
 from finai_api.domain.ontology_definitions import (
     DEFINITION_MODELS,
     DerivedDefinition,
@@ -18,7 +18,7 @@ from finai_api.domain.ontology_definitions import (
 )
 from finai_api.domain.regulation import RegulatoryDefinition
 from finai_api.domain.resources import ResourceMutation
-from finai_api.services.object_filter_contract import validate_filters
+from finai_api.services.object_filter_contract import filter_leaves, validate_filters
 from finai_api.services.temporal_definition_dependency import TemporalDependencyUnavailable
 from finai_api.services.workspace import WorkspaceError
 
@@ -137,9 +137,7 @@ def validate_definition(
             root = schema(payload["object_type"])
             fields = root["attributes"]["fields"]
             root_types = {payload["object_type"]}
-        validate_filters(
-            [PropertyFilter.model_validate(value) for value in payload["filters"]], fields
-        )
+        validate_filters(filter_leaves(ObjectSetQuery.model_validate(payload)), fields)
         # Traversal definitions bind the link type and endpoint schemas, not UI labels.
         current_types = root_types
         for index, step in enumerate(payload["traversal"]):
@@ -191,9 +189,7 @@ def validate_definition(
                         422, "No declared incoming reference matches the traversal"
                     )
                 current_types = outputs
-            stage_filters = [
-                PropertyFilter.model_validate(value) for value in step.get("filters", [])
-            ]
+            stage_filters = filter_leaves(Traversal.model_validate(step))
             stage_fields = []
             for name in current_types:
                 fields = schema(name)["attributes"]["fields"]

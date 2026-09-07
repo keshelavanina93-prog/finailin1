@@ -1,6 +1,6 @@
 export type { HistorySearchResult } from "./history-search.js";
 export type {
-  ObjectSetFilter, ObjectSetTraversal, ObjectSetQuery, ObjectSetSchemaVersion,
+  ObjectSetFilter, FilterExpression, ObjectSetTraversal, ObjectSetQuery, ObjectSetSchemaVersion,
   ObjectSetTraversalSchemaVersion, ObjectSetResult, ObjectSetInterfacePin,
   ObjectSetInterfaceRoot, ObjectSetInterfaceField, ObjectSetInterfaceBindings,
   ObjectSetInterfaceValue,
