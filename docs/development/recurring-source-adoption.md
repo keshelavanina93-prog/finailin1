@@ -45,10 +45,39 @@ before retention. Foreign-entity read returned 404. The original family was unch
 Validation: 20 parser/snapshot tests; 20 compatibility tests including the original
 snapshot cycle guard; 37 governance tests including policy/visibility and same-change
 set branching refusal. The latter emulate the existing hidden-dependents helper;
-native transition/multi-role coverage remains in progress. Native family publication
+native restricted-field multi-role coverage remains open. Native family publication
 and refusal artifacts are in `evidence/nin56-family-native-*.json`. The source-family
 helper defaults to inspection and requires `--apply` for reviewed publication.
 
 No eligible authentic later SEG snapshot exists in the retained inventory. Native
 baseline and synthetic compatibility checks do not establish authentic recurring
 refresh, paired reporting comparison, full NIN-56/NIN-58 or release acceptance.
+
+## Integrated runtime and durable transition proof
+
+Backend 452009a and frontend edf6ecf/4d6f641 are mounted on API 8062 and web 3062.
+The production build and three consumer response checks passed. Authenticated HTTP
+inspection returned the exact accepted real family and its 51 dependencies;
+unauthenticated inspection returned 401, client compatibility assertions and a
+same-snapshot successor returned 422, and duplicate family proposal returned 409.
+The original family/version/hash remained unchanged. See
+`evidence/nin56-family-integrated-http.json`.
+
+The durable native synthetic transition test passed in 92.14 seconds. Three generated
+workbooks, one company, shared accounts/mappings, per-snapshot aliases, separate
+source scopes/bindings/periods and available lifecycle state were retained inside
+`SYNTHETIC-source-adoption-d70f7a89-516f-4843-aecd-93d8a0584b2c`.
+The reviewed A-to-B transition reopened B's own February period and row count;
+A's missing Base!S2, company version and family baseline remained unchanged.
+Generic schema tampering, self-review, a competing A-to-C successor and invalid
+same-period replacement were refused. An ordinary entity reader received 404 for
+the synthetic company, adoption and retained source. No test resources were placed
+in the ordinary company's visible scope. Exact evidence is in
+`evidence/nin56-source-adoption-native.json`; no authentic later-source claim follows.
+
+API and worker restarted for the integrated code. Existing SEG Function and
+Transformation identities were reviewed against the new runtime manifest, producing
+versions dbd0ad6d-60e9-5101-92ce-0a6fef5a380e and
+2a7e0bd0-3876-587c-9bef-90fa2eb4bf28. The source accounting binding remains
+8d08c8a1-3c38-53dc-aaf7-fd3a4c117910 and the original saved invocation is unchanged.
+Worker process liveness after this restart is not a new workflow execution proof.
