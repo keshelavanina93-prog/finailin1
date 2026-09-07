@@ -1,0 +1,9 @@
+{
+  "proposal_id": "89eac2ea-3f42-4892-8f0f-fd8f316e1674",
+  "target_id": "b9a7e7f7-d066-56de-a57c-1eb28b944a5f",
+  "agent_id": "31afbbf7-75ea-5ab7-a2fd-10e042d936c2",
+  "desired_state": {
+    "resource_id": "fcd3f90c-ef7b-579a-9fcf-3da53e795125",
+    "version_id": "e3553572-885b-5ca2-a48f-b8aaf568b408"
+  }
+}

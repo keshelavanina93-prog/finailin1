@@ -458,6 +458,10 @@ def _validate(
                 from finai_api.services.transformation_definitions import validate_transformation
 
                 validate_transformation(item, target)
+            if item.object_type in {"DeploymentTarget", "RuntimeAgent", "DesiredState"}:
+                from finai_api.domain.runtime_deployment import validate_runtime_deployment
+
+                validate_runtime_deployment(item, target)
             if item.object_type == "RetentionPolicy":
                 from finai_api.services.artifact_retention import validate_policy
 

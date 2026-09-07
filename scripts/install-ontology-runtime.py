@@ -35,6 +35,9 @@ def main() -> None:
         and {"ontology_admin", "ontology_review"}.issubset(p.permissions)
     )
     kinds = {
+        "DeploymentTarget",
+        "RuntimeAgent",
+        "DesiredState",
         "FunctionDefinition",
         "TransformationDefinition",
         "RetentionPolicy",
