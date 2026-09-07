@@ -17,6 +17,44 @@ from finai_api.services.resources import resource_connection
 from finai_api.services.workspace import WorkspaceError
 
 VERSION = "transformation-functions/1"
+MEASUREMENT = "POSTGRES_JSONB_TEXT_UTF8_V1"
+USAGE_KEYS = ("returned_rows", "derived_evaluations", "published_result_bytes")
+
+
+def measured_usage(principal: Principal, run_id: str) -> dict:
+    """Represented retained-result bytes, not disk allocation or a hard storage quota."""
+    with records.scope_connection(principal) as conn:
+        records.set_scope(conn, principal)
+        row = conn.execute(
+            "SELECT jsonb_array_length(payload->'objects'),"
+            "jsonb_array_length(payload->'derived_values'),"
+            "octet_length(convert_to(payload::text,'UTF8')) FROM fact_calculation_runs "
+            "WHERE tenant_id=%s AND run_id=%s",
+            (principal.scope.tenant_id, run_id),
+        ).fetchone()
+    if row is None or any(value is None for value in row):
+        raise WorkspaceError(409, "Retained Function result cannot be measured")
+    return {"measurement": MEASUREMENT, **dict(zip(USAGE_KEYS, row, strict=True))}
+
+
+def cumulative_usage(
+    events: list[dict], node_id: str | None = None, usage: dict | None = None
+) -> dict:
+    unique = {
+        event["node"]: event["usage"]
+        for event in events
+        if event.get("state") == "COMPLETED" and "usage" in event
+    }
+    if node_id is not None and usage is not None:
+        unique[node_id] = usage
+    return {
+        "measurement": MEASUREMENT,
+        **{key: sum(item[key] for item in unique.values()) for key in USAGE_KEYS},
+    }
+
+
+def exceeded_budget(usage: dict, budget: dict) -> bool:
+    return any(usage[key] > budget["max_" + key] for key in USAGE_KEYS)
 
 
 def retain(principal: Principal, request: TransformationRunRequest) -> str:
@@ -178,6 +216,23 @@ def execute_node(context: dict) -> dict:
         "output": reference,
         "new_run_required": not succeeded,
     }
+    budget = compiled.get("resource_budget")
+    if succeeded and budget is not None:
+        usage = measured_usage(principal, reference["run_id"])
+        totals = cumulative_usage(retained["events"], node_id, usage)
+        if exceeded_budget(totals, budget):
+            refusal = {
+                "node": node_id,
+                "state": "BUDGET_REFUSED",
+                "output": reference,
+                "usage": usage,
+                "cumulative_usage": totals,
+                "resource_budget": budget,
+                "new_run_required": True,
+            }
+            records.event(principal, identity, "node:" + node_id + ":budget-refused", refusal)
+            return refusal
+        terminal["usage"] = usage
     records.event(principal, identity, "node:" + node_id + ":terminal", terminal)
     if succeeded:
         for output in compiled["outputs"]:
@@ -196,5 +251,12 @@ def publish(context: dict) -> dict:
     }
     if completed != set(retained["request"]["compiled_plan"]["node_order"]):
         raise WorkspaceError(409, "Transformation is incomplete; publication refused")
+    compiled = retained["request"]["compiled_plan"]
+    if compiled.get("resource_budget") is not None:
+        usage_events = [event for event in retained["events"] if event.get("state") == "COMPLETED"]
+        if any("usage" not in event for event in usage_events) or exceeded_budget(
+            cumulative_usage(usage_events), compiled["resource_budget"]
+        ):
+            raise WorkspaceError(409, "Transformation publication budget is not satisfied")
     manifest = publication.publish(principal, context["workflow_id"], 0)
     return {"publication_id": manifest["publication_id"], "generation": 0}

@@ -63,9 +63,19 @@ class TransformationGraph(BaseModel):
         return order
 
 
+class TransformationResourceBudget(BaseModel):
+    """Returned results and evaluations, not database scan, memory or storage quotas."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    max_returned_rows: int = Field(strict=True, ge=1, le=6400)
+    max_derived_evaluations: int = Field(strict=True, ge=0, le=51200)
+    max_published_result_bytes: int = Field(strict=True, ge=1, le=16000000)
+
+
 class TransformationDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     definition: TransformationGraph
+    resource_budget: TransformationResourceBudget
     evidence_id: UUID | None = None
 
 

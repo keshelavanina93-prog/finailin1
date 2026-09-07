@@ -35,6 +35,28 @@ def validate_transformation(
         )
 
 
+def estimate_work(definition: TransformationDefinition, nodes: list[dict]) -> dict[str, int]:
+    """Admit declared query pages against pinned executable capability limits."""
+    returned_rows = 0
+    derived_evaluations = 0
+    for node in nodes:
+        function_plan = node["function_plan"]
+        capability = function_plan["implementation"]
+        limit = function_plan["request"]["limit"]
+        properties = len(function_plan["derived_properties"])
+        if limit > capability["maximum_rows"] or properties > capability["maximum_properties"]:
+            raise WorkspaceError(409, "Transformation node exceeds the pinned Function capability")
+        returned_rows += limit
+        derived_evaluations += limit * properties
+    if returned_rows > definition.resource_budget.max_returned_rows:
+        raise WorkspaceError(
+            409, "Transformation query pages exceed the reviewed returned-row budget"
+        )
+    if derived_evaluations > definition.resource_budget.max_derived_evaluations:
+        raise WorkspaceError(409, "Transformation properties exceed the reviewed evaluation budget")
+    return {"returned_rows": returned_rows, "derived_evaluations": derived_evaluations}
+
+
 def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
     require_permission(p, "ontology_read")
     if request.known_at > datetime.now(UTC):
@@ -46,6 +68,10 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
             or resource["access_entity"] != p.scope.legal_entity_id
         ):
             raise WorkspaceError(409, "Transformation must belong to the selected company context")
+        if "resource_budget" not in resource["attributes"]:
+            raise WorkspaceError(
+                409, "A reviewed Transformation resource budget requires a new definition version"
+            )
         definition = TransformationDefinition.model_validate(resource["attributes"])
         dependencies = c.execute(
             "SELECT d.relation,v.* FROM resource_dependencies d JOIN resource_versions v "
@@ -87,6 +113,7 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
                 "function_plan": function_plan,
             }
         )
+    estimated_work = estimate_work(definition, nodes)
     result = {
         "contract": "transformation-plan/1",
         "request": request.model_dump(mode="json"),
@@ -97,6 +124,9 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
         "node_order": order,
         "nodes": nodes,
         "outputs": [output.model_dump(mode="json") for output in definition.definition.outputs],
+        "resource_budget": definition.resource_budget.model_dump(mode="json"),
+        "estimated_work": estimated_work,
+        "result_bytes_accounting": "POSTGRES_JSONB_TEXT_UTF8_V1",
         "coverage": "DECLARED_QUERY_PAGES_ONLY",
         "business_effect_authorized": False,
         "current_use_authorized": False,

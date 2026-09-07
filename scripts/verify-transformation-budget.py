@@ -1,9 +1,4 @@
-"""Review and prove an actual source-account Function DAG through the mounted API.
-
-Run --prepare only after the shared Function is republished for the settled package.
-The default mode starts a new build; --replay resubmits its retained request;
---read-only verifies the same retained build without submitting any work.
-"""
+"""Prove actual source observation computation is refused before publication by its reviewed byte budget. No financial authority is established."""
 
 import argparse
 import json
@@ -28,7 +23,7 @@ from finai_api.services import function_execution, resources, transformation_def
 from finai_api.services.workspace import WorkspaceError
 
 FUNCTION_KEY = "source-accounts:reviewed-label-analysis:v1"
-KEY = "source-accounts:reviewed-page-build:v1"
+KEY = "source-accounts:byte-budget-proof:v1"
 NODES = ("first_page", "next_page")
 OUTPUTS = ("source_accounts_first_page", "source_accounts_next_page")
 
@@ -54,7 +49,7 @@ def prepare(author: Principal, grants: dict, identity: UUID) -> None:
         "resource_budget": {
             "max_returned_rows": 6,
             "max_derived_evaluations": 6,
-            "max_published_result_bytes": 1000000,
+            "max_published_result_bytes": 1,
         },
         "definition": {
             "nodes": [
@@ -112,7 +107,7 @@ def prepare(author: Principal, grants: dict, identity: UUID) -> None:
         and {"ontology_admin", "ontology_review"}.issubset(p.permissions)
     )
     proposal = ResourceProposal(
-        title="Source account observation build",
+        title="Source account byte-budget refusal proof",
         rationale="Run two bounded source-label query pages with explicit completion order and named retained outputs; no accounting activation",
         access_entity=author.scope.legal_entity_id,
         mutations=[
@@ -120,7 +115,7 @@ def prepare(author: Principal, grants: dict, identity: UUID) -> None:
                 resource_id=identity,
                 object_type="TransformationDefinition",
                 identity_key=KEY,
-                display_name="Source account observation build",
+                display_name="Source account byte-budget refusal proof",
                 expected_version_id=UUID(previous["version_id"]) if previous else None,
                 valid_from=datetime.now(UTC),
                 attributes=attributes,
@@ -147,28 +142,17 @@ def retained_part(result: dict) -> dict:
     }
 
 
-def read_complete(client: httpx.Client, request_id: str, timeout: int) -> dict:
+def read_failed(client: httpx.Client, request_id: str, timeout: int) -> dict:
     deadline = time.monotonic() + timeout
     while True:
         response = client.get(f"/transformations/runs/{request_id}")
         response.raise_for_status()
         result = response.json()
-        state = result.get("execution", {}).get("state")
-        if result.get("publications"):
+        assert not result.get("publications"), "Refused build must not publish"
+        if result.get("execution", {}).get("state") == "FAILED":
             return result
-        if state in ("FAILED", "CANCELLED") or result.get("runtime_status") in (
-            "FAILED",
-            "CANCELED",
-            "TERMINATED",
-            "TIMED_OUT",
-        ):
-            raise AssertionError(
-                f"Source build did not complete: {state or result.get('runtime_status')}"
-            )
         if time.monotonic() >= deadline:
-            raise TimeoutError(
-                "Source build has no retained publication before the proof deadline"
-            )
+            raise TimeoutError("Budget refusal has no retained failed state")
         time.sleep(1)
 
 
@@ -183,7 +167,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("docs/development/evidence/nin12-transformation-runtime.json"),
+        default=Path("docs/development/evidence/nin32-build-budget-refusal.json"),
     )
     args = parser.parse_args()
     grants = json.loads(os.environ["FINAI_ACCESS_TOKENS"])
@@ -214,11 +198,13 @@ def main() -> None:
         else:
             response = client.get(f"/resources/{identity}")
             response.raise_for_status()
-            version = response.json()["resource"]["version_id"]
             cutoff = datetime.now(UTC).isoformat()
             request = {
                 "request_id": str(uuid4()),
-                "transformation": {"resource_id": str(identity), "version_id": version},
+                "transformation": {
+                    "resource_id": str(identity),
+                    "version_id": response.json()["resource"]["version_id"],
+                },
                 "valid_at": cutoff,
                 "known_at": cutoff,
             }
@@ -229,66 +215,58 @@ def main() -> None:
                 encoding="utf-8",
             )
         if not args.read_only:
-            started = client.post("/transformations/runs", json=request)
-            started.raise_for_status()
+            response = client.post("/transformations/runs", json=request)
+            response.raise_for_status()
             assert (
-                started.json()["workflow_id"]
+                response.json()["workflow_id"]
                 == "transformation:" + request["request_id"]
             )
-        result = read_complete(client, request["request_id"], args.timeout)
+        result = read_failed(client, request["request_id"], args.timeout)
+        compiled = result["request"]["compiled_plan"]
+        assert compiled["resource_budget"] == {
+            "max_returned_rows": 6,
+            "max_derived_evaluations": 6,
+            "max_published_result_bytes": 1,
+        }
+        assert compiled["result_bytes_accounting"] == "POSTGRES_JSONB_TEXT_UTF8_V1"
+        assert compiled["estimated_work"] == {
+            "returned_rows": 6,
+            "derived_evaluations": 6,
+        }
         assert result["business_effect_authorized"] is False
         assert result["current_use_authorized"] is False
-        compiled = result["request"]["compiled_plan"]
-        assert compiled["node_order"] == list(NODES)
-        assert compiled["dependency_semantics"] == "COMPLETION_BARRIER_ONLY"
-        assert compiled["coverage"] == "DECLARED_QUERY_PAGES_ONLY"
-        assert (
-            compiled["transformation"]["version_id"]
-            == request["transformation"]["version_id"]
+        refused = [
+            event
+            for event in result["events"]
+            if event.get("state") == "BUDGET_REFUSED"
+        ]
+        assert len(refused) == 1 and refused[0]["node"] == NODES[0]
+        assert refused[0]["usage"]["published_result_bytes"] > 1
+        assert refused[0]["cumulative_usage"] == refused[0]["usage"]
+        assert not any(event.get("node") == NODES[1] for event in result["events"])
+        reference = refused[0]["output"]
+        response = client.get(f"/functions/invocations/{reference['invocation_id']}")
+        response.raise_for_status()
+        invocation = response.json()
+        assert invocation["status"] == "SUCCEEDED"
+        assert invocation["receipt_hash"] == reference["receipt_hash"]
+        assert invocation["output"]["run_id"] == reference["run_id"]
+        assert invocation["output"]["mode"] == "EVIDENCE_ANALYSIS_ONLY"
+        assert len(invocation["output"]["objects"]) == 3
+        assert len(invocation["output"]["derived_values"]) == 3
+        assert all(
+            value["status"] == "AVAILABLE"
+            for value in invocation["output"]["derived_values"]
         )
-        assert len(result["publications"]) == 1
-        publication = result["publications"][0]
-        assert publication["authority"] == "EXECUTION_ONLY"
-        assert {output["slot"] for output in publication["outputs"]} == set(OUTPUTS)
-        events = {event["event_id"]: event for event in result["events"]}
-        first_done = events[f"node:{NODES[0]}:terminal"]
-        next_started = events[f"node:{NODES[1]}:started"]
-        assert datetime.fromisoformat(
-            first_done["created_at"]
-        ) <= datetime.fromisoformat(next_started["created_at"])
-        node_results = []
-        object_ids = set()
-        for output in publication["outputs"]:
-            reference = output["value"]
-            response = client.get(
-                f"/functions/invocations/{reference['invocation_id']}"
-            )
-            response.raise_for_status()
-            invocation = response.json()
-            assert invocation["status"] == "SUCCEEDED"
-            assert invocation["receipt_hash"] == reference["receipt_hash"]
-            assert invocation["output"]["run_id"] == reference["run_id"]
-            assert len(invocation["output"]["objects"]) == 3
-            assert len(invocation["output"]["derived_values"]) == 3
-            assert all(
-                value["status"] == "AVAILABLE"
-                for value in invocation["output"]["derived_values"]
-            )
-            assert invocation["output"]["mode"] == "EVIDENCE_ANALYSIS_ONLY"
-            object_ids.update(
-                obj["resource_id"] for obj in invocation["output"]["objects"]
-            )
-            node_results.append({"output_id": output["slot"], "invocation": invocation})
-        assert len(object_ids) == 6
         if not args.read_only:
-            repeated = client.post("/transformations/runs", json=request)
-            repeated.raise_for_status()
+            response = client.post("/transformations/runs", json=request)
+            response.raise_for_status()
             assert (
-                repeated.json()["workflow_id"]
+                response.json()["workflow_id"]
                 == "transformation:" + request["request_id"]
             )
-        repeated_result = read_complete(client, request["request_id"], args.timeout)
-        assert retained_part(repeated_result) == retained_part(result)
+        repeated = read_failed(client, request["request_id"], args.timeout)
+        assert retained_part(repeated) == retained_part(result)
         if previous and previous.get("result"):
             assert retained_part(previous["result"]) == retained_part(result)
     args.output.write_text(
@@ -297,10 +275,9 @@ def main() -> None:
                 "checked_at": datetime.now(UTC).isoformat(),
                 "request": request,
                 "result": result,
-                "named_outputs": node_results,
+                "diagnostic_invocation": invocation,
                 "retained_repeat_and_history_equal": True,
-                "completion_barrier_verified": True,
-                "replayed_existing_intent": args.replay,
+                "no_second_node_or_publication": True,
                 "read_only_verification": args.read_only,
                 "financial_authority_established": False,
             },
@@ -311,7 +288,7 @@ def main() -> None:
         encoding="utf-8",
     )
     print(
-        "Actual source build: two completed Function nodes, six observations, two named outputs; history unchanged."
+        "Actual source computation retained; reviewed byte budget refused publication and the second node. History unchanged."
     )
 
 

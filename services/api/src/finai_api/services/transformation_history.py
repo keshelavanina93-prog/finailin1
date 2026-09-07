@@ -76,6 +76,13 @@ def discover(
                     event.get("state") == "COMPLETED" for event in terminals.values()
                 ),
                 "failed_steps": sum(event.get("state") == "FAILED" for event in terminals.values()),
+                "budget_refused_steps": len(
+                    {
+                        event.get("node")
+                        for event in retained["events"]
+                        if event.get("state") == "BUDGET_REFUSED"
+                    }
+                ),
                 "total_steps": len(compiled["nodes"]),
                 "published_output_sets": len(retained["publications"]),
                 "current_use_authorized": False,

@@ -1,0 +1,25 @@
+{
+  "request": {
+    "request_id": "72a5c387-e2f6-484b-918b-1c7f9f71bb36",
+    "subject": {
+      "resource_id": "83a147a7-32a8-58af-a1e5-d74a222842e3",
+      "version_id": "f7e098b4-8f91-569a-87bb-558951c8c569"
+    },
+    "expected_event_id": null,
+    "target_state": "OBSERVED",
+    "epistemic_state": "OBSERVED",
+    "business_state": "PROVISIONAL",
+    "availability_state": "UNAVAILABLE",
+    "reason": "Verification complete: withdraw the deliberately one-byte proof definition from new use while preserving retained run evidence"
+  },
+  "decision": {
+    "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+    "request_id": "72a5c387-e2f6-484b-918b-1c7f9f71bb36",
+    "access_entity": "entity-ge-001",
+    "reviewed_by": "local-steward-reviewer",
+    "decision": "APPROVED",
+    "reason": "Reviewed withdrawal of the task-created restrictive verification definition; source and runtime evidence remain retained",
+    "recorded_at": "2026-09-07 05:14:57.569922+04:00"
+  },
+  "retained_run": "bc1cbc0a-e5ee-4e00-867b-c6693b8b7ad5"
+}

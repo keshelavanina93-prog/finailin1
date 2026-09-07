@@ -3,6 +3,7 @@
 import json
 import os
 from datetime import UTC, datetime
+from uuid import UUID
 
 from finai_api.domain.ontology_catalog import canonical_id, platform_definitions
 from finai_api.domain.ontology_definitions import DEFINITION_MODELS
@@ -70,7 +71,7 @@ def main() -> None:
             author.scope.tenant_id, spec["object_type"], spec["identity_key"]
         )
         try:
-            resources.get_resource(author, identity)
+            previous = resources.get_resource(author, identity)["resource"]
         except WorkspaceError as exc:
             if exc.status != 404:
                 raise
@@ -79,6 +80,35 @@ def main() -> None:
                     resource_id=identity, valid_from=datetime.now(UTC), **spec
                 )
             )
+        else:
+            # Extend only this schema, through normal review/CAS. Existing definitions
+            # keep their accepted schema pin; new executions require a reviewed budget.
+            if (
+                spec["object_type"] == "SchemaDefinition"
+                and spec["identity_key"] == "TransformationDefinition"
+                and "resource_budget" not in previous["attributes"]["fields"]
+            ):
+                attributes = {
+                    **previous["attributes"],
+                    "fields": {
+                        **previous["attributes"]["fields"],
+                        "resource_budget": spec["attributes"]["fields"][
+                            "resource_budget"
+                        ],
+                    },
+                }
+                mutations.append(
+                    ResourceMutation(
+                        resource_id=identity,
+                        expected_version_id=UUID(previous["version_id"]),
+                        valid_from=datetime.now(UTC),
+                        **{
+                            **spec,
+                            "display_name": previous["display_name"],
+                            "attributes": attributes,
+                        },
+                    )
+                )
     if not mutations:
         print("Ontology runtime contracts already present; preserved accepted versions")
         return

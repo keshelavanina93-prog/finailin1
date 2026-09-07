@@ -183,7 +183,9 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "source_record_id": "@SourceRecord",
     },
     "FunctionDefinition": {"object_set_id": "@ObjectSetDefinition", "definition": "OntologyDefinition"},
-    "TransformationDefinition": {"definition": "OntologyDefinition"},
+    "TransformationDefinition": {
+        "definition": "OntologyDefinition", "resource_budget?": "OntologyDefinition",
+    },
     "MetricDefinition": {"code": "Identifier", "function_reference": "Identifier"},
     "ReportSnapshot": {
         "legal_entity_id": "@LegalEntity",

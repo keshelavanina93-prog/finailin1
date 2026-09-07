@@ -2,3 +2,5 @@
 .builds-history article{padding:14px 0;border-bottom:1px solid var(--g8-border)}.builds-history article>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}.builds-history h4{margin:0;font-size:12px}.builds-history time,.builds-history article>p{font-size:11px;line-height:1.6;color:var(--g8-muted)}
 
 .builds-runtime-summary{scroll-margin-block-start:16px}.builds-runtime-summary:focus-visible{outline:1px solid var(--g8-accent);outline-offset:5px}
+
+.builds-budget-refusal{border:1px solid var(--g8-border);border-left:3px solid var(--g8-cyan);padding:14px;background:var(--g8-raised)}.builds-budget-refusal>p,.builds-budget p{font-size:11px;line-height:1.6}.builds-budget table{margin:10px 0}
