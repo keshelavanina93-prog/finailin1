@@ -42,7 +42,7 @@ def normalize(value: object, kind: str) -> str:
         ) from exc
 
 
-def extent_observations(result: dict, config: dict, schema: dict) -> dict:
+def extent_observations(result: dict, config: dict, schema: dict, *, materialized=False) -> dict:
     kind = validate_schema(schema, config["field"])
     if kind != config["kind"]:
         raise WorkspaceError(409, "Temporal extent kind differs from its reviewed schema")
@@ -51,7 +51,9 @@ def extent_observations(result: dict, config: dict, schema: dict) -> dict:
         result["query"]["offset"] != 0
         or result["next_offset"] is not None
         or result["total"] != len(objects)
-        or not len(objects) <= result["query"]["limit"] <= 200
+        or not 1 <= result["query"]["limit"] <= 200
+        or (not materialized and len(objects) > result["query"]["limit"])
+        or (materialized and ("materialization" not in result or len(objects) > 1000))
     ):
         raise WorkspaceError(409, "Temporal extent requires the complete bounded Object Set")
     if len({obj["resource_id"] for obj in objects}) != len(objects):
@@ -91,7 +93,9 @@ def extent_observations(result: dict, config: dict, schema: dict) -> dict:
     return {
         "contract": "temporal-observation-extent/1",
         "authority": "OBSERVATION_EXTENT_ONLY",
-        "coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+        "coverage": "COMPLETE_BOUNDED_MATERIALIZATION"
+        if materialized
+        else "COMPLETE_BOUNDED_OBJECT_SET",
         "schema": config["schema"],
         "field": name,
         "kind": kind,

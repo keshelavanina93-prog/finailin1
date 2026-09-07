@@ -88,6 +88,8 @@ def _disk_manifest() -> dict[str, Any]:
         "dependency_sha256": _digest(dependencies),
         "mode": "EVIDENCE_ANALYSIS_ONLY",
         "maximum_rows": 200,
+        "maximum_materialized_rows": 1000,
+        "maximum_materialized_pages": 10,
         "maximum_properties": 8,
         "capabilities": {
             "read": True,
@@ -147,6 +149,8 @@ def manifest(implementation_id: str = IMPLEMENTATION_ID) -> dict[str, Any]:
         raise WorkspaceError(422, "Function implementation is not installed")
     result = deepcopy(_STARTUP_MANIFEST)
     if implementation_id == WORKSHEET_IMPLEMENTATION_ID:
+        result.pop("maximum_materialized_rows")
+        result.pop("maximum_materialized_pages")
         result.update(
             implementation_id=implementation_id,
             maximum_rows=50,
@@ -384,6 +388,10 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
                 422, "Temporal extent requires a complete Object Set starting at zero"
             )
         result["temporal_extent"] = {"schema": _pin(schema), "field": extent.field, "kind": kind}
+    if not isinstance(spec.definition, WorksheetImplementation) and spec.definition.materialization:
+        if request.offset != 0:
+            raise WorkspaceError(422, "Materialization starts at offset zero")
+        result["materialization"] = spec.definition.materialization.model_dump()
     if request.input_result is not None:
         if selected is None or source is not None:
             raise WorkspaceError(409, "Retained input requires the ontology Object Set adapter")
@@ -414,7 +422,19 @@ def _retained_input(p: Principal, request: FunctionInvocation, compiled: dict) -
     ):
         raise WorkspaceError(409, "Retained input Object Set, scope or time is incompatible")
     objects = source["objects"]
-    if len(objects) > request.limit or len({obj["resource_id"] for obj in objects}) != len(objects):
+    materialization = compiled.get("materialization")
+    if materialization:
+        from finai_api.services.object_set_materialization import validate
+
+        if source["query"]["limit"] != request.limit:
+            raise WorkspaceError(409, "Retained materialization requires the same page size")
+        with resource_connection(p) as conn:
+            validate(source, materialization, selected, conn)
+    elif source.get("materialization") is not None:
+        raise WorkspaceError(409, "Retained materialization requires reviewed consumer bounds")
+    if (not materialization and len(objects) > request.limit) or len(
+        {obj["resource_id"] for obj in objects}
+    ) != len(objects):
         raise WorkspaceError(409, "Retained input page is invalid or exceeds the declared bound")
     source_plan = None
     with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
@@ -503,6 +523,7 @@ def _retained_input(p: Principal, request: FunctionInvocation, compiled: dict) -
                 "interface_values",
                 "type_group_bindings",
                 "type_group_values",
+                "materialization",
             )
             if key in source
         },
@@ -670,19 +691,24 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
 
         return execute(p, request, retained_plan)
     selected = retained_plan["object_set"]
-    result = (
-        _retained_input(p, request, retained_plan)
-        if request.input_result
-        else ontology_definitions.run_set(
-            p,
-            UUID(selected["resource_id"]),
-            UUID(selected["version_id"]),
-            request.offset,
-            request.limit,
-            request.valid_at,
-            request.known_at,
+    if retained_plan.get("materialization") and request.input_result is None:
+        from finai_api.services.object_set_materialization import collect
+
+        result = collect(p, selected, request, retained_plan["materialization"])
+    else:
+        result = (
+            _retained_input(p, request, retained_plan)
+            if request.input_result
+            else ontology_definitions.run_set(
+                p,
+                UUID(selected["resource_id"]),
+                UUID(selected["version_id"]),
+                request.offset,
+                request.limit,
+                request.valid_at,
+                request.known_at,
+            )
         )
-    )
     query_known_at = datetime.fromisoformat(result["query"]["known_at"])
     grouped = {}
     if retained_plan.get("group_count"):
@@ -720,7 +746,9 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
             ).fetchone()
         if schema is None or _pin(schema) != extent["schema"]:
             raise WorkspaceError(409, "Temporal schema pin is unavailable")
-        grouped["temporal_extent"] = extent_observations(result, extent, schema)
+        grouped["temporal_extent"] = extent_observations(
+            result, extent, schema, materialized=bool(retained_plan.get("materialization"))
+        )
     properties = retained_plan["derived_properties"]
     graph = _composed_graph(p, properties, force=bool(retained_plan.get("retained_properties")))
     graph_output = {}
@@ -775,7 +803,11 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
             if "retained_provenance_authority" in retained_plan
             else {}
         ),
-        "coverage": "RETAINED_INPUT_PAGE_ONLY" if request.input_result else "QUERY_PAGE_ONLY",
+        "coverage": "COMPLETE_BOUNDED_MATERIALIZATION"
+        if retained_plan.get("materialization")
+        else "RETAINED_INPUT_PAGE_ONLY"
+        if request.input_result
+        else "QUERY_PAGE_ONLY",
         "mode": "EVIDENCE_ANALYSIS_ONLY",
         "business_effect_authorized": False,
         "current_use_authorized": False,

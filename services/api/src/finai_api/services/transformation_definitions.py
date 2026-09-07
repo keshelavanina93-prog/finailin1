@@ -80,7 +80,7 @@ def validate_transformation(
 
 
 def estimate_work(definition: TransformationDefinition, nodes: list[dict]) -> dict[str, int]:
-    """Admit declared query pages against pinned executable capability limits."""
+    """Admit page or reviewed complete-set bounds against executable capability limits."""
     returned_rows = 0
     derived_evaluations = 0
     for node in nodes:
@@ -90,8 +90,17 @@ def estimate_work(definition: TransformationDefinition, nodes: list[dict]) -> di
         properties = len(function_plan["derived_properties"])
         if limit > capability["maximum_rows"] or properties > capability["maximum_properties"]:
             raise WorkspaceError(409, "Transformation node exceeds the pinned Function capability")
-        returned_rows += limit
-        derived_evaluations += limit * properties
+        materialization = function_plan.get("materialization")
+        bound = limit
+        if materialization:
+            if (
+                materialization["max_objects"] > capability.get("maximum_materialized_rows", 0)
+                or materialization["max_pages"] > capability.get("maximum_materialized_pages", 0)
+            ):
+                raise WorkspaceError(409, "Function does not support the materialization bounds")
+            bound = min(materialization["max_objects"], limit * materialization["max_pages"])
+        returned_rows += bound
+        derived_evaluations += bound * properties
     if returned_rows > definition.resource_budget.max_returned_rows:
         raise WorkspaceError(
             409, "Transformation query pages exceed the reviewed returned-row budget"
@@ -170,6 +179,17 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
             ):
                 raise WorkspaceError(
                     409, "Retained input requires the same exact Object Set version"
+                )
+            if (
+                function_plan.get("materialization")
+                != source["function_plan"].get("materialization")
+                or (
+                    function_plan.get("materialization")
+                    and invocation.limit != source["invocation"]["limit"]
+                )
+            ):
+                raise WorkspaceError(
+                    409, "Retained materialization requires identical reviewed bounds and page size"
                 )
             for required in function_plan.get("retained_properties", []):
                 if {
