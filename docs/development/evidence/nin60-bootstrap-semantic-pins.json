@@ -1,0 +1,12 @@
+{
+  "state": "NATIVE_ROLLBACK_CONTRACT_PASS",
+  "recorded_at": "2026-09-07T20:24:51.045474+00:00",
+  "new_schema_exact_semantic_edges": 3,
+  "idempotent_replay": true,
+  "existing_schema_attributes_unchanged": true,
+  "unresolved_or_foreign_semantics_roll_back_installation": true,
+  "fixture_identities_retained": 0,
+  "company_or_account_facts_created": 0,
+  "historical_schema_repair_performed": false,
+  "release_accepted": false
+}
