@@ -316,8 +316,14 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
                     409, "Function derived-property exact dependency is unavailable"
                 )
             properties.append(_pin(prop))
-        # Existing lineage guard checks each current exact dependency and any material withdrawal.
-        upstream_authority(c, p.scope.tenant_id, request.function.version_id)
+        # Evidence analysis distinguishes immutable provenance from active definitions.
+        # Authoritative consumption keeps the guard's strict default and SQL checks.
+        lineage_authority = upstream_authority(
+            c,
+            p.scope.tenant_id,
+            request.function.version_id,
+            allow_historical_provenance=True,
+        )
     result = {
         "contract": "function-plan/1",
         "request": request.model_dump(mode="json"),
@@ -332,6 +338,8 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
         ),
     }
     retained_properties = getattr(spec.definition, "retained_properties", [])
+    if any(row.get("lineage_use") == "HISTORICAL" for row in lineage_authority):
+        result["retained_provenance_authority"] = lineage_authority
     if retained_properties and request.input_result is None:
         raise WorkspaceError(
             422, "Configured retained properties require an upstream invocation input"
@@ -724,6 +732,11 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
         **graph_output,
         "used_versions": used,
         "static_dependencies": retained_plan["static_dependencies"],
+        **(
+            {"retained_provenance_authority": retained_plan["retained_provenance_authority"]}
+            if "retained_provenance_authority" in retained_plan
+            else {}
+        ),
         "coverage": "RETAINED_INPUT_PAGE_ONLY" if request.input_result else "QUERY_PAGE_ONLY",
         "mode": "EVIDENCE_ANALYSIS_ONLY",
         "business_effect_authorized": False,

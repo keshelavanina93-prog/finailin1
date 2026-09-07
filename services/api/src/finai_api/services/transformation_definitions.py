@@ -123,7 +123,12 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
             "AND v.version_id=d.target_version_id WHERE d.tenant_id=%s AND d.version_id=%s",
             (p.scope.tenant_id, request.transformation.version_id),
         ).fetchall()
-        upstream_authority(c, p.scope.tenant_id, request.transformation.version_id)
+        upstream_authority(
+            c,
+            p.scope.tenant_id,
+            request.transformation.version_id,
+            allow_historical_provenance=True,
+        )
     order = definition.definition.topological_order()
     definitions = {node.node_id: node for node in definition.definition.nodes}
     nodes: list[dict[str, Any]] = []

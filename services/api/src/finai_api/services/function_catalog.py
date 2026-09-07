@@ -45,7 +45,12 @@ def discover(
             )
             try:
                 _current(cursor, principal, reference)
-                upstream_authority(cursor, principal.scope.tenant_id, reference.version_id)
+                upstream_authority(
+                    cursor,
+                    principal.scope.tenant_id,
+                    reference.version_id,
+                    allow_historical_provenance=True,
+                )
             except WorkspaceError as exc:
                 if exc.status not in (404, 409):
                     raise

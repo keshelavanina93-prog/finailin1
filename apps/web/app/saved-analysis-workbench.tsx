@@ -19,7 +19,8 @@ type ConsumedProperty = DerivedValue & {
  definition_id:string;content_hash:string;schema:Pin&{content_hash:string};
  kind:"text"|"decimal";epistemic_state:"DERIVED";source_result:SourceResult;
 };
-type BaseOutput={consumed_property_values?:ConsumedProperty[];group_counts?:GroupCounts;input_result?:{invocation_id:string;receipt_hash:string;run_id:string};run_id:string;contract:"function-result/1";function:Pin;mode:"EVIDENCE_ANALYSIS_ONLY";coverage:"QUERY_PAGE_ONLY"|"REVIEWED_WORKSHEET_PAGE_ONLY"|"RETAINED_INPUT_PAGE_ONLY";current_use_authorized:false;business_effect_authorized:false;invocation_request_id:string;query:{valid_at:string;known_at:string;offset:number;limit:number};objects:CanonicalResource[];total:number;next_offset:number|null;derived_values:DerivedValue[]};
+type RetainedProvenanceAuthority={resource_id:string;version_id:string;content_hash:string;access_entity:string;event_id:string|null;lineage_use:"HISTORICAL"|"ACTIVE"};
+type BaseOutput={retained_provenance_authority?:RetainedProvenanceAuthority[];consumed_property_values?:ConsumedProperty[];group_counts?:GroupCounts;input_result?:{invocation_id:string;receipt_hash:string;run_id:string};run_id:string;contract:"function-result/1";function:Pin;mode:"EVIDENCE_ANALYSIS_ONLY";coverage:"QUERY_PAGE_ONLY"|"REVIEWED_WORKSHEET_PAGE_ONLY"|"RETAINED_INPUT_PAGE_ONLY";current_use_authorized:false;business_effect_authorized:false;invocation_request_id:string;query:{valid_at:string;known_at:string;offset:number;limit:number};objects:CanonicalResource[];total:number;next_offset:number|null;derived_values:DerivedValue[]};
 type Output=BaseOutput&Partial<Omit<WorksheetResult,"coverage">>;
 function worksheet(output:BaseOutput):output is BaseOutput&WorksheetResult{return output.coverage==="REVIEWED_WORKSHEET_PAGE_ONLY"&&"temporal_semantics" in output&&output.temporal_semantics==="IMMUTABLE_RETAINED_SNAPSHOT_NOT_VALID_TIME_FACTS"&&"authority" in output&&output.authority==="SOURCE_CELLS_ONLY"&&"source_rows" in output&&Array.isArray(output.source_rows)&&"source_document" in output&&typeof output.source_document==="object"&&output.source_document!==null&&"source_query" in output&&typeof output.source_query==="object"&&output.source_query!==null;}
 function retainedInput(output:BaseOutput):boolean {return output.coverage==="RETAINED_INPUT_PAGE_ONLY"&&Array.isArray(output.objects)&&Array.isArray(output.derived_values)&&!!output.input_result&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(output.input_result.invocation_id)&&/^[a-f0-9]{64}$/.test(output.input_result.receipt_hash)&&/^fcr_[a-f0-9]{64}$/.test(output.input_result.run_id);}
@@ -58,6 +59,7 @@ function Workbench({initialInvocationId,token,companyName,onInspect,onTrace,onPr
   <div className="saved-analysis-actions">{!request?<button disabled={busy||!selected} onClick={start}>Run and retain analysis</button>:<><button disabled={busy} onClick={()=>run(request)}>{result?.status==="INTENT_RETAINED"?"Resume retained intent":"Retry exact run"}</button><button disabled={busy} onClick={()=>{setRequest(null);setResult(null);setError("");}}>Start a new analysis</button></>}</div>
   <details><summary>Reopen a retained invocation</summary><label>Invocation reference<input value={saved} disabled={busy} onChange={event=>setSaved(event.target.value)}/></label><button disabled={busy||!/^[a-f0-9-]{36}$/i.test(saved)} onClick={()=>{setRequest(null);run(null,saved);}}>Reopen retained result</button></details>
   {busy&&<p role="status">Awaiting the retained run response…</p>}{error&&<p role="alert">{error}</p>}{result&&<><p>{result.status==="INTENT_RETAINED"?"Invocation intent is retained; completion is not established.":result.status==="FAILED"?`Execution failed: ${result.receipt.failure_code??"reason unavailable"}.` :"Analysis result retained."}</p><details><summary>Exact invocation evidence</summary><p>{result.invocation_id}</p><p>{result.receipt_hash??"No terminal receipt hash"}</p>{output&&<p>{output.run_id}</p>}</details></>}
+  {output&&output.retained_provenance_authority!==undefined&&<SourceHistoryAuthority rows={output.retained_provenance_authority}/>}
   {output?.input_result&&<section aria-label="Consumed retained input"><h4>Consumed retained input</h4><p>This downstream result records the exact upstream invocation it consumed. A retained input remains evidence-only; it does not grant financial or current-use authority.</p><details><summary>Exact consumed result provenance</summary><p>Invocation: {output.input_result.invocation_id}</p><p>Receipt hash: {output.input_result.receipt_hash}</p><p>Retained result: {output.input_result.run_id}</p></details></section>}
   {output?.consumed_property_values&&<RetainedCalculatedInputs result={output} onInspect={onInspect} onTrace={onTrace}/>}
   {output&&result?.status==="SUCCEEDED"&&<RetainedBindingAction key={output.run_id} token={token} invocationId={result.invocation_id} output={output} onProposal={onProposal}/>}
@@ -141,5 +143,32 @@ function RetainedCalculatedInputs({result,onInspect,onTrace}:{result:Output;onIn
    })}
   </tbody></table></div>
   {!inputs.length&&<p>No calculated input values were bound for this retained page.</p>}
+ </section>;
+}
+
+
+function SourceHistoryAuthority({rows}:{rows:unknown}) {
+ const uuid=(value:unknown)=>typeof value==="string"&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
+ const isRow=(value:unknown):value is RetainedProvenanceAuthority=>!!value&&typeof value==="object"&&
+  "resource_id" in value&&uuid(value.resource_id)&&"version_id" in value&&uuid(value.version_id)&&
+  "content_hash" in value&&typeof value.content_hash==="string"&&/^[a-f0-9]{64}$/.test(value.content_hash)&&
+  "access_entity" in value&&typeof value.access_entity==="string"&&value.access_entity.trim().length>0&&
+  "event_id" in value&&(value.event_id===null||uuid(value.event_id))&&
+  "lineage_use" in value&&(value.lineage_use==="HISTORICAL"||value.lineage_use==="ACTIVE");
+ if(!Array.isArray(rows)||rows.length>1000||!rows.every(isRow)||new Set(rows.map(row=>row.version_id.toLowerCase())).size!==rows.length) {
+  return <section aria-label="Source history used by this analysis"><h4>Source history used by this analysis</h4><p role="alert">The retained source-history metadata is unavailable or unsupported. No lineage classification is shown.</p></section>;
+ }
+ const historical=rows.filter(row=>row.lineage_use==="HISTORICAL").length;
+ return <section aria-label="Source history used by this analysis"><h4>Source history used by this analysis</h4>
+  <p>{historical} historical supporting versions · {rows.length-historical} active lineage versions recorded for this invocation.</p>
+  <p>Historical rows are pinned supporting provenance, not current governing versions. These classifications were retained with the analysis; they do not establish current permission, current version status, or financial certification.</p>
+  {!rows.length?<p>No source-history references were retained in this metadata.</p>:<details><summary>Inspect exact retained source-history references</summary>
+   <div className="saved-analysis-table"><table><thead><tr><th>Recorded lineage use</th><th>Exact resource & version</th><th>Retained provenance</th></tr></thead><tbody>
+    {rows.map(row=><tr key={row.version_id}><th scope="row">{row.lineage_use==="HISTORICAL"?"Historical support":"Active at invocation"}</th>
+     <td><p>Resource: {row.resource_id}</p><p>Version: {row.version_id}</p></td>
+     <td><p>Content hash: {row.content_hash}</p><p>Access entity: {row.access_entity}</p><p>Event: {row.event_id??"No event reference retained"}</p></td>
+    </tr>)}
+   </tbody></table></div>
+  </details>}
  </section>;
 }

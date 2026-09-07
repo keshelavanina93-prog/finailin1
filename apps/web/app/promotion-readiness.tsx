@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useRef,useState, type FormEvent} from "react";
 import type {PromotionCheck, ResourceProposalDetail} from "@finai/contracts";
+import {RetainedChanges} from "./proposal-impact";
 import {Badge} from "./g8-ui";
 import CalculatedBindingReview from "./calculated-binding-review";
 import JournalProposalReview from "./journal-proposal-review";
@@ -77,6 +78,7 @@ function PromotionPanel({token,proposalId,onDecision}:Props) {
         <details><summary>Evidence trace</summary><p>{result.evaluation.evaluator}</p><p className="full-hash">Proposal: {result.evaluation.proposal_hash}</p><p className="full-hash">Evaluation binding: {result.evaluation.binding_hash}</p></details>
       </> : <p>No evaluation was retained for this proposal. Submit a refreshed proposal before promotion.</p>}
     </section>}
+    {result && <CompanyDimensionChanges detail={result.proposal_detail}/>}
     {result && <AccountDimensionPolicyProposalReview detail={result.proposal_detail}/>}
     {result && <PeriodControlProposalReview detail={result.proposal_detail}/>}
     {result && <CalculatedBindingReview detail={result.proposal_detail}/>}
@@ -96,5 +98,27 @@ function PromotionPanel({token,proposalId,onDecision}:Props) {
     {result?.decision && <p>Recorded decision: {result.decision.toLowerCase()}</p>}
     {result && <small>Checked {new Date(result.checked_at).toLocaleTimeString()} · advisory; this check does not approve</small>}
     <button className="g8-link" disabled={busy || submitting} onClick={()=>{setError("");setRevision(value=>value+1);}}>Recheck eligibility</button>
+  </section>;
+}
+
+
+function CompanyDimensionChanges({detail}:{detail:ResourceProposalDetail}) {
+  const sources=detail.proposal.mutations.filter(row=>row.object_type==="CompanyDimension");
+  if(!sources.length)return null;
+  const ids=new Set(sources.map(row=>row.resource_id));
+  const validation=detail.validation;
+  const dependencies:unknown="dependencies" in validation?validation.dependencies:undefined;
+  const record=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==="object"&&!Array.isArray(value);
+  const uuid=(value:unknown)=>typeof value==="string"&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
+  return <section aria-label="Company dimension source-reference changes">
+    <RetainedChanges validation={{...validation,impact:validation.impact.filter(row=>ids.has(row.resource_id))}}/>
+    {sources.some(source=>!validation.impact.some(item=>item.resource_id===source.resource_id))&&<p role="alert">A source-row comparison is unavailable in the retained validation.</p>}
+    <details><summary>Reviewed reference versions</summary><p>These dependency versions were retained with proposal validation. They are not a claim about current reference versions.</p>
+      {sources.map(source=>{
+        const pins=record(dependencies)?dependencies[source.resource_id]:undefined;
+        if(!Array.isArray(pins)||!pins.every(pin=>record(pin)&&typeof pin.relation==="string"&&uuid(pin.resource_id)&&uuid(pin.version_id)))return <p key={source.resource_id}>{source.display_name}: reviewed reference versions are unavailable.</p>;
+        return <section key={source.resource_id}><h4>{source.display_name}</h4>{pins.length?<div className="data-scroll"><table><thead><tr><th>Relation</th><th>Resource</th><th>Reviewed version</th></tr></thead><tbody>{pins.map((pin,index)=><tr key={`${pin.relation}:${pin.version_id}:${index}`}><td>{pin.relation}</td><td>{pin.resource_id}</td><td>{pin.version_id}</td></tr>)}</tbody></table></div>:<p>No dependency references were retained for this source row.</p>}</section>;
+      })}
+    </details>
   </section>;
 }
