@@ -70,6 +70,12 @@ function parseWorkspace(value:unknown):AnalysisView["workspace"] {
  return {grid:{widths,pinned:Array.isArray(g.pinned)?g.pinned.filter((key:unknown)=>typeof key==="string"&&key.length<=128).slice(0,100):[],focus:focus&&typeof focus.row==="string"&&rowId.test(focus.row)&&typeof focus.column==="string"&&focus.column.length<=128?{row:focus.row,column:focus.column}:null,left:finite(g.left,0,100000,0)},dock:v.dock==="bottom"?"bottom":"right",collapsed:v.collapsed===true,size:finite(v.size,180,700,340)};
 }
 
+/** Keep one keyboard entry in the rendered window without changing evidence selection. */
+export function worksheetTabStop(focus:{row:string;column:string}|null,rows:readonly string[],columns:readonly string[]):{row:string;column:string}|null {
+ if(!rows.length||!columns.length)return null;
+ return {row:focus&&rows.includes(focus.row)?focus.row:rows[0],column:focus&&columns.includes(focus.column)?focus.column:columns[0]};
+}
+
 /** A visual choice, never an aggregation or a financial result. */
 export function hasUsefulMagnitude(projection:AnalysisProjection):boolean {
  const {descriptor,rows}=projection;

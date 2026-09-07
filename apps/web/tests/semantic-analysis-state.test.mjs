@@ -3,7 +3,7 @@ import {readFile} from "node:fs/promises";
 import test from "node:test";
 import ts from "typescript";
 const source=await readFile(new URL("../app/semantic-analysis-state.ts",import.meta.url),"utf8");
-const {assertProjection,evidenceCaption,hasUsefulMagnitude,parseView,requestKey}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
+const {assertProjection,evidenceCaption,hasUsefulMagnitude,parseView,requestKey,worksheetTabStop}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
 const id="11111111-1111-4111-8111-111111111111",hash="a".repeat(64),row="row_"+hash,time="2025-01-31T00:00:00Z";
 const pin={resource_id:id,version_id:id,content_hash:hash};
 const field={key:"units",label:"Units",kind:"decimal",role:"MEASURE",aggregation:"RETAINED_VALUE_ONLY",definition:pin,filterable:false,groupable:false,options:[]};
@@ -84,4 +84,16 @@ test("visual usefulness suppresses no measure, single row and equivalent equal m
  second.values.units.value="2";assert.equal(hasUsefulMagnitude(many),true);
  assert.equal(hasUsefulMagnitude({...many,descriptor:{...many.descriptor,measure:null,visual:"NONE"}}),false);
  assert.equal(hasUsefulMagnitude({...many,rows:[{...second,values:{units:{state:"VALUE",value:"1.0"}}},{...second,values:{units:{state:"VALUE",value:"1.00"}}}]}),false);
+});
+
+test("worksheet retains a keyboard entry after filtering, hiding columns or scrolling",()=>{
+ const focus={row:"retained",column:"amount"};
+ assert.deepEqual(worksheetTabStop(focus,["first","retained"],["$row","amount"]),focus);
+ assert.deepEqual(worksheetTabStop(focus,["filtered"],["$row","amount"]),{row:"filtered",column:"amount"});
+ assert.deepEqual(worksheetTabStop(focus,["retained"],["$row"]),{row:"retained",column:"$row"});
+ assert.deepEqual(worksheetTabStop(focus,["window-row"],["$row","amount"]),{row:"window-row",column:"amount"});
+ assert.deepEqual(worksheetTabStop(null,["first"],["$row","amount"]),{row:"first",column:"$row"});
+ assert.equal(worksheetTabStop(focus,[],["$row"]),null);
+ assert.equal(worksheetTabStop(focus,["retained"],[]),null);
+ assert.deepEqual(focus,{row:"retained",column:"amount"});
 });
