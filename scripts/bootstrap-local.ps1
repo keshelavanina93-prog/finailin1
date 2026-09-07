@@ -58,8 +58,12 @@ if (-not $SkipInstall) {
         }
 
         $python = Join-Path $env:VIRTUAL_ENV 'Scripts\python.exe'
-        & $python -m pip install --cache-dir $directories.PipCache --upgrade pip
-        & $python -m pip install --cache-dir $directories.PipCache -e 'services/api[dev]'
+        & $python -c "import sys,platform; assert sys.version_info[:3]==(3,13,14) and sys.platform=='win32' and platform.machine()=='AMD64', 'The local dependency lock requires Windows AMD64 Python 3.13.14'"
+        & $python -m pip install --cache-dir $directories.PipCache --require-hashes `
+            --only-binary=:all: --no-deps -r 'services/api/requirements-local.lock'
+        # Project source is intentionally editable; external/build dependencies are already locked.
+        & $python -m pip install --cache-dir $directories.PipCache --no-deps `
+            --no-build-isolation -e 'services/api'
     }
     finally {
         Pop-Location
