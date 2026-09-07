@@ -121,7 +121,7 @@ try {
         } elseif ($Service -eq 'all' -and ($DesiredResource -ne [guid]::Empty -or $DesiredVersion -ne [guid]::Empty -or $ObserverActor)) {
             throw 'Observer configuration is incomplete; no collector was started.'
         }
-        if ($env:FINAI_S3_ENDPOINT -eq 'http://127.0.0.1:9061' -or $Service -eq 'minio') {
+        if (($Service -eq 'all' -and $env:FINAI_S3_ENDPOINT -eq 'http://127.0.0.1:9061') -or $Service -eq 'minio') {
             $minioBinary = Join-Path $env:FINAI_RUNTIME_ROOT 'tools\minio\minio.exe'
             $minioData = Join-Path $env:FINAI_DATA_DIR 'minio'
             if (-not (Test-Path -LiteralPath $minioBinary)) { throw 'Run install-local-minio.ps1 first.' }

@@ -40,6 +40,9 @@ export default function SegAccountObservations({ token, documentId, sheet, profi
 } & SourceAccountNavigation) {
   const [policyAccount,setPolicyAccount]=useState<{context:string;account:Definition}|null>(null);
   const identity = JSON.stringify([token, documentId, sheet, profile, companyId]);
+  const [selection, setSelection] = useState<{ key: string; choices: Record<string, string>; rationale: string }>({ key: identity, choices: {}, rationale: "" });
+  const choices = selection.key === identity ? selection.choices : {};
+  const rationale = selection.key === identity ? selection.rationale : "";
   const [state, setState] = useState<{ key: string; busy: boolean; result: Result | null; error: string } | null>(null);
   const request = useRef<AbortController | null>(null);
   const current = state?.key === identity ? state : null;
@@ -49,6 +52,7 @@ export default function SegAccountObservations({ token, documentId, sheet, profi
     request.current?.abort();
     const controller = new AbortController(); request.current = controller;
     setState({ key: identity, busy: true, result: null, error: "" });
+    setSelection({ key: identity, choices: {}, rationale: "" });
     try {
       const response = await fetch(`/api/ontology/source-documents/${documentId}/accounting-context/account-observations`, {
         method: "POST", signal: controller.signal,
@@ -64,6 +68,33 @@ export default function SegAccountObservations({ token, documentId, sheet, profi
     }
   }
 
+  async function proposeChart() {
+    if (!current?.result || !onProposal) return;
+    const result = current.result;
+    request.current?.abort();
+    const controller = new AbortController(); request.current = controller;
+    setState({ key: identity, busy: true, result, error: "" });
+    try {
+      const accounts = result.rows.flatMap(row => {
+        const definition = row.definitions.find(item => `${item.resource_id}:${item.version_id}` === choices[row.code]);
+        return definition ? [{ code: row.code, definition_id: definition.resource_id, definition_version_id: definition.version_id }] : [];
+      });
+      const response = await fetch(`/api/ontology/source-documents/${documentId}/accounting-context/chart-proposal`, {
+        method: "POST", signal: controller.signal,
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ sheet, profile, company_id: companyId, selection: { source_sha256: result.source_sha256, accounts, rationale: rationale.trim() } }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Chart review could not be prepared");
+      if (!controller.signal.aborted) {
+        setState({ key: identity, busy: false, result, error: "" });
+        onProposal(data.proposal.proposal_id);
+      }
+    } catch (failure) {
+      if (!controller.signal.aborted) setState({ key: identity, busy: false, result, error: failure instanceof Error ? failure.message : "Chart review unavailable" });
+    }
+  }
+
   return <section aria-label="Source account code observations">
     {policyAccount?.context===identity&&<AccountDimensionPolicyWorkbench token={token} companyId={companyId} account={policyAccount.account} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onClose={()=>setPolicyAccount(null)} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>}
     <h4>Account codes recorded by the source</h4>
@@ -74,12 +105,26 @@ export default function SegAccountObservations({ token, documentId, sheet, profi
     {current?.result && <>
       <p>{current.result.observed_code_count} observed codes across {current.result.row_count} source rows · candidate review</p>
       {current.result.blockers.map(blocker => <p key={blocker}>{blocker}</p>)}
+      {canPropose && onProposal && <fieldset disabled={current.busy}>
+        <legend>Prepare company chart review</legend>
+        <p>Select the retained definition that applies to each source code below, up to 20 accounts per proposal. Nothing is selected automatically. Unselected codes remain unresolved.</p>
+        <label>Why these definitions apply to this company source
+          <textarea maxLength={1700} value={rationale} onChange={event => setSelection({ key: identity, choices, rationale: event.target.value })}/>
+        </label>
+        <p>This review establishes account identities only. Amounts, currencies, reporting classification and period completeness require their own reviewed context.</p>
+        <button disabled={!Object.values(choices).filter(Boolean).length || Object.values(choices).filter(Boolean).length > 20 || rationale.trim().length < 10} onClick={() => void proposeChart()}>Review selected accounts ({Object.values(choices).filter(Boolean).length})</button>
+      </fieldset>}
       <details><summary>Original source reference</summary><p>SHA-256: <code>{current.result.source_sha256}</code></p></details>
       <div className="source-table"><table><thead><tr><th>Exact source code</th><th>Debit observations</th><th>Credit observations</th><th>Source cells</th><th>Definition candidates</th></tr></thead><tbody>
         {current.result.rows.map(row => <tr key={row.code}>
           <th scope="row"><code>{row.code}</code></th><td>{row.debit_count}</td><td>{row.credit_count}</td>
           <td><details><summary>{row.coordinates.length} of {row.coordinate_count} source coordinates</summary>{row.coordinates_truncated && <p>The coordinate preview reached its limit. The original source retains the remaining cells.</p>}<ul>{row.coordinates.map((cell, index) => <li key={`${cell.coordinate}:${cell.side}:${index}`}><code>{cell.coordinate}</code> · {cell.side.toLowerCase()}</li>)}</ul></details></td>
-          <td>{row.definitions.length ? row.definitions.map(definition => <details key={`${definition.resource_id}:${definition.version_id}`}>
+          <td>{canPropose && onProposal && row.definitions.length > 0 && <label>Definition for {row.code}
+            <select disabled={current.busy} value={choices[row.code] ?? ""} onChange={event => setSelection({ key: identity, choices: { ...choices, [row.code]: event.target.value }, rationale })}>
+              <option value="">Leave unresolved</option>
+              {row.definitions.map(definition => <option key={`${definition.resource_id}:${definition.version_id}`} value={`${definition.resource_id}:${definition.version_id}`}>{definition.display_name}</option>)}
+            </select>
+          </label>}{row.definitions.length ? row.definitions.map(definition => <details key={`${definition.resource_id}:${definition.version_id}`}>
             <summary>{definition.display_name}</summary>
             <button onClick={()=>setPolicyAccount({context:identity,account:definition})}>Review analytical requirements for this definition</button>
             <p>Exact-code candidate · {definition.evidence_class.toLowerCase().replaceAll("_", " ")}</p>
