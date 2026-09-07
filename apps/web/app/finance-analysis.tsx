@@ -29,6 +29,7 @@ function Analysis({companyId,companyName,token,viewStateKey,onInspect,onHistory,
   const [accounts,setAccounts]=useState<CanonicalResource[]>([]);
   const [accountPage,setAccountPage]=useState<ObjectSetResult|null>(null);
   const [result,setResult]=useState<ObjectSetResult|null>(null);
+  const [resultAccounts,setResultAccounts]=useState<{result:ObjectSetResult;resources:CanonicalResource[];error:string}|null>(null);
   const [error,setError]=useState("");const [lookupError,setLookupError]=useState("");
   const [busy,setBusy]=useState(Boolean(restored));const [lookupBusy,setLookupBusy]=useState(true);
   const [revision,setRevision]=useState(0);const [advanced,setAdvanced]=useState(false);
@@ -66,6 +67,16 @@ function Analysis({companyId,companyName,token,viewStateKey,onInspect,onHistory,
   },[client,restored]);
   useEffect(()=>()=>request.current?.abort(),[]);
   useEffect(()=>{
+    if(!result)return;
+    const controller=new AbortController();
+    const ids=[...new Set(result.objects.flatMap(item=>[item.attributes.debit_account_id,item.attributes.credit_account_id]).filter((id):id is string=>typeof id==="string"))];
+    // Resolve display labels at the execution snapshot, not the selector's current time.
+    void client.query({object_type:"LocalAccount",resource_ids:ids,search:"",filters:[],traversal:[],offset:0,limit:100,valid_at:result.query.valid_at,known_at:result.query.known_at},{signal:controller.signal}).then(page=>{
+      if(!controller.signal.aborted)setResultAccounts({result,resources:page.objects,error:page.objects.length!==ids.length?"Some account labels are unavailable at this analysis snapshot.":""});
+    }).catch(cause=>{if(!controller.signal.aborted)setResultAccounts({result,resources:[],error:String(cause)});});
+    return()=>controller.abort();
+  },[client,result]);
+  useEffect(()=>{
     if(!result||!applied)return;
     try{sessionStorage.setItem(storageKey,JSON.stringify({companyId,selection:applied,query:result.query,selected,scroll:scroll.current?.scrollTop??0}));}catch{/* Results stay usable without browser storage. */}
   },[result,applied,selected,companyId,storageKey]);
@@ -93,6 +104,7 @@ function Analysis({companyId,companyName,token,viewStateKey,onInspect,onHistory,
     catch(cause){setLookupError(String(cause));}finally{setLookupBusy(false);}
   }
   const names=new Map(accounts.map(item=>[item.resource_id,accountLabel(item)]));
+  const historicalNames=new Map((resultAccounts?.result===result?resultAccounts.resources:[]).map(item=>[item.resource_id,accountLabel(item)]));
   const changed=applied&&JSON.stringify(applied)!==JSON.stringify(selection);
   if(!companyId)return <Empty title="Choose a company">Select a company to explore its account contributors.</Empty>;
   return <section className="finance-analysis" aria-label="Financial contributor analysis">
@@ -113,9 +125,11 @@ function Analysis({companyId,companyName,token,viewStateKey,onInspect,onHistory,
       {changed&&<p role="status">Filters changed. Apply filters to update the contributors below.</p>}
       {error&&<p role="alert">{error}</p>}
       {busy&&<p role="status">Reading the selected company’s source evidence…</p>}
+      {result&&resultAccounts?.result!==result&&<p role="status">Resolving account labels at the analysis snapshot…</p>}
+      {resultAccounts?.result===result&&resultAccounts?.error&&<p role="status">Account labels: {resultAccounts.error} Source contributors remain unchanged.</p>}
       {!result&&!busy&&!error&&<Empty title="Explore account contributors">Choose an account or apply all company accounts to begin.</Empty>}
-      {result&&<><div className="finance-analysis-summary"><strong>{result.total} contributors</strong><span>{applied?.account?names.get(applied.account)??"Retained account selection":"All company accounts"} · {applied?.side==="either"?"Debit or credit":applied?.side} · {applied?.from||"All dates"}{applied?.to?` through ${applied.to}`:""}</span><small>As read {new Date(result.query.known_at!).toLocaleString()}</small></div>
-        {!result.objects.length?<Empty title="No contributors match">This selection returned no source movements. It does not establish a zero accounting balance.</Empty>:<div className="finance-analysis-table" ref={scroll} onScroll={()=>{try{const saved=JSON.parse(sessionStorage.getItem(storageKey)??"null");if(saved)sessionStorage.setItem(storageKey,JSON.stringify({...saved,scroll:scroll.current?.scrollTop??0}));}catch{/* Optional persistence. */}}}><table><thead><tr><th>Source / document</th><th>Posting date</th><th>Debit account</th><th>Credit account</th><th>Source amount</th><th>Evidence / status</th></tr></thead><tbody>{result.objects.map(resource=><tr key={resource.version_id} aria-selected={selected===resource.version_id}><th scope="row">{text(resource.attributes.document_reference)}<small>{resource.display_name}</small></th><td>{text(resource.attributes.posting_date)}</td><td>{names.get(text(resource.attributes.debit_account_id))??"Account label unavailable"}</td><td>{names.get(text(resource.attributes.credit_account_id))??"Account label unavailable"}</td><td className="amount">{text(resource.attributes.amount)}<small>Unit {human(text(resource.attributes.unit_status))}</small></td><td><Badge>{human(resource.evidence_class)}</Badge><small>Definition {human(resource.authority_state)}</small><button onClick={()=>evidence(resource)} disabled={!onTrace}>Source evidence</button>{onInspect&&<button onClick={()=>{setSelected(resource.version_id);onInspect(resource,{known_at:result.query.known_at!,valid_at:result.query.valid_at!});}}>Investigate in NYX</button>}</td></tr>)}</tbody></table></div>}
+      {result&&<><div className="finance-analysis-summary"><strong>{result.total} contributors</strong><span>{applied?.account?historicalNames.get(applied.account)??"Retained account selection":"All company accounts"} · {applied?.side==="either"?"Debit or credit":applied?.side} · {applied?.from||"All dates"}{applied?.to?` through ${applied.to}`:""}</span><small>As read {new Date(result.query.known_at!).toLocaleString()}</small></div>
+        {!result.objects.length?<Empty title="No contributors match">This selection returned no source movements. It does not establish a zero accounting balance.</Empty>:<div className="finance-analysis-table" ref={scroll} onScroll={()=>{try{const saved=JSON.parse(sessionStorage.getItem(storageKey)??"null");if(saved)sessionStorage.setItem(storageKey,JSON.stringify({...saved,scroll:scroll.current?.scrollTop??0}));}catch{/* Optional persistence. */}}}><table><thead><tr><th>Source / document</th><th>Posting date</th><th>Debit account</th><th>Credit account</th><th>Source amount</th><th>Evidence / status</th></tr></thead><tbody>{result.objects.map(resource=><tr key={resource.version_id} aria-selected={selected===resource.version_id}><th scope="row">{text(resource.attributes.document_reference)}<small>{resource.display_name}</small></th><td>{text(resource.attributes.posting_date)}</td><td>{historicalNames.get(text(resource.attributes.debit_account_id))??"Account label unavailable"}</td><td>{historicalNames.get(text(resource.attributes.credit_account_id))??"Account label unavailable"}</td><td className="amount">{text(resource.attributes.amount)}<small>Unit {human(text(resource.attributes.unit_status))}</small></td><td><Badge>{human(resource.evidence_class)}</Badge><small>Definition {human(resource.authority_state)}</small><button onClick={()=>evidence(resource)} disabled={!onTrace}>Source evidence</button>{onInspect&&<button onClick={()=>{setSelected(resource.version_id);onInspect(resource,{known_at:result.query.known_at!,valid_at:result.query.valid_at!});}}>Investigate in NYX</button>}</td></tr>)}</tbody></table></div>}
         <footer><button disabled={busy||result.query.offset===0} onClick={()=>void execute({...result.query,offset:Math.max(0,result.query.offset-result.query.limit)},applied!)}>Previous</button><span>{result.objects.length?result.query.offset+1:0}–{result.query.offset+result.objects.length} of {result.total}</span><button disabled={busy||result.next_offset===null} onClick={()=>void execute({...result.query,offset:result.next_offset!},applied!)}>Next</button></footer>
         <details><summary>Show system query</summary><p>The exact request is executed by the shared Object Set client. The same snapshot opens in Ontology Studio, including its filters and version evidence.</p><pre>{JSON.stringify({query:result.query,filter_schema_versions:result.filter_schema_versions},null,2)}</pre><button onClick={openStudio}>Open same query in Ontology Studio</button></details>
       </>}
