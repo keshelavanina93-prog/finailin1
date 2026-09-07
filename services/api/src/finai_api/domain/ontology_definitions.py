@@ -17,14 +17,29 @@ class Definition(BaseModel):
 
 
 class Expression(Definition):
-    op: Literal["field", "literal", "add", "subtract", "multiply", "divide", "concat", "coalesce"]
+    op: Literal[
+        "field", "literal", "derived", "add", "subtract", "multiply", "divide", "concat", "coalesce"
+    ]
+    property: "DerivedPropertyReference | None" = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     field: Name | None = None
     value: str | None = Field(default=None, max_length=2000)
     args: list["Expression"] = Field(default_factory=list, max_length=10)
 
     @model_validator(mode="after")
     def shape(self) -> "Expression":
-        if self.op == "field":
+        if self.op == "derived":
+            if (
+                self.property is None
+                or self.field is not None
+                or self.value is not None
+                or self.args
+            ):
+                raise ValueError("Derived expression requires only an exact property reference")
+        elif self.property is not None:
+            raise ValueError("Only derived expressions accept a property reference")
+        elif self.op == "field":
             if self.field is None or self.value is not None or self.args:
                 raise ValueError("Field expression requires only a field name")
         elif self.op == "literal":
@@ -35,6 +50,11 @@ class Expression(Definition):
         elif self.op in {"subtract", "divide"} and len(self.args) != 2:
             raise ValueError("Subtract/divide require exactly two arguments")
         return self
+
+
+class DerivedPropertyReference(Definition):
+    resource_id: UUID
+    version_id: UUID
 
 
 class DerivedDefinition(Definition):

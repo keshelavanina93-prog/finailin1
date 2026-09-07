@@ -1,0 +1,748 @@
+{
+  "phase": "CORRECTION_REPLAY_VERIFIED",
+  "prepared": {
+    "base": {
+      "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+      "version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b"
+    },
+    "composed": {
+      "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+      "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8"
+    },
+    "object_set": {
+      "resource_id": "ece51488-afea-5967-8ae1-187bfde8ee8f",
+      "version_id": "c51b7b8a-5f71-5c2d-b341-1a26ff40f115"
+    },
+    "function": {
+      "resource_id": "3316dc7e-b471-5b50-8473-74810c6c57cd",
+      "version_id": "93341ebd-fe37-56c9-8fbc-339e775caf9c"
+    },
+    "query": {
+      "object_type": "SourceAccountDefinition",
+      "resource_ids": [
+        "00c93da8-3ab9-5597-aaf6-ea79b7307d32"
+      ]
+    }
+  },
+  "request": {
+    "request_id": "71af794f-1c57-4e70-a3cc-163b88e6a328",
+    "function": {
+      "resource_id": "3316dc7e-b471-5b50-8473-74810c6c57cd",
+      "version_id": "93341ebd-fe37-56c9-8fbc-339e775caf9c"
+    },
+    "valid_at": "2026-09-07T10:29:46.652136+00:00",
+    "known_at": "2026-09-07T10:29:46.652136+00:00",
+    "offset": 0,
+    "limit": 1
+  },
+  "checked_at": "2026-09-07T10:32:27.960537+00:00",
+  "calculation": {
+    "contract": "ontology-derived-result/1",
+    "query": {
+      "object_type": "SourceAccountDefinition",
+      "resource_ids": [
+        "00c93da8-3ab9-5597-aaf6-ea79b7307d32"
+      ],
+      "filters": [],
+      "traversal": [],
+      "search": "",
+      "limit": 1,
+      "offset": 0,
+      "valid_at": "2026-09-07T10:29:46.652136Z",
+      "known_at": "2026-09-07T10:29:46.652136Z"
+    },
+    "total": 1,
+    "counts_by_type": {
+      "SourceAccountDefinition": 1
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "definition": {
+            "analytics": [
+              {
+                "position": 1,
+                "coordinate": "Sheet1!I235",
+                "source_label": "Контрагенты"
+              },
+              {
+                "position": 2,
+                "coordinate": "Sheet1!J235",
+                "source_label": "Договоры"
+              }
+            ],
+            "coordinate": "Sheet1!B235",
+            "source_row": 235,
+            "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+            "account_code": "3212",
+            "quick_selection": "6603",
+            "financial_mapping": "UNESTABLISHED",
+            "off_balance_source": "არა",
+            "balance_behavior_source": "П",
+            "currency_tracking_source": "არა",
+            "quantity_tracking_source": "არა",
+            "required_dimension_policy": "UNESTABLISHED"
+          },
+          "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+          "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+          "account_code": "3212",
+          "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+        },
+        "valid_from": "2026-09-06T03:22:44.088415+04:00",
+        "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "object_type": "SourceAccountDefinition",
+        "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+        "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "system_from": "2026-09-06T03:23:28.54828+04:00",
+        "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+        "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+        "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [],
+    "definition_versions": [
+      {
+        "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+        "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+        "definition": {
+          "schema_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+          "definition": {
+            "name": "observed_account_label",
+            "expression": {
+              "op": "concat",
+              "args": [
+                {
+                  "op": "derived",
+                  "property": {
+                    "version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b",
+                    "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5"
+                  }
+                },
+                {
+                  "op": "literal",
+                  "value": " | "
+                },
+                {
+                  "op": "field",
+                  "field": "source_name"
+                }
+              ]
+            },
+            "result_kind": "text"
+          }
+        },
+        "schema_versions": [
+          {
+            "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+            "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+          }
+        ]
+      }
+    ],
+    "derived_values": [
+      {
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "definition_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+        "definition_version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+        "name": "observed_account_label",
+        "kind": "text",
+        "epistemic_state": "DERIVED",
+        "value": "3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+        "status": "AVAILABLE",
+        "source_fields": [
+          {
+            "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+            "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+            "object_content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+            "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+            "field": "source_name",
+            "state": "VALUE",
+            "value": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы"
+          }
+        ],
+        "dependency_values": [
+          {
+            "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+            "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+            "definition_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+            "definition_version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b",
+            "name": "observed_account_code",
+            "kind": "text",
+            "epistemic_state": "DERIVED",
+            "value": "3212",
+            "status": "AVAILABLE",
+            "source_fields": [
+              {
+                "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+                "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+                "object_content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+                "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                "field": "account_code",
+                "state": "VALUE",
+                "value": "3212"
+              }
+            ],
+            "content_hash": "0133c52d81a246196381533239af7678f5d9b41303c32ddf6ef2b2fc9774d82a",
+            "schema": {
+              "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+              "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+              "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+            }
+          }
+        ]
+      }
+    ],
+    "derived_graph": {
+      "roots": [
+        {
+          "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+          "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+          "content_hash": "dacc8e05e0de4680d5e795a0b17f38028643f6fb84293d03f3c03af46091f2b6"
+        }
+      ],
+      "nodes": [
+        {
+          "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+          "version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b",
+          "content_hash": "0133c52d81a246196381533239af7678f5d9b41303c32ddf6ef2b2fc9774d82a",
+          "schema": {
+            "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+            "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+            "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+          },
+          "dependencies": []
+        },
+        {
+          "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+          "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+          "content_hash": "dacc8e05e0de4680d5e795a0b17f38028643f6fb84293d03f3c03af46091f2b6",
+          "schema": {
+            "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+            "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+            "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+          },
+          "dependencies": [
+            {
+              "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+              "version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b"
+            }
+          ]
+        }
+      ]
+    },
+    "coverage": "QUERY_PAGE_ONLY",
+    "scope": {
+      "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+      "legal_entity_id": "entity-ge-001",
+      "period": "2026-08",
+      "currency": "GEL"
+    },
+    "calculation_runtime": "ontology-derived/1",
+    "read_permissions": [
+      "export",
+      "ontology_admin",
+      "ontology_propose",
+      "ontology_read",
+      "read"
+    ],
+    "run_id": "fcr_60d9e42680f7f921691f254548901f1fd85ddc3a0aab5ebaecc2768f9f1b23ed"
+  },
+  "invocation": {
+    "invocation_id": "71af794f-1c57-4e70-a3cc-163b88e6a328",
+    "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+    "status": "SUCCEEDED",
+    "receipt_hash": "baf5bac1292c3f75d8876e6af8281ed486028a07f20acd9378b7d92951f8c5f6",
+    "receipt": {
+      "mode": "EVIDENCE_ANALYSIS_ONLY",
+      "run_id": "fcr_48d0d422bc6a15509a1d84873d5e351f63e20a7c9021dd23330e0101f1c662d8",
+      "status": "SUCCEEDED",
+      "request": {
+        "limit": 1,
+        "offset": 0,
+        "function": {
+          "version_id": "93341ebd-fe37-56c9-8fbc-339e775caf9c",
+          "resource_id": "3316dc7e-b471-5b50-8473-74810c6c57cd"
+        },
+        "known_at": "2026-09-07T10:29:46.652136Z",
+        "valid_at": "2026-09-07T10:29:46.652136Z",
+        "request_id": "71af794f-1c57-4e70-a3cc-163b88e6a328"
+      },
+      "function": {
+        "version_id": "93341ebd-fe37-56c9-8fbc-339e775caf9c",
+        "resource_id": "3316dc7e-b471-5b50-8473-74810c6c57cd",
+        "content_hash": "07e985737b10b6d5a2d68211e39504e79b1e496d6be016076298cfdb9bb725b1"
+      },
+      "plan_hash": "e6dd74e531d223b81ec47a45ea6065f5825142cb1450219a0edbcc05eca029a9",
+      "request_id": "71af794f-1c57-4e70-a3cc-163b88e6a328",
+      "started_at": "2026-09-07T10:29:48.090127+00:00",
+      "exact_scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "completed_at": "2026-09-07T10:29:48.882141+00:00",
+      "implementation": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "code_sha256": "3abace84d0df5987e8ebe67948994523bcaf6656e254eac50f689cecbb24f616",
+        "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+        "capabilities": {
+          "cdc": false,
+          "read": true,
+          "query": true,
+          "write": false,
+          "delete": false,
+          "limits": {
+            "coverage": "QUERY_PAGE_ONLY",
+            "returned_rows": 200,
+            "grouping_fields": 4,
+            "traversal_steps": 4,
+            "query_predicates": 20,
+            "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "derived_properties": 8,
+            "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+            "database_scan_limit": null
+          },
+          "stream": false,
+          "update": false,
+          "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+          "reversal": false,
+          "snapshot": true,
+          "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+          "simulation": false,
+          "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+          "incremental": false,
+          "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+          "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+          "formula_execution": false,
+          "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+          "source_write_exactly_once": false,
+          "grouped_observation_counts": true,
+          "typed_relationship_filters": true,
+          "versioned_interface_inputs": true,
+          "composed_derived_properties": true,
+          "versioned_type_group_inputs": true
+        },
+        "maximum_rows": 200,
+        "dependency_sha256": "1bdc7d74faee728cf0902f22af74007af54ad69d5d6f769acdaf30f92203806f",
+        "implementation_id": "ontology.object-set-derived/v1",
+        "maximum_properties": 8
+      },
+      "current_use_authorized": false,
+      "business_effect_authorized": false,
+      "proof_hash": "baf5bac1292c3f75d8876e6af8281ed486028a07f20acd9378b7d92951f8c5f6",
+      "recorded_at": "2026-09-07T14:29:48.945442+04:00"
+    },
+    "output": {
+      "mode": "EVIDENCE_ANALYSIS_ONLY",
+      "query": {
+        "limit": 1,
+        "offset": 0,
+        "search": "",
+        "filters": [],
+        "known_at": "2026-09-07T10:29:46.652136Z",
+        "valid_at": "2026-09-07T10:29:46.652136Z",
+        "traversal": [],
+        "object_type": "SourceAccountDefinition",
+        "resource_ids": [
+          "00c93da8-3ab9-5597-aaf6-ea79b7307d32"
+        ]
+      },
+      "scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "total": 1,
+      "run_id": "fcr_48d0d422bc6a15509a1d84873d5e351f63e20a7c9021dd23330e0101f1c662d8",
+      "objects": [
+        {
+          "valid_to": null,
+          "attributes": {
+            "definition": {
+              "analytics": [
+                {
+                  "position": 1,
+                  "coordinate": "Sheet1!I235",
+                  "source_label": "Контрагенты"
+                },
+                {
+                  "position": 2,
+                  "coordinate": "Sheet1!J235",
+                  "source_label": "Договоры"
+                }
+              ],
+              "coordinate": "Sheet1!B235",
+              "source_row": 235,
+              "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+              "account_code": "3212",
+              "quick_selection": "6603",
+              "financial_mapping": "UNESTABLISHED",
+              "off_balance_source": "არა",
+              "balance_behavior_source": "П",
+              "currency_tracking_source": "არა",
+              "quantity_tracking_source": "არა",
+              "required_dimension_policy": "UNESTABLISHED"
+            },
+            "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+            "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+            "account_code": "3212",
+            "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+          },
+          "valid_from": "2026-09-06T03:22:44.088415+04:00",
+          "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+          "object_type": "SourceAccountDefinition",
+          "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+          "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+          "system_from": "2026-09-06T03:23:28.54828+04:00",
+          "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+          "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+          "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+          "access_entity": "entity-ge-001",
+          "evidence_class": "SOURCE_BOUND",
+          "authority_state": "APPROVED",
+          "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+        }
+      ],
+      "contract": "function-result/1",
+      "coverage": "QUERY_PAGE_ONLY",
+      "function": {
+        "version_id": "93341ebd-fe37-56c9-8fbc-339e775caf9c",
+        "resource_id": "3316dc7e-b471-5b50-8473-74810c6c57cd",
+        "content_hash": "07e985737b10b6d5a2d68211e39504e79b1e496d6be016076298cfdb9bb725b1"
+      },
+      "plan_hash": "e6dd74e531d223b81ec47a45ea6065f5825142cb1450219a0edbcc05eca029a9",
+      "next_offset": null,
+      "definition_id": "ece51488-afea-5967-8ae1-187bfde8ee8f",
+      "derived_graph": {
+        "nodes": [
+          {
+            "schema": {
+              "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+              "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+              "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+            },
+            "version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b",
+            "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+            "content_hash": "0133c52d81a246196381533239af7678f5d9b41303c32ddf6ef2b2fc9774d82a",
+            "dependencies": []
+          },
+          {
+            "schema": {
+              "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+              "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+              "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+            },
+            "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+            "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+            "content_hash": "dacc8e05e0de4680d5e795a0b17f38028643f6fb84293d03f3c03af46091f2b6",
+            "dependencies": [
+              {
+                "version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b",
+                "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5"
+              }
+            ]
+          }
+        ],
+        "roots": [
+          {
+            "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+            "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+            "content_hash": "dacc8e05e0de4680d5e795a0b17f38028643f6fb84293d03f3c03af46091f2b6"
+          }
+        ]
+      },
+      "used_versions": [
+        {
+          "known_at": "2026-09-07T10:29:46.652136+00:00",
+          "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+          "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+          "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+          "material_state": "UNESTABLISHED"
+        }
+      ],
+      "counts_by_type": {
+        "SourceAccountDefinition": 1
+      },
+      "derived_values": [
+        {
+          "kind": "text",
+          "name": "observed_account_label",
+          "value": "3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+          "status": "AVAILABLE",
+          "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+          "definition_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+          "source_fields": [
+            {
+              "field": "source_name",
+              "state": "VALUE",
+              "value": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+              "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+              "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+              "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+              "object_content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754"
+            }
+          ],
+          "epistemic_state": "DERIVED",
+          "dependency_values": [
+            {
+              "kind": "text",
+              "name": "observed_account_code",
+              "value": "3212",
+              "schema": {
+                "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+              },
+              "status": "AVAILABLE",
+              "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+              "content_hash": "0133c52d81a246196381533239af7678f5d9b41303c32ddf6ef2b2fc9774d82a",
+              "definition_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+              "source_fields": [
+                {
+                  "field": "account_code",
+                  "state": "VALUE",
+                  "value": "3212",
+                  "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+                  "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+                  "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                  "object_content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754"
+                }
+              ],
+              "epistemic_state": "DERIVED",
+              "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+              "definition_version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b"
+            }
+          ],
+          "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+          "definition_version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8"
+        }
+      ],
+      "implementation": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "code_sha256": "3abace84d0df5987e8ebe67948994523bcaf6656e254eac50f689cecbb24f616",
+        "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+        "capabilities": {
+          "cdc": false,
+          "read": true,
+          "query": true,
+          "write": false,
+          "delete": false,
+          "limits": {
+            "coverage": "QUERY_PAGE_ONLY",
+            "returned_rows": 200,
+            "grouping_fields": 4,
+            "traversal_steps": 4,
+            "query_predicates": 20,
+            "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "derived_properties": 8,
+            "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+            "database_scan_limit": null
+          },
+          "stream": false,
+          "update": false,
+          "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+          "reversal": false,
+          "snapshot": true,
+          "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+          "simulation": false,
+          "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+          "incremental": false,
+          "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+          "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+          "formula_execution": false,
+          "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+          "source_write_exactly_once": false,
+          "grouped_observation_counts": true,
+          "typed_relationship_filters": true,
+          "versioned_interface_inputs": true,
+          "composed_derived_properties": true,
+          "versioned_type_group_inputs": true
+        },
+        "maximum_rows": 200,
+        "dependency_sha256": "1bdc7d74faee728cf0902f22af74007af54ad69d5d6f769acdaf30f92203806f",
+        "implementation_id": "ontology.object-set-derived/v1",
+        "maximum_properties": 8
+      },
+      "read_permissions": [
+        "ontology_admin",
+        "ontology_read",
+        "read"
+      ],
+      "calculation_runtime": "shared-functions/1",
+      "static_dependencies": [
+        {
+          "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+          "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+          "content_hash": "dacc8e05e0de4680d5e795a0b17f38028643f6fb84293d03f3c03af46091f2b6"
+        },
+        {
+          "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+          "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+          "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+        },
+        {
+          "version_id": "c51b7b8a-5f71-5c2d-b341-1a26ff40f115",
+          "resource_id": "ece51488-afea-5967-8ae1-187bfde8ee8f",
+          "content_hash": "c1c2bc538c6e6a8d0b3a1f20edf21a817e349041b83f7e0985ec863be54859d8"
+        }
+      ],
+      "invocation_plan_hash": "e6dd74e531d223b81ec47a45ea6065f5825142cb1450219a0edbcc05eca029a9",
+      "definition_version_id": "c51b7b8a-5f71-5c2d-b341-1a26ff40f115",
+      "invocation_request_id": "71af794f-1c57-4e70-a3cc-163b88e6a328",
+      "current_use_authorized": false,
+      "filter_schema_versions": [],
+      "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+      "business_effect_authorized": false
+    },
+    "current_use_authorized": false,
+    "business_effect_authorized": false
+  },
+  "corrected_calculation": {
+    "contract": "ontology-derived-result/1",
+    "query": {
+      "object_type": "SourceAccountDefinition",
+      "resource_ids": [
+        "00c93da8-3ab9-5597-aaf6-ea79b7307d32"
+      ],
+      "filters": [],
+      "traversal": [],
+      "search": "",
+      "limit": 1,
+      "offset": 0,
+      "valid_at": "2026-09-07T10:29:46.652136Z",
+      "known_at": "2026-09-07T10:29:46.652136Z"
+    },
+    "total": 1,
+    "counts_by_type": {
+      "SourceAccountDefinition": 1
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "definition": {
+            "analytics": [
+              {
+                "position": 1,
+                "coordinate": "Sheet1!I235",
+                "source_label": "Контрагенты"
+              },
+              {
+                "position": 2,
+                "coordinate": "Sheet1!J235",
+                "source_label": "Договоры"
+              }
+            ],
+            "coordinate": "Sheet1!B235",
+            "source_row": 235,
+            "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+            "account_code": "3212",
+            "quick_selection": "6603",
+            "financial_mapping": "UNESTABLISHED",
+            "off_balance_source": "არა",
+            "balance_behavior_source": "П",
+            "currency_tracking_source": "არა",
+            "quantity_tracking_source": "არა",
+            "required_dimension_policy": "UNESTABLISHED"
+          },
+          "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+          "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+          "account_code": "3212",
+          "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+        },
+        "valid_from": "2026-09-06T03:22:44.088415+04:00",
+        "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "object_type": "SourceAccountDefinition",
+        "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+        "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "system_from": "2026-09-06T03:23:28.54828+04:00",
+        "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+        "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+        "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [],
+    "definition_versions": [
+      {
+        "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+        "version_id": "d6ef1416-54ae-53bc-896b-fce3b861ad18",
+        "definition": {
+          "schema_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+          "definition": {
+            "name": "observed_account_code",
+            "expression": {
+              "op": "concat",
+              "args": [
+                {
+                  "op": "field",
+                  "field": "account_code"
+                },
+                {
+                  "op": "literal",
+                  "value": ":"
+                }
+              ]
+            },
+            "result_kind": "text"
+          }
+        },
+        "schema_versions": [
+          {
+            "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+            "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+          }
+        ]
+      }
+    ],
+    "derived_values": [
+      {
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "definition_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+        "definition_version_id": "d6ef1416-54ae-53bc-896b-fce3b861ad18",
+        "name": "observed_account_code",
+        "kind": "text",
+        "epistemic_state": "DERIVED",
+        "value": "3212:",
+        "status": "AVAILABLE"
+      }
+    ],
+    "coverage": "QUERY_PAGE_ONLY",
+    "scope": {
+      "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+      "legal_entity_id": "entity-ge-001",
+      "period": "2026-08",
+      "currency": "GEL"
+    },
+    "calculation_runtime": "ontology-derived/1",
+    "read_permissions": [
+      "export",
+      "ontology_admin",
+      "ontology_propose",
+      "ontology_read",
+      "read"
+    ],
+    "run_id": "fcr_ce0f9313c22f8cf6b44b98430ac70994ea234c04dfba010938ebdc00ce488c0a"
+  },
+  "financial_authority_established": false,
+  "read_only_verification": false,
+  "correction": {
+    "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+    "version_id": "d6ef1416-54ae-53bc-896b-fce3b861ad18"
+  },
+  "replayed_existing_receipts": true
+}

@@ -1,0 +1,24 @@
+.derived-run { margin-top: 16px; color: #dbe7ef; }
+.derived-run summary { cursor: pointer; color: #bde9eb; padding: 8px 0; }
+.derived-run p, .derived-run small { color: #aebfcd; font-size: 12px; line-height: 1.6; }
+.derived-run-controls { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; margin: 12px 0; }
+.derived-run-controls label { display: grid; gap: 6px; flex: 1 1 240px; font-size: 12px; }
+.derived-run .derived-run-controls input, .derived-run .derived-run-controls select { width: 100%; min-width: 0; background: #111f2d; color: #e0eaf2; border: 1px solid #34485b; border-radius: 4px; padding: 9px; }
+.derived-run button { background: #17313b; color: #d6f2f2; border: 1px solid #41626c; padding: 9px 12px; border-radius: 4px; }
+.derived-run button:disabled { opacity: .5; cursor: default; }
+.derived-run :is(button, input, select, summary):focus-visible { outline: 2px solid #6bd3d3; outline-offset: 3px; }
+.derived-run-table { overflow: auto; border: 1px solid #2c4052; }
+.derived-run-table table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+.derived-run-table th, .derived-run-table td { padding: 10px; border-bottom: 1px solid #2c4052; text-align: left; vertical-align: top; overflow-wrap: anywhere; font-size: 12px; }
+.derived-run-table th { background: #122231; color: #b7cbd8; font-weight: 500; }
+.derived-run-table th:first-child { width: 23%; }
+.derived-run-table th:nth-child(2) { width: 17%; }
+.derived-run-table th:nth-child(3) { width: 20%; }
+.derived-run-table small { display: block; }
+.derived-run-value { white-space: pre-wrap; font-variant-numeric: tabular-nums; }
+.derived-run h4 { margin: 12px 0 4px; font-size: 12px; }
+.derived-run-inputs { list-style: none; padding: 0; margin: 0; }
+.derived-run-inputs li { padding: 8px 0; border-bottom: 1px solid #273c4b; }
+.derived-run-inputs span { display: block; white-space: pre-wrap; }
+.derived-run-references pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #101b27; color: #acc0cf; font-size: 11px; padding: 10px; max-height: 260px; overflow: auto; }
+@media (max-width: 760px) { .derived-run-table table { min-width: 620px; } }

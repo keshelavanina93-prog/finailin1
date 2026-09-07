@@ -95,6 +95,7 @@ def _disk_manifest() -> dict[str, Any]:
             "typed_relationship_filters": True,
             "versioned_interface_inputs": True,
             "versioned_type_group_inputs": True,
+            "composed_derived_properties": True,
             "grouped_observation_counts": True,
             "snapshot": True,
             "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
@@ -222,6 +223,29 @@ def _pin(row: dict) -> dict:
     }
 
 
+def _composed_graph(principal: Principal, properties: list[dict]) -> dict | None:
+    from finai_api.domain.ontology_definitions import DerivedDefinition
+    from finai_api.services.derived_property_graph import references, resolve_with_loader
+
+    rows = [
+        ontology_definitions.definition(
+            principal, UUID(prop["resource_id"]), UUID(prop["version_id"])
+        )
+        for prop in properties
+    ]
+    if not any(
+        list(
+            references(DerivedDefinition.model_validate(row["attributes"]["definition"]).expression)
+        )
+        for row in rows
+    ):
+        return None
+    return resolve_with_loader(
+        rows,
+        lambda identity, version: ontology_definitions.definition(principal, identity, version),
+    )
+
+
 def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False) -> dict:
     require_permission(p, "ontology_read")
     if request.known_at > datetime.now(UTC):
@@ -273,6 +297,11 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
             [_pin(row) for row in pins], key=lambda row: row["version_id"]
         ),
     }
+    graph = _composed_graph(p, properties)
+    if graph is not None:
+        from finai_api.services.derived_property_graph import public_graph
+
+        result["derived_graph"] = public_graph(graph)
     if source is not None:
         result["source_document"] = source
     if not isinstance(spec.definition, WorksheetImplementation) and spec.definition.group_count:
@@ -352,9 +381,12 @@ def _retained_input(p: Principal, request: FunctionInvocation, compiled: dict) -
         **{
             key: source[key]
             for key in (
-                "filter_schema_versions", "traversal_schema_versions",
-                "interface_bindings", "interface_values",
-                "type_group_bindings", "type_group_values",
+                "filter_schema_versions",
+                "traversal_schema_versions",
+                "interface_bindings",
+                "interface_values",
+                "type_group_bindings",
+                "type_group_values",
             )
             if key in source
         },
@@ -416,12 +448,25 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
             raise WorkspaceError(409, "Grouping schema pin is unavailable")
         grouped = {"group_counts": count_observations(result, grouping, schema)}
     properties = retained_plan["derived_properties"]
-    derived = ontology_definitions.derived_values(
-        p,
-        result["objects"],
-        [UUID(prop["resource_id"]) for prop in properties],
-        {UUID(prop["resource_id"]): UUID(prop["version_id"]) for prop in properties},
-    )
+    graph = _composed_graph(p, properties)
+    graph_output = {}
+    if graph is not None:
+        from finai_api.services.derived_property_graph import evaluate_graph, public_graph
+
+        retained_graph = public_graph(graph)
+        if retained_graph != retained_plan.get("derived_graph"):
+            raise WorkspaceError(409, "Derived graph differs from the retained Function plan")
+        derived = evaluate_graph(graph, result["objects"])
+        graph_output["derived_graph"] = retained_graph
+    else:
+        if retained_plan.get("derived_graph") is not None:
+            raise WorkspaceError(409, "Retained Function derived graph is unavailable")
+        derived = ontology_definitions.derived_values(
+            p,
+            result["objects"],
+            [UUID(prop["resource_id"]) for prop in properties],
+            {UUID(prop["resource_id"]): UUID(prop["version_id"]) for prop in properties},
+        )
     used = []
     with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
         for obj in result["objects"]:
@@ -446,6 +491,7 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
         "implementation": retained_plan["implementation"],
         "plan_hash": retained_plan["plan_hash"],
         "derived_values": derived,
+        **graph_output,
         "used_versions": used,
         "static_dependencies": retained_plan["static_dependencies"],
         "coverage": "RETAINED_INPUT_PAGE_ONLY" if request.input_result else "QUERY_PAGE_ONLY",

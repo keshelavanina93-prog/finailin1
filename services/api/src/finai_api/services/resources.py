@@ -293,10 +293,14 @@ def _validate(
             )
         )
         if exact_version is not None:
-            if source_item.object_type != "ObjectSetDefinition" or not relation.startswith(
+            exact_query = source_item.object_type == "ObjectSetDefinition" and relation.startswith(
                 ("INTERFACE_QUERY:", "TYPE_GROUP_QUERY:")
-            ):
-                raise WorkspaceError(422, "Exact query dependency is not supported here")
+            )
+            exact_property = source_item.object_type == "DerivedProperty" and relation.startswith(
+                ("DERIVED_PROPERTY:", "DERIVED_TRANSITIVE:")
+            )
+            if not (exact_query or exact_property):
+                raise WorkspaceError(422, "Exact ontology dependency is not supported here")
             head = _get(conn, tenant, UUID(identifier))
             external_heads[identifier] = str(head["version_id"])
             with conn.cursor(row_factory=dict_row) as cursor:

@@ -1,0 +1,177 @@
+{
+  "url": "http://127.0.0.1:3062/",
+  "text": "Retained page: offset 0, limit 50, from 1 matching objects. Values cover this page only, not a total over the full set.\n\nEffective context: 9/7/2026, 2:37:52 PM · Known context: 9/7/2026, 2:37:52 PM. A reopened calculation keeps its original context.\n\nORIGINAL OBJECT\tPROPERTY\tRESULT\tAVAILABILITY & INPUTS\n3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы\nSourceAccountDefinition\n\tobserved_account_label\t3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы\tavailable\nInputs & derivation\nDirect source reads\nsource_name\nvalue: მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы\nExact retained references\nEvaluated dependencies\n\nOnly dependencies actually evaluated for this object are listed; unused fallback branches are excluded.\n\nobserved_account_code · available · 3212\naccount_code\nvalue: 3212\nExact retained references\nExact retained references\nExact retained references\nDeclared calculation graph · 2 definitions\nExact retained references",
+  "references": [
+    {
+      "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+      "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+      "object_content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+      "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+    },
+    {
+      "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+      "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+      "object_content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+      "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+    },
+    {
+      "property_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+      "property_version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b",
+      "content_hash": "0133c52d81a246196381533239af7678f5d9b41303c32ddf6ef2b2fc9774d82a",
+      "schema": {
+        "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+        "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+        "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+      },
+      "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+      "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944"
+    },
+    {
+      "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+      "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+      "definition_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+      "definition_version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8"
+    },
+    {
+      "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+      "version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b",
+      "content_hash": "0133c52d81a246196381533239af7678f5d9b41303c32ddf6ef2b2fc9774d82a",
+      "schema": {
+        "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+        "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+        "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+      },
+      "dependencies": []
+    },
+    {
+      "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+      "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+      "content_hash": "dacc8e05e0de4680d5e795a0b17f38028643f6fb84293d03f3c03af46091f2b6",
+      "schema": {
+        "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+        "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+        "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+      },
+      "dependencies": [
+        {
+          "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+          "version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b"
+        }
+      ]
+    },
+    {
+      "run_id": "fcr_559fafab0faf42bea4fbcdb13ea2dca11c0dd50c3482961c8f73372e2ce7c110",
+      "contract": "ontology-derived-result/1",
+      "coverage": "QUERY_PAGE_ONLY",
+      "query": {
+        "object_type": "SourceAccountDefinition",
+        "resource_ids": [
+          "00c93da8-3ab9-5597-aaf6-ea79b7307d32"
+        ],
+        "filters": [],
+        "traversal": [],
+        "search": "",
+        "limit": 50,
+        "offset": 0,
+        "valid_at": "2026-09-07T10:37:52.43532Z",
+        "known_at": "2026-09-07T10:37:52.43532Z"
+      },
+      "roots": [
+        {
+          "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+          "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+          "content_hash": "dacc8e05e0de4680d5e795a0b17f38028643f6fb84293d03f3c03af46091f2b6"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "reopened": {
+    "text": "Retained page: offset 0, limit 1, from 1 matching objects. Values cover this page only, not a total over the full set.\n\nEffective context: 9/7/2026, 2:29:46 PM · Known context: 9/7/2026, 2:29:46 PM. A reopened calculation keeps its original context.\n\nORIGINAL OBJECT\tPROPERTY\tRESULT\tAVAILABILITY & INPUTS\n3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы\nSourceAccountDefinition\n\tobserved_account_label\t3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы\tavailable\nInputs & derivation\nDeclared calculation graph · 2 definitions\nExact retained references",
+    "references": [
+      {
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "object_content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+        "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+      },
+      {
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "object_content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+        "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+      },
+      {
+        "property_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+        "property_version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b",
+        "content_hash": "0133c52d81a246196381533239af7678f5d9b41303c32ddf6ef2b2fc9774d82a",
+        "schema": {
+          "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+          "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+          "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+        },
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944"
+      },
+      {
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "definition_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+        "definition_version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8"
+      },
+      {
+        "schema": {
+          "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+          "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+          "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+        },
+        "version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b",
+        "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5",
+        "content_hash": "0133c52d81a246196381533239af7678f5d9b41303c32ddf6ef2b2fc9774d82a",
+        "dependencies": []
+      },
+      {
+        "schema": {
+          "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+          "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+          "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+        },
+        "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+        "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+        "content_hash": "dacc8e05e0de4680d5e795a0b17f38028643f6fb84293d03f3c03af46091f2b6",
+        "dependencies": [
+          {
+            "version_id": "e36bda37-6a19-5683-9ab6-c34ea93cfd8b",
+            "resource_id": "4e11e6d6-2ca2-5a67-97d4-ce37f4a997a5"
+          }
+        ]
+      },
+      {
+        "run_id": "fcr_60d9e42680f7f921691f254548901f1fd85ddc3a0aab5ebaecc2768f9f1b23ed",
+        "contract": "ontology-derived-result/1",
+        "coverage": "QUERY_PAGE_ONLY",
+        "query": {
+          "limit": 1,
+          "offset": 0,
+          "search": "",
+          "filters": [],
+          "known_at": "2026-09-07T10:29:46.652136Z",
+          "valid_at": "2026-09-07T10:29:46.652136Z",
+          "traversal": [],
+          "object_type": "SourceAccountDefinition",
+          "resource_ids": [
+            "00c93da8-3ab9-5597-aaf6-ea79b7307d32"
+          ]
+        },
+        "roots": [
+          {
+            "version_id": "1de6b912-7af0-582b-ad87-c209bdeeeac8",
+            "resource_id": "c4c26a3b-df85-5eb2-a84c-b0164f118dba",
+            "content_hash": "dacc8e05e0de4680d5e795a0b17f38028643f6fb84293d03f3c03af46091f2b6"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  }
+}

@@ -174,20 +174,26 @@ def _bounded_decimal_text(value: Decimal) -> str:
     return format(value, "f")
 
 
-def evaluate_expression(expression: Expression, values: dict[str, Any]) -> Any:
+def evaluate_expression(
+    expression: Expression, values: dict[str, Any], derived=None, field_value=None
+) -> Any:
     if expression.op == "field":
         assert expression.field is not None
-        return values.get(expression.field)
+        return field_value(expression.field) if field_value else values.get(expression.field)
+    if expression.op == "derived":
+        if derived is None:
+            raise ValueError("Exact derived dependency resolver is required")
+        return derived(expression.property)
     if expression.op == "literal":
         return expression.value
     if expression.op == "coalesce":
         # An unused fallback must not invalidate an observed value, including zero.
         for argument in expression.args:
-            value = evaluate_expression(argument, values)
+            value = evaluate_expression(argument, values, derived, field_value)
             if value is not None:
                 return value
         return None
-    operands = [evaluate_expression(arg, values) for arg in expression.args]
+    operands = [evaluate_expression(arg, values, derived, field_value) for arg in expression.args]
     if any(value is None for value in operands):
         return None
     if expression.op == "concat":
@@ -218,9 +224,27 @@ def derived_values(
     ids: list[UUID],
     versions: dict[UUID, UUID] | None = None,
 ) -> list[dict[str, Any]]:
+    from finai_api.services.derived_property_graph import (
+        evaluate_graph,
+        references,
+        resolve_with_loader,
+    )
+
+    selected = [definition(principal, identity, (versions or {}).get(identity)) for identity in ids]
+    if any(row["object_type"] != "DerivedProperty" for row in selected):
+        raise WorkspaceError(422, "Requested resource is not a derived property")
+    if any(
+        list(
+            references(DerivedDefinition.model_validate(row["attributes"]["definition"]).expression)
+        )
+        for row in selected
+    ):
+        graph = resolve_with_loader(
+            selected, lambda identity, version: definition(principal, identity, version)
+        )
+        return evaluate_graph(graph, objects)
     result = []
-    for identity in ids:
-        resource = definition(principal, identity, (versions or {}).get(identity))
+    for resource in selected:
         if resource["object_type"] != "DerivedProperty":
             raise WorkspaceError(422, "Requested resource is not a derived property")
         model = DerivedDefinition.model_validate(resource["attributes"]["definition"])
@@ -260,7 +284,8 @@ def derived_values(
                 computed.update(value=None, status="UNAVAILABLE", reason=str(exc))
             except DecimalException as exc:
                 computed.update(
-                    value=None, status="UNAVAILABLE",
+                    value=None,
+                    status="UNAVAILABLE",
                     reason=f"Decimal arithmetic range failure: {type(exc).__name__}",
                 )
             result.append(computed)
@@ -280,6 +305,23 @@ def derive_query(
     if any(row["object_type"] != "DerivedProperty" for row in selected):
         raise WorkspaceError(422, "Requested resource is not a derived property")
     pins = {row["resource_id"]: row["version_id"] for row in selected}
+    from finai_api.services.derived_property_graph import (
+        evaluate_graph,
+        public_graph,
+        references,
+        resolve_with_loader,
+    )
+
+    graph = None
+    if any(
+        list(
+            references(DerivedDefinition.model_validate(row["attributes"]["definition"]).expression)
+        )
+        for row in selected
+    ):
+        graph = resolve_with_loader(
+            selected, lambda identity, version: definition(principal, identity, version)
+        )
     result = query_objects(principal, query)
     return {
         **result.model_dump(mode="json"),
@@ -297,7 +339,10 @@ def derive_query(
             }
             for row in selected
         ],
-        "derived_values": derived_values(principal, result.objects, ids, pins),
+        "derived_values": evaluate_graph(graph, result.objects)
+        if graph
+        else derived_values(principal, result.objects, ids, pins),
+        **({"derived_graph": public_graph(graph)} if graph else {}),
         "coverage": "QUERY_PAGE_ONLY",
     }
 

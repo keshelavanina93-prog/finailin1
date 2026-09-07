@@ -258,6 +258,43 @@ def validate_definition(
         fields = contract["attributes"]["fields"]
         if definition.name in fields:
             raise WorkspaceError(422, "Derived property cannot overwrite a stored property")
+        from finai_api.services.derived_property_graph import references
+        from finai_api.services.derived_property_graph import (
+            resolve_with_loader as resolve_derived_graph,
+        )
+
+        property_kinds = {}
+        direct = {
+            (str(pin.resource_id), str(pin.version_id)) for pin in references(definition.expression)
+        }
+        if direct:
+            loaded = {}
+
+            def load_property(identity, version):
+                pin = (str(identity), str(version))
+                if pin not in loaded:
+                    relation = "DERIVED_PROPERTY:" if pin in direct else "DERIVED_TRANSITIVE:"
+                    loaded[pin] = target(pin[0], source, relation + pin[0], pin[1])
+                return loaded[pin]
+
+            # Draft metadata validates the proposal only. Publication assigns the
+            # actual immutable version/hash; this temporary row is never retained.
+            draft = {
+                **item.model_dump(mode="json"),
+                "version_id": str(item.expected_version_id or item.resource_id),
+                "content_hash": "0" * 64,
+                "dependencies": [{**contract, "relation": "FIELD:schema_id"}],
+            }
+            graph = resolve_derived_graph([draft], load_property, draft_root_ids={source})
+            property_kinds = {
+                (
+                    str(node["resource_id"]),
+                    str(node["version_id"]),
+                ): DerivedDefinition.model_validate(
+                    node["resource"]["attributes"]["definition"]
+                ).result_kind
+                for node in graph["nodes"]
+            }
         budget = [100]
 
         def check(expression: Expression, depth: int = 0) -> str:
@@ -275,6 +312,11 @@ def validate_definition(
                     return "decimal" if Decimal(expression.value).is_finite() else "text"
                 except (InvalidOperation, TypeError):
                     return "text"
+            if expression.op == "derived":
+                assert expression.property is not None
+                return property_kinds[
+                    (str(expression.property.resource_id), str(expression.property.version_id))
+                ]
             kinds = [check(arg, depth + 1) for arg in expression.args]
             if expression.op == "concat":
                 return "text"
