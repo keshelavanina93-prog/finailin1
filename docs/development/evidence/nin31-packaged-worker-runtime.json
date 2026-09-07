@@ -1,0 +1,398 @@
+{
+  "contract": "g8-built-worker-flow/1",
+  "status": "LOCAL_PACKAGED_WORKFLOW_PASS",
+  "commit": "81d635eec36addcf7cf1886cf72f776bb8b8b502",
+  "wheel_sha256": "59f6709ececa209c8111a8bb7fa92032ad38e6990ae999fb53ed314a827d169f",
+  "source_archive_sha256": "b1165f8f2277c9b919a7cf3c0f1795a4408ab8fa3f10e62dbede9a3d18edaf06",
+  "installed_api_package": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Lib\\site-packages\\finai_api",
+  "python": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Scripts\\python.exe",
+  "python_sha256": "b70275ad94210fce7548761143be5e177769721045e287bb6c80aac3f928c65b",
+  "interpreter": {
+    "base_prefix": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64",
+    "stdlib": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\Lib"
+  },
+  "task_queue": "g8-candidate-81d635e",
+  "proof_directory": "D:\\FinAI\\finailinear1\\.finai\\runtime-proof\\built-worker-flow-2qq7d7ox",
+  "release_accepted": false,
+  "verification_script_sha256": "a3eea74d79dbce5cfab3a7cc40bae633c247ae1986061a72b0d7aea936b35655",
+  "recovery_from": {
+    "directory": "D:\\FinAI\\finailinear1\\.finai\\runtime-proof\\built-worker-flow-4cva7_zr",
+    "verification_sha256": "c18eaa657208ad8e55b1c81bbf5128d88aec5e0d7ffeb01d6a64b374fe62a8b0",
+    "prior_error": "Packaged worker verification step 7 failed; retained log available"
+  },
+  "completed_history_replayed_after_worker_restart": true,
+  "new_work_executed_after_worker_restart": true,
+  "prior_request_resumed": true,
+  "interrupted_work_recovery_proven": false,
+  "owned_processes_stopped": true,
+  "candidate_api_port_closed": true,
+  "worker_launches": [
+    {
+      "state": {
+        "depth": 0,
+        "task_queue": "g8-candidate-81d635e",
+        "launch_receipt_sha256": "e979261a8be4c5beaa255a33a689d940ba8740692d849925363529b631177ae6",
+        "children": [
+          {
+            "command": "\\??\\C:\\WINDOWS\\system32\\conhost.exe 0x4",
+            "created": "2026-09-07T06:01:55.0600190Z",
+            "parent_pid": 41240,
+            "exe": "C:\\WINDOWS\\system32\\conhost.exe",
+            "depth": 1,
+            "pid": 8528
+          },
+          {
+            "command": "\"D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Scripts\\python.exe\" -B -I -X \"pycache_prefix=D:\\FinAI\\finailinear1\\.finai\\built-workers\\worker-roey1xi1\\cache\" -m finai_api.workflow_worker",
+            "created": "2026-09-07T06:01:55.1030510Z",
+            "parent_pid": 41240,
+            "exe": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\python.exe",
+            "depth": 1,
+            "pid": 36308
+          }
+        ],
+        "parent_pid": 26256,
+        "command": "\"D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Scripts\\python.exe\" -B -I -X \"pycache_prefix=D:\\FinAI\\finailinear1\\.finai\\built-workers\\worker-roey1xi1\\cache\" -m finai_api.workflow_worker",
+        "exe": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Scripts\\python.exe",
+        "created": "2026-09-07T06:01:55.0466830Z",
+        "pid": 41240,
+        "launch_receipt": "D:\\FinAI\\finailinear1\\.finai\\built-workers\\worker-roey1xi1\\launch.json"
+      },
+      "launch": {
+        "contract": "g8-built-worker-launch/1",
+        "wheel": "D:\\FinAI\\finailinear1\\.finai\\artifacts\\api-builds\\build-t9xl1f_h\\wheels\\finai_api-0.1.0-py3-none-any.whl",
+        "wheel_sha256": "59f6709ececa209c8111a8bb7fa92032ad38e6990ae999fb53ed314a827d169f",
+        "api_source_commit": "81d635eec36addcf7cf1886cf72f776bb8b8b502",
+        "api_source_archive_sha256": "b1165f8f2277c9b919a7cf3c0f1795a4408ab8fa3f10e62dbede9a3d18edaf06",
+        "api_build_receipt": "D:\\FinAI\\finailinear1\\.finai\\artifacts\\api-builds\\build-t9xl1f_h\\build-receipt.json",
+        "api_build_receipt_sha256": "b6f79fcc42bf52a0f61c6d493550a7993f367b063b4f1deb3ef2a00a7068c1cc",
+        "python": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Scripts\\python.exe",
+        "python_sha256": "b70275ad94210fce7548761143be5e177769721045e287bb6c80aac3f928c65b",
+        "interpreter": {
+          "base_prefix": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64",
+          "stdlib": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\Lib"
+        },
+        "installed_api_package": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Lib\\site-packages\\finai_api",
+        "cwd": "D:\\FinAI\\finailinear1\\.finai\\built-workers\\worker-roey1xi1",
+        "task_queue": "g8-candidate-81d635e",
+        "prepare_script_sha256": "bd4a1975872dd5dea23f961aee3fa1fb928ac7143c0fc15b6263a985aab7c427",
+        "verifier_script_sha256": "f1ca22a3fb6a5f1cdbc35bf6ea82666debaf596e2b6c651163d9be2368427f9c",
+        "supervisor_script_sha256": "8169654dfd588818ce0b8aa2d0623fa395d22ff10399d3861e25dc9e619b650e",
+        "observation": "VERIFIED_PACKAGE_BYTES_ONLY",
+        "execution_proven": false,
+        "release_accepted": false
+      }
+    },
+    {
+      "state": {
+        "parent_pid": 31424,
+        "command": "\"D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Scripts\\python.exe\" -B -I -X \"pycache_prefix=D:\\FinAI\\finailinear1\\.finai\\built-workers\\worker-gqcryvjb\\cache\" -m finai_api.workflow_worker",
+        "launch_receipt": "D:\\FinAI\\finailinear1\\.finai\\built-workers\\worker-gqcryvjb\\launch.json",
+        "pid": 23212,
+        "depth": 0,
+        "task_queue": "g8-candidate-81d635e",
+        "children": [
+          {
+            "depth": 1,
+            "command": "\\??\\C:\\WINDOWS\\system32\\conhost.exe 0x4",
+            "created": "2026-09-07T06:02:19.6525360Z",
+            "pid": 8984,
+            "exe": "C:\\WINDOWS\\system32\\conhost.exe",
+            "parent_pid": 23212
+          },
+          {
+            "depth": 1,
+            "command": "\"D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Scripts\\python.exe\" -B -I -X \"pycache_prefix=D:\\FinAI\\finailinear1\\.finai\\built-workers\\worker-gqcryvjb\\cache\" -m finai_api.workflow_worker",
+            "created": "2026-09-07T06:02:19.6955750Z",
+            "pid": 12056,
+            "exe": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\python.exe",
+            "parent_pid": 23212
+          }
+        ],
+        "exe": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Scripts\\python.exe",
+        "created": "2026-09-07T06:02:19.6394460Z",
+        "launch_receipt_sha256": "5f15f291aa4dfaebce9e0e28e3b001d8f1e84ac026e40b9b8115a9260ce142b7"
+      },
+      "launch": {
+        "contract": "g8-built-worker-launch/1",
+        "wheel": "D:\\FinAI\\finailinear1\\.finai\\artifacts\\api-builds\\build-t9xl1f_h\\wheels\\finai_api-0.1.0-py3-none-any.whl",
+        "wheel_sha256": "59f6709ececa209c8111a8bb7fa92032ad38e6990ae999fb53ed314a827d169f",
+        "api_source_commit": "81d635eec36addcf7cf1886cf72f776bb8b8b502",
+        "api_source_archive_sha256": "b1165f8f2277c9b919a7cf3c0f1795a4408ab8fa3f10e62dbede9a3d18edaf06",
+        "api_build_receipt": "D:\\FinAI\\finailinear1\\.finai\\artifacts\\api-builds\\build-t9xl1f_h\\build-receipt.json",
+        "api_build_receipt_sha256": "b6f79fcc42bf52a0f61c6d493550a7993f367b063b4f1deb3ef2a00a7068c1cc",
+        "python": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Scripts\\python.exe",
+        "python_sha256": "b70275ad94210fce7548761143be5e177769721045e287bb6c80aac3f928c65b",
+        "interpreter": {
+          "base_prefix": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64",
+          "stdlib": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\Lib"
+        },
+        "installed_api_package": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\worker-d-81d635e\\Lib\\site-packages\\finai_api",
+        "cwd": "D:\\FinAI\\finailinear1\\.finai\\built-workers\\worker-gqcryvjb",
+        "task_queue": "g8-candidate-81d635e",
+        "prepare_script_sha256": "bd4a1975872dd5dea23f961aee3fa1fb928ac7143c0fc15b6263a985aab7c427",
+        "verifier_script_sha256": "f1ca22a3fb6a5f1cdbc35bf6ea82666debaf596e2b6c651163d9be2368427f9c",
+        "supervisor_script_sha256": "8169654dfd588818ce0b8aa2d0623fa395d22ff10399d3861e25dc9e619b650e",
+        "observation": "VERIFIED_PACKAGE_BYTES_ONLY",
+        "execution_proven": false,
+        "release_accepted": false
+      }
+    }
+  ],
+  "full_verification_sha256": "63cfbceab5d30510c744cbb0fb324fa8fe10c8116aa2852aec344b4666898928",
+  "workflows": {
+    "first_workflow": {
+      "request": {
+        "request_id": "3b24ca45-807d-4d0d-9749-09ff44876664",
+        "transformation": {
+          "resource_id": "d77a76bc-1b60-5dee-aff6-fe24d3d014f3",
+          "version_id": "e963991d-e1ed-5344-914a-f54cdc880fee"
+        },
+        "valid_at": "2026-09-07T05:02:25.582189+00:00",
+        "known_at": "2026-09-07T05:02:25.582189+00:00"
+      },
+      "retained_repeat_and_history_equal": true,
+      "financial_authority_established": false,
+      "invocations": {
+        "observation_counts": {
+          "invocation_id": "26fd4179-0ed9-5c14-a554-798ee0df0a3f",
+          "receipt_hash": "329bb86bb4da1c1d3bc1bc3345735483c76c4bcda7d71d5f6f369f9f972a62d8",
+          "run_id": "fcr_469b8646fe0e87734ebfeeb4bed2053182e87ffbda63b28e3605dee0c395e2c7",
+          "objects": 2,
+          "group_counts": {
+            "fields": [
+              "posting_date",
+              "unit_status"
+            ],
+            "groups": [
+              {
+                "key": [
+                  {
+                    "field": "posting_date",
+                    "state": "VALUE",
+                    "value": "2025-11-03"
+                  },
+                  {
+                    "field": "unit_status",
+                    "state": "VALUE",
+                    "value": "UNESTABLISHED"
+                  }
+                ],
+                "count": 2,
+                "contributors": [
+                  {
+                    "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+                    "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+                    "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc"
+                  },
+                  {
+                    "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+                    "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+                    "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b"
+                  }
+                ]
+              }
+            ],
+            "schema": {
+              "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+              "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+              "content_hash": "1853baae71b01eab602e3cb8e49421ffcd9fbaba7dae7de0486a30c585120e42"
+            },
+            "contract": "grouped-observation-counts/1",
+            "coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "authority": "OBSERVATION_COUNTS_ONLY",
+            "object_count": 2
+          }
+        },
+        "source_window": {
+          "invocation_id": "98587a9d-c4a0-57ef-99c4-27aa810c5a30",
+          "receipt_hash": "8736a8ea8334e6600968a09fa1347a0cde464609c170a8e8ad40f6a36b7fe601",
+          "run_id": "fcr_b46aa5030b2cc6b68a062548338bbb3d88b53e7f4a51dd3e39c010fdd323b5cf",
+          "objects": 2,
+          "group_counts": null
+        }
+      }
+    },
+    "second_workflow": {
+      "request": {
+        "request_id": "b4e43985-3867-4e82-a716-743b6e0454a8",
+        "transformation": {
+          "resource_id": "d77a76bc-1b60-5dee-aff6-fe24d3d014f3",
+          "version_id": "e963991d-e1ed-5344-914a-f54cdc880fee"
+        },
+        "valid_at": "2026-09-07T05:02:59.161655+00:00",
+        "known_at": "2026-09-07T05:02:59.161655+00:00"
+      },
+      "retained_repeat_and_history_equal": true,
+      "financial_authority_established": false,
+      "invocations": {
+        "observation_counts": {
+          "invocation_id": "f427ef65-87bd-516d-9a18-c1ed4fe374a6",
+          "receipt_hash": "66dbbc0b920cafe3601a6bb1eb4f31caa87c5ef2f30b5828b0afc8ed2652b250",
+          "run_id": "fcr_4b0af9b3bc9c16936e8c96905c5b0c869580d47ef4c70193623d80be9d7cc541",
+          "objects": 2,
+          "group_counts": {
+            "fields": [
+              "posting_date",
+              "unit_status"
+            ],
+            "groups": [
+              {
+                "key": [
+                  {
+                    "field": "posting_date",
+                    "state": "VALUE",
+                    "value": "2025-11-03"
+                  },
+                  {
+                    "field": "unit_status",
+                    "state": "VALUE",
+                    "value": "UNESTABLISHED"
+                  }
+                ],
+                "count": 2,
+                "contributors": [
+                  {
+                    "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+                    "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+                    "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc"
+                  },
+                  {
+                    "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+                    "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+                    "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b"
+                  }
+                ]
+              }
+            ],
+            "schema": {
+              "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+              "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+              "content_hash": "1853baae71b01eab602e3cb8e49421ffcd9fbaba7dae7de0486a30c585120e42"
+            },
+            "contract": "grouped-observation-counts/1",
+            "coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "authority": "OBSERVATION_COUNTS_ONLY",
+            "object_count": 2
+          }
+        },
+        "source_window": {
+          "invocation_id": "ad51f713-ef4b-583f-9b41-550a2d550c4c",
+          "receipt_hash": "edec583a7eb4a9b4ea95e77eae6895141100f4fbc3258e68ac8e366e8a8e2619",
+          "run_id": "fcr_66bcf49434be52d861b2a84bdd48021654cc879c8054adb89c2c0464cb7ffba8",
+          "objects": 2,
+          "group_counts": null
+        }
+      }
+    },
+    "third_workflow": {
+      "request": {
+        "request_id": "10b19515-45b0-4878-be0f-e861ab6b79fa",
+        "transformation": {
+          "resource_id": "d77a76bc-1b60-5dee-aff6-fe24d3d014f3",
+          "version_id": "e963991d-e1ed-5344-914a-f54cdc880fee"
+        },
+        "valid_at": "2026-09-07T06:02:32.570042+00:00",
+        "known_at": "2026-09-07T06:02:32.570042+00:00"
+      },
+      "retained_repeat_and_history_equal": true,
+      "financial_authority_established": false,
+      "invocations": {
+        "observation_counts": {
+          "invocation_id": "209906ba-b236-59fd-8840-233c27859f89",
+          "receipt_hash": "f1a02baef431d844adc82c597821e1e83dfe70cd697c1640e9779452f3622e87",
+          "run_id": "fcr_ec77b2e4e1798212704a12f51b622594a8446338e6cc0bf2796035c01b8b264d",
+          "objects": 2,
+          "group_counts": {
+            "fields": [
+              "posting_date",
+              "unit_status"
+            ],
+            "groups": [
+              {
+                "key": [
+                  {
+                    "field": "posting_date",
+                    "state": "VALUE",
+                    "value": "2025-11-03"
+                  },
+                  {
+                    "field": "unit_status",
+                    "state": "VALUE",
+                    "value": "UNESTABLISHED"
+                  }
+                ],
+                "count": 2,
+                "contributors": [
+                  {
+                    "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+                    "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+                    "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc"
+                  },
+                  {
+                    "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+                    "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+                    "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b"
+                  }
+                ]
+              }
+            ],
+            "schema": {
+              "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+              "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+              "content_hash": "1853baae71b01eab602e3cb8e49421ffcd9fbaba7dae7de0486a30c585120e42"
+            },
+            "contract": "grouped-observation-counts/1",
+            "coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "authority": "OBSERVATION_COUNTS_ONLY",
+            "object_count": 2
+          }
+        },
+        "source_window": {
+          "invocation_id": "14444550-291b-51fc-85cc-8373bfc593a4",
+          "receipt_hash": "0f55255c38bdd4fa639cefeb25d40a9ace751f3bba23aa1a724c4539f74f7c03",
+          "run_id": "fcr_f48008e7fddec762f03664d6de0a83594423fa084d6e66db48a7eccdef0b47d8",
+          "objects": 2,
+          "group_counts": null
+        }
+      }
+    }
+  },
+  "initial_timeout_root_cause": "UNPROVEN: recovered same artifact on D-native Python; monitored terminal INSERT had no blocker and finished in approximately 5 seconds. Broad RLS query plan found separately.",
+  "python_installation": {
+    "license_sha256": "62bec384df47b0328307db41455ff6ea2559e5546b394ac69148561b21703120",
+    "system_registration_changed": false,
+    "executable": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\python.exe",
+    "recorded_at": "2026-09-07T05:58:08.1878872Z",
+    "executable_sha256": "ef8f51028ac5329641985112f8efb1c2d4c47c86b8011ddf7e6fae21e2b4e5a1",
+    "release_accepted": false,
+    "architecture": "windows-x86_64",
+    "archive_path": "D:\\FinAI\\finailinear1\\.finai\\artifacts\\python\\python-3.13.14-amd64-f73b6535281b58eee6bcfb3403af2bcfac711ea1463d8340c47c3047248eddf7.zip",
+    "observed": {
+      "version": "3.13.14 (tags/v3.13.14:fd17997, Jun 10 2026, 13:03:48) [MSC v.1944 64 bit (AMD64)]",
+      "architecture_bits": 64,
+      "paths": {
+        "executable": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\python.exe",
+        "prefix": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64",
+        "base_prefix": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64",
+        "stdlib": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\Lib",
+        "encodings": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\Lib\\encodings\\__init__.py"
+      },
+      "sys_path": [
+        "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\python313.zip",
+        "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\DLLs",
+        "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\Lib",
+        "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64",
+        "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\Lib\\site-packages"
+      ]
+    },
+    "archive_url": "https://www.python.org/ftp/python/3.13.14/python-3.13.14-amd64.zip",
+    "official_manifest_url": "https://www.python.org/ftp/python/3.13.14/windows-3.13.14.json",
+    "contract": "g8-packaged-python/1",
+    "archive_sha256": "f73b6535281b58eee6bcfb3403af2bcfac711ea1463d8340c47c3047248eddf7",
+    "version": "3.13.14",
+    "official_manifest_sha256": "e99d737ec274237ca9ce4128467fcb0a9e4d02139d55e638c03e4f9514608c08",
+    "license": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\LICENSE.txt",
+    "status": "PINNED_INTERPRETER_VERIFIED",
+    "official_manifest_path": "D:\\FinAI\\finailinear1\\.finai\\artifacts\\python\\windows-3.13.14-74753513a9ee4d508f92a5d86bd6b5df.json"
+  }
+}
