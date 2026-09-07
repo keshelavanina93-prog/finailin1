@@ -20,7 +20,10 @@ type ConsumedProperty = DerivedValue & {
  kind:"text"|"decimal";epistemic_state:"DERIVED";source_result:SourceResult;
 };
 type RetainedProvenanceAuthority={resource_id:string;version_id:string;content_hash:string;access_entity:string;event_id:string|null;lineage_use:"HISTORICAL"|"ACTIVE"};
-type BaseOutput={retained_provenance_authority?:RetainedProvenanceAuthority[];consumed_property_values?:ConsumedProperty[];group_counts?:GroupCounts;input_result?:{invocation_id:string;receipt_hash:string;run_id:string};run_id:string;contract:"function-result/1";function:Pin;mode:"EVIDENCE_ANALYSIS_ONLY";coverage:"QUERY_PAGE_ONLY"|"REVIEWED_WORKSHEET_PAGE_ONLY"|"RETAINED_INPUT_PAGE_ONLY";current_use_authorized:false;business_effect_authorized:false;invocation_request_id:string;query:{valid_at:string;known_at:string;offset:number;limit:number};objects:CanonicalResource[];total:number;next_offset:number|null;derived_values:DerivedValue[]};
+type TemporalWitness=Pin&{content_hash:string;original_value:string};
+type TemporalBoundary={normalized_value:string;witnesses:TemporalWitness[]};
+type TemporalExtent={contract:"temporal-observation-extent/1";authority:"OBSERVATION_EXTENT_ONLY";coverage:"COMPLETE_BOUNDED_OBJECT_SET";schema:Pin&{content_hash:string};field:string;kind:"date"|"datetime";state:"AVAILABLE"|"NO_VALUES";object_count:number;value_count:number;missing_count:number;null_count:number;earliest:TemporalBoundary|null;latest:TemporalBoundary|null};
+type BaseOutput={temporal_extent?:TemporalExtent;retained_provenance_authority?:RetainedProvenanceAuthority[];consumed_property_values?:ConsumedProperty[];group_counts?:GroupCounts;input_result?:{invocation_id:string;receipt_hash:string;run_id:string};run_id:string;contract:"function-result/1";function:Pin;mode:"EVIDENCE_ANALYSIS_ONLY";coverage:"QUERY_PAGE_ONLY"|"REVIEWED_WORKSHEET_PAGE_ONLY"|"RETAINED_INPUT_PAGE_ONLY";current_use_authorized:false;business_effect_authorized:false;invocation_request_id:string;query:{valid_at:string;known_at:string;offset:number;limit:number};objects:CanonicalResource[];total:number;next_offset:number|null;derived_values:DerivedValue[]};
 type Output=BaseOutput&Partial<Omit<WorksheetResult,"coverage">>;
 function worksheet(output:BaseOutput):output is BaseOutput&WorksheetResult{return output.coverage==="REVIEWED_WORKSHEET_PAGE_ONLY"&&"temporal_semantics" in output&&output.temporal_semantics==="IMMUTABLE_RETAINED_SNAPSHOT_NOT_VALID_TIME_FACTS"&&"authority" in output&&output.authority==="SOURCE_CELLS_ONLY"&&"source_rows" in output&&Array.isArray(output.source_rows)&&"source_document" in output&&typeof output.source_document==="object"&&output.source_document!==null&&"source_query" in output&&typeof output.source_query==="object"&&output.source_query!==null;}
 function retainedInput(output:BaseOutput):boolean {return output.coverage==="RETAINED_INPUT_PAGE_ONLY"&&Array.isArray(output.objects)&&Array.isArray(output.derived_values)&&!!output.input_result&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(output.input_result.invocation_id)&&/^[a-f0-9]{64}$/.test(output.input_result.receipt_hash)&&/^fcr_[a-f0-9]{64}$/.test(output.input_result.run_id);}
@@ -63,6 +66,7 @@ function Workbench({initialInvocationId,token,companyName,onInspect,onTrace,onPr
   {output?.input_result&&<section aria-label="Consumed retained input"><h4>Consumed retained input</h4><p>This downstream result records the exact upstream invocation it consumed. A retained input remains evidence-only; it does not grant financial or current-use authority.</p><details><summary>Exact consumed result provenance</summary><p>Invocation: {output.input_result.invocation_id}</p><p>Receipt hash: {output.input_result.receipt_hash}</p><p>Retained result: {output.input_result.run_id}</p></details></section>}
   {output?.consumed_property_values&&<RetainedCalculatedInputs result={output} onInspect={onInspect} onTrace={onTrace}/>}
   {output&&result?.status==="SUCCEEDED"&&<RetainedBindingAction key={output.run_id} token={token} invocationId={result.invocation_id} output={output} onProposal={onProposal}/>}
+  {output&&output.temporal_extent!==undefined&&<TemporalExtentResult result={output} onInspect={onInspect} onTrace={onTrace}/>}
   {output?.group_counts&&<GroupedObservationCounts key={output.run_id} result={output} onInspect={onInspect} onTrace={onTrace}/>}
   {output&&<section aria-label="Retained analysis page"><p>{worksheet(output)?"Requested effective context":"Effective"} {new Date(output.query.valid_at).toLocaleString()} · known {new Date(output.query.known_at).toLocaleString()}</p>{worksheet(output)?<WorksheetAnalysisResult key={output.run_id} token={token} result={output} knownAt={output.query.known_at} onInspect={onInspect} onTrace={onTrace}/>:<><p>{retainedInput(output)?`${output.objects.length} objects in the consumed retained page. Derived values apply to this retained page only.`:`${output.objects.length} objects on this page, offset ${output.query.offset}; ${output.total} query matches. Derived values apply to this page only.`}</p><div className="saved-analysis-table"><table><thead><tr><th>Source object</th><th>Derived values & availability</th><th>Investigate</th></tr></thead><tbody>{output.objects.map(object=><tr key={object.version_id}><th scope="row">{displayName(object.display_name)}<small>{object.object_type}</small></th><td>{output.derived_values.filter(value=>value.object_version_id===object.version_id).map(value=><div key={value.definition_version_id}><p>{value.name.replaceAll("_"," ")}: {value.value??"Unavailable"} · {value.status.toLowerCase().replaceAll("_"," ")}{value.reason?` — ${value.reason}`:""}</p>{(value.source_result||value.dependency_values?.some(dependency=>dependency.source_result))&&<details><summary>Evaluated retained values</summary>{[value,...(value.dependency_values??[])].filter(dependency=>dependency.source_result).map(dependency=><div key={dependency.definition_version_id}><p>{dependency.name.replaceAll("_"," ")}: {dependency.value??"Unavailable"} · {dependency.status.toLowerCase().replaceAll("_"," ")}</p><p>This value was read from the retained upstream result, without rereading its source fields.</p><details><summary>Exact evaluated value provenance</summary><pre>{JSON.stringify({object_id:dependency.object_id,object_version_id:dependency.object_version_id,definition_id:dependency.definition_id,definition_version_id:dependency.definition_version_id,source_result:dependency.source_result},null,2)}</pre></details></div>)}</details>}</div>)}{!output.derived_values.some(value=>value.object_version_id===object.version_id)&&<span>No derived value requested for this object.</span>}</td><td><button onClick={()=>onInspect(object,output.query.known_at)}>Inspect</button><button onClick={()=>onTrace(object,output.query.known_at)}>Trace evidence</button></td></tr>)}</tbody></table></div>{!output.objects.length&&<p>{retainedInput(output)?"The consumed retained page contains no objects.":"No objects matched the reviewed query at these cutoffs."}</p>}</>}{request&&!request.input_result&&!retainedInput(output)&&<div className="saved-analysis-actions"><button disabled={busy||output.query.offset===0} onClick={()=>page(Math.max(0,output.query.offset-output.query.limit))}>Previous page</button><button disabled={busy||pageNext===null} onClick={()=>pageNext!==null&&page(pageNext)}>Next page</button></div>}</section>}
   <footer>Evidence analysis only. A retained result does not grant current-use permission, financial authority or a business action.</footer>
@@ -170,5 +174,72 @@ function SourceHistoryAuthority({rows}:{rows:unknown}) {
     </tr>)}
    </tbody></table></div>
   </details>}
+ </section>;
+}
+
+
+function normalizedObservation(value:string,kind:"date"|"datetime"):string|null {
+ if(kind==="date") {
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return null;
+  const [year,month,day]=value.split("-").map(Number);
+  const days=[31,year%4===0&&(year%100!==0||year%400===0)?29:28,31,30,31,30,31,31,30,31,30,31];
+  return year>=1&&month>=1&&month<=12&&day>=1&&day<=days[month-1]?value:null;
+ }
+ const parts=/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})(?:\.(\d{1,6}))?(Z|[+-]\d{2}:\d{2})$/i.exec(value);
+ if(!parts||normalizedObservation(parts[1],"date")===null)return null;
+ const [hour,minute,second]=parts[2].split(":").map(Number);
+ const offset=parts[4].toUpperCase()==="Z"?[0,0]:parts[4].slice(1).split(":").map(Number);
+ if(hour>23||minute>59||second>59||offset[0]>15||offset[1]>59)return null;
+ const parsed=new Date(`${parts[1]}T${parts[2]}${parts[4]}`);
+ if(!Number.isFinite(parsed.valueOf())||!/^\d{4}-/.test(parsed.toISOString()))return null;
+ return `${parsed.toISOString().slice(0,19)}.${(parts[3]??"").padEnd(6,"0")}Z`;
+}
+
+function validTemporalExtent(result:Output):boolean {
+ const extent=result.temporal_extent;
+ const uuid=(value:unknown)=>typeof value==="string"&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
+ const hash=(value:unknown)=>typeof value==="string"&&/^[a-f0-9]{64}$/.test(value);
+ if(!extent||extent.contract!=="temporal-observation-extent/1"||extent.authority!=="OBSERVATION_EXTENT_ONLY"||extent.coverage!=="COMPLETE_BOUNDED_OBJECT_SET"||
+  !["date","datetime"].includes(extent.kind)||!["AVAILABLE","NO_VALUES"].includes(extent.state)||typeof extent.field!=="string"||!extent.field||
+  !uuid(extent.schema?.resource_id)||!uuid(extent.schema?.version_id)||!hash(extent.schema?.content_hash)||
+  ![extent.object_count,extent.value_count,extent.missing_count,extent.null_count].every(count=>Number.isInteger(count)&&count>=0&&count<=200)||
+  extent.value_count+extent.missing_count+extent.null_count!==extent.object_count||!Array.isArray(result.objects)||extent.object_count!==result.objects.length||extent.object_count!==result.total||result.query.offset!==0||result.query.limit>200||result.next_offset!==null||
+  !result.objects.every(object=>object.schema_version_id===extent.schema.version_id))return false;
+ if(extent.state==="NO_VALUES")return extent.value_count===0&&extent.earliest===null&&extent.latest===null;
+ if(extent.value_count===0||!extent.earliest||!extent.latest)return false;
+ function boundary(value:TemporalBoundary):boolean {
+  if(!value||typeof value.normalized_value!=="string"||normalizedObservation(value.normalized_value,extent!.kind)!==value.normalized_value||
+   !Array.isArray(value.witnesses)||value.witnesses.length<1||value.witnesses.length>extent!.value_count||
+   new Set(value.witnesses.map(witness=>witness?.version_id)).size!==value.witnesses.length)return false;
+  return value.witnesses.every(witness=>{
+   if(!witness||!uuid(witness.resource_id)||!uuid(witness.version_id)||!hash(witness.content_hash)||typeof witness.original_value!=="string")return false;
+   const object=result.objects.find(row=>row.resource_id===witness.resource_id&&row.version_id===witness.version_id&&row.content_hash===witness.content_hash);
+   return !!object&&object.attributes[extent!.field]===witness.original_value&&normalizedObservation(witness.original_value,extent!.kind)===value.normalized_value;
+  });
+ }
+ return boundary(extent.earliest)&&boundary(extent.latest)&&extent.earliest.normalized_value<=extent.latest.normalized_value;
+}
+
+function TemporalExtentResult({result,onInspect,onTrace}:{result:Output;onInspect:Props["onInspect"];onTrace:Props["onTrace"]}) {
+ const extent=result.temporal_extent;
+ if(!extent||!validTemporalExtent(result))return <section aria-label="Dates represented in this source selection"><h4>Dates represented in this source selection</h4><p role="alert">The retained date-extent evidence is unavailable or does not match its source versions. No date range is shown.</p></section>;
+ return <section aria-label="Dates represented in this source selection"><h4>Dates represented in this source selection</h4>
+  <p>{extent.field.replaceAll("_"," ")} · {extent.value_count} observed values · {extent.missing_count} missing fields · {extent.null_count} explicit nulls · {extent.object_count} selected objects.</p>
+  <p>This covers the complete bounded Object Set selected for this analysis. It does not establish an accounting period, coverage of all source records, or financial authority.</p>
+  {extent.state==="NO_VALUES"?<p>{extent.object_count===0?"The retained selection is empty; no date boundaries exist.":"This selection contains no date values; missing and null fields do not define date boundaries."}</p>:<div className="saved-analysis-table"><table><thead><tr><th>Boundary</th><th>{extent.kind==="date"?"Calendar date":"Normalized timestamp (UTC)"}</th><th>Supporting source observations</th></tr></thead><tbody>
+   {(["earliest","latest"] as const).map(key=>{
+    const boundary=extent[key]!;
+    return <tr key={key}><th scope="row">{key==="earliest"?"First represented":"Last represented"}</th><td>{boundary.normalized_value}</td>
+     <td><details><summary>{boundary.witnesses.length} exact {boundary.witnesses.length===1?"witness":"witnesses"}</summary>{boundary.witnesses.map(witness=>{
+      const object=result.objects.find(row=>row.resource_id===witness.resource_id&&row.version_id===witness.version_id&&row.content_hash===witness.content_hash)!;
+      return <div key={witness.version_id}><p>{displayName(object.display_name)}</p><p>Original {extent.field.replaceAll("_"," ")}: {witness.original_value}</p>
+       <button onClick={()=>onInspect(object,result.query.known_at)}>Inspect observation</button><button onClick={()=>onTrace(object,result.query.known_at)}>Trace evidence</button>
+       <details><summary>Exact witness reference</summary><pre>{JSON.stringify({resource_id:witness.resource_id,version_id:witness.version_id,content_hash:witness.content_hash},null,2)}</pre></details>
+      </div>;
+     })}</details></td>
+    </tr>;
+   })}
+  </tbody></table></div>}
+  <details><summary>Reviewed field and schema</summary><p>Field: {extent.field}</p><p>Schema: {extent.schema.resource_id}</p><p>Version: {extent.schema.version_id}</p><p>Content hash: {extent.schema.content_hash}</p><p>{extent.kind==="date"?"Calendar dates are displayed unchanged, without a timezone conversion.":"UTC boundaries retain six fractional digits; original source timestamps remain visible with each witness."}</p></details>
  </section>;
 }

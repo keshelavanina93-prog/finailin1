@@ -24,6 +24,12 @@ class GroupCount(BaseModel):
         return value
 
 
+class TemporalExtent(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    schema_id: UUID
+    field: str = Field(min_length=1, max_length=128)
+
+
 class FunctionImplementation(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     implementation_id: Literal["ontology.object-set-derived/v1"]
@@ -32,6 +38,9 @@ class FunctionImplementation(BaseModel):
     dependency_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     derived_property_ids: list[UUID] = Field(default_factory=list, max_length=8)
     group_count: GroupCount | None = Field(default=None, exclude_if=lambda value: value is None)
+    temporal_extent: TemporalExtent | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     retained_properties: list[VersionReference] = Field(
         default_factory=list, max_length=8, exclude_if=lambda value: not value
     )

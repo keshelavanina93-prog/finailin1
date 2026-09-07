@@ -233,6 +233,13 @@ def validate_function(item: ResourceMutation, target: Callable[..., dict]) -> No
         schema = target(str(grouping.schema_id), str(item.resource_id), "FUNCTION_GROUP_SCHEMA")
         validate_schema(schema, grouping.fields)
 
+    if spec.definition.temporal_extent is not None:
+        from finai_api.services.temporal_observations import validate_schema as temporal_schema
+
+        extent = spec.definition.temporal_extent
+        schema = target(str(extent.schema_id), str(item.resource_id), "FUNCTION_TEMPORAL_SCHEMA")
+        temporal_schema(schema, extent.field)
+
 
 def _pin(row: dict) -> dict:
     return {
@@ -364,6 +371,19 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
         if request.offset != 0:
             raise WorkspaceError(422, "Grouping requires a complete Object Set starting at zero")
         result["group_count"] = {"schema": _pin(schema), "fields": grouping.fields}
+    if not isinstance(spec.definition, WorksheetImplementation) and spec.definition.temporal_extent:
+        from finai_api.services.temporal_observations import validate_schema as temporal_schema
+
+        extent = spec.definition.temporal_extent
+        schema = by_id.get(str(extent.schema_id))
+        if schema is None:
+            raise WorkspaceError(409, "Temporal schema exact dependency is unavailable")
+        kind = temporal_schema(schema, extent.field)
+        if request.offset != 0:
+            raise WorkspaceError(
+                422, "Temporal extent requires a complete Object Set starting at zero"
+            )
+        result["temporal_extent"] = {"schema": _pin(schema), "field": extent.field, "kind": kind}
     if request.input_result is not None:
         if selected is None or source is not None:
             raise WorkspaceError(409, "Retained input requires the ontology Object Set adapter")
@@ -683,6 +703,24 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
         if schema is None or _pin(schema) != grouping["schema"]:
             raise WorkspaceError(409, "Grouping schema pin is unavailable")
         grouped = {"group_counts": count_observations(result, grouping, schema)}
+    if retained_plan.get("temporal_extent"):
+        from finai_api.services.temporal_observations import extent_observations
+
+        extent = retained_plan["temporal_extent"]
+        with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
+            schema = c.execute(
+                "SELECT v.*,i.identity_key FROM resource_versions v "
+                "JOIN canonical_identities i USING(tenant_id,resource_id) "
+                "WHERE v.tenant_id=%s AND v.resource_id=%s AND v.version_id=%s",
+                (
+                    p.scope.tenant_id,
+                    extent["schema"]["resource_id"],
+                    extent["schema"]["version_id"],
+                ),
+            ).fetchone()
+        if schema is None or _pin(schema) != extent["schema"]:
+            raise WorkspaceError(409, "Temporal schema pin is unavailable")
+        grouped["temporal_extent"] = extent_observations(result, extent, schema)
     properties = retained_plan["derived_properties"]
     graph = _composed_graph(p, properties, force=bool(retained_plan.get("retained_properties")))
     graph_output = {}
