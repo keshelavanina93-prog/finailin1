@@ -2,10 +2,11 @@
 
 import asyncio
 from contextlib import suppress
+from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from temporalio.common import WorkflowIDReusePolicy
 from temporalio.exceptions import WorkflowAlreadyStartedError
@@ -14,7 +15,12 @@ from finai_api.api.workflow_routes import client
 from finai_api.domain.review import Principal
 from finai_api.domain.transformation import TransformationRunRequest
 from finai_api.security import authenticated_principal, require_permission
-from finai_api.services import function_catalog, report_workflows, transformation_runs
+from finai_api.services import (
+    function_catalog,
+    report_workflows,
+    transformation_history,
+    transformation_runs,
+)
 from finai_api.services.workspace import WorkspaceError
 from finai_api.transformation_workflow import TransformationWorkflow
 
@@ -53,6 +59,16 @@ async def start(principal: User, request: TransformationRunRequest) -> dict[str,
         "state": "START_REQUEST_RECORDED",
         "business_effect_authorized": False,
     }
+
+
+@router.get("/runs")
+def history(
+    principal: User,
+    limit: int = Query(default=20, ge=1, le=50),
+    before_created_at: datetime | None = None,
+    before_request_id: UUID | None = None,
+) -> dict[str, Any]:
+    return transformation_history.discover(principal, limit, before_created_at, before_request_id)
 
 
 @router.get("/runs/{request_id}")

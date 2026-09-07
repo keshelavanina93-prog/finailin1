@@ -18,7 +18,7 @@ from finai_api.storage import retain, retrieve
 
 router = APIRouter()
 compiler = AuthorityCompiler()
-REQUIRED_SCHEMA_VERSION = 43
+REQUIRED_SCHEMA_VERSION = 44
 
 
 @router.get("/health", tags=["operations"])

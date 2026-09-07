@@ -1,7 +1,8 @@
 # ruff: noqa: F811
 """Real native node invocation, reuse and SQL barrier/output refusal."""
 
-from uuid import uuid4
+from datetime import datetime
+from uuid import UUID, uuid4
 
 import psycopg
 import pytest
@@ -12,6 +13,7 @@ from test_function_execution import function_case
 from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.domain.transformation import TransformationRunRequest
 from finai_api.services import report_workflows as records
+from finai_api.services import transformation_history
 from finai_api.services import transformation_runs as runs
 from finai_api.services.workspace import WorkspaceError
 
@@ -117,3 +119,24 @@ def test_native_two_node_publication_replay_and_forged_topology(retained, monkey
     with pytest.raises(WorkspaceError, match="incomplete"):
         runs.publish(failed_context)
     assert runs.read(reader, failed_identity)["publications"] == []
+    with monkeypatch.context() as patch:
+        patch.setattr(runs.function_execution, "plan", lambda *_: pytest.fail("History replanned"))
+        first_page = transformation_history.discover(reader, limit=1)
+        cursor = first_page["next_cursor"]
+        assert first_page["items"][0]["workflow_id"] == failed_identity
+        assert first_page["items"][0]["failed_steps"] == 1
+        second_page = transformation_history.discover(
+            reader, 1, datetime.fromisoformat(cursor["created_at"]), UUID(cursor["request_id"])
+        )
+        assert second_page["next_cursor"] is None
+        historical = second_page["items"][0]
+        assert historical["workflow_id"] == identity
+        assert historical["completed_steps"] == historical["total_steps"] == 2
+        assert historical["published_output_sets"] == 1
+        assert "runtime_status" not in historical
+        stranger = reader.model_copy(
+            update={"scope": reader.scope.model_copy(update={"legal_entity_id": "other-company"})}
+        )
+        assert transformation_history.discover(stranger)["items"] == []
+    with pytest.raises(WorkspaceError, match="both cursor"):
+        transformation_history.discover(reader, before_request_id=uuid4())
