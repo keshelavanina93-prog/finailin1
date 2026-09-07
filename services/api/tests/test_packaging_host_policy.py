@@ -59,3 +59,10 @@ def test_windows_dependency_refuses_foreign_drive(monkeypatch):
     )
     with pytest.raises(ValueError, match="Dependencies must remain on D:"):
         builder.resolved_path(path)
+
+
+@pytest.mark.parametrize("path", ["C:/candidate/receipt.json", "D:/candidate/receipt.json"])
+def test_posix_refuses_windows_paths_before_filesystem_access(monkeypatch, path):
+    monkeypatch.setattr(builder.source_artifact, "os", SimpleNamespace(name="posix"))
+    with pytest.raises(ValueError, match=r"Windows host.*D:"):
+        builder.source_artifact.check_path(PureWindowsPath(path))

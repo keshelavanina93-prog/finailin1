@@ -58,6 +58,12 @@ jobs:
           cache: pip
           cache-dependency-path: services/api/pyproject.toml
       - run: python -m pip install -e "services/api[dev]"
+      - name: Check native packaging paths before service setup
+        run: >-
+          python -m pytest --no-cov
+          services/api/tests/test_package_web_artifact.py
+          services/api/tests/test_built_worker_launch.py
+          services/api/tests/test_packaging_host_policy.py
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25.3"

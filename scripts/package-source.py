@@ -10,7 +10,7 @@ import subprocess
 import tempfile
 import zipfile
 from contextlib import contextmanager
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_FILES = 20_000
@@ -40,6 +40,8 @@ def file_digest(path):
 
 
 def check_path(path):
+    if os.name != "nt" and PureWindowsPath(str(path)).drive:
+        raise ValueError("Windows artifact paths require a Windows host and must remain on D:")
     for part in (path, *path.parents):
         if part.is_symlink() or part.is_junction():
             raise ValueError("Artifact paths cannot traverse reparse points")
