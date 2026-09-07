@@ -1,0 +1,48 @@
+{
+  "recorded_at": "2026-09-07T20:19:06.677872+00:00",
+  "kind": "BUILDER_BROWSER_EVIDENCE",
+  "web": "http://127.0.0.1:3062",
+  "web_build_id": "PdFOs6jzDbFgf59D5Yn5i",
+  "frontend": "3b31b0a",
+  "backend": "0b72fb1",
+  "principal": "ordinary configured ingest operator; no grant changes",
+  "invocation_id": "c77e06cd-7b47-5f8d-9157-18619827cbe2",
+  "descriptor_sha256": "dc57ccc8d8702134cf1bdd3be0212b88c97950942f042a28acc2aabbfbcde450",
+  "checks": {
+    "valid_authenticated_deep_link": true,
+    "canonical_company_restored": true,
+    "objects": 38,
+    "charts": 0,
+    "no_approved_measure_explicit": true,
+    "selected_account_code": "1210",
+    "original_coordinate": "Sheet1!B189",
+    "original_value": "1210",
+    "trace_root_version_prefix": "93eb5aae",
+    "trace_source_evidence_version_prefix": "9e20b9e2",
+    "trace_source_record_coordinate": "Sheet1!B189",
+    "account_code_filter_one_row": true,
+    "chart_arrangement_preserves_row": true,
+    "saved_view_reopens_original_38_rows_and_selection": true,
+    "clear_selection_restores_row_button_focus": true,
+    "narrow_viewport": {
+      "width": 820,
+      "document_scroll_width": 805,
+      "grid_width": 550,
+      "grid_scroll_width": 750,
+      "selected_rows": 1
+    }
+  },
+  "screenshots": [
+    "nin60-objects-selected-desktop.png",
+    "nin60-objects-narrow.png"
+  ],
+  "screenshots_visually_reviewed": true,
+  "dom_artifact": "nin60-objects-restored-dom.txt",
+  "limitations": [
+    "Builder evidence, independent challenge remains pending due unavailable task-control IPC.",
+    "Full G8 shell, intelligence/Findings/Actions, financial completeness, generalization and release are not accepted.",
+    "Data headings and repeated object labels still need broader product design acceptance.",
+    "First manual deep-link probe omitted required view defaults and was correctly rejected; the complete serialized view was then tested.",
+    "Offscreen control probes were corrected by explicitly scrolling the controls into view before clicking."
+  ]
+}
