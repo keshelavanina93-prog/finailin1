@@ -20,9 +20,11 @@ def catalog(principal: User, after_resource_id: UUID | None = None) -> dict[str,
 
 
 @router.get("/implementation")
-def implementation(principal: User) -> dict[str, Any]:
+def implementation(
+    principal: User, implementation_id: str = function_execution.IMPLEMENTATION_ID
+) -> dict[str, Any]:
     require_permission(principal, "ontology_read")
-    return function_execution.manifest()
+    return function_execution.manifest(implementation_id)
 
 
 @router.post("/invocations")

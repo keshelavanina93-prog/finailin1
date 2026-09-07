@@ -4,6 +4,7 @@ import importlib.metadata
 import json
 import platform
 from collections.abc import Callable
+from copy import deepcopy
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
@@ -12,7 +13,11 @@ from uuid import UUID
 
 from psycopg.rows import dict_row
 
-from finai_api.domain.function_execution import FunctionDefinition, FunctionInvocation
+from finai_api.domain.function_execution import (
+    FunctionDefinition,
+    FunctionInvocation,
+    WorksheetImplementation,
+)
 from finai_api.domain.resources import ResourceMutation
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
@@ -23,6 +28,7 @@ from finai_api.services.upstream_authority import upstream_authority
 from finai_api.services.workspace import WorkspaceError
 
 IMPLEMENTATION_ID = "ontology.object-set-derived/v1"
+WORKSHEET_IMPLEMENTATION_ID = "source.retained-xls-worksheet/v1"
 
 
 def _digest(value: Any) -> str:
@@ -57,6 +63,7 @@ def _disk_manifest() -> dict[str, Any]:
         "psycopg-binary",
         "fastapi",
         "pydantic-settings",
+        "xlrd",
     ):
         dependencies[package] = importlib.metadata.version(package)
     return {
@@ -67,6 +74,33 @@ def _disk_manifest() -> dict[str, Any]:
         "mode": "EVIDENCE_ANALYSIS_ONLY",
         "maximum_rows": 200,
         "maximum_properties": 8,
+        "capabilities": {
+            "read": True,
+            "query": True,
+            "snapshot": True,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "incremental": False,
+            "cdc": False,
+            "stream": False,
+            "write": False,
+            "update": False,
+            "delete": False,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "source_write_exactly_once": False,
+            "simulation": False,
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": False,
+            "formula_execution": False,
+            "limits": {
+                "returned_rows": 200,
+                "derived_properties": 8,
+                "coverage": "QUERY_PAGE_ONLY",
+                "database_scan_limit": None,
+            },
+        },
     }
 
 
@@ -75,7 +109,7 @@ def _disk_manifest() -> dict[str, Any]:
 _STARTUP_MANIFEST = _disk_manifest()
 
 
-def manifest() -> dict[str, Any]:
+def manifest(implementation_id: str = IMPLEMENTATION_ID) -> dict[str, Any]:
     try:
         current = _disk_manifest()
     except (OSError, importlib.metadata.PackageNotFoundError) as exc:
@@ -84,11 +118,35 @@ def manifest() -> dict[str, Any]:
         ) from exc
     if current != _STARTUP_MANIFEST:
         raise WorkspaceError(503, "Function package changed; restart the runtime before execution")
-    return dict(_STARTUP_MANIFEST)
+    if implementation_id not in (IMPLEMENTATION_ID, WORKSHEET_IMPLEMENTATION_ID):
+        raise WorkspaceError(422, "Function implementation is not installed")
+    result = deepcopy(_STARTUP_MANIFEST)
+    if implementation_id == WORKSHEET_IMPLEMENTATION_ID:
+        result.update(
+            implementation_id=implementation_id,
+            maximum_rows=50,
+            maximum_properties=0,
+            maximum_columns=256,
+            capabilities={
+                **result["capabilities"],
+                "query": False,
+                "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+                "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "limits": {
+                    "returned_rows": 50,
+                    "columns": 256,
+                    "source_bytes": 32000000,
+                    "derived_properties": 0,
+                    "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                    "database_scan_limit": None,
+                },
+            },
+        )
+    return result
 
 
 def _check_implementation(spec: FunctionDefinition) -> dict:
-    current = manifest()
+    current = manifest(spec.definition.implementation_id)
     expected = spec.definition.model_dump(mode="json")
     if any(
         expected[key] != current[key]
@@ -103,6 +161,16 @@ def _check_implementation(spec: FunctionDefinition) -> dict:
 def validate_function(item: ResourceMutation, target: Callable[[str, str, str], dict]) -> None:
     spec = FunctionDefinition.model_validate(item.attributes)
     _check_implementation(spec)
+    if isinstance(spec.definition, WorksheetImplementation):
+        selected = target(str(spec.evidence_id), str(item.resource_id), "FIELD:evidence_id")
+        if (
+            selected["object_type"] != "SourceEvidence"
+            or selected["attributes"].get("sha256") != spec.definition.source_sha256
+        ):
+            raise WorkspaceError(
+                409, "Worksheet Function requires matching canonical SourceEvidence"
+            )
+        return
     selected = target(str(spec.object_set_id), str(item.resource_id), "FIELD:object_set_id")
     if selected["object_type"] != "ObjectSetDefinition":
         raise WorkspaceError(409, "Function requires a canonical Object Set definition")
@@ -141,7 +209,12 @@ def plan(p: Principal, request: FunctionInvocation) -> dict:
         ).fetchall()
         by_id = {str(row["resource_id"]): row for row in pins}
         selected = by_id.get(str(spec.object_set_id))
-        if selected is None or selected["object_type"] != "ObjectSetDefinition":
+        source = None
+        if isinstance(spec.definition, WorksheetImplementation):
+            from finai_api.services.worksheet_function import source_plan
+
+            source = source_plan(p, request, spec, by_id)
+        elif selected is None or selected["object_type"] != "ObjectSetDefinition":
             raise WorkspaceError(409, "Function Object Set exact dependency is unavailable")
         properties = []
         for identity in spec.definition.derived_property_ids:
@@ -160,12 +233,14 @@ def plan(p: Principal, request: FunctionInvocation) -> dict:
         "mode": "EVIDENCE_ANALYSIS_ONLY",
         "function": _pin(function),
         "implementation": implementation,
-        "object_set": _pin(selected),
+        "object_set": _pin(selected) if selected else None,
         "derived_properties": properties,
         "static_dependencies": sorted(
             [_pin(row) for row in pins], key=lambda row: row["version_id"]
         ),
     }
+    if source is not None:
+        result["source_document"] = source
     result["plan_hash"] = _digest(result)
     return result
 
@@ -181,6 +256,10 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
         raise WorkspaceError(
             409, "Function plan no longer matches installed implementation and exact context"
         )
+    if retained_plan["implementation"]["implementation_id"] == WORKSHEET_IMPLEMENTATION_ID:
+        from finai_api.services.worksheet_function import execute
+
+        return execute(p, request, retained_plan)
     selected = retained_plan["object_set"]
     result = ontology_definitions.run_set(
         p,

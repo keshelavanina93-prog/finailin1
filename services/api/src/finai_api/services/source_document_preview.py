@@ -7,7 +7,11 @@ from finai_api.services.source_documents import document_bytes
 from finai_api.services.workspace import WorkspaceError
 
 
-def preview(principal: Principal, identity: str, sheet_name: str | None, offset: int) -> dict:
+def preview(
+    principal: Principal, identity: str, sheet_name: str | None, offset: int, limit: int = 50
+) -> dict:
+    if offset < 0 or not 1 <= limit <= 50:
+        raise WorkspaceError(422, "Worksheet page requires a nonnegative offset and 1-50 rows")
     metadata, content = document_bytes(principal, identity)
     try:
         book = xlrd.open_workbook(file_contents=content, on_demand=True)
@@ -23,7 +27,7 @@ def preview(principal: Principal, identity: str, sheet_name: str | None, offset:
             if sheet.ncols > 256:
                 raise WorkspaceError(422, "Sheet exceeds the 256-column preview limit")
             rows = []
-            for index in range(offset, min(offset + 50, sheet.nrows)):
+            for index in range(offset, min(offset + limit, sheet.nrows)):
                 cells = []
                 for column in range(sheet.ncols):
                     cell = sheet.cell(index, column)
@@ -47,7 +51,7 @@ def preview(principal: Principal, identity: str, sheet_name: str | None, offset:
                 "date_mode": book.datemode,
                 "rows": rows,
                 "offset": offset,
-                "next_offset": offset + 50 if offset + 50 < sheet.nrows else None,
+                "next_offset": offset + limit if offset + limit < sheet.nrows else None,
                 "authority": "SOURCE_CELLS_ONLY",
             }
         finally:

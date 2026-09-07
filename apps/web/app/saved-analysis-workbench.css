@@ -11,3 +11,5 @@
 .saved-analysis-table td p{margin:0 0 7px}
 .saved-analysis-table td button{display:block;width:100%;max-width:100%;white-space:normal;padding:7px 6px;margin:0 0 6px;font-size:10px}
 @container(max-width:500px){.saved-analysis-table th,.saved-analysis-table td{padding:7px 5px}.saved-analysis-table thead th:first-child{width:30%}.saved-analysis-table thead th:nth-child(2){width:44%}.saved-analysis-table thead th:last-child{width:26%}}
+
+.worksheet-cell-table{max-height:520px;overflow:auto;scrollbar-gutter:stable}.worksheet-cell-table table{table-layout:fixed;width:100%}.worksheet-cell-table th,.worksheet-cell-table td{white-space:pre-wrap;overflow-wrap:anywhere;padding:9px}.worksheet-cell-table thead th:first-child{width:30%}.worksheet-cell-table thead th:nth-child(2){width:18%}.worksheet-cell-table thead th:last-child{width:52%}.worksheet-cell-table tbody th{position:static;text-transform:none;letter-spacing:0;font-weight:500}.worksheet-null{color:var(--g8-muted);font-style:italic}.worksheet-analysis>p,.worksheet-analysis header p{font-size:11px;line-height:1.6}

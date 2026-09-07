@@ -109,6 +109,25 @@ def main() -> None:
                         },
                     )
                 )
+            if (
+                spec["object_type"] == "SchemaDefinition"
+                and spec["identity_key"] == "FunctionDefinition"
+                and previous["attributes"]["fields"]["object_set_id"]["required"]
+            ):
+                fields = {**previous["attributes"]["fields"]}
+                fields["object_set_id"] = {**fields["object_set_id"], "required": False}
+                mutations.append(
+                    ResourceMutation(
+                        resource_id=identity,
+                        expected_version_id=UUID(previous["version_id"]),
+                        valid_from=datetime.now(UTC),
+                        **{
+                            **spec,
+                            "display_name": previous["display_name"],
+                            "attributes": {**previous["attributes"], "fields": fields},
+                        },
+                    )
+                )
     if not mutations:
         print("Ontology runtime contracts already present; preserved accepted versions")
         return

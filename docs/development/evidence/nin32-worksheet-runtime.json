@@ -1,0 +1,1921 @@
+{
+  "checked_at": "2026-09-07T01:45:51.734222+00:00",
+  "request": {
+    "request_id": "49b1d06c-2607-4e66-b39e-e375631ce003",
+    "transformation": {
+      "resource_id": "5b45554d-4968-52ed-ad06-d974d6196b08",
+      "version_id": "a20d76ba-5d54-5aa6-864b-ccf31b3b1ef7"
+    },
+    "valid_at": "2026-09-07T01:38:31.861283+00:00",
+    "known_at": "2026-09-07T01:38:31.861283+00:00"
+  },
+  "result": {
+    "workflow_id": "transformation:49b1d06c-2607-4e66-b39e-e375631ce003",
+    "request": {
+      "definition": {
+        "nodes": [
+          {
+            "node_id": "source_title",
+            "function": {
+              "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+              "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+              "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 3,
+              "offset": 0,
+              "function": {
+                "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+              },
+              "known_at": "2026-09-07T01:38:31.861283Z",
+              "valid_at": "2026-09-07T01:38:31.861283Z",
+              "request_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 3,
+                "offset": 0,
+                "function": {
+                  "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                  "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+                },
+                "known_at": "2026-09-07T01:38:31.861283Z",
+                "valid_at": "2026-09-07T01:38:31.861283Z",
+                "request_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+                "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+              },
+              "plan_hash": "2107f76425f3046abceab2c075bd8533005238cac3ac184c0e177d80b2046402",
+              "object_set": null,
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": false,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "columns": 256,
+                    "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                    "source_bytes": 32000000,
+                    "returned_rows": 50,
+                    "derived_properties": 0,
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+                  "source_write_exactly_once": false
+                },
+                "maximum_rows": 50,
+                "maximum_columns": 256,
+                "dependency_sha256": "17b6b90d6b9782c1273b457a7481cd786ddc78942b4ebb9ebb56a6f329d341f6",
+                "implementation_id": "source.retained-xls-worksheet/v1",
+                "maximum_properties": 0
+              },
+              "source_document": {
+                "sheet": "TDSheet",
+                "sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8",
+                "evidence": {
+                  "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                  "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                  "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+                },
+                "filename": "SGP.xls",
+                "first_row": 0,
+                "row_count": 6,
+                "document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434"
+              },
+              "derived_properties": [],
+              "static_dependencies": [
+                {
+                  "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                  "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                  "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                }
+              ]
+            }
+          },
+          {
+            "node_id": "source_context",
+            "function": {
+              "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+              "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+              "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+            },
+            "depends_on": [
+              "source_title"
+            ],
+            "invocation": {
+              "limit": 3,
+              "offset": 3,
+              "function": {
+                "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+              },
+              "known_at": "2026-09-07T01:38:31.861283Z",
+              "valid_at": "2026-09-07T01:38:31.861283Z",
+              "request_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 3,
+                "offset": 3,
+                "function": {
+                  "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                  "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+                },
+                "known_at": "2026-09-07T01:38:31.861283Z",
+                "valid_at": "2026-09-07T01:38:31.861283Z",
+                "request_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+                "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+              },
+              "plan_hash": "7744ee83424c0e39b8e834ea9a7a19e3934d789110e9b8f92bd990bc46103ea1",
+              "object_set": null,
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": false,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "columns": 256,
+                    "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                    "source_bytes": 32000000,
+                    "returned_rows": 50,
+                    "derived_properties": 0,
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+                  "source_write_exactly_once": false
+                },
+                "maximum_rows": 50,
+                "maximum_columns": 256,
+                "dependency_sha256": "17b6b90d6b9782c1273b457a7481cd786ddc78942b4ebb9ebb56a6f329d341f6",
+                "implementation_id": "source.retained-xls-worksheet/v1",
+                "maximum_properties": 0
+              },
+              "source_document": {
+                "sheet": "TDSheet",
+                "sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8",
+                "evidence": {
+                  "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                  "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                  "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+                },
+                "filename": "SGP.xls",
+                "first_row": 0,
+                "row_count": 6,
+                "document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434"
+              },
+              "derived_properties": [],
+              "static_dependencies": [
+                {
+                  "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                  "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                  "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                }
+              ]
+            }
+          }
+        ],
+        "outputs": {
+          "worksheet_title": "function-invocation/1",
+          "worksheet_context": "function-invocation/1"
+        },
+        "version": "transformation-functions/1"
+      },
+      "request_hash": "adb732ebacd98e38f488809539b2a253e7d81188f65a2b5627795e9d8bcbca51",
+      "compiled_plan": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "nodes": [
+          {
+            "node_id": "source_title",
+            "function": {
+              "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+              "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+              "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 3,
+              "offset": 0,
+              "function": {
+                "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+              },
+              "known_at": "2026-09-07T01:38:31.861283Z",
+              "valid_at": "2026-09-07T01:38:31.861283Z",
+              "request_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 3,
+                "offset": 0,
+                "function": {
+                  "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                  "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+                },
+                "known_at": "2026-09-07T01:38:31.861283Z",
+                "valid_at": "2026-09-07T01:38:31.861283Z",
+                "request_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+                "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+              },
+              "plan_hash": "2107f76425f3046abceab2c075bd8533005238cac3ac184c0e177d80b2046402",
+              "object_set": null,
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": false,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "columns": 256,
+                    "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                    "source_bytes": 32000000,
+                    "returned_rows": 50,
+                    "derived_properties": 0,
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+                  "source_write_exactly_once": false
+                },
+                "maximum_rows": 50,
+                "maximum_columns": 256,
+                "dependency_sha256": "17b6b90d6b9782c1273b457a7481cd786ddc78942b4ebb9ebb56a6f329d341f6",
+                "implementation_id": "source.retained-xls-worksheet/v1",
+                "maximum_properties": 0
+              },
+              "source_document": {
+                "sheet": "TDSheet",
+                "sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8",
+                "evidence": {
+                  "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                  "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                  "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+                },
+                "filename": "SGP.xls",
+                "first_row": 0,
+                "row_count": 6,
+                "document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434"
+              },
+              "derived_properties": [],
+              "static_dependencies": [
+                {
+                  "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                  "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                  "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                }
+              ]
+            }
+          },
+          {
+            "node_id": "source_context",
+            "function": {
+              "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+              "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+              "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+            },
+            "depends_on": [
+              "source_title"
+            ],
+            "invocation": {
+              "limit": 3,
+              "offset": 3,
+              "function": {
+                "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+              },
+              "known_at": "2026-09-07T01:38:31.861283Z",
+              "valid_at": "2026-09-07T01:38:31.861283Z",
+              "request_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 3,
+                "offset": 3,
+                "function": {
+                  "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                  "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+                },
+                "known_at": "2026-09-07T01:38:31.861283Z",
+                "valid_at": "2026-09-07T01:38:31.861283Z",
+                "request_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+                "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+              },
+              "plan_hash": "7744ee83424c0e39b8e834ea9a7a19e3934d789110e9b8f92bd990bc46103ea1",
+              "object_set": null,
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": false,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "columns": 256,
+                    "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                    "source_bytes": 32000000,
+                    "returned_rows": 50,
+                    "derived_properties": 0,
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+                  "source_write_exactly_once": false
+                },
+                "maximum_rows": 50,
+                "maximum_columns": 256,
+                "dependency_sha256": "17b6b90d6b9782c1273b457a7481cd786ddc78942b4ebb9ebb56a6f329d341f6",
+                "implementation_id": "source.retained-xls-worksheet/v1",
+                "maximum_properties": 0
+              },
+              "source_document": {
+                "sheet": "TDSheet",
+                "sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8",
+                "evidence": {
+                  "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                  "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                  "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+                },
+                "filename": "SGP.xls",
+                "first_row": 0,
+                "row_count": 6,
+                "document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434"
+              },
+              "derived_properties": [],
+              "static_dependencies": [
+                {
+                  "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                  "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                  "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                }
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "node_id": "source_title",
+            "output_id": "worksheet_title"
+          },
+          {
+            "node_id": "source_context",
+            "output_id": "worksheet_context"
+          }
+        ],
+        "request": {
+          "known_at": "2026-09-07T01:38:31.861283Z",
+          "valid_at": "2026-09-07T01:38:31.861283Z",
+          "request_id": "49b1d06c-2607-4e66-b39e-e375631ce003",
+          "transformation": {
+            "version_id": "a20d76ba-5d54-5aa6-864b-ccf31b3b1ef7",
+            "resource_id": "5b45554d-4968-52ed-ad06-d974d6196b08"
+          }
+        },
+        "contract": "transformation-plan/1",
+        "coverage": "DECLARED_QUERY_PAGES_ONLY",
+        "plan_hash": "269321ef9ec2d4dee7161db1a7beaa1f29bb31350868c7e3d6f571422ef2ff53",
+        "node_order": [
+          "source_title",
+          "source_context"
+        ],
+        "exact_scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "estimated_work": {
+          "returned_rows": 6,
+          "derived_evaluations": 0
+        },
+        "transformation": {
+          "version_id": "a20d76ba-5d54-5aa6-864b-ccf31b3b1ef7",
+          "resource_id": "5b45554d-4968-52ed-ad06-d974d6196b08",
+          "content_hash": "75eb1d06de689c332365fe0ca6f5e26e5829925ce2d4f91635976c7312469a7c"
+        },
+        "resource_budget": {
+          "max_returned_rows": 6,
+          "max_derived_evaluations": 0,
+          "max_published_result_bytes": 1000000
+        },
+        "dependency_semantics": "COMPLETION_BARRIER_ONLY",
+        "current_use_authorized": false,
+        "result_bytes_accounting": "POSTGRES_JSONB_TEXT_UTF8_V1",
+        "business_effect_authorized": false
+      }
+    },
+    "actor_id": "bootstrap-e9c67bab62119cae3b026aa3",
+    "created_at": "2026-09-07T05:38:33.110155+04:00",
+    "definition": {
+      "nodes": [
+        {
+          "node_id": "source_title",
+          "function": {
+            "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+            "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+            "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+          },
+          "depends_on": [],
+          "invocation": {
+            "limit": 3,
+            "offset": 0,
+            "function": {
+              "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+              "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+            },
+            "known_at": "2026-09-07T01:38:31.861283Z",
+            "valid_at": "2026-09-07T01:38:31.861283Z",
+            "request_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+          },
+          "function_plan": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "request": {
+              "limit": 3,
+              "offset": 0,
+              "function": {
+                "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+              },
+              "known_at": "2026-09-07T01:38:31.861283Z",
+              "valid_at": "2026-09-07T01:38:31.861283Z",
+              "request_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+            },
+            "contract": "function-plan/1",
+            "function": {
+              "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+              "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+              "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+            },
+            "plan_hash": "2107f76425f3046abceab2c075bd8533005238cac3ac184c0e177d80b2046402",
+            "object_set": null,
+            "exact_scope": {
+              "period": "2026-08",
+              "currency": "GEL",
+              "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+              "legal_entity_id": "entity-ge-001"
+            },
+            "implementation": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+              "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+              "capabilities": {
+                "cdc": false,
+                "read": true,
+                "query": false,
+                "write": false,
+                "delete": false,
+                "limits": {
+                  "columns": 256,
+                  "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                  "source_bytes": 32000000,
+                  "returned_rows": 50,
+                  "derived_properties": 0,
+                  "database_scan_limit": null
+                },
+                "stream": false,
+                "update": false,
+                "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "reversal": false,
+                "snapshot": true,
+                "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                "simulation": false,
+                "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                "incremental": false,
+                "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                "formula_execution": false,
+                "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+                "source_write_exactly_once": false
+              },
+              "maximum_rows": 50,
+              "maximum_columns": 256,
+              "dependency_sha256": "17b6b90d6b9782c1273b457a7481cd786ddc78942b4ebb9ebb56a6f329d341f6",
+              "implementation_id": "source.retained-xls-worksheet/v1",
+              "maximum_properties": 0
+            },
+            "source_document": {
+              "sheet": "TDSheet",
+              "sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8",
+              "evidence": {
+                "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+              },
+              "filename": "SGP.xls",
+              "first_row": 0,
+              "row_count": 6,
+              "document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434"
+            },
+            "derived_properties": [],
+            "static_dependencies": [
+              {
+                "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+              },
+              {
+                "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+              }
+            ]
+          }
+        },
+        {
+          "node_id": "source_context",
+          "function": {
+            "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+            "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+            "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+          },
+          "depends_on": [
+            "source_title"
+          ],
+          "invocation": {
+            "limit": 3,
+            "offset": 3,
+            "function": {
+              "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+              "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+            },
+            "known_at": "2026-09-07T01:38:31.861283Z",
+            "valid_at": "2026-09-07T01:38:31.861283Z",
+            "request_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+          },
+          "function_plan": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "request": {
+              "limit": 3,
+              "offset": 3,
+              "function": {
+                "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+                "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+              },
+              "known_at": "2026-09-07T01:38:31.861283Z",
+              "valid_at": "2026-09-07T01:38:31.861283Z",
+              "request_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+            },
+            "contract": "function-plan/1",
+            "function": {
+              "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+              "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+              "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+            },
+            "plan_hash": "7744ee83424c0e39b8e834ea9a7a19e3934d789110e9b8f92bd990bc46103ea1",
+            "object_set": null,
+            "exact_scope": {
+              "period": "2026-08",
+              "currency": "GEL",
+              "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+              "legal_entity_id": "entity-ge-001"
+            },
+            "implementation": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+              "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+              "capabilities": {
+                "cdc": false,
+                "read": true,
+                "query": false,
+                "write": false,
+                "delete": false,
+                "limits": {
+                  "columns": 256,
+                  "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                  "source_bytes": 32000000,
+                  "returned_rows": 50,
+                  "derived_properties": 0,
+                  "database_scan_limit": null
+                },
+                "stream": false,
+                "update": false,
+                "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "reversal": false,
+                "snapshot": true,
+                "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                "simulation": false,
+                "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                "incremental": false,
+                "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                "formula_execution": false,
+                "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+                "source_write_exactly_once": false
+              },
+              "maximum_rows": 50,
+              "maximum_columns": 256,
+              "dependency_sha256": "17b6b90d6b9782c1273b457a7481cd786ddc78942b4ebb9ebb56a6f329d341f6",
+              "implementation_id": "source.retained-xls-worksheet/v1",
+              "maximum_properties": 0
+            },
+            "source_document": {
+              "sheet": "TDSheet",
+              "sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8",
+              "evidence": {
+                "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+              },
+              "filename": "SGP.xls",
+              "first_row": 0,
+              "row_count": 6,
+              "document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434"
+            },
+            "derived_properties": [],
+            "static_dependencies": [
+              {
+                "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+                "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+                "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+              },
+              {
+                "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+              }
+            ]
+          }
+        }
+      ],
+      "outputs": {
+        "worksheet_title": "function-invocation/1",
+        "worksheet_context": "function-invocation/1"
+      },
+      "version": "transformation-functions/1"
+    },
+    "events": [
+      {
+        "event_id": "node:source_title:started",
+        "node": "source_title",
+        "state": "RUNNING",
+        "created_at": "2026-09-07T05:38:34.984851+04:00"
+      },
+      {
+        "event_id": "node:source_title:terminal",
+        "node": "source_title",
+        "state": "COMPLETED",
+        "usage": {
+          "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+          "returned_rows": 3,
+          "derived_evaluations": 0,
+          "published_result_bytes": 6576
+        },
+        "output": {
+          "run_id": "fcr_bea17a188e67be6375b8dce8d26c1151d9d92bd9ccddb96fa185f2da79d8cb73",
+          "receipt_hash": "014808de54e0bf29cd6f78f9f23a87205f1e7ef62f64656f121ed999f39a4b29",
+          "invocation_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+        },
+        "new_run_required": false,
+        "created_at": "2026-09-07T05:38:36.880296+04:00"
+      },
+      {
+        "event_id": "output:b05b23c55012d583e61eeb474743c191924144f4b8e1061ff46f5dde15fdeb64",
+        "node": "worksheet_title",
+        "state": "STAGED",
+        "value": {
+          "run_id": "fcr_bea17a188e67be6375b8dce8d26c1151d9d92bd9ccddb96fa185f2da79d8cb73",
+          "receipt_hash": "014808de54e0bf29cd6f78f9f23a87205f1e7ef62f64656f121ed999f39a4b29",
+          "invocation_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+        },
+        "sha256": "4336b7fa11e763ce19b7b866456ae33e9dc7dcb6db798372c05854838240cd93",
+        "generation": 0,
+        "artifact_type": "function-invocation/1",
+        "created_at": "2026-09-07T05:38:37.000567+04:00"
+      },
+      {
+        "event_id": "node:source_context:started",
+        "node": "source_context",
+        "state": "RUNNING",
+        "created_at": "2026-09-07T05:38:37.145058+04:00"
+      },
+      {
+        "event_id": "node:source_context:terminal",
+        "node": "source_context",
+        "state": "COMPLETED",
+        "usage": {
+          "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+          "returned_rows": 3,
+          "derived_evaluations": 0,
+          "published_result_bytes": 6557
+        },
+        "output": {
+          "run_id": "fcr_079de9c1b891fe877d0fee79a7d7ca73a1255e649cc4724d0c0e3a70d8e1fe40",
+          "receipt_hash": "eb6395b3f0030821390192ceefc42ca1bb35a1e52678ad8d30459592c1e36be1",
+          "invocation_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+        },
+        "new_run_required": false,
+        "created_at": "2026-09-07T05:38:38.842984+04:00"
+      },
+      {
+        "event_id": "output:003ae57e671a59d0f8b37be33a938efc13a30b787722d616a4ff32d629634fbc",
+        "node": "worksheet_context",
+        "state": "STAGED",
+        "value": {
+          "run_id": "fcr_079de9c1b891fe877d0fee79a7d7ca73a1255e649cc4724d0c0e3a70d8e1fe40",
+          "receipt_hash": "eb6395b3f0030821390192ceefc42ca1bb35a1e52678ad8d30459592c1e36be1",
+          "invocation_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+        },
+        "sha256": "943b8748045e7deb03890ca59b34890e452bf9c0e4572708bac1b1d02e769ab5",
+        "generation": 0,
+        "artifact_type": "function-invocation/1",
+        "created_at": "2026-09-07T05:38:38.963482+04:00"
+      },
+      {
+        "event_id": "publication:0",
+        "node": "publication",
+        "state": "PUBLISHED",
+        "manifest": {
+          "outputs": [
+            {
+              "slot": "worksheet_context",
+              "value": {
+                "run_id": "fcr_079de9c1b891fe877d0fee79a7d7ca73a1255e649cc4724d0c0e3a70d8e1fe40",
+                "receipt_hash": "eb6395b3f0030821390192ceefc42ca1bb35a1e52678ad8d30459592c1e36be1",
+                "invocation_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+              },
+              "sha256": "943b8748045e7deb03890ca59b34890e452bf9c0e4572708bac1b1d02e769ab5",
+              "event_id": "output:003ae57e671a59d0f8b37be33a938efc13a30b787722d616a4ff32d629634fbc",
+              "artifact_type": "function-invocation/1"
+            },
+            {
+              "slot": "worksheet_title",
+              "value": {
+                "run_id": "fcr_bea17a188e67be6375b8dce8d26c1151d9d92bd9ccddb96fa185f2da79d8cb73",
+                "receipt_hash": "014808de54e0bf29cd6f78f9f23a87205f1e7ef62f64656f121ed999f39a4b29",
+                "invocation_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+              },
+              "sha256": "4336b7fa11e763ce19b7b866456ae33e9dc7dcb6db798372c05854838240cd93",
+              "event_id": "output:b05b23c55012d583e61eeb474743c191924144f4b8e1061ff46f5dde15fdeb64",
+              "artifact_type": "function-invocation/1"
+            }
+          ],
+          "protocol": "execution-publication/1",
+          "authority": "EXECUTION_ONLY",
+          "generation": 0,
+          "workflow_id": "transformation:49b1d06c-2607-4e66-b39e-e375631ce003",
+          "publication_id": "pub_dfbc6ae235c31c0e20e1fc41ce027585740c5d15ec161ae1204131db665e9614",
+          "definition_sha256": "696081e0573b3d698bcf271d894fb21acd453a7a2a47a1cd7b3094c9d5a2c74c"
+        },
+        "created_at": "2026-09-07T05:38:39.172646+04:00"
+      }
+    ],
+    "publications": [
+      {
+        "outputs": [
+          {
+            "slot": "worksheet_context",
+            "value": {
+              "run_id": "fcr_079de9c1b891fe877d0fee79a7d7ca73a1255e649cc4724d0c0e3a70d8e1fe40",
+              "receipt_hash": "eb6395b3f0030821390192ceefc42ca1bb35a1e52678ad8d30459592c1e36be1",
+              "invocation_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+            },
+            "sha256": "943b8748045e7deb03890ca59b34890e452bf9c0e4572708bac1b1d02e769ab5",
+            "event_id": "output:003ae57e671a59d0f8b37be33a938efc13a30b787722d616a4ff32d629634fbc",
+            "artifact_type": "function-invocation/1"
+          },
+          {
+            "slot": "worksheet_title",
+            "value": {
+              "run_id": "fcr_bea17a188e67be6375b8dce8d26c1151d9d92bd9ccddb96fa185f2da79d8cb73",
+              "receipt_hash": "014808de54e0bf29cd6f78f9f23a87205f1e7ef62f64656f121ed999f39a4b29",
+              "invocation_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+            },
+            "sha256": "4336b7fa11e763ce19b7b866456ae33e9dc7dcb6db798372c05854838240cd93",
+            "event_id": "output:b05b23c55012d583e61eeb474743c191924144f4b8e1061ff46f5dde15fdeb64",
+            "artifact_type": "function-invocation/1"
+          }
+        ],
+        "protocol": "execution-publication/1",
+        "authority": "EXECUTION_ONLY",
+        "generation": 0,
+        "workflow_id": "transformation:49b1d06c-2607-4e66-b39e-e375631ce003",
+        "publication_id": "pub_dfbc6ae235c31c0e20e1fc41ce027585740c5d15ec161ae1204131db665e9614",
+        "definition_sha256": "696081e0573b3d698bcf271d894fb21acd453a7a2a47a1cd7b3094c9d5a2c74c"
+      }
+    ],
+    "current_use_authorized": false,
+    "business_effect_authorized": false,
+    "runtime_status": "COMPLETED",
+    "execution": {
+      "cancel_requested": false,
+      "pause_requested": false,
+      "result": {
+        "publication": {
+          "generation": 0,
+          "publication_id": "pub_dfbc6ae235c31c0e20e1fc41ce027585740c5d15ec161ae1204131db665e9614"
+        },
+        "source_context": {
+          "new_run_required": false,
+          "node": "source_context",
+          "output": {
+            "invocation_id": "3351beae-68c7-512b-ac03-ca9d60255134",
+            "receipt_hash": "eb6395b3f0030821390192ceefc42ca1bb35a1e52678ad8d30459592c1e36be1",
+            "run_id": "fcr_079de9c1b891fe877d0fee79a7d7ca73a1255e649cc4724d0c0e3a70d8e1fe40"
+          },
+          "state": "COMPLETED",
+          "usage": {
+            "derived_evaluations": 0,
+            "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+            "published_result_bytes": 6557,
+            "returned_rows": 3
+          }
+        },
+        "source_title": {
+          "new_run_required": false,
+          "node": "source_title",
+          "output": {
+            "invocation_id": "69e9909f-8a44-591f-86c8-f70041223f41",
+            "receipt_hash": "014808de54e0bf29cd6f78f9f23a87205f1e7ef62f64656f121ed999f39a4b29",
+            "run_id": "fcr_bea17a188e67be6375b8dce8d26c1151d9d92bd9ccddb96fa185f2da79d8cb73"
+          },
+          "state": "COMPLETED",
+          "usage": {
+            "derived_evaluations": 0,
+            "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+            "published_result_bytes": 6576,
+            "returned_rows": 3
+          }
+        }
+      },
+      "state": "COMPLETED"
+    }
+  },
+  "named_outputs": [
+    {
+      "output_id": "worksheet_context",
+      "invocation": {
+        "invocation_id": "3351beae-68c7-512b-ac03-ca9d60255134",
+        "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+        "status": "SUCCEEDED",
+        "receipt_hash": "eb6395b3f0030821390192ceefc42ca1bb35a1e52678ad8d30459592c1e36be1",
+        "receipt": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "run_id": "fcr_079de9c1b891fe877d0fee79a7d7ca73a1255e649cc4724d0c0e3a70d8e1fe40",
+          "status": "SUCCEEDED",
+          "request": {
+            "limit": 3,
+            "offset": 3,
+            "function": {
+              "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+              "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+            },
+            "known_at": "2026-09-07T01:38:31.861283Z",
+            "valid_at": "2026-09-07T01:38:31.861283Z",
+            "request_id": "3351beae-68c7-512b-ac03-ca9d60255134"
+          },
+          "function": {
+            "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+            "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+            "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+          },
+          "plan_hash": "7744ee83424c0e39b8e834ea9a7a19e3934d789110e9b8f92bd990bc46103ea1",
+          "request_id": "3351beae-68c7-512b-ac03-ca9d60255134",
+          "started_at": "2026-09-07T01:38:38.011124+00:00",
+          "exact_scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "completed_at": "2026-09-07T01:38:38.527556+00:00",
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": false,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "columns": 256,
+                "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                "source_bytes": 32000000,
+                "returned_rows": 50,
+                "derived_properties": 0,
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+              "source_write_exactly_once": false
+            },
+            "maximum_rows": 50,
+            "maximum_columns": 256,
+            "dependency_sha256": "17b6b90d6b9782c1273b457a7481cd786ddc78942b4ebb9ebb56a6f329d341f6",
+            "implementation_id": "source.retained-xls-worksheet/v1",
+            "maximum_properties": 0
+          },
+          "current_use_authorized": false,
+          "business_effect_authorized": false,
+          "proof_hash": "eb6395b3f0030821390192ceefc42ca1bb35a1e52678ad8d30459592c1e36be1",
+          "recorded_at": "2026-09-07T05:38:38.580565+04:00"
+        },
+        "output": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "query": {
+            "limit": 3,
+            "offset": 3,
+            "known_at": "2026-09-07T01:38:31.861283+00:00",
+            "valid_at": "2026-09-07T01:38:31.861283+00:00"
+          },
+          "scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "run_id": "fcr_079de9c1b891fe877d0fee79a7d7ca73a1255e649cc4724d0c0e3a70d8e1fe40",
+          "objects": [],
+          "contract": "function-result/1",
+          "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+          "function": {
+            "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+            "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+            "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+          },
+          "authority": "SOURCE_CELLS_ONLY",
+          "plan_hash": "7744ee83424c0e39b8e834ea9a7a19e3934d789110e9b8f92bd990bc46103ea1",
+          "next_offset": null,
+          "source_rows": [
+            {
+              "row": 4,
+              "cells": [
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!A4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!B4"
+                },
+                {
+                  "type": 1,
+                  "value": "Выводимые данные: сумма",
+                  "coordinate": "TDSheet!C4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!D4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!E4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!F4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!G4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!H4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!I4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!J4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!K4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!L4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!M4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!N4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!O4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!P4"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!Q4"
+                }
+              ]
+            },
+            {
+              "row": 5,
+              "cells": [
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!A5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!B5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!C5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!D5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!E5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!F5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!G5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!H5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!I5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!J5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!K5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!L5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!M5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!N5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!O5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!P5"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!Q5"
+                }
+              ]
+            },
+            {
+              "row": 6,
+              "cells": [
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!A6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!B6"
+                },
+                {
+                  "type": 1,
+                  "value": "Счет",
+                  "coordinate": "TDSheet!C6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!D6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!E6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!F6"
+                },
+                {
+                  "type": 1,
+                  "value": "Сальдо на начало периода",
+                  "coordinate": "TDSheet!G6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!H6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!I6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!J6"
+                },
+                {
+                  "type": 1,
+                  "value": "Оборот за период",
+                  "coordinate": "TDSheet!K6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!L6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!M6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!N6"
+                },
+                {
+                  "type": 1,
+                  "value": "Сальдо на конец периода",
+                  "coordinate": "TDSheet!O6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!P6"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!Q6"
+                }
+              ]
+            }
+          ],
+          "source_query": {
+            "offset": 3,
+            "date_mode": 0,
+            "row_count": 5542,
+            "next_offset": 6,
+            "column_count": 17
+          },
+          "returned_rows": 3,
+          "used_versions": [],
+          "derived_values": [],
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": false,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "columns": 256,
+                "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                "source_bytes": 32000000,
+                "returned_rows": 50,
+                "derived_properties": 0,
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+              "source_write_exactly_once": false
+            },
+            "maximum_rows": 50,
+            "maximum_columns": 256,
+            "dependency_sha256": "17b6b90d6b9782c1273b457a7481cd786ddc78942b4ebb9ebb56a6f329d341f6",
+            "implementation_id": "source.retained-xls-worksheet/v1",
+            "maximum_properties": 0
+          },
+          "source_document": {
+            "sheet": "TDSheet",
+            "sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8",
+            "evidence": {
+              "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+              "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+              "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+            },
+            "filename": "SGP.xls",
+            "first_row": 0,
+            "row_count": 6,
+            "document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434"
+          },
+          "read_permissions": [
+            "export",
+            "ingest",
+            "ontology_propose",
+            "ontology_read",
+            "read"
+          ],
+          "temporal_semantics": "IMMUTABLE_RETAINED_SNAPSHOT_NOT_VALID_TIME_FACTS",
+          "calculation_runtime": "shared-functions/1",
+          "static_dependencies": [
+            {
+              "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+              "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+              "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+            },
+            {
+              "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+              "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+              "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+            }
+          ],
+          "invocation_plan_hash": "7744ee83424c0e39b8e834ea9a7a19e3934d789110e9b8f92bd990bc46103ea1",
+          "invocation_request_id": "3351beae-68c7-512b-ac03-ca9d60255134",
+          "current_use_authorized": false,
+          "business_effect_authorized": false
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      }
+    },
+    {
+      "output_id": "worksheet_title",
+      "invocation": {
+        "invocation_id": "69e9909f-8a44-591f-86c8-f70041223f41",
+        "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+        "status": "SUCCEEDED",
+        "receipt_hash": "014808de54e0bf29cd6f78f9f23a87205f1e7ef62f64656f121ed999f39a4b29",
+        "receipt": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "run_id": "fcr_bea17a188e67be6375b8dce8d26c1151d9d92bd9ccddb96fa185f2da79d8cb73",
+          "status": "SUCCEEDED",
+          "request": {
+            "limit": 3,
+            "offset": 0,
+            "function": {
+              "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+              "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c"
+            },
+            "known_at": "2026-09-07T01:38:31.861283Z",
+            "valid_at": "2026-09-07T01:38:31.861283Z",
+            "request_id": "69e9909f-8a44-591f-86c8-f70041223f41"
+          },
+          "function": {
+            "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+            "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+            "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+          },
+          "plan_hash": "2107f76425f3046abceab2c075bd8533005238cac3ac184c0e177d80b2046402",
+          "request_id": "69e9909f-8a44-591f-86c8-f70041223f41",
+          "started_at": "2026-09-07T01:38:36.049960+00:00",
+          "exact_scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "completed_at": "2026-09-07T01:38:36.566699+00:00",
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": false,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "columns": 256,
+                "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                "source_bytes": 32000000,
+                "returned_rows": 50,
+                "derived_properties": 0,
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+              "source_write_exactly_once": false
+            },
+            "maximum_rows": 50,
+            "maximum_columns": 256,
+            "dependency_sha256": "17b6b90d6b9782c1273b457a7481cd786ddc78942b4ebb9ebb56a6f329d341f6",
+            "implementation_id": "source.retained-xls-worksheet/v1",
+            "maximum_properties": 0
+          },
+          "current_use_authorized": false,
+          "business_effect_authorized": false,
+          "proof_hash": "014808de54e0bf29cd6f78f9f23a87205f1e7ef62f64656f121ed999f39a4b29",
+          "recorded_at": "2026-09-07T05:38:36.621873+04:00"
+        },
+        "output": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "query": {
+            "limit": 3,
+            "offset": 0,
+            "known_at": "2026-09-07T01:38:31.861283+00:00",
+            "valid_at": "2026-09-07T01:38:31.861283+00:00"
+          },
+          "scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "run_id": "fcr_bea17a188e67be6375b8dce8d26c1151d9d92bd9ccddb96fa185f2da79d8cb73",
+          "objects": [],
+          "contract": "function-result/1",
+          "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+          "function": {
+            "version_id": "bc378f59-a05c-5172-8ee6-f4b0f3aafd04",
+            "resource_id": "5412df81-d1fd-5908-a50c-a0c49700b99c",
+            "content_hash": "c09f5799d745ed24bdb387139d0fdd66571684651083ca97a0943e18fac33b8b"
+          },
+          "authority": "SOURCE_CELLS_ONLY",
+          "plan_hash": "2107f76425f3046abceab2c075bd8533005238cac3ac184c0e177d80b2046402",
+          "next_offset": 3,
+          "source_rows": [
+            {
+              "row": 1,
+              "cells": [
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!A1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!B1"
+                },
+                {
+                  "type": 1,
+                  "value": "სოკარ ჯორჯია პეტროლეუმი // Сокар Джорджия Петролеум",
+                  "coordinate": "TDSheet!C1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!D1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!E1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!F1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!G1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!H1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!I1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!J1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!K1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!L1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!M1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!N1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!O1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!P1"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!Q1"
+                }
+              ]
+            },
+            {
+              "row": 2,
+              "cells": [
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!A2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!B2"
+                },
+                {
+                  "type": 1,
+                  "value": "Оборотно-сальдовая ведомость",
+                  "coordinate": "TDSheet!C2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!D2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!E2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!F2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!G2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!H2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!I2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!J2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!K2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!L2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!M2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!N2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!O2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!P2"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!Q2"
+                }
+              ]
+            },
+            {
+              "row": 3,
+              "cells": [
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!A3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!B3"
+                },
+                {
+                  "type": 1,
+                  "value": "Период: 2025 г.",
+                  "coordinate": "TDSheet!C3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!D3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!E3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!F3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!G3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!H3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!I3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!J3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!K3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!L3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!M3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!N3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!O3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!P3"
+                },
+                {
+                  "type": 0,
+                  "value": "",
+                  "coordinate": "TDSheet!Q3"
+                }
+              ]
+            }
+          ],
+          "source_query": {
+            "offset": 0,
+            "date_mode": 0,
+            "row_count": 5542,
+            "next_offset": 3,
+            "column_count": 17
+          },
+          "returned_rows": 3,
+          "used_versions": [],
+          "derived_values": [],
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": false,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "columns": 256,
+                "coverage": "REVIEWED_WORKSHEET_PAGE_ONLY",
+                "source_bytes": 32000000,
+                "returned_rows": 50,
+                "derived_properties": 0,
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "HASH_VERIFIED_SOURCE_BYTES_AND_SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "IMMUTABLE_RETAINED_BYTES_WITH_EXACT_HASH_AND_SCOPE",
+              "source_write_exactly_once": false
+            },
+            "maximum_rows": 50,
+            "maximum_columns": 256,
+            "dependency_sha256": "17b6b90d6b9782c1273b457a7481cd786ddc78942b4ebb9ebb56a6f329d341f6",
+            "implementation_id": "source.retained-xls-worksheet/v1",
+            "maximum_properties": 0
+          },
+          "source_document": {
+            "sheet": "TDSheet",
+            "sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8",
+            "evidence": {
+              "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+              "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+              "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+            },
+            "filename": "SGP.xls",
+            "first_row": 0,
+            "row_count": 6,
+            "document_id": "doc_e7f62004ac8e4b76b9a8091cf7531632fbec3d52f20c47bf7348b31be475c434"
+          },
+          "read_permissions": [
+            "export",
+            "ingest",
+            "ontology_propose",
+            "ontology_read",
+            "read"
+          ],
+          "temporal_semantics": "IMMUTABLE_RETAINED_SNAPSHOT_NOT_VALID_TIME_FACTS",
+          "calculation_runtime": "shared-functions/1",
+          "static_dependencies": [
+            {
+              "version_id": "0536a83e-4a2a-5823-b66b-8ae25a5b17fd",
+              "resource_id": "86271832-cbef-5593-a95b-3d326dd1d643",
+              "content_hash": "7b43ee51292cd8db0040c9318f7f776e242ef38d827c980294e19cbe0b3ea189"
+            },
+            {
+              "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+              "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+              "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+            }
+          ],
+          "invocation_plan_hash": "2107f76425f3046abceab2c075bd8533005238cac3ac184c0e177d80b2046402",
+          "invocation_request_id": "69e9909f-8a44-591f-86c8-f70041223f41",
+          "current_use_authorized": false,
+          "business_effect_authorized": false
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      }
+    }
+  ],
+  "source_sha256": "74e6f0d96943c48280854d8e437a9a78565c7796656ba07efe640ce398e381f8",
+  "retained_repeat_and_history_equal": true,
+  "original_preview_cells_equal": true,
+  "financial_authority_established": false
+}
