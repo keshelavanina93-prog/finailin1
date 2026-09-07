@@ -12,6 +12,8 @@ from finai_api.domain.ontology_catalog import (
     canonical_id,
     platform_definitions,
 )
+from finai_api.services.upstream_authority import upstream_authority
+from finai_api.services.workspace import WorkspaceError
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
@@ -22,6 +24,12 @@ def seed_version(resource_id):
 
 def install(conn, tenant, definitions):
     """The caller owns the transaction: identities, versions and edges commit together."""
+    # Serialize with the existing resource/lifecycle publication boundary. A seed
+    # cannot be withdrawn between validating its current use and committing its consumer.
+    conn.execute(
+        "SELECT pg_advisory_xact_lock(hashtextextended(%s,0))",
+        (f"canonical:{tenant}",),
+    )
     created, existing, schemas = [], [], []
     with conn.cursor(row_factory=dict_row) as cursor:
         for definition in definitions:
@@ -107,6 +115,17 @@ def install(conn, tenant, definitions):
                     ),
                 )
                 edges += 1
+            try:
+                # Exact pins remain exact. This shared guard also checks temporal
+                # successors, lifecycle withdrawal and availability; never substitute a head.
+                upstream_authority(cursor, tenant, schema_version)
+            except WorkspaceError as exc:
+                if exc.status not in (404, 409):
+                    raise
+                raise ValueError(
+                    f"{schema['identity_key']}: exact bootstrap semantics are unavailable "
+                    f"for current use; use reviewed platform publication ({exc.detail})"
+                ) from exc
     return {
         "created_identities": created,
         "existing_identities_unchanged": existing,
