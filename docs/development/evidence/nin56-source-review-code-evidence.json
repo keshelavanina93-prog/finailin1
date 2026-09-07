@@ -1,0 +1,37 @@
+{
+  "contract": "g8-product-candidate-evidence/1",
+  "candidate": "9c44a92",
+  "base": "9260df0",
+  "branch": "development/nin56-source-review",
+  "issues": [
+    "NIN-56",
+    "NIN-57",
+    "NIN-58"
+  ],
+  "implementation": "Connected recurring source review in existing SourceAccountingContext; shared company-scoped SDK catalogs; exact reference inspect/proposal and accepted successor reopen; existing proposal/inspect/trace callbacks.",
+  "checks": {
+    "typecheck": "PASS",
+    "focused_eslint": "PASS",
+    "response_contract_tests": "3 PASS"
+  },
+  "authority_boundaries": {
+    "api_sql_changes": false,
+    "client_compatibility_calculation": false,
+    "client_totals": false,
+    "company_creation": false,
+    "inherited_period": false,
+    "request_payload": "Exact refs, family name/key/system, explicit policy and rationale only. No compatibility metadata or snapshots sent."
+  },
+  "gates": {
+    "CODE_PRESENT": true,
+    "LOCAL_CONTRACT_PASS": true,
+    "AUTHENTIC_SOURCE_PASS": false,
+    "BROWSER_ACCEPTANCE_PASS": false,
+    "CONVERGENCE_ACCEPTED": false
+  },
+  "blockers": [
+    "Shared source-adoption API implementation is owned by horizontal and was not yet mounted for this consumer verification.",
+    "No distinct eligible authentic successor supplied; synthetic unit fixtures do not establish recurring refresh acceptance."
+  ],
+  "next": "Integrate after native governance checks; authenticate current source family inspection and any eligible distinct successor, then NIN-50 revalidation."
+}
