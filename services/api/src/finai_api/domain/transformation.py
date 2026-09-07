@@ -18,6 +18,14 @@ class TransformationNode(BaseModel):
     depends_on: list[NodeId] = Field(default_factory=list, max_length=31)
     offset: int = Field(default=0, ge=0, le=1000000)
     limit: int = Field(default=50, ge=1, le=200)
+    input_binding: "TransformationInput | None" = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+
+
+class TransformationInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    upstream_node_id: NodeId
 
 
 class TransformationOutput(BaseModel):
@@ -45,6 +53,17 @@ class TransformationGraph(BaseModel):
                 raise ValueError("Transformation dependency edges must be unique")
             if node.node_id in node.depends_on or not set(node.depends_on).issubset(ids):
                 raise ValueError("Transformation dependency must identify another existing node")
+            if node.input_binding is not None:
+                upstream = node.input_binding.upstream_node_id
+                if upstream not in node.depends_on or node.offset != 0:
+                    raise ValueError(
+                        "Retained input requires an explicit dependency and zero offset"
+                    )
+                source = next(item for item in self.nodes if item.node_id == upstream)
+                if node.limit < source.limit:
+                    raise ValueError(
+                        "Retained input limit must accommodate the complete upstream page"
+                    )
         self.topological_order()
         return self
 

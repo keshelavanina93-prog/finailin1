@@ -59,6 +59,11 @@ class FunctionDefinition(BaseModel):
         return self
 
 
+class RetainedResultInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    invocation_id: UUID
+
+
 class FunctionInvocation(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     request_id: UUID = Field(default_factory=uuid4)
@@ -67,6 +72,17 @@ class FunctionInvocation(BaseModel):
     known_at: datetime
     offset: int = Field(default=0, ge=0, le=1000000)
     limit: int = Field(default=50, ge=1, le=200)
+    input_result: RetainedResultInput | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+
+    @model_validator(mode="after")
+    def complete_input_page(self) -> "FunctionInvocation":
+        if self.input_result is not None and self.offset != 0:
+            raise ValueError("Retained input consumes the complete page; offset must be zero")
+        if self.input_result is not None and self.input_result.invocation_id == self.request_id:
+            raise ValueError("Function cannot consume its own result")
+        return self
 
     @field_validator("valid_at", "known_at")
     @classmethod

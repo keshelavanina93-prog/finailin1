@@ -4,3 +4,5 @@
 .builds-runtime-summary{scroll-margin-block-start:16px}.builds-runtime-summary:focus-visible{outline:1px solid var(--g8-accent);outline-offset:5px}
 
 .builds-budget-refusal{border:1px solid var(--g8-border);border-left:3px solid var(--g8-cyan);padding:14px;background:var(--g8-raised)}.builds-budget-refusal>p,.builds-budget p{font-size:11px;line-height:1.6}.builds-budget table{margin:10px 0}
+
+.builds-input{border-top:1px solid var(--g8-border);padding-top:8px;margin-top:8px}.builds-input strong{font-size:10px}.builds-input p{font-size:10px;line-height:1.5}.builds-input button{white-space:normal}

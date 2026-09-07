@@ -203,7 +203,7 @@ def _pin(row: dict) -> dict:
     }
 
 
-def plan(p: Principal, request: FunctionInvocation) -> dict:
+def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False) -> dict:
     require_permission(p, "ontology_read")
     if request.known_at > datetime.now(UTC):
         raise WorkspaceError(422, "Function knowledge time cannot be in the future")
@@ -256,8 +256,80 @@ def plan(p: Principal, request: FunctionInvocation) -> dict:
     }
     if source is not None:
         result["source_document"] = source
+    if request.input_result is not None:
+        if selected is None or source is not None:
+            raise WorkspaceError(409, "Retained input requires the ontology Object Set adapter")
+        if not defer_input:
+            _retained_input(p, request, result)
     result["plan_hash"] = _digest(result)
     return result
+
+
+def _retained_input(p: Principal, request: FunctionInvocation, compiled: dict) -> dict:
+    """Resolve immutable shared evidence, never repeat the upstream Object Set query."""
+    from finai_api.services.function_invocations import history
+
+    assert request.input_result is not None
+    retained = history(p, request.input_result.invocation_id)
+    source = retained.get("output")
+    if retained["status"] != "SUCCEEDED" or not isinstance(source, dict):
+        raise WorkspaceError(409, "Retained input requires a successful Function receipt")
+    selected = compiled["object_set"]
+    if (
+        source.get("implementation", {}).get("implementation_id") != IMPLEMENTATION_ID
+        or source.get("definition_id") != selected["resource_id"]
+        or source.get("definition_version_id") != selected["version_id"]
+        or retained["receipt"]["exact_scope"] != p.scope.model_dump(mode="json")
+        or datetime.fromisoformat(retained["receipt"]["request"]["valid_at"]) != request.valid_at
+        or datetime.fromisoformat(retained["receipt"]["request"]["known_at"]) != request.known_at
+        or source["query"]["limit"] > request.limit
+    ):
+        raise WorkspaceError(409, "Retained input Object Set, scope or time is incompatible")
+    objects = source["objects"]
+    if len(objects) > request.limit or len({obj["resource_id"] for obj in objects}) != len(objects):
+        raise WorkspaceError(409, "Retained input page is invalid or exceeds the declared bound")
+    with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
+        c.execute("SET LOCAL statement_timeout = '10s'")
+        for obj in objects:
+            row = c.execute(
+                "SELECT to_jsonb(v)-'tenant_id' || "
+                "jsonb_build_object('identity_key',i.identity_key) AS object "
+                "FROM resource_versions v JOIN canonical_identities i USING(tenant_id,resource_id) "
+                "WHERE v.tenant_id=%s AND v.resource_id=%s AND v.version_id=%s "
+                "AND v.system_from<=%s",
+                (
+                    p.scope.tenant_id,
+                    obj["resource_id"],
+                    obj["version_id"],
+                    datetime.fromisoformat(source["query"]["known_at"]),
+                ),
+            ).fetchone()
+            if row is None or row["object"] != obj:
+                raise WorkspaceError(409, "Retained input canonical version content is unavailable")
+    return {
+        **{
+            key: source[key]
+            for key in (
+                "query",
+                "total",
+                "counts_by_type",
+                "objects",
+                "next_offset",
+                "definition_id",
+                "definition_version_id",
+            )
+        },
+        **(
+            {"filter_schema_versions": source["filter_schema_versions"]}
+            if "filter_schema_versions" in source
+            else {}
+        ),
+        "input_result": {
+            "invocation_id": retained["invocation_id"],
+            "receipt_hash": retained["receipt_hash"],
+            "run_id": source["run_id"],
+        },
+    }
 
 
 def execute_plan(p: Principal, retained_plan: dict) -> dict:
@@ -276,14 +348,18 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
 
         return execute(p, request, retained_plan)
     selected = retained_plan["object_set"]
-    result = ontology_definitions.run_set(
-        p,
-        UUID(selected["resource_id"]),
-        UUID(selected["version_id"]),
-        request.offset,
-        request.limit,
-        request.valid_at,
-        request.known_at,
+    result = (
+        _retained_input(p, request, retained_plan)
+        if request.input_result
+        else ontology_definitions.run_set(
+            p,
+            UUID(selected["resource_id"]),
+            UUID(selected["version_id"]),
+            request.offset,
+            request.limit,
+            request.valid_at,
+            request.known_at,
+        )
     )
     query_known_at = datetime.fromisoformat(result["query"]["known_at"])
     properties = retained_plan["derived_properties"]
@@ -318,7 +394,7 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
         "derived_values": derived,
         "used_versions": used,
         "static_dependencies": retained_plan["static_dependencies"],
-        "coverage": "QUERY_PAGE_ONLY",
+        "coverage": "RETAINED_INPUT_PAGE_ONLY" if request.input_result else "QUERY_PAGE_ONLY",
         "mode": "EVIDENCE_ANALYSIS_ONLY",
         "business_effect_authorized": False,
         "current_use_authorized": False,

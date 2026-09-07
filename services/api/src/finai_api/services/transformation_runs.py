@@ -190,6 +190,26 @@ def execute_node(context: dict) -> dict:
         if events.get("node:" + dependency + ":terminal", {}).get("state") != "COMPLETED":
             raise WorkspaceError(409, "Transformation completion barrier is not satisfied")
     request = FunctionInvocation.model_validate(node["invocation"])
+    if node.get("input_binding"):
+        source_id = node["input_binding"]["upstream_node_id"]
+        source_node = next(row for row in compiled["nodes"] if row["node_id"] == source_id)
+        if (
+            source_id not in node["depends_on"]
+            or request.input_result is None
+            or str(request.input_result.invocation_id) != source_node["invocation"]["request_id"]
+        ):
+            raise WorkspaceError(409, "Transformation retained input identity is inconsistent")
+        source_receipt = function_invocations.history(principal, request.input_result.invocation_id)
+        expected = {
+            "invocation_id": source_receipt["invocation_id"],
+            "receipt_hash": source_receipt["receipt_hash"],
+            "run_id": (source_receipt.get("output") or {}).get("run_id"),
+        }
+        if (
+            source_receipt["status"] != "SUCCEEDED"
+            or events["node:" + source_id + ":terminal"].get("output") != expected
+        ):
+            raise WorkspaceError(409, "Transformation retained input receipt is inconsistent")
     records.event(
         principal, identity, "node:" + node_id + ":started", {"node": node_id, "state": "RUNNING"}
     )

@@ -7,7 +7,11 @@ from uuid import uuid5
 
 from psycopg.rows import dict_row
 
-from finai_api.domain.function_execution import FunctionDefinition, FunctionInvocation
+from finai_api.domain.function_execution import (
+    FunctionDefinition,
+    FunctionInvocation,
+    RetainedResultInput,
+)
 from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.domain.resources import ResourceMutation
 from finai_api.domain.review import Principal
@@ -24,6 +28,7 @@ def validate_transformation(
     item: ResourceMutation, target: Callable[[str, str, str], dict]
 ) -> None:
     definition = TransformationDefinition.model_validate(item.attributes)
+    functions = {}
     for node in definition.definition.nodes:
         function = target(
             str(node.function_id), str(item.resource_id), "TRANSFORMATION_FUNCTION:" + node.node_id
@@ -33,6 +38,17 @@ def validate_transformation(
         function_execution._check_implementation(
             FunctionDefinition.model_validate(function["attributes"])
         )
+        functions[node.node_id] = FunctionDefinition.model_validate(function["attributes"])
+    for node in definition.definition.nodes:
+        if node.input_binding:
+            source = functions[node.input_binding.upstream_node_id]
+            destination = functions[node.node_id]
+            if (
+                source.definition.implementation_id != function_execution.IMPLEMENTATION_ID
+                or destination.definition.implementation_id != function_execution.IMPLEMENTATION_ID
+                or source.object_set_id != destination.object_set_id
+            ):
+                raise WorkspaceError(409, "Retained input requires compatible ontology Object Sets")
 
 
 def estimate_work(definition: TransformationDefinition, nodes: list[dict]) -> dict[str, int]:
@@ -82,7 +98,7 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
         upstream_authority(c, p.scope.tenant_id, request.transformation.version_id)
     order = definition.definition.topological_order()
     definitions = {node.node_id: node for node in definition.definition.nodes}
-    nodes = []
+    nodes: list[dict[str, Any]] = []
     for node_id in order:
         node = definitions[node_id]
         pins = [
@@ -102,8 +118,26 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
             known_at=request.known_at,
             offset=node.offset,
             limit=node.limit,
+            input_result=RetainedResultInput(
+                invocation_id=uuid5(request.request_id, node.input_binding.upstream_node_id)
+            )
+            if node.input_binding
+            else None,
         )
-        function_plan = function_execution.plan(p, invocation)
+        function_plan = function_execution.plan(
+            p, invocation, defer_input=node.input_binding is not None
+        )
+        if node.input_binding:
+            source = next(
+                row for row in nodes if row["node_id"] == node.input_binding.upstream_node_id
+            )
+            if (
+                function_plan["object_set"] != source["function_plan"]["object_set"]
+                or function_plan["object_set"] is None
+            ):
+                raise WorkspaceError(
+                    409, "Retained input requires the same exact Object Set version"
+                )
         nodes.append(
             {
                 "node_id": node_id,
@@ -111,6 +145,11 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
                 "function": function_execution._pin(pins[0]),
                 "invocation": invocation.model_dump(mode="json"),
                 "function_plan": function_plan,
+                **(
+                    {"input_binding": node.input_binding.model_dump(mode="json")}
+                    if node.input_binding
+                    else {}
+                ),
             }
         )
     estimated_work = estimate_work(definition, nodes)
@@ -131,5 +170,7 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
         "business_effect_authorized": False,
         "current_use_authorized": False,
     }
+    if any(node.input_binding for node in definition.definition.nodes):
+        result["input_semantics"] = "EXPLICIT_RETAINED_RESULT"
     result["plan_hash"] = function_execution._digest(result)
     return result
