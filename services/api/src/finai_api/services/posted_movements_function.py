@@ -117,7 +117,7 @@ def source_plan(principal, request, spec, pins):
         raise WorkspaceError(409, "Retained posting source exceeds the reviewed row budget")
     if not parsed["posting_identity_ready"]:
         raise WorkspaceError(409, "Duplicate recorder identities require source review")
-    return {
+    result = {
         "document_id": adapter.document_id,
         "sha256": adapter.source_sha256,
         "filename": metadata["filename"],
@@ -145,6 +145,35 @@ def source_plan(principal, request, spec, pins):
         "observed_through": scope["attributes"]["observed_through"],
         "accounts": rule["accounts"],
     }
+    if adapter.entity_movement_review:
+        from finai_api.services.resources import list_resources
+
+        policies = list_resources(
+            principal,
+            "AccountDimensionPolicy",
+            "",
+            0,
+            valid_at=request.valid_at,
+            known_at=request.known_at,
+            limit=1000,
+        )
+        result["entity_movement_review"] = {
+            "policies": {
+                ref["resource_id"]: [
+                    {
+                        "resource_id": str(p.resource_id),
+                        "version_id": str(p.version_id),
+                        "content_hash": p.content_hash,
+                    }
+                    for p in policies
+                    if p.attributes.get("account_id") == ref["resource_id"]
+                    and p.attributes.get("legal_entity_id") == result["company_id"]
+                    and p.authority_state == "APPROVED"
+                ]
+                for ref in rule["accounts"].values()
+            },
+        }
+    return result
 
 
 def calculate(parsed, source):
@@ -161,7 +190,8 @@ def calculate(parsed, source):
     if len(headers) != 1:
         raise WorkspaceError(409, "An exact posted amount header is required")
     amount_column = headers[0].removesuffix("1")
-    groups, excluded, included = {}, [], []
+    groups: dict[tuple[str, str], dict] = {}
+    excluded, included = [], []
     with localcontext() as context:
         context.prec = 50
         context.traps[Inexact] = True
@@ -255,7 +285,7 @@ def execute(principal, request, plan):
             minimum_state="OBSERVED",
         ),
     )
-    return {
+    output = {
         "contract": "function-result/1",
         "function": plan["function"],
         "implementation": plan["implementation"],
@@ -283,3 +313,14 @@ def execute(principal, request, plan):
         "business_effect_authorized": False,
         "current_use_authorized": False,
     }
+    if "entity_movement_review" in source:
+        from finai_api.services.entity_movement_review import review
+        from finai_api.services.semantic_analysis_support import Resolver
+
+        resolver = Resolver(principal, plan)
+        targets = {ref["resource_id"]: resolver.version(ref) for ref in plan["static_dependencies"]}
+        output["source_headers"] = parsed["headers"]
+        output["entity_movement_review"] = review(
+            parsed, source, targets, source["entity_movement_review"]["policies"]
+        )
+    return output

@@ -96,6 +96,9 @@ class PostedMovementsImplementation(BaseModel):
     source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     sheet: str = Field(min_length=1, max_length=128)
     max_source_rows: int = Field(strict=True, ge=1, le=1000)
+    entity_movement_review: bool = Field(
+        default=False, strict=True, exclude_if=lambda value: not value
+    )
 
     @property
     def derived_property_ids(self) -> list[UUID]:
