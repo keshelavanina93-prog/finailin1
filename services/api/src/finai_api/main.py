@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 from finai_api.api.certification_routes import router as certification_router
 from finai_api.api.company_context_routes import router as company_context_router
+from finai_api.api.company_journal_routes import router as company_journal_router
 from finai_api.api.event_time_routes import router as event_time_router
 from finai_api.api.function_routes import router as function_router
 from finai_api.api.history_search_routes import router as history_search_router
@@ -53,6 +54,7 @@ app.include_router(operator_router)
 app.include_router(proposal_queue_router)
 app.include_router(source_document_router)
 app.include_router(company_context_router)
+app.include_router(company_journal_router)
 app.include_router(ontology_operation_router)
 
 

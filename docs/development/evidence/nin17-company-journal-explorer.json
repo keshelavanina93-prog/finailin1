@@ -1,0 +1,40 @@
+{
+  "base_commit": "8f60ace",
+  "http": {
+    "checked_at": "2026-09-07T11:30:58.404658+04:00",
+    "url": "http://127.0.0.1:3062/api/ontology/",
+    "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+    "unauthenticated_status": 401,
+    "unaccepted_context_status": 422,
+    "unaccepted_context_detail": {
+      "detail": "Ledger is not configured for this company"
+    },
+    "missing_selection_status": 422,
+    "write_method_status": 404,
+    "accounting_state": "ACCOUNTING_CONFIGURATION_REQUIRED",
+    "accepted_ledger_count": 0,
+    "authentic_journal_presented": false
+  },
+  "native_readback": "PASS",
+  "synthetic_fixture_only": true,
+  "publication_validation_bypassed_only_during_fixture_creation": true,
+  "financial_publication_proven": false,
+  "invariant_checks": 7,
+  "focused_lint_and_types": "PASS",
+  "production_build": "PASS",
+  "browser": {
+    "screenshot": "nin17-company-journal-explorer.png",
+    "company_directory_expand_collapse": "PASS",
+    "source_context_retained": "PASS",
+    "actor": "local-steward",
+    "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+    "positive_journal_detail_browser_proven": false,
+    "url": "http://127.0.0.1:3062/",
+    "unconfigured_company_does_not_mount_journal_explorer": true
+  },
+  "authentic_journal_publication_proven": false,
+  "hidden_line_rls_proven": false,
+  "complete_nin17_acceptance": false,
+  "complete_nin25_acceptance": false,
+  "release_accepted": false
+}
