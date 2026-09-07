@@ -3,7 +3,7 @@ import {readFile} from "node:fs/promises";
 import test from "node:test";
 import ts from "typescript";
 const source=await readFile(new URL("../app/semantic-analysis-state.ts",import.meta.url),"utf8");
-const {assertProjection,parseView,requestKey}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
+const {assertProjection,evidenceCaption,parseView,requestKey}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
 const id="11111111-1111-4111-8111-111111111111",hash="a".repeat(64),row="row_"+hash,time="2025-01-31T00:00:00Z";
 const pin={resource_id:id,version_id:id,content_hash:hash};
 const field={key:"units",label:"Units",kind:"decimal",role:"MEASURE",aggregation:"RETAINED_VALUE_ONLY",definition:pin,filterable:false,groupable:false,options:[]};
@@ -44,4 +44,28 @@ test("numeric values must retain their declared type and bounded finite scale",(
 test("sections cannot repeat or omit retained rows and evidence counts stay bounded",()=>{
  for(const sections of [[],[{label:"repeat",row_keys:[row,row]}]])assert.throws(()=>assertProjection({...projection,sections},request));
  for(const contributor_count of [-1,1.5,1001])assert.throws(()=>assertProjection({...projection,rows:[{...projection.rows[0],contributor_count}]},request));
+});
+const objectTable={...projection,descriptor:{...projection.descriptor,contract:"semantic-analysis/2",row_noun:"objects",measure:null,visual:"NONE",fields:[{...field,role:"ATTRIBUTE",aggregation:"NONE"}]}};
+test("v2 explicitly permits table-only attributes without promoting stored numbers",()=>{
+ const original=JSON.stringify(objectTable);
+ assert.doesNotThrow(()=>assertProjection(objectTable,request));
+ assert.equal(JSON.stringify(objectTable),original);
+ assert.equal(objectTable.rows[0].values.units.value,"9007199254740993.125");
+ const exponential={...objectTable,rows:[{...objectTable.rows[0],values:{units:{state:"VALUE",value:"1E+900",label:null,reference:null}}}]};
+ assert.doesNotThrow(()=>assertProjection(exponential,request));
+ assert.equal(exponential.rows[0].values.units.value,"1E+900");
+ for(const patch of [{visual:"HORIZONTAL_BARS"},{measure:"units"},{row_noun:"groups"},{fields:[field]},{fields:[{...field,role:"ATTRIBUTE"}]}])assert.throws(()=>assertProjection({...objectTable,descriptor:{...objectTable.descriptor,...patch}},request));
+ assert.throws(()=>assertProjection({...objectTable,descriptor:{...objectTable.descriptor,contract:"semantic-analysis/1"}},request));
+});
+test("evidence basis remains explicit and unsupported bases are refused",()=>{
+ const selectedRequest={...request,selected_row:row};
+ const contributor={label:"Retained definition",reference:pin,cells:[{label:"Stored attribute",value:"9007199254740993.125",coordinate:null,formula:null}]};
+ for(const basis of [undefined,"ORIGINAL_SOURCE","CANONICAL_DEFINITION","UNAVAILABLE"]){
+  const selected={...objectTable,request:selectedRequest,selection:{row_key:row,contributor_index:0,contributor_count:1,contributor:{...contributor,basis}}};
+  assert.doesNotThrow(()=>assertProjection(selected,selectedRequest));
+ }
+ assert.equal(evidenceCaption(undefined),"Original retained evidence");
+ assert.equal(evidenceCaption("CANONICAL_DEFINITION"),"Retained canonical definition");
+ assert.equal(evidenceCaption("UNAVAILABLE"),"Original source unavailable");
+ assert.throws(()=>assertProjection({...objectTable,request:selectedRequest,selection:{row_key:row,contributor_index:0,contributor_count:1,contributor:{...contributor,basis:"INFERRED"}}},selectedRequest));
 });
