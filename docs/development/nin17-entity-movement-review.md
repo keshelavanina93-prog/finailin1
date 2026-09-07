@@ -3,7 +3,7 @@
 Base: `development/enterprise-hydration-foundation@30a6948c4b6c5cbe90e18ebfca10d3c316c2654c`.
 Isolated worktree: `D:/FinAI/g8-finance-journal`; branch `development/nin17-entity-journal`.
 
-The candidate extends the existing `accounting.retained-posted-movements/v1` Function with an opt-in `entity_movement_review` declaration. Existing definitions omit this field and retain their previous result shape. The new result records source posting-pair candidates, exact debit/credit/net account movements, exclusion coverage, and a content-hashed reconciliation receipt. The existing semantic analysis endpoint renders the paired movement table and original-cell drill without frontend changes or a second registry.
+The candidate extends the existing `accounting.retained-posted-movements/v1` Function with an opt-in `entity_movement_review` declaration. Existing definitions omit this field and retain their previous result shape. The new result records source posting-pair candidates, exact debit/credit/net account movements, exclusion coverage, and a content-hashed reconciliation receipt. The existing semantic analysis endpoint provides the paired movement table and original-cell drill through `semantic-analysis/2`: debit, credit and net movements are exact decimal attributes with `aggregation=NONE`, `measure=null`, `visual=NONE`, and `row_noun=objects`. This introduces no approved measure, frontend changes or second registry.
 
 ## Authentic evidence and limits
 
@@ -42,3 +42,9 @@ This focused command intentionally does not claim the repository-wide CI coverag
 4. Open the returned invocation through `/v1/ontology/analysis/project` with SEG company `365aa5d9-c2ec-52e1-867a-50fe3415f486`. Verify 37 account rows, exact source-side controls, net movement, exclusions, original-cell drill and preserved history. Shared Function result storage retains the reconciliation with the result.
 5. Independent NIN-50 assesses only the integrated candidate after canonical CI green. API/worker/browser/restart and domain acceptance remain open.
 6. A successor must resolve the governed SEG journal source adapter, exact amount representation and source-supported account-dimension rules/assignments before it can publish any journal or claim a journal-derived trial balance. Do not mark the broader finance journey complete from this fallback.
+
+## Integration review repair
+
+The first frozen candidate `2f0ce4a` mixed `/1` with ATTRIBUTE fields and was correctly rejected by the frontend SDK. The replacement uses the existing `/2` table-only contract for all three movement attributes, with no measures or chart. NIN-59 confirmed its presentation branch preserves this contract and needs no extension.
+
+`python scripts/verify-nin17-projection-sdk.py` (Node 22+ and repository Python test dependencies) produces actual backend initial, contributor-selected and filtered/grouped projections, then calls the unchanged frontend `assertProjection` directly. All three pass. Three negative checks reject the original mixed `/1` regression and forbidden measure/chart claims. The SDK source SHA-256 is `5628c90ecd831b8833ee2e0c53194042cc2a85daec87405d5e1b10c3ba3a9536`. All 42 focused Python tests still pass. This is local backend/frontend SDK compatibility evidence; it is not mounted browser/runtime or independent acceptance.

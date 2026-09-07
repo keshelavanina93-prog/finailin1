@@ -86,7 +86,17 @@ def case(monkeypatch):
 def test_same_workspace_exact_movement_selection_and_refusals(case):
     history, request = case
     result = semantic_analysis.project(None, request)
-    assert result.descriptor.measure == "net_movement" and len(result.rows) == 2
+    assert result.descriptor.measure is None and len(result.rows) == 2
+    assert result.descriptor.contract == "semantic-analysis/2"
+    assert result.descriptor.visual == "NONE"
+    assert result.descriptor.row_noun == "objects"
+    assert all(field.aggregation == "NONE" for field in result.descriptor.fields)
+    assert [field.role for field in result.descriptor.fields] == [
+        "DIMENSION",
+        "ATTRIBUTE",
+        "ATTRIBUTE",
+        "ATTRIBUTE",
+    ]
     assert {r.values["net_movement"].value for r in result.rows} == {"731.97", "-731.97"}
     selected = semantic_analysis.project(
         None,
