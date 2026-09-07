@@ -1,0 +1,2109 @@
+{
+  "checked_at": "2026-09-07T04:39:20.901194+00:00",
+  "request": {
+    "request_id": "38862fdc-65da-4f5b-a0b0-685057bdee66",
+    "function": {
+      "resource_id": "426db425-5f66-504c-bb46-3310770444fc",
+      "version_id": "9925bd01-fc6a-5556-bd04-dc7420438fcb"
+    },
+    "valid_at": "2026-09-07T04:36:45.526840+00:00",
+    "known_at": "2026-09-07T04:36:45.526840+00:00",
+    "offset": 0,
+    "limit": 200
+  },
+  "window": {
+    "contract": "ontology-object-set/1",
+    "query": {
+      "object_type": "SourceJournalMovement",
+      "resource_ids": null,
+      "filters": [
+        {
+          "field": "source_family",
+          "value": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-11-03",
+          "operator": "gte"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-11-04",
+          "operator": "lt"
+        }
+      ],
+      "traversal": [],
+      "search": "",
+      "limit": 200,
+      "offset": 0,
+      "valid_at": "2026-09-07T04:36:45.526840Z",
+      "known_at": "2026-09-07T04:36:45.526840Z"
+    },
+    "total": 2,
+    "counts_by_type": {
+      "SourceJournalMovement": 2
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "312.29",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-03",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "3"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "03.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG ადიგენის სერვის ცენტრი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს ტოიოტა ცენტრი თეგეტა"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან(ავტოტექმომსახურება)"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "312.29"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Kartli"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!5",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "74d01a8b-95a9-5dca-b08e-7b3b98189ab1",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:39.437262+04:00",
+        "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+        "system_from": "2026-09-06T09:56:47.868316+04:00",
+        "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc",
+        "display_name": "TR!row:5",
+        "identity_key": "source-fact:bb3f5efc-459e-5c46-999b-f50329285136",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "938.95",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-03",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "3"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "03.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG ცენტრალური რეგიონალური ოფისი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს თეგეტა მოტორსი"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "938.95"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Kartli"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!6",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "492b0b11-d980-5f97-94ad-15e8a72e60f7",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:39.539745+04:00",
+        "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+        "system_from": "2026-09-06T09:56:49.086973+04:00",
+        "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b",
+        "display_name": "TR!row:6",
+        "identity_key": "source-fact:ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [
+      {
+        "object_type": "SourceJournalMovement",
+        "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+        "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      }
+    ]
+  },
+  "lower_boundary": {
+    "contract": "ontology-object-set/1",
+    "query": {
+      "object_type": "SourceJournalMovement",
+      "resource_ids": null,
+      "filters": [
+        {
+          "field": "source_family",
+          "value": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-11-03"
+        }
+      ],
+      "traversal": [],
+      "search": "",
+      "limit": 200,
+      "offset": 0,
+      "valid_at": "2026-09-07T04:36:45.526840Z",
+      "known_at": "2026-09-07T04:36:45.526840Z"
+    },
+    "total": 2,
+    "counts_by_type": {
+      "SourceJournalMovement": 2
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "312.29",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-03",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "3"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "03.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG ადიგენის სერვის ცენტრი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს ტოიოტა ცენტრი თეგეტა"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან(ავტოტექმომსახურება)"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "312.29"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Kartli"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!5",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "74d01a8b-95a9-5dca-b08e-7b3b98189ab1",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:39.437262+04:00",
+        "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+        "system_from": "2026-09-06T09:56:47.868316+04:00",
+        "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc",
+        "display_name": "TR!row:5",
+        "identity_key": "source-fact:bb3f5efc-459e-5c46-999b-f50329285136",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "938.95",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-03",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "3"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "03.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG ცენტრალური რეგიონალური ოფისი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს თეგეტა მოტორსი"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "938.95"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Kartli"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!6",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "492b0b11-d980-5f97-94ad-15e8a72e60f7",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:39.539745+04:00",
+        "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+        "system_from": "2026-09-06T09:56:49.086973+04:00",
+        "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b",
+        "display_name": "TR!row:6",
+        "identity_key": "source-fact:ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [
+      {
+        "object_type": "SourceJournalMovement",
+        "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+        "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      }
+    ]
+  },
+  "excluded_upper_boundary": {
+    "contract": "ontology-object-set/1",
+    "query": {
+      "object_type": "SourceJournalMovement",
+      "resource_ids": null,
+      "filters": [
+        {
+          "field": "source_family",
+          "value": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR"
+        },
+        {
+          "field": "posting_date",
+          "value": "2025-11-04"
+        }
+      ],
+      "traversal": [],
+      "search": "",
+      "limit": 200,
+      "offset": 0,
+      "valid_at": "2026-09-07T04:36:45.526840Z",
+      "known_at": "2026-09-07T04:36:45.526840Z"
+    },
+    "total": 6,
+    "counts_by_type": {
+      "SourceJournalMovement": 6
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "50.85",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-04",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "4"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "04.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000004790 from 04.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG ცენტრალური რეგიონალური ოფისი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს ამბოლი"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "50.85"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Kartli"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!10",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "c4d0baf2-bb23-5dbe-87c1-494a65fb1ca3",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000004790 from 04.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:40.036187+04:00",
+        "version_id": "e7086054-b7a4-5a2e-8603-2c0e4f93c9f9",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "8e3e90d2-4e1a-58e9-b0bd-94fb8652c9b1",
+        "system_from": "2026-09-06T09:56:53.92113+04:00",
+        "content_hash": "c7c9a6b3c06b9a84a7efdccdd918e1d8f52e68aa83dc30a47acd3851fda70758",
+        "display_name": "TR!row:10",
+        "identity_key": "source-fact:8e3e90d2-4e1a-58e9-b0bd-94fb8652c9b1",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "50.85",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-04",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "4"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "04.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000004791 from 04.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG ცენტრალური რეგიონალური ოფისი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს ამბოლი"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "50.85"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Kartli"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!11",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "27f14879-702f-5108-aecf-7a439c25e2c2",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000004791 from 04.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:40.133475+04:00",
+        "version_id": "11d52969-a1f3-51e6-8556-a36e50bf4c88",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "0fb6e260-df7f-5102-8cdb-0b2530eb388d",
+        "system_from": "2026-09-06T09:56:55.140883+04:00",
+        "content_hash": "e64899cab905b7e792d3e85f7b110b058a7280ee4f5afecbd5713a55d92053e1",
+        "display_name": "TR!row:11",
+        "identity_key": "source-fact:0fb6e260-df7f-5102-8cdb-0b2530eb388d",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "224.57",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-04",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "4"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "04.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000004812 from 04.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG აღმოსავლეთის რეგიონალური ოფისი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს ფრანს ავტო"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "224.57"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Kakheti"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!12",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "4907a413-160e-5fbc-b01a-536272c5468a",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000004812 from 04.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:40.328006+04:00",
+        "version_id": "7aa65f2f-8e2e-5646-a617-eb871712567d",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "9f651113-b2d3-57de-97a5-910dd9dfd13b",
+        "system_from": "2026-09-06T09:56:56.335158+04:00",
+        "content_hash": "d3da8c3c5e64b8ef2a1e6087c8d116f3b63fa4a9d42df7464c6177ae8b987bae",
+        "display_name": "TR!row:12",
+        "identity_key": "source-fact:9f651113-b2d3-57de-97a5-910dd9dfd13b",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "224.57",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-04",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "4"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "04.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000004538 from 04.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG იმერეთის რეგიონალური ოფისი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს ფრანს ავტო"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "224.57"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Imereti"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!7",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "cceed730-509a-5060-a9b3-f4dc2720eac0",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000004538 from 04.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:39.633578+04:00",
+        "version_id": "058e4e4c-36bb-54c4-90ef-0146edafe421",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "d1726958-ef27-54c7-a3e0-762d1f1dc3b8",
+        "system_from": "2026-09-06T09:56:50.305608+04:00",
+        "content_hash": "925b6a75b57d6a2ace9ebbaf6e2bba5d58fba11f253fe3bdc633e0f08d32daa1",
+        "display_name": "TR!row:7",
+        "identity_key": "source-fact:d1726958-ef27-54c7-a3e0-762d1f1dc3b8",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "535.0",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-04",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "4"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "04.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000004604 from 04.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "წარმომადგენლობითი ხარჯები (ადმინისტრაციული) ნორმის ფარგლებში // Представительские расходы_адм. норма"
+              },
+              "M": {
+                "type": 1,
+                "value": "ქუთაისის საწყობი საქორგგაზი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "ი.მ. ეკატერინე ვარდანეიშვილი"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "535"
+              },
+              "X": {
+                "type": 1,
+                "value": "წარმომადგენლობითი (ადმინისტრაციული) по вх.док. 0937736429 от 04.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Imereti"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Representative Expenses"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Procurement"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!8",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "035db654-debc-52f4-b6db-0a27e8adc639",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000004604 from 04.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:39.726961+04:00",
+        "version_id": "110aaea5-2a3e-5ca3-9c08-b9e1cabcec91",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "2b71c4f3-f59e-5e03-ab80-20d6df8691ad",
+        "system_from": "2026-09-06T09:56:51.491751+04:00",
+        "content_hash": "c553bffed326bfc158b5a85099c515010c2833b190a2681fb53bde7b479b7f73",
+        "display_name": "TR!row:8",
+        "identity_key": "source-fact:2b71c4f3-f59e-5e03-ab80-20d6df8691ad",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      },
+      {
+        "valid_to": null,
+        "attributes": {
+          "amount": "50.85",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "unit_status": "UNESTABLISHED",
+          "posting_date": "2025-11-04",
+          "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+          "source_details": {
+            "cells": {
+              "A": {
+                "type": 0,
+                "value": ""
+              },
+              "B": {
+                "type": 1,
+                "value": "SOG"
+              },
+              "C": {
+                "type": 1,
+                "value": "November"
+              },
+              "D": {
+                "type": 2,
+                "value": "4"
+              },
+              "E": {
+                "type": 2,
+                "value": "11"
+              },
+              "F": {
+                "type": 2,
+                "value": "2025"
+              },
+              "G": {
+                "type": 1,
+                "value": "04.11.2025 0:00:00"
+              },
+              "H": {
+                "type": 2,
+                "value": "1"
+              },
+              "I": {
+                "type": 1,
+                "value": "Поступление товаров и услуг SAG0000004747 from 04.11.2025 0:00:00"
+              },
+              "J": {
+                "type": 1,
+                "value": "სს. საქორგგაზი // АО Сакорггаз"
+              },
+              "K": {
+                "type": 1,
+                "value": "7310.02.1"
+              },
+              "L": {
+                "type": 1,
+                "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+              },
+              "M": {
+                "type": 1,
+                "value": "SOG იმერეთის რეგიონალური ოფისი"
+              },
+              "N": {
+                "type": 6,
+                "value": ""
+              },
+              "O": {
+                "type": 6,
+                "value": ""
+              },
+              "P": {
+                "type": 6,
+                "value": ""
+              },
+              "Q": {
+                "type": 1,
+                "value": "3110"
+              },
+              "R": {
+                "type": 1,
+                "value": "შპს ამბოლი"
+              },
+              "S": {
+                "type": 1,
+                "value": "ხელშეკრულება გამყიდველთან"
+              },
+              "T": {
+                "type": 6,
+                "value": ""
+              },
+              "U": {
+                "type": 6,
+                "value": ""
+              },
+              "V": {
+                "type": 6,
+                "value": ""
+              },
+              "W": {
+                "type": 2,
+                "value": "50.85"
+              },
+              "X": {
+                "type": 1,
+                "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+              },
+              "Y": {
+                "type": 1,
+                "value": "SOG-Imereti"
+              },
+              "Z": {
+                "type": 1,
+                "value": "Service"
+              },
+              "AA": {
+                "type": 1,
+                "value": "Auto Park"
+              }
+            },
+            "parser": "source-accounting/1",
+            "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+            "currency_authority": "UNESTABLISHED",
+            "same_account_source_rows": []
+          },
+          "source_row_key": "TR!9",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+          "source_record_id": "793557c6-da5f-50d9-a779-80f6cd65f185",
+          "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+          "document_reference": "Поступление товаров и услуг SAG0000004747 from 04.11.2025 0:00:00"
+        },
+        "valid_from": "2026-09-06T09:56:39.823531+04:00",
+        "version_id": "62688838-caf3-5377-b4c9-961d143b919d",
+        "object_type": "SourceJournalMovement",
+        "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+        "resource_id": "7dd65b41-5c7a-5de7-b1db-6d7062b700f5",
+        "system_from": "2026-09-06T09:56:52.690684+04:00",
+        "content_hash": "796351a6b3db6f30dc7c4c147cc42fb09fea3f7fe854a64c784b4fba2d562d0f",
+        "display_name": "TR!row:9",
+        "identity_key": "source-fact:7dd65b41-5c7a-5de7-b1db-6d7062b700f5",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [
+      {
+        "object_type": "SourceJournalMovement",
+        "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282",
+        "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+      }
+    ]
+  },
+  "invocation": {
+    "invocation_id": "38862fdc-65da-4f5b-a0b0-685057bdee66",
+    "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+    "status": "SUCCEEDED",
+    "receipt_hash": "114915ddb8ffc74e7ef31814036b1e8b2ea455e68cf5cffae04f458755a23082",
+    "receipt": {
+      "mode": "EVIDENCE_ANALYSIS_ONLY",
+      "run_id": "fcr_920c17eeab8d4fd711ad2f2413fc6b9dc92624c84f1afd2c6f2f92ab52287822",
+      "status": "SUCCEEDED",
+      "request": {
+        "limit": 200,
+        "offset": 0,
+        "function": {
+          "version_id": "9925bd01-fc6a-5556-bd04-dc7420438fcb",
+          "resource_id": "426db425-5f66-504c-bb46-3310770444fc"
+        },
+        "known_at": "2026-09-07T04:36:45.526840Z",
+        "valid_at": "2026-09-07T04:36:45.526840Z",
+        "request_id": "38862fdc-65da-4f5b-a0b0-685057bdee66"
+      },
+      "function": {
+        "version_id": "9925bd01-fc6a-5556-bd04-dc7420438fcb",
+        "resource_id": "426db425-5f66-504c-bb46-3310770444fc",
+        "content_hash": "56dee84ca88ba49697416da3ca5fdae31a971644f98788be9bd49f88e5e3a9ed"
+      },
+      "plan_hash": "14ea676720aeecedc8925d9b791396edae65fef20f4d1285c61de4b1d87ab884",
+      "request_id": "38862fdc-65da-4f5b-a0b0-685057bdee66",
+      "started_at": "2026-09-07T04:36:46.736744+00:00",
+      "exact_scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "completed_at": "2026-09-07T04:36:47.312637+00:00",
+      "implementation": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+        "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+        "capabilities": {
+          "cdc": false,
+          "read": true,
+          "query": true,
+          "write": false,
+          "delete": false,
+          "limits": {
+            "coverage": "QUERY_PAGE_ONLY",
+            "returned_rows": 200,
+            "derived_properties": 8,
+            "database_scan_limit": null
+          },
+          "stream": false,
+          "update": false,
+          "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+          "reversal": false,
+          "snapshot": true,
+          "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+          "simulation": false,
+          "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+          "incremental": false,
+          "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+          "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+          "formula_execution": false,
+          "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+          "source_write_exactly_once": false
+        },
+        "maximum_rows": 200,
+        "dependency_sha256": "8749bea57ea81ae37f393683982378880c9fefb21b808e8002691460e3789912",
+        "implementation_id": "ontology.object-set-derived/v1",
+        "maximum_properties": 8
+      },
+      "current_use_authorized": false,
+      "business_effect_authorized": false,
+      "proof_hash": "114915ddb8ffc74e7ef31814036b1e8b2ea455e68cf5cffae04f458755a23082",
+      "recorded_at": "2026-09-07T08:36:47.366184+04:00"
+    },
+    "output": {
+      "mode": "EVIDENCE_ANALYSIS_ONLY",
+      "query": {
+        "limit": 200,
+        "offset": 0,
+        "search": "",
+        "filters": [
+          {
+            "field": "source_family",
+            "value": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR"
+          },
+          {
+            "field": "posting_date",
+            "value": "2025-11-03",
+            "operator": "gte"
+          },
+          {
+            "field": "posting_date",
+            "value": "2025-11-04",
+            "operator": "lt"
+          }
+        ],
+        "known_at": "2026-09-07T04:36:45.526840Z",
+        "valid_at": "2026-09-07T04:36:45.526840Z",
+        "traversal": [],
+        "object_type": "SourceJournalMovement",
+        "resource_ids": null
+      },
+      "scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "total": 2,
+      "run_id": "fcr_920c17eeab8d4fd711ad2f2413fc6b9dc92624c84f1afd2c6f2f92ab52287822",
+      "objects": [
+        {
+          "valid_to": null,
+          "attributes": {
+            "amount": "312.29",
+            "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+            "unit_status": "UNESTABLISHED",
+            "posting_date": "2025-11-03",
+            "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+            "source_details": {
+              "cells": {
+                "A": {
+                  "type": 0,
+                  "value": ""
+                },
+                "B": {
+                  "type": 1,
+                  "value": "SOG"
+                },
+                "C": {
+                  "type": 1,
+                  "value": "November"
+                },
+                "D": {
+                  "type": 2,
+                  "value": "3"
+                },
+                "E": {
+                  "type": 2,
+                  "value": "11"
+                },
+                "F": {
+                  "type": 2,
+                  "value": "2025"
+                },
+                "G": {
+                  "type": 1,
+                  "value": "03.11.2025 0:00:00"
+                },
+                "H": {
+                  "type": 2,
+                  "value": "1"
+                },
+                "I": {
+                  "type": 1,
+                  "value": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+                },
+                "J": {
+                  "type": 1,
+                  "value": "სს. საქორგგაზი // АО Сакорггаз"
+                },
+                "K": {
+                  "type": 1,
+                  "value": "7310.02.1"
+                },
+                "L": {
+                  "type": 1,
+                  "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+                },
+                "M": {
+                  "type": 1,
+                  "value": "SOG ადიგენის სერვის ცენტრი"
+                },
+                "N": {
+                  "type": 6,
+                  "value": ""
+                },
+                "O": {
+                  "type": 6,
+                  "value": ""
+                },
+                "P": {
+                  "type": 6,
+                  "value": ""
+                },
+                "Q": {
+                  "type": 1,
+                  "value": "3110"
+                },
+                "R": {
+                  "type": 1,
+                  "value": "შპს ტოიოტა ცენტრი თეგეტა"
+                },
+                "S": {
+                  "type": 1,
+                  "value": "ხელშეკრულება გამყიდველთან(ავტოტექმომსახურება)"
+                },
+                "T": {
+                  "type": 6,
+                  "value": ""
+                },
+                "U": {
+                  "type": 6,
+                  "value": ""
+                },
+                "V": {
+                  "type": 6,
+                  "value": ""
+                },
+                "W": {
+                  "type": 2,
+                  "value": "312.29"
+                },
+                "X": {
+                  "type": 1,
+                  "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+                },
+                "Y": {
+                  "type": 1,
+                  "value": "SOG-Kartli"
+                },
+                "Z": {
+                  "type": 1,
+                  "value": "Service"
+                },
+                "AA": {
+                  "type": 1,
+                  "value": "Auto Park"
+                }
+              },
+              "parser": "source-accounting/1",
+              "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+              "currency_authority": "UNESTABLISHED",
+              "same_account_source_rows": []
+            },
+            "source_row_key": "TR!5",
+            "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+            "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+            "source_record_id": "74d01a8b-95a9-5dca-b08e-7b3b98189ab1",
+            "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+            "document_reference": "Поступление товаров и услуг SAG0000004931 from 03.11.2025 0:00:00"
+          },
+          "valid_from": "2026-09-06T09:56:39.437262+04:00",
+          "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+          "object_type": "SourceJournalMovement",
+          "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+          "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+          "system_from": "2026-09-06T09:56:47.868316+04:00",
+          "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc",
+          "display_name": "TR!row:5",
+          "identity_key": "source-fact:bb3f5efc-459e-5c46-999b-f50329285136",
+          "access_entity": "entity-ge-001",
+          "evidence_class": "SOURCE_BOUND",
+          "authority_state": "APPROVED",
+          "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+        },
+        {
+          "valid_to": null,
+          "attributes": {
+            "amount": "938.95",
+            "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+            "unit_status": "UNESTABLISHED",
+            "posting_date": "2025-11-03",
+            "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+            "source_details": {
+              "cells": {
+                "A": {
+                  "type": 0,
+                  "value": ""
+                },
+                "B": {
+                  "type": 1,
+                  "value": "SOG"
+                },
+                "C": {
+                  "type": 1,
+                  "value": "November"
+                },
+                "D": {
+                  "type": 2,
+                  "value": "3"
+                },
+                "E": {
+                  "type": 2,
+                  "value": "11"
+                },
+                "F": {
+                  "type": 2,
+                  "value": "2025"
+                },
+                "G": {
+                  "type": 1,
+                  "value": "03.11.2025 0:00:00"
+                },
+                "H": {
+                  "type": 2,
+                  "value": "1"
+                },
+                "I": {
+                  "type": 1,
+                  "value": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+                },
+                "J": {
+                  "type": 1,
+                  "value": "სს. საქორგგაზი // АО Сакорггаз"
+                },
+                "K": {
+                  "type": 1,
+                  "value": "7310.02.1"
+                },
+                "L": {
+                  "type": 1,
+                  "value": "კომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины"
+                },
+                "M": {
+                  "type": 1,
+                  "value": "SOG ცენტრალური რეგიონალური ოფისი"
+                },
+                "N": {
+                  "type": 6,
+                  "value": ""
+                },
+                "O": {
+                  "type": 6,
+                  "value": ""
+                },
+                "P": {
+                  "type": 6,
+                  "value": ""
+                },
+                "Q": {
+                  "type": 1,
+                  "value": "3110"
+                },
+                "R": {
+                  "type": 1,
+                  "value": "შპს თეგეტა მოტორსი"
+                },
+                "S": {
+                  "type": 1,
+                  "value": "ხელშეკრულება გამყიდველთან"
+                },
+                "T": {
+                  "type": 6,
+                  "value": ""
+                },
+                "U": {
+                  "type": 6,
+                  "value": ""
+                },
+                "V": {
+                  "type": 6,
+                  "value": ""
+                },
+                "W": {
+                  "type": 2,
+                  "value": "938.95"
+                },
+                "X": {
+                  "type": 1,
+                  "value": "კომერციული ავტოტექმომსახურება по вх.док.  от 01.11.2025"
+                },
+                "Y": {
+                  "type": 1,
+                  "value": "SOG-Kartli"
+                },
+                "Z": {
+                  "type": 1,
+                  "value": "Service"
+                },
+                "AA": {
+                  "type": 1,
+                  "value": "Auto Park"
+                }
+              },
+              "parser": "source-accounting/1",
+              "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+              "currency_authority": "UNESTABLISHED",
+              "same_account_source_rows": []
+            },
+            "source_row_key": "TR!6",
+            "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+            "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+            "source_record_id": "492b0b11-d980-5f97-94ad-15e8a72e60f7",
+            "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+            "document_reference": "Поступление товаров и услуг SAG0000005161 from 03.11.2025 0:00:00"
+          },
+          "valid_from": "2026-09-06T09:56:39.539745+04:00",
+          "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+          "object_type": "SourceJournalMovement",
+          "proposal_id": "f301492a-0b2d-45e5-97e9-12728735ff1d",
+          "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+          "system_from": "2026-09-06T09:56:49.086973+04:00",
+          "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b",
+          "display_name": "TR!row:6",
+          "identity_key": "source-fact:ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+          "access_entity": "entity-ge-001",
+          "evidence_class": "SOURCE_BOUND",
+          "authority_state": "APPROVED",
+          "schema_version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db"
+        }
+      ],
+      "contract": "function-result/1",
+      "coverage": "QUERY_PAGE_ONLY",
+      "function": {
+        "version_id": "9925bd01-fc6a-5556-bd04-dc7420438fcb",
+        "resource_id": "426db425-5f66-504c-bb46-3310770444fc",
+        "content_hash": "56dee84ca88ba49697416da3ca5fdae31a971644f98788be9bd49f88e5e3a9ed"
+      },
+      "plan_hash": "14ea676720aeecedc8925d9b791396edae65fef20f4d1285c61de4b1d87ab884",
+      "next_offset": null,
+      "definition_id": "72f56d81-f99f-5ccd-a5b8-64af9d284409",
+      "used_versions": [
+        {
+          "known_at": "2026-09-07T04:36:45.526840+00:00",
+          "version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+          "resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+          "content_hash": "6b20498fb8cbe0262f3e16a6c1375dc5083573a1de60ff0deb080adf591248fc",
+          "material_state": "UNESTABLISHED"
+        },
+        {
+          "known_at": "2026-09-07T04:36:45.526840+00:00",
+          "version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+          "resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+          "content_hash": "9d009f24ef2616df4b0f8337e5a93940a29e5a63aa9258a2be9026a0d624fc2b",
+          "material_state": "UNESTABLISHED"
+        }
+      ],
+      "counts_by_type": {
+        "SourceJournalMovement": 2
+      },
+      "derived_values": [],
+      "implementation": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "code_sha256": "0cfc85a19ba0b8fd0ab3799d8ed24dd77c125d2edfb398cfb523f26792b8e121",
+        "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+        "capabilities": {
+          "cdc": false,
+          "read": true,
+          "query": true,
+          "write": false,
+          "delete": false,
+          "limits": {
+            "coverage": "QUERY_PAGE_ONLY",
+            "returned_rows": 200,
+            "derived_properties": 8,
+            "database_scan_limit": null
+          },
+          "stream": false,
+          "update": false,
+          "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+          "reversal": false,
+          "snapshot": true,
+          "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+          "simulation": false,
+          "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+          "incremental": false,
+          "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+          "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+          "formula_execution": false,
+          "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+          "source_write_exactly_once": false
+        },
+        "maximum_rows": 200,
+        "dependency_sha256": "8749bea57ea81ae37f393683982378880c9fefb21b808e8002691460e3789912",
+        "implementation_id": "ontology.object-set-derived/v1",
+        "maximum_properties": 8
+      },
+      "read_permissions": [
+        "ontology_admin",
+        "ontology_read",
+        "read"
+      ],
+      "calculation_runtime": "shared-functions/1",
+      "static_dependencies": [
+        {
+          "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+          "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+          "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+        },
+        {
+          "version_id": "762cd946-e0f7-53f5-b551-86826a695210",
+          "resource_id": "72f56d81-f99f-5ccd-a5b8-64af9d284409",
+          "content_hash": "928467cef3f10f0b31e0942505aa6b5c967c1386ed30b8f0d79a5ac1d898938e"
+        }
+      ],
+      "invocation_plan_hash": "14ea676720aeecedc8925d9b791396edae65fef20f4d1285c61de4b1d87ab884",
+      "definition_version_id": "762cd946-e0f7-53f5-b551-86826a695210",
+      "invocation_request_id": "38862fdc-65da-4f5b-a0b0-685057bdee66",
+      "current_use_authorized": false,
+      "filter_schema_versions": [
+        {
+          "version_id": "8a47f47f-e4f5-563e-843c-76bf7b1b81db",
+          "object_type": "SourceJournalMovement",
+          "resource_id": "bad94aa4-a02c-56fb-bc85-63e51e5b2282"
+        }
+      ],
+      "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+      "business_effect_authorized": false
+    },
+    "current_use_authorized": false,
+    "business_effect_authorized": false
+  },
+  "source_sha256": "45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d",
+  "source_evidence_pins": [
+    {
+      "resource_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+      "version_id": "01578cee-e347-5cd5-ad29-2b2e1bc9c932",
+      "content_hash": "8893189ec3895afcb3619d6908cf5ee108a164c127c48c7b91a991eccde9db5d"
+    }
+  ],
+  "source_evidence_bindings": [
+    {
+      "object_resource_id": "bb3f5efc-459e-5c46-999b-f50329285136",
+      "object_version_id": "b0bdd101-21fa-54fb-8ebd-e43650e3b0c2",
+      "evidence_version_id": "01578cee-e347-5cd5-ad29-2b2e1bc9c932"
+    },
+    {
+      "object_resource_id": "ffbad914-9b0c-5220-b7c5-1bd41e1d7a71",
+      "object_version_id": "adcfb207-4b22-5b83-94fb-321b93416da3",
+      "evidence_version_id": "01578cee-e347-5cd5-ad29-2b2e1bc9c932"
+    }
+  ],
+  "exact_object_readback_equal": true,
+  "financial_authority_established": false,
+  "read_only_verification": false
+}

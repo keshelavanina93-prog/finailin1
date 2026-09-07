@@ -11,6 +11,9 @@ class PropertyFilter(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     field: str = Field(min_length=1, max_length=128)
     value: StrictStr | StrictInt | StrictBool | None
+    operator: Literal["eq", "lt", "lte", "gt", "gte"] = Field(
+        default="eq", exclude_if=lambda value: value == "eq"
+    )
 
 
 class Traversal(BaseModel):

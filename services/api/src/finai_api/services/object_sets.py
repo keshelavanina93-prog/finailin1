@@ -8,7 +8,7 @@ from psycopg.types.json import Jsonb
 
 from finai_api.domain.object_sets import FilterSchemaVersion, ObjectSetQuery, ObjectSetResult
 from finai_api.domain.review import Principal
-from finai_api.services.object_filter_contract import validate_filters
+from finai_api.services.object_filter_contract import RANGE_PATTERNS, validate_filters
 from finai_api.services.resources import resource_connection
 from finai_api.services.workspace import WorkspaceError
 
@@ -32,6 +32,14 @@ def query_objects(
         "JOIN canonical_identities i USING(tenant_id,resource_id) "
         "WHERE v.tenant_id=%s AND v.system_from<=%s)",
     ]
+    if request.filters:
+        ctes.append(
+            "filter_schema_candidates AS (SELECT DISTINCT ON(resource_id) * FROM versions "
+            "WHERE object_type='SchemaDefinition' AND identity_key=ANY(%s::text[]) "
+            "AND valid_from<=%s AND (valid_to IS NULL OR valid_to>%s) "
+            "ORDER BY resource_id,system_from DESC,version_id)"
+        )
+        args += [root_types, request.valid_at, request.valid_at]
     # Every traversal starts with a typed root. Incoming/link destinations are resolved
     # by exact dependencies below, never by materializing unrelated tenant history.
     ctes.append(
@@ -53,8 +61,40 @@ def query_objects(
         predicate += " AND resource_id=ANY(%s::uuid[])"
         args.append(request.resource_ids)
     for condition in request.filters:
-        predicate += " AND attributes @> %s::jsonb"
-        args.append(Jsonb({condition.field: condition.value}))
+        if condition.operator == "eq":
+            predicate += " AND attributes @> %s::jsonb"
+            args.append(Jsonb({condition.field: condition.value}))
+        else:
+            operator = {"lt": "<", "lte": "<=", "gt": ">", "gte": ">="}[condition.operator]
+            predicate += " AND EXISTS (SELECT 1 FROM filter_schema_candidates fs "
+            predicate += "JOIN versions os ON os.version_id=current_objects.schema_version_id "
+            predicate += "AND os.object_type='SchemaDefinition' AND os.authority_state='APPROVED' "
+            predicate += "CROSS JOIN LATERAL (SELECT %s::text AS field,%s::text AS threshold) f "
+            predicate += "WHERE fs.identity_key=current_objects.object_type "
+            predicate += "AND fs.authority_state='APPROVED' "
+            predicate += "AND os.attributes->'fields'->f.field->>'kind'="
+            predicate += "fs.attributes->'fields'->f.field->>'kind' "
+            args += [condition.field, str(condition.value) if condition.value is not None else None]
+            predicate += "AND CASE os.attributes->'fields'->f.field->>'kind' "
+            for kind, sql_type, json_type in (
+                ("integer", "numeric", "number"),
+                ("decimal", "numeric", "string"),
+                ("date", "date", "string"),
+                ("datetime", "timestamptz", "string"),
+            ):
+                value = "current_objects.attributes->>f.field"
+                predicate += f"WHEN '{kind}' THEN CASE WHEN "
+                predicate += f"jsonb_typeof(current_objects.attributes->f.field)='{json_type}' "
+                if kind in RANGE_PATTERNS:
+                    predicate += f"AND {value} ~ %s AND f.threshold ~ %s "
+                    args += ["^" + RANGE_PATTERNS[kind] + "$", "^" + RANGE_PATTERNS[kind] + "$"]
+                predicate += f"AND pg_input_is_valid({value},'{sql_type}') "
+                predicate += f"AND pg_input_is_valid(f.threshold,'{sql_type}') "
+                predicate += f"THEN ({value})::{sql_type} {operator} "
+                predicate += f"(CASE WHEN pg_input_is_valid(f.threshold,'{sql_type}') "
+                predicate += f"THEN f.threshold ELSE NULL END)::{sql_type} "
+                predicate += "ELSE false END "
+            predicate += "ELSE false END)"
     predicate += " AND position(lower(%s) in lower(display_name || ' ' || identity_key))>0"
     args.append(request.search)
     ctes.append("s0 AS (SELECT * FROM current_objects WHERE " + predicate + ")")
@@ -125,14 +165,6 @@ def query_objects(
             args += [request.valid_at, request.valid_at, step.name]
         ctes.append(f"s{index} AS ({sql})")
     final = f"s{len(request.traversal)}"
-    if request.filters:
-        ctes.append(
-            "filter_schema_candidates AS (SELECT DISTINCT ON(resource_id) * FROM versions "
-            "WHERE object_type='SchemaDefinition' AND identity_key=ANY(%s::text[]) "
-            "AND valid_from<=%s AND (valid_to IS NULL OR valid_to>%s) "
-            "ORDER BY resource_id,system_from DESC,version_id)"
-        )
-        args += [root_types, request.valid_at, request.valid_at]
     ctes += [
         f"page AS (SELECT * FROM {final} ORDER BY display_name,resource_id,version_id "
         "LIMIT %s OFFSET %s)",
@@ -161,6 +193,28 @@ def query_objects(
             ) from exc
         assert row is not None  # Aggregate SELECT always returns one row, including empty sets.
         total, counts, objects, filter_schemas = row
+        for condition in request.filters:
+            kinds = {
+                schema["attributes"]["fields"].get(condition.field, {}).get("kind")
+                for schema in filter_schemas
+            }
+            for kind in kinds if condition.operator != "eq" else ():
+                threshold_type = {
+                    "integer": "numeric",
+                    "decimal": "numeric",
+                    "date": "date",
+                    "datetime": "timestamptz",
+                }.get(kind)
+                if threshold_type is None:
+                    continue
+                representable = conn.execute(
+                    "SELECT pg_input_is_valid(%s,%s)",
+                    (str(condition.value), threshold_type),
+                ).fetchone()
+                if representable is None or representable[0] is not True:
+                    raise WorkspaceError(
+                        422, "Range threshold exceeds supported exact representation"
+                    )
     schema_pins = []
     if request.filters:
         schemas = {schema["identity_key"]: schema for schema in filter_schemas}
@@ -176,6 +230,20 @@ def query_objects(
                     version_id=schema["version_id"],
                 )
             )
+        for condition in request.filters:
+            if (
+                condition.operator != "eq"
+                and len(
+                    {
+                        schema["attributes"]["fields"][condition.field]["kind"]
+                        for schema in schemas.values()
+                    }
+                )
+                != 1
+            ):
+                raise WorkspaceError(
+                    422, "Grouped range filters require the same declared field kind"
+                )
     return ObjectSetResult(
         query=request,
         total=total,

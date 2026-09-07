@@ -7,8 +7,12 @@ import DerivedPropertyRun from "./derived-property-run";
 import OntologyDefinitionEditor from "./ontology-definition-editor";
 import "./object-sets.css";
 
+type FilterOperator="eq"|"lt"|"lte"|"gt"|"gte";
+const operators:Record<FilterOperator,string>={eq:"Equals",lt:"Less than / before",lte:"At most / on or before",gt:"Greater than / after",gte:"At least / on or after"};
+const rangeKinds=new Set(["integer","decimal","date","datetime"]);
+
 export type Query = {
-  object_type: string; search: string; filters: { field: string; value: string | number | boolean }[];
+  object_type: string; search: string; filters: { field: string; operator?:FilterOperator; value: string | number | boolean }[];
   traversal: { kind: "reference" | "link"; name: string; direction: "outgoing" | "incoming" }[];
   offset: number; limit: number; valid_at?: string; known_at?: string;
 };
@@ -25,6 +29,7 @@ function restoreExecution(key?:string):SavedExecution|null {
     const data=JSON.parse(raw) as SavedExecution;
     const query=data.query;
     if(!query||typeof query.object_type!=="string"||typeof query.search!=="string"||!Array.isArray(query.filters)||!Array.isArray(query.traversal)||!Number.isInteger(query.offset)||query.offset<0||!Number.isInteger(query.limit)||query.limit<1||query.limit>200||!query.valid_at||!query.known_at||!Number.isFinite(Date.parse(query.valid_at))||!Number.isFinite(Date.parse(query.known_at)))return null;
+    if(query.filters.length>20||query.filters.some(filter=>!filter||typeof filter.field!=="string"||filter.field.length>128||!Object.hasOwn(operators,filter.operator??"eq")||!["string","number","boolean"].includes(typeof filter.value)||typeof filter.value==="number"&&!Number.isFinite(filter.value)))return null;
     if(![null,"sets","groups"].includes(data.family))return null;
     const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
     if(data.family&&(!uuid.test(data.definition_id??"")||!uuid.test(data.definition_version_id??"")))return null;
@@ -38,9 +43,8 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
   const catalog = suppliedCatalog ?? loadedCatalog;
   const schemas = catalog.filter(item => item.object_type === "SchemaDefinition");
   const [kind, setKind] = useState(restored?.query.object_type??"LegalEntity");
-  const [field, setField] = useState(restored?.query.filters[0]?.field??"");
+  const [filterRows,setFilterRows]=useState<Array<{field:string;operator:FilterOperator;value:string}>>(()=>restored?.query.filters.map(filter=>({field:filter.field,operator:filter.operator??"eq",value:String(filter.value)}))??[]);
   const [formSearch,setFormSearch]=useState(restored?.query.search??"");
-  const [formValue,setFormValue]=useState(String(restored?.query.filters[0]?.value??""));
   const [formTraversal,setFormTraversal]=useState(restored?.query.traversal[0]?`${restored.query.traversal[0].kind}:${restored.query.traversal[0].name}`:"");
   const [formDirection,setFormDirection]=useState(restored?.query.traversal[0]?.direction??"outgoing");
   const [result, setResult] = useState<Result | null>(null);
@@ -122,7 +126,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       const response = await fetch(`/api/ontology/model/${family}/${page?.definition_id ?? selected!.resource_id}/objects?${params}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
       const data = await response.json();
       if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Published query failed");
-      if (generation.current === request) { setResult(data); setExecutionFamily(family); }
+      if (generation.current === request) { setResult(data); setExecutionFamily(family); setKind(data.query.object_type); setFormSearch(data.query.search); setFilterRows(data.query.filters.map((filter:Query["filters"][number])=>({field:filter.field,operator:filter.operator??"eq",value:String(filter.value)}))); setFormTraversal(data.query.traversal[0]?`${data.query.traversal[0].kind}:${data.query.traversal[0].name}`:""); setFormDirection(data.query.traversal[0]?.direction??"outgoing"); }
     } catch (cause) { if (generation.current === request) setError(cause instanceof Error ? cause.message : "Query failed"); }
     finally { if (generation.current === request) setBusy(false); }
   }
@@ -166,16 +170,25 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    let value: string | number | boolean = String(data.get("value") ?? "");
-    if (field && fields[field]?.kind === "integer") {
-      if (!/^-?\d+$/.test(value) || !Number.isSafeInteger(Number(value))) { setError("Enter a whole number within the supported integer range."); return; }
-      value = Number(value);
+    const filters:Query["filters"]=[];
+    for(const row of filterRows){
+      const {field,operator}=row;let value:string|number|boolean=row.value;
+      if(!field||!fields[field]||operator!=="eq"&&!rangeKinds.has(fields[field].kind)){setError("Choose a schema property and supported comparison for every filter.");return;}
+      if(fields[field].kind==="datetime"&&operator!=="eq"&&!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/i.test(value)){setError("Enter timestamps with seconds and an explicit timezone. Values are sent unchanged for schema validation.");return;}
+      if(fields[field].kind==="integer"){
+        if(!/^-?\d+$/.test(value)||!Number.isSafeInteger(Number(value))){setError("Enter a whole number between -9007199254740991 and 9007199254740991; larger integers cannot be represented exactly by this browser input.");return;}
+        value=Number(value);
+      }
+      if(fields[field].kind==="boolean"){
+        if(value!=="true"&&value!=="false"){setError("Choose true or false.");return;}
+        value=value==="true";
+      }
+      filters.push({field,value,...(operator!=="eq"?{operator}:{})});
     }
-    if (field && fields[field]?.kind === "boolean") value = value === "true";
     const edge = String(data.get("traversal") ?? "");
     const split = edge.indexOf(":");
     void run({ object_type: kind, search: String(data.get("search") ?? ""),
-      filters: field ? [{ field, value }] : [],
+      filters,
       traversal: edge ? [{ kind: edge.slice(0, split) as "reference" | "link", name: edge.slice(split + 1), direction: String(data.get("direction")) as "outgoing" | "incoming" }] : [],
       offset: 0, limit: 50 });
   }
@@ -185,10 +198,9 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
     <details className="object-set-studio"><summary>Ontology Studio  -  define shared query contracts</summary><OntologyDefinitionEditor token={token} definitions={definitions} onProposal={onProposal}/></details>
     <div className="resource-form"><label>Published sets and type groups<select value={libraryId} onChange={event => setLibraryId(event.target.value)}><option value="">Choose a published definition</option>{definitions.filter(item => ["ObjectSetDefinition", "ObjectInterface", "ObjectTypeGroup"].includes(item.object_type)).map(item => <option key={item.resource_id} value={item.resource_id}>{item.display_name} · {label(item.object_type)}</option>)}</select></label><button type="button" disabled={busy || !libraryId} onClick={() => void openPublished()}>Open published set</button></div>
     <form className="resource-form" onSubmit={submit}>
-      <label>Object type<select value={kind} onChange={event => { setKind(event.target.value); setField("");setFormValue("");setFormTraversal(""); }}>{schemas.map(schema => <option key={schema.resource_id} value={schema.identity_key}>{label(schema.identity_key)}</option>)}</select></label>
+      <label>Object type<select value={kind} onChange={event => { setKind(event.target.value); setFilterRows([]);setFormTraversal(""); }}>{schemas.map(schema => <option key={schema.resource_id} value={schema.identity_key}>{label(schema.identity_key)}</option>)}</select></label>
       <label>Name or business key<input name="search" value={formSearch} onChange={event=>setFormSearch(event.target.value)} maxLength={128} placeholder="Search this object type" /></label>
-      <label>Property equals<select value={field} onChange={event => {setField(event.target.value);setFormValue(fields[event.target.value]?.kind==="boolean"?"true":"");}}><option value="">No property filter</option>{Object.entries(fields).filter(([, spec]) => !["money", "quantity", "geometry", "geojson", "definition"].includes(spec.kind)).map(([name]) => <option key={name} value={name}>{label(name)}</option>)}</select></label>
-      {field && <label>Property value{fields[field]?.kind === "boolean" ? <select name="value" value={formValue} onChange={event=>setFormValue(event.target.value)}><option value="true">True</option><option value="false">False</option></select> : <input key={field} name="value" value={formValue} onChange={event=>setFormValue(event.target.value)} type={fields[field]?.kind === "date" ? "date" : "text"} required maxLength={256} placeholder={fields[field]?.kind === "reference" ? "Canonical object ID" : fields[field]?.kind === "datetime" ? "ISO timestamp with timezone" : "Exact value"} />}</label>}
+      <fieldset className="object-set-filters"><legend>Property filters · all conditions must match</legend>{filterRows.map((row,index)=><div key={index} className="object-set-filter-row"><label>Property<select value={row.field} onChange={event=>setFilterRows(previous=>previous.map((item,position)=>position===index?{field:event.target.value,operator:"eq",value:fields[event.target.value]?.kind==="boolean"?"true":""}:item))}><option value="">Choose property</option>{Object.entries(fields).filter(([,spec])=>!["money","quantity","geometry","geojson","definition"].includes(spec.kind)).map(([name])=><option key={name} value={name}>{label(name)}</option>)}</select></label><label>Comparison<select value={row.operator} onChange={event=>setFilterRows(previous=>previous.map((item,position)=>position===index?{...item,operator:event.target.value as FilterOperator}:item))}>{(Object.keys(operators) as FilterOperator[]).filter(item=>item==="eq"||rangeKinds.has(fields[row.field]?.kind)).map(item=><option key={item} value={item}>{operators[item]}</option>)}</select></label><label>Value{fields[row.field]?.kind==="boolean"?<select value={row.value} onChange={event=>setFilterRows(previous=>previous.map((item,position)=>position===index?{...item,value:event.target.value}:item))}><option value="true">True</option><option value="false">False</option></select>:<input value={row.value} onChange={event=>setFilterRows(previous=>previous.map((item,position)=>position===index?{...item,value:event.target.value}:item))} required maxLength={256} type={fields[row.field]?.kind==="date"?"date":"text"} placeholder={fields[row.field]?.kind==="datetime"?"YYYY-MM-DDTHH:mm:ss+04:00":fields[row.field]?.kind==="decimal"?"Exact decimal text":fields[row.field]?.kind==="reference"?"Canonical object ID":"Exact value"}/>}</label><button type="button" onClick={()=>setFilterRows(previous=>previous.filter((_,position)=>position!==index))} aria-label={`Remove filter ${index+1}`}>Remove</button></div>)}<button type="button" disabled={filterRows.length>=20} onClick={()=>setFilterRows(previous=>[...previous,{field:"",operator:"eq",value:""}])}>Add property filter</button><p className="muted">Up to 20 conditions. Add separate lower and upper bounds for an interval. Range comparisons use the query-time schema; missing, null and boolean values do not match. Decimal and timestamp text is sent unchanged.</p></fieldset>
       <label>Follow relationship<select key={kind} name="traversal" value={formTraversal} onChange={event=>setFormTraversal(event.target.value)}><option value="">Return matching objects</option><optgroup label="Reference properties">{references.map(([name]) => <option key={name} value={`reference:${name}`}>{label(name)}</option>)}</optgroup><optgroup label="Typed links">{links.map(link => <option key={link.resource_id} value={`link:${link.identity_key}`}>{link.display_name}</option>)}</optgroup></select></label>
       <label>Direction<select name="direction" value={formDirection} onChange={event=>setFormDirection(event.target.value as "outgoing"|"incoming")}><option value="outgoing">From matching objects</option><option value="incoming">Into matching objects</option></select></label>
       <button disabled={busy || !schemas.length}>{busy ? "Querying…" : "Explore objects"}</button>
@@ -201,6 +213,7 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       {result.definition_id&&<div className="object-set-definition"><strong>Published query  -  exact retained version</strong><span className="object-set-actions">{onInspect&&<button onClick={()=>void inspectDefinition(onInspect)}>Inspect definition</button>}{onHistory&&<button onClick={()=>void inspectDefinition(onHistory)}>Definition history</button>}{onTrace&&<button onClick={()=>void inspectDefinition(onTrace)}>Trace definition</button>}</span><details><summary>Published definition reference</summary><code>{result.definition_id}<br/>{result.definition_version_id}</code></details></div>}
       <div className="toolbar"><h3>{result.total.toLocaleString()} matching object versions</h3><span>{Object.entries(result.counts_by_type).map(([type, count]) => `${label(type)}: ${count}`).join(" · ")}</span></div>
       <p className="muted">{result.query.traversal.length ? "Relationships return the exact versions they reference, which may differ from today's values. " : "Effective objects at the query time. "}Counts cover the full result, not just this page.</p>
+      {!!result.query.filters.length&&<section aria-label="Applied property comparisons"><h4>Applied comparisons</h4>{result.query.filters.map((filter,index)=><p key={index}>{label(filter.field)} · {operators[filter.operator??"eq"]} · <code>{String(filter.value)}</code></p>)}</section>}
       {!!result.filter_schema_versions?.length && <details><summary>Property filters validated against the query-time schema</summary>{result.filter_schema_versions.map(schema=><p key={schema.version_id}>{label(schema.object_type)} · Schema version <code>{schema.version_id}</code></p>)}</details>}
       <div className="data-scroll"><table><thead><tr><th>Object</th><th>Type</th><th>Authority & investigation</th><th>Values & provenance</th></tr></thead><tbody>{result.objects.map(object => <tr key={object.version_id}><td>{object.display_name}<small>{object.identity_key}</small></td><td>{label(object.object_type)}</td><td><span>{label(object.authority_state)}  -  {label(object.evidence_class)}</span>{investigate(object)}</td><td><details><summary>Inspect returned version</summary><dl className="resource-fields">{Object.entries(object.attributes).map(([key, value]) => <div key={key}><dt>{label(key)}</dt><dd>{typeof value === "object" ? JSON.stringify(value) : String(value)}</dd></div>)}</dl><p>Object: {object.resource_id}</p><p>Version: {object.version_id}</p><p>Evidence: {label(object.evidence_class)}</p><p>Effective from: {object.valid_from}</p></details></td></tr>)}</tbody></table></div>
       {!result.total && <p className="empty-state">No objects match this query. Try another type, value or relationship.</p>}
