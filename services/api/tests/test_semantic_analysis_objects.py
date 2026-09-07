@@ -341,12 +341,40 @@ def test_same_company_identity_with_mixed_reviewed_versions_is_refused(retained)
         project(retained)
 
 
-def test_scalar_field_without_exact_semantic_dependency_is_refused(retained):
+def test_scalar_field_without_exact_semantic_dependency_is_schema_only(retained):
     _, _, resolver, _, schema, _ = retained
+    unpinned_id = schema["attributes"]["fields"]["account_code"]["semantic_id"]
     resolver.links[schema["version_id"]] = [
         d for d in resolver.dependencies(schema) if d["relation"] != "SEMANTIC:account_code"
     ]
-    with pytest.raises(WorkspaceError, match="semantic contract"):
+    descriptor, rows, _ = project(retained)
+    field = next(f for f in descriptor.fields if f.key == "account_code")
+    assert field.semantic_id is None and field.definition == pin(schema)
+    assert str(field.field_id) == schema["attributes"]["fields"]["account_code"]["field_id"]
+    assert field.role == "ATTRIBUTE" and field.aggregation == "NONE"
+    assert descriptor.measure is None and descriptor.visual == "NONE"
+    assert [row.values["account_code"].value for row in rows] == ["1210", "1220", "1297"]
+    assert all(str(ref.resource_id) != unpinned_id for ref in descriptor.definitions)
+    assert any(
+        "Account code: no exact semantic version is retained" in reason
+        for reason in descriptor.unavailable_operations
+    )
+
+
+@pytest.mark.parametrize("change", ["ambiguous", "wrong_type"])
+def test_invalid_retained_semantics_never_degrade_to_schema_only(retained, change):
+    _, _, resolver, _, schema, _ = retained
+    semantic = next(
+        d for d in resolver.dependencies(schema) if d["relation"] == "SEMANTIC:account_code"
+    )
+    other = resolver.add("SemanticContract" if change == "ambiguous" else "UnrelatedObject", {})
+    other["resource_id"] = semantic["resource_id"]
+    if change == "wrong_type":
+        resolver.links[schema["version_id"]] = [
+            d for d in resolver.dependencies(schema) if d["relation"] != "SEMANTIC:account_code"
+        ]
+    resolver.link(schema, other, "SEMANTIC:account_code")
+    with pytest.raises(WorkspaceError):
         project(retained)
 
 
