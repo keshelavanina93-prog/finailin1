@@ -75,11 +75,11 @@ def build(history, plan, resolver, company_id):
                 key=key,
                 label=label,
                 kind="decimal",
-                role="MEASURE" if key == "net_movement" else "ATTRIBUTE",
+                role="ATTRIBUTE",
                 definition=descriptor.function,
                 unit=currency.unit,
                 unit_reference=currency.unit_reference,
-                aggregation="RETAINED_VALUE_ONLY" if key == "net_movement" else "NONE",
+                aggregation="NONE",
             )
         )
     reconciliation = expected["reconciliation"]
@@ -88,7 +88,10 @@ def build(history, plan, resolver, company_id):
             "fields": fields,
             "grain": ["account"],
             "partition_keys": [],
-            "measure": "net_movement",
+            "contract": "semantic-analysis/2",
+            "row_noun": "objects",
+            "measure": None,
+            "visual": "NONE",
             "authority": "Reconciled source movements; canonical journals unavailable",
             "coverage": [
                 *descriptor.coverage,
