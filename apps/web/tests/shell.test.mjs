@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
-import ts from "typescript";
-
-const source = await readFile(new URL("../app/api/hydration/route.ts", import.meta.url), "utf8");
-const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } });
-const { POST } = await import(`data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`);
+import { loadTypeScript } from "./load-typescript.mjs";
+const { POST } = await loadTypeScript(new URL("../app/api/hydration/route.ts", import.meta.url));
 const request = (body = "{}", auth = true) => new Request("http://localhost/api/hydration", {
   method: "POST", body, headers: auth ? { authorization: "Bearer test-token" } : {},
 });

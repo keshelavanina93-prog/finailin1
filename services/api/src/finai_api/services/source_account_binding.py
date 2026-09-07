@@ -3,6 +3,7 @@
 import re
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import TypedDict
 from uuid import UUID, uuid5
 
 import xlrd
@@ -14,6 +15,12 @@ from finai_api.services import resources
 from finai_api.services.company_source import observe_companies, observe_tb_company
 from finai_api.services.source_documents import document_bytes
 from finai_api.services.workspace import WorkspaceError
+
+
+class AccountUsage(TypedDict):
+    code: str
+    coordinate: str
+    occurrences: int
 
 
 def account_code(book, sheet, row: int, column: int) -> str:
@@ -64,7 +71,8 @@ def observe_usage(content: bytes, sheet_name: str, profile: str) -> dict:
                 raise WorkspaceError(422, "Unknown account source profile")
             if any(sheet.cell_value(r, c) != label for (r, c), label in expected.items()):
                 raise WorkspaceError(422, "Account source headers differ from the selected profile")
-            groups, controls = {}, []
+            groups: dict[str, AccountUsage] = {}
+            controls: list[dict[str, str]] = []
             for row in range(start, sheet.nrows):
                 for column in columns:
                     if sheet.cell_value(row, column) == "":

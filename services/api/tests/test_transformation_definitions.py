@@ -128,7 +128,10 @@ def test_compiler_admission_uses_aggregate_budget_and_adapter_limits(
             "function_plan": {
                 "request": {"limit": node_limit},
                 "derived_properties": [{}] * properties,
-                "implementation": {"maximum_rows": maximum_rows, "maximum_properties": 8},
+                "implementation": {
+                    "implementation_id": "ontology.object-set-derived/v1",
+                    "maximum_rows": maximum_rows, "maximum_properties": 8,
+                },
             }
         }
         for _ in range(2)

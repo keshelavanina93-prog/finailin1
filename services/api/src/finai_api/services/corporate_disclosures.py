@@ -3,6 +3,7 @@
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from html.parser import HTMLParser
+from typing import Any, Literal
 from uuid import UUID, uuid5
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -237,7 +238,7 @@ def propose(principal, document_id, context: DisclosureContext):
         evidence, record = UUID(attrs["evidence_id"]), UUID(attrs["source_record_id"])
         related_id = context.bindings[row["row_number"]]
         create = related_id is None
-        if create:
+        if related_id is None:
             matches = [
                 c
                 for c in data["companies"]
@@ -248,7 +249,9 @@ def propose(principal, document_id, context: DisclosureContext):
             related_id = canonical_id(
                 principal.scope.tenant_id, "LegalEntity", "reported-code:" + row["reported_code"]
             )
-        items = [
+        items: list[
+            tuple[UUID, str, str, str, dict[str, Any], Literal["SOURCE_BOUND", "USER_ASSERTED"]]
+        ] = [
             (
                 evidence,
                 "SourceEvidence",

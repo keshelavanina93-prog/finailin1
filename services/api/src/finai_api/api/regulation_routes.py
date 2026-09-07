@@ -10,6 +10,7 @@ from fastapi import APIRouter, Query
 from pydantic import BaseModel, ConfigDict, Field
 from temporalio.client import (
     Schedule,
+    ScheduleActionExecutionStartWorkflow,
     ScheduleActionStartWorkflow,
     ScheduleAlreadyRunningError,
     ScheduleIntervalSpec,
@@ -98,6 +99,9 @@ async def read_monitor(identity: str, principal: User):
         }
         if description.info.recent_actions:
             latest = description.info.recent_actions[-1].action
+            if not isinstance(latest, ScheduleActionExecutionStartWorkflow):
+                result["runtime"]["latest_execution"] = "UNKNOWN_ACTION"
+                return result
             execution = await runtime.get_workflow_handle(latest.workflow_id).describe()
             status = execution.status.name if execution.status else "UNKNOWN"
             result["runtime"]["latest_execution"] = status

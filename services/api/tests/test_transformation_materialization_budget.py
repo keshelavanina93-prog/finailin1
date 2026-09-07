@@ -12,7 +12,10 @@ def node(limit=200, materialized=True, capable=True):
     plan = {
         "request": {"limit": limit},
         "derived_properties": [],
-        "implementation": {"maximum_rows": 200, "maximum_properties": 8},
+        "implementation": {
+            "implementation_id": "ontology.object-set-derived/v1",
+            "maximum_rows": 200, "maximum_properties": 8,
+        },
     }
     if capable:
         plan["implementation"].update(

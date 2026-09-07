@@ -33,7 +33,8 @@ jobs:
 
   api:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # A cold official-source MinIO build needs more time than the API checks alone.
+    timeout-minutes: 30
     services:
       postgres:
         image: postgres:17-alpine
@@ -45,6 +46,10 @@ jobs:
           --health-timeout 3s --health-retries 10
     env:
       FINAI_MIGRATION_DATABASE_URL: postgresql://postgres:ci-only-password@127.0.0.1:5432/postgres
+      G8_BINDING_DB_TEST: "1"
+      G8_S3_DB_TEST: "1"
+      FINAI_PUBLICATION_DB_CHECK: "1"
+      FINAI_SOURCE_ADOPTION_NATIVE: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -53,16 +58,48 @@ jobs:
           cache: pip
           cache-dependency-path: services/api/pyproject.toml
       - run: python -m pip install -e "services/api[dev]"
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.3"
+          cache: false
+      - name: Restore pinned official MinIO binaries
+        id: minio-cache
+        uses: actions/cache@v4
+        with:
+          path: .finai/tools/minio
+          key: ${{ runner.os }}-${{ runner.arch }}-go1.25.3-minio-${{ hashFiles('scripts/install-ci-minio.sh') }}
+      - name: Build pinned official MinIO server and client
+        if: steps.minio-cache.outputs.cache-hit != 'true'
+        run: bash scripts/install-ci-minio.sh
+      - name: Verify cached MinIO binary hashes
+        working-directory: .finai/tools/minio
+        run: sha256sum --check SHA256SUMS
       - name: Provision restricted PostgreSQL runtime
         run: |
           mkdir -p .finai
           python scripts/provision-local.py
+      - name: Provision private versioned evidence storage
+        run: >-
+          python scripts/provision-ci-minio.py --runtime .finai
+          --server .finai/tools/minio/minio --client .finai/tools/minio/mc --port 9064
+      - name: Load disposable runtime configuration
+        run: |
           python - <<'PY'
           import json, os
           with open('.finai/local.json') as source, open(os.environ['GITHUB_ENV'], 'a') as target:
               for key, value in json.load(source).items():
+                  if any(part in key for part in ('PASSWORD', 'SECRET', 'TOKEN', 'ACCESS_KEY', 'DATABASE_URL')):
+                      print(f'::add-mask::{value}')
                   target.write(f'{key}={value}\n')
           PY
+      - name: Install canonical platform definitions for native authority checks
+        run: python scripts/install-ontology.py
       - run: python -m ruff check services/api
       - run: python -m mypy services/api/src
       - run: python -m pytest services/api/tests
+      - name: Stop disposable evidence service
+        if: always()
+        run: |
+          if [ -f .finai/minio-ci.pid ]; then
+            kill "$(cat .finai/minio-ci.pid)"
+          fi

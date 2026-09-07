@@ -38,7 +38,7 @@ def observe_companies(content: bytes, sheet_name: str, header_row: int, column: 
                 "ორგანიზაცია",
             }:
                 raise WorkspaceError(422, "The selected header is not a recognized company field")
-            groups = {}
+            groups: dict[str, list[int]] = {}
             blank_rows = []
             for row in range(header_row, sheet.nrows):
                 value = sheet.cell_value(row, column - 1)

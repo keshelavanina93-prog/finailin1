@@ -1,7 +1,9 @@
 """Opt-in durable native SYNTHETIC acceptance; never an authentic paired-source claim.
 
-Uses configured actor identities in an isolated SYNTHETIC access_entity test
-scope without changing credentials, grants or schemas. All retained documents and
+Uses configured actor identities when explicitly supplied, otherwise three
+synthetic service principals on the pre-seeded CI tenant. Both paths use an isolated
+SYNTHETIC access_entity without changing persisted credentials, grants or schemas.
+All retained documents and
 canonical resources share that synthetic scope, separate from real SEG. Reuse the explicit
 FINAI_SOURCE_ADOPTION_NATIVE_ID UUID to resume the same bounded fixture.
 """
@@ -18,6 +20,7 @@ import pytest
 from test_seg_expense_source import workbook
 
 from finai_api.config import get_settings
+from finai_api.domain.authority import ExactScope
 from finai_api.domain.ontology_catalog import canonical_id
 from finai_api.domain.resource_lifecycle import LifecycleRequest, LifecycleReview, VersionReference
 from finai_api.domain.resources import ResourceMutation, ResourceProposal, ResourceReview
@@ -54,27 +57,55 @@ def synthetic_book(label, month, *, missing=False):
     return result.getvalue()
 
 
-@pytest.mark.skipif(
-    os.environ.get("FINAI_SOURCE_ADOPTION_NATIVE") != "1",
-    reason="Explicit native synthetic opt-in required",
-)
-def test_native_reviewed_source_transition(monkeypatch):
-    grants = json.loads(os.environ["FINAI_NATIVE_CONFIGURED_TOKENS"])
-    # conftest installs unit credentials; restore only the configured native grants.
-    monkeypatch.setenv("FINAI_ACCESS_TOKENS", json.dumps(grants))
-    get_settings.cache_clear()
-    people = [Principal.model_validate(value) for value in grants.values()]
-    author = next(p for p in people if {"ontology_admin", "ontology_propose"} <= set(p.permissions))
-    reviewer = next(
-        p
-        for p in people
-        if p.actor_id != author.actor_id
-        and p.scope == author.scope
-        and {"ontology_admin", "ontology_review"} <= set(p.permissions)
-    )
-    ingestor = next(p for p in people if p.scope == author.scope and "ingest" in p.permissions)
+@pytest.fixture
+def native_people(monkeypatch):
     namespace = UUID(os.environ.get("FINAI_SOURCE_ADOPTION_NATIVE_ID", str(uuid4())))
-    synthetic_scope = author.scope.model_copy(
+    configured = os.environ.get("FINAI_NATIVE_CONFIGURED_TOKENS")
+    if configured:
+        grants = json.loads(configured)
+        # Preserve the explicit configured-native path; never discover mounted grants.
+        monkeypatch.setenv("FINAI_ACCESS_TOKENS", json.dumps(grants))
+        get_settings.cache_clear()
+        people = [Principal.model_validate(value) for value in grants.values()]
+        author = next(
+            p for p in people if {"ontology_admin", "ontology_propose"} <= set(p.permissions)
+        )
+        reviewer = next(
+            p
+            for p in people
+            if p.actor_id != author.actor_id
+            and p.scope == author.scope
+            and {"ontology_admin", "ontology_review"} <= set(p.permissions)
+        )
+        ingestor = next(p for p in people if p.scope == author.scope and "ingest" in p.permissions)
+        base_scope = author.scope
+    else:
+        base_scope = ExactScope(
+            tenant_id=UUID(
+                os.environ.get(
+                    "FINAI_SOURCE_ADOPTION_NATIVE_TENANT", "805d8a32-d12b-4268-a236-b0b16e59da9f"
+                )
+            ),
+            legal_entity_id="synthetic-native-fixture",
+            period="2026-08",
+            currency="GEL",
+        )
+
+        def person(role, permissions):
+            return Principal(
+                actor_id=f"synthetic-adoption-{namespace}-{role}",
+                display_name=f"SYNTHETIC source adoption {role}",
+                scope=base_scope,
+                permissions=permissions,
+            )
+
+        author = person("author", ("read", "ontology_read", "ontology_admin", "ontology_propose"))
+        reviewer = person(
+            "reviewer", ("read", "ontology_read", "ontology_admin", "ontology_review")
+        )
+        ingestor = person("ingestor", ("read", "ontology_read", "ingest"))
+        assert len({author.actor_id, reviewer.actor_id, ingestor.actor_id}) == 3
+    synthetic_scope = base_scope.model_copy(
         update={"legal_entity_id": "SYNTHETIC-source-adoption-" + str(namespace)}
     )
     # Native-test principals only: no credential/grant registry changes. All
@@ -82,6 +113,18 @@ def test_native_reviewed_source_transition(monkeypatch):
     author = author.model_copy(update={"scope": synthetic_scope})
     reviewer = reviewer.model_copy(update={"scope": synthetic_scope})
     ingestor = ingestor.model_copy(update={"scope": synthetic_scope})
+    try:
+        yield namespace, author, reviewer, ingestor
+    finally:
+        get_settings.cache_clear()
+
+
+@pytest.mark.skipif(
+    os.environ.get("FINAI_SOURCE_ADOPTION_NATIVE") != "1",
+    reason="Explicit native synthetic opt-in required",
+)
+def test_native_reviewed_source_transition(native_people):
+    namespace, author, reviewer, ingestor = native_people
     label = f"SYNTHETIC SEG-layout acceptance {namespace}"
     print("native_synthetic_namespace", str(namespace), flush=True)
     company = uuid5(namespace, "company")

@@ -106,7 +106,9 @@ def test_database_trigger_denies_evidence_mutation_even_for_owner() -> None:
     for statement in (
         "UPDATE hydration_runs SET receipt=receipt",
         "DELETE FROM hydration_runs",
-        "TRUNCATE hydration_runs",
+        # Include dependent tables so the assertion reaches the immutable
+        # retention trigger rather than PostgreSQL's earlier foreign-key guard.
+        "TRUNCATE hydration_runs CASCADE",
     ):
         with (
             psycopg.connect(os.environ["FINAI_MIGRATION_DATABASE_URL"]) as conn,

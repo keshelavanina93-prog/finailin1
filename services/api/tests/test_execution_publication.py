@@ -30,9 +30,9 @@ def retained_run():
         permissions=("read", "ingest"),
     )
 
-    def create(outputs):
+    def create(outputs, definition_version="verification/1"):
         identity = "verification_" + uuid4().hex
-        definition = {"version": "verification/1", "nodes": [], "outputs": outputs}
+        definition = {"version": definition_version, "nodes": [], "outputs": outputs}
         with records.scope_connection(principal) as conn:
             scope = records.set_scope(conn, principal)
             conn.execute(
@@ -126,7 +126,9 @@ def test_api_reads_committed_outputs_when_temporal_is_unavailable(retained_run, 
     from finai_api.config import get_settings
     from finai_api.main import app
 
-    principal, identity = retained_run({"data": "dataset-reference/1"})
+    principal, identity = retained_run(
+        {"data": "dataset-reference/1"}, definition_version="report-source-process/3"
+    )
     publication.stage(principal, identity, 0, "data", "dataset-reference/1", {"id": "retained"})
     manifest = publication.publish(principal, identity, 0)
     # Staging a later generation must not expose it through the publication consumer API.

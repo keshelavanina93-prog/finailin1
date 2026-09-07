@@ -1,0 +1,90 @@
+{
+  "issue": "NIN-61",
+  "recorded_at_utc": "2026-09-07T21:23:30.7546323Z",
+  "base_commit": "30a6948c4b6c5cbe90e18ebfca10d3c316c2654c",
+  "repair_branch": "development/nin61-ci-repair",
+  "local_checkout": "D:\\FinAI\\g8-ci-repair",
+  "coverage": {
+    "exclusions_added": false,
+    "percent": 90.39641851397212,
+    "scope_changed": false,
+    "missing": 1330,
+    "statements": 13849,
+    "threshold_percent": 90
+  },
+  "api": {
+    "native_flags": [
+      "G8_BINDING_DB_TEST",
+      "G8_S3_DB_TEST",
+      "FINAI_PUBLICATION_DB_CHECK",
+      "FINAI_SOURCE_ADOPTION_NATIVE"
+    ],
+    "mypy": {
+      "command": "python -m mypy services/api/src",
+      "status": "PASS",
+      "source_files": 166
+    },
+    "command": "python -m pytest services/api/tests",
+    "ruff": "PASS",
+    "exit_code": 0,
+    "skipped": 17,
+    "duration_seconds": 633.11,
+    "warnings": 2,
+    "post_review_test_checks": {
+      "native_opt_out_verified": 3,
+      "passed": 46,
+      "description": "Exact pin assertions strengthened and three new native tests require explicit opt-in; full-run enabled execution behavior unchanged."
+    },
+    "passed": 1133
+  },
+  "web": {
+    "production_build": "PASS",
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "tests": {
+      "web": 36,
+      "status": "PASS",
+      "ontology_client": 16,
+      "contracts": 1
+    },
+    "frozen_install": "PASS"
+  },
+  "runtime": {
+    "minio_port": 9064,
+    "postgres_port": 55441,
+    "kind": "DISPOSABLE_SYNTHETIC",
+    "mounted_product_changed": false
+  },
+  "canonical_ci": {
+    "status": "PENDING_PUSH_AND_GITHUB_RUN"
+  },
+  "required_checks": {
+    "status": "PENDING_CANONICAL_GREEN",
+    "main_branch_exists": false,
+    "contexts": [
+      "api",
+      "web-and-contracts"
+    ]
+  },
+  "acceptance": {
+    "release": "NOT_GRANTED",
+    "local_integrated": "PASS",
+    "authentic_source": "NOT_GRANTED",
+    "product": "NOT_GRANTED",
+    "canonical_ci": "PENDING"
+  },
+  "logs": [
+    {
+      "path": ".finai/artifacts/nin61-full-api-gate.log",
+      "sha256": "eba0927bb2c75b5d9ce07820e739363fac2d41f04a2f448f59d8a74c58d0f73d"
+    },
+    {
+      "path": ".finai/artifacts/nin61-review-fixes.log",
+      "sha256": "5090e9d25d2b840c307a581f7b96c99346b063c181d22fc98f9aee2b5eb9064b"
+    },
+    {
+      "path": ".finai/artifacts/nin61-native-opt-out.log",
+      "sha256": "078bd2dc8833cab15d0f58d6165fe41c8befc4cd5ec5617d5fd8d172c972c2eb"
+    }
+  ]
+}

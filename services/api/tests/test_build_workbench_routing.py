@@ -1,19 +1,22 @@
+# ruff: noqa: F811
 """Build navigation uses retained identities and cannot enter source control handlers."""
 
 import asyncio
-import json
 import os
 from uuid import uuid4
 
 import pytest
+from test_definition_history import item, retained  # noqa: F401
+from test_function_execution import function_case
 
 from finai_api.api import workflow_routes as routes
 from finai_api.domain.authority import ExactScope
+from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.domain.review import Principal
+from finai_api.domain.transformation import TransformationRunRequest
+from finai_api.services import transformation_runs
 from finai_api.services.operator_workbench import listing, summarize
 from finai_api.services.workspace import WorkspaceError
-
-_RETAINED_GRANTS = json.loads(os.environ.get("FINAI_ACCESS_TOKENS", "{}"))
 
 
 def principal():
@@ -92,16 +95,36 @@ def test_retained_source_versions_remain_supported(version):
 
 
 @pytest.mark.skipif(os.environ.get("G8_BINDING_DB_TEST") != "1", reason="Native retained read")
-def test_native_retained_build_listing_exact_title_and_permission_filter():
-    grant = next(
-        g
-        for g in _RETAINED_GRANTS.values()
-        if {"read", "ontology_read", "ingest"}.issubset(g["permissions"])
+def test_native_retained_build_listing_exact_title_and_permission_filter(retained):
+    user, invocation, _, _, _ = function_case(retained)
+    user = user.model_copy(update={"permissions": (*user.permissions, "read", "ingest")})
+    _, publish = retained
+    transformation = item(
+        "TransformationDefinition",
+        {
+            "resource_budget": {
+                "max_returned_rows": 50, "max_derived_evaluations": 400,
+                "max_published_result_bytes": 16000000,
+            },
+            "definition": {
+                "nodes": [{
+                    "node_id": "observe", "function_id": str(invocation.function.resource_id),
+                }],
+                "outputs": [{"output_id": "observations", "node_id": "observe"}],
+            },
+        },
     )
-    user = Principal.model_validate(grant)
+    version = publish(transformation)[0]
+    request = TransformationRunRequest(
+        transformation=VersionReference(
+            resource_id=version["resource_id"], version_id=version["version_id"],
+        ),
+        valid_at=invocation.valid_at, known_at=invocation.known_at,
+    )
+    workflow_id = transformation_runs.retain(user, request)
     page = listing(user, None, True)
     builds = [row for row in page["items"] if row["family"] == "build"]
-    assert builds, "This native acceptance requires retained transformation runs"
+    assert [row["workflow_id"] for row in builds] == [workflow_id]
     assert all(row["title"] != "Retained transformation build" for row in builds)
     assert all(row["transformation"]["version_id"] and row["request_id"] for row in builds)
     restricted = user.model_copy(update={"permissions": ("read",)})

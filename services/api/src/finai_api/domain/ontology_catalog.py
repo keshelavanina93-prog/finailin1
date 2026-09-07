@@ -36,13 +36,21 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
     "Artifact": {"sha256": "Identifier", "byte_length": "Count", "document_id": "Identifier",
                  "evidence_id": "@SourceEvidence", "definition": "OntologyDefinition"},
     "DeploymentTarget": {"definition": "OntologyDefinition"},
-    "RuntimeAgent": {"deployment_target_id": "@DeploymentTarget", "definition": "OntologyDefinition"},
-    "DesiredState": {"deployment_target_id": "@DeploymentTarget", "runtime_agent_id": "@RuntimeAgent", "definition": "OntologyDefinition"},
+    "RuntimeAgent": {
+        "deployment_target_id": "@DeploymentTarget", "definition": "OntologyDefinition",
+    },
+    "DesiredState": {
+        "deployment_target_id": "@DeploymentTarget", "runtime_agent_id": "@RuntimeAgent",
+        "definition": "OntologyDefinition",
+    },
     "RetentionPolicy": {"definition": "OntologyDefinition"},
     "CertificationContract": {
         "subject_schema_id?": "@SchemaDefinition", "definition": "OntologyDefinition",
     },
-    "SourceRegulatoryPublication": {"document_id": "Identifier", "act_id": "@RegulatoryAct", "evidence_id": "@SourceEvidence", "observation": "OntologyDefinition"},
+    "SourceRegulatoryPublication": {
+        "document_id": "Identifier", "act_id": "@RegulatoryAct",
+        "evidence_id": "@SourceEvidence", "observation": "OntologyDefinition",
+    },
     "SourceLicenceNotice": {
         "document_id": "Identifier", "source_record_id": "@SourceRecord",
         "notice": "OntologyDefinition",

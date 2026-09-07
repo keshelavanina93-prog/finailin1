@@ -102,11 +102,14 @@ def read_run(principal: Principal, run_id: str) -> dict:
 
     collect(payload)
     with resource_connection(principal) as conn:
-        count = conn.execute(
+        retained = conn.execute(
             "SELECT count(DISTINCT version_id) FROM resource_versions "
             "WHERE tenant_id=%s AND version_id=ANY(%s::uuid[])",
             (principal.scope.tenant_id, sorted(versions)),
-        ).fetchone()[0]
+        ).fetchone()
+    if retained is None:
+        raise WorkspaceError(404, "Calculation inputs are unavailable in current access context")
+    count = retained[0]
     if count != len(versions):
         raise WorkspaceError(404, "Calculation inputs are unavailable in current access context")
     return payload

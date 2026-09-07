@@ -50,10 +50,13 @@ def retain_document(principal: Principal, filename: str, content: bytes) -> dict
                     principal.actor_id,
                 ),
             )
-            filename = conn.execute(
+            retained = conn.execute(
                 "SELECT filename FROM source_documents WHERE tenant_id=%s AND document_id=%s",
                 (principal.scope.tenant_id, identity),
-            ).fetchone()[0]
+            ).fetchone()
+            if retained is None:
+                raise WorkspaceError(409, "Retained document is unavailable after storage")
+            filename = retained[0]
     return {
         "document_id": identity,
         "filename": filename,

@@ -228,7 +228,7 @@ def derive_snapshot(principal, binding_row, target) -> SourceSnapshot:
             or account["attributes"].get("account_code") != code
         ):
             raise WorkspaceError(409, "Snapshot account mapping version or identity disagrees")
-    codes = set()
+    codes: set[str] = set()
     for row in parsed["rows"]:
         item = row["attributes"] if profile == "seg_expense_base" else row
         codes.update(

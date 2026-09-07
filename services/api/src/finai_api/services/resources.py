@@ -569,9 +569,9 @@ def _validate(
 
                 validate_context(principal, item, target)
             if item.object_type in {"SourceFamily", "SourceSnapshotAdoption"}:
-                from finai_api.services.source_adoption import validate
+                from finai_api.services.source_adoption import validate as validate_adoption
 
-                validate(conn, principal, item, target, previous, access_entity)
+                validate_adoption(conn, principal, item, target, previous, access_entity)
             if (
                 item.object_type == "Alias"
                 and item.attributes.get("source_system") == "RETAINED_ACCOUNTING_COMPANY"
@@ -595,9 +595,11 @@ def _validate(
 
                     validate_line(conn, principal, item, target, proposal, validation_time)
             if item.object_type == "AccountDimensionPolicy":
-                from finai_api.services.journal_dimensions import validate_policy
+                from finai_api.services.journal_dimensions import (
+                    validate_policy as validate_dimension_policy,
+                )
 
-                validate_policy(conn, principal, item, target, proposal, validation_time)
+                validate_dimension_policy(conn, principal, item, target, proposal, validation_time)
             if item.object_type == "PeriodControl":
                 from finai_api.services.period_control import validate as validate_period_control
 
@@ -802,7 +804,9 @@ def _validate(
             validate_requirement_coverage(
                 requirements,
                 [
-                    VersionReference(resource_id=pin["resource_id"], version_id=pin["version_id"])
+                    VersionReference(
+                        resource_id=UUID(pin["resource_id"]), version_id=UUID(pin["version_id"])
+                    )
                     for pin in dependencies[identifier]
                 ],
                 schema_versions.get(identifier),

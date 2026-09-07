@@ -7,6 +7,7 @@ from copy import deepcopy
 from datetime import UTC, date, datetime
 from decimal import Decimal
 from functools import lru_cache
+from typing import Any, NotRequired, TypedDict
 from uuid import UUID, uuid5
 
 import xlrd
@@ -19,6 +20,14 @@ from finai_api.services.source_account_binding import account_code, observe_usag
 from finai_api.services.source_documents import document_bytes
 from finai_api.services.workspace import WorkspaceError
 from finai_api.services.xls_source import FIELDS, MONTHS, cell_text
+
+
+class SourceAccountingRow(TypedDict):
+    row: int
+    attributes: dict[str, Any]
+    account_code: NotRequired[str]
+    debit_code: NotRequired[str]
+    credit_code: NotRequired[str]
 
 
 def decimal_cell(sheet, row, column):
@@ -39,7 +48,7 @@ def _read_rows_cached(content: bytes, sheet_name: str, profile: str) -> dict:
     book = xlrd.open_workbook(file_contents=content, formatting_info=True, on_demand=True)
     try:
         sheet = book.sheet_by_name(sheet_name)
-        result = []
+        result: list[SourceAccountingRow] = []
         if profile == "1c_tb":
             for field, column in FIELDS.items():
                 if sheet.cell_value(6, column) != (
@@ -68,7 +77,7 @@ def _read_rows_cached(content: bytes, sheet_name: str, profile: str) -> dict:
                 raise WorkspaceError(
                     422, "The source does not establish a supported accounting period"
                 )
-            stack = []
+            stack: list[tuple[int, int]] = []
             for row in range(7, sheet.nrows):
                 if not any(v != "" for v in sheet.row_values(row)):
                     continue
@@ -160,7 +169,7 @@ def _read_rows_cached(content: bytes, sheet_name: str, profile: str) -> dict:
                         "currency_authority": "UNESTABLISHED",
                         "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
                         "same_account_source_rows": duplicate_accounts.get(
-                            item.get("account_code"), []
+                            item.get("account_code", ""), []
                         ),
                     },
                 }

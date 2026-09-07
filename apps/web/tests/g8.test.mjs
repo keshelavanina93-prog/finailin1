@@ -1,14 +1,8 @@
 import assert from "node:assert/strict";
-import {readFile} from "node:fs/promises";
 import test from "node:test";
-import ts from "typescript";
-async function load(path) {
-  const source=await readFile(new URL(path,import.meta.url),"utf8");
-  const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}});
-  return import(`data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`);
-}
-const {GET}=await load("../app/api/readiness/route.ts");
-const {belongsToCompany,workItems}=await load("../app/g8-model.ts");
+import {loadTypeScript} from "./load-typescript.mjs";
+const {GET}=await loadTypeScript(new URL("../app/api/readiness/route.ts",import.meta.url));
+const {belongsToCompany,workItems}=await loadTypeScript(new URL("../app/g8-model.ts",import.meta.url));
 test("readiness never queries storage for missing or denied identity",async t=>{
   let calls=0;
   t.mock.method(globalThis,"fetch",async()=>{calls++;return Response.json({detail:"Denied"},{status:403});});
