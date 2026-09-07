@@ -187,16 +187,23 @@ def prepare(
     metadata, content = document_bytes(principal, document_id)
     parsed = _read_rows_cached(content, sheet, profile)
     evidence = canonical_id(principal.scope.tenant_id, "SourceEvidence", metadata["source_sha256"])
-    company = resources.current_resources(principal, [company_id]).get(str(company_id))
-    if (
-        not company
-        or company["authority_state"] != "APPROVED"
-        or company["object_type"] != "LegalEntity"
-        or company["evidence_class"] != "SOURCE_BOUND"
-        or company["attributes"].get("evidence_id") != str(evidence)
-        or company["display_name"] != parsed["company_label"]
-    ):
-        raise WorkspaceError(409, "Select the reviewed company from this source")
+    from finai_api.services.source_accounting_context import direct_company_match
+    from finai_api.services.source_company_alias import _effective_resources
+    from finai_api.services.source_company_alias import inspect as inspect_company_alias
+
+    company = _effective_resources(principal, [company_id]).get(str(company_id))
+    company_alias = None
+    if not direct_company_match(company, parsed["company_label"], str(evidence)):
+        match = inspect_company_alias(principal, document_id, sheet, profile, company_id)
+        if not match["accepted"]:
+            raise WorkspaceError(
+                409, "Review this source snapshot against the existing company: " + match["reason"]
+            )
+        company = match["company"]
+        company_alias = match["alias"]
+    company_pins = {company["resource_id"]: company["version_id"]}
+    if company_alias:
+        company_pins[company_alias["resource_id"]] = company_alias["version_id"]
     chart = uuid5(company_id, "1c-observed-chart")
     selected = parsed["rows"][offset : offset + 25]
     ids = {
@@ -246,6 +253,14 @@ def prepare(
                 "record_id": str(record),
                 "coordinate": coordinate,
                 "attributes": attrs,
+                "source_versions": {
+                    **company_pins,
+                    **{
+                        accounts[item[field]]["resource_id"]: accounts[item[field]]["version_id"]
+                        for field in ("account_code", "debit_code", "credit_code")
+                        if item.get(field)
+                    },
+                },
             }
         )
     published = resources.current_resources(principal, [UUID(row["resource_id"]) for row in rows])
@@ -285,6 +300,7 @@ def propose(
 ):
     page = prepare(principal, document_id, sheet, profile, company_id, offset)
     mutations = []
+    source_versions = {}
     existing = resources.current_resources(
         principal, [UUID(row[key]) for row in page["rows"] for key in ("record_id", "resource_id")]
     )
@@ -321,6 +337,11 @@ def propose(
                     valid_from=datetime.now(UTC),
                 )
             )
+            if kind == page["object_type"]:
+                source_versions[UUID(identity)] = {
+                    UUID(resource_id): UUID(version_id)
+                    for resource_id, version_id in row["source_versions"].items()
+                }
     if not mutations:
         raise WorkspaceError(409, "This source fact page is empty or already published")
     return resources.propose(
@@ -333,5 +354,6 @@ def propose(
             "these observations do not create postings or report totals.",
             access_entity=principal.scope.legal_entity_id,
             mutations=mutations,
+            source_versions=source_versions,
         ),
     )

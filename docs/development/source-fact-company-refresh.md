@@ -1,0 +1,11 @@
+# Reviewed snapshot attribution in source facts
+
+The typed 1C source-fact consumer now uses the same effective canonical company and reviewed source-company Alias already used by the source accounting context. A later workbook no longer has to be the workbook from which the LegalEntity was originally observed. It must either match that original direct source attribution or have its own accepted Alias for the exact retained snapshot, sheet, profile, label and company. Unreviewed or withdrawn attribution is refused by the existing resolver.
+
+The company and account identities remain unchanged. New source evidence, source records, fact identities and the exact snapshot source-family key remain distinct. New fact proposals retain the resolved company, Alias and account version pins as canonical dependencies, so a changed publication head cannot silently replace the reviewed inputs. Source observations still do not establish currency, ledger authority, postings or financial totals.
+
+Twelve focused synthetic contract cases passed in 2.41 seconds: direct-source compatibility, reviewed later snapshot reuse, exact identity/version lineage, refusal of unreviewed snapshots, resolver withdrawal, parser rejection, changed account chart and existing alias provenance checks. The native reviewed-alias temporal test passed in 9.15 seconds, preserving current attribution through scheduled future revisions and rejecting revoked/future-only attribution. It does not represent native publication of a new authentic accounting snapshot.
+
+Scoped Ruff passed. Mypy did not complete: the installed version failed internally in `typeshed/stdlib/zipimport.pyi:17` and reported missing `xlrd` stubs. No typing-pass claim is made.
+
+NIN-56 remains open. This correction reuses an explicitly reviewed per-snapshot identity mapping; it does not introduce a stable recurring family compatibility contract, carry accounting meaning forward automatically, or prove an authentic later-source/report comparison. Reviewed schema/meaning compatibility, new account adoption into an existing chart and paired authentic snapshot acceptance remain required. Existing snapshot source-family keys are preserved rather than relabelled as stable recurring families.
