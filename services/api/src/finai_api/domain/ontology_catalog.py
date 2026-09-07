@@ -177,6 +177,7 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
     "MappingVersion": {
         "source_schema_id": "@SchemaDefinition",
         "target_schema_id": "@SchemaDefinition",
+        "definition?": "OntologyDefinition",
     },
     "AccountMappingVersion": {
         "local_account_id": "@LocalAccount",
@@ -269,6 +270,8 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "dimension_mapping_id?": "@MappingVersion", "granularity?": "Identifier",
         "deepest_valid_drill?": "Identifier", "amount_field?": "Text",
         "amount_semantics?": "Identifier", "unresolved_reason?": "Text",
+        "vat_treatment?": "Identifier", "supplementary_amount_field?": "Text",
+        "supplementary_amount_role?": "Identifier",
     },
 }
 

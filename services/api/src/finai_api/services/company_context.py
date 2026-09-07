@@ -30,6 +30,7 @@ KINDS = [
     "CompanyDimension",
     "SourceAccountingScope",
     "SourceAccountingBinding",
+    "Alias",
     "CorporateDisclosureBinding",
     "SourceCorporateObservation",
     "Licence",
@@ -248,6 +249,14 @@ def project(nodes, pins, company_id=None, pinned_scopes=()):
         "relationships": relationships,
         "ledgers": ledgers,
         "accounting_sources": accounting,
+        "source_company_aliases": [
+            node
+            for node in nodes
+            if node["object_type"] == "Alias"
+            and node["attributes"].get("source_system") == "RETAINED_ACCOUNTING_COMPANY"
+            and linked(node, "target_id") == company
+            and node["attributes"].get("document_id")
+        ],
         "disclosures": disclosures,
         "licence_evidence": licences,
         "structural_resources": list(related.values()),

@@ -204,3 +204,30 @@ def test_company_eligibility_check_bound_is_explicit_and_never_grants_use(monkey
     assert unchecked["checked_at"] is None
     assert unchecked["current_use_authorized"] is False
     assert unchecked["eligible_for_accounting"] is False
+
+
+def test_source_company_alias_projection_requires_exact_company_pin():
+    company = {
+        "resource_id": "company",
+        "version_id": "c1",
+        "object_type": "LegalEntity",
+        "attributes": {},
+    }
+    other = {**company, "resource_id": "other", "version_id": "c2"}
+    alias = {
+        "resource_id": "alias",
+        "version_id": "a1",
+        "object_type": "Alias",
+        "attributes": {
+            "target_id": "company",
+            "source_system": "RETAINED_ACCOUNTING_COMPANY",
+            "document_id": "receipt",
+        },
+    }
+    nodes = [company, other, alias]
+    pins = {("a1", "target_id"): "c1"}
+    assert project(nodes, pins, "company")["context"]["source_company_aliases"] == [alias]
+    assert project(nodes, pins, "other")["context"]["source_company_aliases"] == []
+    assert project(nodes, {}, "company")["context"]["source_company_aliases"] == []
+    company["version_id"] = "new"
+    assert project(nodes, pins, "company")["context"]["source_company_aliases"] == []

@@ -8,7 +8,7 @@ type Resource = { resource_id: string; version_id: string; display_name: string;
 type SourceObservations = { source_sha256: string; construction_receipt_id?: string; source_snapshot?: { source_use?: string }; row_count: number; granularity?: string; deepest_valid_drill?: string; unresolved?: string[]; sample_rows?: { row: number; numeric_observations: Record<string, { coordinate: string; value: string }> }[] };
 type CompanyBinding = { accepted: boolean; can_propose: boolean; company: Pick<Resource, "resource_id" | "display_name"> | null; source_label: string; alias: Resource | null; reason?: string };
 type Context = { chart?: Resource|null; scope_id: string; observed: Record<string, string>; source_coordinate?: string; source_company_label?: string; canonical_ready?: boolean; unresolved?: string[]; source_observations?: SourceObservations; company_binding?: CompanyBinding; accounting_eligibility?: { state: string; reason: string; eligible_for_accounting: boolean; effective_from: string | null; effective_to: string | null; known_from: string | null }; scope: Resource | null; binding: Resource | null; candidates: Record<string, Resource[]> };
-const fields = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "transaction_currency_id", "reporting_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
+const fields = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "transaction_currency_id", "reporting_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics", "vat_treatment", "supplementary_amount_field", "supplementary_amount_role"];
 const required = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
 
 export default function SourceAccountingContext({ token, documentId, sheet, profile, companyId, canPropose, onProposal, onInspectResource, onTraceResource, compactCompanyIdentity = false }: {
@@ -83,8 +83,9 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
   const roleAgrees = Boolean(roleField && selection[roleField] === selection.currency_id);
   const resourcesExist = choices.every(([key, , rows]) => !selection[key] || rows.some(row => row.resource_id === selection[key]));
   const depthAgrees = selection.granularity !== "PERIOD_ACCOUNT" || selection.deepest_valid_drill === "PERIOD_ACCOUNT";
+  const postedAmountAgrees = profile !== "seg_expense_base" || (selection.amount_field === "source_amount" && selection.amount_semantics === "DEBIT_CREDIT" && selection.vat_treatment === "AS_POSTED" && selection.supplementary_amount_field === "annotated_amount" && selection.supplementary_amount_role === "NON_AUTHORITATIVE_SOURCE_OBSERVATION");
   const complete = use === "STRUCTURAL_REFERENCE" || (use === "REVIEW_CANDIDATE" && unresolved.trim().length >= 10) ||
-    (use === "ACCOUNTING_INPUT" && required.every(key => selection[key]?.trim()) && multipleCurrenciesReady && roleAgrees && resourcesExist && depthAgrees);
+    (use === "ACCOUNTING_INPUT" && required.every(key => selection[key]?.trim()) && multipleCurrenciesReady && roleAgrees && resourcesExist && depthAgrees && postedAmountAgrees);
   const canonicalReady = context?.canonical_ready === true;
 
   function change(key: string, value: string) {
@@ -152,6 +153,12 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
           {select("deepest_valid_drill", "Deepest supported evidence", selection.granularity === "PERIOD_ACCOUNT" ? [["PERIOD_ACCOUNT", "Period and account"]] : [["SOURCE_CELL", "Source cell"], ["SOURCE_ROW", "Source row"], ["PERIOD_ACCOUNT", "Period and account"]])}
           <label htmlFor={`${prefix}-amount-field`}>Amount property in the source contract</label><input id={`${prefix}-amount-field`} value={selection.amount_field ?? ""} onChange={event => change("amount_field", event.target.value)} maxLength={128}/>
           {select("amount_semantics", "Amount meaning", [["DEBIT_CREDIT", "Separate debit and credit"], ["SIGNED_MOVEMENT", "Signed movement"], ["PERIOD_BALANCE", "Period balance"]])}
+          {profile === "seg_expense_base" && <>
+            {select("vat_treatment", "VAT treatment", [["AS_POSTED", "Use posted amount; no global VAT adjustment"]])}
+            {select("supplementary_amount_field", "Supplementary source amount", [["annotated_amount", "Amount column — preserved separately"]])}
+            {select("supplementary_amount_role", "Supplementary amount authority", [["NON_AUTHORITATIVE_SOURCE_OBSERVATION", "Excluded from financial totals"]])}
+            <p>For this reviewed layout, source_amount is Сумма. A missing posted amount remains unavailable even when Amount contains zero.</p>
+          </>}
           <p>The amount property must be supported by source evidence and the reviewed contract. A source label alone does not establish gross/net treatment or VAT recoverability.</p>
           {use === "ACCOUNTING_INPUT" && !complete && <p>Accounting use requires all mappings, compatible currency roles and supported evidence depth. Keep unresolved choices as a review candidate.</p>}
         </fieldset>}

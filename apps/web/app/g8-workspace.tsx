@@ -267,12 +267,15 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
   },[view,selectedCompanyId,token,recentKey]);
 
   const companyDocumentIds=resolvedContext?[...new Set([
+    ...(resolvedContext.source_company_aliases??[]).map(row=>String(row.attributes.document_id)),
     ...resolvedContext.accounting_sources.map(row=>String(row.scope.attributes.document_id)),
     ...resolvedContext.disclosures.map(row=>String(row.observation.attributes.document_id)),
     ...resolvedContext.licence_evidence.flatMap(row=>row.notice?[String(row.notice.attributes.document_id)]:[]),
   ])]:[];
   const companyMismatch = !!selectedCompanyId && selectedCompanyId !== contextCompanyId;
-  const scopedEvidence = companyMismatch ? [] : snapshot.evidence.data ?? [];
+  const scopedEvidence = companyMismatch
+    ? (snapshot.evidence.data??[]).filter(item=>companyDocumentIds.includes(item.receipt_id))
+    : snapshot.evidence.data ?? [];
   const scopedProposals = (snapshot.proposals.data ?? []).filter(item => !currentCompany || item.access_entity === currentCompany.access_entity || item.access_entity === "__PLATFORM__");
   const items = workItems(scopedEvidence,scopedProposals);
   const pending = items.filter(item => item.state === "PENDING");

@@ -36,6 +36,7 @@ def main():
         if spec["object_type"] != "SchemaDefinition" or spec["identity_key"] not in {
             "SourceAccountingBinding",
             "SourceAccountingScope",
+            "MappingVersion",
             "Alias",
             "JournalEntry",
             "JournalLine",
