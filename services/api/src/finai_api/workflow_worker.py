@@ -14,10 +14,12 @@ from finai_api.report_workflow import ReportSourceWorkflow
 from finai_api.security import require_permission
 from finai_api.services import execution_publication as publication
 from finai_api.services import report_workflows as records
+from finai_api.services import transformation_runs
 from finai_api.services.regulatory_monitors import check as regulatory_source_check
 from finai_api.services.report_inputs import ReportInputRequest, retain_assessment
 from finai_api.services.tb_frontier import analyze
 from finai_api.services.workspace import detail
+from finai_api.transformation_workflow import TransformationWorkflow
 
 
 @activity.defn(name="report_source_hierarchy")
@@ -135,8 +137,16 @@ async def main() -> None:
         worker = Worker(
             client,
             task_queue="g8-report-source-v1",
-            workflows=[ReportSourceWorkflow, RegulatorySourceCheck],
-            activities=[coverage, hierarchy, publish_outputs, regulatory_source_check],
+            workflows=[ReportSourceWorkflow, RegulatorySourceCheck, TransformationWorkflow],
+            activities=[
+                coverage,
+                hierarchy,
+                publish_outputs,
+                regulatory_source_check,
+                transformation_runs.load,
+                transformation_runs.execute_node,
+                transformation_runs.publish,
+            ],
             activity_executor=executor,
         )
         await worker.run()

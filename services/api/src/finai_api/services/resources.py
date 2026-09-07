@@ -454,6 +454,10 @@ def _validate(
                 from finai_api.services.function_execution import validate_function
 
                 validate_function(item, target)
+            if item.object_type == "TransformationDefinition":
+                from finai_api.services.transformation_definitions import validate_transformation
+
+                validate_transformation(item, target)
             if item.object_type == "RetentionPolicy":
                 from finai_api.services.artifact_retention import validate_policy
 

@@ -1,6 +1,7 @@
 """Discover reviewed analysis Functions in the server-owned company access scope."""
 
 from datetime import UTC, datetime
+from typing import Literal
 from uuid import UUID
 
 from psycopg.rows import dict_row
@@ -14,17 +15,23 @@ from finai_api.services.upstream_authority import upstream_authority
 from finai_api.services.workspace import WorkspaceError
 
 
-def discover(principal: Principal, after_resource_id: UUID | None = None) -> dict:
+def discover(
+    principal: Principal,
+    after_resource_id: UUID | None = None,
+    *,
+    resource_type: Literal["FunctionDefinition", "TransformationDefinition"] = "FunctionDefinition",
+) -> dict:
     require_permission(principal, "ontology_read")
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         rows = cursor.execute(
             "SELECT v.* FROM resource_versions v WHERE tenant_id=%s AND access_entity=%s "
-            "AND object_type='FunctionDefinition' AND authority_state='APPROVED' "
+            "AND object_type=%s AND authority_state='APPROVED' "
             "AND version_id=g8_effective_version_id(tenant_id,resource_id,%s) "
             "AND (%s::uuid IS NULL OR resource_id>%s) ORDER BY resource_id LIMIT 51",
             (
                 principal.scope.tenant_id,
                 principal.scope.legal_entity_id,
+                resource_type,
                 datetime.now(UTC),
                 after_resource_id,
                 after_resource_id,

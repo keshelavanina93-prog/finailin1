@@ -35,6 +35,7 @@ def main() -> None:
     )
     kinds = {
         "FunctionDefinition",
+        "TransformationDefinition",
         "RetentionPolicy",
         "CertificationContract",
         "SourceRegulatoryPublication",

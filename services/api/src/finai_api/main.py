@@ -20,6 +20,7 @@ from finai_api.api.reporting_routes import router as reporting_router
 from finai_api.api.retention_routes import router as retention_router
 from finai_api.api.routes import router
 from finai_api.api.source_document_routes import router as source_document_router
+from finai_api.api.transformation_routes import router as transformation_router
 from finai_api.api.workflow_routes import router as workflow_router
 from finai_api.api.workspace_routes import router as workspace_router
 from finai_api.evidence_objects import EvidenceStoreUnavailable
@@ -41,6 +42,7 @@ app.include_router(lifecycle_router)
 app.include_router(certification_router)
 app.include_router(retention_router)
 app.include_router(function_router)
+app.include_router(transformation_router)
 app.include_router(event_time_router)
 app.include_router(history_search_router)
 app.include_router(operations_router)
