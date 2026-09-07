@@ -1,6 +1,6 @@
 "use client";
 
-import {useRef,useState,type RefObject,type CSSProperties} from "react";
+import {useEffect,useRef,useState,type RefObject,type CSSProperties} from "react";
 import type {AnalysisField,AnalysisProjection,AnalysisRow,AnalysisValue} from "@finai/contracts";
 
 export type WorksheetLayout={widths:Record<string,number>;pinned:string[];focus:{row:string;column:string}|null;left:number};
@@ -8,11 +8,13 @@ type Props={projection:AnalysisProjection;fields:AnalysisField[];columns:string[
 
 /** Presentation only: row order, values and groups come from the canonical response. */
 export default function SemanticWorksheet({projection,fields,columns,layout,onLayout,onColumns,scroll,label,onPick}:Props){
- const [top,setTop]=useState(0);
+ const [top,setTop]=useState(0);const [available,setAvailable]=useState(700);
+ useEffect(()=>{const el=scroll.current;if(!el)return;const observer=new ResizeObserver(()=>setAvailable(el.clientWidth));observer.observe(el);return()=>observer.disconnect();},[scroll]);
  const drag=useRef<{key:string;x:number;width:number}|null>(null);
  const ordered=columns.map(key=>fields.find(field=>field.key===key)).filter((field):field is AnalysisField=>Boolean(field));
  const shown=[...ordered.filter(field=>layout.pinned.includes(field.key)),...ordered.filter(field=>!layout.pinned.includes(field.key))];
- const width=(key:string)=>layout.widths[key]??160;
+ const flexible=shown.filter(field=>layout.widths[field.key]===undefined).length;const allocated=shown.reduce((sum,field)=>sum+(layout.widths[field.key]??0),0);
+ const width=(key:string)=>layout.widths[key]??Math.max(160,(available-220-allocated)/Math.max(1,flexible));
  const offsets=new Map<string,number>();let offset=220;
  shown.forEach(field=>{if(layout.pinned.includes(field.key)){offsets.set(field.key,offset);offset+=width(field.key);}});
  const style=(key:string):CSSProperties=>({width:width(key),...(offsets.has(key)?{position:"sticky",left:offsets.get(key),zIndex:2}: {})});
@@ -20,7 +22,7 @@ export default function SemanticWorksheet({projection,fields,columns,layout,onLa
  const rows=projection.sections.flatMap(section=>section.row_keys.map(key=>({row:rowsByKey.get(key)!,section:section.label})));
  const start=Math.max(0,Math.floor(top/36)-8),end=Math.min(rows.length,start+70);
  function moveColumn(key:string,delta:number){const next=[...columns],index=next.indexOf(key),target=index+delta;if(target<0||target>=next.length)return;[next[index],next[target]]=[next[target],next[index]];onColumns(next);}
- function focusCell(rowIndex:number,columnIndex:number){const row=rows[Math.max(0,Math.min(rows.length-1,rowIndex))]?.row;if(!row)return;const column=columnIndex<=0?"$row":shown[Math.min(shown.length,columnIndex)-1]?.key??"$row";onLayout({...layout,focus:{row:row.key,column}});const el=scroll.current;if(!el)return;const y=rowIndex*36;if(y<el.scrollTop)el.scrollTo({top:y});if(y+72>el.scrollTop+el.clientHeight)el.scrollTo({top:y+72-el.clientHeight});setTop(el.scrollTop);requestAnimationFrame(()=>el.querySelector<HTMLElement>(`[data-row="${row.key}"][data-column="${CSS.escape(column)}"]`)?.focus({preventScroll:true}));}
+ function focusCell(rowIndex:number,columnIndex:number){const row=rows[Math.max(0,Math.min(rows.length-1,rowIndex))]?.row;if(!row)return;const column=columnIndex<=0?"$row":shown[Math.min(shown.length,columnIndex)-1]?.key??"$row";onLayout({...layout,focus:{row:row.key,column}});const el=scroll.current;if(!el)return;const y=rowIndex*36;if(y<el.scrollTop)el.scrollTo({top:y});if(y+72>el.scrollTop+el.clientHeight)el.scrollTo({top:y+72-el.clientHeight});setTop(el.scrollTop);requestAnimationFrame(()=>{const cell=el.querySelector<HTMLElement>(`[data-row="${row.key}"][data-column="${CSS.escape(column)}"]`);cell?.focus({preventScroll:true});cell?.scrollIntoView({block:"nearest",inline:"nearest"});});}
  return <div className="semantic-worksheet">
   <details className="semantic-column-menu"><summary>Columns · {shown.length}</summary><div>{fields.map(field=>{const visible=columns.includes(field.key);return <div key={field.key}><label><input type="checkbox" checked={visible} onChange={()=>onColumns(visible?columns.filter(key=>key!==field.key):[...columns,field.key])}/>{field.label}</label><button disabled={!visible||columns.indexOf(field.key)===0} aria-label={`Move ${field.label} left`} onClick={()=>moveColumn(field.key,-1)}>←</button><button disabled={!visible||columns.indexOf(field.key)===columns.length-1} aria-label={`Move ${field.label} right`} onClick={()=>moveColumn(field.key,1)}>→</button><button disabled={!visible} aria-pressed={layout.pinned.includes(field.key)} onClick={()=>onLayout({...layout,pinned:layout.pinned.includes(field.key)?layout.pinned.filter(key=>key!==field.key):[...layout.pinned,field.key]})}>Pin {field.label}</button></div>;})}</div></details>
   <div ref={scroll} className="semantic-grid" onScroll={event=>{setTop(event.currentTarget.scrollTop);if(event.currentTarget.scrollLeft!==layout.left)onLayout({...layout,left:event.currentTarget.scrollLeft});}} aria-label="Retained analysis grid">
