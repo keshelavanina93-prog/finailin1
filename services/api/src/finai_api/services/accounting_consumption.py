@@ -303,6 +303,28 @@ def _calculation_consumer(rows, edges, key, pins) -> bool:
     )
 
 
+def _pure_observation_definition(item) -> bool:
+    """Classify validated read-only adapter definitions, never material financial outputs.
+
+    Resource publication validates the installed executable and exact inputs before
+    this classification. Typed configuration, rather than a caller authority flag,
+    distinguishes observation-only definitions from derived/calculating Functions.
+    """
+    from finai_api.domain.function_execution import FunctionDefinition, FunctionImplementation
+
+    if item.object_type != "FunctionDefinition":
+        return False
+    try:
+        spec = FunctionDefinition.model_validate(item.attributes)
+    except ValueError:
+        return False
+    return (
+        isinstance(spec.definition, FunctionImplementation)
+        and not spec.definition.derived_property_ids
+        and spec.definition.group_count is None
+    )
+
+
 def validate_accounting_proposal(
     conn: Any,
     principal: Principal,
@@ -326,7 +348,11 @@ def validate_accounting_proposal(
         "JournalEntry",
         "JournalLine",
     }
-    candidates = [item for item in proposal.mutations if item.object_type not in exempt]
+    candidates = [
+        item
+        for item in proposal.mutations
+        if item.object_type not in exempt and not _pure_observation_definition(item)
+    ]
     if not candidates:
         return
     proposed = {

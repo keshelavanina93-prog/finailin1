@@ -269,7 +269,9 @@ def _validate(
     canonical_binding_targets: set[str] = set()
     validation_time = datetime.now(UTC)
 
-    def target(identifier: str, source: str, relation: str) -> dict[str, Any]:
+    def target(
+        identifier: str, source: str, relation: str, exact_version: str | None = None
+    ) -> dict[str, Any]:
         source_item = mutations[source]
         from finai_api.services.journal_dimensions import requested_target
 
@@ -290,7 +292,33 @@ def _validate(
                 ("DEFINITION_TYPE:", "DEFINITION_LINK:", "TRAVERSAL_CANDIDATE:", "SET_ROOT:")
             )
         )
-        if dimension_target is not None:
+        if exact_version is not None:
+            if source_item.object_type != "ObjectSetDefinition" or not relation.startswith(
+                "INTERFACE_QUERY:"
+            ):
+                raise WorkspaceError(422, "Exact query dependency is not supported here")
+            head = _get(conn, tenant, UUID(identifier))
+            external_heads[identifier] = str(head["version_id"])
+            with conn.cursor(row_factory=dict_row) as cursor:
+                exact = cursor.execute(
+                    "SELECT v.*,i.identity_key FROM resource_versions v "
+                    "JOIN canonical_identities i USING(tenant_id,resource_id) "
+                    "WHERE v.tenant_id=%s AND v.resource_id=%s AND v.version_id=%s",
+                    (tenant, identifier, exact_version),
+                ).fetchone()
+                if exact is None:
+                    raise WorkspaceError(404, "Exact interface query dependency is unavailable")
+                exact["dependencies"] = cursor.execute(
+                    "SELECT d.relation,v.*,i.identity_key FROM resource_dependencies d "
+                    "JOIN resource_versions v ON v.tenant_id=d.tenant_id "
+                    "AND v.resource_id=d.target_resource_id AND v.version_id=d.target_version_id "
+                    "JOIN canonical_identities i ON i.tenant_id=v.tenant_id "
+                    "AND i.resource_id=v.resource_id "
+                    "WHERE d.tenant_id=%s AND d.version_id=%s",
+                    (tenant, exact_version),
+                ).fetchall()
+            result = exact
+        elif dimension_target is not None:
             head = _get(conn, tenant, UUID(identifier))
             external_heads[identifier] = str(head["version_id"])
             result = dimension_target

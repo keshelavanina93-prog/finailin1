@@ -7,7 +7,7 @@ from uuid import UUID, uuid5
 
 from pydantic import ValidationError
 
-from finai_api.domain.object_sets import PropertyFilter
+from finai_api.domain.object_sets import ObjectSetQuery, PropertyFilter
 from finai_api.domain.ontology_definitions import (
     DEFINITION_MODELS,
     DerivedDefinition,
@@ -27,7 +27,7 @@ def validate_definition(
     item: ResourceMutation,
     schemas: dict[str, str],
     links: dict[str, str],
-    target: Callable[[str, str, str], dict[str, Any]],
+    target: Callable[..., dict[str, Any]],
 ) -> None:
     model = DEFINITION_MODELS.get(item.object_type)
     if model is None:
@@ -105,14 +105,30 @@ def validate_definition(
 
     if item.object_type == "ObjectSetDefinition":
         payload = definition.model_dump(mode="json")
-        root = schema(payload["object_type"])
-        fields = root["attributes"]["fields"]
+        interface = payload.get("interface")
+        if interface is not None:
+            from finai_api.services.interface_query import resolve_with_loader
+
+            selection = ObjectSetQuery.model_validate(payload).interface
+            assert selection is not None
+            bindings = resolve_with_loader(
+                selection,
+                lambda identity, version: target(
+                    str(identity), source, "INTERFACE_QUERY:" + str(identity), str(version)
+                ),
+            )
+            fields = bindings["fields"]
+            root_types = {row["object_type"] for row in bindings["implementations"]}
+        else:
+            root = schema(payload["object_type"])
+            fields = root["attributes"]["fields"]
+            root_types = {payload["object_type"]}
         validate_filters(
             [PropertyFilter.model_validate(value) for value in payload["filters"]], fields
         )
         # Traversal definitions bind the link type and endpoint schemas, not UI labels.
-        current_types = {payload["object_type"]}
-        for step in payload["traversal"]:
+        current_types = root_types
+        for index, step in enumerate(payload["traversal"]):
             if step["kind"] == "link":
                 if step["name"] not in links:
                     raise WorkspaceError(422, "Saved traversal references an unknown link type")
@@ -131,8 +147,13 @@ def validate_definition(
                 current_types = outputs
             elif step["direction"] == "outgoing":
                 outputs = set()
-                for name in current_types:
-                    spec = schema(name)["attributes"]["fields"].get(step["name"], {})
+                selected_fields = (
+                    [bindings["fields"]]
+                    if interface is not None and index == 0
+                    else [schema(name)["attributes"]["fields"] for name in current_types]
+                )
+                for source_fields in selected_fields:
+                    spec = source_fields.get(step["name"], {})
                     if spec.get("kind") != "reference" or spec.get("target_type") in {None, "*"}:
                         raise WorkspaceError(
                             422, "Saved traversal requires a declared typed reference"
@@ -171,7 +192,7 @@ def validate_definition(
                     )
         for identifier in payload.get("resource_ids") or []:
             selected = target(identifier, source, "SET_ROOT:" + identifier)
-            if selected["object_type"] != payload["object_type"]:
+            if selected["object_type"] not in root_types:
                 raise WorkspaceError(422, "Object Set root identity has a different object type")
     elif item.object_type == "ObjectInterface":
         for name, spec in definition.model_dump(mode="json")["fields"].items():

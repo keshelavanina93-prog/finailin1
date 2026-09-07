@@ -1,0 +1,35 @@
+{
+  "url": "http://127.0.0.1:3062/",
+  "viewport": {
+    "width": 1264,
+    "height": 625
+  },
+  "query": {
+    "object_type": "ObjectInterface",
+    "resource_ids": null,
+    "filters": [],
+    "traversal": [],
+    "search": "",
+    "limit": 50,
+    "offset": 50,
+    "valid_at": "2026-09-07T09:28:36.807396Z",
+    "known_at": "2026-09-07T09:28:36.807396Z",
+    "interface": {
+      "resource_id": "558db2fa-6bd0-5ef0-9209-f08cbc2c3bf7",
+      "version_id": "844c71a1-163e-530b-92c7-d3d2b3eaee8c",
+      "implementations": [
+        {
+          "resource_id": "1bfd39fc-3796-5c81-9bce-d603c09f4d1f",
+          "version_id": "8c1a1ac4-19cf-51b1-ab17-b1d6716950e9"
+        },
+        {
+          "resource_id": "0cbd60a4-067c-53f5-84a1-5db446a0dfca",
+          "version_id": "d27d00e5-f752-549e-9b8c-883586ff520f"
+        }
+      ]
+    }
+  },
+  "visibleInterfaceRows": 50,
+  "bindings": "Exact interface and implementation bindingsInterface: 558db2fa-6bd0-5ef0-9209-f08cbc2c3bf7 · 844c71a1-163e-530b-92c7-d3d2b3eaee8cSource Account Definition · implementation 1bfd39fc-3796-5c81-9bce-d603c09f4d1f · 8c1a1ac4-19cf-51b1-ab17-b1d6716950e9Schema: e365d1cd-40f1-5fa5-8343-3db93f32e4aa · bf7db86a-b539-529c-9b27-d7abaa640964evidence → evidence idsource record → source record idSource Journal Movement · implementation 0cbd60a4-067c-53f5-84a1-5db446a0dfca · d27d00e5-f752-549e-9b8c-883586ff520fSchema: bad94aa4-a02c-56fb-bc85-63e51e5b2282 · 8a47f47f-e4f5-563e-843c-76bf7b1b81dbevidence → evidence idsource record → source record id",
+  "errors": []
+}

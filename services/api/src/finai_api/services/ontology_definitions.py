@@ -358,11 +358,11 @@ def run_group(
     resource = definition(
         principal, identity, version, valid_at=query.valid_at, known_at=query.known_at
     )
-    mappings = {}
     if resource["object_type"] == "ObjectTypeGroup":
         types = resource["attributes"]["definition"]["types"]
     elif resource["object_type"] == "ObjectInterface":
         types = []
+        selected_implementations = []
         for candidate in definitions(principal, query.valid_at, query.known_at):
             if candidate["object_type"] != "ObjectTypeImplementation" or candidate["attributes"][
                 "interface_id"
@@ -376,41 +376,43 @@ def run_group(
             schema = pins.get("FIELD:schema_id")
             if not schema or not contract or contract["version_id"] != resource["version_id"]:
                 continue
-            if schema["identity_key"] in mappings:
+            if schema["identity_key"] in types:
                 raise WorkspaceError(
                     409, "Multiple active implementations exist for one interface/type"
                 )
             types.append(schema["identity_key"])
-            mappings[schema["identity_key"]] = {
-                "fields": candidate["attributes"]["definition"]["fields"],
-                "implementation_version_id": candidate["version_id"],
-                "schema_version_id": schema["version_id"],
+            selected_implementations.append(
+                {
+                    "resource_id": str(candidate["resource_id"]),
+                    "version_id": str(candidate["version_id"]),
+                }
+            )
+        if not selected_implementations:
+            raise WorkspaceError(409, "No reviewed implementations match this interface version")
+        if len(selected_implementations) > 100:
+            raise WorkspaceError(409, "Interface query exceeds its implementation bound")
+        query = ObjectSetQuery.model_validate(
+            {
+                **query.model_dump(),
+                "interface": {
+                    "resource_id": str(resource["resource_id"]),
+                    "version_id": str(resource["version_id"]),
+                    "implementations": selected_implementations,
+                },
             }
+        )
+        result = query_objects(principal, query)
+        return {
+            **result.model_dump(mode="json"),
+            "definition_id": str(identity),
+            "definition_version_id": str(resource["version_id"]),
+        }
     else:
         raise WorkspaceError(422, "Resource is not an interface or type group")
     result = query_objects(principal, query, types)
-    values = []
-    for obj in result.objects:
-        if obj["object_type"] not in mappings:
-            continue
-        mapping = mappings[obj["object_type"]]
-        compatible = str(obj["schema_version_id"]) == str(mapping["schema_version_id"])
-        values.append(
-            {
-                "object_id": obj["resource_id"],
-                "object_version_id": obj["version_id"],
-                "implementation_version_id": mapping["implementation_version_id"],
-                "status": "AVAILABLE" if compatible else "SCHEMA_CHANGED",
-                "values": {
-                    key: obj["attributes"].get(field) for key, field in mapping["fields"].items()
-                }
-                if compatible
-                else None,
-            }
-        )
     return {
         **result.model_dump(mode="json"),
-        "interface_values": values,
+        "interface_values": [],
         "definition_id": identity,
         "definition_version_id": resource["version_id"],
     }

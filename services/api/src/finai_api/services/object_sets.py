@@ -73,9 +73,9 @@ def _filter_sql(filters, alias, schema_cte, args, exact_schema=False):
     return predicate
 
 
-def _stage_contracts(conn, principal, request, root_types):
+def _stage_contracts(conn, principal, request, root_types, binding=None):
     """Resolve typed destinations even when the requested root has no instances."""
-    if not any(step.filters for step in request.traversal):
+    if not any(step.filters for step in request.traversal) and not (binding and request.traversal):
         return {}
     with conn.cursor(row_factory=dict_row) as cursor:
         rows = cursor.execute(
@@ -95,7 +95,7 @@ def _stage_contracts(conn, principal, request, root_types):
     current = set(root_types)
     result = {}
     for index, step in enumerate(request.traversal, 1):
-        if not current.issubset(schemas):
+        if not current.issubset(schemas) and not (binding and index == 1):
             raise WorkspaceError(422, "Traversal schema is unavailable at the requested time")
         if step.kind == "link":
             link = links.get(step.name)
@@ -111,7 +111,16 @@ def _stage_contracts(conn, principal, request, root_types):
                 raise WorkspaceError(422, "Traversal requires compatible explicit link endpoints")
         elif step.direction == "outgoing":
             outputs = set()
+            if binding and index == 1:
+                spec = binding["fields"].get(step.name, {})
+                if spec.get("kind") != "reference" or spec.get("target_type") in (None, "*"):
+                    raise WorkspaceError(
+                        422, "First interface traversal requires a typed reference alias"
+                    )
+                outputs.add(spec["target_type"])
             for name in current:
+                if binding and index == 1:
+                    continue
                 spec = schemas[name]["attributes"]["fields"].get(step.name, {})
                 if spec.get("kind") != "reference" or spec.get("target_type") in (None, "*"):
                     raise WorkspaceError(422, "Traversal requires a declared typed reference")
@@ -161,7 +170,7 @@ def query_objects(
 ) -> ObjectSetResult:
     with resource_connection(principal) as conn:
         conn.execute("SELECT set_config('statement_timeout','10000',true)")
-        if any(step.filters for step in request.traversal):
+        if request.interface is not None or any(step.filters for step in request.traversal):
             conn.execute(
                 "SELECT pg_advisory_xact_lock_shared(hashtextextended(%s,0))",
                 (f"canonical:{principal.scope.tenant_id}",),
@@ -187,14 +196,52 @@ def _query_objects(
     # One statement gives counts, page and traversal a single database snapshot.
     # Only internal CTE names are interpolated; every caller value is a parameter.
     root_types = types if types is not None else [request.object_type]
-    stage_schemas = _stage_contracts(conn, principal, request, root_types)
+    binding = None
+    if request.interface is not None:
+        from finai_api.services.interface_query import resolve
+
+        if types is not None:
+            raise WorkspaceError(422, "An interface query has explicitly pinned concrete types")
+        binding = resolve(principal, request.interface, request.valid_at, request.known_at)
+        root_types = [item["object_type"] for item in binding["implementations"]]
+        validate_filters(request.filters, binding["fields"])
+    stage_schemas = _stage_contracts(conn, principal, request, root_types, binding)
     args: list[Any] = [principal.scope.tenant_id, request.known_at]
     ctes = [
         "versions AS NOT MATERIALIZED (SELECT v.*,i.identity_key FROM resource_versions v "
         "JOIN canonical_identities i USING(tenant_id,resource_id) "
         "WHERE v.tenant_id=%s AND v.system_from<=%s)",
     ]
-    if request.filters:
+    if binding:
+        ctes.append(
+            "interface_mappings AS (SELECT * FROM jsonb_to_recordset(%s::jsonb) "
+            "AS m(object_type text,schema_version_id uuid,fields jsonb))"
+        )
+        args.append(
+            Jsonb(
+                [
+                    {
+                        "object_type": item["object_type"],
+                        "schema_version_id": item["schema"]["version_id"],
+                        "fields": item["fields"],
+                    }
+                    for item in binding["implementations"]
+                ]
+            )
+        )
+    if request.filters and binding:
+        ctes.append(
+            "filter_schema_candidates AS (SELECT v.*,i.identity_key FROM resource_versions v "
+            "JOIN canonical_identities i USING(tenant_id,resource_id) "
+            "WHERE v.tenant_id=%s AND v.version_id=ANY(%s::uuid[]))"
+        )
+        args.extend(
+            [
+                principal.scope.tenant_id,
+                [item["schema"]["version_id"] for item in binding["implementations"]],
+            ]
+        )
+    elif request.filters:
         ctes.append(
             "filter_schema_candidates AS (SELECT DISTINCT ON(resource_id) * FROM versions "
             "WHERE object_type='SchemaDefinition' AND identity_key=ANY(%s::text[]) "
@@ -222,11 +269,42 @@ def _query_objects(
     if request.resource_ids is not None:
         predicate += " AND resource_id=ANY(%s::uuid[])"
         args.append(request.resource_ids)
-    predicate += _filter_sql(request.filters, "current_objects", "filter_schema_candidates", args)
-    predicate += " AND position(lower(%s) in lower(display_name || ' ' || identity_key))>0"
-    args.append(request.search)
-    ctes.append("s0 AS (SELECT * FROM current_objects WHERE " + predicate + ")")
     invalid_stage_ctes = []
+    if binding:
+        predicate += " AND position(lower(%s) in lower(display_name || ' ' || identity_key))>0"
+        args.append(request.search)
+        ctes.append("interface_roots AS (SELECT * FROM current_objects WHERE " + predicate + ")")
+        if request.filters or request.traversal:
+            ctes.append(
+                "invalid_interface_root AS (SELECT 1 FROM interface_roots r "
+                "JOIN interface_mappings m ON m.object_type=r.object_type "
+                "WHERE r.schema_version_id IS DISTINCT FROM m.schema_version_id LIMIT 1)"
+            )
+            invalid_stage_ctes.append((0, "invalid_interface_root"))
+        predicates = []
+        for implementation in binding["implementations"]:
+            args.append(implementation["object_type"])
+            mapped = [
+                condition.model_copy(update={"field": implementation["fields"][condition.field]})
+                for condition in request.filters
+            ]
+            predicates.append(
+                "(object_type=%s"
+                + _filter_sql(mapped, "current_objects", "filter_schema_candidates", args)
+                + ")"
+            )
+        ctes.append(
+            "s0 AS (SELECT * FROM interface_roots current_objects WHERE "
+            + " OR ".join(predicates)
+            + ")"
+        )
+    else:
+        predicate += _filter_sql(
+            request.filters, "current_objects", "filter_schema_candidates", args
+        )
+        predicate += " AND position(lower(%s) in lower(display_name || ' ' || identity_key))>0"
+        args.append(request.search)
+        ctes.append("s0 AS (SELECT * FROM current_objects WHERE " + predicate + ")")
     for index, step in enumerate(request.traversal, 1):
         previous = f"s{index - 1}"
         if step.kind == "reference":
@@ -239,8 +317,14 @@ def _query_objects(
                 )
                 sql = (
                     f"SELECT DISTINCT t.* FROM {previous} s "
-                    "JOIN resource_dependencies d ON d.tenant_id=s.tenant_id "
-                    "AND d.version_id=s.version_id AND d.relation=%s "
+                    + (
+                        "JOIN interface_mappings m ON m.object_type=s.object_type "
+                        if binding and index == 1
+                        else ""
+                    )
+                    + "JOIN resource_dependencies d ON d.tenant_id=s.tenant_id "
+                    "AND d.version_id=s.version_id AND d.relation="
+                    + ("'FIELD:'||(m.fields->>%s) " if binding and index == 1 else "%s ")
                     + destination
                     + "WHERE t.authority_state='APPROVED'"
                 )
@@ -260,7 +344,11 @@ def _query_objects(
                     "ORDER BY selected.system_from DESC,selected.version_id LIMIT 1) t "
                     "ON t.version_id=d.version_id WHERE t.authority_state='APPROVED'"
                 )
-            args.append("FIELD:" + step.name)
+            args.append(
+                step.name
+                if binding and index == 1 and step.direction == "outgoing"
+                else "FIELD:" + step.name
+            )
             if step.direction == "incoming":
                 args += [request.valid_at, request.valid_at]
         else:
@@ -355,6 +443,12 @@ def _query_objects(
     assert row is not None  # Aggregate SELECT always returns one row, including empty sets.
     total, counts, objects, filter_schemas, invalid_stages = row
     if invalid_stages:
+        if 0 in invalid_stages:
+            raise WorkspaceError(
+                409,
+                "Interface root schema differs from its exact implementation; "
+                "filtering or traversal cannot reinterpret this object",
+            )
         raise WorkspaceError(
             409,
             "Reached object schema is unavailable or its property semantics "
@@ -365,6 +459,8 @@ def _query_objects(
             schema["attributes"]["fields"].get(condition.field, {}).get("kind")
             for schema in filter_schemas
         }
+        if binding:
+            kinds = {binding["fields"][condition.field]["kind"]}
         for kind in kinds if condition.operator != "eq" else ():
             threshold_type = {
                 "integer": "numeric",
@@ -387,7 +483,8 @@ def _query_objects(
             raise WorkspaceError(422, "Query filter schema unavailable at the requested time")
         for kind in sorted(schemas):
             schema = schemas[kind]
-            validate_filters(request.filters, schema["attributes"]["fields"])
+            if not binding:
+                validate_filters(request.filters, schema["attributes"]["fields"])
             schema_pins.append(
                 FilterSchemaVersion(
                     object_type=kind,
@@ -395,7 +492,7 @@ def _query_objects(
                     version_id=schema["version_id"],
                 )
             )
-        for condition in request.filters:
+        for condition in request.filters if not binding else []:
             if (
                 condition.operator != "eq"
                 and len(
@@ -409,6 +506,11 @@ def _query_objects(
                 raise WorkspaceError(
                     422, "Grouped range filters require the same declared field kind"
                 )
+    projected = None
+    if binding:
+        from finai_api.services.interface_query import values
+
+        projected = values(binding, objects) if not request.traversal else []
     return ObjectSetResult(
         query=request,
         total=total,
@@ -418,6 +520,8 @@ def _query_objects(
         if request.offset + request.limit < total
         else None,
         filter_schema_versions=schema_pins,
+        interface_bindings=binding,
+        interface_values=projected,
         traversal_schema_versions=[
             TraversalSchemaVersion(
                 step=index,

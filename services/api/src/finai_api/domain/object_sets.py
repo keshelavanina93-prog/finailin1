@@ -35,6 +35,22 @@ class Traversal(BaseModel):
     )
 
 
+class InterfacePin(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    resource_id: UUID
+    version_id: UUID
+
+
+class InterfaceRoot(InterfacePin):
+    implementations: list[InterfacePin] = Field(min_length=1, max_length=100)
+
+    @model_validator(mode="after")
+    def unique_implementations(self):
+        if len({item.resource_id for item in self.implementations}) != len(self.implementations):
+            raise ValueError("Interface implementation identities must be unique")
+        return self
+
+
 class ObjectSetQuery(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     object_type: str = Field(pattern=r"^[A-Z][A-Za-z0-9]{1,63}$")
@@ -46,9 +62,12 @@ class ObjectSetQuery(BaseModel):
     offset: int = Field(default=0, ge=0, le=1000000)
     valid_at: datetime | None = None
     known_at: datetime | None = None
+    interface: InterfaceRoot | None = Field(default=None, exclude_if=lambda value: value is None)
 
     @model_validator(mode="after")
     def predicate_budget(self):
+        if self.interface is not None and self.object_type != "ObjectInterface":
+            raise ValueError("A pinned interface root requires object_type ObjectInterface")
         if len(self.filters) + sum(len(step.filters) for step in self.traversal) > 20:
             raise ValueError("Object Set root and traversal filters share a 20-predicate limit")
         return self
@@ -81,4 +100,10 @@ class ObjectSetResult(BaseModel):
     filter_schema_versions: list[FilterSchemaVersion] = Field(default_factory=list)
     traversal_schema_versions: list[TraversalSchemaVersion] = Field(
         default_factory=list, exclude_if=lambda value: not value
+    )
+    interface_bindings: dict[str, Any] | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    interface_values: list[dict[str, Any]] | None = Field(
+        default=None, exclude_if=lambda value: value is None
     )
