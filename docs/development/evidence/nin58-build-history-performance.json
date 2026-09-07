@@ -1,0 +1,398 @@
+{
+  "observed_at": "2026-09-07T17:17:38.980671+00:00",
+  "baseline_seconds": 69.022,
+  "corrected_seconds": 1.879,
+  "scope": "same authorized main scope, first 20 retained builds",
+  "proof_checks": "Unchanged transformation_runs.read for every returned build",
+  "history": {
+    "purpose": "HISTORICAL_BUILD_EVIDENCE",
+    "items": [
+      {
+        "request_id": "d1393555-a1c2-4b0a-b071-d59a1b0a9a92",
+        "workflow_id": "transformation:d1393555-a1c2-4b0a-b071-d59a1b0a9a92",
+        "created_at": "2026-09-07T20:55:03.572013+04:00",
+        "display_name": "SEG January 2025 account movement report",
+        "transformation": {
+          "version_id": "d356c02f-9cbf-5707-a816-1b958599e728",
+          "resource_id": "b062ec8f-8b97-53cb-ad16-91d6d5c52b32"
+        },
+        "valid_at": "2026-09-07T16:55:01.091233Z",
+        "known_at": "2026-09-07T16:55:01.091233Z",
+        "completed_steps": 1,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 1,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "e9b594f8-eea7-4dc5-a927-782cf3364434",
+        "workflow_id": "transformation:e9b594f8-eea7-4dc5-a927-782cf3364434",
+        "created_at": "2026-09-07T19:53:14.406170+04:00",
+        "display_name": "Count observations meeting either selected source account condition",
+        "transformation": {
+          "version_id": "059d7255-a7b8-53d7-a205-570997e20bd6",
+          "resource_id": "30ec4e28-9f86-5786-8545-f50830019e05"
+        },
+        "valid_at": "2026-09-07T15:52:50.425000Z",
+        "known_at": "2026-09-07T15:52:50.425000Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "deb2c218-edef-484e-88ff-f3ae32420974",
+        "workflow_id": "transformation:deb2c218-edef-484e-88ff-f3ae32420974",
+        "created_at": "2026-09-07T19:25:53.396132+04:00",
+        "display_name": "Count SOG observations by posting date",
+        "transformation": {
+          "version_id": "06f03e2a-2923-5552-ba83-3a53bf6affc9",
+          "resource_id": "db02a2e4-9158-555a-81ac-5f2dc1ee6b28"
+        },
+        "valid_at": "2026-09-07T15:25:39.495000Z",
+        "known_at": "2026-09-07T15:25:39.495000Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "b179b12c-6353-4894-a7b8-b743dc3ac7d0",
+        "workflow_id": "transformation:b179b12c-6353-4894-a7b8-b743dc3ac7d0",
+        "created_at": "2026-09-07T19:10:18.046593+04:00",
+        "display_name": "Retain SOG source dates and explain their observed extent",
+        "transformation": {
+          "version_id": "c538b345-f42e-5a61-ac49-a505f53fcd40",
+          "resource_id": "5caf1f3d-9116-5c82-b42e-598b50ddf3c7"
+        },
+        "valid_at": "2026-09-07T15:09:52.204000Z",
+        "known_at": "2026-09-07T15:09:52.204000Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "8a12d1ba-59fb-413c-9633-c6dc0a64f306",
+        "workflow_id": "transformation:8a12d1ba-59fb-413c-9633-c6dc0a64f306",
+        "created_at": "2026-09-07T18:03:38.713422+04:00",
+        "display_name": "Retain SOG source dates and explain their observed extent",
+        "transformation": {
+          "version_id": "3f7b9c77-820e-5f9f-b5c2-75ca9927f1ff",
+          "resource_id": "470667e9-dc43-5f67-866c-8ecd4b1a82ee"
+        },
+        "valid_at": "2026-09-07T14:03:15.269000Z",
+        "known_at": "2026-09-07T14:03:15.269000Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "3fbea9ae-f186-4fe5-91a2-4b7e1cb3e9e8",
+        "workflow_id": "transformation:3fbea9ae-f186-4fe5-91a2-4b7e1cb3e9e8",
+        "created_at": "2026-09-07T17:27:04.440964+04:00",
+        "display_name": "Parallel Region and Department reads with retained-input dependency",
+        "transformation": {
+          "version_id": "23fe5b9c-d9ea-5486-928f-6f53e1920d3d",
+          "resource_id": "89519a6e-d810-512f-bfbb-615709055510"
+        },
+        "valid_at": "2026-09-07T13:25:53.247000Z",
+        "known_at": "2026-09-07T13:25:53.247000Z",
+        "completed_steps": 3,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 3,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "39972057-1ccc-4928-b7a0-5557fe9057a0",
+        "workflow_id": "transformation:39972057-1ccc-4928-b7a0-5557fe9057a0",
+        "created_at": "2026-09-07T16:54:16.595338+04:00",
+        "display_name": "Parallel budget classification and original source record reads",
+        "transformation": {
+          "version_id": "9f97167c-bcb9-52ac-a89f-a0755db92b68",
+          "resource_id": "aae791cb-4157-50c4-8798-3adcca744389"
+        },
+        "valid_at": "2026-09-07T12:53:49.638000Z",
+        "known_at": "2026-09-07T12:53:49.638000Z",
+        "completed_steps": 3,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 3,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "1a9d5584-1469-453b-8b36-e7ff5c8e6c52",
+        "workflow_id": "transformation:1a9d5584-1469-453b-8b36-e7ff5c8e6c52",
+        "created_at": "2026-09-07T16:29:17.695521+04:00",
+        "display_name": "Calculate Department display and wait for canonical review",
+        "transformation": {
+          "version_id": "97be2c1d-94ee-5029-9fcd-9ca3d10ad844",
+          "resource_id": "bca03792-34c5-5ae1-ac7f-4c4c75ac2408"
+        },
+        "valid_at": "2026-09-07T12:28:27.381000Z",
+        "known_at": "2026-09-07T12:28:27.382000Z",
+        "completed_steps": 1,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 1,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "3b560725-39ca-4414-95ef-667e3b225db5",
+        "workflow_id": "transformation:3b560725-39ca-4414-95ef-667e3b225db5",
+        "created_at": "2026-09-07T15:11:18.371951+04:00",
+        "display_name": "Calculate and consume one retained source-account label",
+        "transformation": {
+          "version_id": "2e8dbb4e-7f13-505d-b240-4c6f78376b69",
+          "resource_id": "c4faddce-c1bf-5b95-9302-605a0421b36d"
+        },
+        "valid_at": "2026-09-07T11:11:17.232005Z",
+        "known_at": "2026-09-07T11:11:17.232005Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "b3bf45f6-8cc1-4cf2-955e-81bbe4b3313b",
+        "workflow_id": "transformation:b3bf45f6-8cc1-4cf2-955e-81bbe4b3313b",
+        "created_at": "2026-09-07T10:16:48.818785+04:00",
+        "display_name": "SOG retained-window observation counts",
+        "transformation": {
+          "version_id": "df23bf78-c8fe-5af4-915e-4d3e32b6403f",
+          "resource_id": "682fca79-0950-5505-948b-385fabff06c1"
+        },
+        "valid_at": "2026-09-07T06:16:48.304821Z",
+        "known_at": "2026-09-07T06:16:48.304821Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "10b19515-45b0-4878-be0f-e861ab6b79fa",
+        "workflow_id": "transformation:10b19515-45b0-4878-be0f-e861ab6b79fa",
+        "created_at": "2026-09-07T10:02:33.045686+04:00",
+        "display_name": "SOG retained-window observation counts",
+        "transformation": {
+          "version_id": "e963991d-e1ed-5344-914a-f54cdc880fee",
+          "resource_id": "d77a76bc-1b60-5dee-aff6-fe24d3d014f3"
+        },
+        "valid_at": "2026-09-07T06:02:32.570042Z",
+        "known_at": "2026-09-07T06:02:32.570042Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "b4e43985-3867-4e82-a716-743b6e0454a8",
+        "workflow_id": "transformation:b4e43985-3867-4e82-a716-743b6e0454a8",
+        "created_at": "2026-09-07T09:02:59.907111+04:00",
+        "display_name": "SOG retained-window observation counts",
+        "transformation": {
+          "version_id": "e963991d-e1ed-5344-914a-f54cdc880fee",
+          "resource_id": "d77a76bc-1b60-5dee-aff6-fe24d3d014f3"
+        },
+        "valid_at": "2026-09-07T05:02:59.161655Z",
+        "known_at": "2026-09-07T05:02:59.161655Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "3b24ca45-807d-4d0d-9749-09ff44876664",
+        "workflow_id": "transformation:3b24ca45-807d-4d0d-9749-09ff44876664",
+        "created_at": "2026-09-07T09:02:26.048467+04:00",
+        "display_name": "SOG retained-window observation counts",
+        "transformation": {
+          "version_id": "e963991d-e1ed-5344-914a-f54cdc880fee",
+          "resource_id": "d77a76bc-1b60-5dee-aff6-fe24d3d014f3"
+        },
+        "valid_at": "2026-09-07T05:02:25.582189Z",
+        "known_at": "2026-09-07T05:02:25.582189Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "bf61ac13-efdf-45d4-902c-4a126aa30245",
+        "workflow_id": "transformation:bf61ac13-efdf-45d4-902c-4a126aa30245",
+        "created_at": "2026-09-07T08:50:23.984931+04:00",
+        "display_name": "SOG retained-window observation counts",
+        "transformation": {
+          "version_id": "c01faa87-4753-5307-b34a-ac227e6fa9df",
+          "resource_id": "682fca79-0950-5505-948b-385fabff06c1"
+        },
+        "valid_at": "2026-09-07T04:50:23.475658Z",
+        "known_at": "2026-09-07T04:50:23.475658Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "70f8c374-0d0a-458a-b6aa-f36674636fd3",
+        "workflow_id": "transformation:70f8c374-0d0a-458a-b6aa-f36674636fd3",
+        "created_at": "2026-09-07T08:27:15.183797+04:00",
+        "display_name": "Review source account evidence before publication",
+        "transformation": {
+          "version_id": "4d2700cc-6002-5405-99f5-bcaf8c622424",
+          "resource_id": "80031d1f-c5a2-5495-ac25-b7dbf9c0480d"
+        },
+        "valid_at": "2026-09-07T04:27:14.705455Z",
+        "known_at": "2026-09-07T04:27:14.705455Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 0,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "d60106cc-c121-4cc7-a201-7062d0a51087",
+        "workflow_id": "transformation:d60106cc-c121-4cc7-a201-7062d0a51087",
+        "created_at": "2026-09-07T08:19:32.151414+04:00",
+        "display_name": "Review source account evidence before publication",
+        "transformation": {
+          "version_id": "4d2700cc-6002-5405-99f5-bcaf8c622424",
+          "resource_id": "80031d1f-c5a2-5495-ac25-b7dbf9c0480d"
+        },
+        "valid_at": "2026-09-07T04:19:31.598474Z",
+        "known_at": "2026-09-07T04:19:31.598474Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "99254463-6b8d-403a-886e-66472f355d39",
+        "workflow_id": "transformation:99254463-6b8d-403a-886e-66472f355d39",
+        "created_at": "2026-09-07T08:15:27.117874+04:00",
+        "display_name": "Review source account evidence before publication",
+        "transformation": {
+          "version_id": "5152bedf-5bae-5b66-ada1-3816bd43506b",
+          "resource_id": "80031d1f-c5a2-5495-ac25-b7dbf9c0480d"
+        },
+        "valid_at": "2026-09-07T04:15:26.631604Z",
+        "known_at": "2026-09-07T04:15:26.631604Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 0,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "6ae16d38-c3d1-4c82-9239-dda508de2545",
+        "workflow_id": "transformation:6ae16d38-c3d1-4c82-9239-dda508de2545",
+        "created_at": "2026-09-07T08:00:18.465522+04:00",
+        "display_name": "Source account retained-input chain",
+        "transformation": {
+          "version_id": "683c56d2-b4f6-5127-bcfb-360c9c6bc86b",
+          "resource_id": "b3751372-9735-5381-9045-5ceff9cdbdb0"
+        },
+        "valid_at": "2026-09-07T04:00:17.974353Z",
+        "known_at": "2026-09-07T04:00:17.974353Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "96b55340-9e0e-46a1-a3de-5db222747965",
+        "workflow_id": "transformation:96b55340-9e0e-46a1-a3de-5db222747965",
+        "created_at": "2026-09-07T07:05:54.103129+04:00",
+        "display_name": "SGP source worksheet build",
+        "transformation": {
+          "version_id": "4cddf232-2e11-578b-9c73-3704b128f712",
+          "resource_id": "5b45554d-4968-52ed-ad06-d974d6196b08"
+        },
+        "valid_at": "2026-09-07T03:05:53.201318Z",
+        "known_at": "2026-09-07T03:05:53.201318Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "request_id": "49b1d06c-2607-4e66-b39e-e375631ce003",
+        "workflow_id": "transformation:49b1d06c-2607-4e66-b39e-e375631ce003",
+        "created_at": "2026-09-07T05:38:33.110155+04:00",
+        "display_name": "SGP source worksheet build",
+        "transformation": {
+          "version_id": "a20d76ba-5d54-5aa6-864b-ccf31b3b1ef7",
+          "resource_id": "5b45554d-4968-52ed-ad06-d974d6196b08"
+        },
+        "valid_at": "2026-09-07T01:38:31.861283Z",
+        "known_at": "2026-09-07T01:38:31.861283Z",
+        "completed_steps": 2,
+        "failed_steps": 0,
+        "budget_refused_steps": 0,
+        "total_steps": 2,
+        "published_output_sets": 1,
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      }
+    ],
+    "next_cursor": {
+      "created_at": "2026-09-07T05:38:33.110155+04:00",
+      "request_id": "49b1d06c-2607-4e66-b39e-e375631ce003"
+    }
+  },
+  "native_contract_test": "1 passed: historical label after rename, pagination, scope exclusion, no replanning, topology and publication guards",
+  "release_accepted": false
+}

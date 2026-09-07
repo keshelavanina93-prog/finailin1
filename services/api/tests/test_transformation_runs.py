@@ -134,12 +134,23 @@ def test_native_two_node_publication_replay_and_forged_topology(retained, monkey
     with pytest.raises(WorkspaceError, match="incomplete"):
         runs.publish(failed_context)
     assert runs.read(reader, failed_identity)["publications"] == []
+    # Build discovery must keep the label pinned by the retained request even
+    # after the current definition is renamed.
+    publish(
+        definition.model_copy(
+            update={
+                "expected_version_id": UUID(row["version_id"]),
+                "display_name": "SYNTHETIC renamed current build",
+            }
+        )
+    )
     with monkeypatch.context() as patch:
         patch.setattr(runs.function_execution, "plan", lambda *_: pytest.fail("History replanned"))
         first_page = transformation_history.discover(reader, limit=1)
         cursor = first_page["next_cursor"]
         assert first_page["items"][0]["workflow_id"] == failed_identity
         assert first_page["items"][0]["failed_steps"] == 1
+        assert first_page["items"][0]["display_name"] == row["display_name"]
         second_page = transformation_history.discover(
             reader, 1, datetime.fromisoformat(cursor["created_at"]), UUID(cursor["request_id"])
         )
@@ -148,6 +159,7 @@ def test_native_two_node_publication_replay_and_forged_topology(retained, monkey
         assert historical["workflow_id"] == identity
         assert historical["completed_steps"] == historical["total_steps"] == 2
         assert historical["published_output_sets"] == 1
+        assert historical["display_name"] == row["display_name"]
         assert "runtime_status" not in historical
         stranger = reader.model_copy(
             update={"scope": reader.scope.model_copy(update={"legal_entity_id": "other-company"})}

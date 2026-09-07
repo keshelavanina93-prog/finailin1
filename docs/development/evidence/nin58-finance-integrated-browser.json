@@ -1,0 +1,151 @@
+{
+  "runtime": "http://127.0.0.1:3062",
+  "api": "http://127.0.0.1:8062",
+  "frontend_commit": "0beeadd",
+  "candidate_evidence_commit": "21e5566",
+  "route": [
+    "SEG company",
+    "Data / Builds / retained history first row",
+    "Open retained build",
+    "Open retained analysis",
+    "Open in Finance",
+    "Account 7310.02.1 Debit",
+    "Base!S2 source cells",
+    "Function system trace",
+    "Return to Finance",
+    "Exact Function NYX context",
+    "Excluded Base!S288"
+  ],
+  "request_id": "d1393555-a1c2-4b0a-b071-d59a1b0a9a92",
+  "no_additional_calculation_started": true,
+  "observations": {
+    "history": {
+      "company": "შპს სოკარ ენერჯი ჯორჯია⌄",
+      "loadedBuilds": 20,
+      "historyVisible": true,
+      "errors": []
+    },
+    "baseline": {
+      "company": "შპს სოკარ ენერჯი ჯორჯია⌄",
+      "heading": "Finance",
+      "context": "Ledger\nSEG statutory 1C general ledger\nBook\n1C reglamented accounting\nPeriod\nJanuary 2025\nCurrency\nGEL",
+      "groups": [
+        "1210\tCredit\t1120126.500000000003\tInspect 70 source rows",
+        "1210\tDebit\t935409.05000000000000\tInspect 18 source rows",
+        "1220\tCredit\t41465.39999999999705\tInspect 6 source rows",
+        "1220\tDebit\t97189.83\tInspect 5 source rows",
+        "1297\tCredit\t39619.30\tInspect 4 source rows",
+        "1297\tDebit\t39619.300000000003\tInspect 2 source rows",
+        "1410\tCredit\t129684.05000000000000\tInspect 14 source rows",
+        "1410\tDebit\t281496.43000000000015\tInspect 19 source rows",
+        "1430\tCredit\t2202.54\tInspect 11 source rows",
+        "1430\tDebit\t1852.05\tInspect 5 source rows",
+        "1496\tDebit\t2398582.33\tInspect 1 source rows",
+        "1622\tCredit\t15188.47\tInspect 2 source rows",
+        "1622\tDebit\t15188.469999999999\tInspect 6 source rows",
+        "1810\tCredit\t800000\tInspect 2 source rows",
+        "1821\tDebit\t629318.86\tInspect 2 source rows",
+        "2120\tCredit\t27000\tInspect 1 source rows",
+        "2130\tDebit\t32809.33\tInspect 4 source rows",
+        "2160\tCredit\t5809.33\tInspect 3 source rows",
+        "2160\tDebit\t5809.33\tInspect 3 source rows",
+        "2230\tCredit\t39353.010000000000011\tInspect 148 source rows",
+        "2231\tCredit\t90490.58\tInspect 1 source rows",
+        "2610\tCredit\t135813.6400000000044\tInspect 14 source rows",
+        "3110\tCredit\t368284.6399999999910336\tInspect 124 source rows",
+        "3110\tDebit\t190686.14\tInspect 49 source rows",
+        "3111\tCredit\t91213.530000000000\tInspect 8 source rows",
+        "3111\tDebit\t102820.37999999999701\tInspect 6 source rows",
+        "3130\tCredit\t789562.100000000003\tInspect 63 source rows",
+        "3130\tDebit\t785181.92\tInspect 13 source rows",
+        "3199\tCredit\t68102.02\tInspect 5 source rows",
+        "3199\tDebit\t68102.01999999999705\tInspect 17 source rows",
+        "3310.01.1\tCredit\t987.31000000000002\tInspect 3 source rows",
+        "3310.01.1\tDebit\t987.31\tInspect 1 source rows",
+        "3320\tCredit\t157763.58000000000001\tInspect 2 source rows",
+        "3320\tDebit\t156508.89\tInspect 2 source rows",
+        "3330\tCredit\t43227.74\tInspect 20 source rows",
+        "3330\tDebit\t43227.74\tInspect 1 source rows",
+        "3340.01\tCredit\t1045.67\tInspect 2 source rows",
+        "3340.01\tDebit\t1045.67\tInspect 2 source rows",
+        "3340.03\tCredit\t2733.930000000000002\tInspect 6 source rows",
+        "3340.03\tDebit\t2733.930000000000002\tInspect 6 source rows",
+        "3340.04\tCredit\t49366.780000000001981\tInspect 43 source rows",
+        "3340.04\tDebit\t49366.780000000001981\tInspect 43 source rows",
+        "3370.01\tCredit\t31152.24\tInspect 3 source rows",
+        "3370.01\tDebit\t15722.9\tInspect 1 source rows",
+        "3390\tCredit\t252327.34\tInspect 4 source rows",
+        "3390\tDebit\t303146.380000000001983\tInspect 52 source rows",
+        "3411\tCredit\t1252364.62\tInspect 5 source rows",
+        "3411\tDebit\t21748.75\tInspect 2 source rows",
+        "4141\tCredit\t3506580\tInspect 2 source rows",
+        "4170\tCredit\t52634.82\tInspect 1 source rows",
+        "4170\tDebit\t129245.75999999999\tInspect 1 source rows",
+        "6110\tCredit\t281496.43000000000015\tInspect 19 source rows",
+        "6110\tDebit\t42940.13\tInspect 19 source rows",
+        "7310.02.1\tDebit\t58988.95\tInspect 6 source rows",
+        "7410\tDebit\t7714.67\tInspect 1 source rows",
+        "7410.01\tDebit\t1229652.6000000000074616\tInspect 288 source rows",
+        "8110\tCredit\t3107371.66\tInspect 9 source rows",
+        "8220.01.1\tDebit\t4854884.020000000003\tInspect 17 source rows",
+        "9210\tDebit\t987.31000000000002\tInspect 3 source rows"
+      ],
+      "evidence": [
+        "Saved calculation evidenceInvocation: c631bb9c-f92e-5dd9-a693-233c1b3b7925Receipt: 1cb82d90e0945947feb5aee646d8dc3ce076a4c2311b4b2eea17a41dfe2350d7This is retained calculation evidence. Reopening it does not authorize new accounting use."
+      ],
+      "viewport": {
+        "width": 1264,
+        "height": 625
+      }
+    },
+    "source": {
+      "source": "Account 7310.02.1 · debit contributors\nBase!2 · 2025-01-01 · Поступление товаров и услуг SEG0000000028 from 01.01.2025 0:00:00\n\nDebit 7310.02.1 · Credit 3110\n\nOriginal retained cells\nSOURCE CELL\tRECORDED VALUE\tSOURCE FORMULA\nBase!A2\t01.01.2025 0:00:00\t—\nBase!B2\t1\t—\nBase!C2\tПоступление товаров и услуг SEG0000000028 from 01.01.2025 0:00:00\t—\nBase!D2\tსოკარ ენერჯი ჯორჯია // Сокар Энерджи Джорджия\t—\nBase!E2\t7310.02.1\t—\nBase!F2\tწარმომადგენლობითი ხარჯები (ადმინისტრაციული) ზენორმატიული // Представительские расходы_адм. сверхнорм\t—\nBase!G2\tდირექტორატი\t—\nBase!J2\t0\t—\nBase!K2\t0\t—\nBase!L2\t3110\t—\nBase!M2\tსს გუდვილი\t—\nBase!N2\tხელშეკრულება გამყიდველთან\t—\nBase!Q2\t0\t—\nBase!R2\t0\t—\nBase!S2\t731.97\t—\nBase!T2\trepresentative (administrative) по вх.док. от\t—\nBase!AA2\tშედარების საფუძველზე დარიცხვა\t—\nBase!AC2\tExpense\t—\nBase!AD2\t821.66000000000008\t—\nBase!AE2\t01\tMID(A2,4,2)\nBase!AF2\tწარმომადგენლობითი ხარჯები (ადმინისტრაციული) ზენორმატიული // Представительские расходы_адм. сверхнорм\tIF(AC2=\"Expense\",IF(OR(LEFT(E2,2)=\"73\",LEFT(E2,2)=\"82\"),F2,G2),\"???\")\nBase!AG2\tდირექტორატი\tIF(AC2=\"Expense\",IF(OR(LEFT(E2,2)=\"73\",LEFT(E2,2)=\"82\"),G2,F2),\"???\")\nBase!AH2\tDirectorate\t—\nBase!AI2\tGoodwill\t—\nBase!AJ2\tHousehold Materials\t—\nBase!AN2\t89.690000000000055\tAD2-S2\nBase!3 · 2025-01-01 · Поступление товаров и услуг SEG0000000062 from 01.01.2025 0:00:00\nBase!168 · 2025-01-31 · Поступление товаров и услуг SEG0000000030 from 31.01.2025 0:00:00\nBase!189 · 2025-01-31 · Поступление товаров и услуг SEG0000000058 from 31.01.2025 0:00:00\nBase!203 · 2025-01-31 · Поступление товаров и услуг SEG0000000072 from 31.01.2025 0:00:00\nBase!257 · 2025-01-31 · Операция (бухгалтерский и налоговый учет) SEG00000012 from 31.01.2025 12:00:09\nPrevious source rowsNext source rows",
+      "openRows": [
+        "Base!2 · 2025-01-01 · Поступление товаров и услуг SEG0000000028 from 01.01.2025 0:00:00"
+      ],
+      "evidence": [
+        "Saved calculation evidenceInvocation: c631bb9c-f92e-5dd9-a693-233c1b3b7925Receipt: 1cb82d90e0945947feb5aee646d8dc3ce076a4c2311b4b2eea17a41dfe2350d7This is retained calculation evidence. Reopening it does not authorize new accounting use."
+      ]
+    },
+    "trace": {
+      "time": [
+        "2026-09-07T16:55:01.091233+00:00"
+      ],
+      "selected": [
+        "FunctionDefinitionSEG January 2025 posted accoAPPROVED · 43338349SEG January 2025 posted account movements · 43338349-1dde-5fa5-81a0-8a94c871f1bc"
+      ],
+      "detail": "Canvas overview · click to move, or focus and use arrow keys\nFunctionDefinition\nSEG January 2025 posted account movements\n\nAPPROVED · recorded 9/7/2026, 8:53:44 PM\n\nOpen this version\nRecorded connections\nDepends on · POSTED_MOVEMENT_INPUT\n2120 · 2120 · დაუმთავრებელი მშენებლობა\nDepends on · POSTED_MOVEMENT_INPUT\n1210 · 1210 · ეროვნული ვალუტა რეზიდენტ ბანკში\nDepends on · POSTED_MOVEMENT_INPUT\n3320 · 3320 · გადასახდელი საშემოსავლო გადასახადი\nDepends on · POSTED_MOVEMENT_INPUT\n2610 · 2610 · არამატერიალური აქტივების ამორტიზაცია\nDepends on · POSTED_MOVEMENT_INPUT\n3390 · 3390 · სხვა საგადასახადო ვალდებულებები\nDepends on · POSTED_MOVEMENT_INPUT\n3340.01 · 3340.01 · გადახდილი დ. ღ. გ. ძირითადი საშუალე"
+    },
+    "return": {
+      "heading": "Finance",
+      "company": "შპს სოკარ ენერჯი ჯორჯია⌄",
+      "openRows": [
+        "Base!2 · 2025-01-01 · Поступление товаров и услуг SEG0000000028 from 01.01.2025 0:00:00"
+      ],
+      "selected": "Account 7310.02.1 · debit contributors",
+      "evidence": [
+        "Saved calculation evidenceInvocation: c631bb9c-f92e-5dd9-a693-233c1b3b7925Receipt: 1cb82d90e0945947feb5aee646d8dc3ce076a4c2311b4b2eea17a41dfe2350d7This is retained calculation evidence. Reopening it does not authorize new accounting use."
+      ]
+    },
+    "nyx": {
+      "reply": "Explain selected\n\nშპს სოკარ ენერჯი ჯორჯია · CONFIGURED · snapshot at request\n\nSEG January 2025 posted account movements is a recorded function definition. Definition review: approved; evidence class: user asserted. Known by G8 at Sep 7, 2026, 08:55 PM. Effective from Sep 7, 2026, 08:53 PM; no end is recorded. No reviewed material state was recorded for this version by the selected knowledge cutoff. Its current material authority and availability are not established by this historical view. The visible history contains 1 version and 2 dependent links. Trace shows the recorded evidence chain. These links identify where to investigate; they do not establish a cause, complete business impact or permission for current financial use.\n\nTrace SEG January 2025 posted account movements\nHistory of SEG January 2025 posted account movements\nExact retained reference",
+      "refs": [
+        "94c26511-53bf-5dd4-97e8-b89a11334bd3",
+        "43338349-1dde-5fa5-81a0-8a94c871f1bc",
+        "2026-09-07T16:55:01.091233+00:00"
+      ]
+    },
+    "excluded": {
+      "excluded": "Excluded source rows\n\nThe posted amount is missing or is not a literal source number. No supplementary value or zero was substituted.\n\nBase!S288: no literal posted amount.\n\nBase!288 · 2025-01-31 · Корректировка долга SEG00000011 from 31.01.2025 23:45:38\nPrevious source rowsNext source rows",
+      "evidence": [
+        "Saved calculation evidenceInvocation: c631bb9c-f92e-5dd9-a693-233c1b3b7925Receipt: 1cb82d90e0945947feb5aee646d8dc3ce076a4c2311b4b2eea17a41dfe2350d7This is retained calculation evidence. Reopening it does not authorize new accounting use."
+      ]
+    }
+  },
+  "limits": [
+    "Current-binding exact version is required; general historical-binding report rendering is not accepted.",
+    "Dense worksheet/source drawer and view scroll refinements remain pending NIN25.",
+    "NYX is deterministic recorded-resource context; persistent Findings/Investigations and AI reasoning are not implemented."
+  ],
+  "release_accepted": false
+}

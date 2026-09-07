@@ -82,3 +82,54 @@ invocation through Finance and an Open in Finance handoff from retained builds.
 NIN-25, NIN-49, NIN-58 and release acceptance remain open. Compatible later-source
 adoption, shared Finding/Investigation state and the rest of the golden journey
 remain unbuilt or unproven.
+
+## Finance consumer and history discovery integration
+
+Product candidate c97ad07 and its evidence 9ae8a85 were integrated as 0beeadd and
+21e5566. Finance now consumes the same retained invocation through the existing
+build output, with no second calculation, report formula or private company
+identity. In the integrated production browser on port 3062, the journey was:
+
+`SEG → Data / Builds / retained history → Open retained analysis → Open in Finance
+→ account 7310.02.1 Debit → six contributors → Base!S2 (731.97) → exact Function
+trace → return → NYX exact Function context → excluded Base!S288`.
+
+The report retained its original invocation and receipt throughout. Returning from
+trace preserved the selected account and expanded source row. NYX's recorded
+resource explanation used Function version 43338349-1dde-5fa5-81a0-8a94c871f1bc and
+knowledge time 2026-09-07T16:55:01.091233+00:00. This verifies deterministic context
+continuity, not an implemented Finding, Investigation or model reasoning runtime.
+
+Browser verification exposed a real build-history timeout. Profiling found that
+the initial workflow-to-resource-name join consumed approximately 67 seconds;
+all 20 retained proof checks together took 2 seconds. Discovery now bounds the
+workflow page first, then reads only those exact resource versions for labels.
+RLS, the historical labels and every existing retained proof check remain intact.
+The same authorized 20-build page dropped from 69.022 to 1.879 seconds locally,
+and the browser loaded the history successfully. This is a measured local result,
+not a general scale or production latency certification.
+
+The focused native contract test passed in 18.50 seconds, including old labels
+after the current definition was renamed, pagination, foreign-scope exclusion,
+no history replanning, and topology/publication guards. Both Finance handoff tests
+and the integrated production build passed. API and worker restarted after this
+one-file backend correction. The same canonical Function and Transformation were
+reviewed for the new manifest: versions 0609eaa9-ba2b-5d62-8399-1f52e801e0ef and
+57dd9c8d-88ba-5cb6-9f12-383ad955651a respectively. The original worker result and
+accounting binding remained unchanged and reopened successfully afterward.
+
+Machine evidence: `evidence/nin58-build-history-performance.json` and
+`evidence/nin58-finance-integrated-browser.json`; screenshots:
+`evidence/nin58-finance-integrated.png` and `evidence/nin58-finance-source.png`.
+NIN-50 cycle 10 independently confirmed Temporal completion, one publication,
+unchanged retained hashes, and equality with cycle 9's original-source arithmetic.
+It did not perform another disruptive restart or grant convergence/release acceptance.
+
+NIN-25 remains open. The working Finance table still needs more compact rows,
+better source inspection, historical account labels and view-scroll refinement;
+the product specialist owns that follow-up. Reports fail closed when their saved
+binding version differs from the current context, so general historical binding
+rendering is not accepted. The next shared prerequisite is reviewed source-family
+and snapshot compatibility. A scoped inventory established no eligible later SEG
+posting snapshot; synthetic compatibility checks cannot substitute for an authentic
+paired-source comparison, and withdrawn January 2026 remains excluded.

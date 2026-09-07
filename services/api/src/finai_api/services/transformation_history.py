@@ -32,12 +32,9 @@ def discover(
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         scope = records.set_scope(conn, principal)
         rows = cursor.execute(
-            "SELECT w.workflow_id,w.created_at,v.display_name FROM workflow_requests w "
-            "LEFT JOIN resource_versions v ON v.tenant_id=w.tenant_id "
-            "AND v.resource_id=(w.payload->'compiled_plan'->'request'"
-            "->'transformation'->>'resource_id')::uuid "
-            "AND v.version_id=(w.payload->'compiled_plan'->'request'"
-            "->'transformation'->>'version_id')::uuid "
+            "SELECT w.workflow_id,w.created_at,"
+            "w.payload->'compiled_plan'->'request'->'transformation' AS transformation "
+            "FROM workflow_requests w "
             "WHERE w.tenant_id=%s AND w.exact_scope=%s AND w.definition_version=%s "
             "AND (%s::timestamptz IS NULL OR (w.created_at,w.workflow_id)<(%s,%s)) "
             "ORDER BY w.created_at DESC,w.workflow_id DESC LIMIT %s",
@@ -51,6 +48,18 @@ def discover(
                 limit + 1,
             ),
         ).fetchall()
+        # Bound name resolution before touching the version table. A join here can
+        # evaluate resource visibility across the entire version history even when
+        # only one small workflow page was requested. Exact point reads retain RLS
+        # and the historical label; all immutable proof checks still run below.
+        for row in rows[:limit]:
+            reference = row["transformation"]
+            name = cursor.execute(
+                "SELECT display_name FROM resource_versions "
+                "WHERE tenant_id=%s AND resource_id=%s AND version_id=%s",
+                (principal.scope.tenant_id, reference["resource_id"], reference["version_id"]),
+            ).fetchone()
+            row["display_name"] = name["display_name"] if name else None
     page = rows[:limit]
     items = []
     for row in page:
