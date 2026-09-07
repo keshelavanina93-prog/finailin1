@@ -14,7 +14,45 @@ function Get-WorkflowProcess($Record) {
 function Test-WorkflowOwnership($Record,$Process) {
  return [bool]($Record -and $Process -and $Process.ExecutablePath -eq $Record.exe -and
   $Process.CommandLine -eq $Record.command -and
+  (-not $Record.parent_pid -or $Process.ParentProcessId -eq $Record.parent_pid) -and
   $Process.CreationDate.ToUniversalTime() -eq ([datetime]$Record.created).ToUniversalTime())
+}
+function Stop-WorkflowTree($Record) {
+ if(-not (Test-WorkflowOwnership $Record (Get-WorkflowProcess $Record))){
+  throw 'Workflow root ownership changed; refusing tree stop'
+ }
+ $pending=[Collections.Generic.Queue[object]]::new()
+ $pending.Enqueue($Record)
+ $tree=[Collections.Generic.List[object]]::new()
+ $seen=@{}
+ while($pending.Count){
+  $entry=$pending.Dequeue()
+  $key=[string]$entry.pid+':'+[string]$entry.created
+  if($seen.ContainsKey($key)){continue}
+  $seen[$key]=$true
+  $actual=Get-WorkflowProcess $entry
+  if(-not (Test-WorkflowOwnership $entry $actual)){continue}
+  if($tree.Count -ge 32){throw 'Workflow descendant ownership bound exceeded'}
+  $tree.Add($entry)
+  $depth=if($entry.depth){[int]$entry.depth}else{0}
+  foreach($child in @(Get-CimInstance Win32_Process -Filter "ParentProcessId=$([int]$entry.pid)")){
+   if($child.CreationDate.ToUniversalTime() -lt $actual.CreationDate.ToUniversalTime()){continue}
+   if($depth -ge 8 -or -not $child.ExecutablePath -or -not $child.CommandLine){
+    throw 'Workflow descendant ownership cannot be established'
+   }
+   $pending.Enqueue(@{pid=$child.ProcessId;parent_pid=$child.ParentProcessId;exe=$child.ExecutablePath;command=$child.CommandLine;created=$child.CreationDate.ToUniversalTime().ToString('o');depth=$depth+1})
+  }
+ }
+ foreach($entry in @($tree | Sort-Object -Property depth -Descending)){
+  if(Test-WorkflowOwnership $entry (Get-WorkflowProcess $entry)){Stop-Process -Id $entry.pid -Force}
+ }
+ $deadline=[DateTime]::UtcNow.AddSeconds(10)
+ do {
+  $remaining=@($tree | Where-Object {Test-WorkflowOwnership $_ (Get-WorkflowProcess $_)})
+  if(-not $remaining.Count){return}
+  Start-Sleep -Milliseconds 100
+ } while([DateTime]::UtcNow -lt $deadline)
+ throw 'Owned workflow tree did not exit within the bounded stop timeout'
 }
 function Test-TemporalReachability {
  $connection=[Net.Sockets.TcpClient]::new()
@@ -62,7 +100,7 @@ try {
   $owned=Test-WorkflowOwnership $record $process
   if($process -and -not $owned){throw 'Workflow process ownership changed; refusing mutation'}
   if($Action -eq 'stop'){
-   if($owned){Stop-Process -Id $record.pid -Force}
+   if($owned){Stop-WorkflowTree $record}
    $records=@($records | Where-Object name -ne $spec.name)
   } elseif($Action -eq 'start' -and -not $owned){
    if($spec.name -eq 'temporal' -and (Get-NetTCPConnection -LocalPort 7233 -State Listen -ErrorAction SilentlyContinue)){throw 'Temporal port occupied by unmanaged service'}

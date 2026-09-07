@@ -1,0 +1,87 @@
+{
+  "checked_at": "2026-09-07T06:19:11.936562+00:00",
+  "contract": "g8-d-native-development/1",
+  "python": {
+    "executable": "D:\\FinAI\\finailinear1\\.venv\\Scripts\\python.exe",
+    "base_prefix": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64",
+    "stdlib": "D:\\FinAI\\finailinear1\\.finai\\python\\cpython-3.13.14-windows-x86_64\\Lib",
+    "version": "3.13.14 (tags/v3.13.14:fd17997, Jun 10 2026, 13:03:48) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "preserved_environment": "D:\\FinAI\\finailinear1\\.finai\\environment-backups\\venv-c-base-20260907",
+  "node": "D:\\FinAI\\finailinear1\\.finai\\tools\\node\\node.exe",
+  "node_sha256": "ae1a50511be58e987483fdbc12125407443926d2d394669ade2352776e920dd3",
+  "services": [
+    {
+      "service": "minio",
+      "process_id": 8684,
+      "executable": "D:\\FinAI\\finailinear1\\.finai\\tools\\minio\\minio.exe",
+      "created_at": "2026-09-06T20:14:38.013057Z"
+    },
+    {
+      "service": "api",
+      "process_id": 19072,
+      "executable": "D:\\FinAI\\finailinear1\\.venv\\Scripts\\python.exe",
+      "created_at": "2026-09-07T06:15:03.305699Z"
+    },
+    {
+      "service": "web",
+      "process_id": 35076,
+      "executable": "D:\\FinAI\\finailinear1\\.finai\\tools\\node\\node.exe",
+      "created_at": "2026-09-07T06:15:13.238598Z"
+    },
+    {
+      "service": "observer",
+      "process_id": 43908,
+      "executable": "D:\\FinAI\\finailinear1\\.venv\\Scripts\\python.exe",
+      "created_at": "2026-09-07T06:15:22.3469430Z"
+    }
+  ],
+  "workflow_processes": [
+    {
+      "exe": "D:\\FinAI\\finailinear1\\.finai\\tools\\temporal\\temporal.exe",
+      "name": "temporal",
+      "created": "2026-09-07T04:20:17.427695Z",
+      "pid": 444,
+      "log": "D:\\FinAI\\finailinear1\\.finai\\workflow-temporal-28d77feb830446a2a8a7e7b6200f055a",
+      "command": "\"D:\\FinAI\\finailinear1\\.finai\\tools\\temporal\\temporal.exe\" server start-dev --headless --ip 127.0.0.1 --port 7233 --db-filename \"D:\\FinAI\\finailinear1\\.finai\\data\\temporal.db\""
+    },
+    {
+      "created": "2026-09-07T06:15:07.8402190Z",
+      "log": "D:\\FinAI\\finailinear1\\.finai\\workflow-worker-6128acdb36534375a58e4f04106eca65",
+      "name": "worker",
+      "pid": 39912,
+      "command": "\"D:\\FinAI\\finailinear1\\.venv\\Scripts\\python.exe\" -m finai_api.workflow_worker",
+      "exe": "D:\\FinAI\\finailinear1\\.venv\\Scripts\\python.exe"
+    }
+  ],
+  "source_workflow": {
+    "request": {
+      "request_id": "b3bf45f6-8cc1-4cf2-955e-81bbe4b3313b",
+      "transformation": {
+        "resource_id": "682fca79-0950-5505-948b-385fabff06c1",
+        "version_id": "df23bf78-c8fe-5af4-915e-4d3e32b6403f"
+      },
+      "valid_at": "2026-09-07T06:16:48.304821+00:00",
+      "known_at": "2026-09-07T06:16:48.304821+00:00"
+    },
+    "retained_repeat_and_history_equal": true,
+    "invocations": {
+      "observation_counts": {
+        "id": "5c8bba0e-0186-5779-9a2e-b9a1d1eba4d6",
+        "receipt_hash": "f887c7ec4365d5b8a5983bf463f38a2d92a024fabdc811c13b4a2ff7b4d0361c",
+        "run_id": "fcr_502767ede643d90ae8190c65daf18338bf1c2b12cfd06020312c4d85fb6638bf",
+        "source_object_count": 2
+      },
+      "source_window": {
+        "id": "9cee0329-8ef8-56b1-81f0-75723c8e7163",
+        "receipt_hash": "c8d34eabf5c8eaf8b61762f7a017d557a7ceacbae57ad89f284016b59c734d79",
+        "run_id": "fcr_e95253ac3e5a93aa227d2677be22fab895adf1c02bdc78bc15ae664813f43641",
+        "source_object_count": 2
+      }
+    },
+    "full_proof": "D:\\FinAI\\finailinear1\\.finai\\runtime-proof\\d-native-grouped-runtime.json",
+    "full_proof_sha256": "1e56af167d9f4843a925143754138a828a2014cbc1df23f6c2d9a44083ebe629"
+  },
+  "financial_authority_established": false,
+  "release_accepted": false
+}

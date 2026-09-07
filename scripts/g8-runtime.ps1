@@ -99,14 +99,14 @@ try {
         & "$PSScriptRoot\load-local.ps1"
         & "$PSScriptRoot\assert-d-drive.ps1" -RepositoryRoot $repositoryRoot
         $python = Join-Path $env:VIRTUAL_ENV 'Scripts\python.exe'
+        $node = Join-Path $env:FINAI_RUNTIME_ROOT 'tools\node\node.exe'
         $server = Join-Path $repositoryRoot 'apps\web\.next\standalone\apps\web\server.js'
         $requiredFiles = @()
         if ($Service -in @('all', 'api', 'observer')) { $requiredFiles += $python }
-        if ($Service -in @('all', 'web')) { $requiredFiles += $server }
+        if ($Service -in @('all', 'web')) { $requiredFiles += @($server, $node) }
         foreach ($required in $requiredFiles) {
             if (-not (Test-Path -LiteralPath $required)) { throw 'Runtime dependencies/build missing; run bootstrap-local.ps1 and pnpm build first.' }
         }
-        $node = (Get-Command node.exe -ErrorAction Stop).Source
         $specs = @(
             @{ name = 'api'; port = $ApiPort; url = "http://127.0.0.1:$ApiPort/ready"; executable = $python; arguments = "-m uvicorn finai_api.main:app --host 127.0.0.1 --port $ApiPort" },
             @{ name = 'web'; port = $WebPort; url = "http://127.0.0.1:$WebPort"; executable = $node; arguments = ('"' + $server + '"') }
