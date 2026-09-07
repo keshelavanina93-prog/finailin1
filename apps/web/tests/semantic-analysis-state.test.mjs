@@ -3,7 +3,7 @@ import {readFile} from "node:fs/promises";
 import test from "node:test";
 import ts from "typescript";
 const source=await readFile(new URL("../app/semantic-analysis-state.ts",import.meta.url),"utf8");
-const {assertProjection,evidenceCaption,hasUsefulMagnitude,parseView,requestKey,worksheetTabStop}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
+const {assertProjection,evidenceCaption,formatAnalysisDecimal,hasUsefulMagnitude,parseView,requestKey,worksheetTabStop}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
 const id="11111111-1111-4111-8111-111111111111",hash="a".repeat(64),row="row_"+hash,time="2025-01-31T00:00:00Z";
 const pin={resource_id:id,version_id:id,content_hash:hash};
 const field={key:"units",label:"Units",kind:"decimal",role:"MEASURE",aggregation:"RETAINED_VALUE_ONLY",definition:pin,filterable:false,groupable:false,options:[]};
@@ -96,4 +96,28 @@ test("worksheet retains a keyboard entry after filtering, hiding columns or scro
  assert.equal(worksheetTabStop(focus,[],["$row"]),null);
  assert.equal(worksheetTabStop(focus,["retained"],[]),null);
  assert.deepEqual(focus,{row:"retained",column:"amount"});
+});
+
+const presentedField={...objectTable.descriptor.fields[0],unit:"GEL",unit_reference:pin,presentation:{format:"FIXED_DECIMAL",fraction_digits:2,currency:pin}};
+test("declared decimal display preserves large exact strings, signs and tiny residues",()=>{
+ for(const [exact,expected] of [["900719925474099312345.125","900,719,925,474,099,312,345.13"],["-58988.955","-58,988.96"],["0.0000000000006576","≈0.00"],["-0.0000000000006576","≈-0.00"],["0","0.00"],["-0.00","-0.00"],["1E+900","1E+900"],["1E-900","1E-900"]]){
+  assert.equal(formatAnalysisDecimal(exact,presentedField),expected);
+  assert.equal(formatAnalysisDecimal(exact,field),exact);
+ }
+ assert.equal(formatAnalysisDecimal("12.5",{...presentedField,presentation:{...presentedField.presentation,fraction_digits:0}}),"13");
+ assert.equal(formatAnalysisDecimal("12.1234567",{...presentedField,presentation:{...presentedField.presentation,fraction_digits:6}}),"12.123457");
+});
+test("presentation is optional and cannot override currency, type or authority semantics",()=>{
+ const candidate={...objectTable,descriptor:{...objectTable.descriptor,fields:[presentedField]}};
+ const retained=JSON.stringify(candidate);
+ assert.doesNotThrow(()=>assertProjection(candidate,request));
+ assert.equal(JSON.stringify(candidate),retained);
+ assert.equal(candidate.descriptor.measure,null);assert.equal(candidate.descriptor.visual,"NONE");
+ for(const patch of [{presentation:null},{presentation:{...presentedField.presentation,format:"PERCENT"}},{presentation:{...presentedField.presentation,fraction_digits:7}},{presentation:{...presentedField.presentation,fraction_digits:true}},{presentation:{...presentedField.presentation,fraction_digits:1.5}},{presentation:{...presentedField.presentation,currency:{...pin,version_id:"22222222-2222-4222-8222-222222222222"}}},{presentation:{...presentedField.presentation,currency:{...pin,content_hash:"b".repeat(64)}}},{presentation:{...presentedField.presentation,scale:100}},{unit:null},{unit:" "},{unit_reference:null},{kind:"integer"},{role:"DIMENSION"}]){
+  const invalid={...presentedField,...patch};
+  assert.throws(()=>assertProjection({...candidate,descriptor:{...candidate.descriptor,fields:[invalid]}},request));
+  assert.throws(()=>formatAnalysisDecimal("12.345",invalid));
+ }
+ assert.throws(()=>assertProjection({...candidate,descriptor:{...candidate.descriptor,visual:"HORIZONTAL_BARS",measure:"units"}},request));
+ assert.doesNotThrow(()=>assertProjection({...projection,descriptor:{...projection.descriptor,fields:[{...presentedField,role:"MEASURE",aggregation:"RETAINED_VALUE_ONLY"}]}},request));
 });

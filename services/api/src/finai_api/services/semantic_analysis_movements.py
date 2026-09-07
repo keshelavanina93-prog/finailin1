@@ -1,6 +1,12 @@
 """Movement-only paired account table through the existing semantic workspace."""
 
-from finai_api.domain.semantic_analysis import Coverage, FieldDefinition, Row, Value
+from finai_api.domain.semantic_analysis import (
+    Coverage,
+    DecimalPresentation,
+    FieldDefinition,
+    Row,
+    Value,
+)
 from finai_api.services.entity_movement_review import review
 from finai_api.services.semantic_analysis_posted import build as posted_build
 from finai_api.services.semantic_analysis_support import pin, row_key, value_options
@@ -64,6 +70,16 @@ def build(history, plan, resolver, company_id):
             for coordinate in movement["source_coordinates"]
         ]
     currency = next(f for f in descriptor.fields if f.role == "MEASURE")
+    digits = function["attributes"]["definition"].get("movement_display_fraction_digits")
+    if digits is not None and currency.unit_reference is None:
+        raise WorkspaceError(409, "Movement display requires the exact currency reference")
+    presentation = (
+        DecimalPresentation(
+            format="FIXED_DECIMAL", fraction_digits=digits, currency=currency.unit_reference
+        )
+        if digits is not None
+        else None
+    )
     fields = [descriptor.fields[0].model_copy(update={"options": value_options(rows, "account")})]
     for key, label in (
         ("debit_movement", "Debit movement"),
@@ -76,6 +92,7 @@ def build(history, plan, resolver, company_id):
                 label=label,
                 kind="decimal",
                 role="ATTRIBUTE",
+                presentation=presentation,
                 definition=descriptor.function,
                 unit=currency.unit,
                 unit_reference=currency.unit_reference,
