@@ -17,6 +17,9 @@
   "next_build_exit_code": 0,
   "build_invocation_independently_verified": false,
   "runtime_verified": false,
+  "runtime_verification_outcome": "FAILED_NODE_DEPENDENCY_RESOLUTION",
+  "runtime_failure": "MODULE_NOT_FOUND @swc/helpers/_/_interop_require_default",
+  "temporary_processes_stopped": true,
   "release_accepted": false,
   "frontend_acceptance": false,
   "sbom_complete": false

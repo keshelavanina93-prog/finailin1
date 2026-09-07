@@ -1,0 +1,29 @@
+{
+  "api_source_archive_sha256": "135531cd50aae31df4449ab99cc463c705c6362c27d3ebe114863385016bd15a",
+  "api_source_commit": "7c26eebc2681b04d97d9da06744cf5079a483185",
+  "api_wheel_sha256": "ad02f3d51be927f56705a90143b6171bc19fff85c277f9f5e334f2bc277ee41a",
+  "contract": "g8-built-http-verification/1",
+  "http_statuses": {
+    "api_ready": 200,
+    "web_readiness_authorized": 200,
+    "web_readiness_unauthorized": 401,
+    "web_root": 200,
+    "web_session_authorized": 200
+  },
+  "installed_api_package": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\python\\Lib\\site-packages\\finai_api",
+  "node_executable_sha256": "ae1a50511be58e987483fdbc12125407443926d2d394669ade2352776e920dd3",
+  "owned_processes_stopped": true,
+  "python_executable_sha256": "b70275ad94210fce7548761143be5e177769721045e287bb6c80aac3f928c65b",
+  "release_accepted": false,
+  "requests": "GET_ONLY",
+  "web_archive_sha256": "e7e59f0a0a41409eb893f30763b6c9846d51f11aa632c72d6b009668d4408662",
+  "web_build_invocation_verified": false,
+  "web_source": {
+    "archive_sha256": "a6b0913ae10b4221ee5abf643d315a8718008b22342f5ada76d9a40c1c4a2916",
+    "commit": "bec2202e62c9c7544eaa0766d9cd9e1118ca6940",
+    "files": 589,
+    "kind": "SOURCE_ARTIFACT",
+    "tree": "6cf4fcbd7daaa756d6742a88af6e816162ea2b28"
+  },
+  "worker_execution_verified": false
+}

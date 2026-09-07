@@ -10,9 +10,12 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location("source_artifact", ROOT / "scripts/package-source.py")
+spec = importlib.util.spec_from_file_location(
+    "source_artifact", ROOT / "scripts/package-source.py"
+)
 source_artifact = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(source_artifact)
+WEB_MANIFEST = "G8-WEB-MANIFEST.json"
 MAX_FILES = 100_000
 MAX_BYTES = 2_000_000_000
 
@@ -47,21 +50,31 @@ def resolved_path(path):
 def permitted(path, roots):
     resolved = resolved_path(path)
     if not within(resolved, [resolved_path(root) for root in roots]):
-        raise ValueError("Dependency resolves outside the recorded build roots: " + str(path))
+        raise ValueError(
+            "Dependency resolves outside the recorded build roots: " + str(path)
+        )
     info = path.lstat()
-    if (getattr(info, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT
-            and not path.is_symlink() and not path.is_junction()):
+    if (
+        getattr(info, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT
+        and not path.is_symlink()
+        and not path.is_junction()
+    ):
         raise ValueError("Unsupported reparse point: " + str(path))
     if not resolved.is_file() and not resolved.is_dir():
-        raise ValueError("Only regular files and directories may be packaged: " + str(path))
+        raise ValueError(
+            "Only regular files and directories may be packaged: " + str(path)
+        )
     return resolved
 
 
 def private(name):
     lower = name.lower()
-    return lower == ".env" or lower.startswith(".env.") or lower in {
-        ".npmrc", ".pnpmrc", ".netrc", "credentials", "credentials.json"
-    } or lower.endswith((".pem", ".key", ".p12", ".pfx"))
+    return (
+        lower == ".env"
+        or lower.startswith(".env.")
+        or lower in {".npmrc", ".pnpmrc", ".netrc", "credentials", "credentials.json"}
+        or lower.endswith((".pem", ".key", ".p12", ".pfx"))
+    )
 
 
 def package(source, archive, output_root, dependency_roots, build_directory):
@@ -81,20 +94,75 @@ def package(source, archive, output_root, dependency_roots, build_directory):
     output_root.mkdir(parents=True, exist_ok=True)
     stage = Path(tempfile.mkdtemp(prefix="web-artifact-", dir=output_root))
     payload = stage / "web.zip"
-    files, excluded, visited_names = [], [], set()
+    files, excluded, visited_names, links, directories = [], [], set(), [], set()
+    standalone_root = resolved_path(standalone)
     total = 0
     with zipfile.ZipFile(payload, "x", compression=zipfile.ZIP_STORED) as target:
+
         def collect(path, destination, ancestors=()):
             nonlocal total
             resolved = permitted(path, roots)
             if private(path.name):
                 excluded.append(destination)
                 return
+            if path.is_symlink() or path.is_junction():
+                if not resolved.is_dir():
+                    raise ValueError("Only directory dependency links are supported")
+                if resolved.is_relative_to(standalone_root):
+                    relative = resolved.relative_to(standalone_root)
+                elif resolved.is_relative_to(roots[0]):
+                    relative = resolved.relative_to(roots[0])
+                else:
+                    raise ValueError(
+                        "Dependency link cannot map to the traced standalone tree"
+                    )
+                mapped = standalone_root / relative
+                mapped_resolved = resolved_path(mapped)
+                if (
+                    mapped.is_symlink()
+                    or mapped.is_junction()
+                    or not mapped_resolved.is_relative_to(standalone_root)
+                ):
+                    raise ValueError(
+                        "Dependency link target is not a physical traced directory"
+                    )
+                destination = source_artifact.safe_name(destination)
+                target_name = source_artifact.safe_name(relative.as_posix())
+                if (
+                    destination.casefold() == target_name.casefold()
+                    or destination.casefold().startswith(target_name.casefold() + "/")
+                ):
+                    raise ValueError(
+                        "Dependency link cannot target itself or an ancestor"
+                    )
+                if destination.casefold() in visited_names:
+                    raise ValueError("Duplicate dependency link path")
+                visited_names.add(destination.casefold())
+                links.append(
+                    {
+                        "path": destination,
+                        "target": target_name,
+                        "kind": "DIRECTORY_LINK",
+                    }
+                )
+                return
             if resolved.is_dir():
+                if destination:
+                    folded = source_artifact.safe_name(destination).casefold()
+                    if folded in visited_names:
+                        raise ValueError("Conflicting artifact directory")
+                    visited_names.add(folded)
+                    directories.add(folded)
                 if resolved in ancestors:
                     raise ValueError("Dependency directory cycle detected")
-                for child in sorted(resolved.iterdir(), key=lambda item: item.name.casefold()):
-                    collect(child, destination + "/" + child.name if destination else child.name, (*ancestors, resolved))
+                for child in sorted(
+                    resolved.iterdir(), key=lambda item: item.name.casefold()
+                ):
+                    collect(
+                        child,
+                        destination + "/" + child.name if destination else child.name,
+                        (*ancestors, resolved),
+                    )
                 return
             destination = source_artifact.safe_name(destination)
             folded = destination.casefold()
@@ -106,38 +174,75 @@ def package(source, archive, output_root, dependency_roots, build_directory):
                 raise ValueError("Web artifact exceeds bounded inventory")
             data = resolved.read_bytes()
             after = resolved.stat()
-            if (permitted(path, roots) != resolved
-                    or (after.st_size, after.st_mtime_ns, after.st_ino)
-                    != (before.st_size, before.st_mtime_ns, before.st_ino)):
+            if permitted(path, roots) != resolved or (
+                after.st_size,
+                after.st_mtime_ns,
+                after.st_ino,
+            ) != (before.st_size, before.st_mtime_ns, before.st_ino):
                 raise ValueError("Build output changed during collection")
             total += len(data)
             source_artifact.member(target, destination, data)
-            root_index = next(index for index, root in enumerate(roots) if resolved.is_relative_to(root))
-            files.append({"path": destination, "sha256": source_artifact.digest(data), "bytes": len(data),
-                          "input_root": root_index, "input_path": resolved.relative_to(roots[root_index]).as_posix()})
+            root_index = next(
+                index
+                for index, root in enumerate(roots)
+                if resolved.is_relative_to(root)
+            )
+            files.append(
+                {
+                    "path": destination,
+                    "sha256": source_artifact.digest(data),
+                    "bytes": len(data),
+                    "input_root": root_index,
+                    "input_path": resolved.relative_to(roots[root_index]).as_posix(),
+                }
+            )
 
         collect(standalone, "")
         collect(static, "apps/web/" + build_directory + "/static")
         public = source / "apps/web/public"
         if public.is_dir():
             collect(public, "apps/web/public")
-    verify_inputs(source, manifest)
-    receipt = {
-        "contract": "g8-web-artifact/1", "kind": "WEB_BUILD_ARTIFACT",
-        "status": "VERIFIED_INPUTS_STANDALONE_COLLECTED", "source": provenance,
-        "archive_sha256": source_artifact.file_digest(payload), "archive": payload.name,
-        "entrypoint": "apps/web/server.js", "build_directory": build_directory,
-        "input_roots": [str(root) for root in roots], "files": files,
-        "excluded_private_paths": excluded, "bytes": total,
-        "build_invocation_verified": False, "runnable_release": False,
-        "release_accepted": False, "sbom_complete": False,
-        "limitations": ["Collection verifies tracked inputs and collected bytes, not build invocation provenance.",
-                        "Environment values embedded by the build are not established secret-free by file exclusion.",
-                        "No runtime or release acceptance is established."]
-    }
+        for link in links:
+            if link["target"].casefold() not in directories:
+                raise ValueError(
+                    "Dependency link target is absent from collected physical directories"
+                )
+        verify_inputs(source, manifest)
+        receipt = {
+            "contract": "g8-web-artifact/2",
+            "kind": "WEB_BUILD_ARTIFACT",
+            "status": "VERIFIED_INPUTS_STANDALONE_COLLECTED",
+            "source": provenance,
+            "entrypoint": "apps/web/server.js",
+            "build_directory": build_directory,
+            "input_roots": [str(root) for root in roots],
+            "files": files,
+            "links": links,
+            "excluded_private_paths": excluded,
+            "bytes": total,
+            "build_invocation_verified": False,
+            "runnable_release": False,
+            "release_accepted": False,
+            "sbom_complete": False,
+            "limitations": [
+                "Collection verifies tracked inputs and collected bytes, not build invocation provenance.",
+                "Environment values embedded by the build are not established secret-free by file exclusion.",
+                "No runtime or release acceptance is established.",
+            ],
+        }
+        source_artifact.member(target, WEB_MANIFEST, source_artifact.encoded(receipt))
+    receipt.update(
+        archive_sha256=source_artifact.file_digest(payload), archive=payload.name
+    )
     (stage / "web-artifact.json").write_bytes(source_artifact.encoded(receipt))
-    return {"artifact_directory": str(stage), "archive_sha256": receipt["archive_sha256"],
-            "files": len(files), "bytes": total, "source_commit": provenance["commit"], "status": receipt["status"]}
+    return {
+        "artifact_directory": str(stage),
+        "archive_sha256": receipt["archive_sha256"],
+        "files": len(files),
+        "bytes": total,
+        "source_commit": provenance["commit"],
+        "status": receipt["status"],
+    }
 
 
 def main():
@@ -150,9 +255,18 @@ def main():
     args = parser.parse_args()
     if not re.fullmatch(r"\.next(?:-[a-z0-9-]+)?", args.build_directory):
         parser.error("Build directory must be a local .next directory")
-    print(json.dumps(package(args.source.absolute(), args.source_archive.absolute(),
-                             args.output_root.absolute(), [path.absolute() for path in args.dependency_root],
-                             args.build_directory), indent=2))
+    print(
+        json.dumps(
+            package(
+                args.source.absolute(),
+                args.source_archive.absolute(),
+                args.output_root.absolute(),
+                [path.absolute() for path in args.dependency_root],
+                args.build_directory,
+            ),
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

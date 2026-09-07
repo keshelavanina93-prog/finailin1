@@ -1,0 +1,19 @@
+{
+  "kind": "COMMITTED_WEB_ARTIFACT_WITH_LINKS",
+  "contract": "g8-web-artifact/2",
+  "source_commit": "bec2202e62c9c7544eaa0766d9cd9e1118ca6940",
+  "source_archive_sha256": "a6b0913ae10b4221ee5abf643d315a8718008b22342f5ada76d9a40c1c4a2916",
+  "web_archive_sha256": "e7e59f0a0a41409eb893f30763b6c9846d51f11aa632c72d6b009668d4408662",
+  "manifest_sha256": "9217924d472cdc864a41e2cf3790ffbed65e2dcdc06f31c12bc5dd663fe6fed2",
+  "artifact_directory": "D:\\FinAI\\finailinear1\\.finai\\artifacts\\web-builds\\web-artifact-6nyqpb3d",
+  "files": 1300,
+  "links": 26,
+  "payload_bytes": 25117802,
+  "tracked_source_files_verified": 589,
+  "entrypoint": "apps/web/server.js",
+  "isolated_http_verified": true,
+  "full_runtime_verified": false,
+  "release_accepted": false,
+  "frontend_acceptance": false,
+  "sbom_complete": false
+}
