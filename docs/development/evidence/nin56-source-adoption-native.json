@@ -1,0 +1,87 @@
+{
+  "evidence_kind": "SYNTHETIC_NATIVE_CONTRACT_PROOF",
+  "synthetic": true,
+  "authentic_paired_source_acceptance": false,
+  "observed_date": "2026-09-07",
+  "test": {
+    "id": "services/api/tests/test_source_adoption_native.py::test_native_reviewed_source_transition",
+    "result": "PASS",
+    "passed": 1,
+    "elapsed_seconds": 92.14,
+    "namespace": "d70f7a89-516f-4843-aecd-93d8a0584b2c",
+    "access_entity": "SYNTHETIC-source-adoption-d70f7a89-516f-4843-aecd-93d8a0584b2c",
+    "worktree": "D:/FinAI/g8-source-adoption",
+    "invocation": "pytest services/api/tests/test_source_adoption_native.py -o addopts= -p no:cacheprovider -q -s --tb=short",
+    "explicit_opt_in": "FINAI_SOURCE_ADOPTION_NATIVE=1",
+    "fixture_rerun_for_this_evidence": false
+  },
+  "company_id": "ab71f753-24fe-55d7-bb8f-69f6ce618149",
+  "family": {
+    "resource_id": "9cda90f4-db0e-56fd-b939-c1b4755e77f2",
+    "version_id": "8c2c0c22-59e4-55ff-8edf-21ee35a8d710",
+    "content_hash": "88d34eb05ddfbe75e1000ce517d4bb249a518843194aedb0be8d48ab501e9836"
+  },
+  "adoption": {
+    "resource_id": "9d4b2fe6-ff41-5d79-8b2c-480100c15f67",
+    "version_id": "0334c918-cd11-5945-929b-d1c14431597f",
+    "content_hash": "92eb7e6b2dda1b64717675050ec3454b823d7d3601d34ef29833286952bda81c",
+    "policy": "DISJOINT_PERIOD_ADDITION"
+  },
+  "snapshots": [
+    {
+      "label": "SYNTHETIC A",
+      "document_id": "doc_73e72a8a37c666d72c077676023d8151faafff7a8a3edad2af2acde135f4ba16",
+      "binding_id": "a082ddfe-112d-5638-b4f4-e8cff0a27d2e",
+      "period": "2025-01",
+      "source_rows": 1,
+      "missing_amount_count": 1,
+      "missing_amount_coordinates": ["Base!S2"]
+    },
+    {
+      "label": "SYNTHETIC B",
+      "document_id": "doc_505ce24669c9a1fa8dde405d79ae94b014516d9a5b155f1e62e2176f148dcfae",
+      "binding_id": "cb03a5ff-44e4-5a93-97c3-81d793a461f0",
+      "period": "2025-02",
+      "source_rows": 1,
+      "missing_amount_count": 0,
+      "missing_amount_coordinates": []
+    },
+    {
+      "label": "SYNTHETIC C competing successor candidate",
+      "document_id": "doc_4405a674980f8715549c544b9baa92010670a3955b163716f95be0b049b67bc3",
+      "binding_id": "15e918f5-f441-5319-9f82-8936640878fc",
+      "period": "2025-03",
+      "adoption_from_A": "REFUSED_COMPETING_SUCCESSOR"
+    }
+  ],
+  "asserted_results": {
+    "retained_workbook_bytes_used": true,
+    "separate_actor_proposal_review": "PASS",
+    "binding_lifecycle": "OBSERVED_AVAILABLE",
+    "same_company_and_account_mapping_identities": "PASS",
+    "distinct_snapshot_company_aliases": "PASS",
+    "successor_own_period": "PASS",
+    "original_baseline_unchanged": "PASS",
+    "read_successor": "PASS",
+    "accounting_aggregation_authorized": false,
+    "schema_tamper": "REFUSED",
+    "self_review": "REFUSED",
+    "competing_successor": "REFUSED",
+    "replacement_with_different_period": "REFUSED"
+  },
+  "ordinary_reader_isolation": {
+    "probe_kind": "READ_ONLY_EXISTING_CONFIGURED_NON_ADMIN_PRINCIPAL",
+    "default_transaction_read_only": true,
+    "company": {"resource_id": "ab71f753-24fe-55d7-bb8f-69f6ce618149", "status": 404},
+    "adoption": {"resource_id": "9d4b2fe6-ff41-5d79-8b2c-480100c15f67", "status": 404},
+    "source": {"document_id": "doc_73e72a8a37c666d72c077676023d8151faafff7a8a3edad2af2acde135f4ba16", "status": 404}
+  },
+  "boundaries": {
+    "real_seg_changed": false,
+    "canonical_schemas_changed_by_fixture": false,
+    "credential_or_grant_registry_changed": false,
+    "runtime_api_deployed_by_fixture": false,
+    "financial_totals_or_complete_ledger_proven": false,
+    "authentic_later_seg_source_available": false
+  }
+}
