@@ -1,6 +1,6 @@
 {
   "issue": "NIN-57",
-  "candidate_commit": "3ba989c",
+  "candidate_commit": "690f987",
   "branch": "development/nin57-finance-analysis",
   "baseline": "5a2e25f",
   "checked_at": "2026-09-07T16:22:05.576Z",
@@ -34,7 +34,8 @@
     "loading": "Observed in authenticated browser",
     "invalid_decimal": "Browser alert refuses grouping separators",
     "degraded": "Unestablished currency and non-additive source observation status visible",
-    "empty": "Authenticated browser: 0 contributors, no-match explanation, no zero-balance claim, disabled pagination"
+    "empty": "Authenticated browser: 0 contributors, no-match explanation, no zero-balance claim, disabled pagination",
+    "temporal_followup": "690f987: microsecond-aware known_at guards, snapshot-bound account labels; authenticated TR!row:106 source cells reopened successfully; 5 focused tests/typecheck/lint PASS"
   },
   "query": {
     "object_type": "SourceJournalMovement",
