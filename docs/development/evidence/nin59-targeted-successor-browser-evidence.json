@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "issue": "NIN-59",
+  "date": "2026-09-07",
+  "implementation_freeze": "bd9c62d",
+  "integration_commit": "1cb3151d73d3a3a4e3f5a5a482d52e3df7765a1c",
+  "web_build_id": "0Gdm-UkD1qWSqMWfb9Jii",
+  "scope": "TARGETED_SUCCESSOR_RECHECK_ONLY",
+  "observed_identity_label": "Enterprise identity steward",
+  "changes_to_code_runtime_or_grants": false,
+  "checks": {
+    "narrow_820": {
+      "document_overflow": false,
+      "label_within_header_bounds": true,
+      "label_overflow": "hidden",
+      "label_white_space": "normal",
+      "table_width": 619.99,
+      "grid_width": 567.61,
+      "measure": "58,988.95",
+      "evidence": "DOM_AND_LAYOUT_GEOMETRY"
+    },
+    "restoration_notice": "Saved view restored. Exact result references verified.",
+    "stale_descriptor": {
+      "method": "Deliberately stale all-zero descriptor hash in reference-only deep link; retained source untouched.",
+      "refusal": true,
+      "review_original_action": true,
+      "recovered_invocation": "c631bb9c-f92e-5dd9-a693-233c1b3b7925",
+      "recovered_company": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+      "recovered_rows": 59,
+      "filters": [],
+      "selected_row": null,
+      "original_descriptor_sha256": "5a9701895198d03153ea7c306110adb0b4cf969c383dc1b369c554b58985c47e"
+    },
+    "saved_preference_after_recovery": {
+      "reopen_succeeded": true,
+      "selected_rows": 1,
+      "measure": "58,988.95"
+    }
+  },
+  "artifact_root": "D:\\FinAI\\g8-adaptive-workspace\\artifacts\\nin59-browser",
+  "artifacts": [
+    "successor-narrow-layout.json",
+    "successor-restored.txt",
+    "successor-stale-refusal.txt",
+    "successor-recovery.json",
+    "successor-saved-preference-preserved.txt"
+  ],
+  "limitations": [
+    "CDP screenshot capture timed out twice; no successor screenshot or full visual acceptance claimed.",
+    "Only requested narrow/restoration/409 checks repeated; earlier two-subject proof remains bound to24fd9cc.",
+    "Independent NIN-50 acceptance remains open."
+  ]
+}
