@@ -97,7 +97,7 @@ def test_long_windows_dependency_path_keeps_containment(tmp_path):
     root = tmp_path / "dependencies"
     root.mkdir()
     parent = root / ("long-component-" * 8) / ("nested-component-" * 7)
-    extended = Path("\\\\?\\" + str(parent.absolute()))
+    extended = Path("\\\\?\\" + str(parent.absolute())) if os.name == "nt" else parent
     extended.mkdir(parents=True)
     file = extended / "index.js"
     file.write_bytes(b"// long-path fixture")
@@ -111,6 +111,9 @@ def test_long_windows_dependency_path_keeps_containment(tmp_path):
 
 def junction(path, target):
     path.parent.mkdir(parents=True, exist_ok=True)
+    if os.name != "nt":
+        path.symlink_to(target, target_is_directory=True)
+        return
     environment = {**os.environ, "G8_TEST_LINK": str(path), "G8_TEST_TARGET": str(target)}
     subprocess.run(
         [
