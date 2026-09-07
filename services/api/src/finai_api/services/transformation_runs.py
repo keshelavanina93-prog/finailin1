@@ -331,6 +331,11 @@ def load(context: dict) -> dict:
         "dependencies": {node["node_id"]: node["depends_on"] for node in compiled["nodes"]},
         **({"publication_review": True} if compiled.get("publication_review") else {}),
         **({"binding_review": True} if compiled.get("binding_review") else {}),
+        **(
+            {"execution_policy": compiled["execution_policy"]}
+            if compiled.get("execution_policy")
+            else {}
+        ),
     }
 
 
@@ -396,30 +401,70 @@ def execute_node(context: dict) -> dict:
         "output": reference,
         "new_run_required": not succeeded,
     }
-    budget = compiled.get("resource_budget")
-    if succeeded and budget is not None:
-        usage = measured_usage(principal, reference["run_id"])
-        totals = cumulative_usage(retained["events"], node_id, usage)
-        if exceeded_budget(totals, budget):
-            refusal = {
-                "node": node_id,
-                "state": "BUDGET_REFUSED",
-                "output": reference,
-                "usage": usage,
-                "cumulative_usage": totals,
-                "resource_budget": budget,
-                "new_run_required": True,
-            }
-            records.event(principal, identity, "node:" + node_id + ":budget-refused", refusal)
-            return refusal
-        terminal["usage"] = usage
-    records.event(principal, identity, "node:" + node_id + ":terminal", terminal)
+    terminal = retain_terminal(principal, identity, compiled, terminal)
+    if terminal["state"] == "BUDGET_REFUSED":
+        return terminal
     if succeeded:
         for output in compiled["outputs"]:
             if output["node_id"] == node_id:
                 publication.stage(
                     principal, identity, 0, output["output_id"], "function-invocation/1", reference
                 )
+    return terminal
+
+
+def retain_terminal(principal: Principal, identity: str, compiled: dict, terminal: dict) -> dict:
+    """Commit measured usage once, atomically with the node's immutable terminal event."""
+    node_id = terminal["node"]
+    budget = compiled.get("resource_budget")
+    succeeded = terminal["state"] == "COMPLETED"
+    usage = (
+        measured_usage(principal, terminal["output"]["run_id"])
+        if succeeded and budget is not None
+        else None
+    )
+    with records.scope_connection(principal) as conn:
+        scope = records.set_scope(conn, principal)
+        conn.execute(
+            "SELECT pg_advisory_xact_lock(hashtextextended(%s,0))",
+            ("transformation-review:" + str(principal.scope.tenant_id) + ":" + identity,),
+        )
+        conn.execute(
+            "SELECT pg_advisory_xact_lock(hashtextextended(%s,45))",
+            (str(principal.scope.tenant_id) + ":" + identity,),
+        )
+        rows = conn.execute(
+            "SELECT event_id,payload FROM workflow_events WHERE tenant_id=%s AND workflow_id=%s",
+            (principal.scope.tenant_id, identity),
+        ).fetchall()
+        events = {row[0]: row[1] for row in rows}
+        for key in ("node:" + node_id + ":terminal", "node:" + node_id + ":budget-refused"):
+            if key in events:
+                prior = events[key]
+                if prior.get("output") != terminal["output"]:
+                    raise WorkspaceError(
+                        409, "Node terminal receipt conflicts with retained evidence"
+                    )
+                return prior
+        key = "node:" + node_id + ":terminal"
+        if usage is not None:
+            assert budget is not None
+            totals = cumulative_usage(list(events.values()), node_id, usage)
+            terminal = {**terminal, "usage": usage}
+            if exceeded_budget(totals, budget):
+                key = "node:" + node_id + ":budget-refused"
+                terminal = {
+                    **terminal,
+                    "state": "BUDGET_REFUSED",
+                    "cumulative_usage": totals,
+                    "resource_budget": budget,
+                    "new_run_required": True,
+                }
+        conn.execute(
+            "INSERT INTO workflow_events(tenant_id,workflow_id,exact_scope,event_id,payload) "
+            "VALUES(%s,%s,%s,%s,%s)",
+            (principal.scope.tenant_id, identity, Jsonb(scope), key, Jsonb(terminal)),
+        )
     return terminal
 
 

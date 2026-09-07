@@ -121,6 +121,13 @@ class TransformationBindingReview(BaseModel):
         return value
 
 
+class TransformationExecutionPolicy(BaseModel):
+    """Reviewed per-run scheduling limit, not a tenant or memory quota."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    max_concurrent_nodes: int = Field(strict=True, ge=1, le=4)
+
+
 class TransformationDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     definition: TransformationGraph
@@ -130,6 +137,9 @@ class TransformationDefinition(BaseModel):
         default=None, exclude_if=lambda value: value is None
     )
     binding_review: TransformationBindingReview | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    execution_policy: TransformationExecutionPolicy | None = Field(
         default=None, exclude_if=lambda value: value is None
     )
 

@@ -1,0 +1,2207 @@
+{
+  "phase": "PARALLEL_OVERLAP_VERIFIED",
+  "prepared": {
+    "sources": {
+      "budget_context": {
+        "resource_id": "2cc5e885-54f5-5b58-9359-29fd06bf8eac",
+        "version_id": "04968d1d-d74a-556c-a54a-5d1be27212b6",
+        "object_type": "CompanyDimension",
+        "identity_key": "source-dimension:2cc5e885-54f5-5b58-9359-29fd06bf8eac",
+        "display_name": "Budget Article New",
+        "access_entity": "entity-ge-001",
+        "schema_version_id": "914769e4-20d9-5d01-967d-43de86255079",
+        "attributes": {
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+          "dimension_id": "c7b6ad59-544a-5219-a9df-c23ec7f88264",
+          "source_column": "Z",
+          "source_header": "Budget Article New",
+          "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "source_record_id": "434c6e5a-85dc-5d06-b724-31020771254e"
+        },
+        "content_hash": "f4f8bc4a5f359bc2895a7e4953a9e05c85f42d74a83e0e952addf2a2c90c5e07",
+        "valid_from": "2026-09-06T11:12:51.691974+04:00",
+        "valid_to": null,
+        "system_from": "2026-09-06T11:12:56.360775+04:00",
+        "authority_state": "APPROVED",
+        "evidence_class": "SOURCE_BOUND",
+        "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3"
+      },
+      "source_record": {
+        "resource_id": "434c6e5a-85dc-5d06-b724-31020771254e",
+        "version_id": "8a428868-73b6-5658-ad2f-b906b44124bf",
+        "object_type": "SourceRecord",
+        "identity_key": "source-dimension:434c6e5a-85dc-5d06-b724-31020771254e",
+        "display_name": "TR!Z2",
+        "access_entity": "entity-ge-001",
+        "schema_version_id": "556519c2-1efd-53c2-8411-371d07823640",
+        "attributes": {
+          "coordinate": "TR!Z2",
+          "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+        },
+        "content_hash": "c2894717d7fbe926c39d3caaea130943a71ad4f6bb0532acfa270fb720d0434d",
+        "valid_from": "2026-09-06T11:12:51.691974+04:00",
+        "valid_to": null,
+        "system_from": "2026-09-06T11:12:56.099301+04:00",
+        "authority_state": "APPROVED",
+        "evidence_class": "SOURCE_BOUND",
+        "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3"
+      }
+    },
+    "functions": {
+      "budget_context": {
+        "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd",
+        "version_id": "a5797807-966d-5c38-854a-097e36264f04"
+      },
+      "source_record": {
+        "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43",
+        "version_id": "a9987bda-831c-54af-8504-fca7534fe92b"
+      },
+      "joined": {
+        "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c",
+        "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4"
+      }
+    },
+    "transformation": {
+      "resource_id": "aae791cb-4157-50c4-8798-3adcca744389",
+      "version_id": "9f97167c-bcb9-52ac-a89f-a0755db92b68"
+    }
+  },
+  "request": {
+    "known_at": "2026-09-07T12:53:49.638000Z",
+    "valid_at": "2026-09-07T12:53:49.638000Z",
+    "request_id": "39972057-1ccc-4928-b7a0-5557fe9057a0",
+    "transformation": {
+      "version_id": "9f97167c-bcb9-52ac-a89f-a0755db92b68",
+      "resource_id": "aae791cb-4157-50c4-8798-3adcca744389"
+    }
+  },
+  "checked_at": "2026-09-07T12:57:08.604026+00:00",
+  "result": {
+    "workflow_id": "transformation:39972057-1ccc-4928-b7a0-5557fe9057a0",
+    "request": {
+      "definition": {
+        "nodes": [
+          {
+            "node_id": "budget_context",
+            "function": {
+              "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+              "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd",
+              "content_hash": "a9d08a0a8711d943f8a8afbfb17f50617d38894510c8b8ca005d31a0f6473e68"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+                "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd"
+              },
+              "known_at": "2026-09-07T12:53:49.638000Z",
+              "valid_at": "2026-09-07T12:53:49.638000Z",
+              "request_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+                  "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd"
+                },
+                "known_at": "2026-09-07T12:53:49.638000Z",
+                "valid_at": "2026-09-07T12:53:49.638000Z",
+                "request_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+                "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd",
+                "content_hash": "a9d08a0a8711d943f8a8afbfb17f50617d38894510c8b8ca005d31a0f6473e68"
+              },
+              "plan_hash": "46d03df38fb4a95c26aa02c274be8ecc68ee39f4d707247ff7ffee42ef10de22",
+              "object_set": {
+                "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+                "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+                "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [],
+              "static_dependencies": [
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                },
+                {
+                  "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+                  "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+                  "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+                }
+              ]
+            }
+          },
+          {
+            "node_id": "source_record",
+            "function": {
+              "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+              "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43",
+              "content_hash": "f48550fe1053bbecb845c2641d11d90ed96f4a5b82e3d65b9dfa09d7db584ddf"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+                "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43"
+              },
+              "known_at": "2026-09-07T12:53:49.638000Z",
+              "valid_at": "2026-09-07T12:53:49.638000Z",
+              "request_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+                  "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43"
+                },
+                "known_at": "2026-09-07T12:53:49.638000Z",
+                "valid_at": "2026-09-07T12:53:49.638000Z",
+                "request_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+                "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43",
+                "content_hash": "f48550fe1053bbecb845c2641d11d90ed96f4a5b82e3d65b9dfa09d7db584ddf"
+              },
+              "plan_hash": "9146fa50643385fef69d5e2187cdaa60a43f42ea2ff48427c0d055260aab1bdc",
+              "object_set": {
+                "version_id": "3b23f4e3-c95f-53dd-b2e8-9425a39fd0de",
+                "resource_id": "39f89152-a7e5-54f8-975b-6c7ba29f6b20",
+                "content_hash": "e1af39c2951e57d7140b3a4e1ed956f1d4ad1e1accd9a609fda1bdee8ae0a809"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [],
+              "static_dependencies": [
+                {
+                  "version_id": "3b23f4e3-c95f-53dd-b2e8-9425a39fd0de",
+                  "resource_id": "39f89152-a7e5-54f8-975b-6c7ba29f6b20",
+                  "content_hash": "e1af39c2951e57d7140b3a4e1ed956f1d4ad1e1accd9a609fda1bdee8ae0a809"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                }
+              ]
+            }
+          },
+          {
+            "node_id": "joined",
+            "function": {
+              "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+              "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c",
+              "content_hash": "2fc74ddd5eb67801f225b7da159309d8a8335fd435a1858a0b49d4a73360e855"
+            },
+            "depends_on": [
+              "budget_context",
+              "source_record"
+            ],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+                "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c"
+              },
+              "known_at": "2026-09-07T12:53:49.638000Z",
+              "valid_at": "2026-09-07T12:53:49.638000Z",
+              "request_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+              "input_result": {
+                "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+              }
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+                  "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c"
+                },
+                "known_at": "2026-09-07T12:53:49.638000Z",
+                "valid_at": "2026-09-07T12:53:49.638000Z",
+                "request_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+                "input_result": {
+                  "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+                }
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+                "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c",
+                "content_hash": "2fc74ddd5eb67801f225b7da159309d8a8335fd435a1858a0b49d4a73360e855"
+              },
+              "plan_hash": "44b225281796d00be564aff45e4d375bdbf26700d9a4ce63948a9b2018245426",
+              "object_set": {
+                "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+                "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+                "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [],
+              "static_dependencies": [
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                },
+                {
+                  "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+                  "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+                  "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+                }
+              ]
+            },
+            "input_binding": {
+              "upstream_node_id": "budget_context"
+            }
+          }
+        ],
+        "outputs": {
+          "joined": "function-invocation/1",
+          "source_record": "function-invocation/1",
+          "budget_context": "function-invocation/1"
+        },
+        "version": "transformation-functions/1"
+      },
+      "request_hash": "e479173ac672af1a45658f1dc4c154001d1e393d327f5b94a702b2db7c0916d3",
+      "compiled_plan": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "nodes": [
+          {
+            "node_id": "budget_context",
+            "function": {
+              "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+              "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd",
+              "content_hash": "a9d08a0a8711d943f8a8afbfb17f50617d38894510c8b8ca005d31a0f6473e68"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+                "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd"
+              },
+              "known_at": "2026-09-07T12:53:49.638000Z",
+              "valid_at": "2026-09-07T12:53:49.638000Z",
+              "request_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+                  "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd"
+                },
+                "known_at": "2026-09-07T12:53:49.638000Z",
+                "valid_at": "2026-09-07T12:53:49.638000Z",
+                "request_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+                "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd",
+                "content_hash": "a9d08a0a8711d943f8a8afbfb17f50617d38894510c8b8ca005d31a0f6473e68"
+              },
+              "plan_hash": "46d03df38fb4a95c26aa02c274be8ecc68ee39f4d707247ff7ffee42ef10de22",
+              "object_set": {
+                "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+                "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+                "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [],
+              "static_dependencies": [
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                },
+                {
+                  "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+                  "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+                  "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+                }
+              ]
+            }
+          },
+          {
+            "node_id": "source_record",
+            "function": {
+              "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+              "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43",
+              "content_hash": "f48550fe1053bbecb845c2641d11d90ed96f4a5b82e3d65b9dfa09d7db584ddf"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+                "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43"
+              },
+              "known_at": "2026-09-07T12:53:49.638000Z",
+              "valid_at": "2026-09-07T12:53:49.638000Z",
+              "request_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+                  "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43"
+                },
+                "known_at": "2026-09-07T12:53:49.638000Z",
+                "valid_at": "2026-09-07T12:53:49.638000Z",
+                "request_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+                "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43",
+                "content_hash": "f48550fe1053bbecb845c2641d11d90ed96f4a5b82e3d65b9dfa09d7db584ddf"
+              },
+              "plan_hash": "9146fa50643385fef69d5e2187cdaa60a43f42ea2ff48427c0d055260aab1bdc",
+              "object_set": {
+                "version_id": "3b23f4e3-c95f-53dd-b2e8-9425a39fd0de",
+                "resource_id": "39f89152-a7e5-54f8-975b-6c7ba29f6b20",
+                "content_hash": "e1af39c2951e57d7140b3a4e1ed956f1d4ad1e1accd9a609fda1bdee8ae0a809"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [],
+              "static_dependencies": [
+                {
+                  "version_id": "3b23f4e3-c95f-53dd-b2e8-9425a39fd0de",
+                  "resource_id": "39f89152-a7e5-54f8-975b-6c7ba29f6b20",
+                  "content_hash": "e1af39c2951e57d7140b3a4e1ed956f1d4ad1e1accd9a609fda1bdee8ae0a809"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                }
+              ]
+            }
+          },
+          {
+            "node_id": "joined",
+            "function": {
+              "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+              "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c",
+              "content_hash": "2fc74ddd5eb67801f225b7da159309d8a8335fd435a1858a0b49d4a73360e855"
+            },
+            "depends_on": [
+              "budget_context",
+              "source_record"
+            ],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+                "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c"
+              },
+              "known_at": "2026-09-07T12:53:49.638000Z",
+              "valid_at": "2026-09-07T12:53:49.638000Z",
+              "request_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+              "input_result": {
+                "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+              }
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+                  "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c"
+                },
+                "known_at": "2026-09-07T12:53:49.638000Z",
+                "valid_at": "2026-09-07T12:53:49.638000Z",
+                "request_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+                "input_result": {
+                  "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+                }
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+                "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c",
+                "content_hash": "2fc74ddd5eb67801f225b7da159309d8a8335fd435a1858a0b49d4a73360e855"
+              },
+              "plan_hash": "44b225281796d00be564aff45e4d375bdbf26700d9a4ce63948a9b2018245426",
+              "object_set": {
+                "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+                "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+                "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [],
+              "static_dependencies": [
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                },
+                {
+                  "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+                  "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+                  "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+                }
+              ]
+            },
+            "input_binding": {
+              "upstream_node_id": "budget_context"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "node_id": "budget_context",
+            "output_id": "budget_context"
+          },
+          {
+            "node_id": "source_record",
+            "output_id": "source_record"
+          },
+          {
+            "node_id": "joined",
+            "output_id": "joined"
+          }
+        ],
+        "request": {
+          "known_at": "2026-09-07T12:53:49.638000Z",
+          "valid_at": "2026-09-07T12:53:49.638000Z",
+          "request_id": "39972057-1ccc-4928-b7a0-5557fe9057a0",
+          "transformation": {
+            "version_id": "9f97167c-bcb9-52ac-a89f-a0755db92b68",
+            "resource_id": "aae791cb-4157-50c4-8798-3adcca744389"
+          }
+        },
+        "contract": "transformation-plan/1",
+        "coverage": "DECLARED_QUERY_PAGES_ONLY",
+        "plan_hash": "2625cf915ca7c92a96df3d0be6aafece0499ae7ab8bb844d926703bb61233f22",
+        "node_order": [
+          "budget_context",
+          "source_record",
+          "joined"
+        ],
+        "exact_scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "estimated_work": {
+          "returned_rows": 3,
+          "derived_evaluations": 0
+        },
+        "transformation": {
+          "version_id": "9f97167c-bcb9-52ac-a89f-a0755db92b68",
+          "resource_id": "aae791cb-4157-50c4-8798-3adcca744389",
+          "content_hash": "caa830fa70f5f8615055317e101d71131dca8f307e5a40cb2045ddeef4f70d51"
+        },
+        "input_semantics": "EXPLICIT_RETAINED_RESULT",
+        "resource_budget": {
+          "max_returned_rows": 3,
+          "max_derived_evaluations": 0,
+          "max_published_result_bytes": 1000000
+        },
+        "execution_policy": {
+          "max_concurrent_nodes": 2
+        },
+        "dependency_semantics": "COMPLETION_BARRIER_ONLY",
+        "current_use_authorized": false,
+        "result_bytes_accounting": "POSTGRES_JSONB_TEXT_UTF8_V1",
+        "business_effect_authorized": false
+      }
+    },
+    "actor_id": "bootstrap-e9c67bab62119cae3b026aa3",
+    "created_at": "2026-09-07T16:54:16.595338+04:00",
+    "definition": {
+      "nodes": [
+        {
+          "node_id": "budget_context",
+          "function": {
+            "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+            "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd",
+            "content_hash": "a9d08a0a8711d943f8a8afbfb17f50617d38894510c8b8ca005d31a0f6473e68"
+          },
+          "depends_on": [],
+          "invocation": {
+            "limit": 1,
+            "offset": 0,
+            "function": {
+              "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+              "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd"
+            },
+            "known_at": "2026-09-07T12:53:49.638000Z",
+            "valid_at": "2026-09-07T12:53:49.638000Z",
+            "request_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+          },
+          "function_plan": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "request": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+                "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd"
+              },
+              "known_at": "2026-09-07T12:53:49.638000Z",
+              "valid_at": "2026-09-07T12:53:49.638000Z",
+              "request_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+            },
+            "contract": "function-plan/1",
+            "function": {
+              "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+              "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd",
+              "content_hash": "a9d08a0a8711d943f8a8afbfb17f50617d38894510c8b8ca005d31a0f6473e68"
+            },
+            "plan_hash": "46d03df38fb4a95c26aa02c274be8ecc68ee39f4d707247ff7ffee42ef10de22",
+            "object_set": {
+              "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+              "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+              "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+            },
+            "exact_scope": {
+              "period": "2026-08",
+              "currency": "GEL",
+              "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+              "legal_entity_id": "entity-ge-001"
+            },
+            "implementation": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+              "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+              "capabilities": {
+                "cdc": false,
+                "read": true,
+                "query": true,
+                "write": false,
+                "delete": false,
+                "limits": {
+                  "coverage": "QUERY_PAGE_ONLY",
+                  "returned_rows": 200,
+                  "grouping_fields": 4,
+                  "traversal_steps": 4,
+                  "query_predicates": 20,
+                  "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                  "derived_properties": 8,
+                  "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                  "database_scan_limit": null
+                },
+                "stream": false,
+                "update": false,
+                "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "reversal": false,
+                "snapshot": true,
+                "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                "simulation": false,
+                "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                "incremental": false,
+                "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                "formula_execution": false,
+                "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                "source_write_exactly_once": false,
+                "grouped_observation_counts": true,
+                "typed_relationship_filters": true,
+                "versioned_interface_inputs": true,
+                "composed_derived_properties": true,
+                "versioned_type_group_inputs": true
+              },
+              "maximum_rows": 200,
+              "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+              "implementation_id": "ontology.object-set-derived/v1",
+              "maximum_properties": 8
+            },
+            "derived_properties": [],
+            "static_dependencies": [
+              {
+                "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+              },
+              {
+                "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+                "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+                "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+              }
+            ]
+          }
+        },
+        {
+          "node_id": "source_record",
+          "function": {
+            "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+            "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43",
+            "content_hash": "f48550fe1053bbecb845c2641d11d90ed96f4a5b82e3d65b9dfa09d7db584ddf"
+          },
+          "depends_on": [],
+          "invocation": {
+            "limit": 1,
+            "offset": 0,
+            "function": {
+              "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+              "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43"
+            },
+            "known_at": "2026-09-07T12:53:49.638000Z",
+            "valid_at": "2026-09-07T12:53:49.638000Z",
+            "request_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+          },
+          "function_plan": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "request": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+                "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43"
+              },
+              "known_at": "2026-09-07T12:53:49.638000Z",
+              "valid_at": "2026-09-07T12:53:49.638000Z",
+              "request_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+            },
+            "contract": "function-plan/1",
+            "function": {
+              "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+              "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43",
+              "content_hash": "f48550fe1053bbecb845c2641d11d90ed96f4a5b82e3d65b9dfa09d7db584ddf"
+            },
+            "plan_hash": "9146fa50643385fef69d5e2187cdaa60a43f42ea2ff48427c0d055260aab1bdc",
+            "object_set": {
+              "version_id": "3b23f4e3-c95f-53dd-b2e8-9425a39fd0de",
+              "resource_id": "39f89152-a7e5-54f8-975b-6c7ba29f6b20",
+              "content_hash": "e1af39c2951e57d7140b3a4e1ed956f1d4ad1e1accd9a609fda1bdee8ae0a809"
+            },
+            "exact_scope": {
+              "period": "2026-08",
+              "currency": "GEL",
+              "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+              "legal_entity_id": "entity-ge-001"
+            },
+            "implementation": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+              "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+              "capabilities": {
+                "cdc": false,
+                "read": true,
+                "query": true,
+                "write": false,
+                "delete": false,
+                "limits": {
+                  "coverage": "QUERY_PAGE_ONLY",
+                  "returned_rows": 200,
+                  "grouping_fields": 4,
+                  "traversal_steps": 4,
+                  "query_predicates": 20,
+                  "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                  "derived_properties": 8,
+                  "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                  "database_scan_limit": null
+                },
+                "stream": false,
+                "update": false,
+                "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "reversal": false,
+                "snapshot": true,
+                "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                "simulation": false,
+                "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                "incremental": false,
+                "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                "formula_execution": false,
+                "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                "source_write_exactly_once": false,
+                "grouped_observation_counts": true,
+                "typed_relationship_filters": true,
+                "versioned_interface_inputs": true,
+                "composed_derived_properties": true,
+                "versioned_type_group_inputs": true
+              },
+              "maximum_rows": 200,
+              "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+              "implementation_id": "ontology.object-set-derived/v1",
+              "maximum_properties": 8
+            },
+            "derived_properties": [],
+            "static_dependencies": [
+              {
+                "version_id": "3b23f4e3-c95f-53dd-b2e8-9425a39fd0de",
+                "resource_id": "39f89152-a7e5-54f8-975b-6c7ba29f6b20",
+                "content_hash": "e1af39c2951e57d7140b3a4e1ed956f1d4ad1e1accd9a609fda1bdee8ae0a809"
+              },
+              {
+                "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+              }
+            ]
+          }
+        },
+        {
+          "node_id": "joined",
+          "function": {
+            "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+            "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c",
+            "content_hash": "2fc74ddd5eb67801f225b7da159309d8a8335fd435a1858a0b49d4a73360e855"
+          },
+          "depends_on": [
+            "budget_context",
+            "source_record"
+          ],
+          "invocation": {
+            "limit": 1,
+            "offset": 0,
+            "function": {
+              "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+              "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c"
+            },
+            "known_at": "2026-09-07T12:53:49.638000Z",
+            "valid_at": "2026-09-07T12:53:49.638000Z",
+            "request_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+            "input_result": {
+              "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+            }
+          },
+          "function_plan": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "request": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+                "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c"
+              },
+              "known_at": "2026-09-07T12:53:49.638000Z",
+              "valid_at": "2026-09-07T12:53:49.638000Z",
+              "request_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+              "input_result": {
+                "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+              }
+            },
+            "contract": "function-plan/1",
+            "function": {
+              "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+              "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c",
+              "content_hash": "2fc74ddd5eb67801f225b7da159309d8a8335fd435a1858a0b49d4a73360e855"
+            },
+            "plan_hash": "44b225281796d00be564aff45e4d375bdbf26700d9a4ce63948a9b2018245426",
+            "object_set": {
+              "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+              "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+              "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+            },
+            "exact_scope": {
+              "period": "2026-08",
+              "currency": "GEL",
+              "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+              "legal_entity_id": "entity-ge-001"
+            },
+            "implementation": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+              "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+              "capabilities": {
+                "cdc": false,
+                "read": true,
+                "query": true,
+                "write": false,
+                "delete": false,
+                "limits": {
+                  "coverage": "QUERY_PAGE_ONLY",
+                  "returned_rows": 200,
+                  "grouping_fields": 4,
+                  "traversal_steps": 4,
+                  "query_predicates": 20,
+                  "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                  "derived_properties": 8,
+                  "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                  "database_scan_limit": null
+                },
+                "stream": false,
+                "update": false,
+                "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "reversal": false,
+                "snapshot": true,
+                "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                "simulation": false,
+                "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                "incremental": false,
+                "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                "formula_execution": false,
+                "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                "source_write_exactly_once": false,
+                "grouped_observation_counts": true,
+                "typed_relationship_filters": true,
+                "versioned_interface_inputs": true,
+                "composed_derived_properties": true,
+                "versioned_type_group_inputs": true
+              },
+              "maximum_rows": 200,
+              "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+              "implementation_id": "ontology.object-set-derived/v1",
+              "maximum_properties": 8
+            },
+            "derived_properties": [],
+            "static_dependencies": [
+              {
+                "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+              },
+              {
+                "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+                "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+                "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+              }
+            ]
+          },
+          "input_binding": {
+            "upstream_node_id": "budget_context"
+          }
+        }
+      ],
+      "outputs": {
+        "joined": "function-invocation/1",
+        "source_record": "function-invocation/1",
+        "budget_context": "function-invocation/1"
+      },
+      "version": "transformation-functions/1"
+    },
+    "events": [
+      {
+        "event_id": "node:budget_context:started",
+        "node": "budget_context",
+        "state": "RUNNING",
+        "created_at": "2026-09-07T16:54:18.666668+04:00"
+      },
+      {
+        "event_id": "node:source_record:started",
+        "node": "source_record",
+        "state": "RUNNING",
+        "created_at": "2026-09-07T16:54:18.670852+04:00"
+      },
+      {
+        "event_id": "node:budget_context:terminal",
+        "node": "budget_context",
+        "state": "COMPLETED",
+        "usage": {
+          "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+          "returned_rows": 1,
+          "derived_evaluations": 0,
+          "published_result_bytes": 4683
+        },
+        "output": {
+          "run_id": "fcr_dae3886e9be4d122896146dabe39845537747b87c520d03d5b46fa52f073baee",
+          "receipt_hash": "a119c43936cf2c00962c965c3ac5c4ca4e76843fcc21cfd69d76505e0493e2e2",
+          "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+        },
+        "new_run_required": false,
+        "created_at": "2026-09-07T16:54:20.196364+04:00"
+      },
+      {
+        "event_id": "node:source_record:terminal",
+        "node": "source_record",
+        "state": "COMPLETED",
+        "usage": {
+          "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+          "returned_rows": 1,
+          "derived_evaluations": 0,
+          "published_result_bytes": 4445
+        },
+        "output": {
+          "run_id": "fcr_3fbc0d25b15863231f32e3fc91d9f0e5b23dc90d68040a378fb8b37bc574ee6e",
+          "receipt_hash": "68d296ba4fe301d0eead2574f076edb6337c466cdc697259644328c82df2f2c6",
+          "invocation_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+        },
+        "new_run_required": false,
+        "created_at": "2026-09-07T16:54:20.218579+04:00"
+      },
+      {
+        "event_id": "output:1227885775e0531240bc36a25123035dc671512f94338f096d66288c25950ab0",
+        "node": "budget_context",
+        "state": "STAGED",
+        "value": {
+          "run_id": "fcr_dae3886e9be4d122896146dabe39845537747b87c520d03d5b46fa52f073baee",
+          "receipt_hash": "a119c43936cf2c00962c965c3ac5c4ca4e76843fcc21cfd69d76505e0493e2e2",
+          "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+        },
+        "sha256": "102f7286b7b9598369d3ce8b4840ecf8d0ce6f02cee8bda277a5d7b8ad501ffa",
+        "generation": 0,
+        "artifact_type": "function-invocation/1",
+        "created_at": "2026-09-07T16:54:20.315187+04:00"
+      },
+      {
+        "event_id": "output:d0a6a7e02410bee4eb73a5356eec61c5fbfecb5f043fa2eaf1efb70e8c16f993",
+        "node": "source_record",
+        "state": "STAGED",
+        "value": {
+          "run_id": "fcr_3fbc0d25b15863231f32e3fc91d9f0e5b23dc90d68040a378fb8b37bc574ee6e",
+          "receipt_hash": "68d296ba4fe301d0eead2574f076edb6337c466cdc697259644328c82df2f2c6",
+          "invocation_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+        },
+        "sha256": "ccc2e45d4b5f02b950e16711806f2c12b1253cc642f160d46187f40165006fe0",
+        "generation": 0,
+        "artifact_type": "function-invocation/1",
+        "created_at": "2026-09-07T16:54:20.344009+04:00"
+      },
+      {
+        "event_id": "node:joined:started",
+        "node": "joined",
+        "state": "RUNNING",
+        "created_at": "2026-09-07T16:54:20.671127+04:00"
+      },
+      {
+        "event_id": "node:joined:terminal",
+        "node": "joined",
+        "state": "COMPLETED",
+        "usage": {
+          "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+          "returned_rows": 1,
+          "derived_evaluations": 0,
+          "published_result_bytes": 4933
+        },
+        "output": {
+          "run_id": "fcr_86d6a49203b374514af8849d43c928e6c20b51547ac67f0414179f8f238c100e",
+          "receipt_hash": "920cb08264b81657a63cb2b4bcba3c16e8755c16cd4f1e0eaedc40dc1891277f",
+          "invocation_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff"
+        },
+        "new_run_required": false,
+        "created_at": "2026-09-07T16:54:22.812280+04:00"
+      },
+      {
+        "event_id": "output:0636c016818b9296c46a722680415b8965fc9c9bcb7577ec1b0c321f516a6241",
+        "node": "joined",
+        "state": "STAGED",
+        "value": {
+          "run_id": "fcr_86d6a49203b374514af8849d43c928e6c20b51547ac67f0414179f8f238c100e",
+          "receipt_hash": "920cb08264b81657a63cb2b4bcba3c16e8755c16cd4f1e0eaedc40dc1891277f",
+          "invocation_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff"
+        },
+        "sha256": "b071df49ca2697ca3d932f5eddf23a27f6be3199dc8ad8c6d279fcd57f2777e7",
+        "generation": 0,
+        "artifact_type": "function-invocation/1",
+        "created_at": "2026-09-07T16:54:22.941823+04:00"
+      },
+      {
+        "event_id": "publication:0",
+        "node": "publication",
+        "state": "PUBLISHED",
+        "manifest": {
+          "outputs": [
+            {
+              "slot": "budget_context",
+              "value": {
+                "run_id": "fcr_dae3886e9be4d122896146dabe39845537747b87c520d03d5b46fa52f073baee",
+                "receipt_hash": "a119c43936cf2c00962c965c3ac5c4ca4e76843fcc21cfd69d76505e0493e2e2",
+                "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+              },
+              "sha256": "102f7286b7b9598369d3ce8b4840ecf8d0ce6f02cee8bda277a5d7b8ad501ffa",
+              "event_id": "output:1227885775e0531240bc36a25123035dc671512f94338f096d66288c25950ab0",
+              "artifact_type": "function-invocation/1"
+            },
+            {
+              "slot": "joined",
+              "value": {
+                "run_id": "fcr_86d6a49203b374514af8849d43c928e6c20b51547ac67f0414179f8f238c100e",
+                "receipt_hash": "920cb08264b81657a63cb2b4bcba3c16e8755c16cd4f1e0eaedc40dc1891277f",
+                "invocation_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff"
+              },
+              "sha256": "b071df49ca2697ca3d932f5eddf23a27f6be3199dc8ad8c6d279fcd57f2777e7",
+              "event_id": "output:0636c016818b9296c46a722680415b8965fc9c9bcb7577ec1b0c321f516a6241",
+              "artifact_type": "function-invocation/1"
+            },
+            {
+              "slot": "source_record",
+              "value": {
+                "run_id": "fcr_3fbc0d25b15863231f32e3fc91d9f0e5b23dc90d68040a378fb8b37bc574ee6e",
+                "receipt_hash": "68d296ba4fe301d0eead2574f076edb6337c466cdc697259644328c82df2f2c6",
+                "invocation_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+              },
+              "sha256": "ccc2e45d4b5f02b950e16711806f2c12b1253cc642f160d46187f40165006fe0",
+              "event_id": "output:d0a6a7e02410bee4eb73a5356eec61c5fbfecb5f043fa2eaf1efb70e8c16f993",
+              "artifact_type": "function-invocation/1"
+            }
+          ],
+          "protocol": "execution-publication/1",
+          "authority": "EXECUTION_ONLY",
+          "generation": 0,
+          "workflow_id": "transformation:39972057-1ccc-4928-b7a0-5557fe9057a0",
+          "publication_id": "pub_14c99bccea4e3b01f6a66001a43704dd50539292f8dab5e91382f4375ac22a98",
+          "definition_sha256": "4cd1157ef06b9dabaf5e5b6889f96a4f90e2b69bcc2b577c24df9c252a95bb53"
+        },
+        "created_at": "2026-09-07T16:54:23.162265+04:00"
+      }
+    ],
+    "publications": [
+      {
+        "outputs": [
+          {
+            "slot": "budget_context",
+            "value": {
+              "run_id": "fcr_dae3886e9be4d122896146dabe39845537747b87c520d03d5b46fa52f073baee",
+              "receipt_hash": "a119c43936cf2c00962c965c3ac5c4ca4e76843fcc21cfd69d76505e0493e2e2",
+              "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+            },
+            "sha256": "102f7286b7b9598369d3ce8b4840ecf8d0ce6f02cee8bda277a5d7b8ad501ffa",
+            "event_id": "output:1227885775e0531240bc36a25123035dc671512f94338f096d66288c25950ab0",
+            "artifact_type": "function-invocation/1"
+          },
+          {
+            "slot": "joined",
+            "value": {
+              "run_id": "fcr_86d6a49203b374514af8849d43c928e6c20b51547ac67f0414179f8f238c100e",
+              "receipt_hash": "920cb08264b81657a63cb2b4bcba3c16e8755c16cd4f1e0eaedc40dc1891277f",
+              "invocation_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff"
+            },
+            "sha256": "b071df49ca2697ca3d932f5eddf23a27f6be3199dc8ad8c6d279fcd57f2777e7",
+            "event_id": "output:0636c016818b9296c46a722680415b8965fc9c9bcb7577ec1b0c321f516a6241",
+            "artifact_type": "function-invocation/1"
+          },
+          {
+            "slot": "source_record",
+            "value": {
+              "run_id": "fcr_3fbc0d25b15863231f32e3fc91d9f0e5b23dc90d68040a378fb8b37bc574ee6e",
+              "receipt_hash": "68d296ba4fe301d0eead2574f076edb6337c466cdc697259644328c82df2f2c6",
+              "invocation_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+            },
+            "sha256": "ccc2e45d4b5f02b950e16711806f2c12b1253cc642f160d46187f40165006fe0",
+            "event_id": "output:d0a6a7e02410bee4eb73a5356eec61c5fbfecb5f043fa2eaf1efb70e8c16f993",
+            "artifact_type": "function-invocation/1"
+          }
+        ],
+        "protocol": "execution-publication/1",
+        "authority": "EXECUTION_ONLY",
+        "generation": 0,
+        "workflow_id": "transformation:39972057-1ccc-4928-b7a0-5557fe9057a0",
+        "publication_id": "pub_14c99bccea4e3b01f6a66001a43704dd50539292f8dab5e91382f4375ac22a98",
+        "definition_sha256": "4cd1157ef06b9dabaf5e5b6889f96a4f90e2b69bcc2b577c24df9c252a95bb53"
+      }
+    ],
+    "publication_review": null,
+    "binding_review": null,
+    "current_use_authorized": false,
+    "business_effect_authorized": false,
+    "runtime_status": "COMPLETED",
+    "execution": {
+      "cancel_requested": false,
+      "pause_requested": false,
+      "result": {
+        "budget_context": {
+          "new_run_required": false,
+          "node": "budget_context",
+          "output": {
+            "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0",
+            "receipt_hash": "a119c43936cf2c00962c965c3ac5c4ca4e76843fcc21cfd69d76505e0493e2e2",
+            "run_id": "fcr_dae3886e9be4d122896146dabe39845537747b87c520d03d5b46fa52f073baee"
+          },
+          "state": "COMPLETED",
+          "usage": {
+            "derived_evaluations": 0,
+            "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+            "published_result_bytes": 4683,
+            "returned_rows": 1
+          }
+        },
+        "joined": {
+          "new_run_required": false,
+          "node": "joined",
+          "output": {
+            "invocation_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+            "receipt_hash": "920cb08264b81657a63cb2b4bcba3c16e8755c16cd4f1e0eaedc40dc1891277f",
+            "run_id": "fcr_86d6a49203b374514af8849d43c928e6c20b51547ac67f0414179f8f238c100e"
+          },
+          "state": "COMPLETED",
+          "usage": {
+            "derived_evaluations": 0,
+            "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+            "published_result_bytes": 4933,
+            "returned_rows": 1
+          }
+        },
+        "publication": {
+          "generation": 0,
+          "publication_id": "pub_14c99bccea4e3b01f6a66001a43704dd50539292f8dab5e91382f4375ac22a98"
+        },
+        "source_record": {
+          "new_run_required": false,
+          "node": "source_record",
+          "output": {
+            "invocation_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5",
+            "receipt_hash": "68d296ba4fe301d0eead2574f076edb6337c466cdc697259644328c82df2f2c6",
+            "run_id": "fcr_3fbc0d25b15863231f32e3fc91d9f0e5b23dc90d68040a378fb8b37bc574ee6e"
+          },
+          "state": "COMPLETED",
+          "usage": {
+            "derived_evaluations": 0,
+            "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+            "published_result_bytes": 4445,
+            "returned_rows": 1
+          }
+        }
+      },
+      "state": "COMPLETED"
+    }
+  },
+  "invocations": {
+    "budget_context": {
+      "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0",
+      "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+      "status": "SUCCEEDED",
+      "receipt_hash": "a119c43936cf2c00962c965c3ac5c4ca4e76843fcc21cfd69d76505e0493e2e2",
+      "receipt": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "run_id": "fcr_dae3886e9be4d122896146dabe39845537747b87c520d03d5b46fa52f073baee",
+        "status": "SUCCEEDED",
+        "request": {
+          "limit": 1,
+          "offset": 0,
+          "function": {
+            "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+            "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd"
+          },
+          "known_at": "2026-09-07T12:53:49.638000Z",
+          "valid_at": "2026-09-07T12:53:49.638000Z",
+          "request_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+        },
+        "function": {
+          "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+          "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd",
+          "content_hash": "a9d08a0a8711d943f8a8afbfb17f50617d38894510c8b8ca005d31a0f6473e68"
+        },
+        "plan_hash": "46d03df38fb4a95c26aa02c274be8ecc68ee39f4d707247ff7ffee42ef10de22",
+        "request_id": "818e05a2-309a-5c77-8936-71a400e573f0",
+        "started_at": "2026-09-07T12:54:19.414291+00:00",
+        "exact_scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "completed_at": "2026-09-07T12:54:19.851414+00:00",
+        "implementation": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+          "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+          "capabilities": {
+            "cdc": false,
+            "read": true,
+            "query": true,
+            "write": false,
+            "delete": false,
+            "limits": {
+              "coverage": "QUERY_PAGE_ONLY",
+              "returned_rows": 200,
+              "grouping_fields": 4,
+              "traversal_steps": 4,
+              "query_predicates": 20,
+              "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+              "derived_properties": 8,
+              "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+              "database_scan_limit": null
+            },
+            "stream": false,
+            "update": false,
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": false,
+            "snapshot": true,
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "simulation": false,
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "incremental": false,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "formula_execution": false,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "source_write_exactly_once": false,
+            "grouped_observation_counts": true,
+            "typed_relationship_filters": true,
+            "versioned_interface_inputs": true,
+            "composed_derived_properties": true,
+            "versioned_type_group_inputs": true
+          },
+          "maximum_rows": 200,
+          "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+          "implementation_id": "ontology.object-set-derived/v1",
+          "maximum_properties": 8
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false,
+        "proof_hash": "a119c43936cf2c00962c965c3ac5c4ca4e76843fcc21cfd69d76505e0493e2e2",
+        "recorded_at": "2026-09-07T16:54:19.910845+04:00"
+      },
+      "output": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "query": {
+          "limit": 1,
+          "offset": 0,
+          "search": "",
+          "filters": [],
+          "known_at": "2026-09-07T12:53:49.638000Z",
+          "valid_at": "2026-09-07T12:53:49.638000Z",
+          "traversal": [],
+          "object_type": "CompanyDimension",
+          "resource_ids": [
+            "2cc5e885-54f5-5b58-9359-29fd06bf8eac"
+          ]
+        },
+        "scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "total": 1,
+        "run_id": "fcr_dae3886e9be4d122896146dabe39845537747b87c520d03d5b46fa52f073baee",
+        "objects": [
+          {
+            "valid_to": null,
+            "attributes": {
+              "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+              "dimension_id": "c7b6ad59-544a-5219-a9df-c23ec7f88264",
+              "source_column": "Z",
+              "source_header": "Budget Article New",
+              "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+              "source_record_id": "434c6e5a-85dc-5d06-b724-31020771254e"
+            },
+            "valid_from": "2026-09-06T11:12:51.691974+04:00",
+            "version_id": "04968d1d-d74a-556c-a54a-5d1be27212b6",
+            "object_type": "CompanyDimension",
+            "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3",
+            "resource_id": "2cc5e885-54f5-5b58-9359-29fd06bf8eac",
+            "system_from": "2026-09-06T11:12:56.360775+04:00",
+            "content_hash": "f4f8bc4a5f359bc2895a7e4953a9e05c85f42d74a83e0e952addf2a2c90c5e07",
+            "display_name": "Budget Article New",
+            "identity_key": "source-dimension:2cc5e885-54f5-5b58-9359-29fd06bf8eac",
+            "access_entity": "entity-ge-001",
+            "evidence_class": "SOURCE_BOUND",
+            "authority_state": "APPROVED",
+            "schema_version_id": "914769e4-20d9-5d01-967d-43de86255079"
+          }
+        ],
+        "contract": "function-result/1",
+        "coverage": "QUERY_PAGE_ONLY",
+        "function": {
+          "version_id": "a5797807-966d-5c38-854a-097e36264f04",
+          "resource_id": "0f0be30d-651c-51f8-8d2e-35741c9d44dd",
+          "content_hash": "a9d08a0a8711d943f8a8afbfb17f50617d38894510c8b8ca005d31a0f6473e68"
+        },
+        "plan_hash": "46d03df38fb4a95c26aa02c274be8ecc68ee39f4d707247ff7ffee42ef10de22",
+        "next_offset": null,
+        "definition_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+        "used_versions": [
+          {
+            "known_at": "2026-09-07T12:53:49.638000+00:00",
+            "version_id": "04968d1d-d74a-556c-a54a-5d1be27212b6",
+            "resource_id": "2cc5e885-54f5-5b58-9359-29fd06bf8eac",
+            "content_hash": "f4f8bc4a5f359bc2895a7e4953a9e05c85f42d74a83e0e952addf2a2c90c5e07",
+            "material_state": "UNESTABLISHED"
+          }
+        ],
+        "counts_by_type": {
+          "CompanyDimension": 1
+        },
+        "derived_values": [],
+        "implementation": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+          "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+          "capabilities": {
+            "cdc": false,
+            "read": true,
+            "query": true,
+            "write": false,
+            "delete": false,
+            "limits": {
+              "coverage": "QUERY_PAGE_ONLY",
+              "returned_rows": 200,
+              "grouping_fields": 4,
+              "traversal_steps": 4,
+              "query_predicates": 20,
+              "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+              "derived_properties": 8,
+              "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+              "database_scan_limit": null
+            },
+            "stream": false,
+            "update": false,
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": false,
+            "snapshot": true,
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "simulation": false,
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "incremental": false,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "formula_execution": false,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "source_write_exactly_once": false,
+            "grouped_observation_counts": true,
+            "typed_relationship_filters": true,
+            "versioned_interface_inputs": true,
+            "composed_derived_properties": true,
+            "versioned_type_group_inputs": true
+          },
+          "maximum_rows": 200,
+          "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+          "implementation_id": "ontology.object-set-derived/v1",
+          "maximum_properties": 8
+        },
+        "read_permissions": [
+          "ontology_read",
+          "read"
+        ],
+        "calculation_runtime": "shared-functions/1",
+        "static_dependencies": [
+          {
+            "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+            "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+            "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+          },
+          {
+            "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+            "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+            "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+          }
+        ],
+        "invocation_plan_hash": "46d03df38fb4a95c26aa02c274be8ecc68ee39f4d707247ff7ffee42ef10de22",
+        "definition_version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+        "invocation_request_id": "818e05a2-309a-5c77-8936-71a400e573f0",
+        "current_use_authorized": false,
+        "filter_schema_versions": [],
+        "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+        "business_effect_authorized": false
+      },
+      "current_use_authorized": false,
+      "business_effect_authorized": false
+    },
+    "joined": {
+      "invocation_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+      "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+      "status": "SUCCEEDED",
+      "receipt_hash": "920cb08264b81657a63cb2b4bcba3c16e8755c16cd4f1e0eaedc40dc1891277f",
+      "receipt": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "run_id": "fcr_86d6a49203b374514af8849d43c928e6c20b51547ac67f0414179f8f238c100e",
+        "status": "SUCCEEDED",
+        "request": {
+          "limit": 1,
+          "offset": 0,
+          "function": {
+            "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+            "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c"
+          },
+          "known_at": "2026-09-07T12:53:49.638000Z",
+          "valid_at": "2026-09-07T12:53:49.638000Z",
+          "request_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+          "input_result": {
+            "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+          }
+        },
+        "function": {
+          "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+          "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c",
+          "content_hash": "2fc74ddd5eb67801f225b7da159309d8a8335fd435a1858a0b49d4a73360e855"
+        },
+        "plan_hash": "44b225281796d00be564aff45e4d375bdbf26700d9a4ce63948a9b2018245426",
+        "request_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+        "started_at": "2026-09-07T12:54:21.768296+00:00",
+        "exact_scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "completed_at": "2026-09-07T12:54:22.480647+00:00",
+        "implementation": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+          "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+          "capabilities": {
+            "cdc": false,
+            "read": true,
+            "query": true,
+            "write": false,
+            "delete": false,
+            "limits": {
+              "coverage": "QUERY_PAGE_ONLY",
+              "returned_rows": 200,
+              "grouping_fields": 4,
+              "traversal_steps": 4,
+              "query_predicates": 20,
+              "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+              "derived_properties": 8,
+              "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+              "database_scan_limit": null
+            },
+            "stream": false,
+            "update": false,
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": false,
+            "snapshot": true,
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "simulation": false,
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "incremental": false,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "formula_execution": false,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "source_write_exactly_once": false,
+            "grouped_observation_counts": true,
+            "typed_relationship_filters": true,
+            "versioned_interface_inputs": true,
+            "composed_derived_properties": true,
+            "versioned_type_group_inputs": true
+          },
+          "maximum_rows": 200,
+          "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+          "implementation_id": "ontology.object-set-derived/v1",
+          "maximum_properties": 8
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false,
+        "proof_hash": "920cb08264b81657a63cb2b4bcba3c16e8755c16cd4f1e0eaedc40dc1891277f",
+        "recorded_at": "2026-09-07T16:54:22.536403+04:00"
+      },
+      "output": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "query": {
+          "limit": 1,
+          "offset": 0,
+          "search": "",
+          "filters": [],
+          "known_at": "2026-09-07T12:53:49.638000Z",
+          "valid_at": "2026-09-07T12:53:49.638000Z",
+          "traversal": [],
+          "object_type": "CompanyDimension",
+          "resource_ids": [
+            "2cc5e885-54f5-5b58-9359-29fd06bf8eac"
+          ]
+        },
+        "scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "total": 1,
+        "run_id": "fcr_86d6a49203b374514af8849d43c928e6c20b51547ac67f0414179f8f238c100e",
+        "objects": [
+          {
+            "valid_to": null,
+            "attributes": {
+              "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+              "dimension_id": "c7b6ad59-544a-5219-a9df-c23ec7f88264",
+              "source_column": "Z",
+              "source_header": "Budget Article New",
+              "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+              "source_record_id": "434c6e5a-85dc-5d06-b724-31020771254e"
+            },
+            "valid_from": "2026-09-06T11:12:51.691974+04:00",
+            "version_id": "04968d1d-d74a-556c-a54a-5d1be27212b6",
+            "object_type": "CompanyDimension",
+            "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3",
+            "resource_id": "2cc5e885-54f5-5b58-9359-29fd06bf8eac",
+            "system_from": "2026-09-06T11:12:56.360775+04:00",
+            "content_hash": "f4f8bc4a5f359bc2895a7e4953a9e05c85f42d74a83e0e952addf2a2c90c5e07",
+            "display_name": "Budget Article New",
+            "identity_key": "source-dimension:2cc5e885-54f5-5b58-9359-29fd06bf8eac",
+            "access_entity": "entity-ge-001",
+            "evidence_class": "SOURCE_BOUND",
+            "authority_state": "APPROVED",
+            "schema_version_id": "914769e4-20d9-5d01-967d-43de86255079"
+          }
+        ],
+        "contract": "function-result/1",
+        "coverage": "RETAINED_INPUT_PAGE_ONLY",
+        "function": {
+          "version_id": "1981d69b-285d-545d-bb77-5025b85c79d4",
+          "resource_id": "8c5f14d6-1e57-520e-a4dd-52cbb405336c",
+          "content_hash": "2fc74ddd5eb67801f225b7da159309d8a8335fd435a1858a0b49d4a73360e855"
+        },
+        "plan_hash": "44b225281796d00be564aff45e4d375bdbf26700d9a4ce63948a9b2018245426",
+        "next_offset": null,
+        "input_result": {
+          "run_id": "fcr_dae3886e9be4d122896146dabe39845537747b87c520d03d5b46fa52f073baee",
+          "receipt_hash": "a119c43936cf2c00962c965c3ac5c4ca4e76843fcc21cfd69d76505e0493e2e2",
+          "invocation_id": "818e05a2-309a-5c77-8936-71a400e573f0"
+        },
+        "definition_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+        "used_versions": [
+          {
+            "known_at": "2026-09-07T12:53:49.638000+00:00",
+            "version_id": "04968d1d-d74a-556c-a54a-5d1be27212b6",
+            "resource_id": "2cc5e885-54f5-5b58-9359-29fd06bf8eac",
+            "content_hash": "f4f8bc4a5f359bc2895a7e4953a9e05c85f42d74a83e0e952addf2a2c90c5e07",
+            "material_state": "UNESTABLISHED"
+          }
+        ],
+        "counts_by_type": {
+          "CompanyDimension": 1
+        },
+        "derived_values": [],
+        "implementation": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+          "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+          "capabilities": {
+            "cdc": false,
+            "read": true,
+            "query": true,
+            "write": false,
+            "delete": false,
+            "limits": {
+              "coverage": "QUERY_PAGE_ONLY",
+              "returned_rows": 200,
+              "grouping_fields": 4,
+              "traversal_steps": 4,
+              "query_predicates": 20,
+              "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+              "derived_properties": 8,
+              "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+              "database_scan_limit": null
+            },
+            "stream": false,
+            "update": false,
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": false,
+            "snapshot": true,
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "simulation": false,
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "incremental": false,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "formula_execution": false,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "source_write_exactly_once": false,
+            "grouped_observation_counts": true,
+            "typed_relationship_filters": true,
+            "versioned_interface_inputs": true,
+            "composed_derived_properties": true,
+            "versioned_type_group_inputs": true
+          },
+          "maximum_rows": 200,
+          "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+          "implementation_id": "ontology.object-set-derived/v1",
+          "maximum_properties": 8
+        },
+        "read_permissions": [
+          "ontology_read",
+          "read"
+        ],
+        "calculation_runtime": "shared-functions/1",
+        "static_dependencies": [
+          {
+            "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+            "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+            "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+          },
+          {
+            "version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+            "resource_id": "95d589f6-691a-576d-ac71-8aa968ad41a9",
+            "content_hash": "450419b1c56c19681aeed88308406fa826ca90251bbc5599437be40737521c88"
+          }
+        ],
+        "invocation_plan_hash": "44b225281796d00be564aff45e4d375bdbf26700d9a4ce63948a9b2018245426",
+        "definition_version_id": "f9225828-359a-5749-b510-fb92e0a45bcc",
+        "invocation_request_id": "ebd4aa68-8647-5b94-823b-5d93d672fcff",
+        "current_use_authorized": false,
+        "filter_schema_versions": [],
+        "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+        "business_effect_authorized": false
+      },
+      "current_use_authorized": false,
+      "business_effect_authorized": false
+    },
+    "source_record": {
+      "invocation_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5",
+      "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+      "status": "SUCCEEDED",
+      "receipt_hash": "68d296ba4fe301d0eead2574f076edb6337c466cdc697259644328c82df2f2c6",
+      "receipt": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "run_id": "fcr_3fbc0d25b15863231f32e3fc91d9f0e5b23dc90d68040a378fb8b37bc574ee6e",
+        "status": "SUCCEEDED",
+        "request": {
+          "limit": 1,
+          "offset": 0,
+          "function": {
+            "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+            "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43"
+          },
+          "known_at": "2026-09-07T12:53:49.638000Z",
+          "valid_at": "2026-09-07T12:53:49.638000Z",
+          "request_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5"
+        },
+        "function": {
+          "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+          "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43",
+          "content_hash": "f48550fe1053bbecb845c2641d11d90ed96f4a5b82e3d65b9dfa09d7db584ddf"
+        },
+        "plan_hash": "9146fa50643385fef69d5e2187cdaa60a43f42ea2ff48427c0d055260aab1bdc",
+        "request_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5",
+        "started_at": "2026-09-07T12:54:19.420586+00:00",
+        "exact_scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "completed_at": "2026-09-07T12:54:19.872074+00:00",
+        "implementation": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+          "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+          "capabilities": {
+            "cdc": false,
+            "read": true,
+            "query": true,
+            "write": false,
+            "delete": false,
+            "limits": {
+              "coverage": "QUERY_PAGE_ONLY",
+              "returned_rows": 200,
+              "grouping_fields": 4,
+              "traversal_steps": 4,
+              "query_predicates": 20,
+              "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+              "derived_properties": 8,
+              "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+              "database_scan_limit": null
+            },
+            "stream": false,
+            "update": false,
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": false,
+            "snapshot": true,
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "simulation": false,
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "incremental": false,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "formula_execution": false,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "source_write_exactly_once": false,
+            "grouped_observation_counts": true,
+            "typed_relationship_filters": true,
+            "versioned_interface_inputs": true,
+            "composed_derived_properties": true,
+            "versioned_type_group_inputs": true
+          },
+          "maximum_rows": 200,
+          "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+          "implementation_id": "ontology.object-set-derived/v1",
+          "maximum_properties": 8
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false,
+        "proof_hash": "68d296ba4fe301d0eead2574f076edb6337c466cdc697259644328c82df2f2c6",
+        "recorded_at": "2026-09-07T16:54:19.931116+04:00"
+      },
+      "output": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "query": {
+          "limit": 1,
+          "offset": 0,
+          "search": "",
+          "filters": [],
+          "known_at": "2026-09-07T12:53:49.638000Z",
+          "valid_at": "2026-09-07T12:53:49.638000Z",
+          "traversal": [],
+          "object_type": "SourceRecord",
+          "resource_ids": [
+            "434c6e5a-85dc-5d06-b724-31020771254e"
+          ]
+        },
+        "scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "total": 1,
+        "run_id": "fcr_3fbc0d25b15863231f32e3fc91d9f0e5b23dc90d68040a378fb8b37bc574ee6e",
+        "objects": [
+          {
+            "valid_to": null,
+            "attributes": {
+              "coordinate": "TR!Z2",
+              "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+            },
+            "valid_from": "2026-09-06T11:12:51.691974+04:00",
+            "version_id": "8a428868-73b6-5658-ad2f-b906b44124bf",
+            "object_type": "SourceRecord",
+            "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3",
+            "resource_id": "434c6e5a-85dc-5d06-b724-31020771254e",
+            "system_from": "2026-09-06T11:12:56.099301+04:00",
+            "content_hash": "c2894717d7fbe926c39d3caaea130943a71ad4f6bb0532acfa270fb720d0434d",
+            "display_name": "TR!Z2",
+            "identity_key": "source-dimension:434c6e5a-85dc-5d06-b724-31020771254e",
+            "access_entity": "entity-ge-001",
+            "evidence_class": "SOURCE_BOUND",
+            "authority_state": "APPROVED",
+            "schema_version_id": "556519c2-1efd-53c2-8411-371d07823640"
+          }
+        ],
+        "contract": "function-result/1",
+        "coverage": "QUERY_PAGE_ONLY",
+        "function": {
+          "version_id": "a9987bda-831c-54af-8504-fca7534fe92b",
+          "resource_id": "66a72734-45e0-5f0b-b074-0bfd05dbbb43",
+          "content_hash": "f48550fe1053bbecb845c2641d11d90ed96f4a5b82e3d65b9dfa09d7db584ddf"
+        },
+        "plan_hash": "9146fa50643385fef69d5e2187cdaa60a43f42ea2ff48427c0d055260aab1bdc",
+        "next_offset": null,
+        "definition_id": "39f89152-a7e5-54f8-975b-6c7ba29f6b20",
+        "used_versions": [
+          {
+            "known_at": "2026-09-07T12:53:49.638000+00:00",
+            "version_id": "8a428868-73b6-5658-ad2f-b906b44124bf",
+            "resource_id": "434c6e5a-85dc-5d06-b724-31020771254e",
+            "content_hash": "c2894717d7fbe926c39d3caaea130943a71ad4f6bb0532acfa270fb720d0434d",
+            "material_state": "UNESTABLISHED"
+          }
+        ],
+        "counts_by_type": {
+          "SourceRecord": 1
+        },
+        "derived_values": [],
+        "implementation": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+          "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+          "capabilities": {
+            "cdc": false,
+            "read": true,
+            "query": true,
+            "write": false,
+            "delete": false,
+            "limits": {
+              "coverage": "QUERY_PAGE_ONLY",
+              "returned_rows": 200,
+              "grouping_fields": 4,
+              "traversal_steps": 4,
+              "query_predicates": 20,
+              "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+              "derived_properties": 8,
+              "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+              "database_scan_limit": null
+            },
+            "stream": false,
+            "update": false,
+            "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+            "reversal": false,
+            "snapshot": true,
+            "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+            "simulation": false,
+            "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+            "incremental": false,
+            "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+            "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+            "formula_execution": false,
+            "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+            "source_write_exactly_once": false,
+            "grouped_observation_counts": true,
+            "typed_relationship_filters": true,
+            "versioned_interface_inputs": true,
+            "composed_derived_properties": true,
+            "versioned_type_group_inputs": true
+          },
+          "maximum_rows": 200,
+          "dependency_sha256": "6c3d3d2a3bc73482a4c7c18aeec6b0252a080c34c93d48cde6b75b0590d33891",
+          "implementation_id": "ontology.object-set-derived/v1",
+          "maximum_properties": 8
+        },
+        "read_permissions": [
+          "ontology_read",
+          "read"
+        ],
+        "calculation_runtime": "shared-functions/1",
+        "static_dependencies": [
+          {
+            "version_id": "3b23f4e3-c95f-53dd-b2e8-9425a39fd0de",
+            "resource_id": "39f89152-a7e5-54f8-975b-6c7ba29f6b20",
+            "content_hash": "e1af39c2951e57d7140b3a4e1ed956f1d4ad1e1accd9a609fda1bdee8ae0a809"
+          },
+          {
+            "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+            "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+            "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+          }
+        ],
+        "invocation_plan_hash": "9146fa50643385fef69d5e2187cdaa60a43f42ea2ff48427c0d055260aab1bdc",
+        "definition_version_id": "3b23f4e3-c95f-53dd-b2e8-9425a39fd0de",
+        "invocation_request_id": "fa5cdd59-ddc6-5707-9b69-a231acf222f5",
+        "current_use_authorized": false,
+        "filter_schema_versions": [],
+        "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+        "business_effect_authorized": false
+      },
+      "current_use_authorized": false,
+      "business_effect_authorized": false
+    }
+  },
+  "timing": {
+    "persisted_node_intervals": {
+      "budget_context": {
+        "started_at": "2026-09-07T16:54:18.666668+04:00",
+        "completed_at": "2026-09-07T16:54:20.196364+04:00",
+        "start_event_id": "node:budget_context:started",
+        "terminal_event_id": "node:budget_context:terminal"
+      },
+      "source_record": {
+        "started_at": "2026-09-07T16:54:18.670852+04:00",
+        "completed_at": "2026-09-07T16:54:20.218579+04:00",
+        "start_event_id": "node:source_record:started",
+        "terminal_event_id": "node:source_record:terminal"
+      },
+      "joined": {
+        "started_at": "2026-09-07T16:54:20.671127+04:00",
+        "completed_at": "2026-09-07T16:54:22.812280+04:00",
+        "start_event_id": "node:joined:started",
+        "terminal_event_id": "node:joined:terminal"
+      }
+    },
+    "actual_overlap_demonstrated": true,
+    "evidence_basis": "PERSISTED_START_TO_COMPLETION_INTERVALS"
+  },
+  "financial_authority_established": false
+}

@@ -208,6 +208,8 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
     }
     if any(node.input_binding for node in definition.definition.nodes):
         result["input_semantics"] = "EXPLICIT_RETAINED_RESULT"
+    if definition.execution_policy is not None:
+        result["execution_policy"] = definition.execution_policy.model_dump(mode="json")
     if definition.publication_review is not None:
         result["publication_review"] = definition.publication_review.model_dump(mode="json")
     if definition.binding_review is not None:

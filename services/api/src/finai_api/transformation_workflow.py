@@ -1,5 +1,6 @@
 """Deterministic completion barriers; Functions own computation and output identity."""
 
+import asyncio
 from contextlib import suppress
 from datetime import timedelta
 from typing import Any
@@ -54,6 +55,44 @@ class TransformationWorkflow:
         self.state = "RUNNING"
         return True
 
+    async def _parallel_nodes(self, context: dict, topology: dict, options: dict) -> bool:
+        pending = set(topology["node_order"])
+        completed: set[str] = set()
+        limit = topology["execution_policy"]["max_concurrent_nodes"]
+        while pending:
+            if not await self._boundary():
+                return False
+            ready = sorted(
+                node for node in pending if set(topology["dependencies"][node]).issubset(completed)
+            )[:limit]
+            if not ready:
+                self.state = "FAILED"
+                return False
+            handles = [
+                workflow.start_activity(
+                    "transformation_node", {**context, "node_id": node}, **options
+                )
+                for node in ready
+            ]
+            # Drain every launched read-only activity, including after a failed sibling.
+            outcomes = await asyncio.gather(*handles, return_exceptions=True)
+            failed = False
+            for node, outcome in zip(ready, outcomes, strict=True):
+                if isinstance(outcome, BaseException):
+                    self.result[node] = {"state": "FAILED"}
+                    failed = True
+                else:
+                    self.result[node] = outcome
+                    if outcome.get("state") != "COMPLETED":
+                        failed = True
+                    else:
+                        completed.add(node)
+                pending.remove(node)
+            if self.cancelled or failed:
+                self.state = "CANCELLED" if self.cancelled else "FAILED"
+                return False
+        return True
+
     @workflow.run
     async def run(self, context: dict) -> dict:
         options: dict[str, Any] = {
@@ -62,21 +101,27 @@ class TransformationWorkflow:
         }
         try:
             topology = await workflow.execute_activity("transformation_load", context, **options)
-            completed: set[str] = set()
-            for node_id in topology["node_order"]:
-                if not await self._boundary():
+            if workflow.patched("transformation-parallel-nodes-v1") and topology.get(
+                "execution_policy"
+            ):
+                if not await self._parallel_nodes(context, topology, options):
                     return self.result
-                if not set(topology["dependencies"][node_id]).issubset(completed):
-                    self.state = "FAILED"
-                    return self.result
-                outcome = await workflow.execute_activity(
-                    "transformation_node", {**context, "node_id": node_id}, **options
-                )
-                self.result[node_id] = outcome
-                if outcome["state"] != "COMPLETED":
-                    self.state = "FAILED"
-                    return self.result
-                completed.add(node_id)
+            else:
+                completed: set[str] = set()
+                for node_id in topology["node_order"]:
+                    if not await self._boundary():
+                        return self.result
+                    if not set(topology["dependencies"][node_id]).issubset(completed):
+                        self.state = "FAILED"
+                        return self.result
+                    outcome = await workflow.execute_activity(
+                        "transformation_node", {**context, "node_id": node_id}, **options
+                    )
+                    self.result[node_id] = outcome
+                    if outcome["state"] != "COMPLETED":
+                        self.state = "FAILED"
+                        return self.result
+                    completed.add(node_id)
             if not await self._boundary():
                 return self.result
             if workflow.patched("transformation-binding-review-v1") and topology.get(

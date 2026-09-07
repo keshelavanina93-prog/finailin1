@@ -206,6 +206,7 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "definition": "OntologyDefinition", "resource_budget?": "OntologyDefinition",
         "publication_review?": "OntologyDefinition",
         "binding_review?": "OntologyDefinition",
+        "execution_policy?": "OntologyDefinition",
     },
     "MetricDefinition": {"code": "Identifier", "function_reference": "Identifier"},
     "ReportSnapshot": {

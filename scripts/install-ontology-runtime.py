@@ -94,13 +94,11 @@ def main() -> None:
                 "JournalLine": ("side", "dimension_policy_id", "dimensions"),
             }.get(spec["identity_key"], ())
             missing_journal_fields = [
-                field for field in journal_fields
+                field
+                for field in journal_fields
                 if field not in previous["attributes"].get("fields", {})
             ]
-            if (
-                spec["object_type"] == "SchemaDefinition"
-                and missing_journal_fields
-            ):
+            if spec["object_type"] == "SchemaDefinition" and missing_journal_fields:
                 mutations.append(
                     ResourceMutation(
                         resource_id=identity,
@@ -129,7 +127,12 @@ def main() -> None:
                 and spec["identity_key"] == "TransformationDefinition"
                 and any(
                     field not in previous["attributes"]["fields"]
-                    for field in ("resource_budget", "publication_review", "binding_review")
+                    for field in (
+                        "resource_budget",
+                        "publication_review",
+                        "binding_review",
+                        "execution_policy",
+                    )
                 )
             ):
                 attributes = {
@@ -138,7 +141,12 @@ def main() -> None:
                         **previous["attributes"]["fields"],
                         **{
                             field: spec["attributes"]["fields"][field]
-                            for field in ("resource_budget", "publication_review", "binding_review")
+                            for field in (
+                                "resource_budget",
+                                "publication_review",
+                                "binding_review",
+                                "execution_policy",
+                            )
                             if field not in previous["attributes"]["fields"]
                         },
                     },
