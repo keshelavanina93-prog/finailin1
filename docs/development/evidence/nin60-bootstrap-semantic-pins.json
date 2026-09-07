@@ -1,12 +1,26 @@
 {
   "state": "NATIVE_ROLLBACK_CONTRACT_PASS",
-  "recorded_at": "2026-09-07T20:24:51.045474+00:00",
-  "new_schema_exact_semantic_edges": 3,
+  "recorded_at": "2026-09-07T21:42:49.085550+00:00",
+  "database_port": 55441,
+  "data_directory": "D:/FinAI/g8-ci-repair/.finai/data/postgres-ci",
+  "platform_definitions": 142,
+  "schema_definitions": 96,
+  "semantic_contracts": 18,
+  "new_schema_exact_semantic_edges": 438,
+  "all_exact_seed_kinds_and_versions_verified": true,
   "idempotent_replay": true,
-  "existing_schema_attributes_unchanged": true,
-  "unresolved_or_foreign_semantics_roll_back_installation": true,
+  "reviewed_successor_and_headless_identity_unchanged": true,
+  "existing_attributes_versions_heads_dependencies_and_reviews_unchanged": true,
+  "canonical_resource_and_lifecycle_review_used": true,
+  "refusals_rolled_back_without_partial_publication": [
+    "reviewed_semantic_successor",
+    "unavailable_semantic_seed",
+    "revoked_semantic_seed",
+    "foreign_semantic_identity"
+  ],
   "fixture_identities_retained": 0,
   "company_or_account_facts_created": 0,
   "historical_schema_repair_performed": false,
+  "commit_restart_proof": false,
   "release_accepted": false
 }
