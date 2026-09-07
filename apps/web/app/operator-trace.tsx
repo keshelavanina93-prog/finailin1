@@ -1,16 +1,23 @@
 "use client";
 
 import {useEffect, useRef, useState} from "react";
+import {restorationInstant} from "./definition-restoration-time";
 import {displayName} from "./display-name";
 import "./operator-trace.css";
 
 export type TraceSelection = {resource_id:string; version_id:string; company_id:string; known_at?:string};
+export type TraceNodeContext = {resource_id:string;version_id:string;known_at:string};
+export type TraceContextChange = {selection:TraceNodeContext|null;status:"selected"|"loading"|"unavailable"|"unselected"};
 type Node = {resource_id:string;version_id:string;object_type:string;display_name:string;authority_state:string;system_from:string;valid_from:string;source_document_id?:string|null};
 type Edge = {source_version_id:string;target_version_id:string;relation:string};
 type Graph = {root_version_id:string;known_at:string;nodes:Node[];edges:Edge[]};
 
-export default function OperatorTrace({token,root,onClose,onInspect}:{token:string;root:TraceSelection;onClose:()=>void;onInspect:(node:Node,knownAt:string)=>void}) {
- const [graph,setGraph]=useState<Graph|null>(null);const [error,setError]=useState("");
+export default function OperatorTrace({token,root,onClose,onInspect,onSelectionChange}:{onSelectionChange?:(context:TraceContextChange)=>void;token:string;root:TraceSelection;onClose:()=>void;onInspect:(node:Node,knownAt:string)=>void}) {
+ const graphKey=JSON.stringify([token,root.company_id,root.resource_id,root.version_id,root.known_at]);
+ const [response,setResponse]=useState<{key:string;graph:Graph|null;error:string}|null>(null);
+ const graph=response?.key===graphKey?response.graph:null;
+ const [actionError,setError]=useState("");
+ const error=response?.key===graphKey?response.error||actionError:"";
  const [focus,setFocus]=useState(root.version_id);const [filter,setFilter]=useState("");
  const [technical,setTechnical]=useState(false);const [zoom,setZoom]=useState(1);
  const [windowBox,setWindowBox]=useState({left:0,top:0,width:0,height:0});
@@ -21,9 +28,18 @@ export default function OperatorTrace({token,root,onClose,onInspect}:{token:stri
   const observer=new ResizeObserver(update);observer.observe(element);element.addEventListener("scroll",update,{passive:true});update();
   return()=>{observer.disconnect();element.removeEventListener("scroll",update);};
  },[graph]);
- useEffect(()=>{const controller=new AbortController();
-  void fetch(`/api/ontology/operator/trace/${root.resource_id}?version_id=${root.version_id}${root.known_at?`&known_at=${encodeURIComponent(root.known_at)}`:""}`,{headers:{Authorization:`Bearer ${token}`},signal:controller.signal}).then(async response=>{const result=await response.json();if(!response.ok)throw Error(typeof result.detail==="string"?result.detail:"Trace unavailable");if(!controller.signal.aborted)setGraph(result);}).catch(e=>{if(!controller.signal.aborted)setError(String(e));});return()=>controller.abort();
- },[token,root.resource_id,root.version_id,root.known_at]);
+ useEffect(()=>{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),20000);let disposed=false;
+  void fetch(`/api/ontology/operator/trace/${root.resource_id}?version_id=${root.version_id}${root.known_at?`&known_at=${encodeURIComponent(root.known_at)}`:""}`,{headers:{Authorization:`Bearer ${token}`},signal:controller.signal}).then(async response=>{
+   const result=await response.json();if(!response.ok)throw Error(typeof result.detail==="string"?result.detail:"Trace unavailable");
+   const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
+   if(result.root_version_id!==root.version_id||!restorationInstant(result.known_at)||(root.known_at&&restorationInstant(result.known_at)!==restorationInstant(root.known_at))||!Array.isArray(result.nodes)||!Array.isArray(result.edges))throw Error("Trace did not match the requested version and knowledge cutoff.");
+   const versions=new Set<string>();
+   for(const node of result.nodes){if(!node||!uuid.test(node.resource_id)||!uuid.test(node.version_id)||versions.has(node.version_id)||typeof node.display_name!=="string"||typeof node.object_type!=="string"||typeof node.authority_state!=="string"||!restorationInstant(node.system_from)||!restorationInstant(node.valid_from))throw Error("Trace contains unavailable version metadata.");versions.add(node.version_id);}
+   if(!result.nodes.some((node:Node)=>node.resource_id===root.resource_id&&node.version_id===root.version_id)||result.edges.some((edge:Edge)=>!edge||!versions.has(edge.source_version_id)||!versions.has(edge.target_version_id)||typeof edge.relation!=="string"))throw Error("Trace references do not match its retained nodes.");
+   if(!disposed)setResponse({key:graphKey,graph:result,error:""});
+  }).catch(e=>{if(!disposed)setResponse({key:graphKey,graph:null,error:controller.signal.aborted?"Trace timed out. Reopen this exact version to retry.":String(e)});}).finally(()=>clearTimeout(timer));
+  return()=>{disposed=true;clearTimeout(timer);controller.abort();};
+ },[token,root.company_id,root.resource_id,root.version_id,root.known_at,graphKey]);
  const depth=new Map<string,number>([[root.version_id,0]]);
  if(graph){const queue=[root.version_id];for(let i=0;i<queue.length;i++){for(const edge of graph.edges.filter(e=>e.source_version_id===queue[i]))if(!depth.has(edge.target_version_id)){depth.set(edge.target_version_id,depth.get(queue[i])!+1);queue.push(edge.target_version_id);}}}
  const matching=graph?.nodes.filter(n=>(technical||!["SchemaDefinition","SemanticContract","LinkType"].includes(n.object_type))&&`${n.display_name} ${n.object_type}`.toLowerCase().includes(filter.toLowerCase()))??[];
@@ -32,9 +48,15 @@ export default function OperatorTrace({token,root,onClose,onInspect}:{token:stri
  const levels=new Map<number,number>();
  const positions=new Map(nodes.map(n=>{const level=depth.get(n.version_id)??0;const row=levels.get(level)??0;levels.set(level,row+1);return[n.version_id,{x:30+level*300,y:30+row*110}];}));
  const width=Math.max(850,...[...positions.values()].map(p=>p.x+270));const height=Math.max(420,...[...positions.values()].map(p=>p.y+100));
- const selected=graph?.nodes.find(n=>n.version_id===focus);
+ const selected=nodes.find(n=>n.version_id===focus);
+ const selectedResourceId=selected?.resource_id;const selectedVersionId=selected?.version_id;const knownAt=graph?.known_at;
+ useEffect(()=>{
+  onSelectionChange?.(selectedResourceId&&selectedVersionId&&knownAt?{selection:{resource_id:selectedResourceId,version_id:selectedVersionId,known_at:knownAt},status:"selected"}:{selection:null,status:!graph?(error?"unavailable":"loading"):"unselected"});
+ },[selectedResourceId,selectedVersionId,knownAt,graph,error,filter,technical,focus,onSelectionChange]);
+ function selectNode(id:string){if(id===focus)return;onSelectionChange?.({selection:null,status:"loading"});setFocus(id);}
+
  function revealNode(id:string){const node=graph?.nodes.find(n=>n.version_id===id);if(!node)return;
-  reveal.current=true;setFilter("");if(["SchemaDefinition","SemanticContract","LinkType"].includes(node.object_type))setTechnical(true);setFocus(id);setZoom(1);
+  reveal.current=true;setFilter("");if(["SchemaDefinition","SemanticContract","LinkType"].includes(node.object_type))setTechnical(true);selectNode(id);setZoom(1);
   // Clicking an already selected node must still reveal it after a manual pan.
   if(id===focus&&zoom===1&&!filter&&positions.has(id)){const p=positions.get(id)!;viewport.current?.scrollTo({left:Math.max(0,p.x+120-windowBox.width/2),top:Math.max(0,p.y+40-windowBox.height/2)});reveal.current=false;}
  }
@@ -45,14 +67,14 @@ export default function OperatorTrace({token,root,onClose,onInspect}:{token:stri
  async function download(node:Node){try{const response=await fetch(`/api/ontology/source-documents/${node.source_document_id}/content`,{headers:{Authorization:`Bearer ${token}`}});if(!response.ok)throw Error("Original source unavailable in this context");const url=URL.createObjectURL(await response.blob());const anchor=document.createElement("a");anchor.href=url;anchor.download=node.source_document_id!;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){setError(String(e));}}
  return <section className="g8-trace" aria-label="System trace">
   <header><div><strong>System trace</strong><p>Recorded dependency versions · changes require a separate reviewed action</p>{graph&&<p>Known by G8 at <time dateTime={graph.known_at}>{new Date(graph.known_at).toLocaleString()}</time></p>}</div><button onClick={onClose}>Close trace</button></header>
-  <div className="g8-trace-toolbar"><label>Find in trace<input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Company, rule, source…"/></label><label><input type="checkbox" checked={technical} onChange={e=>setTechnical(e.target.checked)}/>Include schema mechanics</label><button onClick={()=>setZoom(z=>Math.max(.01,z/1.25))} aria-label="Zoom out">−</button><span aria-label="Canvas zoom">{Math.round(zoom*100)}%</span><button onClick={()=>setZoom(z=>Math.min(2,z*1.25))} aria-label="Zoom in">+</button><button disabled={!nodes.length} onClick={fit}>Fit visible graph</button><button disabled={!selected} onClick={()=>revealNode(focus)}>Fit selected object</button><button onClick={()=>{setZoom(1);viewport.current?.scrollTo(0,0);}}>Reset canvas</button></div>
+  <div className="g8-trace-toolbar"><label>Find in trace<input value={filter} onChange={e=>{onSelectionChange?.({selection:null,status:"unselected"});setFilter(e.target.value);}} placeholder="Company, rule, source…"/></label><label><input type="checkbox" checked={technical} onChange={e=>{onSelectionChange?.({selection:null,status:"unselected"});setTechnical(e.target.checked);}}/>Include schema mechanics</label><button onClick={()=>setZoom(z=>Math.max(.01,z/1.25))} aria-label="Zoom out">−</button><span aria-label="Canvas zoom">{Math.round(zoom*100)}%</span><button onClick={()=>setZoom(z=>Math.min(2,z*1.25))} aria-label="Zoom in">+</button><button disabled={!nodes.length} onClick={fit}>Fit visible graph</button><button disabled={!selected} onClick={()=>revealNode(focus)}>Fit selected object</button><button onClick={()=>{setZoom(1);viewport.current?.scrollTo(0,0);}}>Reset canvas</button></div>
   {error&&<p role="alert">{error}</p>}{!graph&&!error&&<p role="status">Resolving recorded version dependencies…</p>}
   {graph&&<><p>{nodes.length} of {graph.nodes.length} recorded versions visible{matching.length>200?" · narrow the filter to see additional matches":""}. Arrows point to dependencies. Drag the canvas or use its scrollbars.</p><div className="g8-trace-body">
    <div className="g8-trace-canvas" ref={viewport} onPointerDown={e=>{if((e.target as Element).closest('[data-trace-node]'))return;drag.current={x:e.clientX,y:e.clientY,left:e.currentTarget.scrollLeft,top:e.currentTarget.scrollTop};e.currentTarget.setPointerCapture(e.pointerId);}} onPointerMove={e=>{if(drag.current){e.currentTarget.scrollLeft=drag.current.left+drag.current.x-e.clientX;e.currentTarget.scrollTop=drag.current.top+drag.current.y-e.clientY;}}} onPointerUp={()=>{drag.current=null;}} onPointerCancel={()=>{drag.current=null;}}>
     <svg width={width*zoom} height={height*zoom} viewBox={`0 0 ${width} ${height}`} aria-label="Recorded ontology dependency canvas">
      <defs><marker id="trace-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="currentColor"/></marker></defs>
      {graph.edges.map(e=>{const a=positions.get(e.source_version_id),b=positions.get(e.target_version_id);return a&&b?<path key={`${e.source_version_id}:${e.target_version_id}:${e.relation}`} className={focus===e.source_version_id||focus===e.target_version_id?"focused-edge":""} d={`M${a.x+240},${a.y+40} C${a.x+275},${a.y+40} ${b.x-35},${b.y+40} ${b.x},${b.y+40}`} markerEnd="url(#trace-arrow)"><title>{e.relation}</title></path>:null;})}
-     {nodes.map(n=>{const p=positions.get(n.version_id)!;return <g data-trace-node key={n.version_id} role="button" tabIndex={0} aria-label={`Inspect ${displayName(n.display_name)} ${n.object_type}`} aria-pressed={focus===n.version_id} onClick={()=>setFocus(n.version_id)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setFocus(n.version_id);}}} transform={`translate(${p.x},${p.y})`} className={focus===n.version_id?"selected-node":""}><rect width="240" height="80" rx="5"/><text x="12" y="20" className="trace-kind">{n.object_type}</text><text x="12" y="42">{displayName(n.display_name).slice(0,28)}</text><text x="12" y="65" className="trace-kind">{n.authority_state} · {n.version_id.slice(0,8)}</text><title>{displayName(n.display_name)} · {n.version_id}</title></g>;})}
+     {nodes.map(n=>{const p=positions.get(n.version_id)!;return <g data-trace-node key={n.version_id} role="button" tabIndex={0} aria-label={`Inspect ${displayName(n.display_name)} ${n.object_type}`} aria-pressed={focus===n.version_id} onClick={()=>selectNode(n.version_id)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectNode(n.version_id);}}} transform={`translate(${p.x},${p.y})`} className={focus===n.version_id?"selected-node":""}><rect width="240" height="80" rx="5"/><text x="12" y="20" className="trace-kind">{n.object_type}</text><text x="12" y="42">{displayName(n.display_name).slice(0,28)}</text><text x="12" y="65" className="trace-kind">{n.authority_state} · {n.version_id.slice(0,8)}</text><title>{displayName(n.display_name)} · {n.version_id}</title></g>;})}
     </svg>
    </div>
    <aside aria-label="Trace object details"><div className="g8-trace-overview"><small>Canvas overview · click to move, or focus and use arrow keys</small><svg role="button" tabIndex={0} aria-label="Navigate trace overview" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" onPointerDown={e=>{const box=e.currentTarget.getBoundingClientRect();viewport.current?.scrollTo({left:Math.max(0,(e.clientX-box.left)/box.width*width*zoom-windowBox.width/2),top:Math.max(0,(e.clientY-box.top)/box.height*height*zoom-windowBox.height/2)});}} onKeyDown={e=>{const delta={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(delta){e.preventDefault();viewport.current?.scrollBy(delta[0]*windowBox.width/2,delta[1]*windowBox.height/2);}}}>

@@ -14,7 +14,7 @@ type ResourceReference={resource_id:string;version_id:string;known_at:string;dis
 type ResourceNavigation=(resourceId:string,versionId:string,knownAt:string)=>void;
 type CertificationReference={receipt_id:string;contract_resource_id:string;contract_version_id:string;proof_hash:string};
 type Reply={question:string;answer:string;references:WorkItem[];context:string;resourceReference?:ResourceReference;certificationReference?:CertificationReference};
-export default function NyxInteraction({token,items,work,context,blockers,availability,onInspect,onData,onWork,mapSelection,inspection,onResourceTrace,onResourceHistory}:{token?:string;mapSelection?:MapSelection|null;inspection?:OperatorInspection|null;onResourceTrace?:ResourceNavigation;onResourceHistory?:ResourceNavigation;items:WorkItem[];work:WorkItem|null;context:string;blockers:string[];availability:string;onInspect:(item:WorkItem)=>void;onData:()=>void;onWork:()=>void}) {
+export default function NyxInteraction({token,items,work,context,blockers,availability,onInspect,onData,onWork,mapSelection,inspection,traceActive=false,traceMessage,onResourceTrace,onResourceHistory}:{token?:string;traceActive?:boolean;traceMessage?:string;mapSelection?:MapSelection|null;inspection?:OperatorInspection|null;onResourceTrace?:ResourceNavigation;onResourceHistory?:ResourceNavigation;items:WorkItem[];work:WorkItem|null;context:string;blockers:string[];availability:string;onInspect:(item:WorkItem)=>void;onData:()=>void;onWork:()=>void}) {
  const [question,setQuestion]=useState("");const [history,setHistory]=useState<Reply[]>([]);
  const target=mapSelection?{resource_id:mapSelection.resource.resource_id,version_id:mapSelection.resource.version_id,known_at:mapSelection.knownAt}:inspection?{resource_id:inspection.resource.resource_id,version_id:inspection.resource.version_id,known_at:inspection.known_at}:null;
  const lifecycle=useResourceLifecycle(token,target);
@@ -31,6 +31,7 @@ export default function NyxInteraction({token,items,work,context,blockers,availa
  function ask(value:string){const q=value.trim();if(!q)return;const pending=items.filter(i=>i.state==="PENDING");let answer="";let references:WorkItem[]=[];let resourceReference:ResourceReference|undefined;let usesQueueContext=true;
  if(/forecast|profit|margin|revenue|cash flow|budget/i.test(q)){answer="Financial analysis is not connected to authoritative metrics in this workspace yet. I can help inspect retained evidence and review blockers, but cannot explain or invent financial performance.";}
  else if(/attention|pending|review items/i.test(q)){references=pending.slice(0,8);answer=`${pending.length} pending items in the loaded authorized queues. Open an item to inspect its evidence and review eligibility.`;}
+ else if(traceActive&&!inspection&&/why|block|explain|selected|impact|produced|trace|history|evidence|version/i.test(q)){usesQueueContext=false;answer=traceMessage??"The selected trace version is unavailable. Select a visible trace object to inspect its retained context.";}
  else if(mapSelection&&/map|asset|selected|connect|impact|explain/i.test(q)){
   usesQueueContext=false;const r=mapSelection.resource;
   resourceReference={resource_id:r.resource_id,version_id:r.version_id,known_at:mapSelection.knownAt,display_name:displayName(r.display_name)};

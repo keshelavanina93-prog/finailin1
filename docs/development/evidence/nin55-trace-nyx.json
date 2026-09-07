@@ -1,0 +1,84 @@
+{
+  "captured_at": "2026-09-07T16:16:58.420823+00:00",
+  "base_commit": "5a2e25f",
+  "url": "http://127.0.0.1:3062/",
+  "source_sha256": {
+    "apps/web/app/operator-trace.tsx": "76f7a19ec51028d86d3277f701c61ce91645a101b5a517185ffbd4acbd9009fc",
+    "apps/web/app/g8-workspace.tsx": "b34204235cfb95cfba6cb6e6fed3313768aa1d5c38214151bf16329e8774c84f",
+    "apps/web/app/nyx-interaction.tsx": "fcacf83e5941fdccef59a8eaab0f10974ea1fd8150fb3f0603e11a290c47915a"
+  },
+  "requests": [
+    "e9b594f8-eea7-4dc5-a927-782cf3364434",
+    "deb2c218-edef-484e-88ff-f3ae32420974"
+  ],
+  "assertions_passed": true,
+  "browser": {
+    "origin": {
+      "origin": "RESOURCE CONTEXT\n\nTR!row:4\nDefinition review: APPROVED\n\nSource Journal Movement · SOURCE BOUND\n\nShow system traceView history & compare\nDefinition review & material state\n\nDefinition review: approved. Evidence class: source bound.\n\nRegistry approval records review of this definition. Material authority, how a value is known and its availability are separate observations.\n\nNo reviewed material lifecycle state was recorded for this version by the selected knowledge cutoff. This does not establish its current state.\n\nRetained state as known at 9/7/2026, 7:52:50 PM · 0 reviewed events\n\nHistorical state inspection does not authorize current use. Reports and actions must check their required authority, availability and exact inputs when they run.\n\nRefresh retained state\nEffective from\nSep 6\nKnown by G8 at\n9/7/2026, 7:52:50 PM\nVersions known then\n1\nVisible dependents\n9\nDepartment: Auto Park\nDepartment: Auto Park\nDepartment: Auto Park\nBudget Article New: Service\nBudget Article New: Service\nBudget Article New: Service\nRegion: SOG-Kartli\nRegion: SOG-Kartli\nIdentity & version\nClear selection",
+      "group": "posting date: 2025-11-01\n\n\t2\t\nInspect group contributions\n\nTR!row:4\n\nInspect\nTrace source\n\nTR!row:3\n\nInspect\nTrace source"
+    },
+    "root": {
+      "selected": "Inspect TR!row:4 SourceJournalMovement",
+      "trace": "TR!row:4",
+      "cutoff": "2026-09-07T15:52:50.425000+00:00",
+      "reply": "Explain selectedNo company selected · Company accounting context unresolved · snapshot at requestTR!row:4 is a recorded source journal movement. Definition review: approved; evidence class: source bound. Known by G8 at Sep 7, 2026, 07:52 PM. Effective from Sep 6, 2026, 09:56 AM; no end is recorded. No reviewed material state was recorded for this version by the selected knowledge cutoff. Its current material authority and availability are not established by this historical view. The visible history contains 1 version and 9 dependent links. Trace shows the recorded evidence chain. These links identify where to investigate; they do not establish a cause, complete business impact or permission for current financial use.Trace TR!row:4History of TR!row:4Exact retained referenceResourcebab13833-cc93-58b0-99f9-62bcecb71eaaVersionc01ad940-1833-5b8b-857a-95b53214898fKnown-at cutoff2026-09-07T15:52:50.425000+00:00",
+      "reference": [
+        "bab13833-cc93-58b0-99f9-62bcecb71eaa",
+        "c01ad940-1833-5b8b-857a-95b53214898f",
+        "2026-09-07T15:52:50.425000+00:00"
+      ]
+    },
+    "account": {
+      "selected": "Inspect 3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებები LocalAccount",
+      "trace": "3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებები",
+      "cutoff": "2026-09-07T15:52:50.425000+00:00",
+      "reply": "Explain selectedNo company selected · Company accounting context unresolved · snapshot at request3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებები is a recorded local account. Definition review: approved; evidence class: source bound. Known by G8 at Sep 7, 2026, 07:52 PM. Effective from Sep 6, 2026, 09:51 AM; no end is recorded. No reviewed material state was recorded for this version by the selected knowledge cutoff. Its current material authority and availability are not established by this historical view. The visible history contains 1 version and 100 dependent links (bounded). Trace shows the recorded evidence chain. These links identify where to investigate; they do not establish a cause, complete business impact or permission for current financial use.Trace 3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებებიHistory of 3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებებიExact retained referenceResource1d3bb778-9f59-5f21-ae02-34961db3a633Versionf776f6f3-b623-516c-a1ea-896fbe0517a3Known-at cutoff2026-09-07T15:52:50.425000+00:00",
+      "reference": [
+        "1d3bb778-9f59-5f21-ae02-34961db3a633",
+        "f776f6f3-b623-516c-a1ea-896fbe0517a3",
+        "2026-09-07T15:52:50.425000+00:00"
+      ]
+    },
+    "hidden": {
+      "visibleNodes": 0,
+      "reply": "Explain selectedNo company selected · Company accounting context unresolved · snapshot at requestSelect a visible trace object; the previous selection is hidden by the trace filters.",
+      "reference": []
+    },
+    "return": {
+      "traceClosed": true,
+      "origin": "RESOURCE CONTEXTTR!row:4Definition review: APPROVEDSource Journal Movement · SOURCE BOUNDShow system traceView history & compareDefinition review & material stateDefinition review: approved. Evidence class: source bound.Registry approval records review of this definition. Material authority, how a value is known and its availability are separate observations.No reviewed material lifecycle state was recorded for this version by the selected knowledge cutoff. This does not establish its current state.Retained state as known at 9/7/2026, 7:52:50 PM · 0 reviewed eventsHistorical state inspection does not authorize current use. Reports and actions must check their required authority, availability and exact inputs when they run.Refresh retained stateEffective fromSep 6Known by G8 at9/7/2026, 7:52:50 PMVersions known then1Visible dependents9Department: Auto ParkDepartment: Auto ParkDepartment: Auto ParkBudget Article New: ServiceBudget Article New: ServiceBudget Article New: ServiceRegion: SOG-KartliRegion: SOG-KartliIdentity & versionbab13833-cc93-58b0-99f9-62bcecb71eaac01ad940-1833-5b8b-857a-95b53214898fClear selection",
+      "group": "posting date: 2025-11-01\n\n\t2\t\nInspect group contributions\n\nTR!row:4\n\nInspect\nTrace source\n\nTR!row:3\n\nInspect\nTrace source",
+      "reference": [
+        "bab13833-cc93-58b0-99f9-62bcecb71eaa",
+        "c01ad940-1833-5b8b-857a-95b53214898f",
+        "2026-09-07T15:52:50.425000+00:00"
+      ]
+    },
+    "retained-reply": {
+      "trace": "3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებები",
+      "reference": [
+        "1d3bb778-9f59-5f21-ae02-34961db3a633",
+        "f776f6f3-b623-516c-a1ea-896fbe0517a3",
+        "2026-09-07T15:52:50.425000+00:00"
+      ],
+      "cutoff": "2026-09-07T15:52:50.425000+00:00"
+    },
+    "earlier-time": {
+      "selected": "Inspect TR!row:4 SourceJournalMovement",
+      "cutoff": "2026-09-07T15:25:39.495000+00:00",
+      "reply": "Explain selectedNo company selected · Company accounting context unresolved · snapshot at requestTR!row:4 is a recorded source journal movement. Definition review: approved; evidence class: source bound. Known by G8 at Sep 7, 2026, 07:25 PM. Effective from Sep 6, 2026, 09:56 AM; no end is recorded. No reviewed material state was recorded for this version by the selected knowledge cutoff. Its current material authority and availability are not established by this historical view. The visible history contains 1 version and 9 dependent links. Trace shows the recorded evidence chain. These links identify where to investigate; they do not establish a cause, complete business impact or permission for current financial use.Trace TR!row:4History of TR!row:4Exact retained referenceResourcebab13833-cc93-58b0-99f9-62bcecb71eaaVersionc01ad940-1833-5b8b-857a-95b53214898fKnown-at cutoff2026-09-07T15:25:39.495000+00:00",
+      "reference": [
+        "bab13833-cc93-58b0-99f9-62bcecb71eaa",
+        "c01ad940-1833-5b8b-857a-95b53214898f",
+        "2026-09-07T15:25:39.495000+00:00"
+      ]
+    },
+    "company": {
+      "traceClosed": true,
+      "company": "სს. საქორგგაზი⌄",
+      "reply": "Explain selectedსს. საქორგგაზი · Company accounting context unresolved · snapshot at requestSelect a company resource, map object or work item to inspect its recorded context and evidence.",
+      "reference": [],
+      "replyCount": 1
+    }
+  }
+}
