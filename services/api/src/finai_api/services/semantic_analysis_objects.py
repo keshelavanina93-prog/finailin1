@@ -186,12 +186,22 @@ def build(history, plan, resolver, company_id):
             if dep["relation"] == "SEMANTIC:" + name
             and str(dep["resource_id"]) == str(spec.get("semantic_id"))
         }
-        if len(semantics) != 1:
-            raise WorkspaceError(409, "Object field requires its exact schema semantic contract")
-        semantic = next(iter(semantics.values()))
-        if semantic["object_type"] != "SemanticContract":
-            raise WorkspaceError(409, "Object field semantics have an incompatible type")
-        definitions[str(semantic["version_id"])] = pin(semantic)
+        if len(semantics) > 1:
+            raise WorkspaceError(409, "Object field has ambiguous retained semantic versions")
+        semantic = next(iter(semantics.values()), None)
+        if semantic:
+            if semantic["object_type"] != "SemanticContract":
+                raise WorkspaceError(409, "Object field semantics have an incompatible type")
+            definitions[str(semantic["version_id"])] = pin(semantic)
+        else:
+            # Some existing bootstrap schemas name semantic identities without
+            # retaining a version edge. Their exact stored type still supports
+            # a raw attribute table; it grants no interpretation or measure.
+            unavailable.append(
+                field_label(name, spec)
+                + ": no exact semantic version is retained; only its stored schema and value "
+                "are available."
+            )
         fields.append(
             FieldDefinition(
                 key=name,
@@ -200,7 +210,7 @@ def build(history, plan, resolver, company_id):
                 role="ATTRIBUTE",
                 definition=pin(schema),
                 field_id=spec.get("field_id"),
-                semantic_id=spec.get("semantic_id"),
+                semantic_id=spec.get("semantic_id") if semantic else None,
                 filterable=True,
                 groupable=True,
             )
