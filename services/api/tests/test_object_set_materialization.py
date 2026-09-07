@@ -50,12 +50,11 @@ def test_legacy_and_excluded_calculations():
             materialization={"max_objects": 300, "max_pages": 2},
             derived_property_ids=[uuid4()],
         )
-    with pytest.raises(ValueError):
-        FunctionImplementation(
-            **base,
-            materialization={"max_objects": 300, "max_pages": 2},
-            group_count={"schema_id": uuid4(), "fields": ["day"]},
-        )
+    assert FunctionImplementation(
+        **base,
+        materialization={"max_objects": 300, "max_pages": 2},
+        group_count={"schema_id": uuid4(), "fields": ["day"]},
+    ).materialization is not None
 
 
 def materialization_case(retained):

@@ -16,7 +16,7 @@ def validate_schema(schema: dict, fields: list[str]) -> None:
         raise WorkspaceError(422, "Grouping requires declared scalar properties")
 
 
-def count_observations(result: dict, grouping: dict, schema: dict) -> dict:
+def count_observations(result: dict, grouping: dict, schema: dict, *, materialized=False) -> dict:
     fields = grouping["fields"]
     validate_schema(schema, fields)
     objects = result["objects"]
@@ -24,7 +24,9 @@ def count_observations(result: dict, grouping: dict, schema: dict) -> dict:
         result["query"]["offset"] != 0
         or result["next_offset"] is not None
         or result["total"] != len(objects)
-        or not len(objects) <= result["query"]["limit"] <= 200
+        or not 1 <= result["query"]["limit"] <= 200
+        or (not materialized and len(objects) > result["query"]["limit"])
+        or (materialized and ("materialization" not in result or len(objects) > 1000))
     ):
         raise WorkspaceError(409, "Observation counts require the complete bounded Object Set")
     if len({obj["resource_id"] for obj in objects}) != len(objects):
@@ -70,7 +72,9 @@ def count_observations(result: dict, grouping: dict, schema: dict) -> dict:
     return {
         "contract": "grouped-observation-counts/1",
         "authority": "OBSERVATION_COUNTS_ONLY",
-        "coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+        "coverage": "COMPLETE_BOUNDED_MATERIALIZATION"
+        if materialized
+        else "COMPLETE_BOUNDED_OBJECT_SET",
         "schema": grouping["schema"],
         "fields": fields,
         "object_count": len(objects),

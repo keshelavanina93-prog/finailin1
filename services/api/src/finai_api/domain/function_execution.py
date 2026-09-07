@@ -56,10 +56,8 @@ class FunctionImplementation(BaseModel):
 
     @model_validator(mode="after")
     def unique_properties(self) -> "FunctionImplementation":
-        if self.materialization and (
-            self.derived_property_ids or self.group_count or self.retained_properties
-        ):
-            raise ValueError("Materialization supports original objects and temporal extent only")
+        if self.materialization and (self.derived_property_ids or self.retained_properties):
+            raise ValueError("Materialization does not support calculated properties")
         if len(set(self.derived_property_ids)) != len(self.derived_property_ids):
             raise ValueError("Function derived property identities must be unique")
         if len({ref.resource_id for ref in self.retained_properties}) != len(

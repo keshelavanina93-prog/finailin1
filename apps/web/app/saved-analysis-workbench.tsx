@@ -8,7 +8,7 @@ import "./saved-analysis-workbench.css";
 type Pin={resource_id:string;version_id:string};
 type SavedFunction={reference:Pin;display_name:string;attributes:Record<string,unknown>;content_hash:string};
 type Request={input_result?:{invocation_id:string};request_id:string;function:Pin;valid_at:string;known_at:string;offset:number;limit:number};
-type GroupCounts={contract:"grouped-observation-counts/1";authority:"OBSERVATION_COUNTS_ONLY";coverage:"COMPLETE_BOUNDED_OBJECT_SET";schema:Pin&{content_hash:string};fields:string[];object_count:number;groups:Array<{key:Array<{field:string;state:"MISSING"|"NULL"|"VALUE";value?:string|number|boolean}>;count:number;contributors:Array<Pin&{content_hash:string}>}>};
+type GroupCounts={contract:"grouped-observation-counts/1";authority:"OBSERVATION_COUNTS_ONLY";coverage:"COMPLETE_BOUNDED_OBJECT_SET"|"COMPLETE_BOUNDED_MATERIALIZATION";schema:Pin&{content_hash:string};fields:string[];object_count:number;groups:Array<{key:Array<{field:string;state:"MISSING"|"NULL"|"VALUE";value?:string|number|boolean}>;count:number;contributors:Array<Pin&{content_hash:string}>}>};
 type SourceResult = {invocation_id:string;receipt_hash:string;run_id:string};
 type DerivedValue = {
  object_id:string;object_version_id:string;definition_id?:string;definition_version_id:string;
@@ -78,7 +78,7 @@ function Workbench({initialInvocationId,token,companyName,onInspect,onTrace,onPr
 
 function GroupedObservationCounts({result,onInspect,onTrace}:{result:Output;onInspect:Props["onInspect"];onTrace:Props["onTrace"]}){
  const counts=result.group_counts;
- if(!counts||counts.contract!=="grouped-observation-counts/1"||counts.authority!=="OBSERVATION_COUNTS_ONLY"||counts.coverage!=="COMPLETE_BOUNDED_OBJECT_SET"||!Array.isArray(counts.groups)||!Array.isArray(counts.fields))return <p role="alert">Grouped observation evidence has an unsupported contract; no count interpretation is shown.</p>;
+ if(!counts||!validGroupedObservations(result))return <p role="alert">Grouped observation evidence has an unsupported contract; no count interpretation is shown.</p>;
  return <section aria-label="Grouped source observations"><h4>Grouped source observations</h4><p>{counts.object_count.toLocaleString()} source observations in the complete bounded Object Set. These are observation counts, not journal, transaction or financial totals.</p><p>Grouped by {counts.fields.map(field=>field.replaceAll("_"," ")).join(", ")}.</p><div className="saved-analysis-table"><table><thead><tr><th>Group</th><th>Source observations</th><th>Contributing evidence</th></tr></thead><tbody>{counts.groups.map((group,index)=><tr key={index}><th scope="row">{group.key.map(key=><p key={key.field}>{key.field.replaceAll("_"," ")}: {key.state==="MISSING"?"Not present":key.state==="NULL"?"Explicit null":key.state==="VALUE"?String(key.value):"Unsupported key state"}</p>)}</th><td>{group.count.toLocaleString()}</td><td><details><summary>Inspect group contributions</summary>{group.contributors.map(pin=>{const object=result.objects.find(candidate=>candidate.resource_id===pin.resource_id&&candidate.version_id===pin.version_id&&candidate.content_hash===pin.content_hash);return <div key={`${pin.resource_id}:${pin.version_id}`}>{object?<><p>{displayName(object.display_name)}</p><button onClick={()=>onInspect(object,result.query.known_at)}>Inspect</button><button onClick={()=>onTrace(object,result.query.known_at)}>Trace source</button></>:<p>The exact contributing version is unavailable in this retained result.</p>}</div>;})}</details></td></tr>)}</tbody></table></div>{!counts.groups.length&&<p>No observation groups were returned.</p>}<details><summary>Grouping fields &amp; exact schema provenance</summary><p>Schema resource: {counts.schema.resource_id}</p><p>Schema version: {counts.schema.version_id}</p><p>Schema hash: {counts.schema.content_hash}</p><p>Fields: {counts.fields.join(", ")}</p><p>Coverage: {counts.coverage} · Authority: {counts.authority}</p><p>Result: {result.run_id}</p></details></section>;
 }
 
@@ -260,7 +260,7 @@ function validMaterialization(output:BaseOutput):boolean {
  if(!manifest||output.coverage!=="COMPLETE_BOUNDED_MATERIALIZATION"||manifest.contract!=="bounded-object-set-materialization/1"||manifest.coverage!=="COMPLETE_BOUNDED_MATERIALIZATION"||manifest.hash_algorithm!=="POSTGRES_JSONB_TEXT_UTF8_SHA256"||
   !pin(manifest.object_set)||!integer(manifest.max_objects,1,1000)||!integer(manifest.max_pages,1,10)||!integer(manifest.object_count,0,manifest.max_objects)||!integer(manifest.page_count,1,manifest.max_pages)||
   !Array.isArray(manifest.pages)||manifest.pages.length!==manifest.page_count||!Array.isArray(output.objects)||output.objects.length!==manifest.object_count||output.total!==manifest.object_count||output.next_offset!==null||
-  !output.query||output.query.offset!==0||!integer(output.query.limit,1,200)||!Array.isArray(output.derived_values)||output.derived_values.length!==0||output.group_counts!==undefined)return false;
+  !output.query||output.query.offset!==0||!integer(output.query.limit,1,200)||!Array.isArray(output.derived_values)||output.derived_values.length!==0)return false;
  if(!materializationRecord(output.counts_by_type)||Object.entries(output.counts_by_type).some(([kind,count])=>!/^([A-Z][A-Za-z0-9]{1,63})$/.test(kind)||!integer(count,0,manifest.object_count))||Object.values(output.counts_by_type).reduce((sum,count)=>sum+count,0)!==manifest.object_count)return false;
  const queryContext=(query:Record<string,unknown>)=>Object.fromEntries(Object.entries(query).filter(([key])=>key!=="offset"));
  const outputContext=stableMaterialization(queryContext(output.query));
@@ -315,4 +315,41 @@ function MaterializationCoverage({result}:{result:Output}) {
    </details>)}
   </details>
  </section>;
+}
+
+
+function validGroupedObservations(result:Output):boolean {
+ const counts=result.group_counts;
+ const materialized=result.materialization!==undefined&&validMaterialization(result);
+ const bound=materialized?result.materialization!.max_objects:200;
+ const uuid=(value:unknown)=>typeof value==="string"&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
+ const hash=(value:unknown)=>typeof value==="string"&&/^[a-f0-9]{64}$/.test(value);
+ if(!counts||counts.contract!=="grouped-observation-counts/1"||counts.authority!=="OBSERVATION_COUNTS_ONLY"||
+  counts.coverage!==(materialized?"COMPLETE_BOUNDED_MATERIALIZATION":"COMPLETE_BOUNDED_OBJECT_SET")||
+  result.materialization!==undefined&&!materialized||result.coverage==="COMPLETE_BOUNDED_MATERIALIZATION"&&!materialized||
+  !uuid(counts.schema?.resource_id)||!uuid(counts.schema?.version_id)||!hash(counts.schema?.content_hash)||
+  !Array.isArray(counts.fields)||counts.fields.length<1||counts.fields.length>4||counts.fields.some(field=>typeof field!=="string"||!field)||new Set(counts.fields).size!==counts.fields.length||
+  !Number.isInteger(counts.object_count)||counts.object_count<0||counts.object_count>bound||!Array.isArray(result.objects)||counts.object_count!==result.objects.length||counts.object_count!==result.total||
+  result.query.offset!==0||result.next_offset!==null||!Array.isArray(counts.groups)||counts.groups.length>counts.object_count)return false;
+ const objects=new Map<string,CanonicalResource>();
+ for(const object of result.objects){
+  if(!uuid(object.resource_id)||!uuid(object.version_id)||!hash(object.content_hash)||object.schema_version_id!==counts.schema.version_id||objects.has(object.resource_id))return false;
+  objects.set(object.resource_id,object);
+ }
+ const seen=new Set<string>();const groupKeys=new Set<string>();let total=0;
+ for(const group of counts.groups){
+  if(!group||!Number.isInteger(group.count)||group.count<1||group.count>bound||!Array.isArray(group.contributors)||group.contributors.length!==group.count||!Array.isArray(group.key)||group.key.length!==counts.fields.length)return false;
+  if(!group.key.every((key,index)=>key&&key.field===counts.fields[index]&&["MISSING","NULL","VALUE"].includes(key.state)&&
+    (key.state==="VALUE"?(typeof key.value==="string"||typeof key.value==="boolean"||typeof key.value==="number"&&Number.isSafeInteger(key.value)):key.value===undefined)))return false;
+  const signature=stableMaterialization(group.key);
+  if(groupKeys.has(signature))return false;groupKeys.add(signature);
+  for(const contributor of group.contributors){
+   if(!contributor||!uuid(contributor.resource_id)||!uuid(contributor.version_id)||!hash(contributor.content_hash)||seen.has(contributor.resource_id))return false;
+   const object=objects.get(contributor.resource_id);
+   if(!object||object.version_id!==contributor.version_id||object.content_hash!==contributor.content_hash||!group.key.every(key=>key.state==="MISSING"?!Object.hasOwn(object.attributes,key.field):key.state==="NULL"?Object.hasOwn(object.attributes,key.field)&&object.attributes[key.field]===null:Object.hasOwn(object.attributes,key.field)&&object.attributes[key.field]===key.value))return false;
+   seen.add(contributor.resource_id);
+  }
+  total+=group.count;
+ }
+ return total===counts.object_count&&seen.size===objects.size;
 }

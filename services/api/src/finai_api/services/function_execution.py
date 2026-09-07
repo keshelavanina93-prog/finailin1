@@ -728,7 +728,11 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
             ).fetchone()
         if schema is None or _pin(schema) != grouping["schema"]:
             raise WorkspaceError(409, "Grouping schema pin is unavailable")
-        grouped = {"group_counts": count_observations(result, grouping, schema)}
+        grouped = {
+            "group_counts": count_observations(
+                result, grouping, schema, materialized=bool(retained_plan.get("materialization"))
+            )
+        }
     if retained_plan.get("temporal_extent"):
         from finai_api.services.temporal_observations import extent_observations
 
