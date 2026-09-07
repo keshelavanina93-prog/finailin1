@@ -24,6 +24,7 @@ def main() -> None:
         ),
     )
     parser.add_argument("--check-history", action="store_true")
+    parser.add_argument("--check-policies", action="store_true")
     args = parser.parse_args()
     token = next(
         key
@@ -96,6 +97,23 @@ def main() -> None:
             for row in first["items"] + second["items"]:
                 assert row["proof"]["artifact"] == original["artifact"]
                 assert row["current_use_authorized"] is False
+        if args.check_policies:
+            policies = client.post(
+                "/policies", json={"artifact": artifact, "limit": 20}
+            )
+            policies.raise_for_status()
+            options = policies.json()
+            assert options["execution_authorized"] is False
+            assert len(options["items"]) <= 20
+            for option in options["items"]:
+                assert (
+                    original["artifact"]["artifact_class"]
+                    in option["definition"]["artifact_classes"]
+                )
+                assert (
+                    option["reference"]["resource_id"]
+                    and option["reference"]["version_id"]
+                )
     args.output.write_text(
         json.dumps(
             {
@@ -106,6 +124,7 @@ def main() -> None:
                 "source_still_readable_and_hash_unchanged": True,
                 "disposition_executed": False,
                 "artifact_history_pages_checked": args.check_history,
+                "reviewed_policy_discovery_checked": args.check_policies,
                 "legal_compliance_established": False,
             },
             indent=2,

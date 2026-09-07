@@ -10,6 +10,7 @@ from finai_api.domain.artifact_retention import (
     ArtifactReference,
     RetentionEvaluationRequest,
     RetentionHistoryRequest,
+    RetentionPolicyDiscoveryRequest,
 )
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal
@@ -47,3 +48,8 @@ def history(principal: User, evaluation_id: UUID) -> dict[str, Any]:
 @router.post("/history")
 def artifact_history(principal: User, request: RetentionHistoryRequest) -> dict[str, Any]:
     return artifact_retention.artifact_history(principal, request)
+
+
+@router.post("/policies")
+def policies(principal: User, request: RetentionPolicyDiscoveryRequest) -> dict[str, Any]:
+    return artifact_retention.discover_policies(principal, request)

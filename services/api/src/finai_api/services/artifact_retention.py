@@ -13,8 +13,10 @@ from finai_api.domain.artifact_retention import (
     RetentionEvaluationRequest,
     RetentionHistoryRequest,
     RetentionPolicy,
+    RetentionPolicyDiscoveryRequest,
 )
 from finai_api.domain.authority import canonical_sha256
+from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.domain.resources import ResourceMutation
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
@@ -206,4 +208,61 @@ def artifact_history(p: Principal, request: RetentionHistoryRequest) -> dict:
         "items": [_envelope(row) for row in page],
         "next_cursor": next_cursor,
         "current_use_authorized": False,
+    }
+
+
+def discover_policies(p: Principal, request: RetentionPolicyDiscoveryRequest) -> dict:
+    """List a bounded candidate page; applicability does not establish eligibility."""
+    from finai_api.services.artifact_references import resolve_artifact
+
+    require_permission(p, "ontology_read")
+    artifact = resolve_artifact(p, request.artifact)
+    if artifact["exact_scope"] != p.scope.model_dump(mode="json"):
+        raise WorkspaceError(409, "Artifact discovery must preserve exact scope")
+    query = (
+        "SELECT v.* FROM resource_versions v WHERE v.tenant_id=%s "
+        "AND v.access_entity=%s AND v.object_type='RetentionPolicy' "
+        "AND v.version_id=g8_effective_version_id(v.tenant_id,v.resource_id,%s) "
+        "AND v.authority_state='APPROVED' "
+        "AND (v.attributes->'definition'->'artifact_classes') @> %s "
+    )
+    params: list[Any] = [
+        p.scope.tenant_id,
+        p.scope.legal_entity_id,
+        datetime.now(UTC),
+        Jsonb([artifact["artifact_class"]]),
+    ]
+    if request.after_resource_id:
+        query += "AND v.resource_id>%s "
+        params.append(request.after_resource_id)
+    query += "ORDER BY v.resource_id LIMIT %s"
+    params.append(request.limit + 1)
+    items = []
+    with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
+        candidates = c.execute(query, params).fetchall()
+        page = candidates[: request.limit]
+        for candidate in page:
+            reference = VersionReference(
+                resource_id=candidate["resource_id"], version_id=candidate["version_id"]
+            )
+            try:
+                policy = _current(c, p, reference)
+                upstream_authority(c, p.scope.tenant_id, reference.version_id)
+            except WorkspaceError as exc:
+                if exc.status not in (404, 409):
+                    raise
+                continue
+            spec = RetentionPolicy.model_validate(policy["attributes"])
+            items.append(
+                {
+                    "reference": reference.model_dump(mode="json"),
+                    "display_name": policy["display_name"],
+                    "content_hash": policy["content_hash"],
+                    "definition": spec.definition.model_dump(mode="json"),
+                }
+            )
+    return {
+        "items": items,
+        "next_cursor": str(page[-1]["resource_id"]) if len(candidates) > request.limit else None,
+        "execution_authorized": False,
     }

@@ -95,3 +95,9 @@ class RetentionHistoryRequest(FrozenModel):
     artifact: ArtifactReference
     limit: int = Field(default=20, ge=1, le=50)
     before: RetentionHistoryCursor | None = None
+
+
+class RetentionPolicyDiscoveryRequest(FrozenModel):
+    artifact: ArtifactReference
+    limit: int = Field(default=20, ge=1, le=50)
+    after_resource_id: UUID | None = None

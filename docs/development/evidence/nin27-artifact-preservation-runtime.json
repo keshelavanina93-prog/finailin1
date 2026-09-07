@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-06T23:58:55.674755+00:00",
+  "checked_at": "2026-09-07T00:07:08.952625+00:00",
   "artifact": {
     "reference": {
       "kind": "SOURCE_RECEIPT",
@@ -100,5 +100,6 @@
   "source_still_readable_and_hash_unchanged": true,
   "disposition_executed": false,
   "artifact_history_pages_checked": true,
+  "reviewed_policy_discovery_checked": true,
   "legal_compliance_established": false
 }

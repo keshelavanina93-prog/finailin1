@@ -20,7 +20,7 @@ The replacement G8 Data surface exposes Storage & preservation within selected s
 - Authenticated browser: Data → ანგარიშები (1).xlsx → Storage & preservation → Record preservation check returned preserved, policy not established, with no execution/legal/financial grant. Receipt `bcbd8e3a-d64f-474a-89fe-bb933233e8c5`, proof `343227cf42ff8f9fc1428f23367e7ca770dc0f53a45285a532a1f2954a0a473f`. Captured and visually reviewed `.finai/artifacts/browser-shots/g8-source-preservation-sgp12.png`. The failed-inspection state disabled recording before the corrected API was available.
 - Correction: the original screenshot filename and checkpoint incorrectly attributed that exact receipt to SGP12.xls. The offscreen automation click had not selected SGP12. Intake readback establishes source `ir_ea498afd44a9e438752f41d7ed3ec8867fcaaa1466f1de865ea9a3bc4529eb40` as ანგარიშები (1).xlsx. No source-selection defect was demonstrated; the exact receipt/proof remain valid.
 
-Full NIN-27 disposition/deletion handling and NIN-25 product acceptance remain open. Verification uses the integrated local workspace, which contains preserved unrelated changes; it is not a clean-checkout release claim.
+Full disposition/deletion execution and NIN-25 product acceptance remain open. The shared NIN-27 contract supplies classification, policy conditions and immutable assessment evidence; an actual deletion executor must consume these through NIN-29's canonical Action/effect/readback authority. It must not be a second executor inside the retention service. Verification uses the integrated local workspace, which contains preserved unrelated changes; it is not a clean-checkout release claim.
 
 ## Selected-source history continuation
 
@@ -31,3 +31,13 @@ Data provides Recorded preservation history independently of successful storage 
 Focused native history verification covers 2/2/1 pages without duplicates, separate-artifact exclusion, exact-scope isolation and reopening unchanged evidence after policy revocation while current resolver/policy helpers are unavailable. Frontend lint, TypeScript and production build pass. Migration041 applied; API/web restarted. Actual SEG web-proxy limit-one pages returned distinct stored assessments with unchanged source/proofs (`--check-history`).
 
 Authenticated browser switched from ანგარიშები (1).xlsx to SGP12.xls (zero assessments) and back to the exact accounts source `ir_ea498afd44a9e438752f41d7ed3ec8867fcaaa1466f1de865ea9a3bc4529eb40`. The prior assessment at 03:54:14 reappeared: one row, preserved/preserve, policy not established. No new assessment was created. Screenshot `.finai/artifacts/browser-shots/g8-accounts-preservation-history.png` captured and visually reviewed; browser closed.
+
+## Reviewed policy discovery and selection
+
+The selected artifact can discover reviewed RetentionPolicy versions in its exact company. Bounded candidate pages use canonical resource IDs, current effective versions and upstream revalidation. Future editing heads do not hide the effective policy; withdrawn policies are excluded. A page can contain no usable policies and still advance its cursor past unavailable candidates. Holds and unestablished legal basis remain visible as policy declarations, never eligibility or compliance claims.
+
+Data defaults to no policy. Deliberate selection passes the exact policy reference to a preservation assessment, where it is checked again. An attempted request freezes its identity and selected policy for safe retry; an explicit new check creates a new request identity. No automatic policy selection, legal configuration or disposition command is added.
+
+Focused native verification passes for future/current policy versions, held/unestablished declarations, revoked and other-company exclusion, and empty-page cursor advancement. Frontend lint, TypeScript, production build and API/web restart pass. Actual SEG web-proxy discovery passes with `--check-history --check-policies`. Positive configured-policy browser acceptance remains unverified without actual business policy configuration; synthetic native fixtures do not establish that gate.
+
+Authenticated browser verified the exact accounts source above defaults to No policy selected and reports no matching reviewed policies. No policy or assessment was created. Screenshot `.finai/artifacts/browser-shots/g8-accounts-preservation-no-policy.png` captured/viewed; browser closed.

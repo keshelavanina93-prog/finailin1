@@ -4,12 +4,15 @@ import {useEffect,useRef,useState} from "react";
 type ArtifactReference={kind:"SOURCE_RECEIPT";receipt_id:string}|{kind:"SOURCE_DOCUMENT";document_id:string};
 type Artifact={reference:ArtifactReference;artifact_class:string;content_hash:string;exact_scope:Record<string,unknown>;recorded_at:string;authority_scope:string};
 type Inspection={artifact:Artifact;execution_authorized:false;legal_compliance_established:false};
-type Evaluation={evaluation_id:string;proof_hash:string;recorded_at:string;execution_authorized:false;current_use_authorized:false;proof:{artifact:Artifact;status:string;reasons:string[];effective_disposition:"PRESERVE";requested_action:"PRESERVE"|"DELETE"|"ARCHIVE";purpose:"DISPOSITION_EVALUATION_ONLY";legal_compliance_established:false}};
+type Evaluation={evaluation_id:string;proof_hash:string;recorded_at:string;execution_authorized:false;current_use_authorized:false;proof:{requested_policy?:PolicyReference|null;artifact:Artifact;status:string;reasons:string[];effective_disposition:"PRESERVE";requested_action:"PRESERVE"|"DELETE"|"ARCHIVE";purpose:"DISPOSITION_EVALUATION_ONLY";legal_compliance_established:false}};
+type PolicyReference={resource_id:string;version_id:string};
+type RetentionPolicy={reference:PolicyReference;display_name:string;content_hash:string;definition:{artifact_classes:string[];minimum_retention_days:number;legal_basis_state:"DECLARED"|"NOT_ESTABLISHED";legal_basis?:string|null;legal_hold:boolean}};
 type Props={token:string;artifact:ArtifactReference;canRecord:boolean};
 const human=(text:string)=>text.toLowerCase().replaceAll("_"," ");
 const same=(a:ArtifactReference,b:ArtifactReference)=>a.kind===b.kind&&(a.kind==="SOURCE_RECEIPT"&&b.kind==="SOURCE_RECEIPT"?a.receipt_id===b.receipt_id:a.kind==="SOURCE_DOCUMENT"&&b.kind==="SOURCE_DOCUMENT"&&a.document_id===b.document_id);
 export default function ArtifactPreservation(props:Props){return <Preservation key={JSON.stringify([props.token,props.artifact])} {...props}/>;}
 function Preservation({token,artifact,canRecord}:Props){
+ const [policy,setPolicy]=useState<RetentionPolicy|null>(null);const [requestLocked,setRequestLocked]=useState(false);
  const [historyRevision,setHistoryRevision]=useState(0);
  const [open,setOpen]=useState(false);const [revision,setRevision]=useState(0);const [inspection,setInspection]=useState<Inspection|null>(null);const [error,setError]=useState("");const [loading,setLoading]=useState(false);
  const [evaluation,setEvaluation]=useState<Evaluation|null>(null);const [recording,setRecording]=useState(false);const [recordError,setRecordError]=useState("");
@@ -28,11 +31,11 @@ function Preservation({token,artifact,canRecord}:Props){
   void inspect();return()=>{disposed=true;clearTimeout(timer);controller.abort();};
  },[open,token,reference,revision]);
  async function record(){
-  if(recording||!inspection||!canRecord)return;const controller=new AbortController();recordRequest.current=controller;const timer=setTimeout(()=>controller.abort(),20000);setRecording(true);setRecordError("");requestId.current??=crypto.randomUUID();
+  if(recording||!inspection||!canRecord)return;const controller=new AbortController();recordRequest.current=controller;const timer=setTimeout(()=>controller.abort(),20000);setRecording(true);setRequestLocked(true);setRecordError("");requestId.current??=crypto.randomUUID();
   try{
-   const response=await fetch("/api/ontology/retention/evaluations",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({artifact,requested_action:"PRESERVE",request_id:requestId.current}),signal:controller.signal});
+   const response=await fetch("/api/ontology/retention/evaluations",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({artifact,...(policy?{policy:policy.reference}:{}),requested_action:"PRESERVE",request_id:requestId.current}),signal:controller.signal});
    if(!response.ok)throw new Error("The preservation assessment could not be confirmed. Retry uses the same request reference.");const data:Evaluation=await response.json();
-   if(data.evaluation_id!==requestId.current||!same(data.proof.artifact.reference,artifact)||data.proof.artifact.content_hash!==inspection.artifact.content_hash||data.proof.purpose!=="DISPOSITION_EVALUATION_ONLY"||data.proof.requested_action!=="PRESERVE"||data.proof.effective_disposition!=="PRESERVE"||data.execution_authorized!==false||data.current_use_authorized!==false||data.proof.legal_compliance_established!==false)throw new Error("The assessment did not match this retained source and preservation request.");
+   if((policy?(data.proof.requested_policy?.resource_id!==policy.reference.resource_id||data.proof.requested_policy.version_id!==policy.reference.version_id):data.proof.requested_policy!=null)||data.evaluation_id!==requestId.current||!same(data.proof.artifact.reference,artifact)||data.proof.artifact.content_hash!==inspection.artifact.content_hash||data.proof.purpose!=="DISPOSITION_EVALUATION_ONLY"||data.proof.requested_action!=="PRESERVE"||data.proof.effective_disposition!=="PRESERVE"||data.execution_authorized!==false||data.current_use_authorized!==false||data.proof.legal_compliance_established!==false)throw new Error("The assessment did not match this retained source and preservation request.");
    if(recordRequest.current===controller&&!controller.signal.aborted){setEvaluation(data);setHistoryRevision(value=>value+1);}
   }catch(failure){if(recordRequest.current===controller)setRecordError(controller.signal.aborted?"The response timed out; the assessment may have been recorded. Retry safely uses the same request reference.":failure instanceof Error?failure.message:"Assessment unavailable");}
   finally{clearTimeout(timer);if(recordRequest.current===controller)setRecording(false);}
@@ -40,11 +43,13 @@ function Preservation({token,artifact,canRecord}:Props){
  return <details className="source-detail" onToggle={event=>setOpen(event.currentTarget.open)}><summary>Storage & preservation</summary>{open&&<section aria-label="Source preservation">
   <p>Inspect retained source metadata and record a preservation assessment.</p>
   {loading&&<p role="status">Inspecting retained source…</p>}{error&&<p role="alert">{error}</p>}
-  {inspection&&<><dl><dt>Storage class</dt><dd>{human(inspection.artifact.artifact_class)}</dd><dt>Retained on</dt><dd>{new Date(inspection.artifact.recorded_at).toLocaleString()}</dd><dt>Authority scope</dt><dd>{human(inspection.artifact.authority_scope)}</dd></dl><p>Retention policy is not selected. A recorded check requests preservation for further review; this inspection does not establish a legal retention period.</p><details><summary>Exact retained metadata</summary><dl><dt>Source reference</dt><dd>{artifact.kind==="SOURCE_RECEIPT"?artifact.receipt_id:artifact.document_id}</dd><dt>Content hash</dt><dd>{inspection.artifact.content_hash}</dd><dt>Server access scope</dt><dd><pre>{JSON.stringify(inspection.artifact.exact_scope,null,2)}</pre></dd></dl></details></>}
+  {inspection&&<><dl><dt>Storage class</dt><dd>{human(inspection.artifact.artifact_class)}</dd><dt>Retained on</dt><dd>{new Date(inspection.artifact.recorded_at).toLocaleString()}</dd><dt>Authority scope</dt><dd>{human(inspection.artifact.authority_scope)}</dd></dl><p>{policy?"The selected policy is checked again when the assessment is recorded.":"Retention policy is not selected."} A recorded check requests preservation for further review; this inspection does not establish a legal retention period.</p><details><summary>Exact retained metadata</summary><dl><dt>Source reference</dt><dd>{artifact.kind==="SOURCE_RECEIPT"?artifact.receipt_id:artifact.document_id}</dd><dt>Content hash</dt><dd>{inspection.artifact.content_hash}</dd><dt>Server access scope</dt><dd><pre>{JSON.stringify(inspection.artifact.exact_scope,null,2)}</pre></dd></dl></details></>}
+  <PolicySelection token={token} artifact={artifact} selected={policy} disabled={requestLocked} onSelect={setPolicy}/>
   {evaluation&&<div role="status"><h4>Preservation assessment recorded</h4><p>{human(evaluation.proof.status)} · disposition: {human(evaluation.proof.effective_disposition)}</p>{evaluation.proof.reasons.map(reason=><p key={reason}>{human(reason)}</p>)}<small>{new Date(evaluation.recorded_at).toLocaleString()}</small><details><summary>Assessment reference</summary><p>{evaluation.evaluation_id}</p><p>{evaluation.proof_hash}</p></details></div>}
   {recordError&&<p role="alert">{recordError}</p>}
   <p>This is retained assessment evidence. It does not execute storage changes, establish legal compliance or confer financial authority.</p>
   <button type="button" disabled={loading||recording} onClick={()=>setRevision(value=>value+1)}>Refresh metadata</button>{canRecord&&<button type="button" disabled={!inspection||loading||recording||Boolean(evaluation)} onClick={()=>void record()}>{recording?"Recording assessment…":recordError?"Retry preservation check":"Record preservation check"}</button>}
+  {requestLocked&&!recording&&<><p>{evaluation?"This assessment is retained with its original policy reference.":"The previous request may already be recorded. Its policy is frozen for a safe retry."}</p><button type="button" onClick={()=>{requestId.current=null;setRequestLocked(false);setRecordError("");setEvaluation(null);}}>Start a new preservation check</button></>}
   <PreservationHistory token={token} artifact={artifact} revision={historyRevision}/>
  </section>}</details>;
 }
@@ -75,5 +80,27 @@ function HistoryRecords({token,artifact}:{token:string;artifact:ArtifactReferenc
   {!loading&&!error&&!items.length&&<p>No retained preservation assessments were found for this source in your authorized scope.</p>}
   {items.map(item=><article key={item.evaluation_id}><h4>{new Date(item.recorded_at).toLocaleString()} · {human(item.proof.requested_action)} requested</h4><p>Assessment: {human(item.proof.status)} · retained disposition: {human(item.proof.effective_disposition)}</p>{item.proof.reasons.map(reason=><p key={reason}>{human(reason)}</p>)}<details><summary>Exact assessment evidence</summary><dl><dt>Assessment</dt><dd>{item.evaluation_id}</dd><dt>Proof hash</dt><dd>{item.proof_hash}</dd><dt>Source content hash</dt><dd>{item.proof.artifact.content_hash}</dd></dl></details></article>)}
   <p>{items.length} retained assessments loaded.</p><button type="button" disabled={loading} onClick={()=>{setBefore(null);setRevision(value=>value+1);}}>Refresh history</button>{error&&<button type="button" disabled={loading} onClick={()=>setRevision(value=>value+1)}>Retry history page</button>}{next&&!error&&<button type="button" disabled={loading} onClick={()=>setBefore(next)}>Load older assessments</button>}
+ </section>;
+}
+
+function PolicySelection({token,artifact,selected,disabled,onSelect}:{token:string;artifact:ArtifactReference;selected:RetentionPolicy|null;disabled:boolean;onSelect:(policy:RetentionPolicy|null)=>void}){
+ const [policies,setPolicies]=useState<RetentionPolicy[]>([]);const [after,setAfter]=useState<string|null>(null);const [next,setNext]=useState<string|null>(null);const [revision,setRevision]=useState(0);const [loading,setLoading]=useState(true);const [error,setError]=useState("");const reference=JSON.stringify(artifact);
+ useEffect(()=>{
+  const controller=new AbortController();let disposed=false;const timer=setTimeout(()=>controller.abort(),20000);
+  async function load(){setLoading(true);setError("");try{
+   const response=await fetch("/api/ontology/retention/policies",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({artifact:JSON.parse(reference),limit:20,...(after?{after_resource_id:after}:{})}),signal:controller.signal,cache:"no-store"});
+   if(!response.ok)throw new Error("Reviewed policies could not be loaded. No policy is selected automatically.");
+   const data:{items:RetentionPolicy[];next_cursor:string|null;execution_authorized:false}=await response.json();
+   if(data.execution_authorized!==false||!Array.isArray(data.items)||data.items.length>20||data.next_cursor===after&&after!==null)throw new Error("The policy page could not be verified.");
+   if(!disposed){setPolicies(previous=>Array.from(new Map([...(after?previous:[]),...data.items].map(item=>[item.reference.resource_id,item])).values()));setNext(data.next_cursor);}
+  }catch(failure){if(!disposed)setError(controller.signal.aborted?"Policy lookup timed out. Retry this page.":failure instanceof Error?failure.message:"Policies unavailable");}
+  finally{clearTimeout(timer);if(!disposed)setLoading(false);}}
+  void load();return()=>{disposed=true;clearTimeout(timer);controller.abort();};
+ },[token,reference,after,revision]);
+ const options=selected&&!policies.some(item=>item.reference.version_id===selected.reference.version_id)?[selected,...policies]:policies;
+ return <section aria-label="Optional preservation policy"><label>Reviewed policy for this source<select aria-label="Preservation policy" disabled={disabled||loading} value={selected?.reference.version_id??""} onChange={event=>onSelect(options.find(item=>item.reference.version_id===event.target.value)??null)}><option value="">No policy selected</option>{options.map(item=><option key={item.reference.version_id} value={item.reference.version_id}>{item.display_name}</option>)}</select></label>
+  {loading&&<p role="status">Loading reviewed policies…</p>}{error&&<p role="alert">{error}</p>}{!loading&&!error&&!policies.length&&<p>No matching reviewed policies were returned for this source.</p>}
+  {selected&&<><dl><dt>Policy minimum retention age</dt><dd>{selected.definition.minimum_retention_days} days</dd><dt>Policy legal hold</dt><dd>{selected.definition.legal_hold?"Declared":"Not declared"}</dd><dt>Policy legal basis</dt><dd>{human(selected.definition.legal_basis_state)}</dd></dl>{selected.definition.legal_basis&&<p>{selected.definition.legal_basis}</p>}<p>These are reviewed policy declarations, not a legal-compliance determination. The assessment rechecks the exact policy version.</p><details><summary>Selected policy reference</summary><p>{selected.reference.resource_id}</p><p>{selected.reference.version_id}</p><p>{selected.content_hash}</p></details></>}
+  {error&&<button type="button" disabled={loading||disabled} onClick={()=>setRevision(value=>value+1)}>Retry policy page</button>}{next&&!error&&<button type="button" disabled={loading||disabled} onClick={()=>setAfter(next)}>Load more reviewed policies</button>}
  </section>;
 }
