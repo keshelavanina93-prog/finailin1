@@ -2,10 +2,14 @@
 [CmdletBinding()]
 param(
     [ValidateSet('start', 'status', 'stop')][string]$Action = 'status',
-    [ValidateSet('all', 'api', 'web', 'minio')][string]$Service = 'all',
+    [ValidateSet('all', 'api', 'web', 'minio', 'observer')][string]$Service = 'all',
     [ValidateRange(1024, 65535)][int]$ApiPort = 8061,
     [ValidateRange(1024, 65535)][int]$WebPort = 3061,
-    [ValidateRange(5, 120)][int]$HealthTimeoutSeconds = 30
+    [ValidateRange(5, 120)][int]$HealthTimeoutSeconds = 30,
+    [guid]$DesiredResource = [guid]::Empty,
+    [guid]$DesiredVersion = [guid]::Empty,
+    [ValidatePattern('^[A-Za-z0-9_.:-]{1,128}$')][string]$ObserverActor = '',
+    [ValidateRange(30, 86400)][int]$ObserverInterval = 60
 )
 
 $ErrorActionPreference = 'Stop'
@@ -46,6 +50,12 @@ function Test-Health([string]$Url) {
     try { return (Invoke-WebRequest -Uri $Url -TimeoutSec 2 -SkipHttpErrorCheck).StatusCode -eq 200 }
     catch { return $false }
 }
+function Test-ManagedReadiness($Record) {
+    # The collector has no health listener. Process ownership is only liveness;
+    # collection outcomes are retained by the existing canonical observation API.
+    if ($Record.service -eq 'observer') { return Test-Owned $Record }
+    return Test-Health $Record.healthUrl
+}
 function Stop-Owned($Record) {
     if (-not (Test-Owned $Record)) { throw "Cannot verify ownership of $($Record.service); no process was stopped." }
     # Snapshot descendants while the verified parent is alive. Never stop by port/name.
@@ -76,7 +86,7 @@ try {
         $script:records = @($saved.services)
     }
     if ($Action -eq 'stop') {
-        foreach ($record in @($script:records | Where-Object { $Service -eq 'all' -or $_.service -eq $Service } | Sort-Object { switch ($_.service) { 'web' { 0 }; 'api' { 1 }; 'minio' { 2 } } })) {
+        foreach ($record in @($script:records | Where-Object { $Service -eq 'all' -or $_.service -eq $Service } | Sort-Object { switch ($_.service) { 'observer' { -1 }; 'web' { 0 }; 'api' { 1 }; 'minio' { 2 } } })) {
             if (Test-Owned $record) { Stop-Owned $record }
             elseif ($null -ne (Get-ProcessIdentity $record.processId)) { throw "Ownership changed for $($record.service); refusing to stop it." }
             $script:records = @($script:records | Where-Object { $_.service -ne $record.service })
@@ -91,7 +101,7 @@ try {
         $python = Join-Path $env:VIRTUAL_ENV 'Scripts\python.exe'
         $server = Join-Path $repositoryRoot 'apps\web\.next\standalone\apps\web\server.js'
         $requiredFiles = @()
-        if ($Service -in @('all', 'api')) { $requiredFiles += $python }
+        if ($Service -in @('all', 'api', 'observer')) { $requiredFiles += $python }
         if ($Service -in @('all', 'web')) { $requiredFiles += $server }
         foreach ($required in $requiredFiles) {
             if (-not (Test-Path -LiteralPath $required)) { throw 'Runtime dependencies/build missing; run bootstrap-local.ps1 and pnpm build first.' }
@@ -101,6 +111,16 @@ try {
             @{ name = 'api'; port = $ApiPort; url = "http://127.0.0.1:$ApiPort/ready"; executable = $python; arguments = "-m uvicorn finai_api.main:app --host 127.0.0.1 --port $ApiPort" },
             @{ name = 'web'; port = $WebPort; url = "http://127.0.0.1:$WebPort"; executable = $node; arguments = ('"' + $server + '"') }
         )
+        $observerConfigured = $DesiredResource -ne [guid]::Empty -and $DesiredVersion -ne [guid]::Empty -and $ObserverActor
+        if ($Service -eq 'observer' -or ($Service -eq 'all' -and $observerConfigured)) {
+            if (-not $observerConfigured) { throw 'Observer requires explicit reviewed DesiredResource, DesiredVersion and ObserverActor.' }
+            $observerScript = Join-Path $repositoryRoot 'scripts\g8-runtime-observer.py'
+            if (-not (Test-Path -LiteralPath $observerScript)) { throw 'Runtime observer component is missing.' }
+            $observerConfig = "$DesiredResource|$DesiredVersion|$ObserverActor|$ObserverInterval|$ApiPort"
+            $specs += @{ name = 'observer'; port = 0; url = $null; executable = $python; observerConfig = $observerConfig; arguments = ('"' + $observerScript + '" --loop --desired-resource ' + $DesiredResource + ' --desired-version ' + $DesiredVersion + ' --actor-id ' + $ObserverActor + ' --interval ' + $ObserverInterval + ' --api-port ' + $ApiPort) }
+        } elseif ($Service -eq 'all' -and ($DesiredResource -ne [guid]::Empty -or $DesiredVersion -ne [guid]::Empty -or $ObserverActor)) {
+            throw 'Observer configuration is incomplete; no collector was started.'
+        }
         if ($env:FINAI_S3_ENDPOINT -eq 'http://127.0.0.1:9061' -or $Service -eq 'minio') {
             $minioBinary = Join-Path $env:FINAI_RUNTIME_ROOT 'tools\minio\minio.exe'
             $minioData = Join-Path $env:FINAI_DATA_DIR 'minio'
@@ -115,10 +135,11 @@ try {
             if ($existing.Count -gt 1) { throw 'Duplicate runtime service records.' }
             if ($existing.Count -eq 1 -and (Test-Owned $existing[0])) {
                 if ($existing[0].port -ne $spec.port) { throw 'Managed runtime uses different ports. Stop it explicitly before changing ports.' }
-                if (-not (Test-Health $existing[0].healthUrl)) { throw "Managed $($spec.name) is unhealthy; inspect its logs." }
+                if ($spec.name -eq 'observer' -and $existing[0].observerConfig -ne $spec.observerConfig) { throw 'Managed observer configuration differs. Stop it before changing the reviewed target.' }
+                if (-not (Test-ManagedReadiness $existing[0])) { throw "Managed $($spec.name) is unhealthy; inspect its logs." }
                 continue
             }
-            if (Get-NetTCPConnection -State Listen -LocalPort $spec.port -ErrorAction SilentlyContinue) {
+            if ($spec.port -gt 0 -and (Get-NetTCPConnection -State Listen -LocalPort $spec.port -ErrorAction SilentlyContinue)) {
                 throw "Port $($spec.port) is already occupied by an unmanaged service. It has been preserved; use alternate ports."
             }
             if ($spec.name -eq 'minio' -and (Get-NetTCPConnection -State Listen -LocalPort 9062 -ErrorAction SilentlyContinue)) { throw 'MinIO console port 9062 is occupied; existing process was preserved.' }
@@ -154,12 +175,13 @@ try {
                 $identity = Get-ProcessIdentity $process.Id
                 if ($null -eq $identity) { throw "$($spec.name) exited during launch; inspect logs in $controlRoot." }
                 $record = [pscustomobject]@{ service = $spec.name; processId = $identity.ProcessId; createdAt = $identity.CreationDate.ToUniversalTime().ToString('o'); executable = $identity.ExecutablePath; commandLine = $identity.CommandLine; port = $spec.port; healthUrl = $spec.url; stdout = $stdout; stderr = $stderr }
+                if ($spec.name -eq 'observer') { $record | Add-Member -NotePropertyName observerConfig -NotePropertyValue $spec.observerConfig }
                 $newRecords += $record
                 $script:records = @($script:records | Where-Object { $_.service -ne $spec.name }) + $record
                 Write-State
                 $deadline = [DateTime]::UtcNow.AddSeconds($HealthTimeoutSeconds)
-                while ((Test-Owned $record) -and [DateTime]::UtcNow -lt $deadline -and -not (Test-Health $record.healthUrl)) { Start-Sleep -Milliseconds 250 }
-                if (-not (Test-Owned $record) -or -not (Test-Health $record.healthUrl)) { throw "$($spec.name) did not become healthy; inspect logs in $controlRoot." }
+                while ((Test-Owned $record) -and [DateTime]::UtcNow -lt $deadline -and -not (Test-ManagedReadiness $record)) { Start-Sleep -Milliseconds 250 }
+                if (-not (Test-Owned $record) -or -not (Test-ManagedReadiness $record)) { throw "$($spec.name) did not become ready; inspect logs in $controlRoot." }
             }
         } catch {
             foreach ($record in $newRecords) {
@@ -170,12 +192,20 @@ try {
             throw
         }
     }
-    foreach ($serviceName in @('minio', 'api', 'web') | Where-Object { $Service -eq 'all' -or $_ -eq $Service }) {
+    foreach ($serviceName in @('minio', 'api', 'web', 'observer') | Where-Object { $Service -eq 'all' -or $_ -eq $Service }) {
         $record = $script:records | Where-Object { $_.service -eq $serviceName } | Select-Object -First 1
         if ($record) {
             $owned = Test-Owned $record
-            [pscustomobject]@{ service = $serviceName; managed = $owned; healthy = ($owned -and (Test-Health $record.healthUrl)); port = $record.port; stdout = $record.stdout; stderr = $record.stderr }
+            if ($serviceName -eq 'observer') {
+                [pscustomobject]@{ service = $serviceName; managed = $owned; observation = 'PROCESS_LIVENESS_ONLY'; configuration = $record.observerConfig; stdout = $record.stdout; stderr = $record.stderr }
+            } else {
+                [pscustomobject]@{ service = $serviceName; managed = $owned; healthy = ($owned -and (Test-Health $record.healthUrl)); port = $record.port; stdout = $record.stdout; stderr = $record.stderr }
+            }
         } else {
+            if ($serviceName -eq 'observer') {
+                [pscustomobject]@{ service = $serviceName; managed = $false; observation = 'NOT_MANAGED' }
+                continue
+            }
             $port = switch ($serviceName) { 'minio' { 9061 }; 'api' { $ApiPort }; 'web' { $WebPort } }
             [pscustomobject]@{ service = $serviceName; managed = $false; port = $port; occupied = [bool](Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) }
         }

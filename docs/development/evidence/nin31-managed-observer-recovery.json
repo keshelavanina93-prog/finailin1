@@ -1,0 +1,194 @@
+{
+  "checked_at": "2026-09-07T02:41:33.806051+00:00",
+  "outage_checkpoint": {
+    "config_hash": "c64ebeddd0b7280350a88739e712dbdaf3eb057d42c6c82de53f00c26c43f3ff",
+    "contract": "runtime-observer-checkpoint/1",
+    "last_ack": null,
+    "pending": {
+      "desired_state": {
+        "resource_id": "fcd3f90c-ef7b-579a-9fcf-3da53e795125",
+        "version_id": "e3553572-885b-5ca2-a48f-b8aaf568b408"
+      },
+      "request_id": "7d3ff4af-28b2-4b08-9a5c-69e0df4d1f9e"
+    }
+  },
+  "recovered_checkpoint": {
+    "config_hash": "c64ebeddd0b7280350a88739e712dbdaf3eb057d42c6c82de53f00c26c43f3ff",
+    "contract": "runtime-observer-checkpoint/1",
+    "last_ack": {
+      "proof_hash": "4b7b9b96ef3abc5507e5d4791d08d135eb2aa2cb5b90212e817de4d9217a9f27",
+      "recorded_at": "2026-09-07T06:40:45.068334+04:00",
+      "request_id": "7d3ff4af-28b2-4b08-9a5c-69e0df4d1f9e",
+      "run_id": "fcr_4b7b9b96ef3abc5507e5d4791d08d135eb2aa2cb5b90212e817de4d9217a9f27"
+    },
+    "pending": null
+  },
+  "recovered_request_receipt": {
+    "request_id": "7d3ff4af-28b2-4b08-9a5c-69e0df4d1f9e",
+    "run_id": "fcr_4b7b9b96ef3abc5507e5d4791d08d135eb2aa2cb5b90212e817de4d9217a9f27",
+    "proof_hash": "4b7b9b96ef3abc5507e5d4791d08d135eb2aa2cb5b90212e817de4d9217a9f27",
+    "recorded_at": "2026-09-07T06:40:45.068334+04:00",
+    "reported_state": {
+      "scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "run_id": "fcr_4b7b9b96ef3abc5507e5d4791d08d135eb2aa2cb5b90212e817de4d9217a9f27",
+      "contract": "runtime-observation/1",
+      "request_id": "7d3ff4af-28b2-4b08-9a5c-69e0df4d1f9e",
+      "observation": {
+        "health": {
+          "schema": "ready",
+          "status": "ready",
+          "database": "ready",
+          "evidence_store": "ready"
+        },
+        "observed_at": "2026-09-07T02:40:45.007486+00:00",
+        "disk_identity": {
+          "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+          "dependency_sha256": "9e947e306ff33ee9709e599065c733835220fdf360881e8e3217c4334abf7d7c"
+        },
+        "loaded_identity": {
+          "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+          "dependency_sha256": "9e947e306ff33ee9709e599065c733835220fdf360881e8e3217c4334abf7d7c"
+        },
+        "identity_semantics": "FUNCTION_PACKAGE_STARTUP_SNAPSHOT_NOT_RELEASE_ATTESTATION",
+        "disk_matches_loaded": true,
+        "observer_started_at": "2026-09-07T02:40:41.927134+00:00",
+        "observer_instance_id": "85957eba-0046-477d-96ac-6466f1a316ea",
+        "database_schema_version": 47
+      },
+      "desired_state": {
+        "version_id": "e3553572-885b-5ca2-a48f-b8aaf568b408",
+        "resource_id": "fcd3f90c-ef7b-579a-9fcf-3da53e795125",
+        "content_hash": "f5f220f8a44354b664c338dd5bd8d81ea6f1d17b1dea5c028aa49ea8309f622f",
+        "display_name": "Reviewed local API expectations"
+      },
+      "runtime_agent": {
+        "version_id": "8da97ff6-7459-5675-8af4-33875678024b",
+        "resource_id": "31afbbf7-75ea-5ab7-a2fd-10e042d936c2",
+        "content_hash": "e1315b6d54d28dbe56b9283654827a48dc5b4a9a8758cfc9e2da59556ac56f7b",
+        "display_name": "Local API observer"
+      },
+      "recorded_state": "DRIFT",
+      "read_permissions": [
+        "export",
+        "ontology_admin",
+        "ontology_propose",
+        "ontology_read",
+        "read"
+      ],
+      "deployment_target": {
+        "version_id": "e034b3ac-fbdb-5cf3-b504-cb8e33512512",
+        "resource_id": "b9a7e7f7-d066-56de-a57c-1eb28b944a5f",
+        "content_hash": "58b0cd6c9305baa05dd57d30f0f4f15fdac4ce34ceedba2638b3ec4410bc9ccd",
+        "display_name": "G8 local API"
+      },
+      "desired_definition": {
+        "expected_code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+        "required_schema_version": 47,
+        "expected_dependency_sha256": "4e7b3e664fc4b3af5c7dc3945de616b17502eb1211cb4fed4c34a7388c710990",
+        "max_observation_age_seconds": 300
+      },
+      "release_provenance": "LOCAL_DEVELOPMENT_UNATTESTED",
+      "calculation_runtime": "local-api-observer/1",
+      "deployment_authorized": false,
+      "current_use_authorized": false
+    },
+    "assessment": {
+      "state": "DRIFT",
+      "checked_at": "2026-09-07T02:41:33.640668+00:00",
+      "age_seconds": 48.633182
+    },
+    "current_use_authorized": false,
+    "deployment_authorized": false
+  },
+  "latest_ack_receipt": {
+    "request_id": "7d3ff4af-28b2-4b08-9a5c-69e0df4d1f9e",
+    "run_id": "fcr_4b7b9b96ef3abc5507e5d4791d08d135eb2aa2cb5b90212e817de4d9217a9f27",
+    "proof_hash": "4b7b9b96ef3abc5507e5d4791d08d135eb2aa2cb5b90212e817de4d9217a9f27",
+    "recorded_at": "2026-09-07T06:40:45.068334+04:00",
+    "reported_state": {
+      "scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "run_id": "fcr_4b7b9b96ef3abc5507e5d4791d08d135eb2aa2cb5b90212e817de4d9217a9f27",
+      "contract": "runtime-observation/1",
+      "request_id": "7d3ff4af-28b2-4b08-9a5c-69e0df4d1f9e",
+      "observation": {
+        "health": {
+          "schema": "ready",
+          "status": "ready",
+          "database": "ready",
+          "evidence_store": "ready"
+        },
+        "observed_at": "2026-09-07T02:40:45.007486+00:00",
+        "disk_identity": {
+          "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+          "dependency_sha256": "9e947e306ff33ee9709e599065c733835220fdf360881e8e3217c4334abf7d7c"
+        },
+        "loaded_identity": {
+          "code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+          "dependency_sha256": "9e947e306ff33ee9709e599065c733835220fdf360881e8e3217c4334abf7d7c"
+        },
+        "identity_semantics": "FUNCTION_PACKAGE_STARTUP_SNAPSHOT_NOT_RELEASE_ATTESTATION",
+        "disk_matches_loaded": true,
+        "observer_started_at": "2026-09-07T02:40:41.927134+00:00",
+        "observer_instance_id": "85957eba-0046-477d-96ac-6466f1a316ea",
+        "database_schema_version": 47
+      },
+      "desired_state": {
+        "version_id": "e3553572-885b-5ca2-a48f-b8aaf568b408",
+        "resource_id": "fcd3f90c-ef7b-579a-9fcf-3da53e795125",
+        "content_hash": "f5f220f8a44354b664c338dd5bd8d81ea6f1d17b1dea5c028aa49ea8309f622f",
+        "display_name": "Reviewed local API expectations"
+      },
+      "runtime_agent": {
+        "version_id": "8da97ff6-7459-5675-8af4-33875678024b",
+        "resource_id": "31afbbf7-75ea-5ab7-a2fd-10e042d936c2",
+        "content_hash": "e1315b6d54d28dbe56b9283654827a48dc5b4a9a8758cfc9e2da59556ac56f7b",
+        "display_name": "Local API observer"
+      },
+      "recorded_state": "DRIFT",
+      "read_permissions": [
+        "export",
+        "ontology_admin",
+        "ontology_propose",
+        "ontology_read",
+        "read"
+      ],
+      "deployment_target": {
+        "version_id": "e034b3ac-fbdb-5cf3-b504-cb8e33512512",
+        "resource_id": "b9a7e7f7-d066-56de-a57c-1eb28b944a5f",
+        "content_hash": "58b0cd6c9305baa05dd57d30f0f4f15fdac4ce34ceedba2638b3ec4410bc9ccd",
+        "display_name": "G8 local API"
+      },
+      "desired_definition": {
+        "expected_code_sha256": "4eb4c38adda3129d0304a03bd12dba2b9d18cda68feca738405d98214667520e",
+        "required_schema_version": 47,
+        "expected_dependency_sha256": "4e7b3e664fc4b3af5c7dc3945de616b17502eb1211cb4fed4c34a7388c710990",
+        "max_observation_age_seconds": 300
+      },
+      "release_provenance": "LOCAL_DEVELOPMENT_UNATTESTED",
+      "calculation_runtime": "local-api-observer/1",
+      "deployment_authorized": false,
+      "current_use_authorized": false
+    },
+    "assessment": {
+      "state": "DRIFT",
+      "checked_at": "2026-09-07T02:41:33.803417+00:00",
+      "age_seconds": 48.795931
+    },
+    "current_use_authorized": false,
+    "deployment_authorized": false
+  },
+  "same_pending_request_recovered": true,
+  "desired_state_unchanged": true,
+  "scope": "LOCAL_API_OUTAGE_AND_COLLECTOR_PROCESS_RESTART",
+  "power_loss_recovery_proven": false
+}
