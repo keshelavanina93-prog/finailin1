@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "issue": "NIN-56",
+  "date": "2026-09-07",
+  "kind": "bounded_authenticated_browser_evidence",
+  "consumer_commit": "5be1a39b85d850a9b966b067fb13e76b722720cf",
+  "runtime": "http://localhost:3062",
+  "integration_commits_reported_by_coordinator": [
+    "452009a",
+    "edf6ecf",
+    "54ae44c",
+    "4d6f641"
+  ],
+  "company_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+  "family": "SEG statutory 1C recorder lines",
+  "checks": {
+    "authenticated": true,
+    "desktop": "1440x1000",
+    "narrow": "820x1000",
+    "narrow_document_overflow": false,
+    "baseline_rows": 596,
+    "period": [
+      "2025-01-01",
+      "2025-01-31"
+    ],
+    "missing_posted_amounts": [
+      "Base!S288"
+    ],
+    "completeness": "unestablished",
+    "same_source_successor": "comparison disabled with distinct retained source explanation",
+    "source_inspection": "NYX Base accounting source scope",
+    "original_evidence_trace_version": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+    "return_context": [
+      "company retained",
+      "family baseline comparison retained",
+      "Base!S288 retained"
+    ],
+    "proposal_created": false
+  },
+  "source_sha256": "d7c7e67c093b40b6f9209b301ca8fab7e4febc85c27d735babb95fa2028a8f0a",
+  "artifacts": [
+    "nin56-baseline-desktop.png",
+    "nin56-baseline-narrow.png",
+    "nin56-same-source-refusal-desktop.png",
+    "nin56-baseline-desktop.txt",
+    "nin56-baseline-narrow.txt",
+    "nin56-same-source-refusal.txt",
+    "nin56-scope-context.txt",
+    "nin56-original-evidence-trace.txt",
+    "nin56-return-context.txt"
+  ],
+  "limitations": [
+    "No authentic later SEG snapshot available; successor adoption and own-period runtime journey remain unproven.",
+    "Existing family was inspected without proposing a duplicate.",
+    "Permission/error state matrix not exercised in this browser pass.",
+    "No independent NIN-50 acceptance claimed."
+  ]
+}
