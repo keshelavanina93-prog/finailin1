@@ -61,7 +61,7 @@ async def start(request: records.WorkflowRequest, principal: User) -> dict[str, 
                 "scope": principal.scope.model_dump(mode="json"),
             },
             id=identity,
-            task_queue="g8-report-source-v1",
+            task_queue=get_settings().temporal_task_queue,
             id_reuse_policy=WorkflowIDReusePolicy.REJECT_DUPLICATE,
         )
     return {"workflow_id": identity}

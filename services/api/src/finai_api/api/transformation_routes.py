@@ -12,6 +12,7 @@ from temporalio.common import WorkflowIDReusePolicy
 from temporalio.exceptions import WorkflowAlreadyStartedError
 
 from finai_api.api.workflow_routes import client
+from finai_api.config import get_settings
 from finai_api.domain.review import Principal
 from finai_api.domain.transformation import TransformationRunRequest
 from finai_api.security import authenticated_principal, require_permission
@@ -50,7 +51,7 @@ async def start(principal: User, request: TransformationRunRequest) -> dict[str,
                 "scope": principal.scope.model_dump(mode="json"),
             },
             id=identity,
-            task_queue="g8-report-source-v1",
+            task_queue=get_settings().temporal_task_queue,
             id_reuse_policy=WorkflowIDReusePolicy.REJECT_DUPLICATE,
         )
     return {

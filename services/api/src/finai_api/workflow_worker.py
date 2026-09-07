@@ -136,7 +136,7 @@ async def main() -> None:
     with ThreadPoolExecutor(max_workers=4) as executor:
         worker = Worker(
             client,
-            task_queue="g8-report-source-v1",
+            task_queue=settings.temporal_task_queue,
             workflows=[ReportSourceWorkflow, RegulatorySourceCheck, TransformationWorkflow],
             activities=[
                 coverage,

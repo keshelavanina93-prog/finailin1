@@ -20,6 +20,7 @@ from temporalio.client import (
 
 from finai_api.api.ontology_routes import User
 from finai_api.api.workflow_routes import client
+from finai_api.config import get_settings
 from finai_api.domain.regulation import RegulatoryDefinition, assess_rule
 from finai_api.domain.resources import ResourceMutation, ResourceProposal
 from finai_api.regulatory_workflow import RegulatorySourceCheck
@@ -49,7 +50,7 @@ async def start_monitor(principal: User, request: regulatory_monitors.MonitorReq
                         "scope": principal.scope.model_dump(mode="json"),
                     },
                     id=identity + "-check",
-                    task_queue="g8-report-source-v1",
+                    task_queue=get_settings().temporal_task_queue,
                     execution_timeout=timedelta(minutes=15),
                 ),
                 spec=ScheduleSpec(
