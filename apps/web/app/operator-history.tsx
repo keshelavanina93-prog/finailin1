@@ -2,6 +2,7 @@
 
 import {useEffect,useState} from "react";
 import type {OperatorInspection,CanonicalResource} from "@finai/contracts";
+import DefinitionRestoration from "./definition-restoration";
 import {displayName} from "./display-name";
 import {readable} from "./g8-model";
 import {Badge} from "./g8-ui";
@@ -19,7 +20,8 @@ export function Value({entry,onInspect}:{entry:HistoryValue;onInspect:(id:string
   return <span>{typeof entry.value==="boolean"?(entry.value?"Yes":"No"):String(entry.value)||"Empty text"}</span>;
 }
 
-export default function OperatorHistory({token,selection,onSelect,onTrace,onInspect,onClose}:{
+export default function OperatorHistory({token,selection,onSelect,onTrace,onInspect,onClose,canPropose,onProposal}:{
+  canPropose?:boolean;onProposal?:(id:string)=>void;
   token:string;selection:HistorySelection;onSelect:(version:CanonicalResource,knownAt:string)=>void;
   onTrace:(version:CanonicalResource,knownAt:string)=>void;onInspect:(id:string,knownAt:string)=>void;onClose:()=>void;
 }) {
@@ -48,6 +50,7 @@ export default function OperatorHistory({token,selection,onSelect,onTrace,onInsp
         <div className="g8-history-toolbar"><label>Compare with<select value={before.version_id} onChange={e=>setBaseline(e.target.value)}>{versions.map((v,i)=><option key={v.version_id} value={v.version_id}>Version {versions.length-i} · {timestamp(v.system_from)}</option>)}</select></label><label className="g8-history-check"><input type="checkbox" checked={changesOnly} onChange={e=>setChangesOnly(e.target.checked)}/>Changed fields only</label><button onClick={()=>onTrace(selected,detail.known_at)}>Trace selected version</button>{before.version_id!==selected.version_id&&<button onClick={()=>onTrace(before,detail.known_at)}>Trace comparison version</button>}</div>
         <p role="status">{versions.length===1?"One recorded version; no earlier version is available.":`${changed} changed fields in the returned evidence.`} Missing fields can reflect access policy; they do not establish deletion.</p>
         <div className="g8-table-scroll"><table><caption>Recorded business fields · {displayName(selected.display_name)}</caption><thead><tr><th scope="col">Field</th><th scope="col">Comparison version</th><th scope="col">Selected version</th><th scope="col">Change</th></tr></thead><tbody>{rows.filter(r=>!changesOnly||r.changed).map(r=><tr key={JSON.stringify(r.path)} className={r.changed?"g8-history-changed":""}><th scope="row">{r.path.map(readable).join(" › ")}</th><td><Value entry={r.before} onInspect={id=>onInspect(id,detail.known_at)}/></td><td><Value entry={r.after} onInspect={id=>onInspect(id,detail.known_at)}/></td><td>{r.changed?"Changed":"Unchanged"}</td></tr>)}</tbody></table>{changesOnly&&!changed&&<p>No changed fields between these versions.</p>}</div>
+        {selected.resource_id===selection.resource_id&&selected.version_id===selection.version_id&&selected.object_type==="ObjectSetDefinition"&&selected.authority_state==="APPROVED"&&<DefinitionRestoration token={token} selected={selected} canPropose={canPropose} onProposal={onProposal}/>}
         <details><summary>Exact version references</summary><dl><dt>Selected version</dt><dd>{selected.version_id}</dd><dt>Comparison version</dt><dd>{before.version_id}</dd><dt>Selected content fingerprint</dt><dd>{selected.content_hash}</dd></dl></details>
       </div>}
     </div>}

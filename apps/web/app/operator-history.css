@@ -9,3 +9,5 @@
 .g8-history th,.g8-history td{text-align:left;vertical-align:top;padding:9px;border-bottom:1px solid var(--g8-border);overflow-wrap:anywhere;min-width:110px;max-width:320px}.g8-history thead th{position:sticky;top:0;z-index:1;background:var(--g8-bg)}
 .g8-history th[scope=row]{font-weight:500}.g8-history-changed th[scope=row]{border-left:3px solid var(--warning)}.g8-history details{margin-top:16px}.g8-history dd{overflow-wrap:anywhere;margin-left:0}.g8-history ul{padding-left:16px;margin:0}
 @media(max-width:1000px){.g8-history-body{grid-template-columns:1fr}.g8-history nav{display:flex;gap:8px;max-height:180px}.g8-history nav button{min-width:200px}}
+
+.g8-history{container-type:inline-size;container-name:history-pane;min-width:0}@container history-pane (max-width:850px){.g8-history-body{grid-template-columns:minmax(0,1fr)}.g8-history-body>nav{display:flex;gap:8px;max-height:180px;overflow:auto;min-width:0}.g8-history-body>nav button{flex:0 0 200px;min-width:200px;margin-bottom:6px}.g8-history-comparison{width:100%;min-width:0}}
