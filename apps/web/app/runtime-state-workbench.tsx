@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import "./runtime-state-workbench.css";
+import RetainedBuildArtifacts from "./retained-build-artifacts";
 
 type Pin = { resource_id:string; version_id:string; content_hash:string; display_name:string };
 type Observation = {
@@ -19,7 +20,7 @@ const human = (value:string) => value.toLowerCase().replaceAll("_", " ");
 
 export default function RuntimeStateWorkbench({token,canRead}:{token:string;canRead:boolean}) {
   const [open,setOpen]=useState(false);
-  return <details className="runtime-state-workbench" onToggle={event=>setOpen(event.currentTarget.open)}><summary>Runtime state &amp; health</summary><p>Retained observations of running components against reviewed expectations. Local development observations do not establish release acceptance or authorize deployment.</p>{open && (canRead ? <ObservedRuntime key={token} token={token}/> : <p role="status">Runtime observations require ontology administrator access for this identity.</p>)}</details>;
+  return <details className="runtime-state-workbench" onToggle={event=>setOpen(event.currentTarget.open)}><summary>Runtime state &amp; health</summary><p>Retained observations of running components against reviewed expectations. Local development observations do not establish release acceptance or authorize deployment.</p>{open && (canRead ? <><ObservedRuntime key={token} token={token}/><RetainedBuildArtifacts key={`artifacts:${token}`} token={token}/></> : <p role="status">Runtime observations require ontology administrator access for this identity.</p>)}</details>;
 }
 
 function ObservedRuntime({token}:{token:string}) {

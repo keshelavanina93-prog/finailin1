@@ -458,6 +458,10 @@ def _validate(
                 from finai_api.services.transformation_definitions import validate_transformation
 
                 validate_transformation(item, target)
+            if item.object_type == "Artifact":
+                from finai_api.services.build_artifact import validate_artifact
+
+                validate_artifact(principal, item, target)
             if item.object_type in {"DeploymentTarget", "RuntimeAgent", "DesiredState"}:
                 from finai_api.domain.runtime_deployment import validate_runtime_deployment
 

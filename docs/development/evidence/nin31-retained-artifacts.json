@@ -1,0 +1,61 @@
+{
+  "contract": "g8-retained-artifact-proof/1",
+  "artifacts": [
+    {
+      "resource_id": "6591ef2d-38d3-559b-ac6b-36cf2a9083ee",
+      "version_id": "e680adf3-7969-5b1d-a314-d5af283a1593",
+      "content_hash": "0189072837c94c9c05106bbe9cd6192f40bc800573295b7cb422abe5362ae7a8",
+      "sha256": "135531cd50aae31df4449ab99cc463c705c6362c27d3ebe114863385016bd15a",
+      "byte_length": 8142608,
+      "document_id": "doc_ddaa40ba5a73cf877feb8a006b557aa3946ee4e8c26d3f15f4a2cdab428981c8",
+      "evidence_id": "c134f0e0-0615-54df-b794-e4258ee740db",
+      "proposal_id": "0689a884-b367-4702-b225-5297bfa7b176",
+      "artifact_kind": "SOURCE_ARCHIVE",
+      "repeated_retention_equal": true,
+      "readback_equal": true
+    },
+    {
+      "resource_id": "f82ccc26-39bc-5da3-8526-1470ed1a0a98",
+      "version_id": "71d2917e-40bb-5557-b3a3-ac608c7a2979",
+      "content_hash": "6be19c3f87aaacba2ad6d2a6174102852956ded4fde2a08cdefbf22e69f3eb6f",
+      "sha256": "a6b0913ae10b4221ee5abf643d315a8718008b22342f5ada76d9a40c1c4a2916",
+      "byte_length": 8170399,
+      "document_id": "doc_3dbe7758250ead203ae7ac5a394d87e4531dc1936520f473df19bf7d0552bbb0",
+      "evidence_id": "df69ddca-39c1-5895-9330-0b30206c31b3",
+      "proposal_id": "4dbd66c1-0a15-442e-b6d3-22bc6c6d214b",
+      "artifact_kind": "SOURCE_ARCHIVE",
+      "repeated_retention_equal": true,
+      "readback_equal": true
+    },
+    {
+      "resource_id": "17d97d28-dd9a-5b70-b7a6-3057509edc1c",
+      "version_id": "83f55b39-95d8-5de5-8aed-56645f2f1573",
+      "content_hash": "05ae9e99ce9989e566964f876fba1855de1481f8928482a70aed37340a2ec745",
+      "sha256": "ad02f3d51be927f56705a90143b6171bc19fff85c277f9f5e334f2bc277ee41a",
+      "byte_length": 356829,
+      "document_id": "doc_f1eb3c0acdb72b1f42b75df5ac03566c19614f52976ada5784eb75cc1c9fe788",
+      "evidence_id": "08d84540-c03b-5c03-9ddc-0a72e54068e4",
+      "proposal_id": "54b16d35-f9f7-4647-8f26-efbee22f1e68",
+      "artifact_kind": "API_WHEEL",
+      "repeated_retention_equal": true,
+      "readback_equal": true
+    },
+    {
+      "resource_id": "94803e70-3faa-59d7-af6a-ba7606f5f7af",
+      "version_id": "617c165d-b55f-54a4-82f4-b0ad36515fd3",
+      "content_hash": "9d0f88b510a73287e4f956dfbf10f8f34a0c1e996c194b4240cdb97368f0af72",
+      "sha256": "e7e59f0a0a41409eb893f30763b6c9846d51f11aa632c72d6b009668d4408662",
+      "byte_length": 26269117,
+      "document_id": "doc_988f0368906b67dc91195a749bd3d8f2d4dbdfc7478f89c502769f79d4c84dd9",
+      "evidence_id": "bafcfd5c-009f-547f-9ae0-9e81baf3d97f",
+      "proposal_id": "5b0fb7e2-b88d-4f12-aed2-682141ef03bb",
+      "artifact_kind": "WEB_STANDALONE",
+      "repeated_retention_equal": true,
+      "readback_equal": true
+    }
+  ],
+  "product_proxy_readback": true,
+  "authority": "RETAINED_BYTES_ONLY",
+  "release_accepted": false,
+  "deployment_granted": false
+}

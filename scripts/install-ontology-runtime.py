@@ -35,6 +35,7 @@ def main() -> None:
         and {"ontology_admin", "ontology_review"}.issubset(p.permissions)
     )
     kinds = {
+        "Artifact",
         "JournalEntry",
         "JournalLine",
         "DeploymentTarget",

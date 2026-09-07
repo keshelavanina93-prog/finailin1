@@ -33,6 +33,8 @@ SEMANTICS = {
 
 # required field -> semantic kind or a canonical target type. Optional fields carry '?'.
 TYPE_FIELDS: dict[str, dict[str, str]] = {
+    "Artifact": {"sha256": "Identifier", "byte_length": "Count", "document_id": "Identifier",
+                 "evidence_id": "@SourceEvidence", "definition": "OntologyDefinition"},
     "DeploymentTarget": {"definition": "OntologyDefinition"},
     "RuntimeAgent": {"deployment_target_id": "@DeploymentTarget", "definition": "OntologyDefinition"},
     "DesiredState": {"deployment_target_id": "@DeploymentTarget", "runtime_agent_id": "@RuntimeAgent", "definition": "OntologyDefinition"},
