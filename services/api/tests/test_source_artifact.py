@@ -80,6 +80,20 @@ def test_modified_content_and_forged_commit_binding_are_rejected(repository):
         artifact.verify(target)
 
 
+def test_materialized_inputs_are_fresh_and_match_committed_bytes(repository):
+    packaged = artifact.package(repository, "HEAD")
+    (repository / "nested/source.py").write_text("dirty")
+    first = artifact.materialize(repository, Path(packaged["archive"]))
+    second = artifact.materialize(repository, Path(packaged["archive"]))
+    assert first["source_directory"] != second["source_directory"]
+    source = Path(first["source_directory"])
+    assert (source / "nested/source.py").read_bytes() == b"print('committed')\n"
+    assert first["archive_sha256"] == packaged["archive_sha256"]
+    assert first["build_executed"] is False
+    assert not (source / ".git").exists()
+    assert json.loads((source.parent / "build-input.json").read_text()) == first
+
+
 def test_git_symbolic_links_are_not_packaged(repository):
     blob = (
         subprocess.run(

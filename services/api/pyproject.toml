@@ -31,6 +31,9 @@ dev = [
 [tool.hatch.build.targets.wheel]
 packages = ["src/finai_api"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"migrations" = "finai_api/migrations"
+
 [tool.pytest.ini_options]
 addopts = "--strict-markers --strict-config --cov=finai_api --cov-report=term-missing --cov-fail-under=90"
 testpaths = ["tests"]

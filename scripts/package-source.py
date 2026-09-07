@@ -5,6 +5,7 @@ import base64
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 import zipfile
@@ -338,14 +339,78 @@ def package(root, ref):
             stage.rmdir()
 
 
+def materialize(root, source_archive):
+    """Prepare isolated build inputs; never merge into an existing checkout."""
+    check_path(root)
+    check_path(source_archive)
+    parent = root / ".finai" / "artifacts" / "build-inputs"
+    check_path(parent)
+    parent.mkdir(parents=True, exist_ok=True)
+    stage = Path(tempfile.mkdtemp(prefix="source-", dir=parent))
+    # Keep failed inputs for diagnosis, without a success receipt. Never recursively delete.
+    snapshot = stage / "source.zip"
+    with source_archive.open("rb") as incoming, snapshot.open("xb") as outgoing:
+        shutil.copyfileobj(incoming, outgoing)
+        outgoing.flush()
+        os.fsync(outgoing.fileno())
+    proof = verify(snapshot)
+    with zipfile.ZipFile(snapshot) as archive:
+        manifest = json.loads(archive.read(MANIFEST))
+        names = {}
+        reserved = {"CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$"} | {
+            f"{prefix}{number}" for prefix in ("COM", "LPT") for number in range(1, 10)
+        }
+        for item in manifest["files"]:
+            parts = item["path"].split("/")
+            if any(part.split(".")[0].upper() in reserved for part in parts):
+                raise ValueError("Source path uses a reserved Windows device name")
+            for index in range(1, len(parts) + 1):
+                name = "/".join(parts[:index])
+                folded = name.casefold()
+                if folded in names and names[folded] != name:
+                    raise ValueError("Source paths collide on Windows")
+                names[folded] = name
+        source = stage / "source"
+        source.mkdir()
+        for item in manifest["files"]:
+            destination = source.joinpath(*item["path"].split("/"))
+            check_path(destination)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open("xb") as output:
+                output.write(archive.read("source/" + item["path"]))
+            if file_digest(destination) != item["sha256"]:
+                raise ValueError("Materialized source differs from archive")
+    receipt = {
+        "contract": "g8-build-input/1",
+        **proof,
+        "source_directory": str(source),
+        "status": "VERIFIED_SOURCE_ONLY",
+        "build_executed": False,
+    }
+    with (stage / "build-input.json").open("xb") as output:
+        output.write(encoded(receipt))
+    return receipt
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ref", default="HEAD")
-    parser.add_argument("--verify", type=Path)
+    operation = parser.add_mutually_exclusive_group()
+    operation.add_argument("--verify", type=Path)
+    operation.add_argument(
+        "--materialize",
+        type=Path,
+        help="Verify and prepare a fresh D-local build input directory",
+    )
     args = parser.parse_args()
     print(
         json.dumps(
-            verify(args.verify) if args.verify else package(ROOT, args.ref), indent=2
+            materialize(ROOT, args.materialize)
+            if args.materialize
+            else verify(args.verify)
+            if args.verify
+            else package(ROOT, args.ref),
+            indent=2,
         )
     )
 

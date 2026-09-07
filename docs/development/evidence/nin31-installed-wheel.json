@@ -1,0 +1,47 @@
+{
+  "wheel_sha256": "867059b81b389a2b3e6e95fcef073e7969f1e200d70b40694faf82e76112481b",
+  "wheel_path": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\wheels\\finai_api-0.1.0-py3-none-any.whl",
+  "installed_package_path": "D:\\FinAI\\finailinear1\\.finai\\packaging-validation\\python\\Lib\\site-packages\\finai_api\\__init__.py",
+  "canonical_sql_files_exact": 47,
+  "editable_installed_function_manifest_equal": true,
+  "installed_app_import_route_count": 26,
+  "manifest": {
+    "implementation_id": "ontology.object-set-derived/v1",
+    "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+    "code_sha256": "db1bd649fec856bee37113a3085c4879662f70a29b173101c379b4cb73a1034b",
+    "dependency_sha256": "8d3e4e2d300c240c0f25e712881b348232424e6f6f38ebd162d6074d7daa8db5",
+    "mode": "EVIDENCE_ANALYSIS_ONLY",
+    "maximum_rows": 200,
+    "maximum_properties": 8,
+    "capabilities": {
+      "read": true,
+      "query": true,
+      "snapshot": true,
+      "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+      "incremental": false,
+      "cdc": false,
+      "stream": false,
+      "write": false,
+      "update": false,
+      "delete": false,
+      "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+      "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+      "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+      "source_write_exactly_once": false,
+      "simulation": false,
+      "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+      "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+      "reversal": false,
+      "formula_execution": false,
+      "limits": {
+        "returned_rows": 200,
+        "derived_properties": 8,
+        "coverage": "QUERY_PAGE_ONLY",
+        "database_scan_limit": null
+      }
+    }
+  },
+  "linux_runtime_verified": false,
+  "runtime_started": false,
+  "release_accepted": false
+}

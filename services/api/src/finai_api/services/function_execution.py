@@ -35,6 +35,25 @@ def _digest(value: Any) -> str:
     return sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def _migration_dependencies(root: Path) -> dict[str, str]:
+    migration_root = root / "migrations"
+    if (
+        not migration_root.exists()
+        and root.parent.name == "src"
+        and (root.parent.parent / "pyproject.toml").is_file()
+    ):
+        migration_root = root.parent.parent / "migrations"
+    migrations = sorted(migration_root.glob("*.sql"))
+    if not migrations:
+        raise WorkspaceError(503, "Packaged Function SQL dependency manifest is unavailable")
+    return {
+        "migrations/" + path.name: sha256(
+            path.read_text(encoding="utf-8").encode("utf-8")
+        ).hexdigest()
+        for path in migrations
+    }
+
+
 def _disk_manifest() -> dict[str, Any]:
     root = Path(__file__).resolve().parents[1]
 
@@ -50,11 +69,7 @@ def _disk_manifest() -> dict[str, Any]:
     dependencies = {
         path.relative_to(root).as_posix(): source_hash(path) for path in sorted(root.rglob("*.py"))
     }
-    migration_root = root.parents[1] / "migrations"
-    migrations = sorted(migration_root.glob("*.sql"))
-    if not migrations:
-        raise WorkspaceError(503, "Packaged Function SQL dependency manifest is unavailable")
-    dependencies.update({"migrations/" + path.name: source_hash(path) for path in migrations})
+    dependencies.update(_migration_dependencies(root))
     dependencies["python"] = platform.python_version()
     for package in (
         "pydantic",
