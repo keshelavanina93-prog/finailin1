@@ -2,6 +2,7 @@ import psycopg
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from finai_api.api.account_dimension_policy_routes import router as account_dimension_policy_router
 from finai_api.api.certification_routes import router as certification_router
 from finai_api.api.company_context_routes import router as company_context_router
 from finai_api.api.company_journal_routes import router as company_journal_router
@@ -35,6 +36,7 @@ app = FastAPI(
     version="0.1.0",
 )
 app.include_router(router)
+app.include_router(account_dimension_policy_router)
 app.include_router(reporting_router)
 app.include_router(workspace_router)
 app.include_router(workflow_router)

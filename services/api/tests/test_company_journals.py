@@ -204,6 +204,8 @@ def test_native_exact_bundle_book_scope_and_hidden_line(retained, monkeypatch):
             "finai_api.services.accounting_consumption.validate_accounting_proposal",
             lambda *_: None,
         )
+        # Retain a pre-dimension-policy bundle to prove historical compatibility.
+        fixture.setattr("finai_api.services.journal_dimensions.validate_line", lambda *_: None)
         published = publish(
             company,
             chart,
@@ -256,6 +258,7 @@ def test_native_exact_bundle_book_scope_and_hidden_line(retained, monkeypatch):
     detail = journals.detail(*args, entry.resource_id, UUID(entry_version), snapshot_at=at)
     assert detail["integrity"]["state"] == "COMPLETE_BALANCED"
     assert detail["integrity"]["balance"]["debit"] == "12.50"
+    assert all(row["dimensions"]["state"] == "UNESTABLISHED" for row in detail["lines"])
     assert not detail["binding_eligibility"]["eligible_for_accounting"]
     assert (
         journals.list_journals(
@@ -317,6 +320,7 @@ def test_native_exact_bundle_book_scope_and_hidden_line(retained, monkeypatch):
             "finai_api.services.accounting_consumption.validate_accounting_proposal",
             lambda *_: None,
         )
+        bypass.setattr("finai_api.services.journal_dimensions.validate_line", lambda *_: None)
         # Deliberately pin the LOCKED control while bypassing only the application gate.
         bypass.setattr(
             "finai_api.services.period_control.require_open",

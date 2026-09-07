@@ -407,7 +407,10 @@ def detail(
             ):
                 issues.append("A line's exact chart or source evidence does not match its binding")
                 continue
-            lines.append({"line": line, "account": account, "source_record": record})
+            from finai_api.services.journal_dimensions import historical
+
+            lines.append({"line": line, "account": account, "source_record": record,
+                          "dimensions": historical(conn, principal, line, account, at)})
         integrity = check_integrity(journal, binding, lines, issues)
         try:
             validate_posting_date(

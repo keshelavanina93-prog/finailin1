@@ -1,4 +1,5 @@
 import type { CanonicalResource } from './ontology.js';
+import type { JournalDimensionReadback } from './account-dimension-policy.js';
 
 export type JournalPin={resource_id:string;version_id:string};
 export type JournalSelection=Record<'legal_entity_id'|'ledger_id'|'book_id'|'period_id'|'chart_id'|'currency_id'|'calendar_id',JournalPin>;
@@ -13,7 +14,7 @@ export interface CompanyJournalListResponse extends JournalReadback {
 }
 export interface CompanyJournalDetailResponse extends JournalReadback {
   journal:CanonicalResource;binding:CanonicalResource;
-  lines:Array<{line:CanonicalResource;account:CanonicalResource;source_record:CanonicalResource}>;
+  lines:Array<{line:CanonicalResource;account:CanonicalResource;source_record:CanonicalResource;dimensions:JournalDimensionReadback}>;
   integrity:{state:'COMPLETE_BALANCED'|'INCOMPLETE_OR_UNAVAILABLE';issues:string[];
     declared_line_count:number;resolved_line_count:number;
     balance:{debit:string;credit:string;currency_id:string}|null};

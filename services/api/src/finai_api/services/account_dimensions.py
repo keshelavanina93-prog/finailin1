@@ -15,9 +15,11 @@ def rules_for_account(
 ) -> list[dict[str, Any]]:
     with conn.cursor(row_factory=dict_row) as cursor:
         return cursor.execute(
-            HEAD_SELECT + "WHERE h.tenant_id=%s AND v.object_type='AccountDimensionRule' "
+            "SELECT v.*,i.identity_key FROM resource_versions v "
+            "JOIN canonical_identities i USING(tenant_id,resource_id) "
+            "WHERE v.tenant_id=%s AND v.object_type='AccountDimensionRule' "
             "AND v.attributes->>'account_id'=%s AND v.authority_state='APPROVED' "
-            "AND v.valid_from<=now() AND (v.valid_to IS NULL OR v.valid_to>now()) "
+            "AND v.version_id=g8_effective_version_id(v.tenant_id,v.resource_id,now()) "
             "ORDER BY v.resource_id",
             (principal.scope.tenant_id, str(account["resource_id"])),
         ).fetchall()

@@ -271,6 +271,16 @@ def _validate(
 
     def target(identifier: str, source: str, relation: str) -> dict[str, Any]:
         source_item = mutations[source]
+        from finai_api.services.journal_dimensions import requested_target
+
+        try:
+            dimension_target = requested_target(
+                conn, principal, source_item, identifier, relation, validation_time
+            )
+        except ValueError as exc:
+            raise WorkspaceError(
+                422, "A valid exact dimension policy declaration is required"
+            ) from exc
         query_payload = source_item.attributes.get("definition", {})
         temporal_query = (
             source_item.object_type == "ObjectSetDefinition"
@@ -280,7 +290,11 @@ def _validate(
                 ("DEFINITION_TYPE:", "DEFINITION_LINK:", "TRAVERSAL_CANDIDATE:", "SET_ROOT:")
             )
         )
-        if temporal_query:
+        if dimension_target is not None:
+            head = _get(conn, tenant, UUID(identifier))
+            external_heads[identifier] = str(head["version_id"])
+            result = dimension_target
+        elif temporal_query:
             # Heads still fence concurrent publication. The semantic dependency pin
             # itself must describe the schema/link used by the saved temporal query.
             head = _get(conn, tenant, UUID(identifier))
@@ -517,6 +531,14 @@ def _validate(
                 from finai_api.services.period_control import require_open
 
                 require_open(conn, principal, item, binding, target, proposal)
+                if item.object_type == "JournalLine":
+                    from finai_api.services.journal_dimensions import validate_line
+
+                    validate_line(conn, principal, item, target, proposal, validation_time)
+            if item.object_type == "AccountDimensionPolicy":
+                from finai_api.services.journal_dimensions import validate_policy
+
+                validate_policy(conn, principal, item, target, proposal, validation_time)
             if item.object_type == "PeriodControl":
                 from finai_api.services.period_control import validate as validate_period_control
 

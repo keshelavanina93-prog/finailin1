@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import AccountDimensionPolicyWorkbench from "./account-dimension-policy-workbench";
 import type { CanonicalResource } from "@finai/contracts";
 
 export type SourceAccountNavigation = {
@@ -34,9 +35,10 @@ type Result = {
   blockers: string[];
 };
 
-export default function SegAccountObservations({ token, documentId, sheet, profile, companyId, onInspectResource, onTraceResource }: {
-  token: string; documentId: string; sheet: string; profile: string; companyId: string;
+export default function SegAccountObservations({ token, documentId, sheet, profile, companyId, onInspectResource, onTraceResource, canPropose=false, onProposal }: {
+  token: string; documentId: string; sheet: string; profile: string; companyId: string; canPropose?:boolean; onProposal?:(id:string)=>void;
 } & SourceAccountNavigation) {
+  const [policyAccount,setPolicyAccount]=useState<{context:string;account:Definition}|null>(null);
   const identity = JSON.stringify([token, documentId, sheet, profile, companyId]);
   const [state, setState] = useState<{ key: string; busy: boolean; result: Result | null; error: string } | null>(null);
   const request = useRef<AbortController | null>(null);
@@ -63,6 +65,7 @@ export default function SegAccountObservations({ token, documentId, sheet, profi
   }
 
   return <section aria-label="Source account code observations">
+    {policyAccount?.context===identity&&<AccountDimensionPolicyWorkbench token={token} companyId={companyId} account={policyAccount.account} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onClose={()=>setPolicyAccount(null)} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>}
     <h4>Account codes recorded by the source</h4>
     <p>Compare exact source codes with retained account definitions. Matches remain review candidates; they do not select a chart or authorize accounting.</p>
     <button disabled={current?.busy} onClick={() => void inspect()}>Inspect source account codes</button>
@@ -78,6 +81,7 @@ export default function SegAccountObservations({ token, documentId, sheet, profi
           <td><details><summary>{row.coordinates.length} of {row.coordinate_count} source coordinates</summary>{row.coordinates_truncated && <p>The coordinate preview reached its limit. The original source retains the remaining cells.</p>}<ul>{row.coordinates.map((cell, index) => <li key={`${cell.coordinate}:${cell.side}:${index}`}><code>{cell.coordinate}</code> · {cell.side.toLowerCase()}</li>)}</ul></details></td>
           <td>{row.definitions.length ? row.definitions.map(definition => <details key={`${definition.resource_id}:${definition.version_id}`}>
             <summary>{definition.display_name}</summary>
+            <button onClick={()=>setPolicyAccount({context:identity,account:definition})}>Review analytical requirements for this definition</button>
             <p>Exact-code candidate · {definition.evidence_class.toLowerCase().replaceAll("_", " ")}</p>
             {typeof definition.attributes.source_name === "string" && <p>{definition.attributes.source_name}</p>}
             {(onInspectResource || onTraceResource) && <div>

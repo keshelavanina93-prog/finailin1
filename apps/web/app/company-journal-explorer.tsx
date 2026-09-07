@@ -74,6 +74,18 @@ function JournalPage({expectedSelection,token,companyId,ledgerId,bookId,periodId
      return <tr key={row.line.version_id}><th scope="row">{row.line.display_name}{actions(row.line)}<small>{row.account.display_name}</small>{actions(row.account)}</th><td>{row.line.attributes.side==="DEBIT"?text(amount?.amount):"—"}</td><td>{row.line.attributes.side==="CREDIT"?text(amount?.amount):"—"}</td><td>{row.source_record.display_name}{actions(row.source_record)}</td></tr>;
     })}</tbody>{balance&&<tfoot><tr><th>Whole journal · server balance</th><td>{balance.debit}</td><td>{balance.credit}</td><td>{currency?.resource_id===balance.currency_id?currency.display_name:"Currency reference retained below"}</td></tr></tfoot>}</table></div>
     {!balance&&<p>No whole-journal balance is displayed while its integrity is incomplete or unavailable.</p>}
+    <section aria-label="Journal analytical assignments"><h4>Analytical assignments by line</h4><p>These are reviewed analytical requirements and attributions. They are separate from the journal’s mathematical debit/credit balance.</p>
+     {detail.lines.map(row=><details key={row.line.version_id}><summary>{row.line.display_name} · {row.account.display_name} · {human(row.dimensions?.state??"UNESTABLISHED")}</summary>
+      {!row.dimensions?<p>No analytical policy readback was returned for this line.</p>:<>
+       {row.dimensions.issues.map((issue,index)=><p role="status" key={index}>{issue}</p>)}
+       {row.dimensions.policy?<><p>Reviewed account policy: {row.dimensions.policy.display_name}</p>{actions(row.dimensions.policy)}<details><summary>Exact reviewed rule references</summary><pre>{JSON.stringify(row.dimensions.policy.attributes.definition,null,2)}</pre></details></>:<p>No reviewed account policy is available in this readback.</p>}
+       {!row.dimensions.assignments.length&&<p>No analytical member assignments were returned for this line. Policy completeness is determined by the server.</p>}
+       {row.dimensions.assignments.map((assignment,index)=><article key={`${assignment.member.version_id}:${index}`}><p><strong>{assignment.dimension.display_name}</strong> · {assignment.member.display_name}</p>{actions(assignment.member)}{actions(assignment.dimension)}
+        {assignment.provenance.kind==="REVIEWED_SOURCE_ATTRIBUTION"?<><p>Source-row evidence with reviewed operator attribution to the <strong>{assignment.provenance.side.toLowerCase()}</strong> side. This is not automatic attribution to both sides.</p><p>Attribution reason: {assignment.provenance.reason}</p><details><summary>Exact source assignment evidence</summary><p>{assignment.provenance.assignment.resource_id} · {assignment.provenance.assignment.version_id}</p></details></>:<p>User-asserted analytical assignment: {assignment.provenance.reason}</p>}
+       </article>)}
+      </>}
+     </details>)}
+    </section>
     <details><summary>Exact accounting evidence references</summary><p>Snapshot: {detail.snapshot_at}</p><p>Journal: {detail.journal.resource_id} · {detail.journal.version_id}</p><p>Accounting binding: {detail.binding.display_name}</p>{actions(detail.binding)}{balance&&<p>Balance currency: {balance.currency_id}</p>}</details>
    </>}
   </section>}

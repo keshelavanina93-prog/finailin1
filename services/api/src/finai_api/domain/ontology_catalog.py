@@ -160,6 +160,10 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "dimension_id": "@DimensionDefinition",
         "required": "Flag",
     },
+    "AccountDimensionPolicy": {
+        "account_id": "@LocalAccount", "legal_entity_id": "@LegalEntity",
+        "chart_id": "@LocalChartOfAccounts", "definition": "OntologyDefinition",
+    },
     "Party": {"registration_code?": "Identifier"},
     "Customer": {"party_id": "@Party"},
     "Supplier": {"party_id": "@Party"},
@@ -188,6 +192,8 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "reference": "Identifier",
     },
     "JournalLine": {
+        "dimension_policy_id?": "@AccountDimensionPolicy",
+        "dimensions?": "OntologyDefinition",
         "side?": "Identifier",
         "accounting_binding_id?": "@SourceAccountingBinding",
         "journal_id": "@JournalEntry",

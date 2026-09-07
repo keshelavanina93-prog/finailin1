@@ -1,0 +1,98 @@
+{
+  "checked_at": "2026-09-07T12:30:34.394824+04:00",
+  "url": "http://127.0.0.1:3062/api/ontology/",
+  "synthetic_context": {
+    "company_id": "ed8fac59-c3ff-4969-ac8c-71b73f47e0bf",
+    "account_id": "b98293ff-d472-41e8-baf9-4a3aaf34e16e"
+  },
+  "synthetic_policy": {
+    "state": "STALE",
+    "rules_complete": true,
+    "rule_count": 1,
+    "required": true,
+    "policy_id": "a04ba38c-3bd9-5d3a-9ae3-29175b2f0bcf",
+    "policy_version": "3ecec5f1-7e39-5a9e-874c-ea2db59eaae3"
+  },
+  "real_sgp_read": {
+    "company_id": "dc706c30-a8fb-57dc-b098-8a6bf2c2309d",
+    "chart_id": "53a371be-fd80-5ac8-a8ef-ef4492bbdfa6",
+    "account_id": "25c1939a-e256-5027-b743-27f79e7462fd",
+    "account_version": "9b7a1d00-7f16-5558-aa5a-7023f3cd9b93",
+    "account_name": "1110 · ნაღდი ფული (სალარო) ეროვნულ ვალუტაში // Касса организации",
+    "state": "UNESTABLISHED",
+    "rules_complete": true,
+    "rule_count": 0
+  },
+  "positive_read_http_status": [
+    200,
+    200
+  ],
+  "unauthenticated_status": 401,
+  "malformed_proposal_status": 422,
+  "company_mismatch_status": 409,
+  "wrong_method_status": 404,
+  "migration": 54,
+  "schema_review": "21382227-c9fa-49de-b7df-5772b7220054",
+  "schema_mutations": 2,
+  "new_business_proposal_created": false,
+  "authentic_journal_publication_proven": false,
+  "base_commit": "9907049",
+  "focused_verification": [
+    {
+      "passed": 2,
+      "elapsed_seconds": 11.37,
+      "scope": "Exact complete effective rules; explicit source and user assignments; missing, duplicate, stale, wrong account/side/row refusals; historical missing evidence refusal",
+      "native": 1,
+      "file": "test_journal_dimensions.py"
+    },
+    {
+      "passed": 1,
+      "elapsed_seconds": 9.77,
+      "scope": "Independent canonical review, immutable retry, stale policy and current-effective rule discovery",
+      "native": 1,
+      "file": "test_account_dimension_policy_api.py"
+    },
+    {
+      "passed": 1,
+      "elapsed_seconds": 5.41,
+      "scope": "Visible account with hidden rule: low-reader incomplete, authorized reader exact complete set",
+      "native": 1,
+      "file": "test_account_rule_hidden_completeness.py"
+    },
+    {
+      "passed": 8,
+      "elapsed_seconds": 23.71,
+      "scope": "Legacy retained line dimensions UNESTABLISHED with separate balance; SQL period lock refusal and context isolation",
+      "native": 1,
+      "file": "test_company_journals.py"
+    }
+  ],
+  "browser": {
+    "horizontal_overflow": false,
+    "journey": "Companies / SGP -> company resource search 1110 -> exact LocalAccount in NYX -> Review analytical requirements",
+    "image": "nin17-account-dimension-policy.png",
+    "submitted": false,
+    "state": "UNESTABLISHED",
+    "url": "http://127.0.0.1:3062/",
+    "reason_required": true,
+    "policy_dialog_width": 1000,
+    "proposal_button_enabled_after_explicit_reason": true,
+    "viewport_width": 1264
+  },
+  "checks": {
+    "python_focused_lint": "PASS",
+    "production_build": "PASS",
+    "api_mypy": "PASS",
+    "frontend_focused_lint": "PASS",
+    "packaged_http": "PASS",
+    "worker": "PROCESS_LIVENESS_ONLY",
+    "frontend_types": "PASS"
+  },
+  "limits": [
+    "No authentic journal publication acceptance",
+    "Journal dimension publication guard is application validation; migration054 is a complete-rule witness, not a new journal database trigger",
+    "No complete Finance or NIN25 visual acceptance",
+    "No new company accounting configuration or accepted SGP analytical policy",
+    "Retained Functions require reviewed implementation repinning before claiming new current execution after API changes"
+  ]
+}

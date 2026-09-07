@@ -39,6 +39,7 @@ def main() -> None:
         "JournalEntry",
         "JournalLine",
         "PeriodControl",
+        "AccountDimensionPolicy",
         "DeploymentTarget",
         "RuntimeAgent",
         "DesiredState",
@@ -90,7 +91,7 @@ def main() -> None:
         else:
             journal_fields = {
                 "JournalEntry": ("definition", "posting_date"),
-                "JournalLine": ("side",),
+                "JournalLine": ("side", "dimension_policy_id", "dimensions"),
             }.get(spec["identity_key"], ())
             missing_journal_fields = [
                 field for field in journal_fields
