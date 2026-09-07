@@ -1,0 +1,83 @@
+"use client";
+
+import {useEffect,useRef,useState} from "react";
+import dynamic from "next/dynamic";
+import type {AnalysisField,AnalysisProjection,AnalysisRequest,AnalysisRow,AnalysisValue} from "@finai/contracts";
+import {assertProjection,parseView,requestKey,type AnalysisView} from "./semantic-analysis-state";
+import {displayPostedAmount} from "./posted-movement-presentation";
+import "./semantic-analysis-workspace.css";
+
+const OperatorTrace=dynamic(()=>import("./operator-trace"),{loading:()=> <p role="status">Opening retained trace…</p>});
+type Reference={resource_id:string;version_id:string;known_at:string};
+type Props={token:string;companyId:string;invocationId:string;onInspect?:(reference:Reference)=>void};
+function label(value:AnalysisValue,field?:AnalysisField):string {
+ if(value.state!=="VALUE")return value.state==="NULL"?"Recorded null":"Not recorded";
+ if(value.label!==null)return value.label;
+ if(value.value==="")return "Empty text";
+ return field?.kind==="decimal"&&typeof value.value==="string"?displayPostedAmount(value.value):String(value.value);
+}
+export default function SemanticAnalysisWorkspace(props:Props){return <Workspace key={`${props.token}:${props.companyId}:${props.invocationId}`} {...props}/>;}
+function Workspace({token,companyId,invocationId,onInspect}:Props){
+ const [request,setRequest]=useState<AnalysisRequest>({company_id:companyId,invocation_id:invocationId});
+ const [response,setResponse]=useState<{key:string;data:AnalysisProjection|null;error:string}|null>(null);
+ const [revision,setRevision]=useState(0);const [storageKey,setStorageKey]=useState("");const [savedAvailable,setSavedAvailable]=useState(false);
+ const [notice,setNotice]=useState("");const [columns,setColumns]=useState<string[]|null>(null);const [visual,setVisual]=useState(true);const [pane,setPane]=useState<"evidence"|"trace">("evidence");
+ const [excluded,setExcluded]=useState<number|null>(null);
+ const [ready,setReady]=useState(false);const [expected,setExpected]=useState<AnalysisView|null>(null);
+ const scroll=useRef<HTMLDivElement>(null);const restoreScroll=useRef<number|null>(null);const lastButton=useRef<HTMLButtonElement|null>(null);
+ const key=requestKey(request);const projection=response?.data??null;const error=response?.key===key?response.error:"";const busy=ready&&(!response||response.key!==key);
+ function restore(view:AnalysisView){setExcluded(null);setExpected(view);setRequest(view.request);setColumns(view.columns);setVisual(view.visual);setPane(view.pane);restoreScroll.current=view.scroll;setNotice("Restoring exact saved references; checking access and revision…");}
+ useEffect(()=>{
+  let disposed=false;
+  void crypto.subtle.digest("SHA-256",new TextEncoder().encode(token)).then(bytes=>{
+   if(disposed)return;
+   const fingerprint=Array.from(new Uint8Array(bytes),byte=>byte.toString(16).padStart(2,"0")).join("");const name=`g8-analysis-view-v1:${fingerprint}:${companyId}`;setStorageKey(name);
+   try{setSavedAvailable(Boolean(localStorage.getItem(name)));}catch{/* Device storage can be disabled. */}
+   const raw=new URL(location.href).searchParams.get("analysis_view");const view=raw?parseView(raw,companyId):null;
+   if(view)restore(view);else if(raw)setNotice("The linked view is invalid or belongs to another company.");setReady(true);
+  }).catch(()=>{if(!disposed){setReady(true);setNotice("Device preferences are unavailable.");}});
+  const back=()=>{const raw=new URL(location.href).searchParams.get("analysis_view");const view=raw?parseView(raw,companyId):null;if(view)restore(view);else{setExpected(null);setRequest({company_id:companyId,invocation_id:invocationId});setColumns(null);setNotice(raw?"Linked view unavailable in this company.":"");}};
+  window.addEventListener("popstate",back);return()=>{disposed=true;window.removeEventListener("popstate",back);};
+ },[token,companyId,invocationId]);
+ useEffect(()=>{
+  if(!ready)return;const controller=new AbortController();let disposed=false;const timer=setTimeout(()=>controller.abort(),25000);
+  void fetch("/api/ontology/analysis/project",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify(request),cache:"no-store",signal:controller.signal}).then(async result=>{
+   const data=await result.json();if(!result.ok)throw Error(result.status===409?"This descriptor revision changed. The saved view remains pinned; open the original result to review the change.":result.status===401||result.status===403?"This analysis is unavailable to the current identity.":typeof data.detail==="string"?data.detail:`Analysis unavailable (${result.status}).`);
+   assertProjection(data,request,expected);if(!disposed)setResponse({key,data,error:""});
+  }).catch(cause=>{if(!disposed)setResponse({key,data:null,error:controller.signal.aborted?"Analysis request timed out. Retry the exact selection.":String(cause)});}).finally(()=>clearTimeout(timer));
+  return()=>{disposed=true;clearTimeout(timer);controller.abort();};
+ },[token,request,key,revision,expected,ready]);
+ useEffect(()=>{if(projection&&scroll.current&&restoreScroll.current!==null){scroll.current.scrollTop=restoreScroll.current;restoreScroll.current=null;}},[projection]);
+ function viewState(next:AnalysisRequest=request):AnalysisView|null {if(!projection)return null;return {version:1,request:{...next,descriptor_sha256:projection.descriptor_sha256,filters:next.filters??[],group_by:next.group_by??null,selected_row:next.selected_row??null,contributor_index:next.contributor_index??0},valid_at:projection.descriptor.valid_at,known_at:projection.descriptor.known_at,receipt_hash:projection.descriptor.receipt_hash,columns:columns??projection.descriptor.fields.map(f=>f.key),visual,pane,scroll:scroll.current?.scrollTop??0};}
+ function change(partial:Partial<AnalysisRequest>){if(!projection||busy)return;const next={...request,descriptor_sha256:projection.descriptor_sha256,...partial};const v=viewState(next);if(v){const url=new URL(location.href);url.searchParams.set("analysis_view",JSON.stringify(v));history.pushState(history.state,"",url);}restoreScroll.current=scroll.current?.scrollTop??0;setRequest(next);}
+ function save(){const view=viewState();if(!view||!storageKey)return;try{localStorage.setItem(storageKey,JSON.stringify(view));setSavedAvailable(true);setNotice("Saved on this device. Reopening checks access and this exact revision.");const url=new URL(location.href);url.searchParams.set("analysis_view",JSON.stringify(view));history.replaceState(history.state,"",url);}catch{setNotice("Device storage is unavailable; the view was not saved.");}}
+ function reopen(){try{const view=parseView(localStorage.getItem(storageKey)??"",companyId);if(view){setResponse(null);restore(view);setRevision(v=>v+1);}else setNotice("The saved view is invalid or belongs to another company.");}catch{setNotice("Device storage is unavailable.");}}
+ const displayedRequest=projection?.request??request;
+ const d=projection?.descriptor;const measure=d?.fields.find(field=>field.key===d.measure);const shown=d?.fields.filter(field=>columns===null||columns.includes(field.key))??[];
+ const rowMap=new Map(projection?.rows.map(row=>[row.key,row]));const selected=projection?.rows.find(row=>row.key===displayedRequest.selected_row);const evidence=projection?.selection;
+ const contributor=excluded===null?evidence?.contributor:d?.excluded_evidence[excluded];
+ const trace=contributor?.reference??selected?.trace??d?.function;
+ const magnitudes=projection?.rows.map(row=>{const value=row.values[d!.measure];return value.state==="VALUE"?Math.abs(Number(value.value)):0;}).filter(Number.isFinite)??[];const maximum=Math.max(0,...magnitudes);
+ function pick(row:AnalysisRow,button:HTMLButtonElement){setExcluded(null);lastButton.current=button;if(row.contributor_count)change({selected_row:row.key,contributor_index:0});else setNotice("No retained contributor is available for this row.");}
+ return <section className="semantic-analysis" aria-label="Adaptive analysis workspace">
+  <header><div><p className="overline">ANALYSIS WORKSPACE</p><h3>{d?.title??"Retained analysis"}</h3>{d&&<p>{d.company_label} · {d.authority}</p>}</div><div className="semantic-actions"><button disabled={!projection||busy||!storageKey} onClick={save}>Save view on this device</button><button disabled={!savedAvailable} onClick={reopen}>Reopen saved view</button></div></header>
+  {notice&&<p role="status">{notice}</p>}{(!ready||busy)&&<p role="status">Loading the exact analysis and its available operations…</p>}{error&&<p role="alert">{error} <button onClick={()=>{setResponse(null);setRevision(v=>v+1);}}>Retry exact request</button></p>}
+  {d&&projection&&<>
+   <dl className="semantic-context">{[...d.context,...d.coverage].map((item,index)=><div key={`${item.label}:${index}`}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>
+   <p className="semantic-time">Effective {d.valid_at} · Known {d.known_at} · Retained {d.recorded_at}</p>
+   <fieldset disabled={busy} className="semantic-controls"><legend className="semantic-sr-only">Retained analysis operations</legend><div className="semantic-toolbar"><details><summary>Filter retained groups ({displayedRequest.filters?.length??0})</summary><div className="semantic-filter-fields">{d.fields.filter(field=>field.filterable).map(field=>{const filter=displayedRequest.filters?.find(f=>f.field===field.key);return <label key={field.key}>{field.label}<select value={filter?String(field.options.findIndex(option=>option.state===filter.state&&option.value===filter.value)):""} onChange={event=>{const option=field.options[Number(event.target.value)];const filters=(request.filters??[]).filter(f=>f.field!==field.key);if(event.target.value!==""&&option)filters.push({field:field.key,state:option.state,value:option.value});change({filters,selected_row:null,contributor_index:0});}} disabled={!filter&&(displayedRequest.filters?.length??0)>=4}><option value="">All retained values</option>{field.options.map((option,i)=><option key={i} value={i}>{label(option,field)}</option>)}</select></label>;})}</div><p>Selects retained groups; it does not recalculate their measures.</p></details>
+    <label>Arrange groups<select value={displayedRequest.group_by??""} onChange={event=>change({group_by:event.target.value||null})}><option value="">Original order</option>{d.fields.filter(field=>field.groupable).map(field=><option key={field.key} value={field.key}>{field.label}</option>)}</select></label>
+    <details><summary>Columns</summary>{d.fields.map(field=><label key={field.key}><input type="checkbox" checked={shown.includes(field)} onChange={event=>setColumns(event.target.checked?[...shown.map(f=>f.key),field.key]:shown.filter(f=>f.key!==field.key).map(f=>f.key))}/>{field.label}</label>)}</details>
+    <label><input type="checkbox" checked={visual} onChange={event=>setVisual(event.target.checked)}/>Show visual</label><span>{projection.rows.length} of {projection.total_rows} retained groups</span>
+   </div>
+   {d.excluded_evidence.length>0&&<details><summary>Excluded evidence ({d.excluded_evidence.length})</summary>{d.excluded_evidence.map((item,index)=><button key={index} onClick={()=>{setExcluded(index);setPane("evidence");}}>{item.label} � {item.coordinate}</button>)}</details>}
+   <div className="semantic-panes"><div className="semantic-primary"><div ref={scroll} className="semantic-grid" tabIndex={0} aria-label="Retained analysis grid"><table><thead><tr><th scope="col">Contributors</th>{shown.map(field=><th key={field.key} scope="col">{field.label}{field.unit&&<small>{field.unit}</small>}</th>)}</tr></thead>{projection.sections.map((section,index)=><tbody key={index}>{displayedRequest.group_by&&<tr><th colSpan={shown.length+1} className="semantic-section">{section.label}</th></tr>}{section.row_keys.map(id=>{const row=rowMap.get(id)!;return <tr key={id} aria-selected={displayedRequest.selected_row===id}><th scope="row"><button onClick={event=>pick(row,event.currentTarget)} aria-pressed={displayedRequest.selected_row===id}>{row.label}<small>{row.contributor_count} contributors</small></button></th>{shown.map(field=><td key={field.key} className={field.role==="MEASURE"?"semantic-number":""} title={String(row.values[field.key].value??row.values[field.key].state)}>{label(row.values[field.key],field)}</td>)}</tr>;})}</tbody>)}</table>{!projection.rows.length&&<p>No retained groups match these selections. This is not a zero result.</p>}</div>
+   {visual&&measure&&<section className="semantic-chart" aria-label={`${measure.label} visual`}><h4>{measure.label}{measure.unit?` · ${measure.unit}`:""}</h4><p>Each bar shows the magnitude of one retained group; signed values remain explicit. No combined totals.</p>{projection.rows.map(row=>{const value=row.values[d.measure];const number=value.state==="VALUE"?Number(value.value):NaN;const width=Number.isFinite(number)&&maximum?Math.abs(number)/maximum*100:0;return <button key={row.key} className="semantic-bar" aria-pressed={displayedRequest.selected_row===row.key} onClick={event=>pick(row,event.currentTarget)}><span>{row.label}</span><span className="semantic-bar-track"><i style={{width:`${width}%`}}/></span><strong title={String(value.value)}>{label(value,measure)}</strong></button>;})}</section>}
+   </div><aside className="semantic-inspector" aria-label="Analysis evidence and trace"><div className="semantic-actions"><button aria-pressed={pane==="evidence"} onClick={()=>setPane("evidence")}>Evidence</button><button aria-pressed={pane==="trace"} onClick={()=>setPane("trace")}>Trace</button>{onInspect&&trace&&<button onClick={()=>onInspect({...trace,known_at:d.known_at})}>Inspect in NYX</button>}</div>
+    {pane==="trace"&&trace?<OperatorTrace key={trace.version_id} token={token} root={{...trace,company_id:companyId,known_at:d.known_at}} onClose={()=>setPane("evidence")} onInspect={(node,knownAt)=>onInspect?.({...node,known_at:knownAt})}/>:contributor?<><h4>{excluded===null?selected?.label:"Excluded evidence"}</h4><p>{contributor.label}</p>{excluded===null&&evidence&&<div className="semantic-actions"><button disabled={evidence.contributor_index===0} onClick={()=>change({contributor_index:evidence.contributor_index-1})}>Previous contributor</button><span>{evidence.contributor_index+1} of {evidence.contributor_count}</span><button disabled={evidence.contributor_index+1>=evidence.contributor_count} onClick={()=>change({contributor_index:evidence.contributor_index+1})}>Next contributor</button></div>}<p>{contributor.sheet} {contributor.coordinate}</p><table><caption>Original retained evidence</caption><thead><tr><th>Field / cell</th><th>Recorded value</th></tr></thead><tbody>{contributor.cells.map((cell,index)=><tr key={index}><th scope="row">{cell.label}<small>{cell.coordinate}</small></th><td>{cell.value===null?"Recorded null":cell.value===""?"Empty text":String(cell.value)}{cell.formula!==null&&<small>Formula: {cell.formula}</small>}</td></tr>)}</tbody></table><details><summary>Exact evidence reference</summary><pre>{JSON.stringify({...contributor,cells:undefined},null,2)}</pre></details><button onClick={()=>{setExcluded(null);change({selected_row:null,contributor_index:0});lastButton.current?.focus();}}>Clear contributor selection</button></>:<p>Select a retained group in the grid or visual to inspect its original contributors.</p>}
+   </aside></div>
+   </fieldset><details><summary>Unavailable operations</summary><ul>{d.unavailable_operations.map(operation=><li key={operation}>{operation}</li>)}</ul><p>Grouping arranges retained rows without aggregation. This view grants no new accounting or business-action authority.</p></details>
+   <details><summary>Advanced · exact query and descriptor</summary><pre>{JSON.stringify({request:projection.request,descriptor_sha256:projection.descriptor_sha256,descriptor:d},null,2)}</pre></details>
+  </>}
+ </section>;
+}
