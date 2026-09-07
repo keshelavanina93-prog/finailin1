@@ -1,0 +1,108 @@
+{
+  "candidate_commit": "477d74a",
+  "checked_at": "2026-09-07T16:35:14.736225+00:00",
+  "url": "http://127.0.0.1:3062/",
+  "api_port": 8062,
+  "source_sha256": {
+    "apps/web/app/finance-analysis.tsx": "e7e5fcd0cdb69d5bab453ac1cd86cfcb82c1f3397d61609fa33a71b889bd7312",
+    "apps/web/app/analysis-source-evidence.tsx": "ce7caf4e77947d3792eb6a2ac311adfc3f48c1d2f12d7b6ca23b20751911f53a",
+    "apps/web/app/finance-analysis-query.ts": "077d2a437c5856af198ac3e90d58b28ae299988c08354c40f6fd7d7dffaf5f44",
+    "apps/web/app/g8-workspace.tsx": "d14a8be28ba3641746d325a331014532c647bcbe97472825bac9c52afcf3dc39",
+    "apps/web/app/operator-trace.tsx": "76f7a19ec51028d86d3277f701c61ce91645a101b5a517185ffbd4acbd9009fc",
+    "apps/web/app/nyx-interaction.tsx": "fcacf83e5941fdccef59a8eaab0f10974ea1fd8150fb3f0603e11a290c47915a"
+  },
+  "assertions_passed": true,
+  "scope": "Integrated authentic account contributor/source/trace/NYX continuity, not a financial report",
+  "browser": {
+    "before": {
+      "query": {
+        "object_type": "SourceJournalMovement",
+        "resource_ids": null,
+        "filters": [
+          {
+            "field": "legal_entity_id",
+            "value": "c6f87828-9609-5b35-afa6-e894a0acfe41"
+          }
+        ],
+        "filter_expression": {
+          "op": "any",
+          "conditions": [
+            {
+              "field": "debit_account_id",
+              "value": "3ba3c8cc-51a1-5566-86f1-5457949db896"
+            },
+            {
+              "field": "credit_account_id",
+              "value": "3ba3c8cc-51a1-5566-86f1-5457949db896"
+            }
+          ]
+        },
+        "traversal": [],
+        "search": "",
+        "limit": 50,
+        "offset": 0,
+        "valid_at": "2026-09-07T16:32:27.996489Z",
+        "known_at": "2026-09-07T16:32:27.996489Z"
+      },
+      "summary": "124 contributors\n7310.02.1 · Коммерческие расходы в организациях, осуществляющих производственную деятельность (по деятельности, не облагаемой ЕНВД) · Debit or credit · All dates\nAs read 9/7/2026, 8:32:27 PM",
+      "firstRow": "Поступление товаров и услуг SAG0000004790 from 04.11.2025 0:00:00\nTR!row:10\n\t2025-11-04\t7310.02.1 · Коммерческие расходы в организациях, осуществляющих производственную деятельность (по деятельности, не облагаемой ЕНВД)\t3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებები // Расчеты с поставщиками и подрядчиками\t50.85\nUnit unestablished\n\tsource bound\nDefinition approved\nSource evidence\nInvestigate in NYX"
+    },
+    "source": {
+      "drawer": "Source evidence · TR!row:10\nReturn to contributors\n\nПоступление товаров и услуг SAG0000004790 from 04.11.2025 0:00:00\n\nPosting date 2025-11-04 · Source amount 50.85 · Currency not established\n\nRetained worksheet position: TR!row:10. Values below are the source cells retained with this movement, without accounting interpretation.\n\nSOURCE COLUMN\tRETAINED VALUE\nA\tBlank in source\nB\tSOG\nC\tNovember\nD\t4\nE\t11\nF\t2025\nG\t04.11.2025 0:00:00\nH\t1\nI\tПоступление товаров и услуг SAG0000004790 from 04.11.2025 0:00:00\nJ\tსს. საქორგგაზი // АО Сакорггаз\nK\t7310.02.1\nL\tკომერც მანქანის საექსპლუატაციო ხარჯი // Затраты по эксплуатации коммерческой машины\nM\tSOG ცენტრალური რეგიონალური ოფისი\nN\tBlank in source\nO\tBlank in source\nP\tBlank in source\nQ\t3110\nR\tშპს ამბოლი\nS\tხელშეკრულება გამყიდველთან\nT\tBlank in source\nU\tBlank in source\nV\tBlank in source\nW\t50.85\nX\tკომერციული ავტოტექმომსახურება по вх.док. от 01.11.2025\nY\tSOG-Kartli\nZ\tService\nAA\tAuto Park\n\nAggregation requires review. These observations do not establish an additive or certified report.\n\nExact evidence references\nShow system trace",
+      "refs": [
+        "e7086054-b7a4-5a2e-8603-2c0e4f93c9f9",
+        "c7c9a6b3c06b9a84a7efdccdd918e1d8f52e68aa83dc30a47acd3851fda70758",
+        "cfd7ab0f-8b13-56a6-a6ba-e3b1e1d4accd",
+        "cd8aee3ec2a7d983efb806750ca01d8bab7a0ae13907b1fd2eb674698df2b6a7",
+        "2026-09-07T16:32:27.996489Z"
+      ]
+    },
+    "nyx": {
+      "trace": "TR!row:10",
+      "cutoff": "2026-09-07T16:32:27.996489+00:00",
+      "reference": [
+        "8e3e90d2-4e1a-58e9-b0bd-94fb8652c9b1",
+        "e7086054-b7a4-5a2e-8603-2c0e4f93c9f9",
+        "2026-09-07T16:32:27.996489+00:00"
+      ],
+      "reply": "Explain selectedსს. საქორგგაზი · ACCOUNTING CONFIGURATION REQUIRED · snapshot at requestTR!row:10 is a recorded source journal movement. Definition review: approved; evidence class: source bound. Known by G8 at Sep 7, 2026, 08:32 PM. Effective from Sep 6, 2026, 09:56 AM; no end is recorded. No reviewed material state was recorded for this version by the selected knowledge cutoff. Its current material authority and availability are not established by this historical view. The visible history contains 1 version and 9 dependent links. Trace shows the recorded evidence chain. These links identify where to investigate; they do not establish a cause, complete business impact or permission for current financial use.Trace TR!row:10History of TR!row:10Exact retained referenceResource8e3e90d2-4e1a-58e9-b0bd-94fb8652c9b1Versione7086054-b7a4-5a2e-8603-2c0e4f93c9f9Known-at cutoff2026-09-07T16:32:27.996489+00:00"
+    },
+    "return": {
+      "query": {
+        "object_type": "SourceJournalMovement",
+        "resource_ids": null,
+        "filters": [
+          {
+            "field": "legal_entity_id",
+            "value": "c6f87828-9609-5b35-afa6-e894a0acfe41"
+          }
+        ],
+        "filter_expression": {
+          "op": "any",
+          "conditions": [
+            {
+              "field": "debit_account_id",
+              "value": "3ba3c8cc-51a1-5566-86f1-5457949db896"
+            },
+            {
+              "field": "credit_account_id",
+              "value": "3ba3c8cc-51a1-5566-86f1-5457949db896"
+            }
+          ]
+        },
+        "traversal": [],
+        "search": "",
+        "limit": 50,
+        "offset": 0,
+        "valid_at": "2026-09-07T16:32:27.996489Z",
+        "known_at": "2026-09-07T16:32:27.996489Z"
+      },
+      "summary": "124 contributors\n7310.02.1 · Коммерческие расходы в организациях, осуществляющих производственную деятельность (по деятельности, не облагаемой ЕНВД) · Debit or credit · All dates\nAs read 9/7/2026, 8:32:27 PM",
+      "firstRow": "Поступление товаров и услуг SAG0000004790 from 04.11.2025 0:00:00\nTR!row:10\n\t2025-11-04\t7310.02.1 · Коммерческие расходы в организациях, осуществляющих производственную деятельность (по деятельности, не облагаемой ЕНВД)\t3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებები // Расчеты с поставщиками и подрядчиками\t50.85\nUnit unestablished\n\tsource bound\nDefinition approved\nSource evidence\nInvestigate in NYX",
+      "selected": "Поступление товаров и услуг SAG0000004790 from 04.11.2025 0:00:00\nTR!row:10\n\t2025-11-04\t7310.02.1 · Коммерческие расходы в организациях, осуществляющих производственную деятельность (по деятельности, не облагаемой ЕНВД)\t3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებები // Расчеты с поставщиками и подрядчиками\t50.85\nUnit unestablished\n\tsource bound\nDefinition approved\nSource evidence\nInvestigate in NYX",
+      "focused": "Source evidence",
+      "traceClosed": true,
+      "drawerClosed": true
+    }
+  }
+}

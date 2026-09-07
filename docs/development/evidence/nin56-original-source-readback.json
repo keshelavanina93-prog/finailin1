@@ -1,0 +1,148 @@
+{
+  "source_sha256": "45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d",
+  "returned": 25,
+  "checked_at": "2026-09-07T16:32:25.7982461Z",
+  "total_rows": 246,
+  "financial_publication_status": "CURRENCY_AND_LEDGER_UNESTABLISHED",
+  "first_row": {
+    "resource_id": "d60f4b04-6479-596e-8fc8-151431c2ade4",
+    "record_id": "07a6cf1c-6e4e-5b0c-8279-61e7086aa016",
+    "coordinate": "TR!row:3",
+    "attributes": {
+      "posting_date": "2025-11-01",
+      "document_reference": "Поступление товаров и услуг SAG0000004889 from 01.11.2025 0:00:00",
+      "amount": "1260.0",
+      "source_row_key": "TR!3",
+      "unit_status": "UNESTABLISHED",
+      "source_details": {
+        "cells": {
+          "A": {
+            "type": 0,
+            "value": ""
+          },
+          "B": {
+            "type": 1,
+            "value": "SOG"
+          },
+          "C": {
+            "type": 1,
+            "value": "November"
+          },
+          "D": {
+            "type": 2,
+            "value": "1"
+          },
+          "E": {
+            "type": 2,
+            "value": "11"
+          },
+          "F": {
+            "type": 2,
+            "value": "2025"
+          },
+          "G": {
+            "type": 1,
+            "value": "01.11.2025 0:00:00"
+          },
+          "H": {
+            "type": 2,
+            "value": "1"
+          },
+          "I": {
+            "type": 1,
+            "value": "Поступление товаров и услуг SAG0000004889 from 01.11.2025 0:00:00"
+          },
+          "J": {
+            "type": 1,
+            "value": "სს. საქორგგაზი // АО Сакорггаз"
+          },
+          "K": {
+            "type": 1,
+            "value": "7310.02.1"
+          },
+          "L": {
+            "type": 1,
+            "value": "სამრეცხაოს ხარჯი // Затраты на мойку"
+          },
+          "M": {
+            "type": 1,
+            "value": "SOG ქუთაისის სერვის-ცენტრი // Service Center - Kutaisi"
+          },
+          "N": {
+            "type": 6,
+            "value": ""
+          },
+          "O": {
+            "type": 6,
+            "value": ""
+          },
+          "P": {
+            "type": 6,
+            "value": ""
+          },
+          "Q": {
+            "type": 1,
+            "value": "3110"
+          },
+          "R": {
+            "type": 1,
+            "value": "ი.მ. რუსუდან კაპანაძე 60002014532"
+          },
+          "S": {
+            "type": 1,
+            "value": "ხელშეკრულება გამყიდველთან"
+          },
+          "T": {
+            "type": 6,
+            "value": ""
+          },
+          "U": {
+            "type": 6,
+            "value": ""
+          },
+          "V": {
+            "type": 6,
+            "value": ""
+          },
+          "W": {
+            "type": 2,
+            "value": "1260"
+          },
+          "X": {
+            "type": 1,
+            "value": "რეცხვის მომსახურება по вх.док.  от "
+          },
+          "Y": {
+            "type": 1,
+            "value": "SOG-Imereti"
+          },
+          "Z": {
+            "type": 1,
+            "value": "Service"
+          },
+          "AA": {
+            "type": 1,
+            "value": "Auto Park"
+          }
+        },
+        "parser": "source-accounting/1",
+        "currency_authority": "UNESTABLISHED",
+        "aggregation_policy": "NON_ADDITIVE_REVIEW_REQUIRED",
+        "same_account_source_rows": []
+      },
+      "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+      "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+      "source_family": "1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR",
+      "debit_account_id": "3ba3c8cc-51a1-5566-86f1-5457949db896",
+      "credit_account_id": "1d3bb778-9f59-5f21-ae02-34961db3a633",
+      "source_record_id": "07a6cf1c-6e4e-5b0c-8279-61e7086aa016"
+    },
+    "source_versions": {
+      "c6f87828-9609-5b35-afa6-e894a0acfe41": "cfee721c-a62d-5297-a9e6-4b63bd4b7c81",
+      "3ba3c8cc-51a1-5566-86f1-5457949db896": "02be57e2-1148-5596-bbcb-9b95cca9dd7a",
+      "1d3bb778-9f59-5f21-ae02-34961db3a633": "f776f6f3-b623-516c-a1ea-896fbe0517a3"
+    },
+    "publication_state": "APPROVED",
+    "published_version_id": "d4eb1b41-1e7f-5849-aa24-46acea728711"
+  }
+}
