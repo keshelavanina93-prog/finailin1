@@ -15,6 +15,7 @@ import CompanyStructureGraph from "./company-structure-graph";
 type Node = CanonicalResource;
 export type CompanyIndex = {source_companies:Node[];workspaces:{configuration:Node;company:Node;enterprise:Node;domain_pack:Node}[];reported_groups?:{reporter:Node;reporting_year:number;members:{company:Node;binding:Node;reported_percent:string|null;former_indicator:string}[]}[]};
 export type Context = {company:Node;accounting_state:string;
+ source_company_aliases?:Node[];
  relationships:{kind:string;record:Node;source:Node;target:Node}[];
  structural_resources:Node[]; dimensions:Node[];
  ledgers:{ledger:Node;calendar_id:Node|null;chart_id:Node|null;currency_id:Node|null;books:Node[];periods:Node[];ready:boolean}[];

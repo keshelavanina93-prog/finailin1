@@ -32,6 +32,9 @@ class ContextSelection(BaseModel):
     deepest_valid_drill: Literal["SOURCE_CELL", "SOURCE_ROW", "PERIOD_ACCOUNT"] | None = None
     amount_field: str | None = Field(default=None, min_length=1, max_length=128)
     amount_semantics: Literal["DEBIT_CREDIT", "SIGNED_MOVEMENT", "PERIOD_BALANCE"] | None = None
+    vat_treatment: Literal["AS_POSTED"] | None = None
+    supplementary_amount_field: str | None = Field(default=None, min_length=1, max_length=128)
+    supplementary_amount_role: Literal["NON_AUTHORITATIVE_SOURCE_OBSERVATION"] | None = None
     unresolved_reason: str | None = Field(default=None, min_length=10, max_length=2000)
     rationale: str = Field(min_length=10, max_length=2000)
 
@@ -200,6 +203,24 @@ def validate_context(principal, item, target):
     source_attrs, ledger_attrs, book_attrs, period_attrs = [
         node["attributes"] for node in (scope, ledger, book, period)
     ]
+    if source_attrs["source_profile"] == "seg_expense_base" and (
+        selection.amount_field != "source_amount"
+        or selection.amount_semantics != "DEBIT_CREDIT"
+        or selection.vat_treatment != "AS_POSTED"
+        or selection.supplementary_amount_field != "annotated_amount"
+        or selection.supplementary_amount_role != "NON_AUTHORITATIVE_SOURCE_OBSERVATION"
+    ):
+        raise WorkspaceError(
+            422,
+            "SEG Base requires posted source_amount, as-posted VAT "
+            "and non-authoritative annotated_amount",
+        )
+    if source_attrs["source_profile"] == "seg_expense_base" and principal is not None:
+        observed_source = source_observations(
+            principal, source_attrs["document_id"], source_attrs["worksheet"], "seg_expense_base"
+        )
+        if not observed_source["posting_identity_ready"]:
+            raise WorkspaceError(409, "Repeated recorder keys require review before accounting use")
     if (
         ledger_attrs["legal_entity_id"] != source_attrs["legal_entity_id"]
         or ledger_attrs["chart_id"] != source_attrs["chart_id"]
@@ -515,6 +536,8 @@ def source_observations(principal, document_id, sheet, profile):
             "granularity": parsed["evidence_granularity"],
             "deepest_valid_drill": parsed["deepest_valid_drill"],
             "currency_observations": parsed["currency_observations"],
+            "findings": parsed["findings"],
+            "posting_identity_ready": parsed["posting_identity_ready"],
             "unresolved": parsed["unresolved"],
             "accounting_mapping_available": False,
             "sample_rows": parsed["rows"][:3],

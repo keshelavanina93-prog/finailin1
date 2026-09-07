@@ -7,7 +7,7 @@ from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from typing import Any
 
-from finai_api.services.workbook_source import read_workbook
+from finai_api.services.workbook_source import profile_workbook, read_workbook
 from finai_api.services.workspace import WorkspaceError
 
 REQUIRED = {
@@ -84,7 +84,13 @@ def read_base(content: bytes, sheet: str = "Base") -> dict[str, Any]:
     companies: set[str] = set()
     dates = []
     currencies: dict[str, list[dict[str, Any]]] = {"debit": [], "credit": []}
-    findings = []
+    # Carry shared intake identity findings into every SEG consumer. Preserve all
+    # rows; duplicate recorder keys require review, never silent deduplication.
+    findings = [
+        item
+        for item in profile_workbook(book)["findings"]
+        if item["sheet"] == sheet and item["code"] == "REPEATED_TRANSACTION_KEY"
+    ]
     for row_number, cells in sorted(rows.items()):
         if row_number == 1:
             continue
@@ -183,6 +189,9 @@ def read_base(content: bytes, sheet: str = "Base") -> dict[str, Any]:
         "deepest_valid_drill": "SOURCE_ROW",
         "currency_observations": currencies,
         "findings": findings,
+        "posting_identity_ready": not any(
+            item["code"] == "REPEATED_TRANSACTION_KEY" for item in findings
+        ),
         "accounting_mapping_available": False,
         "amount_mapping": None,
         "unresolved": [

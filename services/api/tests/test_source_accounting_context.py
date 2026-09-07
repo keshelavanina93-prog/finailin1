@@ -169,3 +169,19 @@ def test_tb_cannot_claim_transaction_drill():
     nodes[ids["scope"]]["attributes"]["source_profile"] = "1c_tb"
     with pytest.raises(WorkspaceError):
         validate_context(None, item, lambda identity, *_: nodes[identity])
+
+
+def test_seg_posted_amount_requires_explicit_vat_and_supplementary_boundary():
+    item, nodes, ids = context()
+    nodes[ids["scope"]]["attributes"]["source_profile"] = "seg_expense_base"
+    item.attributes.update(
+        amount_field="source_amount",
+        amount_semantics="DEBIT_CREDIT",
+        vat_treatment="AS_POSTED",
+        supplementary_amount_field="annotated_amount",
+        supplementary_amount_role="NON_AUTHORITATIVE_SOURCE_OBSERVATION",
+    )
+    validate_context(None, item, lambda identity, *_: nodes[identity])
+    item.attributes["amount_field"] = "annotated_amount"
+    with pytest.raises(WorkspaceError, match="posted source_amount"):
+        validate_context(None, item, lambda identity, *_: nodes[identity])

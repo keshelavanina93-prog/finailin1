@@ -39,3 +39,33 @@ Runtime fixes supporting this checkout: registered D: Git worktrees are admitted
 the storage guard with per-checkout containment; PostgreSQL supports an explicit port
 and refuses an already-running cluster on a different port; starting only API/web no
 longer requires installing or managing an unrelated local MinIO service.
+
+## Reviewed interpretation applied on 2026-09-07
+
+The user explicitly supplied the statutory/reglamented 1C book, GEL functional
+currency, `Сумма` as the posted accounting amount, and as-posted VAT treatment.
+`Amount` remains losslessly retained and non-authoritative. The decision is retained
+as USER_ASSERTED configuration; the chart alone does not establish the Base amount
+columns. No global VAT addition or removal is permitted.
+
+In the isolated vertical database the canonical review path retained 38 exact account
+identities, the accounting scope, book/ledger/period/currency, source identity mapping
+and dimension-preservation policy. Financial statement and canonical analytical
+classification remain unestablished. Binding f4cf95a5-9552-519c-8e59-96ee06bd4308,
+version e8c68d4b-e69f-5e21-9bd5-256420146404, is approved configuration. Its first
+material lifecycle event records OBSERVED / INFERRED / PROVISIONAL / AVAILABLE;
+no reconciliation, authoritative financial totals or certification is claimed.
+
+After a separately managed API stop and start, authenticated web-proxy inspection
+returned HTTP 200 at 15:57:16 UTC with ELIGIBLE_FOR_GUARDED_USE. This supersedes the
+historical restart limitation and unbound-meaning statements above. Each calculation
+still requires its exact consumer authority checks. Base!S288 is absent and remains
+quarantined; it must never inherit supplementary Amount zero. Source coverage is
+595 rows with amounts out of 596 retained rows, not complete ledger coverage.
+
+The source profile now exposes shared repeated-recorder-key findings and refuses
+binding promotion with duplicate posting identities. The company projection exposes
+only retained source aliases with exact company version pins; UI source selection
+uses those authorized document references. Focused accounting/source/company tests:
+32 passed. Full financial report, browser acceptance, refresh and Finding remain
+pending at this checkpoint.

@@ -119,3 +119,28 @@ def test_changed_or_ambiguous_headers_and_invalid_archives_are_refused():
         read_base(b"not a workbook")
     with pytest.raises(WorkspaceError, match="sheet"):
         read_base(workbook(), sheet="Missing")
+
+
+def test_repeated_recorder_keys_retain_both_rows_and_shared_quality_finding():
+    import re
+
+    original = workbook()
+    modified = BytesIO()
+    with ZipFile(BytesIO(original)) as source, ZipFile(modified, "w") as target:
+        for name in source.namelist():
+            payload = source.read(name)
+            if name.endswith("sheet1.xml"):
+                xml = payload.decode()
+                row = re.search(r'<row r="2">.*?</row>', xml).group()
+                duplicate = re.sub(r'r="([A-Z]*)2"', r'r="\g<1>3"', row)
+                payload = xml.replace("</sheetData>", duplicate + "</sheetData>").encode()
+            target.writestr(name, payload)
+    result = read_base(modified.getvalue())
+    assert [row["row"] for row in result["rows"]] == [2, 3]
+    assert not result["posting_identity_ready"]
+    finding = next(
+        item for item in result["findings"] if item["code"] == "REPEATED_TRANSACTION_KEY"
+    )
+    assert finding["coordinates"] == ["A2", "A3"]
+    assert finding["sheet"] == "Base" and finding["occurrences"] == 2
+    assert read_base(original)["posting_identity_ready"]
