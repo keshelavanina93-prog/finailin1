@@ -1,0 +1,109 @@
+{
+  "contract": "g8-product-candidate-evidence/1",
+  "candidate": "c4964dc",
+  "base": "21e5566",
+  "branch": "development/nin58-finance-worksheet",
+  "issues": [
+    "NIN-57",
+    "NIN-25",
+    "NIN-58",
+    "NIN-50"
+  ],
+  "runtime": "http://localhost:3069",
+  "api": "http://127.0.0.1:8062",
+  "backend_changed": false,
+  "checks": {
+    "typecheck": "PASS",
+    "focused_eslint": "PASS",
+    "presentation_and_handoff_tests": "4 PASS"
+  },
+  "implementation": {
+    "paired_columns": "Original backend debit and credit group references. No sums, netting or zero fill. Duplicate groups fail closed.",
+    "display_precision": "Explicit two-decimal presentation using Intl decimal-string formatting, including integers beyond Number safe range. Exact retained decimal remains in tooltip and inspector.",
+    "account_names": "Shared ontology SDK query at retained valid/known timestamps. Resource/version and available content hash must match exact report account pin. No current-label fallback.",
+    "source_inspector": "Native modal drawer, Close/Escape, unique accessible title, returns focus without scrolling the worksheet.",
+    "scroll": "Per-view/company page-position memory on navigation. Worksheet remains mounted and retains its internal scroll/selection.",
+    "nyx": "Only composer positioning changed from sticky to normal flow."
+  },
+  "browser": {
+    "authenticated_company": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+    "invocation_id": "c631bb9c-f92e-5dd9-a693-233c1b3b7925",
+    "entry": "Shared retained build history now loads, named SEG report output opens the same Finance invocation.",
+    "new_calculation": false,
+    "desktop": [
+      1440,
+      1000
+    ],
+    "narrow": [
+      820,
+      1000
+    ],
+    "row_height_px": 44.88,
+    "previous_row_height_px": 67,
+    "heading_top_on_entry_px": 199.36,
+    "account": "7310.02.1",
+    "side": "debit",
+    "display_value": "58,988.95",
+    "exact_value": "58988.95",
+    "source_row_count": 6,
+    "source_cell": "Base!S2",
+    "source_literal": "731.97",
+    "excluded_coordinate": "Base!S288",
+    "excluded_zero_substituted": false,
+    "escape_returns_focus": "7310.02.1 debit 58,988.95, 6 source rows",
+    "table_scroll_preserved_px": 1213.392822265625,
+    "selection_preserved_on_data_finance_return": "7310.02.1",
+    "narrow_document_horizontal_overflow": false,
+    "nyx_composer_position": "static",
+    "nyx_composer_clearance_below_quick_actions_px": 15.99
+  },
+  "limitations": [
+    "Independent NIN-50 acceptance and root production integration remain pending.",
+    "No claim of complete Finance/NIN-25/NIN-58 acceptance, statement classification, full-ledger completeness or certification.",
+    "Existing historical binding-version mismatch still fails closed.",
+    "No new browser fault-injection matrix; labels have explicit loading/unavailable states and duplicates are covered by focused tests.",
+    "Window scroll can be clamped while content loads; measured preserved worksheet scroll and selection are the reliable drill-return proof."
+  ],
+  "artifacts": [
+    {
+      "name": "nin58-worksheet-desktop.png",
+      "bytes": 173274,
+      "sha256": "cdbd41ff8a22c5591bd2dc35a01b62676c48fb0b8552d47fa8dc69d0a921f5c6"
+    },
+    {
+      "name": "nin58-worksheet-source-desktop.png",
+      "bytes": 120510,
+      "sha256": "35bd2660934a37ac36b6c071270ac05f30a7e5f0017de69494362746f69f5ebf"
+    },
+    {
+      "name": "nin58-worksheet-source-desktop.txt",
+      "bytes": 51742,
+      "sha256": "ab3f65f7e6de2a56101b4193fb872bebc7e5434190d6aab87f3714abf1c47cdb"
+    },
+    {
+      "name": "nin58-worksheet-source-narrow.png",
+      "bytes": 51117,
+      "sha256": "92682c331e6119534db794cfdfc4f137283a63b6d621f1ab0aa67419379e1c46"
+    },
+    {
+      "name": "nin58-worksheet-exclusion-narrow.png",
+      "bytes": 28223,
+      "sha256": "d6e8989f0e94654268786954e2cba73c61d17299b938716cddec1a805b9203b2"
+    },
+    {
+      "name": "nin58-worksheet-narrow.txt",
+      "bytes": 44392,
+      "sha256": "5981f05fb6bb80492370f4ff2f2c8dd5e3ec0694cfa83f7b42089e9649bddfbc"
+    },
+    {
+      "name": "nin58-worksheet-nyx.png",
+      "bytes": 174451,
+      "sha256": "48406a4760498196476d33be6ca524d53003d80d25e7311d9a75657ebbb592c1"
+    },
+    {
+      "name": "nin58-worksheet-final.txt",
+      "bytes": 45028,
+      "sha256": "94fe73412fc51dbc1cf015aa80f241570372cd0a5a4f553aa71fffa458aec7b7"
+    }
+  ]
+}
