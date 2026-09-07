@@ -127,6 +127,29 @@ def test_native_grouped_function_receipt_and_incomplete_refusal(retained):
                 function_execution._digest(receipt),
             ),
         )
+    changed_source = deepcopy(result["output"])
+    changed_source.pop("run_id")
+    changed_source["objects"][0]["display_name"] = "SYNTHETIC forged canonical row"
+    forged_source = fact_runs.retain_run(reader, changed_source, runtime="shared-functions/1")
+    receipt["run_id"] = forged_source["run_id"]
+    with (
+        pytest.raises(psycopg.errors.RaiseException, match="exact canonical source versions"),
+        function_invocations._database(reader) as c,
+    ):
+        c.execute(
+            "INSERT INTO function_invocation_results "
+            "(tenant_id,request_id,exact_scope,actor_id,status,run_id,payload,proof_hash) "
+            "VALUES(%s,%s,%s,%s,'SUCCEEDED',%s,%s,%s)",
+            (
+                reader.scope.tenant_id,
+                request.request_id,
+                Jsonb(reader.scope.model_dump(mode="json")),
+                reader.actor_id,
+                forged_source["run_id"],
+                Jsonb(receipt),
+                function_execution._digest(receipt),
+            ),
+        )
     partial = function_invocations.invoke(
         reader, request.model_copy(update={"request_id": uuid4(), "limit": 1})
     )

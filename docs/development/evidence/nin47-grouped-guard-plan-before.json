@@ -1,0 +1,92 @@
+[
+  {
+    "Plan": {
+      "Node Type": "Hash Join",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Join Type": "Right",
+      "Startup Cost": 2.79,
+      "Total Cost": 6264.47,
+      "Plan Rows": 100,
+      "Plan Width": 4,
+      "Disabled": false,
+      "Inner Unique": false,
+      "Hash Cond": "((v.resource_id = ((o.value ->> 'resource_id'::text))::uuid) AND (v.version_id = ((o.value ->> 'version_id'::text))::uuid))",
+      "Filter": "((v.version_id IS NULL) OR (v.object_type IS DISTINCT FROM 'SourceJournalMovement'::text) OR ((v.schema_version_id)::text IS DISTINCT FROM '8a47f47f-e4f5-563e-843c-76bf7b1b81db'::text) OR (((to_jsonb(v.*) - 'tenant_id'::text) || jsonb_build_object('identity_key', i.identity_key)) IS DISTINCT FROM o.value) OR (v.system_from > '2026-09-07 09:02:59.161655+04'::timestamp with time zone))",
+      "Plans": [
+        {
+          "Node Type": "Nested Loop",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Join Type": "Left",
+          "Startup Cost": 0.29,
+          "Total Cost": 6261.58,
+          "Plan Rows": 23,
+          "Plan Width": 1117,
+          "Disabled": false,
+          "Inner Unique": true,
+          "Plans": [
+            {
+              "Node Type": "Seq Scan",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Relation Name": "resource_versions",
+              "Alias": "v",
+              "Startup Cost": 0.0,
+              "Total Cost": 6068.01,
+              "Plan Rows": 23,
+              "Plan Width": 1083,
+              "Disabled": false,
+              "Filter": "((tenant_id = '805d8a32-d12b-4268-a236-b0b16e59da9f'::uuid) AND ((tenant_id)::text = current_setting('finai.tenant_id'::text, true)) AND ((access_entity = '__PLATFORM__'::text) OR (current_setting('finai.tenant_access'::text, true) = 'true'::text) OR ((access_entity <> ALL ('{__TENANT__,__TENANT_RESTRICTED__}'::text[])) AND (access_entity = current_setting('finai.entity_id'::text, true)))) AND g8_can_read_version(tenant_id, version_id))"
+            },
+            {
+              "Node Type": "Index Scan",
+              "Parent Relationship": "Inner",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Scan Direction": "Forward",
+              "Index Name": "canonical_identities_pkey",
+              "Relation Name": "canonical_identities",
+              "Alias": "i",
+              "Startup Cost": 0.29,
+              "Total Cost": 8.41,
+              "Plan Rows": 1,
+              "Plan Width": 82,
+              "Disabled": false,
+              "Index Cond": "((tenant_id = '805d8a32-d12b-4268-a236-b0b16e59da9f'::uuid) AND (resource_id = v.resource_id))",
+              "Filter": "(((tenant_id)::text = current_setting('finai.tenant_id'::text, true)) AND ((access_entity = '__PLATFORM__'::text) OR (current_setting('finai.tenant_access'::text, true) = 'true'::text) OR ((access_entity <> ALL ('{__TENANT__,__TENANT_RESTRICTED__}'::text[])) AND (access_entity = current_setting('finai.entity_id'::text, true)))) AND g8_can_read_identity(tenant_id, resource_id))"
+            }
+          ]
+        },
+        {
+          "Node Type": "Hash",
+          "Parent Relationship": "Inner",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Startup Cost": 1.0,
+          "Total Cost": 1.0,
+          "Plan Rows": 100,
+          "Plan Width": 32,
+          "Disabled": false,
+          "Plans": [
+            {
+              "Node Type": "Function Scan",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Function Name": "jsonb_array_elements",
+              "Alias": "o",
+              "Startup Cost": 0.0,
+              "Total Cost": 1.0,
+              "Plan Rows": 100,
+              "Plan Width": 32,
+              "Disabled": false
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

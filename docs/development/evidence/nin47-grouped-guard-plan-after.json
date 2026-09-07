@@ -1,0 +1,20 @@
+[
+  {
+    "Plan": {
+      "Node Type": "Index Scan",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Scan Direction": "Forward",
+      "Index Name": "resource_history",
+      "Relation Name": "resource_versions",
+      "Alias": "resource_versions",
+      "Startup Cost": 0.29,
+      "Total Cost": 8.58,
+      "Plan Rows": 1,
+      "Plan Width": 970,
+      "Disabled": false,
+      "Index Cond": "((tenant_id = '805d8a32-d12b-4268-a236-b0b16e59da9f'::uuid) AND (resource_id = 'bb3f5efc-459e-5c46-999b-f50329285136'::uuid))",
+      "Filter": "((version_id = 'b0bdd101-21fa-54fb-8ebd-e43650e3b0c2'::uuid) AND ((tenant_id)::text = current_setting('finai.tenant_id'::text, true)) AND ((access_entity = '__PLATFORM__'::text) OR (current_setting('finai.tenant_access'::text, true) = 'true'::text) OR ((access_entity <> ALL ('{__TENANT__,__TENANT_RESTRICTED__}'::text[])) AND (access_entity = current_setting('finai.entity_id'::text, true)))) AND g8_can_read_version(tenant_id, version_id))"
+    }
+  }
+]
