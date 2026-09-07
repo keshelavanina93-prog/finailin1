@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "runtime": "http://127.0.0.1:3062",
+  "implementation": [
+    "f9f7bd7",
+    "9260df0"
+  ],
+  "invocation": "c631bb9c-f92e-5dd9-a693-233c1b3b7925",
+  "receipt": "1cb82d90e0945947feb5aee646d8dc3ce076a4c2311b4b2eea17a41dfe2350d7",
+  "ordinary_history_rows": 20,
+  "worksheet_accounts": 37,
+  "retained_posting_groups": 59,
+  "coverage": {
+    "included": 595,
+    "excluded": "Base!S288",
+    "retained": 596
+  },
+  "exact_amount": "58988.95",
+  "source_cell": {
+    "value": "731.97",
+    "coordinate": "Base!S2"
+  },
+  "source_contributors": 6,
+  "desktop": {
+    "row_height": 45,
+    "width": 1440,
+    "height": 1000
+  },
+  "focus": {
+    "focus": "7310.02.1 debit 58,988.95, 6 source rows",
+    "dialogOpen": false,
+    "selected": "7310.02.1\nКоммерческие расходы в организациях, осуществляющих производственную деятельность (по деятельности, не облагаемой ЕНВД)\n\t\n58,988.95\n6 rows ↗\n\t—",
+    "scroll": 1218
+  },
+  "return": {
+    "returnedSelection": "7310.02.1",
+    "returnedScroll": 1218,
+    "rows": 37,
+    "invocation": "c631bb9c-f92e-5dd9-a693-233c1b3b7925"
+  },
+  "narrow": {
+    "text": "RETAINED SOURCE EVIDENCE\n\nExcluded source rows\n\nReport- January 2025.xlsx · GEL\n\nClose ×\n\nThe posted amount is missing or is not a literal source number. No supplementary value or zero was substituted.\n\nBase!S288: no literal posted amount.\n\nBase!288 · 2025-01-31 · Корректировка долга SEG00000011 from 31.01.2025 23:45:38\n1–1 of 1 source rows\nPrevious source rows\nNext source rows",
+    "modal": true,
+    "bounds": {
+      "left": 26,
+      "right": 805
+    },
+    "viewport": 820
+  },
+  "verification": {
+    "focused_tests": 4,
+    "new_calculation_run": false,
+    "production_build": "PASS",
+    "full_product_acceptance": false
+  }
+}

@@ -133,3 +133,29 @@ rendering is not accepted. The next shared prerequisite is reviewed source-famil
 and snapshot compatibility. A scoped inventory established no eligible later SEG
 posting snapshot; synthetic compatibility checks cannot substitute for an authentic
 paired-source comparison, and withdrawn January 2026 remains excluded.
+
+## Integrated worksheet refinement
+
+Frontend commits f9f7bd7 and 9260df0 replace the separate posting-side rows with
+37 account rows containing the 59 original debit/credit groups. No absent side is
+filled with zero and no groups are netted. Account labels resolve through the shared
+Object Set query at the retained report times and must match its version/hash pins.
+Two-decimal formatting preserves the original decimal string in the source inspector.
+
+On production port 3062, the ordinary 20-build history reopened the same invocation
+c631bb9c-f92e-5dd9-a693-233c1b3b7925. Account 7310.02.1 displayed 58,988.95;
+the modal retained exact 58988.95, six contributors and Base!S2=731.97. Native Escape
+returned focus to that account's amount button. Data-to-Finance return preserved
+the selected account and internal worksheet scroll of 1218 pixels. Rows measured
+45 pixels on this 1440x1000 runtime. At 820 pixels wide, the source modal stayed
+inside the viewport and showed Base!S288 as missing, with no supplementary/zero substitution.
+
+Four focused handoff/presentation tests and the integrated production build passed.
+The source and worksheet screenshots were visually inspected. This accepts the
+bounded worksheet refinement, not full NIN-25, statement completeness, intelligence
+reasoning, general historical binding resolution or release. The API, worker,
+retained invocation, source binding and source bytes were unchanged by this UI update.
+Evidence: `evidence/nin58-worksheet-integrated-evidence.json` and the corresponding
+worksheet/source/narrow PNG files. The next unblocked implementation has started:
+canonical SourceFamily and SourceSnapshotAdoption contracts, server-derived source
+compatibility, normal proposal/review and a consumer within source accounting context.
