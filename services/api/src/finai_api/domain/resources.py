@@ -12,6 +12,25 @@ from pydantic import (
     model_validator,
 )
 
+from finai_api.domain.function_execution import RetainedResultInput
+from finai_api.domain.object_sets import ObjectSetQuery
+from finai_api.domain.resource_lifecycle import VersionReference
+
+
+class CalculatedBindingProperty(VersionReference):
+    content_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class CalculatedBinding(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    binding: VersionReference
+    input_result: RetainedResultInput
+    receipt_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
+    run_id: str = Field(pattern=r"^fcr_[a-f0-9]{64}$")
+    source: VersionReference
+    properties: list[CalculatedBindingProperty] = Field(min_length=1, max_length=100)
+    query: ObjectSetQuery
+
 
 class ResourceMutation(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -75,6 +94,7 @@ class ResourceProposal(BaseModel):
     restores_versions: dict[UUID, UUID] = Field(default_factory=dict, max_length=100)
     source_versions: dict[UUID, dict[UUID, UUID]] = Field(default_factory=dict, max_length=100)
     request_binding: ProposalRequestBinding | None = None
+    calculated_bindings: dict[UUID, CalculatedBinding] = Field(default_factory=dict, max_length=100)
 
     @model_serializer(mode="wrap")
     def preserve_legacy_proposal(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
@@ -87,6 +107,8 @@ class ResourceProposal(BaseModel):
             payload.pop("source_versions", None)
         if self.request_binding is None:
             payload.pop("request_binding", None)
+        if not self.calculated_bindings:
+            payload.pop("calculated_bindings", None)
         return payload
 
     @model_validator(mode="after")
@@ -94,6 +116,8 @@ class ResourceProposal(BaseModel):
         if len({item.resource_id for item in self.mutations}) != len(self.mutations):
             raise ValueError("A change set may contain only one version per canonical identity")
         mutation_ids = {item.resource_id for item in self.mutations}
+        if not set(self.calculated_bindings).issubset(mutation_ids):
+            raise ValueError("Calculated binding evidence must identify a proposed resource")
         if not set(self.source_versions).issubset(mutation_ids):
             raise ValueError("Source lineage must identify a proposed resource")
         if any(len(versions) > 100 for versions in self.source_versions.values()):

@@ -303,7 +303,18 @@ def _validate(
                 source_item.object_type == "FunctionDefinition"
                 and relation.startswith("FUNCTION_RETAINED_PROPERTY:")
             )
-            if not (exact_query or exact_property or exact_function_input):
+            exact_binding_property = (
+                source_item.object_type == "ObjectBinding"
+                and relation.startswith("BINDING_DERIVED_PROPERTY:")
+            )
+            exact_calculated_binding = (
+                source_item.resource_id in proposal.calculated_bindings
+                and relation.startswith("CALCULATED_BINDING:")
+            )
+            if not (
+                exact_query or exact_property or exact_function_input
+                or exact_binding_property or exact_calculated_binding
+            ):
                 raise WorkspaceError(422, "Exact ontology dependency is not supported here")
             head = _get(conn, tenant, UUID(identifier))
             external_heads[identifier] = str(head["version_id"])
@@ -810,6 +821,17 @@ def _validate(
                 ),
             }
         )
+    from finai_api.services.calculated_bindings import (
+        validate_proposal as validate_calculated_binding,
+    )
+
+    if proposal.calculated_bindings or proposal.source_versions:
+        if proposal.calculated_bindings:
+            conn.execute(
+                "SELECT set_config('finai.exact_scope',%s,true)",
+                (json.dumps(principal.scope.model_dump(mode="json")),),
+            )
+        validate_calculated_binding(principal, proposal, target)
     from finai_api.services.accounting_consumption import validate_accounting_proposal
 
     validate_accounting_proposal(conn, principal, proposal, dependencies)

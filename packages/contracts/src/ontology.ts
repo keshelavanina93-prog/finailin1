@@ -18,6 +18,7 @@ export interface ResourceMutation {
   evidence_class?: string;
 }
 export interface ResourceProposal {
+  calculated_bindings?: Record<string, {binding:{resource_id:string;version_id:string};input_result:{invocation_id:string};receipt_hash:string;run_id:string;source:{resource_id:string;version_id:string};properties:Array<{resource_id:string;version_id:string;content_hash:string}>;query:import("./object-sets").ObjectSetQuery}>;
   request_binding?: {operation: "source-accounting-setup/1"; content_sha256: string} | null;
   source_versions?: Record<string, Record<string, string>>;
   expectations?: Array<{name: string; resource_id: string; attribute_path: string[]; expected: unknown}>;

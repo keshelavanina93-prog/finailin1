@@ -478,6 +478,8 @@ def prepare_binding(
     rationale: str,
     version: UUID | None = None,
     proposal_id: UUID | None = None,
+    *,
+    input_result=None,
 ) -> ResourceProposal:
     resource = definition(principal, identity, version)
     if resource["object_type"] != "ObjectBinding":
@@ -487,12 +489,29 @@ def prepare_binding(
     target = pins.get("FIELD:target_schema_id")
     if not source or not target:
         raise WorkspaceError(409, "Binding schema dependencies are unavailable")
-    result = query_objects(principal, source_query.model_copy(update={"offset": 0, "limit": 100}))
-    if not result.total or result.total > 100:
-        raise WorkspaceError(422, "Select 1-100 source objects for an atomic binding publication")
     spec = resource["attributes"]["definition"]
-    mutations, lineage = [], {}
-    for row in result.objects:
+    from finai_api.services import calculated_bindings
+
+    calculated = bool(calculated_bindings.binding_properties(spec))
+    verified, properties = None, []
+    if calculated:
+        verified, properties = calculated_bindings.resolve(
+            principal, resource, source_query, input_result
+        )
+        objects = verified["objects"]
+    else:
+        if input_result is not None:
+            raise WorkspaceError(422, "Stored-field binding does not consume calculated input")
+        result = query_objects(
+            principal, source_query.model_copy(update={"offset": 0, "limit": 100})
+        )
+        if not result.total or result.total > 100:
+            raise WorkspaceError(
+                422, "Select 1-100 source objects for an atomic binding publication"
+            )
+        objects = result.objects
+    mutations, lineage, metadata = [], {}, {}
+    for row in objects:
         if row["evidence_class"] != "SOURCE_BOUND":
             raise WorkspaceError(
                 422,
@@ -540,6 +559,17 @@ def prepare_binding(
                     409,
                     "Canonical binding target changed type, effective version or master identity",
                 )
+        if verified is not None or not spec["fields"]:
+            display, attrs = calculated_bindings.mapped(
+                spec, row, current, verified["consumed_property_values"] if verified else []
+            )
+        else:
+            display = str(values[spec["display_field"]])[:200]
+            attrs = {
+                field["target_field"]: values[field["source_field"]]
+                for field in spec["fields"]
+                if field["source_field"] in values
+            }
         mutation = ResourceMutation(
             resource_id=object_id,
             expected_version_id=current["version_id"] if current else None,
@@ -547,12 +577,8 @@ def prepare_binding(
             identity_key=current["identity_key"]
             if current
             else source_identity_key(identity, business_key),
-            display_name=str(values[spec["display_field"]])[:200],
-            attributes={
-                field["target_field"]: values[field["source_field"]]
-                for field in spec["fields"]
-                if field["source_field"] in values
-            },
+            display_name=display,
+            attributes=attrs,
             valid_from=datetime.now(UTC),
             evidence_class=row["evidence_class"],
         )
@@ -562,6 +588,10 @@ def prepare_binding(
             resource["resource_id"]: resource["version_id"],
         }
         lineage[object_id][target["resource_id"]] = target["version_id"]
+        if verified is not None:
+            metadata[object_id] = calculated_bindings.evidence(
+                resource, row, source_query, input_result, verified, properties
+            )
     return ResourceProposal(
         proposal_id=proposal_id or uuid4(),
         title="Apply ontology binding: " + resource["display_name"][:160],
@@ -569,6 +599,7 @@ def prepare_binding(
         access_entity=principal.scope.legal_entity_id,
         mutations=mutations,
         source_versions=lineage,
+        calculated_bindings=metadata,
     )
 
 

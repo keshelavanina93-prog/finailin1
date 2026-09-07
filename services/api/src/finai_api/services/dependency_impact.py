@@ -41,7 +41,7 @@ def downstream_impact(
                     "display_name": mutation.display_name,
                     "state": "PROPOSED",
                     "cycle_dependency": any(
-                        not ref["relation"].startswith("BOUND_SOURCE:")
+                        not ref["relation"].startswith(("BOUND_SOURCE:", "CALCULATED_BINDING:"))
                         or ref["version_id"] in proposed_versions
                         for ref in refs
                         if ref["resource_id"] == target
@@ -122,7 +122,8 @@ def _traverse(
                 rows = cursor.execute(
                     "SELECT v.resource_id,v.version_id,v.object_type,"
                     "v.display_name,v.access_entity,"
-                    "bool_or(left(d.relation,13)<>'BOUND_SOURCE:') AS cycle_dependency "
+                    "bool_or(left(d.relation,13)<>'BOUND_SOURCE:' AND "
+                    "left(d.relation,19)<>'CALCULATED_BINDING:') AS cycle_dependency "
                     "FROM resource_dependencies d JOIN resource_versions v "
                     "ON v.tenant_id=d.tenant_id AND v.version_id=d.version_id "
                     "JOIN resource_heads h ON h.tenant_id=v.tenant_id "
@@ -188,7 +189,7 @@ def _traverse(
                         )
                     seen.add(child_id)
                     pending.append((child_id, depth + 1))
-    # Retained source versions are immutable provenance, not live feedback edges.
+    # Retained sources and verified calculation receipts are immutable provenance.
     # Keep them in impact/security traversal; only live or co-proposed dependencies
     # participate in the topology cycle check. A FIELD edge is never exempted.
     edges = {

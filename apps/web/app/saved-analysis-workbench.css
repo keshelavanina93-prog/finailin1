@@ -19,3 +19,6 @@
 .saved-analysis .saved-analysis-table pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 10px; max-height: 280px; overflow: auto; color: #aec5d6; background: #101d2a; font-size: 11px; }
 .saved-analysis-calculated summary { cursor: pointer; color: #b3e5e7; }
 .saved-analysis-calculated summary:focus-visible { outline: 2px solid #6bd3d3; outline-offset: 3px; }
+
+.saved-analysis .retained-binding-action :is(input,select,textarea){background:#111f2d;color:#e0eaf2;border:1px solid #34485b;border-radius:4px;padding:9px;width:100%;min-width:0}.retained-binding-action .saved-analysis-table thead th:nth-child(2){width:27%}.retained-binding-action .saved-analysis-table thead th:last-child{width:42%}
+.retained-binding-action td small{display:block;margin-top:5px;color:var(--g8-muted);font-size:9px;line-height:1.5}

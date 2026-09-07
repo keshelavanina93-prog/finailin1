@@ -7,6 +7,7 @@ from uuid import UUID, uuid4, uuid5
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel, ConfigDict, Field
 
+from finai_api.domain.function_execution import RetainedResultInput
 from finai_api.domain.object_sets import ObjectSetQuery
 from finai_api.domain.resources import ResourceProposal
 from finai_api.security import require_permission
@@ -21,6 +22,7 @@ class BindingAction(BaseModel):
     binding_version_id: UUID
     query: ObjectSetQuery
     rationale: str = Field(min_length=10, max_length=2000)
+    input_result: RetainedResultInput | None = Field(default=None, exclude_if=lambda v: v is None)
 
 
 class LicenceAction(licence_notices.NoticeSelection):
@@ -111,6 +113,7 @@ def invoke(principal, request: BindingAction | LicenceAction):
                     request.rationale,
                     request.binding_version_id,
                     proposal_id,
+                    input_result=request.input_result,
                 )
                 contract = {
                     "kind": "OBJECT_BINDING",

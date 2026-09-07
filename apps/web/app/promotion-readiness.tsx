@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState, type FormEvent} from "react";
 import type {PromotionCheck, ResourceProposalDetail} from "@finai/contracts";
 import {Badge} from "./g8-ui";
+import CalculatedBindingReview from "./calculated-binding-review";
 import JournalProposalReview from "./journal-proposal-review";
 import AccountDimensionPolicyProposalReview from "./account-dimension-policy-proposal-review";
 import PeriodControlProposalReview from "./period-control-proposal-review";
@@ -78,6 +79,7 @@ function PromotionPanel({token,proposalId,onDecision}:Props) {
     </section>}
     {result && <AccountDimensionPolicyProposalReview detail={result.proposal_detail}/>}
     {result && <PeriodControlProposalReview detail={result.proposal_detail}/>}
+    {result && <CalculatedBindingReview detail={result.proposal_detail}/>}
     {result && <JournalProposalReview detail={result.proposal_detail}/>}
     {result && <AccountingSetupProposalReview detail={result.proposal_detail}/>}
     {receipt && <p role="status">{receipt}</p>}

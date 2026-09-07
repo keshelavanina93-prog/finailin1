@@ -100,18 +100,42 @@ class TypeGroupDefinition(Definition):
 
 
 class BindingField(Definition):
-    source_field: str = Field(min_length=1, max_length=128)
+    source_field: str | None = Field(
+        default=None, min_length=1, max_length=128, exclude_if=lambda v: v is None
+    )
+    derived_property: DerivedPropertyReference | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
     target_field: Name
+
+    @model_validator(mode="after")
+    def source_choice(self) -> "BindingField":
+        if (self.source_field is None) == (self.derived_property is None):
+            raise ValueError(
+                "Binding field requires exactly one stored field or calculated property"
+            )
+        return self
 
 
 class BindingDefinition(Definition):
     identity_mode: Literal["SOURCE_KEY", "CANONICAL_REFERENCE"] = "SOURCE_KEY"
     identity_field: str = Field(min_length=1, max_length=128)
-    display_field: str = Field(min_length=1, max_length=128)
-    fields: list[BindingField] = Field(min_length=1, max_length=100)
+    display_field: str | None = Field(
+        default=None, min_length=1, max_length=128, exclude_if=lambda v: v is None
+    )
+    display_property: DerivedPropertyReference | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
+    fields: list[BindingField] = Field(max_length=100)
 
     @model_validator(mode="after")
     def unique_targets(self) -> "BindingDefinition":
+        if (self.display_field is None) == (self.display_property is None):
+            raise ValueError(
+                "Binding display requires exactly one stored field or calculated property"
+            )
+        if not self.fields and self.identity_mode != "CANONICAL_REFERENCE":
+            raise ValueError("Display-only binding requires an existing canonical reference")
         if len({field.target_field for field in self.fields}) != len(self.fields):
             raise ValueError("Binding target fields must be unique")
         return self

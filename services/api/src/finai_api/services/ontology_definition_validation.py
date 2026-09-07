@@ -396,9 +396,9 @@ def validate_definition(
         source_fields = source_schema["attributes"]["fields"]
         target_fields = destination["attributes"]["fields"]
         payload = definition.model_dump()
-        if (
-            payload["identity_field"] not in source_fields
-            or payload["display_field"] not in source_fields
+        if payload["identity_field"] not in source_fields or (
+            payload.get("display_field") is not None
+            and payload["display_field"] not in source_fields
         ):
             raise WorkspaceError(
                 422, "Binding identity and display fields must exist in the source schema"
@@ -415,11 +415,44 @@ def validate_definition(
                     "Canonical binding identity must be a required reference to its target type",
                 )
         mapped = set()
+        from finai_api.services.calculated_bindings import binding_properties
+
+        calculated = {}
+        for ref in binding_properties(payload):
+            prop = target(
+                str(ref.resource_id),
+                source,
+                "BINDING_DERIVED_PROPERTY:" + str(ref.resource_id),
+                str(ref.version_id),
+            )
+            schema_pins = [
+                p for p in prop.get("dependencies", []) if p["relation"] == "FIELD:schema_id"
+            ]
+            if (
+                prop["object_type"] != "DerivedProperty"
+                or len(schema_pins) != 1
+                or str(schema_pins[0]["version_id"]) != str(source_schema["version_id"])
+            ):
+                raise WorkspaceError(
+                    409, "Calculated binding property requires the exact source schema"
+                )
+            calculated[str(ref.resource_id)] = DerivedDefinition.model_validate(
+                prop["attributes"]["definition"]
+            )
+        if (
+            payload.get("display_property")
+            and calculated[str(payload["display_property"]["resource_id"])].result_kind != "text"
+        ):
+            raise WorkspaceError(422, "Calculated display property must return text")
         for binding in payload["fields"]:
             a, b = (
-                source_fields.get(binding["source_field"]),
+                source_fields.get(binding.get("source_field")),
                 target_fields.get(binding["target_field"]),
             )
+            if binding.get("derived_property"):
+                a = {
+                    "kind": calculated[str(binding["derived_property"]["resource_id"])].result_kind
+                }
             if (
                 not a
                 or not b
@@ -428,5 +461,7 @@ def validate_definition(
             ):
                 raise WorkspaceError(422, "Binding fields must have compatible canonical types")
             mapped.add(binding["target_field"])
-        if any(spec["required"] and name not in mapped for name, spec in target_fields.items()):
+        if payload["fields"] and any(
+            spec["required"] and name not in mapped for name, spec in target_fields.items()
+        ):
             raise WorkspaceError(422, "Binding must supply every required target property")
