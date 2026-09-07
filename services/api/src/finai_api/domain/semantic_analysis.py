@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, model_validator
 
-Scalar = StrictStr | StrictInt | StrictBool | None
+type Scalar = StrictStr | StrictInt | StrictBool | None
 
 
 class Model(BaseModel):
@@ -57,7 +57,7 @@ class FieldDefinition(Model):
     kind: Literal[
         "text", "identifier", "reference", "integer", "decimal", "boolean", "date", "datetime"
     ]
-    role: Literal["DIMENSION", "MEASURE"]
+    role: Literal["DIMENSION", "MEASURE", "ATTRIBUTE"]
     unit: str | None = None
     unit_reference: Pin | None = None
     definition: Pin
@@ -92,6 +92,9 @@ class Contributor(Model):
     source_sha256: str | None = None
     sheet: str | None = None
     coordinate: str | None = None
+    basis: Literal["ORIGINAL_SOURCE", "CANONICAL_DEFINITION", "UNAVAILABLE"] = Field(
+        default="ORIGINAL_SOURCE", exclude_if=lambda value: value == "ORIGINAL_SOURCE"
+    )
 
 
 class Selection(Model):
@@ -112,7 +115,7 @@ class Coverage(Model):
 
 
 class Descriptor(Model):
-    contract: Literal["semantic-analysis/1"] = "semantic-analysis/1"
+    contract: Literal["semantic-analysis/1", "semantic-analysis/2"] = "semantic-analysis/1"
     invocation_id: UUID
     receipt_hash: str
     run_id: str
@@ -120,11 +123,14 @@ class Descriptor(Model):
     company: Pin
     company_label: str
     title: str
+    row_noun: Literal["groups", "objects"] = Field(
+        default="groups", exclude_if=lambda value: value == "groups"
+    )
     grain: list[str]
     partition_keys: list[str] = Field(default_factory=list)
     fields: list[FieldDefinition]
-    measure: str
-    visual: Literal["HORIZONTAL_BARS"] = "HORIZONTAL_BARS"
+    measure: str | None
+    visual: Literal["HORIZONTAL_BARS", "NONE"] = "HORIZONTAL_BARS"
     filtering: Literal["RETAINED_GROUP_SELECTION"] = "RETAINED_GROUP_SELECTION"
     grouping: Literal["RETAINED_ROWS_WITHOUT_AGGREGATION"] = "RETAINED_ROWS_WITHOUT_AGGREGATION"
     authority: str
@@ -138,6 +144,23 @@ class Descriptor(Model):
     excluded_evidence: list[Contributor] = Field(default_factory=list, max_length=1000)
     current_use_authorized: Literal[False] = False
     business_effect_authorized: Literal[False] = False
+
+    @model_validator(mode="after")
+    def available_measure(self):
+        measures = [field for field in self.fields if field.role == "MEASURE"]
+        if self.measure is None:
+            if self.contract != "semantic-analysis/2" or self.visual != "NONE" or measures:
+                raise ValueError(
+                    "Measure-free definitions require an explicit table-only descriptor"
+                )
+        elif (
+            self.visual != "HORIZONTAL_BARS"
+            or len(measures) != 1
+            or measures[0].key != self.measure
+            or measures[0].kind not in {"decimal", "integer"}
+        ):
+            raise ValueError("A magnitude visual requires one designated numeric measure")
+        return self
 
 
 class Projection(Model):

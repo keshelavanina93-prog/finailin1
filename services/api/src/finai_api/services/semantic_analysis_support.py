@@ -38,7 +38,7 @@ def field_label(name, spec):
 
 
 def value_options(rows, field):
-    result = {}
+    result: dict[str, Value] = {}
     for row in rows:
         value = row.values[field]
         result.setdefault(digest(value.model_dump(mode="json")), value)
@@ -54,6 +54,7 @@ class Resolver:
         self.cache = {}
         self.dependency_cache = {}
         self.source_cache = {}
+        self.construction_sources = {}
 
     def version(self, reference):
         if isinstance(reference, Pin):
@@ -151,7 +152,7 @@ class Resolver:
                     (self.principal.scope.tenant_id, Jsonb(scope), digest_value),
                 ).fetchall()
             if not matches:
-                self.source_cache[cache_key] = None
+                self.source_cache[cache_key] = self._construction_cells(digest_value, sheet, number)
             elif len(matches) != 1:
                 raise WorkspaceError(409, "Original evidence document is ambiguous")
             else:
@@ -184,13 +185,73 @@ class Resolver:
             "coordinate": coordinate,
             "cells": [
                 {
-                    "label": cell["coordinate"] + " · Original XLS value",
+                    "label": cell["coordinate"] + " · Original worksheet value",
                     "coordinate": cell["coordinate"],
                     "value": str(cell["value"])
                     if isinstance(cell["value"], float)
                     else cell["value"],
-                    "formula": None,
+                    "formula": cell.get("formula"),
                 }
                 for cell in cells
             ],
+        }
+
+    def _construction_cells(self, source_sha256, sheet, number):
+        """Read an existing construction's OOXML bytes through the shared source authority."""
+        from finai_api.services.accounting_source_document import read_source
+        from finai_api.services.function_invocations import _database
+        from finai_api.services.workbook_source import read_workbook
+
+        if source_sha256 not in self.construction_sources:
+            if len(self.construction_sources) >= 8:
+                raise WorkspaceError(422, "Narrow original evidence to at most eight workbooks")
+            with _database(self.principal) as c:
+                retained = c.execute(
+                    "SELECT receipt_id FROM hydration_runs WHERE tenant_id=%s AND exact_scope=%s "
+                    "AND source_sha256=%s ORDER BY ingested_at,receipt_id LIMIT 1",
+                    (
+                        self.principal.scope.tenant_id,
+                        Jsonb(self.principal.scope.model_dump(mode="json")),
+                        source_sha256,
+                    ),
+                ).fetchone()
+            if retained is None:
+                self.construction_sources[source_sha256] = None
+            else:
+                metadata, content = read_source(self.principal, retained["receipt_id"])
+                if (
+                    metadata["source_sha256"] != source_sha256
+                    or sha256(content).hexdigest() != source_sha256
+                ):
+                    raise WorkspaceError(409, "Construction bytes differ from original evidence")
+                if not content.startswith(b"PK"):
+                    self.construction_sources[source_sha256] = None
+                else:
+                    try:
+                        workbook = read_workbook(content)
+                    except ValueError as exc:
+                        raise WorkspaceError(
+                            409, "Original workbook cannot be inspected safely"
+                        ) from exc
+                    self.construction_sources[source_sha256] = (metadata, workbook)
+        retained = self.construction_sources[source_sha256]
+        if retained is None:
+            return None
+        metadata, workbook = retained
+        sheets = [item for item in workbook["sheets"] if item["name"] == sheet]
+        if len(sheets) != 1:
+            raise WorkspaceError(409, "Original worksheet is unavailable or ambiguous")
+        cells = [
+            {
+                "coordinate": sheet + "!" + address,
+                "value": cell["value"],
+                "formula": cell.get("formula"),
+            }
+            for address, cell in sheets[0]["cells"].items()
+            if re.fullmatch(r"[A-Z]+" + number, address)
+        ]
+        return {
+            "document_id": metadata["document_id"],
+            "sha256": source_sha256,
+            "rows": [{"row": int(number), "cells": cells}],
         }

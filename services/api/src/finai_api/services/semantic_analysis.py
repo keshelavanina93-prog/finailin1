@@ -58,6 +58,8 @@ def project(principal, request: ProjectionRequest):
         from finai_api.services.semantic_analysis_posted import build
     elif implementation == "ontology.object-set-derived/v1" and plan.get("group_count"):
         from finai_api.services.semantic_analysis_counts import build
+    elif implementation == "ontology.object-set-derived/v1":
+        from finai_api.services.semantic_analysis_objects import build
     else:
         raise WorkspaceError(
             422,
