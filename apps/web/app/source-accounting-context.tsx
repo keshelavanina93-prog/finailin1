@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
+import SourceAdoptionWorkbench from "./source-adoption-workbench";
 import SourceAccountingSetup from "./source-accounting-setup";
 import PostedMovementReport from "./posted-movement-report";
 import type { PostedFunction } from "./posted-movement-report";
@@ -139,6 +140,7 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
       {profile === "seg_expense_base" && <p>The source amount and annotated Amount have unresolved currency and accounting meanings. Petroleum counterparty labels do not identify the source company.</p>}
       {profile === "seg_expense_base" && context.company_binding?.accepted && <SegAccountObservations canPropose={canPropose} onProposal={onProposal} key={`${documentId}:${sheet}:${companyId}`} token={token} documentId={documentId} sheet={sheet} profile={profile} companyId={companyId} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>}
       {canonicalReady&&<SourceAccountingSetup key={contextKey} token={token} documentId={documentId} sheet={sheet} profile={profile} companyId={companyId} companyName={context.company_binding?.company?.display_name??""} chartId={context.observed.chart_id} chartName={context.chart?.display_name} candidates={context.candidates} canPropose={canPropose} refreshing={busy} onRefresh={()=>void run("inspect")} onProposal={onProposal} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>}
+      {context.binding&&context.company_binding?.accepted&&context.company_binding.company?.resource_id===companyId&&<SourceAdoptionWorkbench key={`${contextKey}:${context.binding.version_id}`} token={token} companyId={companyId} binding={context.binding} sourceLabel={`${sheet} · ${context.observed.observed_from}–${context.observed.observed_through}`} eligible={context.accounting_eligibility?.eligible_for_accounting===true} canPropose={canPropose} onProposal={onProposal} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>}
       <p>Observed scope: {context.scope ? "Published" : "Awaiting publication"}. Reviewed selection: {context.binding ? context.binding.attributes.source_use.toLowerCase().replaceAll("_", " ") : "Not selected"}.</p>
       {context.accounting_eligibility && <div><p><strong>{context.accounting_eligibility.eligible_for_accounting ? "Available for guarded accounting use" : "Accounting use is not available"}</strong> · {context.accounting_eligibility.reason}</p>
         {context.binding && <details><summary>Selection timing</summary><dl><dt>Effective from</dt><dd>{context.accounting_eligibility.effective_from ?? "Unavailable"}</dd><dt>Effective until</dt><dd>{context.accounting_eligibility.effective_to ?? "Open ended"}</dd><dt>Recorded at</dt><dd>{context.accounting_eligibility.known_from ?? "Unavailable"}</dd></dl></details>}

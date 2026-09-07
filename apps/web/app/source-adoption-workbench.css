@@ -1,0 +1,15 @@
+.source-adoption{margin:18px 0;border:1px solid var(--g8-border);border-radius:5px;padding:12px;color:var(--g8-text)}
+.source-adoption>summary{cursor:pointer;font-size:13px;font-weight:600}
+.source-adoption h4{margin:14px 0 6px;font-size:15px}.source-adoption h5{font-size:13px;margin:0 0 12px}
+.source-adoption p{font-size:12px;line-height:1.6;color:var(--g8-muted)}
+.source-adoption button{background:transparent;border:1px solid var(--g8-border);color:var(--g8-text);font-size:12px;font-weight:500;padding:6px 10px;margin:0}
+.source-adoption button:hover{background:var(--g8-raised)}.source-adoption button[aria-pressed=true]{background:#14343b;border-color:#28515a;color:var(--g8-cyan)}
+.source-adoption label{display:grid;gap:6px;font-size:12px;margin:10px 0 6px}.source-adoption input,.source-adoption select,.source-adoption textarea{width:100%;min-width:0;font-size:12px}.source-adoption textarea{min-height:80px}
+.source-adoption fieldset{padding:12px;border:1px solid var(--g8-border);margin:12px 0}.source-adoption legend{font-size:12px;padding:0 5px}
+.source-adoption-search{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.source-adoption-search label{flex:1;min-width:180px;margin:0}.source-adoption-mode,.source-adoption-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.source-adoption-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}.source-adoption-fields p{grid-column:1/-1}
+.source-adoption-comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.source-adoption article{min-width:0;border:1px solid var(--g8-border);padding:12px;border-radius:4px}
+.source-adoption dl{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,2fr);gap:8px;font-size:12px}.source-adoption dt{color:var(--g8-muted)}.source-adoption dd{margin:0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.source-adoption dd small{display:block;margin-top:4px}
+.source-adoption details{margin-top:10px;font-size:12px}.source-adoption pre{max-height:280px;overflow:auto;font-size:10px;white-space:pre-wrap;overflow-wrap:anywhere}.source-adoption-accepted{display:flex;gap:12px;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--g8-border);font-size:12px}
+@container(max-width:650px){.source-adoption-comparison,.source-adoption-fields{grid-template-columns:1fr}.source-adoption-accepted{align-items:start;flex-direction:column}}
+@media(max-width:760px){.source-adoption-comparison,.source-adoption-fields{grid-template-columns:1fr}}
