@@ -1,0 +1,120 @@
+{
+  "contract": "g8-product-candidate-evidence/1",
+  "issues": [
+    "NIN-57",
+    "NIN-58",
+    "NIN-25",
+    "NIN-50"
+  ],
+  "candidate": "c97ad07",
+  "base": "1ce0144",
+  "branch": "development/nin58-finance-entry",
+  "runtime": {
+    "frontend": "http://localhost:3067",
+    "backend": "http://127.0.0.1:8062",
+    "backend_owned_by": "horizontal builder",
+    "original_nin57_candidate": "690f987",
+    "original_nin57_qa_runtime": "http://127.0.0.1:3065",
+    "qa_runtime_untouched": true
+  },
+  "checks": {
+    "typecheck": "PASS",
+    "focused_eslint": "PASS",
+    "finance_query_and_reference_tests": "5 PASS"
+  },
+  "journey": {
+    "authenticated": true,
+    "company_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+    "build_request_id": "d1393555-a1c2-4b0a-b071-d59a1b0a9a92",
+    "invocation_id": "c631bb9c-f92e-5dd9-a693-233c1b3b7925",
+    "receipt_hash": "1cb82d90e0945947feb5aee646d8dc3ce076a4c2311b4b2eea17a41dfe2350d7",
+    "route": [
+      "SEG company",
+      "Data / Builds / exact retained build reference",
+      "Open retained analysis",
+      "Open in Finance",
+      "account 7310.02.1 Debit",
+      "six original contributing rows",
+      "Base!S2 literal 731.97",
+      "same Function system trace and return"
+    ],
+    "second_calculation_invoked": false,
+    "context": {
+      "ledger": "SEG statutory 1C general ledger",
+      "book": "1C reglamented accounting",
+      "period": "January 2025",
+      "currency": "GEL"
+    },
+    "coverage": {
+      "included": 595,
+      "source_rows": 596,
+      "excluded": 1,
+      "excluded_coordinate": "Base!S288",
+      "zero_substituted": false
+    },
+    "account_example": {
+      "account": "7310.02.1",
+      "side": "debit",
+      "value": "58988.95",
+      "contributors": 6
+    },
+    "desktop": [
+      1440,
+      1000
+    ],
+    "narrow": [
+      820,
+      1000
+    ],
+    "trace_return": {
+      "same_company": true,
+      "expanded_source_preserved": true,
+      "known_time_from_retained_query": true
+    }
+  },
+  "limitations": [
+    "History list timed out twice at existing 20-second limit; exact retained build lookup succeeded. Horizontal owns performance investigation.",
+    "Historical binding-version mismatch fails closed; general rendering across later binding changes is not claimed.",
+    "Only supported authentic SEG posted-movement source is exposed by this Finance entry. Full-ledger completeness, statement classification and certification remain unestablished.",
+    "This new consumer was verified in a development runtime. Root production build and independent NIN-50 acceptance remain pending.",
+    "No new browser fault-injection or permission matrix performed for this follow-up; original NIN-57 evidence has separate state checks."
+  ],
+  "acceptance": "CANDIDATE_ONLY_NIN50_REVALIDATION_REQUIRED",
+  "files": [
+    {
+      "name": "nin58-finance-desktop.txt",
+      "sha256": "82924ccdf0dea0bda148903b3bf0de4ef3ed34f5d8653781e59454339b9c5e23",
+      "bytes": 23989
+    },
+    {
+      "name": "nin58-finance-desktop.png",
+      "sha256": "554c3221445c767542d388653afc879820e8483cac23a08cdd0479fc09e966e8",
+      "bytes": 99584
+    },
+    {
+      "name": "nin58-finance-narrow.txt",
+      "sha256": "c734b3950ee8394418d9713af3f10d0ae56690704fc8069c7b85d957f921a11e",
+      "bytes": 23890
+    },
+    {
+      "name": "nin58-finance-narrow.png",
+      "sha256": "795f94a91a69be075a5d596b718d643fbf09c60449aa6ebbba7abbbe79e0afb1",
+      "bytes": 88658
+    },
+    {
+      "name": "nin58-finance-trace.txt",
+      "sha256": "1800acfaef3187e44f89c28632efbea030030029f41a5e9aadc66b2a5fb3d554",
+      "bytes": 73392
+    },
+    {
+      "name": "nin58-finance-account-drill.txt",
+      "sha256": "726662140cc9cfdfe582b2a0731e5df32d523430d8c9bf65179cefd10681cd15",
+      "bytes": 26445
+    },
+    {
+      "name": "nin58-finance-source-narrow.png",
+      "sha256": "d97159a1a444f4280a1183452b06a59512860b40a41a7cc58e83d408294e86d3",
+      "bytes": 104012
+    }
+  ]
+}
