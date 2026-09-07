@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "issue": "NIN-59",
+  "date": "2026-09-07",
+  "browser_runtime": "http://localhost:3062",
+  "browser_build": "24fd9cc",
+  "identity": "existing Local operator",
+  "artifact_root": "D:\\FinAI\\g8-adaptive-workspace\\artifacts\\nin59-browser",
+  "subjects": [
+    {
+      "name": "SEG January posted movements",
+      "invocation": "c631bb9c-f92e-5dd9-a693-233c1b3b7925",
+      "descriptor_sha256": "5a9701895198d03153ea7c306110adb0b4cf969c383dc1b369c554b58985c47e",
+      "observed": {
+        "account": "7310.02.1",
+        "posted_amount_display": "58,988.95 GEL",
+        "contributors": 6,
+        "original_cell": "Base!S2",
+        "original_literal": "731.97",
+        "excluded_cell": "Base!S288",
+        "excluded_display": "No literal value retained",
+        "filter_rows": 1,
+        "total_groups": 59,
+        "selected_grid_rows": 1,
+        "selected_visual_rows": 1,
+        "clear_focus": "returns to originating visual button",
+        "save_clear_reopen": "selected row and Base!S2 restored",
+        "inline_trace_version": "8a981dcc-9401-525a-be80-51f9aaa5a4b9"
+      }
+    },
+    {
+      "name": "SOG source dimension header counts",
+      "invocation": "39bbb1ea-cc53-55f1-b901-cc4675ecb7f2",
+      "descriptor_sha256": "8cee8fa139d7b8dc0b2bd450880b36ef8ae5424322f622030724433247056843",
+      "observed": {
+        "groups": 3,
+        "measure": "Observation counts only",
+        "original_cells": {
+          "TR!AA2": "Department",
+          "TR!Z2": "Budget Article New",
+          "TR!Y2": "Region"
+        },
+        "filter": "Source header = Region",
+        "grouping": "Source header",
+        "filter_groups": 1,
+        "retained_count": 1,
+        "save_clear_reopen": "selected Region and TR!Y2 restored",
+        "fresh_authenticated_deep_link": "same company, invocation, filter, grouping, selected Region and original TR!Y2 restored",
+        "inline_trace": "opened within workspace"
+      }
+    }
+  ],
+  "widths": [
+    1440,
+    820
+  ],
+  "narrow_document_overflow": false,
+  "artifacts": [
+    "seg-selected-desktop.txt",
+    "seg-inline-trace.txt",
+    "seg-excluded.txt",
+    "seg-narrow.png",
+    "seg-exact-descriptor.json",
+    "metadata-department.txt",
+    "metadata-budget.txt",
+    "metadata-region.txt",
+    "metadata-desktop.txt",
+    "metadata-desktop.png",
+    "metadata-inline-trace.txt",
+    "metadata-exact-descriptor.json",
+    "metadata-narrow.png",
+    "metadata-narrow.txt",
+    "metadata-deep-link.txt"
+  ],
+  "defects_found": [
+    "Narrow long labels overlapped adjacent grid cells.",
+    "Restoration status stayed in checking state after success.",
+    "Independent QA disclosed invalid measure/typed value acceptance."
+  ],
+  "successor": {
+    "commit": "39c74f4",
+    "checks": {
+      "typescript": "PASS",
+      "focused_lint": "PASS",
+      "state_regressions_passed": 6
+    },
+    "runtime_recheck": "PENDING_INTEGRATION"
+  },
+  "limitations": [
+    "No independent NIN-50 acceptance claimed.",
+    "Successor guard regressions use disclosed cases, not independent held-out proof.",
+    "Nonzero scroll and browser back/forward action not verified in this pass.",
+    "Successor narrow display and restoration notice require targeted browser recheck.",
+    "Existing retained invocations read only; no new calculation or proposal created."
+  ]
+}
