@@ -6,6 +6,7 @@ import {createOntologyClient} from "@g8/ontology-client";
 import {pairPostingGroups,displayPostedAmount,type PostingGroup} from "./posted-movement-presentation";
 import "./posted-movement-report.css";
 
+import SemanticAnalysisWorkspace from "./semantic-analysis-workspace";
 import {financeReportReference} from "./finance-report-reference";
 
 export type PostedFunction = { resource_id: string; version_id: string; display_name: string };
@@ -105,6 +106,7 @@ export default function PostedMovementReport({ token, contextKey, functions, cur
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(()=>{if(initialInvocationId)void run(undefined,initialInvocationId);},[initialInvocationId,run]);
 
+  if(report && expectedSource) return <SemanticAnalysisWorkspace token={token} companyId={expectedSource.company_id} invocationId={report.invocation_id} onInspect={onInspectFunction}/>;
   return <section className="posted-worksheet" aria-label="Posted account movements">
     <h3>Posted account movements · {saved?.key===contextKey?saved.currency:currency}</h3>
     <p>Amounts as posted in Сумма. VAT is not recalculated. Amount is preserved separately and excluded from totals.</p>
