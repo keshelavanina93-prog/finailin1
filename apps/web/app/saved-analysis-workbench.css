@@ -1,0 +1,13 @@
+.saved-analysis{min-width:0;color:var(--g8-text)}.saved-analysis header p,.saved-analysis footer{font-size:11px;color:var(--g8-muted);line-height:1.6}.saved-analysis-controls{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin:18px 0}.saved-analysis label{display:grid;gap:6px;font-size:11px;min-width:0}.saved-analysis input,.saved-analysis select{width:100%;min-width:0}.saved-analysis-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.saved-analysis details{margin:12px 0;overflow-wrap:anywhere}.saved-analysis-table{overflow:auto;max-height:500px}.saved-analysis table{width:100%;font-size:11px;border-collapse:collapse}.saved-analysis th,.saved-analysis td{padding:12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--g8-border)}.saved-analysis th small{display:block;color:var(--g8-muted);font-weight:400}.saved-analysis td button{margin:2px 4px 2px 0}.saved-analysis footer{border-top:1px solid var(--g8-border);padding-top:14px;margin-top:18px}@container(max-width:800px){.saved-analysis-controls{grid-template-columns:1fr}}
+/* Keep the complete evidence row visible in the analyst split pane. */
+.saved-analysis-table{width:100%;min-width:0;overflow-x:hidden;overflow-y:auto;scrollbar-gutter:stable}
+.saved-analysis-table table{table-layout:fixed;min-width:0;max-width:100%}
+.saved-analysis-table th,.saved-analysis-table td{white-space:normal;overflow-wrap:anywhere;word-break:normal;min-width:0;padding:10px;line-height:1.5}
+.saved-analysis-table thead th:first-child{width:31%}
+.saved-analysis-table thead th:nth-child(2){width:47%}
+.saved-analysis-table thead th:last-child{width:22%}
+.saved-analysis-table tbody th{position:static;text-transform:none;letter-spacing:normal;font-size:11px;font-weight:500;color:var(--g8-text);background:transparent}
+.saved-analysis-table tbody th small{font-size:9px;margin-top:5px;line-height:1.5}
+.saved-analysis-table td p{margin:0 0 7px}
+.saved-analysis-table td button{display:block;width:100%;max-width:100%;white-space:normal;padding:7px 6px;margin:0 0 6px;font-size:10px}
+@container(max-width:500px){.saved-analysis-table th,.saved-analysis-table td{padding:7px 5px}.saved-analysis-table thead th:first-child{width:30%}.saved-analysis-table thead th:nth-child(2){width:44%}.saved-analysis-table thead th:last-child{width:26%}}

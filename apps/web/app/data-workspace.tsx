@@ -1,11 +1,12 @@
 "use client";
 
 import {useEffect,useId,useRef,useState,type KeyboardEvent,type ReactNode} from "react";
-import {Archive,ClockCounterClockwise,Files,Plus} from "@phosphor-icons/react";
+import {Archive,ClockCounterClockwise,Files,Plus,Function as FunctionIcon} from "@phosphor-icons/react";
 import "./data-workspace.css";
 
-type Section = "history"|"sources"|"documents";
+type Section = "history"|"sources"|"documents"|"analyses";
 const sections = [
+ {id:"analyses",label:"Saved analyses",icon:FunctionIcon,description:"Run a reviewed evidence analysis with exact definitions, source versions and time cutoffs."},
  {id:"history",label:"Resources & history",icon:ClockCounterClockwise,description:"Find recorded company resources, then inspect their exact version, dependencies and evidence."},
  {id:"sources",label:"Retained sources",icon:Archive,description:"Inspect retained source records and their interpretation, with the original evidence in reach."},
  {id:"documents",label:"Evidence documents",icon:Files,description:"Review company-linked documents and their retained source evidence."},
@@ -14,14 +15,14 @@ const sections = [
 function restoredSection(key:string):Section {
  try {
   const saved=sessionStorage.getItem(key);
-  if(saved==="history"||saved==="sources"||saved==="documents")return saved;
+  if(saved==="history"||saved==="sources"||saved==="documents"||saved==="analyses")return saved;
  } catch {/* Navigation works when session storage is unavailable. */}
  return "history";
 }
 
 /** Parent keys this workbench by identity and company context. Only a section name is persisted. */
-export default function DataWorkspace({companyName,viewStateKey,history,sources,documents,onIntake,observedSourceCount,initialSourceId,sourceSelectionKey=0}: {
- companyName:string;viewStateKey:string;history:ReactNode;sources:ReactNode;documents:ReactNode;
+export default function DataWorkspace({companyName,viewStateKey,history,sources,documents,savedAnalyses,onIntake,observedSourceCount,initialSourceId,sourceSelectionKey=0}: {
+ companyName:string;viewStateKey:string;history:ReactNode;sources:ReactNode;documents:ReactNode;savedAnalyses:ReactNode;
  onIntake:()=>void;observedSourceCount?:number;initialSourceId?:string;sourceSelectionKey?:number;
 }) {
  const incomingSelection=initialSourceId?`${initialSourceId}:${sourceSelectionKey}`:undefined;
@@ -51,7 +52,7 @@ export default function DataWorkspace({companyName,viewStateKey,history,sources,
   event.preventDefault();select(sections[target].id);tabs.current[target]?.focus();
  }
  const active=sections.find(item=>item.id===section)!;
- const panels={history,sources,documents};
+ const panels={history,sources,documents,analyses:savedAnalyses};
  const count=typeof observedSourceCount==="number"&&Number.isSafeInteger(observedSourceCount)&&observedSourceCount>=0?observedSourceCount:null;
  return <section className="dataws" aria-label="Data workspace">
   <header className="dataws-header"><div><p className="dataws-eyebrow">DATA WORKSPACE</p><h2>Resources, history & evidence</h2><p>Follow a business resource to the evidence behind it.</p></div><button className="dataws-intake" onClick={onIntake}><Plus size={14} aria-hidden="true"/>Retain a source</button></header>

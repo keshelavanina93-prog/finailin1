@@ -450,6 +450,10 @@ def _validate(
             from finai_api.services.ontology_definition_validation import validate_definition
 
             validate_definition(item, schema_by_name, link_by_name, target)
+            if item.object_type == "FunctionDefinition":
+                from finai_api.services.function_execution import validate_function
+
+                validate_function(item, target)
             if item.object_type == "RetentionPolicy":
                 from finai_api.services.artifact_retention import validate_policy
 
