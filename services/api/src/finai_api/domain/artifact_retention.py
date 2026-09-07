@@ -1,9 +1,10 @@
 """Exact existing artifact references and reviewed retention conditions."""
 
+from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from finai_api.domain.resource_lifecycle import VersionReference
 
@@ -76,3 +77,21 @@ class RetentionEvaluationRequest(FrozenModel):
     artifact: ArtifactReference
     policy: VersionReference | None = None
     requested_action: Action = "PRESERVE"
+
+
+class RetentionHistoryCursor(FrozenModel):
+    recorded_at: datetime
+    evaluation_id: UUID
+
+    @field_validator("recorded_at")
+    @classmethod
+    def aware_time(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("History cursor timestamp must include a timezone")
+        return value
+
+
+class RetentionHistoryRequest(FrozenModel):
+    artifact: ArtifactReference
+    limit: int = Field(default=20, ge=1, le=50)
+    before: RetentionHistoryCursor | None = None

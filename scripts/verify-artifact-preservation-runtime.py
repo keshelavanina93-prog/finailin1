@@ -23,6 +23,7 @@ def main() -> None:
             "docs/development/evidence/nin27-artifact-preservation-runtime.json"
         ),
     )
+    parser.add_argument("--check-history", action="store_true")
     args = parser.parse_args()
     token = next(
         key
@@ -70,6 +71,31 @@ def main() -> None:
         final = client.post("/inspect", json={"artifact": artifact})
         final.raise_for_status()
         assert final.json() == original
+        if args.check_history:
+            page = client.post("/history", json={"artifact": artifact, "limit": 1})
+            page.raise_for_status()
+            first = page.json()
+            assert first["current_use_authorized"] is False
+            assert len(first["items"]) == 1
+            assert first["next_cursor"] is not None
+            older = client.post(
+                "/history",
+                json={
+                    "artifact": artifact,
+                    "limit": 1,
+                    "before": first["next_cursor"],
+                },
+            )
+            older.raise_for_status()
+            second = older.json()
+            assert len(second["items"]) == 1
+            assert (
+                first["items"][0]["evaluation_id"]
+                != second["items"][0]["evaluation_id"]
+            )
+            for row in first["items"] + second["items"]:
+                assert row["proof"]["artifact"] == original["artifact"]
+                assert row["current_use_authorized"] is False
     args.output.write_text(
         json.dumps(
             {
@@ -79,6 +105,7 @@ def main() -> None:
                 "repeat_and_history_equal": True,
                 "source_still_readable_and_hash_unchanged": True,
                 "disposition_executed": False,
+                "artifact_history_pages_checked": args.check_history,
                 "legal_compliance_established": False,
             },
             indent=2,

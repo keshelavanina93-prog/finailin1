@@ -9,7 +9,11 @@ from uuid import UUID
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from finai_api.domain.artifact_retention import RetentionEvaluationRequest, RetentionPolicy
+from finai_api.domain.artifact_retention import (
+    RetentionEvaluationRequest,
+    RetentionHistoryRequest,
+    RetentionPolicy,
+)
 from finai_api.domain.authority import canonical_sha256
 from finai_api.domain.resources import ResourceMutation
 from finai_api.domain.review import Principal
@@ -167,3 +171,39 @@ def history(p: Principal, evaluation_id: UUID) -> dict:
         if row is None:
             raise WorkspaceError(404, "Retention evaluation unavailable in exact context")
         return _envelope(row)
+
+
+def artifact_history(p: Principal, request: RetentionHistoryRequest) -> dict:
+    """Read retained proof by exact artifact; current bytes and policy are not dependencies."""
+    require_permission(p, "ontology_read")
+    scope = p.scope.model_dump(mode="json")
+    query = (
+        "SELECT * FROM artifact_retention_evaluations WHERE tenant_id=%s AND exact_scope=%s "
+        "AND payload->'artifact'->'reference'=%s "
+    )
+    params: list[Any] = [
+        p.scope.tenant_id,
+        Jsonb(scope),
+        Jsonb(request.artifact.model_dump(mode="json")),
+    ]
+    if request.before:
+        query += "AND (recorded_at,evaluation_id)<(%s,%s) "
+        params.extend([request.before.recorded_at, request.before.evaluation_id])
+    query += "ORDER BY recorded_at DESC,evaluation_id DESC LIMIT %s"
+    params.append(request.limit + 1)
+    with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
+        conn.execute("SELECT set_config('finai.exact_scope',%s,true)", (json.dumps(scope),))
+        rows = c.execute(query, params).fetchall()
+    page = rows[: request.limit]
+    next_cursor = None
+    if len(rows) > request.limit:
+        last = page[-1]
+        next_cursor = {
+            "recorded_at": last["recorded_at"].isoformat(),
+            "evaluation_id": str(last["evaluation_id"]),
+        }
+    return {
+        "items": [_envelope(row) for row in page],
+        "next_cursor": next_cursor,
+        "current_use_authorized": False,
+    }

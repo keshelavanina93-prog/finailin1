@@ -4,12 +4,13 @@ import {useEffect,useRef,useState} from "react";
 type ArtifactReference={kind:"SOURCE_RECEIPT";receipt_id:string}|{kind:"SOURCE_DOCUMENT";document_id:string};
 type Artifact={reference:ArtifactReference;artifact_class:string;content_hash:string;exact_scope:Record<string,unknown>;recorded_at:string;authority_scope:string};
 type Inspection={artifact:Artifact;execution_authorized:false;legal_compliance_established:false};
-type Evaluation={evaluation_id:string;proof_hash:string;recorded_at:string;execution_authorized:false;current_use_authorized:false;proof:{artifact:Artifact;status:string;reasons:string[];effective_disposition:"PRESERVE";requested_action:"PRESERVE";purpose:"DISPOSITION_EVALUATION_ONLY";legal_compliance_established:false}};
+type Evaluation={evaluation_id:string;proof_hash:string;recorded_at:string;execution_authorized:false;current_use_authorized:false;proof:{artifact:Artifact;status:string;reasons:string[];effective_disposition:"PRESERVE";requested_action:"PRESERVE"|"DELETE"|"ARCHIVE";purpose:"DISPOSITION_EVALUATION_ONLY";legal_compliance_established:false}};
 type Props={token:string;artifact:ArtifactReference;canRecord:boolean};
 const human=(text:string)=>text.toLowerCase().replaceAll("_"," ");
 const same=(a:ArtifactReference,b:ArtifactReference)=>a.kind===b.kind&&(a.kind==="SOURCE_RECEIPT"&&b.kind==="SOURCE_RECEIPT"?a.receipt_id===b.receipt_id:a.kind==="SOURCE_DOCUMENT"&&b.kind==="SOURCE_DOCUMENT"&&a.document_id===b.document_id);
 export default function ArtifactPreservation(props:Props){return <Preservation key={JSON.stringify([props.token,props.artifact])} {...props}/>;}
 function Preservation({token,artifact,canRecord}:Props){
+ const [historyRevision,setHistoryRevision]=useState(0);
  const [open,setOpen]=useState(false);const [revision,setRevision]=useState(0);const [inspection,setInspection]=useState<Inspection|null>(null);const [error,setError]=useState("");const [loading,setLoading]=useState(false);
  const [evaluation,setEvaluation]=useState<Evaluation|null>(null);const [recording,setRecording]=useState(false);const [recordError,setRecordError]=useState("");
  const requestId=useRef<string|null>(null);const recordRequest=useRef<AbortController|null>(null);
@@ -32,7 +33,7 @@ function Preservation({token,artifact,canRecord}:Props){
    const response=await fetch("/api/ontology/retention/evaluations",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({artifact,requested_action:"PRESERVE",request_id:requestId.current}),signal:controller.signal});
    if(!response.ok)throw new Error("The preservation assessment could not be confirmed. Retry uses the same request reference.");const data:Evaluation=await response.json();
    if(data.evaluation_id!==requestId.current||!same(data.proof.artifact.reference,artifact)||data.proof.artifact.content_hash!==inspection.artifact.content_hash||data.proof.purpose!=="DISPOSITION_EVALUATION_ONLY"||data.proof.requested_action!=="PRESERVE"||data.proof.effective_disposition!=="PRESERVE"||data.execution_authorized!==false||data.current_use_authorized!==false||data.proof.legal_compliance_established!==false)throw new Error("The assessment did not match this retained source and preservation request.");
-   if(recordRequest.current===controller&&!controller.signal.aborted)setEvaluation(data);
+   if(recordRequest.current===controller&&!controller.signal.aborted){setEvaluation(data);setHistoryRevision(value=>value+1);}
   }catch(failure){if(recordRequest.current===controller)setRecordError(controller.signal.aborted?"The response timed out; the assessment may have been recorded. Retry safely uses the same request reference.":failure instanceof Error?failure.message:"Assessment unavailable");}
   finally{clearTimeout(timer);if(recordRequest.current===controller)setRecording(false);}
  }
@@ -44,5 +45,35 @@ function Preservation({token,artifact,canRecord}:Props){
   {recordError&&<p role="alert">{recordError}</p>}
   <p>This is retained assessment evidence. It does not execute storage changes, establish legal compliance or confer financial authority.</p>
   <button type="button" disabled={loading||recording} onClick={()=>setRevision(value=>value+1)}>Refresh metadata</button>{canRecord&&<button type="button" disabled={!inspection||loading||recording||Boolean(evaluation)} onClick={()=>void record()}>{recording?"Recording assessment…":recordError?"Retry preservation check":"Record preservation check"}</button>}
+  <PreservationHistory token={token} artifact={artifact} revision={historyRevision}/>
  </section>}</details>;
+}
+
+type HistoryCursor={recorded_at:string;evaluation_id:string};
+type HistoryPage={items:Evaluation[];next_cursor:HistoryCursor|null;current_use_authorized:false};
+function PreservationHistory({token,artifact,revision}:{token:string;artifact:ArtifactReference;revision:number}){
+ const [open,setOpen]=useState(false);
+ return <details onToggle={event=>setOpen(event.currentTarget.open)}><summary>Recorded preservation history</summary>{open&&<HistoryRecords key={revision} token={token} artifact={artifact}/>}</details>;
+}
+function HistoryRecords({token,artifact}:{token:string;artifact:ArtifactReference}){
+ const [items,setItems]=useState<Evaluation[]>([]);const [next,setNext]=useState<HistoryCursor|null>(null);const [before,setBefore]=useState<HistoryCursor|null>(null);const [revision,setRevision]=useState(0);const [loading,setLoading]=useState(true);const [error,setError]=useState("");
+ const reference=JSON.stringify(artifact);const cursor=before?JSON.stringify(before):null;
+ useEffect(()=>{
+  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),20000);let disposed=false;
+  async function load(){setLoading(true);setError("");try{
+   const response=await fetch("/api/ontology/retention/history",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({artifact:JSON.parse(reference),limit:20,...(cursor?{before:JSON.parse(cursor)}:{})}),signal:controller.signal,cache:"no-store"});
+   if(!response.ok)throw new Error("Retained assessment history is unavailable for this source.");
+   const data:HistoryPage=await response.json();
+   if(data.current_use_authorized!==false||!Array.isArray(data.items)||data.items.length>20||data.items.some(item=>!same(item.proof.artifact.reference,JSON.parse(reference))||item.proof.purpose!=="DISPOSITION_EVALUATION_ONLY"||item.execution_authorized!==false||item.current_use_authorized!==false)||data.next_cursor&&(!Number.isFinite(Date.parse(data.next_cursor.recorded_at))||!data.next_cursor.evaluation_id||JSON.stringify(data.next_cursor)===cursor))throw new Error("Retained history did not match this source or its page boundary.");
+   if(!disposed){setItems(previous=>Array.from(new Map([...(cursor?previous:[]),...data.items].map(item=>[item.evaluation_id,item])).values()));setNext(data.next_cursor);}
+  }catch(failure){if(!disposed)setError(controller.signal.aborted?"History lookup timed out. Retry this page.":failure instanceof Error?failure.message:"History unavailable");}
+  finally{clearTimeout(timer);if(!disposed)setLoading(false);}}
+  void load();return()=>{disposed=true;clearTimeout(timer);controller.abort();};
+ },[token,reference,cursor,revision]);
+ return <section aria-label="Recorded source preservation assessments"><p>Historical assessments describe what was reviewed then. They do not authorize current use or execute preservation, archive or deletion.</p>
+  {loading&&<p role="status">Loading retained assessments…</p>}{error&&<p role="alert">{error}</p>}
+  {!loading&&!error&&!items.length&&<p>No retained preservation assessments were found for this source in your authorized scope.</p>}
+  {items.map(item=><article key={item.evaluation_id}><h4>{new Date(item.recorded_at).toLocaleString()} · {human(item.proof.requested_action)} requested</h4><p>Assessment: {human(item.proof.status)} · retained disposition: {human(item.proof.effective_disposition)}</p>{item.proof.reasons.map(reason=><p key={reason}>{human(reason)}</p>)}<details><summary>Exact assessment evidence</summary><dl><dt>Assessment</dt><dd>{item.evaluation_id}</dd><dt>Proof hash</dt><dd>{item.proof_hash}</dd><dt>Source content hash</dt><dd>{item.proof.artifact.content_hash}</dd></dl></details></article>)}
+  <p>{items.length} retained assessments loaded.</p><button type="button" disabled={loading} onClick={()=>{setBefore(null);setRevision(value=>value+1);}}>Refresh history</button>{error&&<button type="button" disabled={loading} onClick={()=>setRevision(value=>value+1)}>Retry history page</button>}{next&&!error&&<button type="button" disabled={loading} onClick={()=>setBefore(next)}>Load older assessments</button>}
+ </section>;
 }

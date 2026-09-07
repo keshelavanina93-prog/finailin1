@@ -6,7 +6,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, ConfigDict
 
-from finai_api.domain.artifact_retention import ArtifactReference, RetentionEvaluationRequest
+from finai_api.domain.artifact_retention import (
+    ArtifactReference,
+    RetentionEvaluationRequest,
+    RetentionHistoryRequest,
+)
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal
 from finai_api.services import artifact_retention
@@ -38,3 +42,8 @@ def evaluate(principal: User, request: RetentionEvaluationRequest) -> dict[str, 
 @router.get("/receipts/{evaluation_id}")
 def history(principal: User, evaluation_id: UUID) -> dict[str, Any]:
     return artifact_retention.history(principal, evaluation_id)
+
+
+@router.post("/history")
+def artifact_history(principal: User, request: RetentionHistoryRequest) -> dict[str, Any]:
+    return artifact_retention.artifact_history(principal, request)

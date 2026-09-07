@@ -10,7 +10,7 @@ import pytest
 from psycopg.types.json import Jsonb
 from test_definition_history import DB, item, retained  # noqa: F401
 
-from finai_api.domain.artifact_retention import RetentionEvaluationRequest
+from finai_api.domain.artifact_retention import RetentionEvaluationRequest, RetentionHistoryRequest
 from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.services import artifact_retention as retention
 from finai_api.services import fact_runs, resources
@@ -153,3 +153,65 @@ def test_real_source_document_preserves_bytes_and_server_classification(retained
     assert result["proof"]["artifact"]["artifact_class"] == "IMMUTABLE_SOURCE_EVIDENCE"
     assert result["proof"]["status"] == "BLOCKED"
     assert document_bytes(operator, document["document_id"])[1] == content
+
+
+@DB
+def test_artifact_history_pages_exact_proofs_without_current_artifact_or_policy(
+    retained, monkeypatch
+):
+    from finai_api.services import artifact_references
+
+    reader, publish, policy, request = setup(retained)
+    receipts = [
+        retention.evaluate(reader, request.model_copy(update={"request_id": uuid4()}))
+        for _ in range(5)
+    ]
+    other_run = fact_runs.retain_run(reader, {"synthetic_other_artifact": str(uuid4())})
+    retention.evaluate(
+        reader,
+        RetentionEvaluationRequest(artifact={"kind": "FACT_RUN", "run_id": other_run["run_id"]}),
+    )
+    publish(
+        policy.model_copy(
+            update={
+                "expected_version_id": request.policy.version_id,
+                "authority_state": "REVOKED",
+                "valid_from": datetime.now(UTC) - timedelta(seconds=1),
+            }
+        )
+    )
+
+    def unavailable(*args, **kwargs):
+        raise AssertionError("Historical discovery must not resolve current artifacts or policy")
+
+    monkeypatch.setattr(artifact_references, "resolve_artifact", unavailable)
+    monkeypatch.setattr(retention, "_current", unavailable)
+    page_request = RetentionHistoryRequest(artifact=request.artifact, limit=2)
+    collected = []
+    sizes = []
+    while True:
+        page = retention.artifact_history(reader, page_request)
+        assert page["current_use_authorized"] is False
+        sizes.append(len(page["items"]))
+        collected.extend(page["items"])
+        if page["next_cursor"] is None:
+            break
+        page_request = RetentionHistoryRequest(
+            artifact=request.artifact, limit=2, before=page["next_cursor"]
+        )
+    assert sizes == [2, 2, 1]
+    assert collected == list(reversed(receipts))
+    assert len({row["evaluation_id"] for row in collected}) == 5
+    assert all(
+        row["proof"]["policy"]["reference"] == request.policy.model_dump(mode="json")
+        for row in collected
+    )
+    other_scope = reader.model_copy(
+        update={"scope": reader.scope.model_copy(update={"period": "2025-01"})}
+    )
+    assert (
+        retention.artifact_history(other_scope, RetentionHistoryRequest(artifact=request.artifact))[
+            "items"
+        ]
+        == []
+    )
