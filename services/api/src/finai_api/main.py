@@ -23,6 +23,7 @@ from finai_api.api.reporting_routes import router as reporting_router
 from finai_api.api.retention_routes import router as retention_router
 from finai_api.api.routes import router
 from finai_api.api.runtime_observation_routes import router as runtime_observation_router
+from finai_api.api.source_adoption_routes import router as source_adoption_router
 from finai_api.api.source_document_routes import router as source_document_router
 from finai_api.api.transformation_routes import router as transformation_router
 from finai_api.api.workflow_routes import router as workflow_router
@@ -56,6 +57,7 @@ app.include_router(regulation_router)
 app.include_router(operator_router)
 app.include_router(proposal_queue_router)
 app.include_router(source_document_router)
+app.include_router(source_adoption_router)
 app.include_router(company_context_router)
 app.include_router(company_journal_router)
 app.include_router(period_control_router)

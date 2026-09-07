@@ -264,6 +264,17 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "observed_from": "Date", "observed_through": "Date", "date_basis": "Identifier",
         "coverage_state": "Identifier", "evidence_id": "@SourceEvidence",
     },
+    "SourceFamily": {
+        "company_id": "@LegalEntity", "baseline_binding_id": "@SourceAccountingBinding",
+        "family_key": "Identifier", "source_system": "Identifier",
+        "definition": "OntologyDefinition",
+    },
+    "SourceSnapshotAdoption": {
+        "company_id": "@LegalEntity", "family_id": "@SourceFamily",
+        "predecessor_binding_id": "@SourceAccountingBinding",
+        "successor_binding_id": "@SourceAccountingBinding",
+        "predecessor_adoption_id?": "@SourceSnapshotAdoption", "definition": "OntologyDefinition",
+    },
     "SourceAccountingBinding": {
         "scope_id": "@SourceAccountingScope", "source_use": "Identifier",
         "ledger_id?": "@Ledger", "book_id?": "@AccountingBook",

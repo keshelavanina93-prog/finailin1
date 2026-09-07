@@ -384,6 +384,11 @@ def validate_accounting_proposal(
         "LinkType",
         "SourceAccountingScope",
         "SourceAccountingBinding",
+        # These typed, server-rederived review contracts contain no computed amounts.
+        # Their publication validates every current binding; they grant no sum or
+        # report authority and are not exempted from downstream consumption checks.
+        "SourceFamily",
+        "SourceSnapshotAdoption",
         "SourceJournalMovement",
         "SourceTrialBalanceRow",
         "SourceRecord",
