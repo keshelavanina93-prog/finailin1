@@ -22,13 +22,13 @@ function restoredSection(key:string):Section {
 }
 
 /** Parent keys this workbench by identity and company context. Only a section name is persisted. */
-export default function DataWorkspace({companyName,viewStateKey,history,sources,documents,savedAnalyses,builds,onIntake,observedSourceCount,initialSourceId,sourceSelectionKey=0}: {
+export default function DataWorkspace({companyName,viewStateKey,history,sources,documents,savedAnalyses,builds,onIntake,observedSourceCount,initialSourceId,sourceSelectionKey=0,initialBuildId}: {
  companyName:string;viewStateKey:string;history:ReactNode;sources:ReactNode;documents:ReactNode;savedAnalyses:ReactNode;builds:ReactNode;
- onIntake:()=>void;observedSourceCount?:number;initialSourceId?:string;sourceSelectionKey?:number;
+ onIntake:()=>void;observedSourceCount?:number;initialSourceId?:string;sourceSelectionKey?:number;initialBuildId?:string;
 }) {
  const incomingSelection=initialSourceId?`${initialSourceId}:${sourceSelectionKey}`:undefined;
  const [navigation,setNavigation]=useState(()=>{
-  const section:Section=initialSourceId?"sources":restoredSection(viewStateKey);
+  const section:Section=initialBuildId?"builds":initialSourceId?"sources":restoredSection(viewStateKey);
   return {section,visited:new Set<Section>([section]),sourceSelection:incomingSelection};
  });
  // A new source selection can arrive through NYX while this workspace is mounted.

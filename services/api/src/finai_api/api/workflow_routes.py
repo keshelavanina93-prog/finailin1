@@ -23,6 +23,15 @@ router = APIRouter(prefix="/v1/workspace/workflows", tags=["durable workflows"])
 User = Annotated[Principal, Depends(authenticated_principal)]
 
 
+def require_source_family(record: dict[str, Any]) -> None:
+    if record["definition"].get("version") not in (
+        "report-source-process/1",
+        "report-source-process/2",
+        "report-source-process/3",
+    ):
+        raise WorkspaceError(409, "This endpoint only accepts report-source workflows")
+
+
 async def client() -> Client:
     settings = get_settings()
     try:
@@ -84,6 +93,7 @@ def workbench(principal: User, company_id: UUID | None = None, include_unbound: 
 async def read(identity: str, principal: User) -> dict[str, Any]:
     require_permission(principal, "read")
     result = await asyncio.to_thread(records.read, principal, identity)
+    require_source_family(result)
     result["publications"] = publication.published(result)
     try:
         runtime = await client()
@@ -108,6 +118,7 @@ async def control(identity: str, request: Control, principal: User) -> dict[str,
     require_permission(principal, "read")
     require_permission(principal, "review" if request.command == "complete" else "ingest")
     record = await asyncio.to_thread(records.read, principal, identity)
+    require_source_family(record)
     if request.command == "complete" and record["actor_id"] == principal.actor_id:
         raise WorkspaceError(403, "A different reviewer must acknowledge this source assessment")
     key = "control:" + str(request.idempotency_key)

@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-09-07T02:22:26.201041+00:00",
+  "work_item": {
+    "workflow_id": "transformation:49b1d06c-2607-4e66-b39e-e375631ce003",
+    "family": "build",
+    "title": "SGP source worksheet build",
+    "request_id": "49b1d06c-2607-4e66-b39e-e375631ce003",
+    "transformation": {
+      "version_id": "a20d76ba-5d54-5aa6-864b-ccf31b3b1ef7",
+      "resource_id": "5b45554d-4968-52ed-ad06-d974d6196b08",
+      "content_hash": "75eb1d06de689c332365fe0ca6f5e26e5829925ce2d4f91635976c7312469a7c"
+    },
+    "company_id": null,
+    "created_at": "2026-09-07T05:38:33.110155+04:00",
+    "period": null,
+    "currency": null,
+    "company_binding": "UNBOUND"
+  },
+  "request_id": "49b1d06c-2607-4e66-b39e-e375631ce003",
+  "legacy_control_status": 409,
+  "legacy_control_detail": {
+    "detail": "This endpoint only accepts report-source workflows"
+  },
+  "retained_evidence_unchanged": true,
+  "created_work": false,
+  "financial_authority_established": false
+}

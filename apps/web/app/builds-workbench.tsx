@@ -12,16 +12,30 @@ type WorkUsage={measurement:"POSTGRES_JSONB_TEXT_UTF8_V1";returned_rows:number;d
 type Terminal={node:string;state:string;output?:{invocation_id:string;run_id?:string;receipt_hash:string|null};new_run_required?:boolean;usage?:WorkUsage;cumulative_usage?:WorkUsage;resource_budget?:ResourceBudget};
 type BuildRun={workflow_id:string;current_use_authorized:false;business_effect_authorized:false;request:{compiled_plan:{resource_budget?:ResourceBudget;estimated_work?:{returned_rows:number;derived_evaluations:number};result_bytes_accounting?:string;request:BuildRequest;nodes:Node[];outputs:Array<{output_id:string;node_id:string}>}};definition:{version:string;nodes:Node[]};events:Array<Terminal&{event_id:string;created_at:string;command?:string;reason?:string}>;publications:Array<{publication_id:string;generation:number}>;runtime_status:string;execution?:{state:string;result:Record<string,Terminal>;pause_requested:boolean;cancel_requested:boolean}};
 type Control={command:"pause"|"resume"|"cancel";reason:string;idempotency_key:string};
-type Props={token:string;companyName:string;canControl:boolean;onInspect:(resource:CanonicalResource,knownAt:string)=>void;onTrace:(resource:CanonicalResource,knownAt:string)=>void};
+type Props={initialRequestId?:string;initialTransformation?:Pin;token:string;companyName:string;canControl:boolean;onInspect:(resource:CanonicalResource,knownAt:string)=>void;onTrace:(resource:CanonicalResource,knownAt:string)=>void};
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 const human=(value:string)=>value.toLowerCase().replaceAll("_"," ");
-export default function BuildsWorkbench(props:Props){return <Builds key={props.token} {...props}/>;}
-function Builds({token,companyName,canControl,onInspect,onTrace}:Props){
+export default function BuildsWorkbench(props:Props){return <Builds key={`${props.token}:${props.initialRequestId??"none"}`} {...props}/>;}
+function Builds({token,companyName,canControl,onInspect,onTrace,initialRequestId,initialTransformation}:Props){
  const summaryHeading=useRef<HTMLHeadingElement|null>(null);
  const [historyRevision,setHistoryRevision]=useState(0);
  const [catalog,setCatalog]=useState<Definition[]>([]);const [after,setAfter]=useState<string|null>(null);const [next,setNext]=useState<string|null>(null);const [catalogRevision,setCatalogRevision]=useState(0);const [catalogBusy,setCatalogBusy]=useState(true);const [catalogError,setCatalogError]=useState("");
  const [selected,setSelected]=useState("");const [validAt,setValidAt]=useState(()=>new Date().toISOString());const [knownAt,setKnownAt]=useState(()=>new Date().toISOString());const [frozen,setFrozen]=useState<BuildRequest|null>(null);const [runId,setRunId]=useState("");const [run,setRun]=useState<BuildRun|null>(null);const [busy,setBusy]=useState(false);const [error,setError]=useState("");const [notice,setNotice]=useState("");const [reason,setReason]=useState("");const [pendingControl,setPendingControl]=useState<Control|null>(null);const [outputId,setOutputId]=useState("");const active=useRef<AbortController|null>(null);
  useEffect(()=>()=>{active.current?.abort();active.current=null;},[]);
+ useEffect(()=>{
+  if(!initialRequestId)return;
+  const controller=new AbortController();active.current=controller;const timer=setTimeout(()=>controller.abort(),20000);
+  async function reopen(){setBusy(true);setRunId(initialRequestId!);setError("");try{
+   if(!uuid.test(initialRequestId!))throw new Error("The retained build reference is invalid.");
+   const response=await fetch(`/api/ontology/transformations/runs/${initialRequestId}`,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",signal:controller.signal});
+   if(!response.ok)throw new Error(`Retained build is unavailable (${response.status}).`);
+   const data:BuildRun=await response.json();const request=data.request?.compiled_plan?.request;
+   if(data.workflow_id!==`transformation:${initialRequestId}`||request?.request_id!==initialRequestId||data.current_use_authorized!==false||data.business_effect_authorized!==false||!Array.isArray(data.events)||initialTransformation&&(request.transformation.resource_id!==initialTransformation.resource_id||request.transformation.version_id!==initialTransformation.version_id))throw new Error("Returned evidence did not match the selected build and transformation.");
+   if(active.current===controller&&!controller.signal.aborted)setRun(data);
+  }catch(failure){if(active.current===controller)setError(controller.signal.aborted?"Retained build lookup timed out. Reopen the same reference to retry.":failure instanceof Error?failure.message:"Build unavailable");}
+  finally{clearTimeout(timer);if(active.current===controller)setBusy(false);}}
+  void reopen();return()=>{clearTimeout(timer);controller.abort();if(active.current===controller)active.current=null;};
+ },[token,initialRequestId,initialTransformation]);
  useEffect(()=>{if(run&&summaryHeading.current){summaryHeading.current.scrollIntoView({block:"start"});summaryHeading.current.focus({preventScroll:true});}},[run]);
  useEffect(()=>{const controller=new AbortController();let disposed=false;const timer=setTimeout(()=>controller.abort(),20000);async function load(){setCatalogBusy(true);setCatalogError("");try{const response=await fetch(`/api/ontology/transformations${after?`?after_resource_id=${after}`:""}`,{headers:{Authorization:`Bearer ${token}`},signal:controller.signal,cache:"no-store"});if(!response.ok)throw new Error("Reviewed builds are unavailable.");const data:{items:Definition[];next_cursor:string|null;purpose:string}=await response.json();if(data.purpose!=="EVIDENCE_ANALYSIS_ONLY"||!Array.isArray(data.items)||after&&data.next_cursor===after)throw new Error("Build catalog could not be verified.");if(!disposed){setCatalog(previous=>Array.from(new Map([...(after?previous:[]),...data.items].map(item=>[item.reference.version_id,item])).values()));setNext(data.next_cursor);}}catch(failure){if(!disposed)setCatalogError(controller.signal.aborted?"Build catalog timed out.":failure instanceof Error?failure.message:"Catalog unavailable");}finally{clearTimeout(timer);if(!disposed)setCatalogBusy(false);}}void load();return()=>{disposed=true;clearTimeout(timer);controller.abort();};},[token,after,catalogRevision]);
  async function api<T,>(path:string,signal:AbortSignal,body?:unknown):Promise<T>{const response=await fetch(`/api/ontology/transformations${path}`,{method:body?"POST":"GET",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},signal,cache:"no-store",...(body?{body:JSON.stringify(body)}:{})});if(!response.ok)throw new Error(`Build request could not be confirmed (${response.status}).`);return response.json();}
