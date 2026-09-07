@@ -87,13 +87,17 @@ def main() -> None:
                 )
             )
         else:
-            journal_field = {"JournalEntry": "definition", "JournalLine": "side"}.get(
-                spec["identity_key"]
-            )
+            journal_fields = {
+                "JournalEntry": ("definition", "posting_date"),
+                "JournalLine": ("side",),
+            }.get(spec["identity_key"], ())
+            missing_journal_fields = [
+                field for field in journal_fields
+                if field not in previous["attributes"].get("fields", {})
+            ]
             if (
                 spec["object_type"] == "SchemaDefinition"
-                and journal_field
-                and journal_field not in previous["attributes"]["fields"]
+                and missing_journal_fields
             ):
                 mutations.append(
                     ResourceMutation(
@@ -107,7 +111,10 @@ def main() -> None:
                                 **previous["attributes"],
                                 "fields": {
                                     **previous["attributes"]["fields"],
-                                    journal_field: spec["attributes"]["fields"][journal_field],
+                                    **{
+                                        field: spec["attributes"]["fields"][field]
+                                        for field in missing_journal_fields
+                                    },
                                 },
                             },
                         },

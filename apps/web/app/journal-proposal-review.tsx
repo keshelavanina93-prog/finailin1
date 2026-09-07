@@ -17,6 +17,7 @@ export default function JournalProposalReview({detail}:{detail:ResourceProposalD
   const journalLines=lines.filter(line=>line.attributes.journal_id===journal.resource_id);
   const balance=detail.validation.journal_balances?.find(item=>item.journal_id===journal.resource_id&&item.contract==="balanced-journal/1");
   return <article key={journal.resource_id}><h4>{displayName(journal.display_name)}</h4><p>{text(journal.attributes.reference)??"No journal reference supplied"} · {label(journal.attributes.ledger_id,"Linked ledger")} · {label(journal.attributes.period_id,"Linked fiscal period")}</p>
+   <p><strong>Posting date:</strong> {text(journal.attributes.posting_date)??"Not recorded in this retained journal"}. Posting dates are separate from record effective times.</p>
    {balance?<p className="journal-balance-state"><strong>Balanced in retained validation</strong> · {balance.line_count} lines · {label(balance.currency_id,"Currency identified by retained reference")}</p>:<p role="status">No authoritative journal balance summary was retained for this proposal. No balance status is inferred from its displayed lines.</p>}
    <div className="journal-line-table"><table><thead><tr><th>Proposed line / account</th><th>Debit</th><th>Credit</th><th>Source evidence</th></tr></thead><tbody>{journalLines.map(line=>{
     const amount=record(line.attributes.amount);const side=text(line.attributes.side);const value=text(amount.amount);

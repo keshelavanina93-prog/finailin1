@@ -1,0 +1,28 @@
+{
+  "proposal_id": "0f719315-3b0f-46d8-b863-9e058a69b51d",
+  "decision": "APPROVED",
+  "schema_resource_id": "fc284ca0-6d6b-5ee4-9dc8-6e75f99edcba",
+  "schema_version_id": "cfe2be0a-f120-513b-8bbb-e4034f7e274e",
+  "schema_hash": "e7b9b17a4b38e92e0195431aa6480fa76fcac48160064e452465e12d307f1ed0",
+  "previous_schema_version_id": "30b47112-8c24-5f12-8fa1-01cdb1bce56f",
+  "field": {
+    "kind": "date",
+    "field_id": "d493c56b-b0bc-55d9-a6e2-274ea30b7fa8",
+    "required": false,
+    "deprecated": false,
+    "semantic_id": "d92cec89-c6a3-5d73-9d09-0307d941a00f",
+    "target_type": null
+  },
+  "new_schema_mutations": 1,
+  "historical_backfill_performed": false,
+  "financial_posting_performed": false,
+  "native_positive_accounting_posting_proven": false,
+  "verification": {
+    "focused_validator": "33 checks passed in1.31s; strict dates, parent paths, inclusive boundaries, leap day, changed period",
+    "focused_lint_and_typing": "PASS",
+    "web_production_build": "PASS",
+    "api_restarted": true,
+    "worker_observation": "PROCESS_LIVENESS_ONLY",
+    "release_accepted": false
+  }
+}

@@ -174,6 +174,7 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "group_account_id": "@GroupAccount",
     },
     "JournalEntry": {
+        "posting_date?": "Date",
         "definition?": "OntologyDefinition",
         "accounting_binding_id?": "@SourceAccountingBinding",
         "legal_entity_id": "@LegalEntity",

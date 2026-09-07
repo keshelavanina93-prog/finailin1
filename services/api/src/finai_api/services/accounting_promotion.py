@@ -1,5 +1,7 @@
 """Journal publication must consume a reviewed, current source accounting interpretation."""
 
+import re
+from datetime import date
 from uuid import UUID
 
 from psycopg.rows import dict_row
@@ -8,6 +10,31 @@ from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.services.source_accounting_context import validate_active_selection
 from finai_api.services.upstream_authority import upstream_authority
 from finai_api.services.workspace import WorkspaceError
+
+
+def validate_posting_date(attrs, period):
+    value = attrs.get("posting_date")
+    if not isinstance(value, str) or re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value) is None:
+        raise WorkspaceError(
+            422, "Journal publication requires an explicit posting_date in YYYY-MM-DD format"
+        )
+    try:
+        posting_date = date.fromisoformat(value)
+    except ValueError as exc:
+        raise WorkspaceError(422, "Journal posting_date must be a valid calendar date") from exc
+    try:
+        if period["object_type"] != "FiscalPeriod":
+            raise ValueError("Not a fiscal period")
+        starts = date.fromisoformat(period["attributes"]["starts_on"])
+        ends = date.fromisoformat(period["attributes"]["ends_on"])
+    except (ValueError, KeyError, TypeError) as exc:
+        raise WorkspaceError(
+            422, "Journal requires a reviewed FiscalPeriod with valid date bounds"
+        ) from exc
+    if not starts <= posting_date <= ends:
+        raise WorkspaceError(
+            422, "Journal posting_date must fall within its reviewed fiscal period (inclusive)"
+        )
 
 
 def validate_journal(item, target):
@@ -32,6 +59,7 @@ def validate_journal(item, target):
         config, scope["attributes"], lambda ref: target(ref, key, "ACCOUNTING_CONTEXT:" + ref)
     )
     if item.object_type == "JournalEntry":
+        journal_attrs = attrs
         if any(
             attrs[field] != expected
             for field, expected in {
@@ -45,6 +73,7 @@ def validate_journal(item, target):
             )
     else:
         journal = target(attrs["journal_id"], key, "ACCOUNTING_JOURNAL")
+        journal_attrs = journal["attributes"]
         account = target(attrs["account_id"], key, "ACCOUNTING_ACCOUNT")
         record = target(attrs["source_record_id"], key, "ACCOUNTING_SOURCE_RECORD")
         if (
@@ -60,6 +89,8 @@ def validate_journal(item, target):
             raise WorkspaceError(
                 422, "Journal line account, currency or retained source disagrees with its binding"
             )
+    period = target(config["period_id"], key, "ACCOUNTING_POSTING_PERIOD")
+    validate_posting_date(journal_attrs, period)
     return binding
 
 

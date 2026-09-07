@@ -23,6 +23,7 @@ def journal_fixture():
     scope = nodes[config["scope_id"]]["attributes"]
     entry_id, account_id, record_id = [str(uuid4()) for _ in range(3)]
     entry = {
+        "posting_date": "2026-01-15",
         "accounting_binding_id": str(binding_key[0]),
         "legal_entity_id": scope["legal_entity_id"],
         "ledger_id": config["ledger_id"],
@@ -63,6 +64,48 @@ def test_compatible_entry_and_line_resolve_shared_binding():
     assert validate_journal(item("JournalLine", line), target) == binding
     assert entry["accounting_binding_id"] in visited
     assert line["source_record_id"] in visited
+
+
+@pytest.mark.parametrize("kind", ["JournalEntry", "JournalLine"])
+@pytest.mark.parametrize(
+    "value",
+    [None, True, "2026-1-15", "2026-01-15T00:00:00Z", "2026-02-30", "2025-12-31", "2026-02-01"],
+)
+def test_posting_date_required_and_inside_exact_period(kind, value):
+    nodes, entry, line, _ = journal_fixture()
+    entry["posting_date"] = value
+    with pytest.raises(WorkspaceError, match="posting_date"):
+        validate_journal(
+            item(kind, entry if kind == "JournalEntry" else line),
+            lambda identity, *_: nodes[identity],
+        )
+
+
+@pytest.mark.parametrize("value", ["2026-01-01", "2026-01-31"])
+def test_posting_period_boundaries_are_inclusive_and_pinned(value):
+    nodes, entry, _, binding = journal_fixture()
+    entry["posting_date"] = value
+    visited = []
+
+    def target(identity, owner, relation):
+        visited.append((identity, relation))
+        return nodes[identity]
+
+    validate_journal(item("JournalEntry", entry), target)
+    assert (binding["attributes"]["period_id"], "ACCOUNTING_POSTING_PERIOD") in visited
+
+
+def test_calendar_leap_day_and_changed_period_are_revalidated():
+    nodes, entry, _, binding = journal_fixture()
+    scope = nodes[binding["attributes"]["scope_id"]]["attributes"]
+    period = nodes[binding["attributes"]["period_id"]]["attributes"]
+    scope.update(observed_from="2024-02-01", observed_through="2024-02-28")
+    period.update(starts_on="2024-02-01", ends_on="2024-02-29")
+    entry["posting_date"] = "2024-02-29"
+    validate_journal(item("JournalEntry", entry), lambda identity, *_: nodes[identity])
+    period["ends_on"] = "2024-02-28"
+    with pytest.raises(WorkspaceError, match="posting_date"):
+        validate_journal(item("JournalEntry", entry), lambda identity, *_: nodes[identity])
 
 
 @pytest.mark.parametrize("field", ["legal_entity_id", "ledger_id", "period_id"])
