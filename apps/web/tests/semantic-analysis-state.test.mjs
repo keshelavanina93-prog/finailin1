@@ -5,8 +5,10 @@ import ts from "typescript";
 const source=await readFile(new URL("../app/semantic-analysis-state.ts",import.meta.url),"utf8");
 const {assertProjection,parseView,requestKey}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
 const id="11111111-1111-4111-8111-111111111111",hash="a".repeat(64),row="row_"+hash,time="2025-01-31T00:00:00Z";
+const pin={resource_id:id,version_id:id,content_hash:hash};
+const field={key:"units",label:"Units",kind:"decimal",role:"MEASURE",aggregation:"RETAINED_VALUE_ONLY",definition:pin,filterable:false,groupable:false,options:[]};
 const request={company_id:id,invocation_id:id,descriptor_sha256:hash,filters:[],group_by:null,selected_row:null,contributor_index:0};
-const projection={descriptor:{contract:"semantic-analysis/1",invocation_id:id,company:{resource_id:id},receipt_hash:hash,valid_at:time,known_at:time,recorded_at:time,current_use_authorized:false,business_effect_authorized:false,visual:"HORIZONTAL_BARS",filtering:"RETAINED_GROUP_SELECTION",grouping:"RETAINED_ROWS_WITHOUT_AGGREGATION",measure:"units",fields:[{key:"units"}]},descriptor_sha256:hash,request,rows:[{key:row,values:{units:{state:"VALUE",value:"9007199254740993.125"}}}],sections:[{label:"all",row_keys:[row]}],selection:null};
+const projection={descriptor:{contract:"semantic-analysis/1",invocation_id:id,company:{resource_id:id},receipt_hash:hash,valid_at:time,known_at:time,recorded_at:time,current_use_authorized:false,business_effect_authorized:false,visual:"HORIZONTAL_BARS",filtering:"RETAINED_GROUP_SELECTION",grouping:"RETAINED_ROWS_WITHOUT_AGGREGATION",measure:"units",fields:[field]},descriptor_sha256:hash,request,total_rows:1,rows:[{key:row,label:"Retained group",trace:pin,contributor_count:1,values:{units:{state:"VALUE",value:"9007199254740993.125",label:null,reference:null}}}],sections:[{label:"all",row_keys:[row]}],selection:null};
 test("projection rejects mixed company, revision, echoed query and stale contributor",()=>{
  assert.doesNotThrow(()=>assertProjection(projection,request));
  for(const change of [{descriptor_sha256:"b".repeat(64)},{request:{...request,group_by:"other"}},{selection:{row_key:row,contributor_index:0}}])assert.throws(()=>assertProjection({...projection,...change},request));
@@ -25,4 +27,21 @@ test("saved preference strips payloads and reauthorizes exact result times",()=>
 test("default wire fields normalize without equating different retained filters",()=>{
  assert.equal(requestKey({company_id:id,invocation_id:id}),requestKey({...request,descriptor_sha256:null}));
  assert.notEqual(requestKey({...request,filters:[{field:"x",state:"NULL",value:null}]}),requestKey({...request,filters:[{field:"x",state:"MISSING",value:null}]}));
+});
+test("disclosed QA regression: a text dimension cannot become the bar measure",()=>{
+ const dimension={...field,key:"source_header",label:"Source header",kind:"text",role:"DIMENSION"};
+ assert.throws(()=>assertProjection({...projection,descriptor:{...projection.descriptor,measure:"source_header",fields:[dimension,field]}},request));
+ assert.throws(()=>assertProjection({...projection,descriptor:{...projection.descriptor,fields:[{...field,kind:"string"}]},rows:[{...projection.rows[0],values:{units:{state:"VALUE",value:"not numeric",label:null,reference:null}}}]},request));
+});
+test("numeric values must retain their declared type and bounded finite scale",()=>{
+ for(const value of [true,1,"not numeric","Infinity","1e400","9".repeat(101),"0."+"0".repeat(101)+"1"]){
+  assert.throws(()=>assertProjection({...projection,rows:[{...projection.rows[0],values:{units:{state:"VALUE",value,label:null,reference:null}}}]},request));
+ }
+ const integer={...projection,descriptor:{...projection.descriptor,fields:[{...field,kind:"integer"}]}};
+ for(const value of ["1",true,1.5,Number.MAX_SAFE_INTEGER+1])assert.throws(()=>assertProjection({...integer,rows:[{...projection.rows[0],values:{units:{state:"VALUE",value,label:null,reference:null}}}]},request));
+ assert.doesNotThrow(()=>assertProjection({...integer,rows:[{...projection.rows[0],values:{units:{state:"VALUE",value:3,label:null,reference:null}}}]},request));
+});
+test("sections cannot repeat or omit retained rows and evidence counts stay bounded",()=>{
+ for(const sections of [[],[{label:"repeat",row_keys:[row,row]}]])assert.throws(()=>assertProjection({...projection,sections},request));
+ for(const contributor_count of [-1,1.5,1001])assert.throws(()=>assertProjection({...projection,rows:[{...projection.rows[0],contributor_count}]},request));
 });
