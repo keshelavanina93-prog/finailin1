@@ -9,7 +9,7 @@ type Props={projection:AnalysisProjection;fields:AnalysisField[];columns:string[
 /** Presentation only: row order, values and groups come from the canonical response. */
 export default function SemanticWorksheet({projection,fields,columns,layout,onLayout,onColumns,scroll,label,onPick}:Props){
  const [top,setTop]=useState(0);const [available,setAvailable]=useState(700);
- useEffect(()=>{const el=scroll.current;if(!el)return;const observer=new ResizeObserver(()=>setAvailable(el.clientWidth));observer.observe(el);return()=>observer.disconnect();},[scroll]);
+ useEffect(()=>{const el=scroll.current;if(!el)return;let previousHeight=el.clientHeight;const observer=new ResizeObserver(()=>{setAvailable(el.clientWidth);const selected=el.querySelector<HTMLElement>("tr[aria-selected=true]");if(selected){const relative=selected.getBoundingClientRect().top-el.getBoundingClientRect().top;if(relative>=0&&relative<previousHeight&&relative+36>el.clientHeight)el.scrollBy({top:relative+36-el.clientHeight});}previousHeight=el.clientHeight;});observer.observe(el);return()=>observer.disconnect();},[scroll]);
  const drag=useRef<{key:string;x:number;width:number}|null>(null);
  const ordered=columns.map(key=>fields.find(field=>field.key===key)).filter((field):field is AnalysisField=>Boolean(field));
  const shown=[...ordered.filter(field=>layout.pinned.includes(field.key)),...ordered.filter(field=>!layout.pinned.includes(field.key))];
