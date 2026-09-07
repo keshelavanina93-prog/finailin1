@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "issues": [
+    "NIN-60",
+    "NIN-59"
+  ],
+  "date": "2026-09-07",
+  "code_commit": "78bdb9e",
+  "worktree": "D:\\FinAI\\g8-adaptive-workspace",
+  "branch": "development/nin59-adaptive-workspace",
+  "contract": "semantic-analysis/2",
+  "implemented": {
+    "mode": "measure:null, visual:NONE, row_noun:objects",
+    "attributes": "exact stored values; decimal strings are not coerced or rounded; no measure/chart inferred",
+    "operations": "same canonical selection/filter/arrange/evidence/trace/saved-reference flow",
+    "evidence_basis": [
+      "ORIGINAL_SOURCE (omitted default preserved)",
+      "CANONICAL_DEFINITION",
+      "UNAVAILABLE"
+    ],
+    "v1": "strict numeric measure guards preserved",
+    "advanced_entry": "invocation-ID reopen form closes after successful retained result"
+  },
+  "checks": {
+    "contracts_build": "PASS",
+    "web_typecheck": "PASS",
+    "focused_eslint": "PASS",
+    "state_tests_passed": 8
+  },
+  "runtime": {
+    "modified": false,
+    "browser_proof": "PENDING_MOUNTED_V2_RUNTIME_AND_AUTHENTIC_INVOCATION"
+  },
+  "limitations": [
+    "No live v2 or independent NIN-50 acceptance claimed.",
+    "Unsafe JSON integer attributes are refused, requiring canonical wire support for exact larger integers.",
+    "Nullable semantic_id does not grant unavailable semantic meaning."
+  ]
+}
