@@ -43,7 +43,7 @@ def check_path(path):
     for part in (path, *path.parents):
         if part.is_symlink() or part.is_junction():
             raise ValueError("Artifact paths cannot traverse reparse points")
-    if path.resolve().drive.upper() != "D:":
+    if os.name == "nt" and path.resolve().drive.upper() != "D:":
         raise ValueError("Artifacts must remain on D:")
 
 

@@ -56,7 +56,18 @@
     "mounted_product_changed": false
   },
   "canonical_ci": {
-    "status": "PENDING_PUSH_AND_GITHUB_RUN"
+    "api": {
+      "errors": 5,
+      "cause": "Windows drive restrictions applied to Linux artifact paths",
+      "skipped": 17,
+      "failed": 11,
+      "coverage_percent": 90.4,
+      "passed": 1117
+    },
+    "sha": "8dbf28a31f29c0d168932648871d8b48f3a6688e",
+    "run_id": 34162995067,
+    "web": "PASS",
+    "status": "FIRST_RUN_PORTABILITY_FAILURE_REPAIR_PENDING"
   },
   "required_checks": {
     "status": "PENDING_CANONICAL_GREEN",
@@ -86,5 +97,13 @@
       "path": ".finai/artifacts/nin61-native-opt-out.log",
       "sha256": "078bd2dc8833cab15d0f58d6165fe41c8befc4cd5ec5617d5fd8d172c972c2eb"
     }
-  ]
+  ],
+  "packaging_followup": {
+    "api_source_changed": false,
+    "windows_affected_tests_passed": 35,
+    "linux_full_gate": "PENDING_PUSH",
+    "windows_d_only_retained": true,
+    "host_policy_checks_passed": 9,
+    "cross_host_symlink_and_containment_guards_retained": true
+  }
 }

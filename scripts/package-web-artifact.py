@@ -3,6 +3,7 @@
 import argparse
 import importlib.util
 import json
+import os
 import re
 import stat
 import tempfile
@@ -34,6 +35,10 @@ def within(path, roots):
 
 
 def resolved_path(path):
+    # Linux build workers use native paths. Windows keeps the D:-only policy
+    # and extended-length form needed by deeply nested package dependencies.
+    if os.name != "nt":
+        return path.resolve(strict=True)
     prefix = "\\\\?\\"
     raw = str(path.absolute())
     if re.match(r"^[A-Za-z]:", raw):
