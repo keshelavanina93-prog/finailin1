@@ -131,7 +131,7 @@ def public_graph(graph):
     }
 
 
-def evaluate_graph(graph, objects):
+def evaluate_graph(graph, objects, *, retained_values=None):
     from decimal import DecimalException, InvalidOperation
 
     from finai_api.services.ontology_definitions import evaluate_expression
@@ -142,6 +142,17 @@ def evaluate_graph(graph, objects):
         for key, n in nodes.items()
     }
     evaluated = {}
+    supplied = {}
+    for value in retained_values or []:
+        key = (
+            value["definition_id"],
+            value["definition_version_id"],
+            value["object_id"],
+            value["object_version_id"],
+        )
+        if key in supplied or key[:2] not in nodes:
+            raise WorkspaceError(409, "Retained calculated input does not match the derived graph")
+        supplied[key] = value
     for obj in objects:
         memo = {}
         invoked = {}
@@ -162,6 +173,20 @@ def evaluate_graph(graph, objects):
                 "kind": model.result_kind,
                 "epistemic_state": "DERIVED",
             }
+            supplied_key = (*key, str(obj["resource_id"]), str(obj["version_id"]))
+            if supplied_key in supplied:
+                seed = supplied[supplied_key]
+                row.update(
+                    value=seed["value"],
+                    status=seed["status"],
+                    source_result=seed["source_result"],
+                    source_fields=[],
+                )
+                if "reason" in seed:
+                    row["reason"] = seed["reason"]
+                invoked[key] = []
+                memo[key] = row
+                return row
             fields = {}
             used = []
 
@@ -240,7 +265,7 @@ def evaluate_graph(graph, objects):
 
                 trace(key)
                 row["dependency_values"] = list(dependencies.values())
-            else:
+            elif "source_result" not in row:
                 row.pop("source_fields")
             evaluated[(key, str(obj["resource_id"]), str(obj["version_id"]))] = row
     return [

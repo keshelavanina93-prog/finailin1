@@ -1,0 +1,2055 @@
+{
+  "phase": "CORRECTION_REPLAY_VERIFIED",
+  "prepared": {
+    "label": {
+      "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+      "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242"
+    },
+    "consumer": {
+      "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+      "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013"
+    },
+    "object_set": {
+      "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+      "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3"
+    },
+    "functions": {
+      "source_label": {
+        "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981",
+        "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef"
+      },
+      "consumed_label": {
+        "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42",
+        "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648"
+      }
+    },
+    "transformation": {
+      "resource_id": "c4faddce-c1bf-5b95-9302-605a0421b36d",
+      "version_id": "2e8dbb4e-7f13-505d-b240-4c6f78376b69"
+    }
+  },
+  "request": {
+    "request_id": "3b560725-39ca-4414-95ef-667e3b225db5",
+    "transformation": {
+      "resource_id": "c4faddce-c1bf-5b95-9302-605a0421b36d",
+      "version_id": "2e8dbb4e-7f13-505d-b240-4c6f78376b69"
+    },
+    "valid_at": "2026-09-07T11:11:17.232005+00:00",
+    "known_at": "2026-09-07T11:11:17.232005+00:00"
+  },
+  "replayed_existing_receipts": true,
+  "checked_at": "2026-09-07T11:16:12.221734+00:00",
+  "result": {
+    "workflow_id": "transformation:3b560725-39ca-4414-95ef-667e3b225db5",
+    "request": {
+      "definition": {
+        "nodes": [
+          {
+            "node_id": "source_label",
+            "function": {
+              "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+              "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981",
+              "content_hash": "b5beddab7bed1744dc94233a7b33edc1841d5257b0bbbe963ca1c8ba2bfa713f"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+                "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981"
+              },
+              "known_at": "2026-09-07T11:11:17.232005Z",
+              "valid_at": "2026-09-07T11:11:17.232005Z",
+              "request_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+                  "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981"
+                },
+                "known_at": "2026-09-07T11:11:17.232005Z",
+                "valid_at": "2026-09-07T11:11:17.232005Z",
+                "request_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+                "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981",
+                "content_hash": "b5beddab7bed1744dc94233a7b33edc1841d5257b0bbbe963ca1c8ba2bfa713f"
+              },
+              "plan_hash": "e91898f55461a1cfe5f69c0cdc0f81080059d33a7186ff97a221a53cea7114c7",
+              "object_set": {
+                "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+                "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+                "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "1838704bb8a01995627bc519fc2b9f02a766a45ba0fa5a8148a54558bf3fa5ea",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [
+                {
+                  "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                  "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                  "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+                }
+              ],
+              "static_dependencies": [
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                },
+                {
+                  "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                  "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                  "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+                },
+                {
+                  "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+                  "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+                  "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+                }
+              ]
+            }
+          },
+          {
+            "node_id": "consumed_label",
+            "function": {
+              "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+              "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42",
+              "content_hash": "a2fbaabfa05b92c9d696e69d2e4f2bbe1d5ddc5071eb03045e5e12333d0fe632"
+            },
+            "depends_on": [
+              "source_label"
+            ],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+                "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42"
+              },
+              "known_at": "2026-09-07T11:11:17.232005Z",
+              "valid_at": "2026-09-07T11:11:17.232005Z",
+              "request_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+              "input_result": {
+                "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+              }
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+                  "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42"
+                },
+                "known_at": "2026-09-07T11:11:17.232005Z",
+                "valid_at": "2026-09-07T11:11:17.232005Z",
+                "request_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+                "input_result": {
+                  "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+                }
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+                "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42",
+                "content_hash": "a2fbaabfa05b92c9d696e69d2e4f2bbe1d5ddc5071eb03045e5e12333d0fe632"
+              },
+              "plan_hash": "142f1c63f61e7a67626fc29ec1258f7400567a961c5fae0db6ae74cfea9b7414",
+              "object_set": {
+                "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+                "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+                "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "derived_graph": {
+                "nodes": [
+                  {
+                    "schema": {
+                      "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                      "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                      "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                    },
+                    "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                    "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                    "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0",
+                    "dependencies": [
+                      {
+                        "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                        "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872"
+                      }
+                    ]
+                  },
+                  {
+                    "schema": {
+                      "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                      "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                      "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                    },
+                    "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                    "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                    "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8",
+                    "dependencies": []
+                  }
+                ],
+                "roots": [
+                  {
+                    "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                    "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                    "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+                  }
+                ]
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "1838704bb8a01995627bc519fc2b9f02a766a45ba0fa5a8148a54558bf3fa5ea",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [
+                {
+                  "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                  "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                  "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+                }
+              ],
+              "retained_properties": [
+                {
+                  "schema": {
+                    "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                    "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                    "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                  },
+                  "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                  "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                  "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+                }
+              ],
+              "static_dependencies": [
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                },
+                {
+                  "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                  "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                  "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+                },
+                {
+                  "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                  "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                  "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+                },
+                {
+                  "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+                  "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+                  "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+                }
+              ]
+            },
+            "input_binding": {
+              "upstream_node_id": "source_label"
+            }
+          }
+        ],
+        "outputs": {
+          "source_label": "function-invocation/1",
+          "consumed_label": "function-invocation/1"
+        },
+        "version": "transformation-functions/1"
+      },
+      "request_hash": "70599454f5170b947c763234209d2ee595adba1e2d9e5a61055f5e5941461d82",
+      "compiled_plan": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "nodes": [
+          {
+            "node_id": "source_label",
+            "function": {
+              "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+              "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981",
+              "content_hash": "b5beddab7bed1744dc94233a7b33edc1841d5257b0bbbe963ca1c8ba2bfa713f"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+                "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981"
+              },
+              "known_at": "2026-09-07T11:11:17.232005Z",
+              "valid_at": "2026-09-07T11:11:17.232005Z",
+              "request_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+                  "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981"
+                },
+                "known_at": "2026-09-07T11:11:17.232005Z",
+                "valid_at": "2026-09-07T11:11:17.232005Z",
+                "request_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+                "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981",
+                "content_hash": "b5beddab7bed1744dc94233a7b33edc1841d5257b0bbbe963ca1c8ba2bfa713f"
+              },
+              "plan_hash": "e91898f55461a1cfe5f69c0cdc0f81080059d33a7186ff97a221a53cea7114c7",
+              "object_set": {
+                "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+                "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+                "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "1838704bb8a01995627bc519fc2b9f02a766a45ba0fa5a8148a54558bf3fa5ea",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [
+                {
+                  "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                  "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                  "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+                }
+              ],
+              "static_dependencies": [
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                },
+                {
+                  "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                  "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                  "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+                },
+                {
+                  "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+                  "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+                  "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+                }
+              ]
+            }
+          },
+          {
+            "node_id": "consumed_label",
+            "function": {
+              "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+              "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42",
+              "content_hash": "a2fbaabfa05b92c9d696e69d2e4f2bbe1d5ddc5071eb03045e5e12333d0fe632"
+            },
+            "depends_on": [
+              "source_label"
+            ],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+                "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42"
+              },
+              "known_at": "2026-09-07T11:11:17.232005Z",
+              "valid_at": "2026-09-07T11:11:17.232005Z",
+              "request_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+              "input_result": {
+                "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+              }
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+                  "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42"
+                },
+                "known_at": "2026-09-07T11:11:17.232005Z",
+                "valid_at": "2026-09-07T11:11:17.232005Z",
+                "request_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+                "input_result": {
+                  "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+                }
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+                "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42",
+                "content_hash": "a2fbaabfa05b92c9d696e69d2e4f2bbe1d5ddc5071eb03045e5e12333d0fe632"
+              },
+              "plan_hash": "142f1c63f61e7a67626fc29ec1258f7400567a961c5fae0db6ae74cfea9b7414",
+              "object_set": {
+                "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+                "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+                "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "derived_graph": {
+                "nodes": [
+                  {
+                    "schema": {
+                      "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                      "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                      "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                    },
+                    "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                    "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                    "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0",
+                    "dependencies": [
+                      {
+                        "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                        "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872"
+                      }
+                    ]
+                  },
+                  {
+                    "schema": {
+                      "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                      "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                      "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                    },
+                    "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                    "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                    "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8",
+                    "dependencies": []
+                  }
+                ],
+                "roots": [
+                  {
+                    "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                    "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                    "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+                  }
+                ]
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "1838704bb8a01995627bc519fc2b9f02a766a45ba0fa5a8148a54558bf3fa5ea",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [
+                {
+                  "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                  "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                  "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+                }
+              ],
+              "retained_properties": [
+                {
+                  "schema": {
+                    "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                    "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                    "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                  },
+                  "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                  "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                  "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+                }
+              ],
+              "static_dependencies": [
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                },
+                {
+                  "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                  "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                  "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+                },
+                {
+                  "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                  "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                  "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+                },
+                {
+                  "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+                  "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+                  "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+                }
+              ]
+            },
+            "input_binding": {
+              "upstream_node_id": "source_label"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "node_id": "source_label",
+            "output_id": "source_label"
+          },
+          {
+            "node_id": "consumed_label",
+            "output_id": "consumed_label"
+          }
+        ],
+        "request": {
+          "known_at": "2026-09-07T11:11:17.232005Z",
+          "valid_at": "2026-09-07T11:11:17.232005Z",
+          "request_id": "3b560725-39ca-4414-95ef-667e3b225db5",
+          "transformation": {
+            "version_id": "2e8dbb4e-7f13-505d-b240-4c6f78376b69",
+            "resource_id": "c4faddce-c1bf-5b95-9302-605a0421b36d"
+          }
+        },
+        "contract": "transformation-plan/1",
+        "coverage": "DECLARED_QUERY_PAGES_ONLY",
+        "plan_hash": "8f73d6574e72557f83684bea469fc34d0ff18a9197cfb037a126c3f2a461e819",
+        "node_order": [
+          "source_label",
+          "consumed_label"
+        ],
+        "exact_scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "estimated_work": {
+          "returned_rows": 2,
+          "derived_evaluations": 2
+        },
+        "transformation": {
+          "version_id": "2e8dbb4e-7f13-505d-b240-4c6f78376b69",
+          "resource_id": "c4faddce-c1bf-5b95-9302-605a0421b36d",
+          "content_hash": "649eb8fa601a48db3b7d7e829829d62fe127139bc1ddcb2b4cce1bc82f77f57e"
+        },
+        "input_semantics": "EXPLICIT_RETAINED_RESULT",
+        "resource_budget": {
+          "max_returned_rows": 2,
+          "max_derived_evaluations": 2,
+          "max_published_result_bytes": 1000000
+        },
+        "dependency_semantics": "COMPLETION_BARRIER_ONLY",
+        "current_use_authorized": false,
+        "result_bytes_accounting": "POSTGRES_JSONB_TEXT_UTF8_V1",
+        "business_effect_authorized": false
+      }
+    },
+    "actor_id": "bootstrap-e9c67bab62119cae3b026aa3",
+    "created_at": "2026-09-07T15:11:18.371951+04:00",
+    "definition": {
+      "nodes": [
+        {
+          "node_id": "source_label",
+          "function": {
+            "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+            "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981",
+            "content_hash": "b5beddab7bed1744dc94233a7b33edc1841d5257b0bbbe963ca1c8ba2bfa713f"
+          },
+          "depends_on": [],
+          "invocation": {
+            "limit": 1,
+            "offset": 0,
+            "function": {
+              "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+              "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981"
+            },
+            "known_at": "2026-09-07T11:11:17.232005Z",
+            "valid_at": "2026-09-07T11:11:17.232005Z",
+            "request_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+          },
+          "function_plan": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "request": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+                "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981"
+              },
+              "known_at": "2026-09-07T11:11:17.232005Z",
+              "valid_at": "2026-09-07T11:11:17.232005Z",
+              "request_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+            },
+            "contract": "function-plan/1",
+            "function": {
+              "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+              "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981",
+              "content_hash": "b5beddab7bed1744dc94233a7b33edc1841d5257b0bbbe963ca1c8ba2bfa713f"
+            },
+            "plan_hash": "e91898f55461a1cfe5f69c0cdc0f81080059d33a7186ff97a221a53cea7114c7",
+            "object_set": {
+              "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+              "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+              "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+            },
+            "exact_scope": {
+              "period": "2026-08",
+              "currency": "GEL",
+              "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+              "legal_entity_id": "entity-ge-001"
+            },
+            "implementation": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+              "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+              "capabilities": {
+                "cdc": false,
+                "read": true,
+                "query": true,
+                "write": false,
+                "delete": false,
+                "limits": {
+                  "coverage": "QUERY_PAGE_ONLY",
+                  "returned_rows": 200,
+                  "grouping_fields": 4,
+                  "traversal_steps": 4,
+                  "query_predicates": 20,
+                  "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                  "derived_properties": 8,
+                  "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                  "database_scan_limit": null
+                },
+                "stream": false,
+                "update": false,
+                "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "reversal": false,
+                "snapshot": true,
+                "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                "simulation": false,
+                "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                "incremental": false,
+                "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                "formula_execution": false,
+                "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                "source_write_exactly_once": false,
+                "grouped_observation_counts": true,
+                "typed_relationship_filters": true,
+                "versioned_interface_inputs": true,
+                "composed_derived_properties": true,
+                "versioned_type_group_inputs": true
+              },
+              "maximum_rows": 200,
+              "dependency_sha256": "1838704bb8a01995627bc519fc2b9f02a766a45ba0fa5a8148a54558bf3fa5ea",
+              "implementation_id": "ontology.object-set-derived/v1",
+              "maximum_properties": 8
+            },
+            "derived_properties": [
+              {
+                "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+              }
+            ],
+            "static_dependencies": [
+              {
+                "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+              },
+              {
+                "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+              },
+              {
+                "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+                "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+                "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+              }
+            ]
+          }
+        },
+        {
+          "node_id": "consumed_label",
+          "function": {
+            "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+            "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42",
+            "content_hash": "a2fbaabfa05b92c9d696e69d2e4f2bbe1d5ddc5071eb03045e5e12333d0fe632"
+          },
+          "depends_on": [
+            "source_label"
+          ],
+          "invocation": {
+            "limit": 1,
+            "offset": 0,
+            "function": {
+              "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+              "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42"
+            },
+            "known_at": "2026-09-07T11:11:17.232005Z",
+            "valid_at": "2026-09-07T11:11:17.232005Z",
+            "request_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+            "input_result": {
+              "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+            }
+          },
+          "function_plan": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "request": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+                "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42"
+              },
+              "known_at": "2026-09-07T11:11:17.232005Z",
+              "valid_at": "2026-09-07T11:11:17.232005Z",
+              "request_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+              "input_result": {
+                "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+              }
+            },
+            "contract": "function-plan/1",
+            "function": {
+              "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+              "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42",
+              "content_hash": "a2fbaabfa05b92c9d696e69d2e4f2bbe1d5ddc5071eb03045e5e12333d0fe632"
+            },
+            "plan_hash": "142f1c63f61e7a67626fc29ec1258f7400567a961c5fae0db6ae74cfea9b7414",
+            "object_set": {
+              "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+              "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+              "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+            },
+            "exact_scope": {
+              "period": "2026-08",
+              "currency": "GEL",
+              "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+              "legal_entity_id": "entity-ge-001"
+            },
+            "derived_graph": {
+              "nodes": [
+                {
+                  "schema": {
+                    "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                    "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                    "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                  },
+                  "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                  "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                  "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0",
+                  "dependencies": [
+                    {
+                      "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                      "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872"
+                    }
+                  ]
+                },
+                {
+                  "schema": {
+                    "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                    "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                    "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                  },
+                  "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                  "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                  "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8",
+                  "dependencies": []
+                }
+              ],
+              "roots": [
+                {
+                  "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                  "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                  "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+                }
+              ]
+            },
+            "implementation": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+              "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+              "capabilities": {
+                "cdc": false,
+                "read": true,
+                "query": true,
+                "write": false,
+                "delete": false,
+                "limits": {
+                  "coverage": "QUERY_PAGE_ONLY",
+                  "returned_rows": 200,
+                  "grouping_fields": 4,
+                  "traversal_steps": 4,
+                  "query_predicates": 20,
+                  "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                  "derived_properties": 8,
+                  "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                  "database_scan_limit": null
+                },
+                "stream": false,
+                "update": false,
+                "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "reversal": false,
+                "snapshot": true,
+                "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                "simulation": false,
+                "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                "incremental": false,
+                "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                "formula_execution": false,
+                "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                "source_write_exactly_once": false,
+                "grouped_observation_counts": true,
+                "typed_relationship_filters": true,
+                "versioned_interface_inputs": true,
+                "composed_derived_properties": true,
+                "versioned_type_group_inputs": true
+              },
+              "maximum_rows": 200,
+              "dependency_sha256": "1838704bb8a01995627bc519fc2b9f02a766a45ba0fa5a8148a54558bf3fa5ea",
+              "implementation_id": "ontology.object-set-derived/v1",
+              "maximum_properties": 8
+            },
+            "derived_properties": [
+              {
+                "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+              }
+            ],
+            "retained_properties": [
+              {
+                "schema": {
+                  "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                  "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                  "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                },
+                "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+              }
+            ],
+            "static_dependencies": [
+              {
+                "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+              },
+              {
+                "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+              },
+              {
+                "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+              },
+              {
+                "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+                "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+                "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+              }
+            ]
+          },
+          "input_binding": {
+            "upstream_node_id": "source_label"
+          }
+        }
+      ],
+      "outputs": {
+        "source_label": "function-invocation/1",
+        "consumed_label": "function-invocation/1"
+      },
+      "version": "transformation-functions/1"
+    },
+    "events": [
+      {
+        "event_id": "node:source_label:started",
+        "node": "source_label",
+        "state": "RUNNING",
+        "created_at": "2026-09-07T15:11:20.836993+04:00"
+      },
+      {
+        "event_id": "node:source_label:terminal",
+        "node": "source_label",
+        "state": "COMPLETED",
+        "usage": {
+          "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+          "returned_rows": 1,
+          "derived_evaluations": 1,
+          "published_result_bytes": 6281
+        },
+        "output": {
+          "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+          "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+          "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+        },
+        "new_run_required": false,
+        "created_at": "2026-09-07T15:11:22.699243+04:00"
+      },
+      {
+        "event_id": "output:09d141aa3732cde6209d4d1c7093874b770d60c144b29da7d2af2a5630f861e1",
+        "node": "source_label",
+        "state": "STAGED",
+        "value": {
+          "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+          "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+          "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+        },
+        "sha256": "df149770a1458327b1871296da2c807e30d9625c6eb2cc79bc3e08ea0e5703ab",
+        "generation": 0,
+        "artifact_type": "function-invocation/1",
+        "created_at": "2026-09-07T15:11:22.850369+04:00"
+      },
+      {
+        "event_id": "node:consumed_label:started",
+        "node": "consumed_label",
+        "state": "RUNNING",
+        "created_at": "2026-09-07T15:11:23.205911+04:00"
+      },
+      {
+        "event_id": "node:consumed_label:terminal",
+        "node": "consumed_label",
+        "state": "COMPLETED",
+        "usage": {
+          "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+          "returned_rows": 1,
+          "derived_evaluations": 1,
+          "published_result_bytes": 10091
+        },
+        "output": {
+          "run_id": "fcr_0d87f568332d5114226adf8e1705fd8f6ee8879ab70e322376a15d49bf399891",
+          "receipt_hash": "7abd89dce9d4775d7faf5b3c29989ef238eff4b40aa9016aa6d3b86f1c05f136",
+          "invocation_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0"
+        },
+        "new_run_required": false,
+        "created_at": "2026-09-07T15:11:26.531906+04:00"
+      },
+      {
+        "event_id": "output:b16274a776d939c90a6a1864dd7e73a8eaf6567f0bbcf751dd2ffa264d3cf21a",
+        "node": "consumed_label",
+        "state": "STAGED",
+        "value": {
+          "run_id": "fcr_0d87f568332d5114226adf8e1705fd8f6ee8879ab70e322376a15d49bf399891",
+          "receipt_hash": "7abd89dce9d4775d7faf5b3c29989ef238eff4b40aa9016aa6d3b86f1c05f136",
+          "invocation_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0"
+        },
+        "sha256": "ab675cd57f6959efdadead11791b1f6b887376420e93fcc09c838d279919431f",
+        "generation": 0,
+        "artifact_type": "function-invocation/1",
+        "created_at": "2026-09-07T15:11:26.673634+04:00"
+      },
+      {
+        "event_id": "publication:0",
+        "node": "publication",
+        "state": "PUBLISHED",
+        "manifest": {
+          "outputs": [
+            {
+              "slot": "consumed_label",
+              "value": {
+                "run_id": "fcr_0d87f568332d5114226adf8e1705fd8f6ee8879ab70e322376a15d49bf399891",
+                "receipt_hash": "7abd89dce9d4775d7faf5b3c29989ef238eff4b40aa9016aa6d3b86f1c05f136",
+                "invocation_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0"
+              },
+              "sha256": "ab675cd57f6959efdadead11791b1f6b887376420e93fcc09c838d279919431f",
+              "event_id": "output:b16274a776d939c90a6a1864dd7e73a8eaf6567f0bbcf751dd2ffa264d3cf21a",
+              "artifact_type": "function-invocation/1"
+            },
+            {
+              "slot": "source_label",
+              "value": {
+                "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+                "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+                "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+              },
+              "sha256": "df149770a1458327b1871296da2c807e30d9625c6eb2cc79bc3e08ea0e5703ab",
+              "event_id": "output:09d141aa3732cde6209d4d1c7093874b770d60c144b29da7d2af2a5630f861e1",
+              "artifact_type": "function-invocation/1"
+            }
+          ],
+          "protocol": "execution-publication/1",
+          "authority": "EXECUTION_ONLY",
+          "generation": 0,
+          "workflow_id": "transformation:3b560725-39ca-4414-95ef-667e3b225db5",
+          "publication_id": "pub_cba66400f8aecad442ab12402016e68f45cedf589eeb7454e957768592533a40",
+          "definition_sha256": "9cd06b1a15b431ecd5fde6adad2dc5b70f3b7cc71d5ac07069512193b3c587ba"
+        },
+        "created_at": "2026-09-07T15:11:26.897392+04:00"
+      }
+    ],
+    "publications": [
+      {
+        "outputs": [
+          {
+            "slot": "consumed_label",
+            "value": {
+              "run_id": "fcr_0d87f568332d5114226adf8e1705fd8f6ee8879ab70e322376a15d49bf399891",
+              "receipt_hash": "7abd89dce9d4775d7faf5b3c29989ef238eff4b40aa9016aa6d3b86f1c05f136",
+              "invocation_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0"
+            },
+            "sha256": "ab675cd57f6959efdadead11791b1f6b887376420e93fcc09c838d279919431f",
+            "event_id": "output:b16274a776d939c90a6a1864dd7e73a8eaf6567f0bbcf751dd2ffa264d3cf21a",
+            "artifact_type": "function-invocation/1"
+          },
+          {
+            "slot": "source_label",
+            "value": {
+              "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+              "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+              "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+            },
+            "sha256": "df149770a1458327b1871296da2c807e30d9625c6eb2cc79bc3e08ea0e5703ab",
+            "event_id": "output:09d141aa3732cde6209d4d1c7093874b770d60c144b29da7d2af2a5630f861e1",
+            "artifact_type": "function-invocation/1"
+          }
+        ],
+        "protocol": "execution-publication/1",
+        "authority": "EXECUTION_ONLY",
+        "generation": 0,
+        "workflow_id": "transformation:3b560725-39ca-4414-95ef-667e3b225db5",
+        "publication_id": "pub_cba66400f8aecad442ab12402016e68f45cedf589eeb7454e957768592533a40",
+        "definition_sha256": "9cd06b1a15b431ecd5fde6adad2dc5b70f3b7cc71d5ac07069512193b3c587ba"
+      }
+    ],
+    "publication_review": null,
+    "current_use_authorized": false,
+    "business_effect_authorized": false,
+    "runtime_status": "COMPLETED",
+    "execution": {
+      "cancel_requested": false,
+      "pause_requested": false,
+      "result": {
+        "consumed_label": {
+          "new_run_required": false,
+          "node": "consumed_label",
+          "output": {
+            "invocation_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+            "receipt_hash": "7abd89dce9d4775d7faf5b3c29989ef238eff4b40aa9016aa6d3b86f1c05f136",
+            "run_id": "fcr_0d87f568332d5114226adf8e1705fd8f6ee8879ab70e322376a15d49bf399891"
+          },
+          "state": "COMPLETED",
+          "usage": {
+            "derived_evaluations": 1,
+            "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+            "published_result_bytes": 10091,
+            "returned_rows": 1
+          }
+        },
+        "publication": {
+          "generation": 0,
+          "publication_id": "pub_cba66400f8aecad442ab12402016e68f45cedf589eeb7454e957768592533a40"
+        },
+        "source_label": {
+          "new_run_required": false,
+          "node": "source_label",
+          "output": {
+            "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9",
+            "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+            "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486"
+          },
+          "state": "COMPLETED",
+          "usage": {
+            "derived_evaluations": 1,
+            "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+            "published_result_bytes": 6281,
+            "returned_rows": 1
+          }
+        }
+      },
+      "state": "COMPLETED"
+    }
+  },
+  "chain": {
+    "invocations": {
+      "consumed_label": {
+        "invocation_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+        "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+        "status": "SUCCEEDED",
+        "receipt_hash": "7abd89dce9d4775d7faf5b3c29989ef238eff4b40aa9016aa6d3b86f1c05f136",
+        "receipt": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "run_id": "fcr_0d87f568332d5114226adf8e1705fd8f6ee8879ab70e322376a15d49bf399891",
+          "status": "SUCCEEDED",
+          "request": {
+            "limit": 1,
+            "offset": 0,
+            "function": {
+              "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+              "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42"
+            },
+            "known_at": "2026-09-07T11:11:17.232005Z",
+            "valid_at": "2026-09-07T11:11:17.232005Z",
+            "request_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+            "input_result": {
+              "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+            }
+          },
+          "function": {
+            "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+            "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42",
+            "content_hash": "a2fbaabfa05b92c9d696e69d2e4f2bbe1d5ddc5071eb03045e5e12333d0fe632"
+          },
+          "plan_hash": "142f1c63f61e7a67626fc29ec1258f7400567a961c5fae0db6ae74cfea9b7414",
+          "request_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+          "started_at": "2026-09-07T11:11:24.891429+00:00",
+          "exact_scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "completed_at": "2026-09-07T11:11:26.169408+00:00",
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": true,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "coverage": "QUERY_PAGE_ONLY",
+                "returned_rows": 200,
+                "grouping_fields": 4,
+                "traversal_steps": 4,
+                "query_predicates": 20,
+                "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                "derived_properties": 8,
+                "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+              "source_write_exactly_once": false,
+              "grouped_observation_counts": true,
+              "typed_relationship_filters": true,
+              "versioned_interface_inputs": true,
+              "composed_derived_properties": true,
+              "versioned_type_group_inputs": true
+            },
+            "maximum_rows": 200,
+            "dependency_sha256": "1838704bb8a01995627bc519fc2b9f02a766a45ba0fa5a8148a54558bf3fa5ea",
+            "implementation_id": "ontology.object-set-derived/v1",
+            "maximum_properties": 8
+          },
+          "current_use_authorized": false,
+          "business_effect_authorized": false,
+          "proof_hash": "7abd89dce9d4775d7faf5b3c29989ef238eff4b40aa9016aa6d3b86f1c05f136",
+          "recorded_at": "2026-09-07T15:11:26.236642+04:00"
+        },
+        "output": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "query": {
+            "limit": 1,
+            "offset": 0,
+            "search": "",
+            "filters": [],
+            "known_at": "2026-09-07T11:11:17.232005Z",
+            "valid_at": "2026-09-07T11:11:17.232005Z",
+            "traversal": [],
+            "object_type": "SourceAccountDefinition",
+            "resource_ids": [
+              "00c93da8-3ab9-5597-aaf6-ea79b7307d32"
+            ]
+          },
+          "scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "total": 1,
+          "run_id": "fcr_0d87f568332d5114226adf8e1705fd8f6ee8879ab70e322376a15d49bf399891",
+          "objects": [
+            {
+              "valid_to": null,
+              "attributes": {
+                "definition": {
+                  "analytics": [
+                    {
+                      "position": 1,
+                      "coordinate": "Sheet1!I235",
+                      "source_label": "Контрагенты"
+                    },
+                    {
+                      "position": 2,
+                      "coordinate": "Sheet1!J235",
+                      "source_label": "Договоры"
+                    }
+                  ],
+                  "coordinate": "Sheet1!B235",
+                  "source_row": 235,
+                  "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+                  "account_code": "3212",
+                  "quick_selection": "6603",
+                  "financial_mapping": "UNESTABLISHED",
+                  "off_balance_source": "არა",
+                  "balance_behavior_source": "П",
+                  "currency_tracking_source": "არა",
+                  "quantity_tracking_source": "არა",
+                  "required_dimension_policy": "UNESTABLISHED"
+                },
+                "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+                "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+                "account_code": "3212",
+                "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+              },
+              "valid_from": "2026-09-06T03:22:44.088415+04:00",
+              "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+              "object_type": "SourceAccountDefinition",
+              "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+              "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+              "system_from": "2026-09-06T03:23:28.54828+04:00",
+              "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+              "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+              "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+              "access_entity": "entity-ge-001",
+              "evidence_class": "SOURCE_BOUND",
+              "authority_state": "APPROVED",
+              "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+            }
+          ],
+          "contract": "function-result/1",
+          "coverage": "RETAINED_INPUT_PAGE_ONLY",
+          "function": {
+            "version_id": "319d3cae-8218-5f3e-a4fe-2fb8af53b648",
+            "resource_id": "302862fd-d1c6-5b9e-a752-238a2456aa42",
+            "content_hash": "a2fbaabfa05b92c9d696e69d2e4f2bbe1d5ddc5071eb03045e5e12333d0fe632"
+          },
+          "plan_hash": "142f1c63f61e7a67626fc29ec1258f7400567a961c5fae0db6ae74cfea9b7414",
+          "next_offset": null,
+          "input_result": {
+            "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+            "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+            "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+          },
+          "definition_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+          "derived_graph": {
+            "nodes": [
+              {
+                "schema": {
+                  "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                  "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                  "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                },
+                "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0",
+                "dependencies": [
+                  {
+                    "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                    "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872"
+                  }
+                ]
+              },
+              {
+                "schema": {
+                  "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                  "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                  "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                },
+                "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+                "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8",
+                "dependencies": []
+              }
+            ],
+            "roots": [
+              {
+                "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+                "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+                "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+              }
+            ]
+          },
+          "used_versions": [
+            {
+              "known_at": "2026-09-07T11:11:17.232005+00:00",
+              "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+              "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+              "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+              "material_state": "UNESTABLISHED"
+            }
+          ],
+          "counts_by_type": {
+            "SourceAccountDefinition": 1
+          },
+          "derived_values": [
+            {
+              "kind": "text",
+              "name": "consumed_source_label",
+              "value": "3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы | retained",
+              "status": "AVAILABLE",
+              "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+              "definition_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+              "source_fields": [],
+              "epistemic_state": "DERIVED",
+              "dependency_values": [
+                {
+                  "kind": "text",
+                  "name": "retained_source_label",
+                  "value": "3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+                  "schema": {
+                    "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                    "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                    "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+                  },
+                  "status": "AVAILABLE",
+                  "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+                  "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8",
+                  "definition_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+                  "source_fields": [],
+                  "source_result": {
+                    "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+                    "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+                    "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+                  },
+                  "epistemic_state": "DERIVED",
+                  "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+                  "definition_version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242"
+                }
+              ],
+              "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+              "definition_version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013"
+            }
+          ],
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": true,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "coverage": "QUERY_PAGE_ONLY",
+                "returned_rows": 200,
+                "grouping_fields": 4,
+                "traversal_steps": 4,
+                "query_predicates": 20,
+                "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                "derived_properties": 8,
+                "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+              "source_write_exactly_once": false,
+              "grouped_observation_counts": true,
+              "typed_relationship_filters": true,
+              "versioned_interface_inputs": true,
+              "composed_derived_properties": true,
+              "versioned_type_group_inputs": true
+            },
+            "maximum_rows": 200,
+            "dependency_sha256": "1838704bb8a01995627bc519fc2b9f02a766a45ba0fa5a8148a54558bf3fa5ea",
+            "implementation_id": "ontology.object-set-derived/v1",
+            "maximum_properties": 8
+          },
+          "read_permissions": [
+            "ontology_read",
+            "read"
+          ],
+          "calculation_runtime": "shared-functions/1",
+          "static_dependencies": [
+            {
+              "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+              "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+              "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+            },
+            {
+              "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+              "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+              "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+            },
+            {
+              "version_id": "e84f063f-cf4e-5bdb-9406-26a711eb2013",
+              "resource_id": "c2ed1e06-2cbc-599c-985b-f361ea369933",
+              "content_hash": "832cc612e9e39255a94e3e5f1a50d0d026663d832b9c9413461b7d225c71f0b0"
+            },
+            {
+              "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+              "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+              "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+            }
+          ],
+          "invocation_plan_hash": "142f1c63f61e7a67626fc29ec1258f7400567a961c5fae0db6ae74cfea9b7414",
+          "definition_version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+          "invocation_request_id": "e4fdefbb-aa38-54c2-abf7-d7d84e4196a0",
+          "current_use_authorized": false,
+          "filter_schema_versions": [],
+          "consumed_property_values": [
+            {
+              "kind": "text",
+              "name": "retained_source_label",
+              "value": "3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+              "schema": {
+                "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+                "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+                "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+              },
+              "status": "AVAILABLE",
+              "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+              "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8",
+              "definition_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+              "source_result": {
+                "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+                "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+                "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+              },
+              "epistemic_state": "DERIVED",
+              "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+              "definition_version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242"
+            }
+          ],
+          "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+          "business_effect_authorized": false
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      "source_label": {
+        "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9",
+        "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+        "status": "SUCCEEDED",
+        "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+        "receipt": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+          "status": "SUCCEEDED",
+          "request": {
+            "limit": 1,
+            "offset": 0,
+            "function": {
+              "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+              "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981"
+            },
+            "known_at": "2026-09-07T11:11:17.232005Z",
+            "valid_at": "2026-09-07T11:11:17.232005Z",
+            "request_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+          },
+          "function": {
+            "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+            "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981",
+            "content_hash": "b5beddab7bed1744dc94233a7b33edc1841d5257b0bbbe963ca1c8ba2bfa713f"
+          },
+          "plan_hash": "e91898f55461a1cfe5f69c0cdc0f81080059d33a7186ff97a221a53cea7114c7",
+          "request_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9",
+          "started_at": "2026-09-07T11:11:21.673655+00:00",
+          "exact_scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "completed_at": "2026-09-07T11:11:22.335606+00:00",
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": true,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "coverage": "QUERY_PAGE_ONLY",
+                "returned_rows": 200,
+                "grouping_fields": 4,
+                "traversal_steps": 4,
+                "query_predicates": 20,
+                "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                "derived_properties": 8,
+                "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+              "source_write_exactly_once": false,
+              "grouped_observation_counts": true,
+              "typed_relationship_filters": true,
+              "versioned_interface_inputs": true,
+              "composed_derived_properties": true,
+              "versioned_type_group_inputs": true
+            },
+            "maximum_rows": 200,
+            "dependency_sha256": "1838704bb8a01995627bc519fc2b9f02a766a45ba0fa5a8148a54558bf3fa5ea",
+            "implementation_id": "ontology.object-set-derived/v1",
+            "maximum_properties": 8
+          },
+          "current_use_authorized": false,
+          "business_effect_authorized": false,
+          "proof_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+          "recorded_at": "2026-09-07T15:11:22.393764+04:00"
+        },
+        "output": {
+          "mode": "EVIDENCE_ANALYSIS_ONLY",
+          "query": {
+            "limit": 1,
+            "offset": 0,
+            "search": "",
+            "filters": [],
+            "known_at": "2026-09-07T11:11:17.232005Z",
+            "valid_at": "2026-09-07T11:11:17.232005Z",
+            "traversal": [],
+            "object_type": "SourceAccountDefinition",
+            "resource_ids": [
+              "00c93da8-3ab9-5597-aaf6-ea79b7307d32"
+            ]
+          },
+          "scope": {
+            "period": "2026-08",
+            "currency": "GEL",
+            "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+            "legal_entity_id": "entity-ge-001"
+          },
+          "total": 1,
+          "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+          "objects": [
+            {
+              "valid_to": null,
+              "attributes": {
+                "definition": {
+                  "analytics": [
+                    {
+                      "position": 1,
+                      "coordinate": "Sheet1!I235",
+                      "source_label": "Контрагенты"
+                    },
+                    {
+                      "position": 2,
+                      "coordinate": "Sheet1!J235",
+                      "source_label": "Договоры"
+                    }
+                  ],
+                  "coordinate": "Sheet1!B235",
+                  "source_row": 235,
+                  "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+                  "account_code": "3212",
+                  "quick_selection": "6603",
+                  "financial_mapping": "UNESTABLISHED",
+                  "off_balance_source": "არა",
+                  "balance_behavior_source": "П",
+                  "currency_tracking_source": "არა",
+                  "quantity_tracking_source": "არა",
+                  "required_dimension_policy": "UNESTABLISHED"
+                },
+                "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+                "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+                "account_code": "3212",
+                "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+              },
+              "valid_from": "2026-09-06T03:22:44.088415+04:00",
+              "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+              "object_type": "SourceAccountDefinition",
+              "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+              "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+              "system_from": "2026-09-06T03:23:28.54828+04:00",
+              "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+              "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+              "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+              "access_entity": "entity-ge-001",
+              "evidence_class": "SOURCE_BOUND",
+              "authority_state": "APPROVED",
+              "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+            }
+          ],
+          "contract": "function-result/1",
+          "coverage": "QUERY_PAGE_ONLY",
+          "function": {
+            "version_id": "1e8b24ea-d751-5f04-90d3-ca3c5f3c12ef",
+            "resource_id": "d81c9094-ab46-5dd6-9c21-bf8fc0070981",
+            "content_hash": "b5beddab7bed1744dc94233a7b33edc1841d5257b0bbbe963ca1c8ba2bfa713f"
+          },
+          "plan_hash": "e91898f55461a1cfe5f69c0cdc0f81080059d33a7186ff97a221a53cea7114c7",
+          "next_offset": null,
+          "definition_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+          "used_versions": [
+            {
+              "known_at": "2026-09-07T11:11:17.232005+00:00",
+              "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+              "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+              "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+              "material_state": "UNESTABLISHED"
+            }
+          ],
+          "counts_by_type": {
+            "SourceAccountDefinition": 1
+          },
+          "derived_values": [
+            {
+              "kind": "text",
+              "name": "retained_source_label",
+              "value": "3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+              "status": "AVAILABLE",
+              "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+              "definition_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+              "epistemic_state": "DERIVED",
+              "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+              "definition_version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242"
+            }
+          ],
+          "implementation": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+            "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+            "capabilities": {
+              "cdc": false,
+              "read": true,
+              "query": true,
+              "write": false,
+              "delete": false,
+              "limits": {
+                "coverage": "QUERY_PAGE_ONLY",
+                "returned_rows": 200,
+                "grouping_fields": 4,
+                "traversal_steps": 4,
+                "query_predicates": 20,
+                "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                "derived_properties": 8,
+                "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                "database_scan_limit": null
+              },
+              "stream": false,
+              "update": false,
+              "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+              "reversal": false,
+              "snapshot": true,
+              "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+              "simulation": false,
+              "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+              "incremental": false,
+              "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+              "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+              "formula_execution": false,
+              "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+              "source_write_exactly_once": false,
+              "grouped_observation_counts": true,
+              "typed_relationship_filters": true,
+              "versioned_interface_inputs": true,
+              "composed_derived_properties": true,
+              "versioned_type_group_inputs": true
+            },
+            "maximum_rows": 200,
+            "dependency_sha256": "1838704bb8a01995627bc519fc2b9f02a766a45ba0fa5a8148a54558bf3fa5ea",
+            "implementation_id": "ontology.object-set-derived/v1",
+            "maximum_properties": 8
+          },
+          "read_permissions": [
+            "ontology_read",
+            "read"
+          ],
+          "calculation_runtime": "shared-functions/1",
+          "static_dependencies": [
+            {
+              "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+              "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+              "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+            },
+            {
+              "version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+              "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+              "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8"
+            },
+            {
+              "version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+              "resource_id": "2d81767e-a01f-582c-b201-29367a2b9cc6",
+              "content_hash": "2dafb072f973f04a5a02702c9665075c2e4b27289d1e0e29d6a40f273f4f0a97"
+            }
+          ],
+          "invocation_plan_hash": "e91898f55461a1cfe5f69c0cdc0f81080059d33a7186ff97a221a53cea7114c7",
+          "definition_version_id": "ea5cafa3-372b-5f5e-bac2-d1eb62acd0b3",
+          "invocation_request_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9",
+          "current_use_authorized": false,
+          "filter_schema_versions": [],
+          "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+          "business_effect_authorized": false
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      }
+    },
+    "source_result": {
+      "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9",
+      "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+      "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486"
+    },
+    "exact_original_objects_equal": true,
+    "calculated_value_receipt_binding_verified": true,
+    "no_rerun_requires_focused_backend_evaluator_evidence": true
+  },
+  "financial_authority_established": false,
+  "mid_step_crash_recovery_demonstrated": false,
+  "read_only_verification": false,
+  "correction": {
+    "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+    "version_id": "8764d534-ee1f-5a7a-9cdb-2bf80b27a5b9"
+  },
+  "corrected_calculation": {
+    "contract": "ontology-derived-result/1",
+    "query": {
+      "object_type": "SourceAccountDefinition",
+      "resource_ids": [
+        "00c93da8-3ab9-5597-aaf6-ea79b7307d32"
+      ],
+      "filters": [],
+      "traversal": [],
+      "search": "",
+      "limit": 1,
+      "offset": 0,
+      "valid_at": "2026-09-07T11:11:17.232005Z",
+      "known_at": "2026-09-07T11:11:17.232005Z"
+    },
+    "total": 1,
+    "counts_by_type": {
+      "SourceAccountDefinition": 1
+    },
+    "objects": [
+      {
+        "valid_to": null,
+        "attributes": {
+          "definition": {
+            "analytics": [
+              {
+                "position": 1,
+                "coordinate": "Sheet1!I235",
+                "source_label": "Контрагенты"
+              },
+              {
+                "position": 2,
+                "coordinate": "Sheet1!J235",
+                "source_label": "Договоры"
+              }
+            ],
+            "coordinate": "Sheet1!B235",
+            "source_row": 235,
+            "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+            "account_code": "3212",
+            "quick_selection": "6603",
+            "financial_mapping": "UNESTABLISHED",
+            "off_balance_source": "არა",
+            "balance_behavior_source": "П",
+            "currency_tracking_source": "არა",
+            "quantity_tracking_source": "არა",
+            "required_dimension_policy": "UNESTABLISHED"
+          },
+          "evidence_id": "0074068a-99ea-5a03-8e61-15f7430b04d4",
+          "source_name": "მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+          "account_code": "3212",
+          "source_record_id": "fffbaa02-cda2-54d7-bbcc-fe5bf70d95a3"
+        },
+        "valid_from": "2026-09-06T03:22:44.088415+04:00",
+        "version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "object_type": "SourceAccountDefinition",
+        "proposal_id": "f8913c16-3ad4-4a05-918b-30b67b0251d6",
+        "resource_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "system_from": "2026-09-06T03:23:28.54828+04:00",
+        "content_hash": "90af8fc4e85f51d5d041e4b6ff2d0fbdefa94052e3c079a737eab70914802754",
+        "display_name": "3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы",
+        "identity_key": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df:Sheet1!B235:account",
+        "access_entity": "entity-ge-001",
+        "evidence_class": "SOURCE_BOUND",
+        "authority_state": "APPROVED",
+        "schema_version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+      }
+    ],
+    "next_offset": null,
+    "filter_schema_versions": [],
+    "definition_versions": [
+      {
+        "resource_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+        "version_id": "8764d534-ee1f-5a7a-9cdb-2bf80b27a5b9",
+        "definition": {
+          "schema_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+          "definition": {
+            "name": "retained_source_label",
+            "expression": {
+              "op": "concat",
+              "args": [
+                {
+                  "op": "field",
+                  "field": "account_code"
+                },
+                {
+                  "op": "literal",
+                  "value": " | "
+                },
+                {
+                  "op": "field",
+                  "field": "source_name"
+                },
+                {
+                  "op": "literal",
+                  "value": ":"
+                }
+              ]
+            },
+            "result_kind": "text"
+          }
+        },
+        "schema_versions": [
+          {
+            "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+            "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964"
+          }
+        ]
+      }
+    ],
+    "derived_values": [
+      {
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "definition_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+        "definition_version_id": "8764d534-ee1f-5a7a-9cdb-2bf80b27a5b9",
+        "name": "retained_source_label",
+        "kind": "text",
+        "epistemic_state": "DERIVED",
+        "value": "3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы:",
+        "status": "AVAILABLE"
+      }
+    ],
+    "coverage": "QUERY_PAGE_ONLY",
+    "scope": {
+      "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+      "legal_entity_id": "entity-ge-001",
+      "period": "2026-08",
+      "currency": "GEL"
+    },
+    "calculation_runtime": "ontology-derived/1",
+    "read_permissions": [
+      "export",
+      "ontology_admin",
+      "ontology_propose",
+      "ontology_read",
+      "read"
+    ],
+    "run_id": "fcr_e3f407dc24d55b300f4f812af7502dfccbdec5e4e1e0a058ef1896e924d8f6b1"
+  }
+}

@@ -40,6 +40,13 @@ def validate_transformation(
         )
         functions[node.node_id] = FunctionDefinition.model_validate(function["attributes"])
     for node in definition.definition.nodes:
+        if (
+            getattr(functions[node.node_id].definition, "retained_properties", [])
+            and node.input_binding is None
+        ):
+            raise WorkspaceError(
+                422, "Retained calculated properties require a transformation input binding"
+            )
         if node.input_binding:
             source = functions[node.input_binding.upstream_node_id]
             destination = functions[node.node_id]
@@ -138,6 +145,14 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
                 raise WorkspaceError(
                     409, "Retained input requires the same exact Object Set version"
                 )
+            for required in function_plan.get("retained_properties", []):
+                if {
+                    key: required[key] for key in ("resource_id", "version_id", "content_hash")
+                } not in source["function_plan"]["derived_properties"]:
+                    raise WorkspaceError(
+                        409,
+                        "Upstream Function does not declare the exact retained calculated output",
+                    )
         nodes.append(
             {
                 "node_id": node_id,

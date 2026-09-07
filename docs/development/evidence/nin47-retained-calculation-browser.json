@@ -1,0 +1,79 @@
+{
+  "url": "http://127.0.0.1:3062/",
+  "heading": "Data & evidence",
+  "runtime": "Runtime: completed",
+  "consumed": "Retained calculated inputsThese values were bound from the upstream result for this retained page. Being bound does not mean a value was evaluated; unused fallback values remain listed here. Availability describes the upstream calculation, not financial authority.Original object / propertyRetained value & availabilityUse in this calculation3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაშიretained source label3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займыavailableEvaluated from retained inputProvenance & original objectThis reference identifies the bound upstream value. Whether it was evaluated is shown above; no new source-field reads are implied.Inspect original objectTrace original evidence{\n  \"object_id\": \"00c93da8-3ab9-5597-aaf6-ea79b7307d32\",\n  \"object_version_id\": \"a2f3a359-c945-57b6-a86f-d168ab906944\",\n  \"definition_id\": \"e9c0273b-9d2a-5de8-800f-c1d503974872\",\n  \"definition_version_id\": \"a494ad3c-7fdd-5228-b6fc-277bf2474242\",\n  \"content_hash\": \"94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8\",\n  \"schema\": {\n    \"version_id\": \"bf7db86a-b539-529c-9b27-d7abaa640964\",\n    \"resource_id\": \"e365d1cd-40f1-5fa5-8343-3db93f32e4aa\",\n    \"content_hash\": \"b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854\"\n  },\n  \"source_result\": {\n    \"run_id\": \"fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486\",\n    \"receipt_hash\": \"e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6\",\n    \"invocation_id\": \"a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9\"\n  }\n}",
+  "calculation": "Effective 9/7/2026, 3:11:17 PM · known 9/7/2026, 3:11:17 PM1 objects in the consumed retained page. Derived values apply to this retained page only.Source objectDerived values & availabilityInvestigate3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაშიSourceAccountDefinitionconsumed source label: 3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы | retained · availableEvaluated retained valuesretained source label: 3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы · availableThis value was read from the retained upstream result, without rereading its source fields.Exact evaluated value provenance{\n  \"object_id\": \"00c93da8-3ab9-5597-aaf6-ea79b7307d32\",\n  \"object_version_id\": \"a2f3a359-c945-57b6-a86f-d168ab906944\",\n  \"definition_id\": \"e9c0273b-9d2a-5de8-800f-c1d503974872\",\n  \"definition_version_id\": \"a494ad3c-7fdd-5228-b6fc-277bf2474242\",\n  \"source_result\": {\n    \"run_id\": \"fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486\",\n    \"receipt_hash\": \"e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6\",\n    \"invocation_id\": \"a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9\"\n  }\n}InspectTrace evidence",
+  "refs": [
+    {
+      "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+      "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+      "definition_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+      "definition_version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+      "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8",
+      "schema": {
+        "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+        "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+        "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+      },
+      "source_result": {
+        "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+        "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+        "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+      }
+    },
+    {
+      "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+      "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+      "definition_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+      "definition_version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+      "source_result": {
+        "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+        "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+        "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+      }
+    }
+  ],
+  "invocation": "Exact invocation evidencee4fdefbb-aa38-54c2-abf7-d7d84e4196a07abd89dce9d4775d7faf5b3c29989ef238eff4b40aa9016aa6d3b86f1c05f136fcr_0d87f568332d5114226adf8e1705fd8f6ee8879ab70e322376a15d49bf399891",
+  "alerts": [],
+  "after_restart_reopen": {
+    "url": "http://127.0.0.1:3062/",
+    "runtime": "Runtime: completed",
+    "consumed": "Retained calculated inputsThese values were bound from the upstream result for this retained page. Being bound does not mean a value was evaluated; unused fallback values remain listed here. Availability describes the upstream calculation, not financial authority.Original object / propertyRetained value & availabilityUse in this calculation3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაშიretained source label3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займыavailableEvaluated from retained inputProvenance & original objectThis reference identifies the bound upstream value. Whether it was evaluated is shown above; no new source-field reads are implied.Inspect original objectTrace original evidence{\n  \"object_id\": \"00c93da8-3ab9-5597-aaf6-ea79b7307d32\",\n  \"object_version_id\": \"a2f3a359-c945-57b6-a86f-d168ab906944\",\n  \"definition_id\": \"e9c0273b-9d2a-5de8-800f-c1d503974872\",\n  \"definition_version_id\": \"a494ad3c-7fdd-5228-b6fc-277bf2474242\",\n  \"content_hash\": \"94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8\",\n  \"schema\": {\n    \"version_id\": \"bf7db86a-b539-529c-9b27-d7abaa640964\",\n    \"resource_id\": \"e365d1cd-40f1-5fa5-8343-3db93f32e4aa\",\n    \"content_hash\": \"b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854\"\n  },\n  \"source_result\": {\n    \"run_id\": \"fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486\",\n    \"receipt_hash\": \"e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6\",\n    \"invocation_id\": \"a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9\"\n  }\n}",
+    "calculation": "Effective 9/7/2026, 3:11:17 PM · known 9/7/2026, 3:11:17 PM1 objects in the consumed retained page. Derived values apply to this retained page only.Source objectDerived values & availabilityInvestigate3212 · მოკლევადიანი სესხები ეროვნულ ვალუტაშიSourceAccountDefinitionconsumed source label: 3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы | retained · availableEvaluated retained valuesretained source label: 3212 | მოკლევადიანი სესხები ეროვნულ ვალუტაში // Краткосрочные займы · availableThis value was read from the retained upstream result, without rereading its source fields.Exact evaluated value provenance{\n  \"object_id\": \"00c93da8-3ab9-5597-aaf6-ea79b7307d32\",\n  \"object_version_id\": \"a2f3a359-c945-57b6-a86f-d168ab906944\",\n  \"definition_id\": \"e9c0273b-9d2a-5de8-800f-c1d503974872\",\n  \"definition_version_id\": \"a494ad3c-7fdd-5228-b6fc-277bf2474242\",\n  \"source_result\": {\n    \"run_id\": \"fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486\",\n    \"receipt_hash\": \"e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6\",\n    \"invocation_id\": \"a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9\"\n  }\n}InspectTrace evidence",
+    "refs": [
+      {
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "definition_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+        "definition_version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+        "content_hash": "94e703ae38ac7abc5c9ec87ab07ff31427d770527071d6e199cd42ae5956a0e8",
+        "schema": {
+          "version_id": "bf7db86a-b539-529c-9b27-d7abaa640964",
+          "resource_id": "e365d1cd-40f1-5fa5-8343-3db93f32e4aa",
+          "content_hash": "b25f04bef66109b260988e7fe3cb7bbaacce2fa193117e0dcb7e97e555c1f854"
+        },
+        "source_result": {
+          "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+          "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+          "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+        }
+      },
+      {
+        "object_id": "00c93da8-3ab9-5597-aaf6-ea79b7307d32",
+        "object_version_id": "a2f3a359-c945-57b6-a86f-d168ab906944",
+        "definition_id": "e9c0273b-9d2a-5de8-800f-c1d503974872",
+        "definition_version_id": "a494ad3c-7fdd-5228-b6fc-277bf2474242",
+        "source_result": {
+          "run_id": "fcr_b109f2e8de70dfc084f0e9b315baf2c0a6b3f42a429d571ccffb369248a7b486",
+          "receipt_hash": "e41f6e9fd6523921a26c46d1eb225cd1deb1d89335f9ac1ff3e5e8ee6dd5fff6",
+          "invocation_id": "a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9"
+        }
+      }
+    ],
+    "invocation": "Exact invocation evidencee4fdefbb-aa38-54c2-abf7-d7d84e4196a07abd89dce9d4775d7faf5b3c29989ef238eff4b40aa9016aa6d3b86f1c05f136fcr_0d87f568332d5114226adf8e1705fd8f6ee8879ab70e322376a15d49bf399891",
+    "executionContext": "Retained execution referencesCompletion dependencies control ordering. Only explicit input bindings declare result consumption; the downstream retained analysis records the exact consumed result.Step ID: source_label · dependencies: noneStep ID: consumed_label · dependencies: source_label · input step: source_label · expected invocation: a1cf5861-0cf5-55e1-a2af-5b9cbb0556e9Output ID: source_label · step: source_labelOutput ID: consumed_label · step: consumed_labeltransformation:3b560725-39ca-4414-95ef-667e3b225db5transformation-functions/12026-09-07T11:11:17.232005Z · 2026-09-07T11:11:17.232005Z9/7/2026, 3:11:20 PM · source_label · RUNNING9/7/2026, 3:11:22 PM · source_label · COMPLETED9/7/2026, 3:11:22 PM · source_label · STAGED9/7/2026, 3:11:23 PM · consumed_label · RUNNING9/7/2026, 3:11:26 PM · consumed_label · COMPLETED9/7/2026, 3:11:26 PM · consumed_label · STAGED9/7/2026, 3:11:26 PM · publication · PUBLISHED",
+    "alerts": []
+  },
+  "original_display_unchanged_after_correction_and_restart": true
+}

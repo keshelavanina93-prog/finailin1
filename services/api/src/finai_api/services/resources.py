@@ -299,7 +299,11 @@ def _validate(
             exact_property = source_item.object_type == "DerivedProperty" and relation.startswith(
                 ("DERIVED_PROPERTY:", "DERIVED_TRANSITIVE:")
             )
-            if not (exact_query or exact_property):
+            exact_function_input = (
+                source_item.object_type == "FunctionDefinition"
+                and relation.startswith("FUNCTION_RETAINED_PROPERTY:")
+            )
+            if not (exact_query or exact_property or exact_function_input):
                 raise WorkspaceError(422, "Exact ontology dependency is not supported here")
             head = _get(conn, tenant, UUID(identifier))
             external_heads[identifier] = str(head["version_id"])

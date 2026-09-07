@@ -32,11 +32,20 @@ class FunctionImplementation(BaseModel):
     dependency_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     derived_property_ids: list[UUID] = Field(default_factory=list, max_length=8)
     group_count: GroupCount | None = Field(default=None, exclude_if=lambda value: value is None)
+    retained_properties: list[VersionReference] = Field(
+        default_factory=list, max_length=8, exclude_if=lambda value: not value
+    )
 
     @model_validator(mode="after")
     def unique_properties(self) -> "FunctionImplementation":
         if len(set(self.derived_property_ids)) != len(self.derived_property_ids):
             raise ValueError("Function derived property identities must be unique")
+        if len({ref.resource_id for ref in self.retained_properties}) != len(
+            self.retained_properties
+        ):
+            raise ValueError("Retained property identities must be unique")
+        if self.retained_properties and not self.derived_property_ids:
+            raise ValueError("Retained properties require declared derived outputs")
         return self
 
 

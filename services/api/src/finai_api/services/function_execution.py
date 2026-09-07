@@ -187,7 +187,7 @@ def _check_implementation(spec: FunctionDefinition) -> dict:
     return current
 
 
-def validate_function(item: ResourceMutation, target: Callable[[str, str, str], dict]) -> None:
+def validate_function(item: ResourceMutation, target: Callable[..., dict]) -> None:
     spec = FunctionDefinition.model_validate(item.attributes)
     _check_implementation(spec)
     if isinstance(spec.definition, WorksheetImplementation):
@@ -203,10 +203,29 @@ def validate_function(item: ResourceMutation, target: Callable[[str, str, str], 
     selected = target(str(spec.object_set_id), str(item.resource_id), "FIELD:object_set_id")
     if selected["object_type"] != "ObjectSetDefinition":
         raise WorkspaceError(409, "Function requires a canonical Object Set definition")
+    properties = []
     for identity in spec.definition.derived_property_ids:
         prop = target(str(identity), str(item.resource_id), "FUNCTION_DERIVED_PROPERTY")
         if prop["object_type"] != "DerivedProperty":
             raise WorkspaceError(409, "Function property input must be a canonical DerivedProperty")
+        properties.append(prop)
+    if spec.definition.retained_properties:
+        from finai_api.services.derived_property_graph import resolve_with_loader
+
+        cache = {}
+
+        def load(identity, version):
+            key = (str(identity), str(version))
+            if key not in cache:
+                cache[key] = target(
+                    key[0], str(item.resource_id), "FUNCTION_RETAINED_PROPERTY:" + key[0], key[1]
+                )
+            return cache[key]
+
+        graph = resolve_with_loader(
+            [load(prop["resource_id"], prop["version_id"]) for prop in properties], load
+        )
+        _retained_property_contract(spec.definition.retained_properties, graph)
     if spec.definition.group_count is not None:
         from finai_api.services.grouped_observations import validate_schema
 
@@ -223,7 +242,7 @@ def _pin(row: dict) -> dict:
     }
 
 
-def _composed_graph(principal: Principal, properties: list[dict]) -> dict | None:
+def _composed_graph(principal: Principal, properties: list[dict], *, force=False) -> dict | None:
     from finai_api.domain.ontology_definitions import DerivedDefinition
     from finai_api.services.derived_property_graph import references, resolve_with_loader
 
@@ -233,7 +252,7 @@ def _composed_graph(principal: Principal, properties: list[dict]) -> dict | None
         )
         for prop in properties
     ]
-    if not any(
+    if not force and not any(
         list(
             references(DerivedDefinition.model_validate(row["attributes"]["definition"]).expression)
         )
@@ -244,6 +263,21 @@ def _composed_graph(principal: Principal, properties: list[dict]) -> dict | None
         rows,
         lambda identity, version: ontology_definitions.definition(principal, identity, version),
     )
+
+
+def _retained_property_contract(references, graph):
+    if not graph:
+        raise WorkspaceError(409, "Retained calculated properties require an exact derived graph")
+    nodes = {(node["resource_id"], node["version_id"]): node for node in graph["nodes"]}
+    result = []
+    for ref in references:
+        node = nodes.get((str(ref.resource_id), str(ref.version_id)))
+        if node is None:
+            raise WorkspaceError(
+                409, "Retained property is not an exact member of the derived graph"
+            )
+        result.append({**_pin(node), "schema": node["schema"]})
+    return result
 
 
 def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False) -> dict:
@@ -297,11 +331,18 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
             [_pin(row) for row in pins], key=lambda row: row["version_id"]
         ),
     }
-    graph = _composed_graph(p, properties)
+    retained_properties = getattr(spec.definition, "retained_properties", [])
+    if retained_properties and request.input_result is None:
+        raise WorkspaceError(
+            422, "Configured retained properties require an upstream invocation input"
+        )
+    graph = _composed_graph(p, properties, force=bool(retained_properties))
     if graph is not None:
         from finai_api.services.derived_property_graph import public_graph
 
         result["derived_graph"] = public_graph(graph)
+    if retained_properties:
+        result["retained_properties"] = _retained_property_contract(retained_properties, graph)
     if source is not None:
         result["source_document"] = source
     if not isinstance(spec.definition, WorksheetImplementation) and spec.definition.group_count:
@@ -347,8 +388,32 @@ def _retained_input(p: Principal, request: FunctionInvocation, compiled: dict) -
     objects = source["objects"]
     if len(objects) > request.limit or len({obj["resource_id"] for obj in objects}) != len(objects):
         raise WorkspaceError(409, "Retained input page is invalid or exceeds the declared bound")
+    source_plan = None
     with resource_connection(p) as conn, conn.cursor(row_factory=dict_row) as c:
         c.execute("SET LOCAL statement_timeout = '10s'")
+        if compiled.get("retained_properties"):
+            c.execute(
+                "SELECT set_config('finai.exact_scope',%s,true)",
+                (json.dumps(p.scope.model_dump(mode="json")),),
+            )
+            intent = c.execute(
+                "SELECT plan,plan_hash FROM function_invocations WHERE tenant_id=%s "
+                "AND request_id=%s AND exact_scope=%s::jsonb",
+                (
+                    p.scope.tenant_id,
+                    request.input_result.invocation_id,
+                    json.dumps(p.scope.model_dump(mode="json")),
+                ),
+            ).fetchone()
+            if (
+                intent is None
+                or intent["plan_hash"] != retained["receipt"]["plan_hash"]
+                or source.get("plan_hash") != intent["plan_hash"]
+                or _digest({k: v for k, v in intent["plan"].items() if k != "plan_hash"})
+                != intent["plan_hash"]
+            ):
+                raise WorkspaceError(409, "Retained calculated input plan integrity is unavailable")
+            source_plan = intent["plan"]
         for obj in objects:
             row = c.execute(
                 "SELECT to_jsonb(v)-'tenant_id' || "
@@ -365,7 +430,30 @@ def _retained_input(p: Principal, request: FunctionInvocation, compiled: dict) -
             ).fetchone()
             if row is None or row["object"] != obj:
                 raise WorkspaceError(409, "Retained input canonical version content is unavailable")
+    source_result = {
+        "invocation_id": retained["invocation_id"],
+        "receipt_hash": retained["receipt_hash"],
+        "run_id": source["run_id"],
+    }
+    calculated = {}
+    if source_plan is not None:
+        declared = [
+            ontology_definitions.definition(p, UUID(ref["resource_id"]), UUID(ref["version_id"]))
+            for ref in source_plan["derived_properties"]
+        ]
+        if [_pin(row) for row in declared] != source_plan["derived_properties"]:
+            raise WorkspaceError(
+                409, "Retained calculated output definitions differ from their plan"
+            )
+        calculated["consumed_property_values"] = _retained_property_values(
+            compiled["retained_properties"],
+            declared,
+            objects,
+            source.get("derived_values"),
+            source_result,
+        )
     return {
+        **calculated,
         **{
             key: source[key]
             for key in (
@@ -390,12 +478,152 @@ def _retained_input(p: Principal, request: FunctionInvocation, compiled: dict) -
             )
             if key in source
         },
-        "input_result": {
-            "invocation_id": retained["invocation_id"],
-            "receipt_hash": retained["receipt_hash"],
-            "run_id": source["run_id"],
-        },
+        "input_result": source_result,
     }
+
+
+def _retained_property_values(configured, declared, objects, values, source_result):
+    """Validate upstream output rows; only selected exact properties seed evaluation."""
+    from decimal import Decimal, DecimalException
+
+    from finai_api.domain.ontology_definitions import DerivedDefinition
+
+    props = {}
+    for row in declared:
+        if row["object_type"] != "DerivedProperty" or row["authority_state"] != "APPROVED":
+            raise WorkspaceError(409, "Retained calculated output property is unavailable")
+        model = DerivedDefinition.model_validate(row["attributes"]["definition"])
+        schemas = [pin for pin in row["dependencies"] if pin["relation"] == "FIELD:schema_id"]
+        if len(schemas) != 1:
+            raise WorkspaceError(409, "Retained calculated output schema is unavailable")
+        key = (str(row["resource_id"]), str(row["version_id"]))
+        if key in props:
+            raise WorkspaceError(409, "Retained calculated output has duplicate declared roots")
+        props[key] = (row, model, schemas[0])
+    selected = {(ref["resource_id"], ref["version_id"]): ref for ref in configured}
+    for key, ref in selected.items():
+        if (
+            key not in props
+            or _pin(props[key][0])
+            != {k: ref[k] for k in ("resource_id", "version_id", "content_hash")}
+            or _pin(props[key][2]) != ref["schema"]
+        ):
+            raise WorkspaceError(
+                409, "Upstream Function did not declare the exact retained property output"
+            )
+    object_map = {(str(obj["resource_id"]), str(obj["version_id"])): obj for obj in objects}
+    expected = {(rid, vid, oid, ovid) for rid, vid in props for oid, ovid in object_map}
+    if not isinstance(values, list) or len(values) != len(expected):
+        raise WorkspaceError(409, "Retained calculated outputs are missing or contain extra rows")
+    seen = set()
+    result = []
+    for value in values:
+        if not isinstance(value, dict):
+            raise WorkspaceError(409, "Invalid retained calculated output row")
+        if not {
+            "definition_id",
+            "definition_version_id",
+            "object_id",
+            "object_version_id",
+            "name",
+            "kind",
+            "epistemic_state",
+            "status",
+            "value",
+        }.issubset(value):
+            raise WorkspaceError(409, "Retained calculated output row is incomplete")
+        if "reason" in value and (
+            not isinstance(value["reason"], str) or len(value["reason"]) > 2000
+        ):
+            raise WorkspaceError(409, "Retained calculated output reason is invalid")
+        key = tuple(
+            str(value.get(k))
+            for k in ("definition_id", "definition_version_id", "object_id", "object_version_id")
+        )
+        if key not in expected or key in seen:
+            raise WorkspaceError(
+                409, "Retained calculated output has duplicate or mismatched exact pins"
+            )
+        seen.add(key)
+        row, model, schema = props[key[:2]]
+        obj = object_map[key[2:]]
+        status, data = value.get("status"), value.get("value")
+        if (
+            value.get("kind") != model.result_kind
+            or value.get("name") != model.name
+            or value.get("epistemic_state") != "DERIVED"
+        ):
+            raise WorkspaceError(
+                409, "Retained calculated output type differs from its exact property"
+            )
+        if status not in {"AVAILABLE", "MISSING_INPUT", "UNAVAILABLE", "NOT_APPLICABLE"}:
+            raise WorkspaceError(409, "Retained calculated output status is invalid")
+        if obj["object_type"] != schema["identity_key"]:
+            if status != "NOT_APPLICABLE":
+                raise WorkspaceError(409, "Retained calculated output applicability is invalid")
+        elif status == "NOT_APPLICABLE":
+            raise WorkspaceError(
+                409, "Retained calculated output unexpectedly excludes its object type"
+            )
+        elif str(obj["schema_version_id"]) != str(schema["version_id"]) and status != "UNAVAILABLE":
+            raise WorkspaceError(409, "Retained calculated output object schema is incompatible")
+        if status == "AVAILABLE":
+            if model.result_kind == "text":
+                valid = isinstance(data, str)
+            else:
+                valid = isinstance(data, (str, int)) and not isinstance(data, bool)
+                if valid:
+                    try:
+                        valid = len(str(data)) <= 4096
+                        if valid:
+                            ontology_definitions._bounded_decimal_text(Decimal(str(data)))
+                    except (ValueError, DecimalException):
+                        valid = False
+            if not valid:
+                raise WorkspaceError(
+                    409, "Retained calculated output value violates its declared kind"
+                )
+        elif data is not None:
+            raise WorkspaceError(409, "Unavailable retained calculated output cannot carry a value")
+        if key[:2] in selected:
+            result.append(
+                {
+                    **{
+                        name: value[name]
+                        for name in (
+                            "object_id",
+                            "object_version_id",
+                            "definition_id",
+                            "definition_version_id",
+                            "name",
+                            "kind",
+                            "epistemic_state",
+                            "status",
+                            "value",
+                        )
+                    },
+                    "content_hash": row["content_hash"],
+                    "schema": _pin(schema),
+                    "source_result": source_result,
+                    **({"reason": value["reason"]} if isinstance(value.get("reason"), str) else {}),
+                }
+            )
+    indexed = {
+        (
+            str(v["definition_id"]),
+            str(v["definition_version_id"]),
+            str(v["object_id"]),
+            str(v["object_version_id"]),
+        ): v
+        for v in result
+    }
+    return [
+        indexed[
+            (ref["resource_id"], ref["version_id"], str(obj["resource_id"]), str(obj["version_id"]))
+        ]
+        for ref in configured
+        for obj in objects
+    ]
 
 
 def execute_plan(p: Principal, retained_plan: dict) -> dict:
@@ -448,7 +676,7 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
             raise WorkspaceError(409, "Grouping schema pin is unavailable")
         grouped = {"group_counts": count_observations(result, grouping, schema)}
     properties = retained_plan["derived_properties"]
-    graph = _composed_graph(p, properties)
+    graph = _composed_graph(p, properties, force=bool(retained_plan.get("retained_properties")))
     graph_output = {}
     if graph is not None:
         from finai_api.services.derived_property_graph import evaluate_graph, public_graph
@@ -456,7 +684,9 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
         retained_graph = public_graph(graph)
         if retained_graph != retained_plan.get("derived_graph"):
             raise WorkspaceError(409, "Derived graph differs from the retained Function plan")
-        derived = evaluate_graph(graph, result["objects"])
+        derived = evaluate_graph(
+            graph, result["objects"], retained_values=result.get("consumed_property_values")
+        )
         graph_output["derived_graph"] = retained_graph
     else:
         if retained_plan.get("derived_graph") is not None:
