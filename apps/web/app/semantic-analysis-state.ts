@@ -69,3 +69,11 @@ function parseWorkspace(value:unknown):AnalysisView["workspace"] {
  const focus=g.focus as {row?:unknown;column?:unknown}|undefined;
  return {grid:{widths,pinned:Array.isArray(g.pinned)?g.pinned.filter((key:unknown)=>typeof key==="string"&&key.length<=128).slice(0,100):[],focus:focus&&typeof focus.row==="string"&&rowId.test(focus.row)&&typeof focus.column==="string"&&focus.column.length<=128?{row:focus.row,column:focus.column}:null,left:finite(g.left,0,100000,0)},dock:v.dock==="bottom"?"bottom":"right",collapsed:v.collapsed===true,size:finite(v.size,180,700,340)};
 }
+
+/** A visual choice, never an aggregation or a financial result. */
+export function hasUsefulMagnitude(projection:AnalysisProjection):boolean {
+ const {descriptor,rows}=projection;
+ if(descriptor.visual!=="HORIZONTAL_BARS"||!descriptor.measure||rows.length<2)return false;
+ const values=rows.map(row=>row.values[descriptor.measure!]).filter(value=>value?.state==="VALUE").map(value=>Number(value.value)).filter(Number.isFinite);
+ return new Set(values).size>1;
+}

@@ -3,7 +3,7 @@ import {readFile} from "node:fs/promises";
 import test from "node:test";
 import ts from "typescript";
 const source=await readFile(new URL("../app/semantic-analysis-state.ts",import.meta.url),"utf8");
-const {assertProjection,evidenceCaption,parseView,requestKey}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
+const {assertProjection,evidenceCaption,hasUsefulMagnitude,parseView,requestKey}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
 const id="11111111-1111-4111-8111-111111111111",hash="a".repeat(64),row="row_"+hash,time="2025-01-31T00:00:00Z";
 const pin={resource_id:id,version_id:id,content_hash:hash};
 const field={key:"units",label:"Units",kind:"decimal",role:"MEASURE",aggregation:"RETAINED_VALUE_ONLY",definition:pin,filterable:false,groupable:false,options:[]};
@@ -68,4 +68,20 @@ test("evidence basis remains explicit and unsupported bases are refused",()=>{
  assert.equal(evidenceCaption("CANONICAL_DEFINITION"),"Retained canonical definition");
  assert.equal(evidenceCaption("UNAVAILABLE"),"Original source unavailable");
  assert.throws(()=>assertProjection({...objectTable,request:selectedRequest,selection:{row_key:row,contributor_index:0,contributor_count:1,contributor:{...contributor,basis:"INFERRED"}}},selectedRequest));
+});
+
+test("workspace preferences allowlist layout without persisting result values or credentials",()=>{
+ const input={version:1,request,valid_at:time,known_at:time,receipt_hash:hash,columns:["units"],workspace:{grid:{widths:{units:900,other:-4},pinned:["units",4],focus:{row,column:"units"},left:180,token:"secret",rows:projection.rows},dock:"bottom",collapsed:true,size:999}};
+ const view=parseView(JSON.stringify(input),id);
+ assert.deepEqual(view.workspace,{grid:{widths:{units:600,other:88},pinned:["units"],focus:{row,column:"units"},left:180},dock:"bottom",collapsed:true,size:700});
+ assert.ok(!JSON.stringify(view).includes("secret"));assert.ok(!JSON.stringify(view).includes("9007199254740993"));
+ assert.equal(parseView(JSON.stringify({...input,request:{...request,company_id:"wrong"}}),id),null);
+});
+test("visual usefulness suppresses no measure, single row and equivalent equal magnitudes",()=>{
+ assert.equal(hasUsefulMagnitude(projection),false);
+ const second=structuredClone(projection.rows[0]);second.key="row_"+"b".repeat(64);
+ const many={...projection,rows:[projection.rows[0],second]};assert.equal(hasUsefulMagnitude(many),false);
+ second.values.units.value="2";assert.equal(hasUsefulMagnitude(many),true);
+ assert.equal(hasUsefulMagnitude({...many,descriptor:{...many.descriptor,measure:null,visual:"NONE"}}),false);
+ assert.equal(hasUsefulMagnitude({...many,rows:[{...second,values:{units:{state:"VALUE",value:"1.0"}}},{...second,values:{units:{state:"VALUE",value:"1.00"}}}]}),false);
 });
