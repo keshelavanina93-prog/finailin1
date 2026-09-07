@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from finai_api.domain.object_sets import ObjectSetQuery, ObjectSetResult
+from finai_api.domain.ontology_query_wire import ObjectSetResponse
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal
 from finai_api.services.object_sets import query_objects
@@ -10,7 +11,7 @@ from finai_api.services.object_sets import query_objects
 router = APIRouter(prefix="/v1/ontology/object-sets", tags=["ontology queries"])
 
 
-@router.post("/query", response_model=ObjectSetResult)
+@router.post("/query", response_model=ObjectSetResponse, response_model_exclude_unset=True)
 def query(
     principal: Annotated[Principal, Depends(authenticated_principal)],
     request: ObjectSetQuery,

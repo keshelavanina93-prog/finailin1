@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { CanonicalResource, SchemaField, ObjectSetQuery, ObjectSetResult } from "@finai/contracts";
+import {createOntologyClient} from "@g8/ontology-client";
 import ObjectBindingAction from "./object-binding-action";
 import DerivedPropertyRun from "./derived-property-run";
 import OntologyDefinitionEditor from "./ontology-definition-editor";
@@ -22,17 +23,6 @@ type FilterRow={field:string;operator:FilterOperator;value:string|null};
 type StepRow={kind:"reference"|"link";name:string;direction:"outgoing"|"incoming";filters:FilterRow[]};
 const restoreFilters=(filters:Query["filters"])=>filters.map(filter=>({field:filter.field,operator:filter.operator??"eq",value:filter.value===null?null:String(filter.value)}));
 const restoreSteps=(steps:Query["traversal"]):StepRow[]=>steps.map(step=>({...step,filters:restoreFilters(step.filters??[])}));
-function validateInterfaceResult(result:Result,expected?:Query["interface"],expectedGroup?:Query["type_group"]){
- const group=result.query.type_group;
- if(result.query.interface&&group)throw Error("A query cannot combine interface and type-group roots.");
- if(expectedGroup&&(!group||group.resource_id!==expectedGroup.resource_id||group.version_id!==expectedGroup.version_id))throw Error("The response did not preserve the exact type-group selection.");
- if(group&&(result.query.object_type!=="ObjectTypeGroup"||!result.type_group_bindings||result.type_group_bindings.group.resource_id!==group.resource_id||result.type_group_bindings.group.version_id!==group.version_id||!result.type_group_bindings.fields))throw Error("Exact type-group schema bindings are unavailable.");
- const root=result.query.interface;
- if(expected&&(!root||root.resource_id!==expected.resource_id||root.version_id!==expected.version_id||root.implementations.length!==expected.implementations.length||expected.implementations.some(pin=>!root.implementations.some(actual=>actual.resource_id===pin.resource_id&&actual.version_id===pin.version_id))))throw Error("The response did not preserve the exact interface and implementation selection.");
- if(!root)return;
- const bindings=result.interface_bindings;
- if(!bindings||bindings.interface.resource_id!==root.resource_id||bindings.interface.version_id!==root.version_id||!bindings.fields||bindings.implementations.length!==root.implementations.length||root.implementations.some(pin=>!bindings.implementations.some(binding=>binding.implementation.resource_id===pin.resource_id&&binding.implementation.version_id===pin.version_id)))throw Error("Exact interface field and implementation bindings are unavailable; this query cannot be interpreted safely.");
-}
 type SavedExecution = {query:Query;family:"sets"|"groups"|null;definition_id?:string;definition_version_id?:string};
 function restoreExecution(key?:string):SavedExecution|null {
   if(!key||typeof window==="undefined")return null;
@@ -56,6 +46,8 @@ function restoreExecution(key?:string):SavedExecution|null {
 }
 
 export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal,onInspect,onHistory,onTrace,viewStateKey }: { token: string; catalog?: CanonicalResource[]; onProposal?: (id: string) => void;onInspect?:InvestigationAction;onHistory?:InvestigationAction;onTrace?:InvestigationAction;viewStateKey?:string }) {
+  const client=useMemo(()=>createOntologyClient({baseUrl:"/api/ontology",getToken:()=>token}),[token]);
+  const executionController=useRef<AbortController|null>(null);
   const [restored]=useState(()=>restoreExecution(viewStateKey));
   const [loadedCatalog, setLoadedCatalog] = useState<CanonicalResource[]>([]);
   const catalog = suppliedCatalog ?? loadedCatalog;
@@ -77,20 +69,21 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
   const [publication, setPublication] = useState("");
   const [executionFamily, setExecutionFamily] = useState<"sets" | "groups" | null>(null);
   const generation = useRef(0);
-  useEffect(()=>()=>{generation.current++;},[token]);
+  useEffect(()=>()=>{generation.current++;executionController.current?.abort();},[token]);
   const [definitionError,setDefinitionError]=useState("");
   useEffect(()=>{
     if(!restored)return;
     const controller=new AbortController();const request=++generation.current;
-    const params=new URLSearchParams({offset:String(restored.query.offset),limit:String(restored.query.limit),version:restored.definition_version_id??"",valid_at:restored.query.valid_at!,known_at:restored.query.known_at!});
+    executionController.current=controller;
+    const options={offset:restored.query.offset,limit:restored.query.limit,valid_at:restored.query.valid_at,known_at:restored.query.known_at,signal:controller.signal};
     const replayDefinition=Boolean(restored.family&&!restored.query.interface&&!restored.query.type_group);
-    const url=replayDefinition?`/api/ontology/model/${restored.family}/${restored.definition_id}/objects?${params}`:"/api/ontology/object-sets/query";
-    void fetch(url,{method:replayDefinition?"GET":"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:replayDefinition?undefined:JSON.stringify(restored.query),cache:"no-store",signal:controller.signal})
-      .then(async response=>{const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:"The saved query could not be replayed.");validateInterfaceResult(data,restored.query.interface,restored.query.type_group);if(!controller.signal.aborted&&generation.current===request){setResult({...data,...restored.definition_id?{definition_id:restored.definition_id,definition_version_id:restored.definition_version_id}:{}});setExecutionFamily(restored.family);setLibraryId(restored.definition_id??"");setKind(data.query.object_type);setFilterRows(restoreFilters(data.query.filters));setFormSearch(data.query.search);setRootIds(data.query.resource_ids);setSteps(restoreSteps(data.query.traversal));setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings);}})
+    const exactPin={resource_id:restored.definition_id!,version_id:restored.definition_version_id!};
+    const execution=replayDefinition?(restored.family==="sets"?client.runSavedSet(exactPin,options):client.runGroup(exactPin,options)):client.query(restored.query,{signal:controller.signal});
+    void execution.then(data=>{if(!controller.signal.aborted&&generation.current===request){setResult({...data,...restored.definition_id?{definition_id:restored.definition_id,definition_version_id:restored.definition_version_id}:{}});setExecutionFamily(restored.family);setLibraryId(restored.definition_id??"");setKind(data.query.object_type);setFilterRows(restoreFilters(data.query.filters));setFormSearch(data.query.search);setRootIds(data.query.resource_ids);setSteps(restoreSteps(data.query.traversal));setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings);}})
       .catch(cause=>{if(!controller.signal.aborted&&generation.current===request)setError(cause instanceof Error?cause.message:"Query replay failed");})
       .finally(()=>{if(!controller.signal.aborted&&generation.current===request)setBusy(false);});
     return()=>controller.abort();
-  },[token,restored]);
+  },[client,restored]);
   useEffect(()=>{
     if(!viewStateKey||!result)return;
     try{sessionStorage.setItem(viewStateKey,JSON.stringify({query:result.query,family:executionFamily,definition_id:result.definition_id,definition_version_id:result.definition_version_id}));}catch{/* Storage restrictions do not block server-backed queries. */}
@@ -176,26 +169,20 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
   }
 
 
-  async function openPublished(page?: Result, offset = 0) {
-    const selected = definitions.find(item => item.resource_id === (page?.definition_id ?? libraryId));
-    if (!selected && !page?.definition_id) return;
-    const request = ++generation.current;
-    setBusy(true); setError(""); setResult(null);
+  async function openPublished() {
+    const selected=definitions.find(item=>item.resource_id===libraryId);
+    if(!selected)return;
+    const request=++generation.current;
+    executionController.current?.abort();const controller=new AbortController();executionController.current=controller;
+    setBusy(true);setError("");setResult(null);
     try {
-      const family = page?.definition_id ? executionFamily : selected?.object_type === "ObjectSetDefinition" ? "sets" : "groups";
-      if(!family)throw Error("Published query family is unavailable.");
-      const params = new URLSearchParams({ offset: String(offset), limit: String(page?.query.limit ?? 50), version: page?.definition_version_id ?? selected!.version_id });
-      if (page?.query.valid_at) params.set("valid_at", page.query.valid_at);
-      if (page?.query.known_at) params.set("known_at", page.query.known_at);
-      const response = await fetch(`/api/ontology/model/${family}/${page?.definition_id ?? selected!.resource_id}/objects?${params}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
-      const data = await response.json();
-      if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Published query failed");
-      validateInterfaceResult(data,page?.query.interface,page?.query.type_group);
-      if(!page&&selected?.object_type==="ObjectInterface"&&(!data.query.interface||data.query.interface.resource_id!==selected.resource_id||data.query.interface.version_id!==selected.version_id))throw Error("The published interface did not return its exact executable query root.");
-      if(!page&&selected?.object_type==="ObjectTypeGroup"&&(!data.query.type_group||data.query.type_group.resource_id!==selected.resource_id||data.query.type_group.version_id!==selected.version_id))throw Error("The published type group did not return its exact executable query root.");
-      if (generation.current === request) { setResult(data); setExecutionFamily(family); setKind(data.query.object_type); setFormSearch(data.query.search); setFilterRows(restoreFilters(data.query.filters)); setRootIds(data.query.resource_ids); setInterfaceRoot(data.query.interface); setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings); setSteps(restoreSteps(data.query.traversal)); }
-    } catch (cause) { if (generation.current === request) setError(cause instanceof Error ? cause.message : "Query failed"); }
-    finally { if (generation.current === request) setBusy(false); }
+      const family=selected.object_type==="ObjectSetDefinition"?"sets":"groups";
+      const exactPin={resource_id:selected.resource_id,version_id:selected.version_id};
+      const options={offset:0,limit:50,signal:controller.signal};
+      const data=await (family==="sets"?client.runSavedSet(exactPin,options):client.runGroup(exactPin,options));
+      if(generation.current===request&&!controller.signal.aborted){setResult(data);setExecutionFamily(family);setKind(data.query.object_type);setFormSearch(data.query.search);setFilterRows(restoreFilters(data.query.filters));setRootIds(data.query.resource_ids);setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings);setSteps(restoreSteps(data.query.traversal));}
+    }catch(cause){if(generation.current===request&&!controller.signal.aborted)setError(cause instanceof Error?cause.message:"Query failed");}
+    finally{if(generation.current===request)setBusy(false);}
   }
 
   async function publish(event: FormEvent<HTMLFormElement>) {
@@ -215,25 +202,28 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
     finally { setBusy(false); }
   }
 
-  async function run(query: Query, retainedDefinition?:Result) {
-    const request = ++generation.current;
-    setBusy(true); setError(""); setResult(null);
+  async function run(query: Query) {
+    const request=++generation.current;
+    executionController.current?.abort();const controller=new AbortController();executionController.current=controller;
+    setBusy(true);setError("");setResult(null);
     try {
-      const response = await fetch("/api/ontology/object-sets/query", { method: "POST", cache: "no-store",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(query) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "The object query could not be evaluated.");
-      validateInterfaceResult(data,query.interface,query.type_group);
-      if (request === generation.current) { setResult({...data,...retainedDefinition?.definition_id?{definition_id:retainedDefinition.definition_id,definition_version_id:retainedDefinition.definition_version_id}:{}}); if(!retainedDefinition)setExecutionFamily(null); setInterfaceRoot(data.query.interface); setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings); }
-    } catch (cause) { if (request === generation.current) setError(cause instanceof Error ? cause.message : "Query failed"); }
-    finally { if (request === generation.current) setBusy(false); }
+      const data=await client.query(query,{signal:controller.signal});
+      if(request===generation.current&&!controller.signal.aborted){setResult(data);setExecutionFamily(null);setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings);}
+    }catch(cause){if(request===generation.current&&!controller.signal.aborted)setError(cause instanceof Error?cause.message:"Query failed");}
+    finally{if(request===generation.current)setBusy(false);}
   }
 
-  function goToPage(offset: number) {
-    if (!result) return;
-    if (result.query.interface||result.query.type_group) void run({...result.query,offset},result);
-    else if (result.definition_id) void openPublished(result, offset);
-    else void run({ ...result.query, offset });
+  async function goToPage(offset: number) {
+    if(!result)return;
+    const previous=result;const request=++generation.current;
+    executionController.current?.abort();const controller=new AbortController();executionController.current=controller;
+    setBusy(true);setError("");setResult(null);
+    try{
+      const data=await client.page(previous,offset,{signal:controller.signal});
+      if(!data)throw Error("The requested query page is unavailable.");
+      if(request===generation.current&&!controller.signal.aborted){setResult(data);setInterfaceRoot(data.query.interface);setInterfaceBindings(data.interface_bindings);setGroupRoot(data.query.type_group);setGroupBindings(data.type_group_bindings);}
+    }catch(cause){if(request===generation.current&&!controller.signal.aborted)setError(cause instanceof Error?cause.message:"Query page failed");}
+    finally{if(request===generation.current)setBusy(false);}
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {

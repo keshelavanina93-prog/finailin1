@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@g8/ontology-client": "workspace:*",
     "@finai/contracts": "workspace:*",
     "@phosphor-icons/react": "^2.1.10",
     "maplibre-gl": "^5",

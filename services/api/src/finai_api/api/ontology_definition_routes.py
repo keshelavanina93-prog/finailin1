@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from finai_api.domain.object_sets import ObjectSetQuery
 from finai_api.domain.ontology_definitions import DEFINITION_MODELS, DefinitionWrite
+from finai_api.domain.ontology_query_wire import DefinedObjectSetResponse
 from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.domain.resources import ResourceReview
 from finai_api.domain.review import Principal
@@ -151,7 +152,11 @@ def decide(principal: User, identity: UUID, request: ResourceReview) -> Any:
     return resources.review(principal, identity, request)
 
 
-@router.get("/sets/{identity}/objects")
+@router.get(
+    "/sets/{identity}/objects",
+    response_model=DefinedObjectSetResponse,
+    response_model_exclude_unset=True,
+)
 def run_set(
     principal: User,
     identity: UUID,
@@ -164,7 +169,11 @@ def run_set(
     return definitions.run_set(principal, identity, version, offset, limit, valid_at, known_at)
 
 
-@router.get("/groups/{identity}/objects")
+@router.get(
+    "/groups/{identity}/objects",
+    response_model=DefinedObjectSetResponse,
+    response_model_exclude_unset=True,
+)
 def run_group(
     principal: User,
     identity: UUID,
