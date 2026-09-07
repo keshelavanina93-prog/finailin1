@@ -1,0 +1,15 @@
+{
+  "observed_at": "2026-09-07T16:55:47.5459219Z",
+  "before": {
+    "name": "worker",
+    "pid": 46188,
+    "created": "2026-09-07T16:52:57.538888Z",
+    "exe": "D:\\FinAI\\finailinear1\\.venv\\Scripts\\python.exe"
+  },
+  "after": {
+    "name": "worker",
+    "pid": 41332,
+    "created": "2026-09-07T16:55:46.94698Z",
+    "exe": "D:\\FinAI\\finailinear1\\.venv\\Scripts\\python.exe"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "implementation_commit": "1ce0144",
+  "invocation_id": "c631bb9c-f92e-5dd9-a693-233c1b3b7925",
+  "verification": "scripts/verify-posted-movement-run.py INVOCATION --probe-sql-guards",
+  "database": "main PostgreSQL on D, port 55439, migrations through 62",
+  "checks": [
+    "reopen_same_receipt",
+    "foreign_company_404",
+    "wrong_total_SQL_refused",
+    "wrong_currency_SQL_refused",
+    "missing_exclusion_SQL_refused",
+    "missing_authority_SQL_refused"
+  ],
+  "mutations": "Rollback-only negative probes; no forged result retained",
+  "release_accepted": false
+}
