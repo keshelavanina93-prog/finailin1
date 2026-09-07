@@ -1,0 +1,293 @@
+{
+  "base_commit": "6ed5044",
+  "subject": "b2b90d9c-b9cf-59d0-9506-ac6d7489a5c9",
+  "access_entity": "synthetic-definition-history-3f8d7fa4829b4014af9c03f223863fe4",
+  "original_plan": [
+    {
+      "Plan": {
+        "Node Type": "Limit",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Startup Cost": 4833.61,
+        "Total Cost": 4833.64,
+        "Plan Rows": 1,
+        "Plan Width": 85,
+        "Disabled": false,
+        "Plans": [
+          {
+            "Node Type": "Aggregate",
+            "Strategy": "Sorted",
+            "Partial Mode": "Simple",
+            "Parent Relationship": "Outer",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 4833.61,
+            "Total Cost": 4833.64,
+            "Plan Rows": 1,
+            "Plan Width": 85,
+            "Disabled": false,
+            "Group Key": [
+              "v.resource_id",
+              "v.version_id",
+              "v.object_type",
+              "v.display_name",
+              "v.access_entity"
+            ],
+            "Plans": [
+              {
+                "Node Type": "Sort",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 4833.61,
+                "Total Cost": 4833.61,
+                "Plan Rows": 1,
+                "Plan Width": 101,
+                "Disabled": false,
+                "Sort Key": [
+                  "v.resource_id",
+                  "v.version_id",
+                  "v.object_type",
+                  "v.display_name",
+                  "v.access_entity"
+                ],
+                "Plans": [
+                  {
+                    "Node Type": "Nested Loop",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Join Type": "Inner",
+                    "Startup Cost": 0.58,
+                    "Total Cost": 4833.6,
+                    "Plan Rows": 1,
+                    "Plan Width": 101,
+                    "Disabled": false,
+                    "Inner Unique": true,
+                    "Join Filter": "(v.version_id = h.version_id)",
+                    "Plans": [
+                      {
+                        "Node Type": "Nested Loop",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Join Type": "Inner",
+                        "Startup Cost": 0.29,
+                        "Total Cost": 4825.0,
+                        "Plan Rows": 1,
+                        "Plan Width": 65,
+                        "Disabled": false,
+                        "Inner Unique": false,
+                        "Join Filter": "(d.version_id = h.version_id)",
+                        "Plans": [
+                          {
+                            "Node Type": "Index Scan",
+                            "Parent Relationship": "Outer",
+                            "Parallel Aware": false,
+                            "Async Capable": false,
+                            "Scan Direction": "Forward",
+                            "Index Name": "dependency_reverse",
+                            "Relation Name": "resource_dependencies",
+                            "Alias": "d",
+                            "Startup Cost": 0.29,
+                            "Total Cost": 12.68,
+                            "Plan Rows": 1,
+                            "Plan Width": 49,
+                            "Disabled": false,
+                            "Index Cond": "((tenant_id = '805d8a32-d12b-4268-a236-b0b16e59da9f'::uuid) AND (target_resource_id = 'b2b90d9c-b9cf-59d0-9506-ac6d7489a5c9'::uuid))",
+                            "Filter": "(((tenant_id)::text = current_setting('finai.tenant_id'::text, true)) AND ((access_entity = '__PLATFORM__'::text) OR (current_setting('finai.tenant_access'::text, true) = 'true'::text) OR ((access_entity <> ALL ('{__TENANT__,__TENANT_RESTRICTED__}'::text[])) AND (access_entity = current_setting('finai.entity_id'::text, true)))) AND g8_can_read_version(tenant_id, version_id))"
+                          },
+                          {
+                            "Node Type": "Seq Scan",
+                            "Parent Relationship": "Inner",
+                            "Parallel Aware": false,
+                            "Async Capable": false,
+                            "Relation Name": "resource_heads",
+                            "Alias": "h",
+                            "Startup Cost": 0.0,
+                            "Total Cost": 4812.31,
+                            "Plan Rows": 1,
+                            "Plan Width": 32,
+                            "Disabled": false,
+                            "Filter": "((tenant_id = '805d8a32-d12b-4268-a236-b0b16e59da9f'::uuid) AND ((tenant_id)::text = current_setting('finai.tenant_id'::text, true)) AND ((access_entity = '__PLATFORM__'::text) OR (current_setting('finai.tenant_access'::text, true) = 'true'::text) OR ((access_entity <> ALL ('{__TENANT__,__TENANT_RESTRICTED__}'::text[])) AND (access_entity = current_setting('finai.entity_id'::text, true)))) AND g8_can_read_version(tenant_id, version_id))"
+                          }
+                        ]
+                      },
+                      {
+                        "Node Type": "Index Scan",
+                        "Parent Relationship": "Inner",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Scan Direction": "Forward",
+                        "Index Name": "resource_versions_pkey",
+                        "Relation Name": "resource_versions",
+                        "Alias": "v",
+                        "Startup Cost": 0.29,
+                        "Total Cost": 8.58,
+                        "Plan Rows": 1,
+                        "Plan Width": 100,
+                        "Disabled": false,
+                        "Index Cond": "((tenant_id = '805d8a32-d12b-4268-a236-b0b16e59da9f'::uuid) AND (version_id = d.version_id))",
+                        "Filter": "((authority_state = 'APPROVED'::text) AND ((tenant_id)::text = current_setting('finai.tenant_id'::text, true)) AND ((access_entity = '__PLATFORM__'::text) OR (current_setting('finai.tenant_access'::text, true) = 'true'::text) OR ((access_entity <> ALL ('{__TENANT__,__TENANT_RESTRICTED__}'::text[])) AND (access_entity = current_setting('finai.entity_id'::text, true)))) AND g8_can_read_version(tenant_id, version_id))"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "exact_join_plan": [
+    {
+      "Plan": {
+        "Node Type": "Limit",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Startup Cost": 38.16,
+        "Total Cost": 38.2,
+        "Plan Rows": 1,
+        "Plan Width": 85,
+        "Disabled": false,
+        "Plans": [
+          {
+            "Node Type": "Aggregate",
+            "Strategy": "Sorted",
+            "Partial Mode": "Simple",
+            "Parent Relationship": "Outer",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 38.16,
+            "Total Cost": 38.2,
+            "Plan Rows": 1,
+            "Plan Width": 85,
+            "Disabled": false,
+            "Group Key": [
+              "v.resource_id",
+              "v.version_id",
+              "v.object_type",
+              "v.display_name",
+              "v.access_entity"
+            ],
+            "Plans": [
+              {
+                "Node Type": "Sort",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 38.16,
+                "Total Cost": 38.16,
+                "Plan Rows": 1,
+                "Plan Width": 101,
+                "Disabled": false,
+                "Sort Key": [
+                  "v.resource_id",
+                  "v.version_id",
+                  "v.object_type",
+                  "v.display_name",
+                  "v.access_entity"
+                ],
+                "Plans": [
+                  {
+                    "Node Type": "Nested Loop",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Join Type": "Inner",
+                    "Startup Cost": 0.86,
+                    "Total Cost": 38.15,
+                    "Plan Rows": 1,
+                    "Plan Width": 101,
+                    "Disabled": false,
+                    "Inner Unique": true,
+                    "Plans": [
+                      {
+                        "Node Type": "Nested Loop",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Join Type": "Inner",
+                        "Startup Cost": 0.58,
+                        "Total Cost": 29.56,
+                        "Plan Rows": 1,
+                        "Plan Width": 133,
+                        "Disabled": false,
+                        "Inner Unique": true,
+                        "Plans": [
+                          {
+                            "Node Type": "Index Scan",
+                            "Parent Relationship": "Outer",
+                            "Parallel Aware": false,
+                            "Async Capable": false,
+                            "Scan Direction": "Forward",
+                            "Index Name": "dependency_reverse",
+                            "Relation Name": "resource_dependencies",
+                            "Alias": "d",
+                            "Startup Cost": 0.29,
+                            "Total Cost": 12.68,
+                            "Plan Rows": 1,
+                            "Plan Width": 49,
+                            "Disabled": false,
+                            "Index Cond": "((tenant_id = '805d8a32-d12b-4268-a236-b0b16e59da9f'::uuid) AND (target_resource_id = 'b2b90d9c-b9cf-59d0-9506-ac6d7489a5c9'::uuid))",
+                            "Filter": "(((tenant_id)::text = current_setting('finai.tenant_id'::text, true)) AND ((access_entity = '__PLATFORM__'::text) OR (current_setting('finai.tenant_access'::text, true) = 'true'::text) OR ((access_entity <> ALL ('{__TENANT__,__TENANT_RESTRICTED__}'::text[])) AND (access_entity = current_setting('finai.entity_id'::text, true)))) AND g8_can_read_version(tenant_id, version_id))"
+                          },
+                          {
+                            "Node Type": "Index Scan",
+                            "Parent Relationship": "Inner",
+                            "Parallel Aware": false,
+                            "Async Capable": false,
+                            "Scan Direction": "Forward",
+                            "Index Name": "resource_versions_pkey",
+                            "Relation Name": "resource_versions",
+                            "Alias": "v",
+                            "Startup Cost": 0.29,
+                            "Total Cost": 8.58,
+                            "Plan Rows": 1,
+                            "Plan Width": 100,
+                            "Disabled": false,
+                            "Index Cond": "((tenant_id = '805d8a32-d12b-4268-a236-b0b16e59da9f'::uuid) AND (version_id = d.version_id))",
+                            "Filter": "((authority_state = 'APPROVED'::text) AND ((tenant_id)::text = current_setting('finai.tenant_id'::text, true)) AND ((access_entity = '__PLATFORM__'::text) OR (current_setting('finai.tenant_access'::text, true) = 'true'::text) OR ((access_entity <> ALL ('{__TENANT__,__TENANT_RESTRICTED__}'::text[])) AND (access_entity = current_setting('finai.entity_id'::text, true)))) AND g8_can_read_version(tenant_id, version_id))"
+                          }
+                        ]
+                      },
+                      {
+                        "Node Type": "Index Scan",
+                        "Parent Relationship": "Inner",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Scan Direction": "Forward",
+                        "Index Name": "resource_heads_pkey",
+                        "Relation Name": "resource_heads",
+                        "Alias": "h",
+                        "Startup Cost": 0.29,
+                        "Total Cost": 8.58,
+                        "Plan Rows": 1,
+                        "Plan Width": 48,
+                        "Disabled": false,
+                        "Index Cond": "((tenant_id = '805d8a32-d12b-4268-a236-b0b16e59da9f'::uuid) AND (resource_id = v.resource_id))",
+                        "Filter": "((version_id = v.version_id) AND ((tenant_id)::text = current_setting('finai.tenant_id'::text, true)) AND ((access_entity = '__PLATFORM__'::text) OR (current_setting('finai.tenant_access'::text, true) = 'true'::text) OR ((access_entity <> ALL ('{__TENANT__,__TENANT_RESTRICTED__}'::text[])) AND (access_entity = current_setting('finai.entity_id'::text, true)))) AND g8_can_read_version(tenant_id, version_id))"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "native_tests": {
+    "deselected": 1,
+    "elapsed_seconds": 9.61,
+    "cases": [
+      "test_transitive_current_snapshot_detects_new_consumer_and_excludes_obsolete_edges",
+      "test_hidden_consumers_are_restricted_at_rest_and_require_steward"
+    ],
+    "passed": 2
+  },
+  "measured_latency_improvement": false,
+  "scale_proven": false
+}
