@@ -1,0 +1,27 @@
+{
+  "fixture_tenant": "248cc042-4707-4b4a-8f1f-5237719fc190",
+  "snapshot": {
+    "canonical_identities": {
+      "count": 142,
+      "sha256": "cf77bc74885e46f873755a58a471fc7cc698732e942e48ca4ec1ebf9541c1fac"
+    },
+    "resource_versions": {
+      "count": 142,
+      "sha256": "930eacc7f608334f65a0e3f82562775abd831f1a9e18f96637a332c0d8b69c7b"
+    },
+    "resource_heads": {
+      "count": 142,
+      "sha256": "368e787a1029793dd720caa457fcad54777145aa4bd2e21c9a7f43a932bd1b1d"
+    },
+    "resource_dependencies": {
+      "count": 438,
+      "sha256": "96038282f1ac50973817ed30d60b143f72127b4890eca23863900992a5acce1c"
+    }
+  },
+  "postmaster_started_before": "2026-09-08T01:55:54.415699+04:00",
+  "commit_reopen_pass": true,
+  "database_restart_pass": true,
+  "synthetic_only": true,
+  "postmaster_started_after": "2026-09-08T01:58:20.988796+04:00",
+  "replay_after_restart_unchanged": true
+}

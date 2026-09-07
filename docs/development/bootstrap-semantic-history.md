@@ -1,5 +1,15 @@
 # Exact semantics for new platform installations
 
+The isolated integration candidate also passed a separate committed-install and
+database-restart proof. `scripts/verify-platform-bootstrap-restart.py create`
+creates a synthetic platform tenant only on the explicitly guarded disposable
+CI database at port 55441. After an owned `pg_ctl restart` of that cluster,
+`verify` checks unchanged hashes of identities, versions, heads and dependencies,
+then verifies replay creates nothing. The mounted product database is excluded
+by exact data-directory and port checks. The retained fixture and outcome are in
+`evidence/nin60-bootstrap-commit-restart.json`; this proves local PostgreSQL
+persistence, not whole-system recovery or release acceptance.
+
 The installer now retains SEMANTIC field dependencies to exact approved platform
 SemanticContract seed versions when creating a new SchemaDefinition. Identities,
 versions, heads and dependencies share one transaction; unavailable, foreign or
