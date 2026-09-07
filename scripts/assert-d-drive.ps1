@@ -18,7 +18,20 @@ if (-not $resolvedRoot.StartsWith('D:\', [System.StringComparison]::OrdinalIgnor
 }
 
 if (-not $resolvedRoot.Equals($expectedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
-    throw "FinAI canonical checkout must be '$expectedRoot'. Repository resolved to '$resolvedRoot'."
+    # Admit registered worktrees of this repository, not arbitrary D: checkouts.
+    $commonDirectory = & git -C $resolvedRoot rev-parse --path-format=absolute --git-common-dir 2>$null
+    if ($LASTEXITCODE -ne 0 -or -not $commonDirectory -or
+        -not [IO.Path]::GetFullPath([string]$commonDirectory).Equals(
+            (Join-Path $expectedRoot '.git'), [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Repository must be the canonical checkout or one of its registered D: worktrees."
+    }
+    $registeredWorktrees = & git -C $expectedRoot -c core.quotePath=false worktree list --porcelain
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot verify registered worktrees.' }
+    $registered = @($registeredWorktrees | Where-Object { $_.StartsWith('worktree ') } |
+        ForEach-Object { [IO.Path]::GetFullPath($_.Substring(9)) })
+    if (-not ($registered | Where-Object { $_.Equals($resolvedRoot, [StringComparison]::OrdinalIgnoreCase) })) {
+        throw "Repository is not a registered canonical worktree: '$resolvedRoot'."
+    }
 }
 
 if ($RepositoryOnly) {
@@ -63,8 +76,8 @@ foreach ($name in $guardedNames) {
     $value = [Environment]::GetEnvironmentVariable($name, 'Process')
     if (-not $value) { throw "$name is unset. Run bootstrap-local.ps1 first." }
     $absolute = [IO.Path]::GetFullPath($value)
-    if (-not $absolute.StartsWith($expectedRoot + '\', [System.StringComparison]::OrdinalIgnoreCase)) {
-        throw "$name must remain within the canonical checkout; received '$value'."
+    if (-not $absolute.StartsWith($resolvedRoot + '\', [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "$name must remain within this checkout; received '$value'."
     }
     $candidate = $absolute
     while ($candidate) {
