@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "issue": "NIN-59",
+  "related_issue": "NIN-57",
+  "date": "2026-09-07",
+  "worktree": "D:\\FinAI\\g8-adaptive-workspace",
+  "branch": "development/nin59-adaptive-workspace",
+  "base": "98011c5",
+  "code_commits": [
+    "091d145",
+    "a5e8e58"
+  ],
+  "contract": "semantic-analysis/1",
+  "endpoint": "POST /api/ontology/analysis/project",
+  "implemented": [
+    "shared descriptor-driven grid and synchronized retained-value bars",
+    "server-only retained-group filtering and non-aggregating sections",
+    "selected contributor and excluded evidence in contextual pane",
+    "embedded retained trace and exact NYX references",
+    "reference-only device preferences scoped to token fingerprint and company",
+    "descriptor/receipt/time checks on reopen; URL and back-forward reference restoration",
+    "abort stale requests; retain coherent existing grid during updates; restore scroll and clear-selection focus after response"
+  ],
+  "checks": {
+    "contracts_build": "PASS",
+    "ontology_client_build": "PASS",
+    "web_typecheck": "PASS",
+    "focused_eslint": "PASS",
+    "state_tests": {
+      "passed": 3,
+      "failed": 0
+    },
+    "utf8_decode": "PASS"
+  },
+  "runtime": {
+    "started": false,
+    "qa_3062_modified": false,
+    "browser_two_subject_proof": "PENDING_INTEGRATION"
+  },
+  "limitations": [
+    "Endpoint and authentic second subject supplied by horizontal/vertical owners; not exercised live in this code-only pass.",
+    "Saved views are local device preferences, not cross-device server resources.",
+    "No new calculations, aggregations, business IDs or authority semantics.",
+    "NIN-50 independent acceptance remains open."
+  ]
+}
