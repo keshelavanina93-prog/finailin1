@@ -514,6 +514,13 @@ def _validate(
 
                 binding = validate_journal(item, target)
                 validate_current_binding(conn, principal, binding)
+                from finai_api.services.period_control import require_open
+
+                require_open(conn, principal, item, binding, target, proposal)
+            if item.object_type == "PeriodControl":
+                from finai_api.services.period_control import validate as validate_period_control
+
+                validate_period_control(conn, principal, item, target, proposal)
             if item.object_type == "SourceDimensionAssignment":
                 from finai_api.services.source_dimensions import validate_assignment
 

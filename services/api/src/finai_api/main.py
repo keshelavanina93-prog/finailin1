@@ -15,6 +15,7 @@ from finai_api.api.ontology_operation_routes import router as ontology_operation
 from finai_api.api.ontology_routes import router as ontology_router
 from finai_api.api.operations_routes import router as operations_router
 from finai_api.api.operator_routes import router as operator_router
+from finai_api.api.period_control_routes import router as period_control_router
 from finai_api.api.proposal_queue_routes import router as proposal_queue_router
 from finai_api.api.regulation_routes import router as regulation_router
 from finai_api.api.reporting_routes import router as reporting_router
@@ -55,6 +56,7 @@ app.include_router(proposal_queue_router)
 app.include_router(source_document_router)
 app.include_router(company_context_router)
 app.include_router(company_journal_router)
+app.include_router(period_control_router)
 app.include_router(ontology_operation_router)
 
 

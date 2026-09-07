@@ -5,9 +5,12 @@ from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest
+from psycopg.errors import RaiseException
 from test_definition_history import DB, item, retained  # noqa: F401
 
+from finai_api.domain.resources import ResourceReview
 from finai_api.services import company_journals as journals
+from finai_api.services import period_control, resources
 from finai_api.services.workspace import WorkspaceError
 
 
@@ -186,7 +189,14 @@ def test_native_exact_bundle_book_scope_and_hidden_line(retained, monkeypatch):
         fixture.setattr(
             "finai_api.services.source_accounting_context.validate_context", lambda *_: None
         )
-        fixture.setattr("finai_api.services.accounting_promotion.validate_journal", lambda *_: None)
+        fixture.setattr(
+            "finai_api.services.accounting_promotion.validate_journal",
+            lambda obj, target: target(
+                obj.attributes["accounting_binding_id"],
+                str(obj.resource_id),
+                "ACCOUNTING_INTERPRETATION",
+            ),
+        )
         fixture.setattr(
             "finai_api.services.accounting_promotion.validate_current_binding", lambda *_: None
         )
@@ -208,9 +218,34 @@ def test_native_exact_bundle_book_scope_and_hidden_line(retained, monkeypatch):
             scope,
             binding,
             account,
-            entry,
-            *lines,
         )
+        control_maker = full.model_copy(
+            update={"permissions": ("ontology_read", "ontology_propose", "ontology_review")}
+        )
+        selected = journals.selection(
+            full,
+            company.resource_id,
+            ledger.resource_id,
+            book.resource_id,
+            period.resource_id,
+            datetime.now(UTC),
+        )
+        control_request = period_control.ProposalRequest(
+            selection=selected,
+            request_id=uuid4(),
+            expected_version_id=None,
+            state="OPEN",
+            reason="SYNTHETIC readback fixture posting gate only",
+        )
+        control_result = period_control.propose(control_maker, control_request)
+        resources.review(
+            control_maker.model_copy(update={"actor_id": "synthetic-posting-checker"}),
+            UUID(control_result["proposal_id"]),
+            ResourceReview(
+                decision="APPROVED", rationale="Independent synthetic posting gate approval"
+            ),
+        )
+        published = publish(entry, *lines)
     entry_version = next(
         row["version_id"] for row in published if row["resource_id"] == str(entry.resource_id)
     )
@@ -246,3 +281,51 @@ def test_native_exact_bundle_book_scope_and_hidden_line(retained, monkeypatch):
     )
     with pytest.raises(WorkspaceError):
         journals.list_journals(outsider, *args[1:])
+    state = period_control.read(control_maker, *args[1:])
+    lock_request = control_request.model_copy(
+        update={
+            "request_id": uuid4(),
+            "state": "LOCKED",
+            "expected_version_id": UUID(state["control"]["version_id"]),
+            "reason": "SYNTHETIC SQL guard refusal verification only",
+        }
+    )
+    period_control.propose(control_maker, lock_request)
+    resources.review(
+        control_maker.model_copy(update={"actor_id": "synthetic-posting-checker"}),
+        lock_request.request_id,
+        ResourceReview(decision="APPROVED", rationale="Independent synthetic lock"),
+    )
+    versions = {row["resource_id"]: UUID(row["version_id"]) for row in published}
+    corrections = [
+        obj.model_copy(update={"expected_version_id": versions[str(obj.resource_id)]})
+        for obj in [entry, *lines]
+    ]
+    with monkeypatch.context() as bypass:
+        bypass.setattr(
+            "finai_api.services.accounting_promotion.validate_journal",
+            lambda obj, target: target(
+                obj.attributes["accounting_binding_id"],
+                str(obj.resource_id),
+                "ACCOUNTING_INTERPRETATION",
+            ),
+        )
+        bypass.setattr(
+            "finai_api.services.accounting_promotion.validate_current_binding", lambda *_: None
+        )
+        bypass.setattr(
+            "finai_api.services.accounting_consumption.validate_accounting_proposal",
+            lambda *_: None,
+        )
+        # Deliberately pin the LOCKED control while bypassing only the application gate.
+        bypass.setattr(
+            "finai_api.services.period_control.require_open",
+            lambda conn, p, obj, binding, target, proposal: target(
+                control_result["control_id"], str(obj.resource_id), "PERIOD_POSTING_CONTROL"
+            ),
+        )
+        with pytest.raises(RaiseException, match="Current reviewed OPEN period control required"):
+            publish(*corrections)
+    assert (
+        resources.get_resource(reader, entry.resource_id)["resource"]["version_id"] == entry_version
+    )

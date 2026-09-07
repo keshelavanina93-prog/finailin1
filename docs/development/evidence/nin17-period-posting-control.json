@@ -1,0 +1,93 @@
+{
+  "base_commit": "d85110c",
+  "registry": {
+    "migrations": [
+      52,
+      53
+    ],
+    "database_guard_enabled": true,
+    "schema_proposal": "51fa471f-f98f-4b58-827d-71d865dc5660",
+    "schema_id": "463f2302-43b9-5fdc-b5e9-435fe958c8b2",
+    "schema_version": "3f1df736-de2f-5348-976a-68f5fb9f5687",
+    "schema_hash": "e44d7aac1c9970c3919406c34be6ee0d0330189b0401ad9341254d8bf7dfbf36",
+    "schema_mutations": 1,
+    "financial_configuration_created": false
+  },
+  "native_tests": {
+    "request_replay_and_conflict": true,
+    "late_context_change_refused_at_approval": true,
+    "financial_validators_bypassed_only_for_synthetic_readback_fixture": true,
+    "stale_expected_version_refused": true,
+    "passed": 10,
+    "elapsed_seconds": 267.37,
+    "command": "G8_BINDING_DB_TEST=1 python -m pytest --no-cov services/api/tests/test_period_control.py services/api/tests/test_company_journals.py -q --tb=short",
+    "database_refused_locked_journal_with_application_gate_bypassed": true,
+    "native_cases": 2,
+    "journal_head_unchanged_after_refusal": true,
+    "independent_open_lock_reopen": true,
+    "unit_parameter_cases": 8
+  },
+  "http": {
+    "checked_at": "2026-09-07T11:53:36.466947+04:00",
+    "url": "http://127.0.0.1:3062/api/ontology/",
+    "synthetic_context": {
+      "company_id": "75403cc5-59cf-4467-947d-2ab6286372f9",
+      "ledger_id": "49cfb72c-84b8-40eb-81fa-4ba4430540c1",
+      "book_id": "9abe4454-b06c-496f-b904-a7f19e548fa7",
+      "period_id": "59521814-3e8a-4da1-9220-017718aa505b"
+    },
+    "state": "LOCKED",
+    "control_id": "b2b90d9c-b9cf-59d0-9506-ac6d7489a5c9",
+    "control_version": "f323ae58-c0e8-5153-b17c-315363567e53",
+    "journal_id": "5949b7ff-790d-43e0-9407-7b79b1c7da7f",
+    "journal_version": "45dc522f-6f55-58c1-861d-07b376c7729d",
+    "readback_integrity": {
+      "state": "COMPLETE_BALANCED",
+      "issues": [],
+      "declared_line_count": 2,
+      "resolved_line_count": 2,
+      "balance": {
+        "debit": "12.50",
+        "credit": "12.50",
+        "currency_id": "5b841983-fb5c-4639-86c5-cca7373cdf87"
+      }
+    },
+    "positive_read_http_status": [
+      200,
+      200,
+      200
+    ],
+    "unauthenticated_status": 401,
+    "malformed_proposal_status": 422,
+    "unconfigured_sgp_status": 422,
+    "wrong_method_status": 404,
+    "historical_readback_available_while_locked": true,
+    "new_proposal_created": false,
+    "authentic_accounting_publication_proven": false
+  },
+  "browser": {
+    "two_complete_lines_and_balanced_12_50_displayed": true,
+    "historical_journal_detail_opened": true,
+    "screenshot": "nin17-period-posting-control.png",
+    "posting_change_submission_tested": false,
+    "ineligible_accounting_input_explicit": true,
+    "url": "http://127.0.0.1:3062/",
+    "exact_company_ledger_book_period_selected": true,
+    "fixture_company_id": "75403cc5-59cf-4467-947d-2ab6286372f9",
+    "actor": "local-steward",
+    "locked_state_shown": true,
+    "exact_journal_inspector_opened": true,
+    "balance_footer_wrap_verified": true,
+    "balance_screenshot": "nin17-period-journal-readback.png"
+  },
+  "focused_lint_and_types": "PASS",
+  "production_build": "PASS",
+  "real_socar_control_configured": false,
+  "authentic_journal_publication_proven": false,
+  "close_certification_proven": false,
+  "erp_posting_proven": false,
+  "complete_nin17_acceptance": false,
+  "complete_nin25_acceptance": false,
+  "release_accepted": false,
+  "catalog_lint_baseline": "Four pre-existing E501 lines at 39,40,45,198; no new violations in added PeriodControl definition"
+}

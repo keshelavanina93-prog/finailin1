@@ -3,6 +3,7 @@ import {useEffect,useRef,useState, type FormEvent} from "react";
 import type {PromotionCheck, ResourceProposalDetail} from "@finai/contracts";
 import {Badge} from "./g8-ui";
 import JournalProposalReview from "./journal-proposal-review";
+import PeriodControlProposalReview from "./period-control-proposal-review";
 import AccountingSetupProposalReview from "./accounting-setup-proposal-review";
 
 type Props = {token:string;proposalId:string;onDecision?:(detail:ResourceProposalDetail)=>void};
@@ -74,6 +75,7 @@ function PromotionPanel({token,proposalId,onDecision}:Props) {
         <details><summary>Evidence trace</summary><p>{result.evaluation.evaluator}</p><p className="full-hash">Proposal: {result.evaluation.proposal_hash}</p><p className="full-hash">Evaluation binding: {result.evaluation.binding_hash}</p></details>
       </> : <p>No evaluation was retained for this proposal. Submit a refreshed proposal before promotion.</p>}
     </section>}
+    {result && <PeriodControlProposalReview detail={result.proposal_detail}/>}
     {result && <JournalProposalReview detail={result.proposal_detail}/>}
     {result && <AccountingSetupProposalReview detail={result.proposal_detail}/>}
     {receipt && <p role="status">{receipt}</p>}

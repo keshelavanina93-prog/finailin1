@@ -132,6 +132,11 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "currency_id": "@Currency",
     },
     "AccountingBook": {"ledger_id": "@Ledger", "code": "Identifier"},
+    "PeriodControl": {
+        "legal_entity_id":"@LegalEntity", "ledger_id":"@Ledger", "book_id":"@AccountingBook",
+        "period_id":"@FiscalPeriod", "chart_id":"@LocalChartOfAccounts", "currency_id":"@Currency",
+        "calendar_id":"@FiscalCalendar", "definition":"OntologyDefinition",
+    },
     "FiscalCalendar": {"code": "Identifier"},
     "FiscalPeriod": {"calendar_id": "@FiscalCalendar", "starts_on": "Date", "ends_on": "Date"},
     "Currency": {"code": "CurrencyCode"},

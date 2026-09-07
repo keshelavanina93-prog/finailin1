@@ -58,7 +58,7 @@ class ProposalExpectation(BaseModel):
 
 class ProposalRequestBinding(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
-    operation: Literal["source-accounting-setup/1"]
+    operation: Literal["source-accounting-setup/1", "period-posting-control/1"]
     content_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
 
 

@@ -1,5 +1,6 @@
 export type { HistorySearchResult } from "./history-search.js";
 export type { CompanyJournalListResponse, CompanyJournalDetailResponse, JournalSelection, JournalPin } from "./company-journals.js";
+export type { PeriodControlResponse, PeriodControlProposalRequest, PeriodControlProposalResponse } from "./period-control.js";
 export type { CertificationDefinition, CertificationContract, CertificationEvaluationRequest, DefinitionConformanceReceipt } from "./certification.js";
 export type { ProposalQueuePage, ProposalQueueCursor } from "./proposal-queue.js";
 export const epistemicStates = [

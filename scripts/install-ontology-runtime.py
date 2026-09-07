@@ -38,6 +38,7 @@ def main() -> None:
         "Artifact",
         "JournalEntry",
         "JournalLine",
+        "PeriodControl",
         "DeploymentTarget",
         "RuntimeAgent",
         "DesiredState",
