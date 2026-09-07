@@ -99,6 +99,15 @@ class PostedMovementsImplementation(BaseModel):
     entity_movement_review: bool = Field(
         default=False, strict=True, exclude_if=lambda value: not value
     )
+    movement_display_fraction_digits: int | None = Field(
+        default=None, strict=True, ge=0, le=6, exclude_if=lambda value: value is None
+    )
+
+    @model_validator(mode="after")
+    def movement_presentation(self):
+        if self.movement_display_fraction_digits is not None and not self.entity_movement_review:
+            raise ValueError("Movement display precision requires entity movement review")
+        return self
 
     @property
     def derived_property_ids(self) -> list[UUID]:

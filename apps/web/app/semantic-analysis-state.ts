@@ -9,6 +9,25 @@ const kinds=new Set(["text","identifier","reference","integer","decimal","boolea
 // Bound visual conversion without changing the exact retained decimal label.
 const decimal=/^-?(?:0|[1-9]\d{0,99})(?:\.\d{1,100})?$/;
 const storedDecimal=/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/;
+function validPresentation(field:AnalysisField):boolean {
+ const p=field.presentation;
+ if(p===undefined)return true;
+ return Boolean(p&&Object.keys(p).every(key=>["format","fraction_digits","currency"].includes(key))&&p.format==="FIXED_DECIMAL"&&Number.isInteger(p.fraction_digits)&&p.fraction_digits>=0&&p.fraction_digits<=6&&field.kind==="decimal"&&["ATTRIBUTE","MEASURE"].includes(field.role)&&typeof field.unit==="string"&&field.unit.trim()&&pin(p.currency)&&pin(field.unit_reference!)&&p.currency.resource_id===field.unit_reference?.resource_id&&p.currency.version_id===field.unit_reference?.version_id&&p.currency.content_hash===field.unit_reference?.content_hash);
+}
+const decimalFormats=new Map<number,Intl.NumberFormat>();
+/** Display only: decimal strings never pass through binary floating-point conversion. */
+export function formatAnalysisDecimal(exact:string,field:AnalysisField):string {
+ if(!validPresentation(field))throw Error("Unsupported decimal presentation or currency context.");
+ const p=field.presentation;
+ // Exponential notation remains exact text; no infinity or underflow substitution.
+ if(!p||!/^[-+]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(exact))return exact;
+ let formatter=decimalFormats.get(p.fraction_digits);
+ if(!formatter){formatter=new Intl.NumberFormat("en-US",{minimumFractionDigits:p.fraction_digits,maximumFractionDigits:p.fraction_digits});decimalFormats.set(p.fraction_digits,formatter);}
+ const parts=(formatter.formatToParts as unknown as (value:string)=>Intl.NumberFormatPart[])(exact);
+ if(parts.some(part=>part.type==="infinity"||part.type==="nan"))return exact;
+ const roundedZero=parts.filter(part=>part.type==="integer"||part.type==="fraction").every(part=>/^0+$/.test(part.value));
+ return (roundedZero&&/[1-9]/.test(exact)?"≈":"")+parts.map(part=>part.value).join("");
+}
 export function evidenceCaption(basis:AnalysisContributor["basis"]):string {
  return basis==="CANONICAL_DEFINITION"?"Retained canonical definition":basis==="UNAVAILABLE"?"Original source unavailable":"Original retained evidence";
 }
@@ -39,7 +58,7 @@ export function assertProjection(value:AnalysisProjection,request:AnalysisReques
  if(saved&&(d.valid_at!==saved.valid_at||d.known_at!==saved.known_at||d.receipt_hash!==saved.receipt_hash))throw Error("The saved view’s exact result and time references no longer match.");
  if(d.filtering!=="RETAINED_GROUP_SELECTION"||d.grouping!=="RETAINED_ROWS_WITHOUT_AGGREGATION"||!Array.isArray(d.fields)||!d.fields.length||d.fields.length>100||!Array.isArray(value.rows)||value.rows.length>1000||!Array.isArray(value.sections)||!Number.isInteger(value.total_rows)||value.total_rows<value.rows.length||value.total_rows>1000)throw Error("This analysis descriptor requires an unsupported renderer.");
  const objectTable=d.contract==="semantic-analysis/2";
- if(d.fields.some(field=>!field||typeof field.key!=="string"||!field.key||typeof field.label!=="string"||!kinds.has(field.kind)||!(objectTable?["DIMENSION","ATTRIBUTE"]:["DIMENSION","MEASURE"]).includes(field.role)||!["NONE","RETAINED_VALUE_ONLY"].includes(field.aggregation)||!pin(field.definition)||typeof field.filterable!=="boolean"||typeof field.groupable!=="boolean"||!Array.isArray(field.options)||field.options.length>1000||field.options.some(option=>!validValue(option,field))))throw Error("Unsupported field semantics or typed values in this analysis descriptor.");
+ if(d.fields.some(field=>!field||typeof field.key!=="string"||!field.key||typeof field.label!=="string"||!kinds.has(field.kind)||!validPresentation(field)||!(objectTable?["DIMENSION","ATTRIBUTE"]:["DIMENSION","MEASURE"]).includes(field.role)||!["NONE","RETAINED_VALUE_ONLY"].includes(field.aggregation)||!pin(field.definition)||typeof field.filterable!=="boolean"||typeof field.groupable!=="boolean"||!Array.isArray(field.options)||field.options.length>1000||field.options.some(option=>!validValue(option,field))))throw Error("Unsupported field semantics or typed values in this analysis descriptor.");
  const measures=d.fields.filter(field=>field.role==="MEASURE");
  if(objectTable){
   if(d.measure!==null||d.visual!=="NONE"||d.row_noun!=="objects"||measures.length||d.fields.some(field=>field.aggregation!=="NONE"))throw Error("Object tables must explicitly declare no measure, chart or aggregation.");

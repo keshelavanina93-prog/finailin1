@@ -51,6 +51,12 @@ class ProjectionRequest(Model):
         return self
 
 
+class DecimalPresentation(Model):
+    format: Literal["FIXED_DECIMAL"]
+    fraction_digits: int = Field(strict=True, ge=0, le=6)
+    currency: Pin
+
+
 class FieldDefinition(Model):
     key: str
     label: str
@@ -67,6 +73,21 @@ class FieldDefinition(Model):
     groupable: bool = False
     aggregation: Literal["NONE", "RETAINED_VALUE_ONLY"] = "NONE"
     options: list[Value] = Field(default_factory=list, max_length=1000)
+    presentation: DecimalPresentation | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+
+    @model_validator(mode="after")
+    def presentation_context(self):
+        if self.presentation is not None and (
+            self.kind != "decimal"
+            or self.role not in {"ATTRIBUTE", "MEASURE"}
+            or not self.unit
+            or not self.unit.strip()
+            or self.unit_reference != self.presentation.currency
+        ):
+            raise ValueError("Decimal presentation requires the field's exact currency context")
+        return self
 
 
 class Row(Model):

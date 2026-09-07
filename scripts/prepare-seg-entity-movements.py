@@ -66,6 +66,7 @@ def main():
         sheet="Base",
         max_source_rows=1000,
         entity_movement_review=True,
+        movement_display_fraction_digits=2,
     )
     attrs = {
         "definition": definition,
