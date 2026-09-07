@@ -1,0 +1,2673 @@
+{
+  "descriptor": {
+    "contract": "semantic-analysis/2",
+    "invocation_id": "c77e06cd-7b47-5f8d-9157-18619827cbe2",
+    "receipt_hash": "3e28e02466e715f328a44a325263de64cd4003a147c5596e24acbb8036f3a98b",
+    "run_id": "fcr_096db6c75e79757cd87cfd58f01f25646c1cae81af9356be4a94af5d3f6fdb91",
+    "function": {
+      "resource_id": "983c1f84-5cf0-557f-b5cd-8656a746f209",
+      "version_id": "ec3eeed2-39ee-518b-aae9-1661d147c45a",
+      "content_hash": "7351b8cd225dda67fbf6001e9c974263076bf22d0a08c7c34f0df6ddab56d5ea"
+    },
+    "company": {
+      "resource_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+      "version_id": "928f83fe-09a5-5f73-82ad-83fcfa77af7b",
+      "content_hash": "f1c3000ff2997d128f0d60f6f11197a9f2f720adf1949427e77993ed08516fcf"
+    },
+    "company_label": "შპს სოკარ ენერჯი ჯორჯია",
+    "title": "SEG reviewed account definitions",
+    "row_noun": "objects",
+    "grain": [
+      "__resource"
+    ],
+    "partition_keys": [],
+    "fields": [
+      {
+        "key": "__resource",
+        "label": "Object",
+        "kind": "reference",
+        "role": "DIMENSION",
+        "unit": null,
+        "unit_reference": null,
+        "definition": {
+          "resource_id": "43328dcc-c42a-5dee-b9be-05085d3f8409",
+          "version_id": "cfcb4150-7780-5c28-8465-09864c2539e6",
+          "content_hash": "1e1359e44379b5df70c468dd62ec0713b9747632986471fea2779c827403e299"
+        },
+        "field_id": null,
+        "semantic_id": null,
+        "filterable": true,
+        "groupable": false,
+        "aggregation": "NONE",
+        "options": [
+          {
+            "state": "VALUE",
+            "value": "509b173e-0883-52e9-8603-02fccda048c8",
+            "label": "1210 · 1210 · ეროვნული ვალუტა რეზიდენტ ბანკში // Расчетные счета",
+            "reference": {
+              "resource_id": "509b173e-0883-52e9-8603-02fccda048c8",
+              "version_id": "02b10e2c-5ad8-56bb-82dd-c0f1f7777113",
+              "content_hash": "91b48a8d4db20b66214e3e882db767345aae08d19ea4327af9b57c34fd2d058d"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "77921505-f5ce-576b-8a31-eec6d1c025f2",
+            "label": "1220 · 1220 · უცხოური ვალუტა რეზიდენტ ბანკში // Валютные счета",
+            "reference": {
+              "resource_id": "77921505-f5ce-576b-8a31-eec6d1c025f2",
+              "version_id": "6b8da5a1-b9c2-5b52-a2b6-14fb95d874da",
+              "content_hash": "d394f21acd503af24a5b622b016d572a51f10c9d58e7d99a7da8f5b9d1c7659f"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "6946db8c-1e98-5e9f-a141-d0ffd3a9cc3a",
+            "label": "1297 · 1297 · უცხოური ვალუტის შესყიდვა // Продажа иностранной валюты",
+            "reference": {
+              "resource_id": "6946db8c-1e98-5e9f-a141-d0ffd3a9cc3a",
+              "version_id": "fd748ce9-d91e-5ca9-9ba0-caceeaa460cc",
+              "content_hash": "98e1bcb2748cbd9530d4361698581e80119c5099012febbccad2e5bfb1546f46"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "064ba711-deb7-555e-b7cc-29976a2aa21b",
+            "label": "1410 · 1410 · მოთხოვნები მიწოდებიდან და მომსახურებიდან // Расчеты с покупателями и заказчиками",
+            "reference": {
+              "resource_id": "064ba711-deb7-555e-b7cc-29976a2aa21b",
+              "version_id": "727cee72-48e4-535c-94ad-bc6fe3969fd7",
+              "content_hash": "1028376d58f88f9feee80d70d1a0d50f6626a7d73b9b82b6d4bcf4b87f798d21"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "804a1dd4-441c-5639-a970-44d30e0c3e26",
+            "label": "1430 · 1430 · მოთხოვნები მატერიალ. პასუხისმგ. პირების მიმართ // Расчеты с подотчетными лицами",
+            "reference": {
+              "resource_id": "804a1dd4-441c-5639-a970-44d30e0c3e26",
+              "version_id": "945561ab-c6e9-5d52-98ba-528eb9b8e577",
+              "content_hash": "ef8df883c824cfe9ac9e0d0f980ec005b8ca45f1677cfd11d01df7650c3c1fcd"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "1cb38c93-ca27-5e92-825f-e4135589ce3e",
+            "label": "1496 · 1496 · მოთხოვნები გაცემული სესხებიდან უცხოურ ვალუტაში // Расчеты по займам выданным (в валюте)",
+            "reference": {
+              "resource_id": "1cb38c93-ca27-5e92-825f-e4135589ce3e",
+              "version_id": "8b205ec3-de28-5a10-83f9-1d10e19cba2c",
+              "content_hash": "710d11564c80cb516083b34fa7a357ff05a8cc4772b0d01a39c54f38e69f2ad1"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "7515018b-8999-560f-8b77-d13736a374fd",
+            "label": "1622 · 1622 · საწვავი // Топливо",
+            "reference": {
+              "resource_id": "7515018b-8999-560f-8b77-d13736a374fd",
+              "version_id": "81bf3659-ecb7-556d-b962-8ff4afcbd1df",
+              "content_hash": "cb46e202d1bc11c804edd6e0f2c889cf3f97dfe13b9916293540ccb38abcaf43"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "ba29e9b2-c034-5119-938a-8bf6df3e69ff",
+            "label": "1810 · 1810 · მისაღები დივიდენდები // Расчеты по причитающимся дивидендам и другим доходам",
+            "reference": {
+              "resource_id": "ba29e9b2-c034-5119-938a-8bf6df3e69ff",
+              "version_id": "36adbdb5-670f-5778-8fba-0bdcd0283624",
+              "content_hash": "e594cdbbcfda4dcf660918466713f7fd648f87215b91a0177c2cb22644a7f53f"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "04b40111-3014-5003-9a67-e1b2660c547f",
+            "label": "1820 · 1820 · მისაღები პროცენტები ეროვნულ ვალუტაში // Прочие расчеты с разными дебиторами и кредиторами",
+            "reference": {
+              "resource_id": "04b40111-3014-5003-9a67-e1b2660c547f",
+              "version_id": "aab1c379-4391-57d0-bc3d-cb06359327f5",
+              "content_hash": "2d7bb2edbc82f331eee3fb24a46d9ba126871596b498fccb963fbe104a2c29f4"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "5ae0079d-6a40-58c3-b0be-d8f1645b0168",
+            "label": "1821 · 1821 · მისაღები პროცენტები უცხოურ ვალუტაში// Прочие расчеты с разными дебиторами и кредиторами (в валюте)",
+            "reference": {
+              "resource_id": "5ae0079d-6a40-58c3-b0be-d8f1645b0168",
+              "version_id": "977d742c-381f-5dfb-a31a-a0f14112ac86",
+              "content_hash": "a38a90b9d7ee5c052a71f98b4d4f6acd3d6c3cf48e324cfb2debd87ec0e0a13c"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "289341b2-424e-5a99-8cfb-beaf2b539b4a",
+            "label": "2120 · 2120 · დაუმთავრებელი მშენებლობა // Строительство объектов основных средств",
+            "reference": {
+              "resource_id": "289341b2-424e-5a99-8cfb-beaf2b539b4a",
+              "version_id": "00f66680-bf5f-548b-86dc-d977118f510c",
+              "content_hash": "35ac53f80bc7f387bfbe1e8adb63f5aa052c5344e397b6b4c49ae8adf05c9c72"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "1d8759d6-0771-58ab-9eb5-42fee478f19e",
+            "label": "2130 · 2130 · ძირითადი საშუალებები ორგანიზაციაში // Основные средства в организации",
+            "reference": {
+              "resource_id": "1d8759d6-0771-58ab-9eb5-42fee478f19e",
+              "version_id": "5a041e41-5040-57c2-98ff-dbbbe313eb9e",
+              "content_hash": "0296b6f7584ef76b335c30ddf7620d2a43dba36df934e503a07bd90a3a4ed10f"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "588382f0-1852-5caa-81cb-b9c61b6c8a37",
+            "label": "2160 · 2160 · ძირითადი საუალების შესყიდვა (შუალედური ანგარიში) // Приобретение объектов основных средств",
+            "reference": {
+              "resource_id": "588382f0-1852-5caa-81cb-b9c61b6c8a37",
+              "version_id": "fda326dd-470d-5da1-82bb-fe202ca18457",
+              "content_hash": "36d8044e8e45f5ed8cb0c551962d7c9aace06dda0c55b1b7b96e22669bd03513"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "f5fe56ea-2928-5236-91e6-5575cb6928eb",
+            "label": "2230 · 2230 · ძირითადი საშუალების ამორტიზაცია (ანგ.: 2130-ის) // Амортизация основных средств, учитываемых на счете 01",
+            "reference": {
+              "resource_id": "f5fe56ea-2928-5236-91e6-5575cb6928eb",
+              "version_id": "a72dfa96-d073-5909-b82f-ba6e67f90b2f",
+              "content_hash": "98305b859d1362c185e5a496ab93ade0621fe1ab38c418934840391af379b9a9"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "97ac1dc7-8930-5bee-b9e9-de1bb3b44565",
+            "label": "2231 · 2231 · აქტივის გამოყენების უფლება ცვეთა",
+            "reference": {
+              "resource_id": "97ac1dc7-8930-5bee-b9e9-de1bb3b44565",
+              "version_id": "6a241d60-bb85-5e51-970b-2f762cf8a4ec",
+              "content_hash": "c04da7d30bc8d9ffce83d84388570b9de245b695fa459282cb55d9c9f430316a"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "adf5934c-1fdc-53f3-9349-c6d7a8d69ac0",
+            "label": "2610 · 2610 · არამატერიალური აქტივების ამორტიზაცია // Амортизация нематериальных активов",
+            "reference": {
+              "resource_id": "adf5934c-1fdc-53f3-9349-c6d7a8d69ac0",
+              "version_id": "17082f4c-ea19-584e-aa88-99916e0d70cf",
+              "content_hash": "904ba7371997d6d74fa9e786f185fdfe3e3f6f4f488e1eb72a3552690453b3c3"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "d95ead4b-97ed-5adc-a808-853a8677bd67",
+            "label": "3110 · 3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებები // Расчеты с поставщиками и подрядчиками",
+            "reference": {
+              "resource_id": "d95ead4b-97ed-5adc-a808-853a8677bd67",
+              "version_id": "7c6f483b-0383-521f-b2e4-d6466f57c60a",
+              "content_hash": "e3c7acb23a309398d83418530373ae6a39133f88613cbf5db405e719b027df1a"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "de1986c5-1ae8-577d-bf0c-5448870fbc9b",
+            "label": "3111 · 3111 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებ უცხოურ ვალუტაში // Расчеты с поставщиками и подрядчиками (в валюте)",
+            "reference": {
+              "resource_id": "de1986c5-1ae8-577d-bf0c-5448870fbc9b",
+              "version_id": "7dc79d62-1494-50f1-a896-fed37c0beac1",
+              "content_hash": "7caf9ac53ca488b22e17f9d7cf9a6613d6ade5908d1f0d44fb55c66414cc6225"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "836446dc-7be9-55e4-95b6-6618e555713d",
+            "label": "3130 · 3130 · გადასახდელი ხელფასი // Расчеты с персоналом по оплате труда",
+            "reference": {
+              "resource_id": "836446dc-7be9-55e4-95b6-6618e555713d",
+              "version_id": "cc0a533e-c60e-5097-ae6d-614c6cfd1b95",
+              "content_hash": "9ed542e510e820c967282d59a321899b5452240228b2e5e1ca0f86b00cdcb194"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "7599a90f-5dc7-560a-9969-860247e856b2",
+            "label": "3199 · 3199 · შუალედური ანგარიში სხვა მოკლევადიანი ვალდებულებები მოწოდებიდან და გაწეული მომსახურებიდან",
+            "reference": {
+              "resource_id": "7599a90f-5dc7-560a-9969-860247e856b2",
+              "version_id": "90deaa6e-5579-5580-b19e-27e606a79e57",
+              "content_hash": "b1cbd6fd6f9e39ebe4604334c846f1147193df889fb7bdeae61793a55c5cc8bf"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "a869f7eb-117c-5627-8ebc-744014239745",
+            "label": "3310.01.1 · 3310.01.1 · გადასახდელი მოგების გადასახადი // Расчеты с бюджетом",
+            "reference": {
+              "resource_id": "a869f7eb-117c-5627-8ebc-744014239745",
+              "version_id": "b0516cca-5afa-5d2b-99f5-b690ccb6ece5",
+              "content_hash": "092c4cbf7bba01411f9ba029d2ae1ca16fc827241e6b5c260247cc97a05b1428"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "d21a7c32-8985-5322-b58e-e0f424dac800",
+            "label": "3320 · 3320 · გადასახდელი საშემოსავლო გადასახადი // Налог на доходы физических лиц",
+            "reference": {
+              "resource_id": "d21a7c32-8985-5322-b58e-e0f424dac800",
+              "version_id": "0409233d-7074-5ce4-99bf-6091764a3c36",
+              "content_hash": "5fe719dbcae2cb21f4948457981b0cb44d19d20f05f1b8d8ba3c9cca9c8c8f2e"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "c8365185-ee82-5373-81bd-340066b55c15",
+            "label": "3330 · 3330 · გადასახდელი დ. ღ. გ. // Налог на добавленную стоимость",
+            "reference": {
+              "resource_id": "c8365185-ee82-5373-81bd-340066b55c15",
+              "version_id": "fee5d1a3-11c8-5655-a433-2cdde09c4662",
+              "content_hash": "ea6672da2a114ccd112c35fc1e187dbdee14c99a9a8754495afd2fc5a97b5880"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "2b5a67b5-b120-5f1a-bb37-7e5ecff3f695",
+            "label": "3340.01 · 3340.01 · გადახდილი დ. ღ. გ. ძირითადი საშუალების შესყიდვისას // Налог на добавленную стоимость при приобретении основных средств",
+            "reference": {
+              "resource_id": "2b5a67b5-b120-5f1a-bb37-7e5ecff3f695",
+              "version_id": "2a0e7d43-9cc8-50ca-8f2b-c48d76896981",
+              "content_hash": "7ce60862f59ff4486770bf95b9ac1ffb52bab85be25fd32a826715bbfdc62586"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "a2385842-8217-5ed9-a09b-4d508a5f1f0f",
+            "label": "3340.03 · 3340.03 · გადახდილი დ. ღ. გ. სასაქ ფასეულო // Налог на добавленную стоимость по приобретенным материально-производственным запасам",
+            "reference": {
+              "resource_id": "a2385842-8217-5ed9-a09b-4d508a5f1f0f",
+              "version_id": "35153788-e9d9-5b73-a2bd-66468ffe444b",
+              "content_hash": "d9402bfb3f82922704b7c01a0f367799f2ad0894f4cc98f777f32949282222dc"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "8bb98e62-e7e1-5f8d-8c12-ae138526dda9",
+            "label": "3340.04 · 3340.04 · გადახდილი დ. ღ. გ. მომსახურების შესყიდვისას // Налог на добавленную стоимость по приобретенным услугам",
+            "reference": {
+              "resource_id": "8bb98e62-e7e1-5f8d-8c12-ae138526dda9",
+              "version_id": "9644d0df-3d0d-5c2a-8735-ea0b29b32a33",
+              "content_hash": "28eca5dd6da25f86dd293d8ab6c057e42dd9224a6fd65ef9c8acf641711800e6"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "43d004f7-dba0-5b26-9ee2-253388f22d7c",
+            "label": "3370.01 · 3370.01 · საპენსიო ვალდებულებები (თანამშრომლები / მომს ფპ) // Пенсионные обязательства (сотрудники/ услуга)",
+            "reference": {
+              "resource_id": "43d004f7-dba0-5b26-9ee2-253388f22d7c",
+              "version_id": "d48f919b-24d8-5be3-82e4-ab4c2aae251d",
+              "content_hash": "aa02611e3480e75872d2703c5fdd0f5e4568aca5ce648a447d56bdf753c7967c"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "1de8e0f2-3792-52de-a665-01a1d809bb8e",
+            "label": "3390 · 3390 · სხვა საგადასახადო ვალდებულებები // Прочие налоги и сборы",
+            "reference": {
+              "resource_id": "1de8e0f2-3792-52de-a665-01a1d809bb8e",
+              "version_id": "22338f42-7ac9-5f56-907e-bb9b61ef474e",
+              "content_hash": "e2e154835506d302cc1fe7850ef96538464dc984516873f593471b7c740ad676"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "19292957-4058-5664-ae9f-48bcb968b610",
+            "label": "3411 · 3411 · გადასახდელი პროცენტები უცხოურ ვალუტაში // Проценты по краткосрочным кредитам (в валюте)",
+            "reference": {
+              "resource_id": "19292957-4058-5664-ae9f-48bcb968b610",
+              "version_id": "9666785d-67f1-5789-9ddf-f363efe0c4ea",
+              "content_hash": "2541373f44e5fa2a131b74a38f7627fb15c9ffd9808c1770ef3b03b955493690"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "59389afb-fdcc-5093-b314-97db47b4df82",
+            "label": "4141 · 4141 · გრძელვადიანი სესხები უცხოურ ვალუტაში // Долгосрочные кредиты (в валюте)",
+            "reference": {
+              "resource_id": "59389afb-fdcc-5093-b314-97db47b4df82",
+              "version_id": "41284f65-59ee-5e9a-a44f-284912cad0c0",
+              "content_hash": "45eac608622b93f942f54c404c767f61443ff73c2e48bed0a7d6532c287ffd62"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "0220c597-f22e-5c34-9284-fdf2ffab7816",
+            "label": "4170 · 4170 · აქტივის გამოყენების უფლების გრძელვადიანი ვალდებულება ეროვნულ ვალუტაში",
+            "reference": {
+              "resource_id": "0220c597-f22e-5c34-9284-fdf2ffab7816",
+              "version_id": "56c0a428-5e22-51a5-af6a-e15862f5653c",
+              "content_hash": "7997d0486c10b87ba799f7652a037858a5aa85ff2d668a869e142e520e1caf9c"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "7f607759-1b5f-5eb9-871a-8096fe8c53d1",
+            "label": "6110 · 6110 · შემოსავალი რეალიზაციიდან // Выручка (по деятельности, не облагаемой ЕНВД)",
+            "reference": {
+              "resource_id": "7f607759-1b5f-5eb9-871a-8096fe8c53d1",
+              "version_id": "740ac7f3-c68e-597c-af48-c1ab5f4a9de1",
+              "content_hash": "920aeafb08cec83a9496df8998604ce5e85d5d9797adefc8c88c40aec191018e"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "aafb50fb-40b0-53a1-958c-8a202af2211e",
+            "label": "7310.02.1 · 7310.02.1 · Коммерческие расходы в организациях, осуществляющих производственную деятельность (по деятельности, не облагаемой ЕНВД)",
+            "reference": {
+              "resource_id": "aafb50fb-40b0-53a1-958c-8a202af2211e",
+              "version_id": "d4157989-ba76-572f-bca1-a1c52ef8c08c",
+              "content_hash": "122aef5613c1a9b18ae6531a4a37935feabd8f77a1b549e89298acdf6191fa7b"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "de977816-8a94-5035-a893-7a2116dc076a",
+            "label": "7410 · 7410 · საერთო ადმინისტრაციული ხარჯები // Общехозяйственные расходы",
+            "reference": {
+              "resource_id": "de977816-8a94-5035-a893-7a2116dc076a",
+              "version_id": "dab6ab63-d665-5f43-85e8-488a185ebabe",
+              "content_hash": "25e3fedbc6f656808149b9220ca2a91404fc8b7818d7388ffacb18118aa81e9c"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "8986906c-5386-58d5-9737-1cb3f20430b3",
+            "label": "7410.01 · 7410.01 · საერთო ადმინისტრაციული ხარჯები // Общехозяйственные расходы (по деятельности, не облагаемой ЕНВД)",
+            "reference": {
+              "resource_id": "8986906c-5386-58d5-9737-1cb3f20430b3",
+              "version_id": "746461ca-0cfe-5889-84c3-bc0cc78bdcd1",
+              "content_hash": "4b04da822aacc9e58a4d104a15220df876ee34597657545acb1141d449c48faf"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "9ac4387c-5b0d-5fd6-bf4e-1463ecaf7039",
+            "label": "8110 · 8110 · არასაოპერაციო შემოსავლები // Прочие доходы",
+            "reference": {
+              "resource_id": "9ac4387c-5b0d-5fd6-bf4e-1463ecaf7039",
+              "version_id": "93157798-b950-58ef-a335-4fbd3a01a536",
+              "content_hash": "4216437c1f69dea40e366c649dce600e6333c6c6c356c78cedb7a54c083e6f70"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "4618215f-699b-5f64-9bf7-82bf7a6edba6",
+            "label": "8220.01.1 · 8220.01.1 · სხვა არასაოპერაციო ხარჯები / Прочие расходы (по деятельности, не облагаемой ЕНВД)",
+            "reference": {
+              "resource_id": "4618215f-699b-5f64-9bf7-82bf7a6edba6",
+              "version_id": "56a2ce62-b7d5-59ea-984e-2a112bb1858b",
+              "content_hash": "1280afd4b901987b1e2bdd3d197bebfdbb8ca6422652f8e51643c8a5206508a0"
+            }
+          },
+          {
+            "state": "VALUE",
+            "value": "39217acf-ba3e-51a7-9012-b63ddea60970",
+            "label": "9210 · 9210 · სხვა მოგებისა და ზარალის ანგარიში (ჩაილური) // другой счёт прибыли и убытки",
+            "reference": {
+              "resource_id": "39217acf-ba3e-51a7-9012-b63ddea60970",
+              "version_id": "586cb26c-34eb-533f-b8e1-5374d4516fa7",
+              "content_hash": "b5c5f435a899b299e5a3cf231dd457088a4b6cbcb9264adc68d9f83d3d880e14"
+            }
+          }
+        ]
+      },
+      {
+        "key": "chart_id",
+        "label": "Chart id",
+        "kind": "reference",
+        "role": "ATTRIBUTE",
+        "unit": null,
+        "unit_reference": null,
+        "definition": {
+          "resource_id": "43328dcc-c42a-5dee-b9be-05085d3f8409",
+          "version_id": "cfcb4150-7780-5c28-8465-09864c2539e6",
+          "content_hash": "1e1359e44379b5df70c468dd62ec0713b9747632986471fea2779c827403e299"
+        },
+        "field_id": "6dd85419-77c3-5ac8-80a3-1dcf65f6973d",
+        "semantic_id": null,
+        "filterable": true,
+        "groupable": true,
+        "aggregation": "NONE",
+        "options": [
+          {
+            "state": "VALUE",
+            "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+            "reference": {
+              "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+              "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+              "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+            }
+          }
+        ]
+      },
+      {
+        "key": "evidence_id",
+        "label": "Evidence id",
+        "kind": "reference",
+        "role": "ATTRIBUTE",
+        "unit": null,
+        "unit_reference": null,
+        "definition": {
+          "resource_id": "43328dcc-c42a-5dee-b9be-05085d3f8409",
+          "version_id": "cfcb4150-7780-5c28-8465-09864c2539e6",
+          "content_hash": "1e1359e44379b5df70c468dd62ec0713b9747632986471fea2779c827403e299"
+        },
+        "field_id": "56512737-3c85-5f27-a3b2-946a61a0abd9",
+        "semantic_id": null,
+        "filterable": true,
+        "groupable": true,
+        "aggregation": "NONE",
+        "options": [
+          {
+            "state": "VALUE",
+            "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "label": "Retained company label source",
+            "reference": {
+              "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+              "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+              "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+            }
+          }
+        ]
+      },
+      {
+        "key": "account_code",
+        "label": "Account code",
+        "kind": "identifier",
+        "role": "ATTRIBUTE",
+        "unit": null,
+        "unit_reference": null,
+        "definition": {
+          "resource_id": "43328dcc-c42a-5dee-b9be-05085d3f8409",
+          "version_id": "cfcb4150-7780-5c28-8465-09864c2539e6",
+          "content_hash": "1e1359e44379b5df70c468dd62ec0713b9747632986471fea2779c827403e299"
+        },
+        "field_id": "ac4cdc53-f360-549b-a9b2-9e06f0a82b78",
+        "semantic_id": null,
+        "filterable": true,
+        "groupable": true,
+        "aggregation": "NONE",
+        "options": [
+          {
+            "state": "VALUE",
+            "value": "1210",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "1220",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "1297",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "1410",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "1430",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "1496",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "1622",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "1810",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "1820",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "1821",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "2120",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "2130",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "2160",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "2230",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "2231",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "2610",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3110",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3111",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3130",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3199",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3310.01.1",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3320",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3330",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3340.01",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3340.03",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3340.04",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3370.01",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3390",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "3411",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "4141",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "4170",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "6110",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "7310.02.1",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "7410",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "7410.01",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "8110",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "8220.01.1",
+            "label": null,
+            "reference": null
+          },
+          {
+            "state": "VALUE",
+            "value": "9210",
+            "label": null,
+            "reference": null
+          }
+        ]
+      }
+    ],
+    "measure": null,
+    "visual": "NONE",
+    "filtering": "RETAINED_GROUP_SELECTION",
+    "grouping": "RETAINED_ROWS_WITHOUT_AGGREGATION",
+    "authority": "Retained canonical definitions; no analytical measure authority",
+    "coverage": [
+      {
+        "label": "Retained objects",
+        "value": "38"
+      },
+      {
+        "label": "Query result coverage",
+        "value": "Returned query page only"
+      },
+      {
+        "label": "Further query pages",
+        "value": "None"
+      },
+      {
+        "label": "Financial report completeness",
+        "value": "Not established"
+      }
+    ],
+    "context": [],
+    "valid_at": "2026-09-07T23:43:27.370797+04:00",
+    "known_at": "2026-09-07T23:43:27.370797+04:00",
+    "recorded_at": "2026-09-07T23:43:30.511312+04:00",
+    "definitions": [
+      {
+        "resource_id": "983c1f84-5cf0-557f-b5cd-8656a746f209",
+        "version_id": "ec3eeed2-39ee-518b-aae9-1661d147c45a",
+        "content_hash": "7351b8cd225dda67fbf6001e9c974263076bf22d0a08c7c34f0df6ddab56d5ea"
+      },
+      {
+        "resource_id": "43328dcc-c42a-5dee-b9be-05085d3f8409",
+        "version_id": "cfcb4150-7780-5c28-8465-09864c2539e6",
+        "content_hash": "1e1359e44379b5df70c468dd62ec0713b9747632986471fea2779c827403e299"
+      },
+      {
+        "resource_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+        "version_id": "928f83fe-09a5-5f73-82ad-83fcfa77af7b",
+        "content_hash": "f1c3000ff2997d128f0d60f6f11197a9f2f720adf1949427e77993ed08516fcf"
+      }
+    ],
+    "unavailable_operations": [
+      "No approved measure is present; totals and charts are unavailable.",
+      "Stored numbers are attributes, not financial measures.",
+      "Cross-source joins, forecasts and business effects require their own authority.",
+      "Chart id: no exact semantic version is retained; only its stored schema and value are available.",
+      "Evidence id: no exact semantic version is retained; only its stored schema and value are available.",
+      "Account code: no exact semantic version is retained; only its stored schema and value are available."
+    ],
+    "excluded_evidence": [],
+    "current_use_authorized": false,
+    "business_effect_authorized": false
+  },
+  "descriptor_sha256": "dc57ccc8d8702134cf1bdd3be0212b88c97950942f042a28acc2aabbfbcde450",
+  "rows": [
+    {
+      "key": "row_7347730a04165f5677310c4ec8b6c0b3065172a4420d08ef4763cf18a77b2f98",
+      "label": "1210 · 1210 · ეროვნული ვალუტა რეზიდენტ ბანკში // Расчетные счета",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "509b173e-0883-52e9-8603-02fccda048c8",
+          "label": "1210 · 1210 · ეროვნული ვალუტა რეზიდენტ ბანკში // Расчетные счета",
+          "reference": {
+            "resource_id": "509b173e-0883-52e9-8603-02fccda048c8",
+            "version_id": "02b10e2c-5ad8-56bb-82dd-c0f1f7777113",
+            "content_hash": "91b48a8d4db20b66214e3e882db767345aae08d19ea4327af9b57c34fd2d058d"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "1210",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "509b173e-0883-52e9-8603-02fccda048c8",
+        "version_id": "02b10e2c-5ad8-56bb-82dd-c0f1f7777113",
+        "content_hash": "91b48a8d4db20b66214e3e882db767345aae08d19ea4327af9b57c34fd2d058d"
+      }
+    },
+    {
+      "key": "row_fd9826a8b87446ab1cf0c050ed65f05cb985dedf21a8c8c8b867f4447f15ff40",
+      "label": "1220 · 1220 · უცხოური ვალუტა რეზიდენტ ბანკში // Валютные счета",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "77921505-f5ce-576b-8a31-eec6d1c025f2",
+          "label": "1220 · 1220 · უცხოური ვალუტა რეზიდენტ ბანკში // Валютные счета",
+          "reference": {
+            "resource_id": "77921505-f5ce-576b-8a31-eec6d1c025f2",
+            "version_id": "6b8da5a1-b9c2-5b52-a2b6-14fb95d874da",
+            "content_hash": "d394f21acd503af24a5b622b016d572a51f10c9d58e7d99a7da8f5b9d1c7659f"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "1220",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "77921505-f5ce-576b-8a31-eec6d1c025f2",
+        "version_id": "6b8da5a1-b9c2-5b52-a2b6-14fb95d874da",
+        "content_hash": "d394f21acd503af24a5b622b016d572a51f10c9d58e7d99a7da8f5b9d1c7659f"
+      }
+    },
+    {
+      "key": "row_1f2a7a50e653e6abf7f0542beef3b051978999f32c7efd1e813cc9fefd31c9cf",
+      "label": "1297 · 1297 · უცხოური ვალუტის შესყიდვა // Продажа иностранной валюты",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "6946db8c-1e98-5e9f-a141-d0ffd3a9cc3a",
+          "label": "1297 · 1297 · უცხოური ვალუტის შესყიდვა // Продажа иностранной валюты",
+          "reference": {
+            "resource_id": "6946db8c-1e98-5e9f-a141-d0ffd3a9cc3a",
+            "version_id": "fd748ce9-d91e-5ca9-9ba0-caceeaa460cc",
+            "content_hash": "98e1bcb2748cbd9530d4361698581e80119c5099012febbccad2e5bfb1546f46"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "1297",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "6946db8c-1e98-5e9f-a141-d0ffd3a9cc3a",
+        "version_id": "fd748ce9-d91e-5ca9-9ba0-caceeaa460cc",
+        "content_hash": "98e1bcb2748cbd9530d4361698581e80119c5099012febbccad2e5bfb1546f46"
+      }
+    },
+    {
+      "key": "row_44f367665da8c87803e6f989a5892f47ec8c9f3c6bb0de66c8fa7b5a12751d44",
+      "label": "1410 · 1410 · მოთხოვნები მიწოდებიდან და მომსახურებიდან // Расчеты с покупателями и заказчиками",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "064ba711-deb7-555e-b7cc-29976a2aa21b",
+          "label": "1410 · 1410 · მოთხოვნები მიწოდებიდან და მომსახურებიდან // Расчеты с покупателями и заказчиками",
+          "reference": {
+            "resource_id": "064ba711-deb7-555e-b7cc-29976a2aa21b",
+            "version_id": "727cee72-48e4-535c-94ad-bc6fe3969fd7",
+            "content_hash": "1028376d58f88f9feee80d70d1a0d50f6626a7d73b9b82b6d4bcf4b87f798d21"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "1410",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "064ba711-deb7-555e-b7cc-29976a2aa21b",
+        "version_id": "727cee72-48e4-535c-94ad-bc6fe3969fd7",
+        "content_hash": "1028376d58f88f9feee80d70d1a0d50f6626a7d73b9b82b6d4bcf4b87f798d21"
+      }
+    },
+    {
+      "key": "row_dc56825794dfb48e6b079764483993ce395a4d68b19c27b1863048d6cc4c226a",
+      "label": "1430 · 1430 · მოთხოვნები მატერიალ. პასუხისმგ. პირების მიმართ // Расчеты с подотчетными лицами",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "804a1dd4-441c-5639-a970-44d30e0c3e26",
+          "label": "1430 · 1430 · მოთხოვნები მატერიალ. პასუხისმგ. პირების მიმართ // Расчеты с подотчетными лицами",
+          "reference": {
+            "resource_id": "804a1dd4-441c-5639-a970-44d30e0c3e26",
+            "version_id": "945561ab-c6e9-5d52-98ba-528eb9b8e577",
+            "content_hash": "ef8df883c824cfe9ac9e0d0f980ec005b8ca45f1677cfd11d01df7650c3c1fcd"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "1430",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "804a1dd4-441c-5639-a970-44d30e0c3e26",
+        "version_id": "945561ab-c6e9-5d52-98ba-528eb9b8e577",
+        "content_hash": "ef8df883c824cfe9ac9e0d0f980ec005b8ca45f1677cfd11d01df7650c3c1fcd"
+      }
+    },
+    {
+      "key": "row_cc227ffd28d4688f6301a36fd03d410420ca00bffe286c9ed5bade1a35ca8574",
+      "label": "1496 · 1496 · მოთხოვნები გაცემული სესხებიდან უცხოურ ვალუტაში // Расчеты по займам выданным (в валюте)",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "1cb38c93-ca27-5e92-825f-e4135589ce3e",
+          "label": "1496 · 1496 · მოთხოვნები გაცემული სესხებიდან უცხოურ ვალუტაში // Расчеты по займам выданным (в валюте)",
+          "reference": {
+            "resource_id": "1cb38c93-ca27-5e92-825f-e4135589ce3e",
+            "version_id": "8b205ec3-de28-5a10-83f9-1d10e19cba2c",
+            "content_hash": "710d11564c80cb516083b34fa7a357ff05a8cc4772b0d01a39c54f38e69f2ad1"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "1496",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "1cb38c93-ca27-5e92-825f-e4135589ce3e",
+        "version_id": "8b205ec3-de28-5a10-83f9-1d10e19cba2c",
+        "content_hash": "710d11564c80cb516083b34fa7a357ff05a8cc4772b0d01a39c54f38e69f2ad1"
+      }
+    },
+    {
+      "key": "row_025edb5b8ab6d218b88210a05c976b060a306a0c739ed90eb2c05597e0022558",
+      "label": "1622 · 1622 · საწვავი // Топливо",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "7515018b-8999-560f-8b77-d13736a374fd",
+          "label": "1622 · 1622 · საწვავი // Топливо",
+          "reference": {
+            "resource_id": "7515018b-8999-560f-8b77-d13736a374fd",
+            "version_id": "81bf3659-ecb7-556d-b962-8ff4afcbd1df",
+            "content_hash": "cb46e202d1bc11c804edd6e0f2c889cf3f97dfe13b9916293540ccb38abcaf43"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "1622",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "7515018b-8999-560f-8b77-d13736a374fd",
+        "version_id": "81bf3659-ecb7-556d-b962-8ff4afcbd1df",
+        "content_hash": "cb46e202d1bc11c804edd6e0f2c889cf3f97dfe13b9916293540ccb38abcaf43"
+      }
+    },
+    {
+      "key": "row_dbcca2e8ef4d044a2622de1c007b99bd1d1dafa5a1f009f9c7fbd7972ae24074",
+      "label": "1810 · 1810 · მისაღები დივიდენდები // Расчеты по причитающимся дивидендам и другим доходам",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "ba29e9b2-c034-5119-938a-8bf6df3e69ff",
+          "label": "1810 · 1810 · მისაღები დივიდენდები // Расчеты по причитающимся дивидендам и другим доходам",
+          "reference": {
+            "resource_id": "ba29e9b2-c034-5119-938a-8bf6df3e69ff",
+            "version_id": "36adbdb5-670f-5778-8fba-0bdcd0283624",
+            "content_hash": "e594cdbbcfda4dcf660918466713f7fd648f87215b91a0177c2cb22644a7f53f"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "1810",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "ba29e9b2-c034-5119-938a-8bf6df3e69ff",
+        "version_id": "36adbdb5-670f-5778-8fba-0bdcd0283624",
+        "content_hash": "e594cdbbcfda4dcf660918466713f7fd648f87215b91a0177c2cb22644a7f53f"
+      }
+    },
+    {
+      "key": "row_67d67aa4f12790c55e7c97214a0daad389af3e19bf58d8164af2fe86ab71ddc4",
+      "label": "1820 · 1820 · მისაღები პროცენტები ეროვნულ ვალუტაში // Прочие расчеты с разными дебиторами и кредиторами",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "04b40111-3014-5003-9a67-e1b2660c547f",
+          "label": "1820 · 1820 · მისაღები პროცენტები ეროვნულ ვალუტაში // Прочие расчеты с разными дебиторами и кредиторами",
+          "reference": {
+            "resource_id": "04b40111-3014-5003-9a67-e1b2660c547f",
+            "version_id": "aab1c379-4391-57d0-bc3d-cb06359327f5",
+            "content_hash": "2d7bb2edbc82f331eee3fb24a46d9ba126871596b498fccb963fbe104a2c29f4"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "1820",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "04b40111-3014-5003-9a67-e1b2660c547f",
+        "version_id": "aab1c379-4391-57d0-bc3d-cb06359327f5",
+        "content_hash": "2d7bb2edbc82f331eee3fb24a46d9ba126871596b498fccb963fbe104a2c29f4"
+      }
+    },
+    {
+      "key": "row_c1a7a913fa026eadbd639edc9e0146afa7412c788d17151a2297cd4c926c59a1",
+      "label": "1821 · 1821 · მისაღები პროცენტები უცხოურ ვალუტაში// Прочие расчеты с разными дебиторами и кредиторами (в валюте)",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "5ae0079d-6a40-58c3-b0be-d8f1645b0168",
+          "label": "1821 · 1821 · მისაღები პროცენტები უცხოურ ვალუტაში// Прочие расчеты с разными дебиторами и кредиторами (в валюте)",
+          "reference": {
+            "resource_id": "5ae0079d-6a40-58c3-b0be-d8f1645b0168",
+            "version_id": "977d742c-381f-5dfb-a31a-a0f14112ac86",
+            "content_hash": "a38a90b9d7ee5c052a71f98b4d4f6acd3d6c3cf48e324cfb2debd87ec0e0a13c"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "1821",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "5ae0079d-6a40-58c3-b0be-d8f1645b0168",
+        "version_id": "977d742c-381f-5dfb-a31a-a0f14112ac86",
+        "content_hash": "a38a90b9d7ee5c052a71f98b4d4f6acd3d6c3cf48e324cfb2debd87ec0e0a13c"
+      }
+    },
+    {
+      "key": "row_d7070256150954538034febf1c43820505099064378052e24184bb59c68bb1c1",
+      "label": "2120 · 2120 · დაუმთავრებელი მშენებლობა // Строительство объектов основных средств",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "289341b2-424e-5a99-8cfb-beaf2b539b4a",
+          "label": "2120 · 2120 · დაუმთავრებელი მშენებლობა // Строительство объектов основных средств",
+          "reference": {
+            "resource_id": "289341b2-424e-5a99-8cfb-beaf2b539b4a",
+            "version_id": "00f66680-bf5f-548b-86dc-d977118f510c",
+            "content_hash": "35ac53f80bc7f387bfbe1e8adb63f5aa052c5344e397b6b4c49ae8adf05c9c72"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "2120",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "289341b2-424e-5a99-8cfb-beaf2b539b4a",
+        "version_id": "00f66680-bf5f-548b-86dc-d977118f510c",
+        "content_hash": "35ac53f80bc7f387bfbe1e8adb63f5aa052c5344e397b6b4c49ae8adf05c9c72"
+      }
+    },
+    {
+      "key": "row_9c5e43ba575e1a7138f1fa9a6b5f789c4584789432852bd668824f88b527fe79",
+      "label": "2130 · 2130 · ძირითადი საშუალებები ორგანიზაციაში // Основные средства в организации",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "1d8759d6-0771-58ab-9eb5-42fee478f19e",
+          "label": "2130 · 2130 · ძირითადი საშუალებები ორგანიზაციაში // Основные средства в организации",
+          "reference": {
+            "resource_id": "1d8759d6-0771-58ab-9eb5-42fee478f19e",
+            "version_id": "5a041e41-5040-57c2-98ff-dbbbe313eb9e",
+            "content_hash": "0296b6f7584ef76b335c30ddf7620d2a43dba36df934e503a07bd90a3a4ed10f"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "2130",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "1d8759d6-0771-58ab-9eb5-42fee478f19e",
+        "version_id": "5a041e41-5040-57c2-98ff-dbbbe313eb9e",
+        "content_hash": "0296b6f7584ef76b335c30ddf7620d2a43dba36df934e503a07bd90a3a4ed10f"
+      }
+    },
+    {
+      "key": "row_8f1a7be658b9505deaee58e91e0a92260813b47f6cee5889a2c9f376b7f647bd",
+      "label": "2160 · 2160 · ძირითადი საუალების შესყიდვა (შუალედური ანგარიში) // Приобретение объектов основных средств",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "588382f0-1852-5caa-81cb-b9c61b6c8a37",
+          "label": "2160 · 2160 · ძირითადი საუალების შესყიდვა (შუალედური ანგარიში) // Приобретение объектов основных средств",
+          "reference": {
+            "resource_id": "588382f0-1852-5caa-81cb-b9c61b6c8a37",
+            "version_id": "fda326dd-470d-5da1-82bb-fe202ca18457",
+            "content_hash": "36d8044e8e45f5ed8cb0c551962d7c9aace06dda0c55b1b7b96e22669bd03513"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "2160",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "588382f0-1852-5caa-81cb-b9c61b6c8a37",
+        "version_id": "fda326dd-470d-5da1-82bb-fe202ca18457",
+        "content_hash": "36d8044e8e45f5ed8cb0c551962d7c9aace06dda0c55b1b7b96e22669bd03513"
+      }
+    },
+    {
+      "key": "row_935cc21d87bf47a17b3d4cd869ba05b0d93cf9143f7b174a4e3efda90f262de4",
+      "label": "2230 · 2230 · ძირითადი საშუალების ამორტიზაცია (ანგ.: 2130-ის) // Амортизация основных средств, учитываемых на счете 01",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "f5fe56ea-2928-5236-91e6-5575cb6928eb",
+          "label": "2230 · 2230 · ძირითადი საშუალების ამორტიზაცია (ანგ.: 2130-ის) // Амортизация основных средств, учитываемых на счете 01",
+          "reference": {
+            "resource_id": "f5fe56ea-2928-5236-91e6-5575cb6928eb",
+            "version_id": "a72dfa96-d073-5909-b82f-ba6e67f90b2f",
+            "content_hash": "98305b859d1362c185e5a496ab93ade0621fe1ab38c418934840391af379b9a9"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "2230",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "f5fe56ea-2928-5236-91e6-5575cb6928eb",
+        "version_id": "a72dfa96-d073-5909-b82f-ba6e67f90b2f",
+        "content_hash": "98305b859d1362c185e5a496ab93ade0621fe1ab38c418934840391af379b9a9"
+      }
+    },
+    {
+      "key": "row_1781ef07032ba6a65425c8b83b09de592221b62061c4c82dedd28c73cd472f27",
+      "label": "2231 · 2231 · აქტივის გამოყენების უფლება ცვეთა",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "97ac1dc7-8930-5bee-b9e9-de1bb3b44565",
+          "label": "2231 · 2231 · აქტივის გამოყენების უფლება ცვეთა",
+          "reference": {
+            "resource_id": "97ac1dc7-8930-5bee-b9e9-de1bb3b44565",
+            "version_id": "6a241d60-bb85-5e51-970b-2f762cf8a4ec",
+            "content_hash": "c04da7d30bc8d9ffce83d84388570b9de245b695fa459282cb55d9c9f430316a"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "2231",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "97ac1dc7-8930-5bee-b9e9-de1bb3b44565",
+        "version_id": "6a241d60-bb85-5e51-970b-2f762cf8a4ec",
+        "content_hash": "c04da7d30bc8d9ffce83d84388570b9de245b695fa459282cb55d9c9f430316a"
+      }
+    },
+    {
+      "key": "row_66eedd5cdb5e5f5add4f98eaede62ba30d9f7c657d33efdbe6349b515b5d77b8",
+      "label": "2610 · 2610 · არამატერიალური აქტივების ამორტიზაცია // Амортизация нематериальных активов",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "adf5934c-1fdc-53f3-9349-c6d7a8d69ac0",
+          "label": "2610 · 2610 · არამატერიალური აქტივების ამორტიზაცია // Амортизация нематериальных активов",
+          "reference": {
+            "resource_id": "adf5934c-1fdc-53f3-9349-c6d7a8d69ac0",
+            "version_id": "17082f4c-ea19-584e-aa88-99916e0d70cf",
+            "content_hash": "904ba7371997d6d74fa9e786f185fdfe3e3f6f4f488e1eb72a3552690453b3c3"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "2610",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "adf5934c-1fdc-53f3-9349-c6d7a8d69ac0",
+        "version_id": "17082f4c-ea19-584e-aa88-99916e0d70cf",
+        "content_hash": "904ba7371997d6d74fa9e786f185fdfe3e3f6f4f488e1eb72a3552690453b3c3"
+      }
+    },
+    {
+      "key": "row_c81d54e43665131c9999cc4d38e27f26f820263f483c902d315d535b44a6f21b",
+      "label": "3110 · 3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებები // Расчеты с поставщиками и подрядчиками",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "d95ead4b-97ed-5adc-a808-853a8677bd67",
+          "label": "3110 · 3110 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებულებები // Расчеты с поставщиками и подрядчиками",
+          "reference": {
+            "resource_id": "d95ead4b-97ed-5adc-a808-853a8677bd67",
+            "version_id": "7c6f483b-0383-521f-b2e4-d6466f57c60a",
+            "content_hash": "e3c7acb23a309398d83418530373ae6a39133f88613cbf5db405e719b027df1a"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3110",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "d95ead4b-97ed-5adc-a808-853a8677bd67",
+        "version_id": "7c6f483b-0383-521f-b2e4-d6466f57c60a",
+        "content_hash": "e3c7acb23a309398d83418530373ae6a39133f88613cbf5db405e719b027df1a"
+      }
+    },
+    {
+      "key": "row_30a54b4282b2ab1b1851800d6ec4305fc5c8472d6a5b3816a5937ef330d93be7",
+      "label": "3111 · 3111 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებ უცხოურ ვალუტაში // Расчеты с поставщиками и подрядчиками (в валюте)",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "de1986c5-1ae8-577d-bf0c-5448870fbc9b",
+          "label": "3111 · 3111 · მოწოდებიდან და მომსახურურებიდან წარმოქმნილი ვალდებ უცხოურ ვალუტაში // Расчеты с поставщиками и подрядчиками (в валюте)",
+          "reference": {
+            "resource_id": "de1986c5-1ae8-577d-bf0c-5448870fbc9b",
+            "version_id": "7dc79d62-1494-50f1-a896-fed37c0beac1",
+            "content_hash": "7caf9ac53ca488b22e17f9d7cf9a6613d6ade5908d1f0d44fb55c66414cc6225"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3111",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "de1986c5-1ae8-577d-bf0c-5448870fbc9b",
+        "version_id": "7dc79d62-1494-50f1-a896-fed37c0beac1",
+        "content_hash": "7caf9ac53ca488b22e17f9d7cf9a6613d6ade5908d1f0d44fb55c66414cc6225"
+      }
+    },
+    {
+      "key": "row_c985e09f20ed0e2bdf01b4b768087678f563167314c5c366c8c85d344eacbc06",
+      "label": "3130 · 3130 · გადასახდელი ხელფასი // Расчеты с персоналом по оплате труда",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "836446dc-7be9-55e4-95b6-6618e555713d",
+          "label": "3130 · 3130 · გადასახდელი ხელფასი // Расчеты с персоналом по оплате труда",
+          "reference": {
+            "resource_id": "836446dc-7be9-55e4-95b6-6618e555713d",
+            "version_id": "cc0a533e-c60e-5097-ae6d-614c6cfd1b95",
+            "content_hash": "9ed542e510e820c967282d59a321899b5452240228b2e5e1ca0f86b00cdcb194"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3130",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "836446dc-7be9-55e4-95b6-6618e555713d",
+        "version_id": "cc0a533e-c60e-5097-ae6d-614c6cfd1b95",
+        "content_hash": "9ed542e510e820c967282d59a321899b5452240228b2e5e1ca0f86b00cdcb194"
+      }
+    },
+    {
+      "key": "row_080badb5e9df3ea5a38717288e3fd9e00f57527e7f76e722056a163e80bfcdab",
+      "label": "3199 · 3199 · შუალედური ანგარიში სხვა მოკლევადიანი ვალდებულებები მოწოდებიდან და გაწეული მომსახურებიდან",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "7599a90f-5dc7-560a-9969-860247e856b2",
+          "label": "3199 · 3199 · შუალედური ანგარიში სხვა მოკლევადიანი ვალდებულებები მოწოდებიდან და გაწეული მომსახურებიდან",
+          "reference": {
+            "resource_id": "7599a90f-5dc7-560a-9969-860247e856b2",
+            "version_id": "90deaa6e-5579-5580-b19e-27e606a79e57",
+            "content_hash": "b1cbd6fd6f9e39ebe4604334c846f1147193df889fb7bdeae61793a55c5cc8bf"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3199",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "7599a90f-5dc7-560a-9969-860247e856b2",
+        "version_id": "90deaa6e-5579-5580-b19e-27e606a79e57",
+        "content_hash": "b1cbd6fd6f9e39ebe4604334c846f1147193df889fb7bdeae61793a55c5cc8bf"
+      }
+    },
+    {
+      "key": "row_dcfc7420979dbdffe4e3721f15b8c649a89cd162c8c7b22ae75ae3cc7a38f384",
+      "label": "3310.01.1 · 3310.01.1 · გადასახდელი მოგების გადასახადი // Расчеты с бюджетом",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "a869f7eb-117c-5627-8ebc-744014239745",
+          "label": "3310.01.1 · 3310.01.1 · გადასახდელი მოგების გადასახადი // Расчеты с бюджетом",
+          "reference": {
+            "resource_id": "a869f7eb-117c-5627-8ebc-744014239745",
+            "version_id": "b0516cca-5afa-5d2b-99f5-b690ccb6ece5",
+            "content_hash": "092c4cbf7bba01411f9ba029d2ae1ca16fc827241e6b5c260247cc97a05b1428"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3310.01.1",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "a869f7eb-117c-5627-8ebc-744014239745",
+        "version_id": "b0516cca-5afa-5d2b-99f5-b690ccb6ece5",
+        "content_hash": "092c4cbf7bba01411f9ba029d2ae1ca16fc827241e6b5c260247cc97a05b1428"
+      }
+    },
+    {
+      "key": "row_955e3391c48236677c5f6146654e81692e0c63ecd75e97802bca359e44616b0a",
+      "label": "3320 · 3320 · გადასახდელი საშემოსავლო გადასახადი // Налог на доходы физических лиц",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "d21a7c32-8985-5322-b58e-e0f424dac800",
+          "label": "3320 · 3320 · გადასახდელი საშემოსავლო გადასახადი // Налог на доходы физических лиц",
+          "reference": {
+            "resource_id": "d21a7c32-8985-5322-b58e-e0f424dac800",
+            "version_id": "0409233d-7074-5ce4-99bf-6091764a3c36",
+            "content_hash": "5fe719dbcae2cb21f4948457981b0cb44d19d20f05f1b8d8ba3c9cca9c8c8f2e"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3320",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "d21a7c32-8985-5322-b58e-e0f424dac800",
+        "version_id": "0409233d-7074-5ce4-99bf-6091764a3c36",
+        "content_hash": "5fe719dbcae2cb21f4948457981b0cb44d19d20f05f1b8d8ba3c9cca9c8c8f2e"
+      }
+    },
+    {
+      "key": "row_e56c1547c6cc836869bf35b22d3bb7da5caed9bcd0b1183c7abec144e0a92611",
+      "label": "3330 · 3330 · გადასახდელი დ. ღ. გ. // Налог на добавленную стоимость",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "c8365185-ee82-5373-81bd-340066b55c15",
+          "label": "3330 · 3330 · გადასახდელი დ. ღ. გ. // Налог на добавленную стоимость",
+          "reference": {
+            "resource_id": "c8365185-ee82-5373-81bd-340066b55c15",
+            "version_id": "fee5d1a3-11c8-5655-a433-2cdde09c4662",
+            "content_hash": "ea6672da2a114ccd112c35fc1e187dbdee14c99a9a8754495afd2fc5a97b5880"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3330",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "c8365185-ee82-5373-81bd-340066b55c15",
+        "version_id": "fee5d1a3-11c8-5655-a433-2cdde09c4662",
+        "content_hash": "ea6672da2a114ccd112c35fc1e187dbdee14c99a9a8754495afd2fc5a97b5880"
+      }
+    },
+    {
+      "key": "row_5c77a341660191c583ee19b70a1802a73cdc3544b7f800c8fe54258978d269d3",
+      "label": "3340.01 · 3340.01 · გადახდილი დ. ღ. გ. ძირითადი საშუალების შესყიდვისას // Налог на добавленную стоимость при приобретении основных средств",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "2b5a67b5-b120-5f1a-bb37-7e5ecff3f695",
+          "label": "3340.01 · 3340.01 · გადახდილი დ. ღ. გ. ძირითადი საშუალების შესყიდვისას // Налог на добавленную стоимость при приобретении основных средств",
+          "reference": {
+            "resource_id": "2b5a67b5-b120-5f1a-bb37-7e5ecff3f695",
+            "version_id": "2a0e7d43-9cc8-50ca-8f2b-c48d76896981",
+            "content_hash": "7ce60862f59ff4486770bf95b9ac1ffb52bab85be25fd32a826715bbfdc62586"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3340.01",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "2b5a67b5-b120-5f1a-bb37-7e5ecff3f695",
+        "version_id": "2a0e7d43-9cc8-50ca-8f2b-c48d76896981",
+        "content_hash": "7ce60862f59ff4486770bf95b9ac1ffb52bab85be25fd32a826715bbfdc62586"
+      }
+    },
+    {
+      "key": "row_508eea6471af7cf013ddc11d68f9f368fad0236990f5d4b8213453d4770b4a2f",
+      "label": "3340.03 · 3340.03 · გადახდილი დ. ღ. გ. სასაქ ფასეულო // Налог на добавленную стоимость по приобретенным материально-производственным запасам",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "a2385842-8217-5ed9-a09b-4d508a5f1f0f",
+          "label": "3340.03 · 3340.03 · გადახდილი დ. ღ. გ. სასაქ ფასეულო // Налог на добавленную стоимость по приобретенным материально-производственным запасам",
+          "reference": {
+            "resource_id": "a2385842-8217-5ed9-a09b-4d508a5f1f0f",
+            "version_id": "35153788-e9d9-5b73-a2bd-66468ffe444b",
+            "content_hash": "d9402bfb3f82922704b7c01a0f367799f2ad0894f4cc98f777f32949282222dc"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3340.03",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "a2385842-8217-5ed9-a09b-4d508a5f1f0f",
+        "version_id": "35153788-e9d9-5b73-a2bd-66468ffe444b",
+        "content_hash": "d9402bfb3f82922704b7c01a0f367799f2ad0894f4cc98f777f32949282222dc"
+      }
+    },
+    {
+      "key": "row_2ff14eba672b9fb58434ac1ccc898895d77fe1f71e06760033c7beb6795d6be8",
+      "label": "3340.04 · 3340.04 · გადახდილი დ. ღ. გ. მომსახურების შესყიდვისას // Налог на добавленную стоимость по приобретенным услугам",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "8bb98e62-e7e1-5f8d-8c12-ae138526dda9",
+          "label": "3340.04 · 3340.04 · გადახდილი დ. ღ. გ. მომსახურების შესყიდვისას // Налог на добавленную стоимость по приобретенным услугам",
+          "reference": {
+            "resource_id": "8bb98e62-e7e1-5f8d-8c12-ae138526dda9",
+            "version_id": "9644d0df-3d0d-5c2a-8735-ea0b29b32a33",
+            "content_hash": "28eca5dd6da25f86dd293d8ab6c057e42dd9224a6fd65ef9c8acf641711800e6"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3340.04",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "8bb98e62-e7e1-5f8d-8c12-ae138526dda9",
+        "version_id": "9644d0df-3d0d-5c2a-8735-ea0b29b32a33",
+        "content_hash": "28eca5dd6da25f86dd293d8ab6c057e42dd9224a6fd65ef9c8acf641711800e6"
+      }
+    },
+    {
+      "key": "row_73370f27c2ed6c29cf880127f8c6517089f52f7d353ed4d4468970cca04e9d1c",
+      "label": "3370.01 · 3370.01 · საპენსიო ვალდებულებები (თანამშრომლები / მომს ფპ) // Пенсионные обязательства (сотрудники/ услуга)",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "43d004f7-dba0-5b26-9ee2-253388f22d7c",
+          "label": "3370.01 · 3370.01 · საპენსიო ვალდებულებები (თანამშრომლები / მომს ფპ) // Пенсионные обязательства (сотрудники/ услуга)",
+          "reference": {
+            "resource_id": "43d004f7-dba0-5b26-9ee2-253388f22d7c",
+            "version_id": "d48f919b-24d8-5be3-82e4-ab4c2aae251d",
+            "content_hash": "aa02611e3480e75872d2703c5fdd0f5e4568aca5ce648a447d56bdf753c7967c"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3370.01",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "43d004f7-dba0-5b26-9ee2-253388f22d7c",
+        "version_id": "d48f919b-24d8-5be3-82e4-ab4c2aae251d",
+        "content_hash": "aa02611e3480e75872d2703c5fdd0f5e4568aca5ce648a447d56bdf753c7967c"
+      }
+    },
+    {
+      "key": "row_e1c8b5bd56526c5666a844637c6b0ec6feafb14ea20c82ae1e1ec43a6a052df2",
+      "label": "3390 · 3390 · სხვა საგადასახადო ვალდებულებები // Прочие налоги и сборы",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "1de8e0f2-3792-52de-a665-01a1d809bb8e",
+          "label": "3390 · 3390 · სხვა საგადასახადო ვალდებულებები // Прочие налоги и сборы",
+          "reference": {
+            "resource_id": "1de8e0f2-3792-52de-a665-01a1d809bb8e",
+            "version_id": "22338f42-7ac9-5f56-907e-bb9b61ef474e",
+            "content_hash": "e2e154835506d302cc1fe7850ef96538464dc984516873f593471b7c740ad676"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3390",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "1de8e0f2-3792-52de-a665-01a1d809bb8e",
+        "version_id": "22338f42-7ac9-5f56-907e-bb9b61ef474e",
+        "content_hash": "e2e154835506d302cc1fe7850ef96538464dc984516873f593471b7c740ad676"
+      }
+    },
+    {
+      "key": "row_66a036900ee62d034b8a5f55d68433d63d8959f4acad06adb304dc05e83a3a83",
+      "label": "3411 · 3411 · გადასახდელი პროცენტები უცხოურ ვალუტაში // Проценты по краткосрочным кредитам (в валюте)",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "19292957-4058-5664-ae9f-48bcb968b610",
+          "label": "3411 · 3411 · გადასახდელი პროცენტები უცხოურ ვალუტაში // Проценты по краткосрочным кредитам (в валюте)",
+          "reference": {
+            "resource_id": "19292957-4058-5664-ae9f-48bcb968b610",
+            "version_id": "9666785d-67f1-5789-9ddf-f363efe0c4ea",
+            "content_hash": "2541373f44e5fa2a131b74a38f7627fb15c9ffd9808c1770ef3b03b955493690"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "3411",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "19292957-4058-5664-ae9f-48bcb968b610",
+        "version_id": "9666785d-67f1-5789-9ddf-f363efe0c4ea",
+        "content_hash": "2541373f44e5fa2a131b74a38f7627fb15c9ffd9808c1770ef3b03b955493690"
+      }
+    },
+    {
+      "key": "row_cd2b6962ab7910f4578590e104351003ec7b63ef6c35fdd0bad78f70d813d0eb",
+      "label": "4141 · 4141 · გრძელვადიანი სესხები უცხოურ ვალუტაში // Долгосрочные кредиты (в валюте)",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "59389afb-fdcc-5093-b314-97db47b4df82",
+          "label": "4141 · 4141 · გრძელვადიანი სესხები უცხოურ ვალუტაში // Долгосрочные кредиты (в валюте)",
+          "reference": {
+            "resource_id": "59389afb-fdcc-5093-b314-97db47b4df82",
+            "version_id": "41284f65-59ee-5e9a-a44f-284912cad0c0",
+            "content_hash": "45eac608622b93f942f54c404c767f61443ff73c2e48bed0a7d6532c287ffd62"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "4141",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "59389afb-fdcc-5093-b314-97db47b4df82",
+        "version_id": "41284f65-59ee-5e9a-a44f-284912cad0c0",
+        "content_hash": "45eac608622b93f942f54c404c767f61443ff73c2e48bed0a7d6532c287ffd62"
+      }
+    },
+    {
+      "key": "row_22e93a258b1d905933dde6e863856f94a8238dd395447f7a7db84f0ca402bbb2",
+      "label": "4170 · 4170 · აქტივის გამოყენების უფლების გრძელვადიანი ვალდებულება ეროვნულ ვალუტაში",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "0220c597-f22e-5c34-9284-fdf2ffab7816",
+          "label": "4170 · 4170 · აქტივის გამოყენების უფლების გრძელვადიანი ვალდებულება ეროვნულ ვალუტაში",
+          "reference": {
+            "resource_id": "0220c597-f22e-5c34-9284-fdf2ffab7816",
+            "version_id": "56c0a428-5e22-51a5-af6a-e15862f5653c",
+            "content_hash": "7997d0486c10b87ba799f7652a037858a5aa85ff2d668a869e142e520e1caf9c"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "4170",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "0220c597-f22e-5c34-9284-fdf2ffab7816",
+        "version_id": "56c0a428-5e22-51a5-af6a-e15862f5653c",
+        "content_hash": "7997d0486c10b87ba799f7652a037858a5aa85ff2d668a869e142e520e1caf9c"
+      }
+    },
+    {
+      "key": "row_a22251e8a3745a53705271752ecc3c8c556ce660fd9798e5da466b57ee436f95",
+      "label": "6110 · 6110 · შემოსავალი რეალიზაციიდან // Выручка (по деятельности, не облагаемой ЕНВД)",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "7f607759-1b5f-5eb9-871a-8096fe8c53d1",
+          "label": "6110 · 6110 · შემოსავალი რეალიზაციიდან // Выручка (по деятельности, не облагаемой ЕНВД)",
+          "reference": {
+            "resource_id": "7f607759-1b5f-5eb9-871a-8096fe8c53d1",
+            "version_id": "740ac7f3-c68e-597c-af48-c1ab5f4a9de1",
+            "content_hash": "920aeafb08cec83a9496df8998604ce5e85d5d9797adefc8c88c40aec191018e"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "6110",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "7f607759-1b5f-5eb9-871a-8096fe8c53d1",
+        "version_id": "740ac7f3-c68e-597c-af48-c1ab5f4a9de1",
+        "content_hash": "920aeafb08cec83a9496df8998604ce5e85d5d9797adefc8c88c40aec191018e"
+      }
+    },
+    {
+      "key": "row_16e52efdad9808bae3fb3b96fb683c79689e19b6a095e5072bf9049bdf342df9",
+      "label": "7310.02.1 · 7310.02.1 · Коммерческие расходы в организациях, осуществляющих производственную деятельность (по деятельности, не облагаемой ЕНВД)",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "aafb50fb-40b0-53a1-958c-8a202af2211e",
+          "label": "7310.02.1 · 7310.02.1 · Коммерческие расходы в организациях, осуществляющих производственную деятельность (по деятельности, не облагаемой ЕНВД)",
+          "reference": {
+            "resource_id": "aafb50fb-40b0-53a1-958c-8a202af2211e",
+            "version_id": "d4157989-ba76-572f-bca1-a1c52ef8c08c",
+            "content_hash": "122aef5613c1a9b18ae6531a4a37935feabd8f77a1b549e89298acdf6191fa7b"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "7310.02.1",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "aafb50fb-40b0-53a1-958c-8a202af2211e",
+        "version_id": "d4157989-ba76-572f-bca1-a1c52ef8c08c",
+        "content_hash": "122aef5613c1a9b18ae6531a4a37935feabd8f77a1b549e89298acdf6191fa7b"
+      }
+    },
+    {
+      "key": "row_dd1378a51f91f9e67e4671cf20fc77388821f56d8ff2ad80e7274b06e39068ef",
+      "label": "7410 · 7410 · საერთო ადმინისტრაციული ხარჯები // Общехозяйственные расходы",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "de977816-8a94-5035-a893-7a2116dc076a",
+          "label": "7410 · 7410 · საერთო ადმინისტრაციული ხარჯები // Общехозяйственные расходы",
+          "reference": {
+            "resource_id": "de977816-8a94-5035-a893-7a2116dc076a",
+            "version_id": "dab6ab63-d665-5f43-85e8-488a185ebabe",
+            "content_hash": "25e3fedbc6f656808149b9220ca2a91404fc8b7818d7388ffacb18118aa81e9c"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "7410",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "de977816-8a94-5035-a893-7a2116dc076a",
+        "version_id": "dab6ab63-d665-5f43-85e8-488a185ebabe",
+        "content_hash": "25e3fedbc6f656808149b9220ca2a91404fc8b7818d7388ffacb18118aa81e9c"
+      }
+    },
+    {
+      "key": "row_625d48435e973e7863fd0104f17b3fe22d25256d1782de9253235dc22ac1ce07",
+      "label": "7410.01 · 7410.01 · საერთო ადმინისტრაციული ხარჯები // Общехозяйственные расходы (по деятельности, не облагаемой ЕНВД)",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "8986906c-5386-58d5-9737-1cb3f20430b3",
+          "label": "7410.01 · 7410.01 · საერთო ადმინისტრაციული ხარჯები // Общехозяйственные расходы (по деятельности, не облагаемой ЕНВД)",
+          "reference": {
+            "resource_id": "8986906c-5386-58d5-9737-1cb3f20430b3",
+            "version_id": "746461ca-0cfe-5889-84c3-bc0cc78bdcd1",
+            "content_hash": "4b04da822aacc9e58a4d104a15220df876ee34597657545acb1141d449c48faf"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "7410.01",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "8986906c-5386-58d5-9737-1cb3f20430b3",
+        "version_id": "746461ca-0cfe-5889-84c3-bc0cc78bdcd1",
+        "content_hash": "4b04da822aacc9e58a4d104a15220df876ee34597657545acb1141d449c48faf"
+      }
+    },
+    {
+      "key": "row_665618aa5365327454494eb486496e7367d3362dc3bd19e07fbe65ed2ffd3849",
+      "label": "8110 · 8110 · არასაოპერაციო შემოსავლები // Прочие доходы",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "9ac4387c-5b0d-5fd6-bf4e-1463ecaf7039",
+          "label": "8110 · 8110 · არასაოპერაციო შემოსავლები // Прочие доходы",
+          "reference": {
+            "resource_id": "9ac4387c-5b0d-5fd6-bf4e-1463ecaf7039",
+            "version_id": "93157798-b950-58ef-a335-4fbd3a01a536",
+            "content_hash": "4216437c1f69dea40e366c649dce600e6333c6c6c356c78cedb7a54c083e6f70"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "8110",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "9ac4387c-5b0d-5fd6-bf4e-1463ecaf7039",
+        "version_id": "93157798-b950-58ef-a335-4fbd3a01a536",
+        "content_hash": "4216437c1f69dea40e366c649dce600e6333c6c6c356c78cedb7a54c083e6f70"
+      }
+    },
+    {
+      "key": "row_496c9c7c1115d2f6edb24ff6bd72db1c72d2a22fe99e101aea98182b88171860",
+      "label": "8220.01.1 · 8220.01.1 · სხვა არასაოპერაციო ხარჯები / Прочие расходы (по деятельности, не облагаемой ЕНВД)",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "4618215f-699b-5f64-9bf7-82bf7a6edba6",
+          "label": "8220.01.1 · 8220.01.1 · სხვა არასაოპერაციო ხარჯები / Прочие расходы (по деятельности, не облагаемой ЕНВД)",
+          "reference": {
+            "resource_id": "4618215f-699b-5f64-9bf7-82bf7a6edba6",
+            "version_id": "56a2ce62-b7d5-59ea-984e-2a112bb1858b",
+            "content_hash": "1280afd4b901987b1e2bdd3d197bebfdbb8ca6422652f8e51643c8a5206508a0"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "8220.01.1",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "4618215f-699b-5f64-9bf7-82bf7a6edba6",
+        "version_id": "56a2ce62-b7d5-59ea-984e-2a112bb1858b",
+        "content_hash": "1280afd4b901987b1e2bdd3d197bebfdbb8ca6422652f8e51643c8a5206508a0"
+      }
+    },
+    {
+      "key": "row_112849bf140713d3b32e15ea0c8b3fb26f1b5cf757792b7e99f21870b677d9e0",
+      "label": "9210 · 9210 · სხვა მოგებისა და ზარალის ანგარიში (ჩაილური) // другой счёт прибыли и убытки",
+      "values": {
+        "__resource": {
+          "state": "VALUE",
+          "value": "39217acf-ba3e-51a7-9012-b63ddea60970",
+          "label": "9210 · 9210 · სხვა მოგებისა და ზარალის ანგარიში (ჩაილური) // другой счёт прибыли и убытки",
+          "reference": {
+            "resource_id": "39217acf-ba3e-51a7-9012-b63ddea60970",
+            "version_id": "586cb26c-34eb-533f-b8e1-5374d4516fa7",
+            "content_hash": "b5c5f435a899b299e5a3cf231dd457088a4b6cbcb9264adc68d9f83d3d880e14"
+          }
+        },
+        "chart_id": {
+          "state": "VALUE",
+          "value": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+          "label": "Observed 1C chart · შპს სოკარ ენერჯი ჯორჯია",
+          "reference": {
+            "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+            "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+            "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+          }
+        },
+        "evidence_id": {
+          "state": "VALUE",
+          "value": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+          "label": "Retained company label source",
+          "reference": {
+            "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+            "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+            "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+          }
+        },
+        "account_code": {
+          "state": "VALUE",
+          "value": "9210",
+          "label": null,
+          "reference": null
+        }
+      },
+      "contributor_count": 1,
+      "trace": {
+        "resource_id": "39217acf-ba3e-51a7-9012-b63ddea60970",
+        "version_id": "586cb26c-34eb-533f-b8e1-5374d4516fa7",
+        "content_hash": "b5c5f435a899b299e5a3cf231dd457088a4b6cbcb9264adc68d9f83d3d880e14"
+      }
+    }
+  ],
+  "total_rows": 38,
+  "sections": [
+    {
+      "label": "SEG reviewed account definitions",
+      "row_keys": [
+        "row_7347730a04165f5677310c4ec8b6c0b3065172a4420d08ef4763cf18a77b2f98",
+        "row_fd9826a8b87446ab1cf0c050ed65f05cb985dedf21a8c8c8b867f4447f15ff40",
+        "row_1f2a7a50e653e6abf7f0542beef3b051978999f32c7efd1e813cc9fefd31c9cf",
+        "row_44f367665da8c87803e6f989a5892f47ec8c9f3c6bb0de66c8fa7b5a12751d44",
+        "row_dc56825794dfb48e6b079764483993ce395a4d68b19c27b1863048d6cc4c226a",
+        "row_cc227ffd28d4688f6301a36fd03d410420ca00bffe286c9ed5bade1a35ca8574",
+        "row_025edb5b8ab6d218b88210a05c976b060a306a0c739ed90eb2c05597e0022558",
+        "row_dbcca2e8ef4d044a2622de1c007b99bd1d1dafa5a1f009f9c7fbd7972ae24074",
+        "row_67d67aa4f12790c55e7c97214a0daad389af3e19bf58d8164af2fe86ab71ddc4",
+        "row_c1a7a913fa026eadbd639edc9e0146afa7412c788d17151a2297cd4c926c59a1",
+        "row_d7070256150954538034febf1c43820505099064378052e24184bb59c68bb1c1",
+        "row_9c5e43ba575e1a7138f1fa9a6b5f789c4584789432852bd668824f88b527fe79",
+        "row_8f1a7be658b9505deaee58e91e0a92260813b47f6cee5889a2c9f376b7f647bd",
+        "row_935cc21d87bf47a17b3d4cd869ba05b0d93cf9143f7b174a4e3efda90f262de4",
+        "row_1781ef07032ba6a65425c8b83b09de592221b62061c4c82dedd28c73cd472f27",
+        "row_66eedd5cdb5e5f5add4f98eaede62ba30d9f7c657d33efdbe6349b515b5d77b8",
+        "row_c81d54e43665131c9999cc4d38e27f26f820263f483c902d315d535b44a6f21b",
+        "row_30a54b4282b2ab1b1851800d6ec4305fc5c8472d6a5b3816a5937ef330d93be7",
+        "row_c985e09f20ed0e2bdf01b4b768087678f563167314c5c366c8c85d344eacbc06",
+        "row_080badb5e9df3ea5a38717288e3fd9e00f57527e7f76e722056a163e80bfcdab",
+        "row_dcfc7420979dbdffe4e3721f15b8c649a89cd162c8c7b22ae75ae3cc7a38f384",
+        "row_955e3391c48236677c5f6146654e81692e0c63ecd75e97802bca359e44616b0a",
+        "row_e56c1547c6cc836869bf35b22d3bb7da5caed9bcd0b1183c7abec144e0a92611",
+        "row_5c77a341660191c583ee19b70a1802a73cdc3544b7f800c8fe54258978d269d3",
+        "row_508eea6471af7cf013ddc11d68f9f368fad0236990f5d4b8213453d4770b4a2f",
+        "row_2ff14eba672b9fb58434ac1ccc898895d77fe1f71e06760033c7beb6795d6be8",
+        "row_73370f27c2ed6c29cf880127f8c6517089f52f7d353ed4d4468970cca04e9d1c",
+        "row_e1c8b5bd56526c5666a844637c6b0ec6feafb14ea20c82ae1e1ec43a6a052df2",
+        "row_66a036900ee62d034b8a5f55d68433d63d8959f4acad06adb304dc05e83a3a83",
+        "row_cd2b6962ab7910f4578590e104351003ec7b63ef6c35fdd0bad78f70d813d0eb",
+        "row_22e93a258b1d905933dde6e863856f94a8238dd395447f7a7db84f0ca402bbb2",
+        "row_a22251e8a3745a53705271752ecc3c8c556ce660fd9798e5da466b57ee436f95",
+        "row_16e52efdad9808bae3fb3b96fb683c79689e19b6a095e5072bf9049bdf342df9",
+        "row_dd1378a51f91f9e67e4671cf20fc77388821f56d8ff2ad80e7274b06e39068ef",
+        "row_625d48435e973e7863fd0104f17b3fe22d25256d1782de9253235dc22ac1ce07",
+        "row_665618aa5365327454494eb486496e7367d3362dc3bd19e07fbe65ed2ffd3849",
+        "row_496c9c7c1115d2f6edb24ff6bd72db1c72d2a22fe99e101aea98182b88171860",
+        "row_112849bf140713d3b32e15ea0c8b3fb26f1b5cf757792b7e99f21870b677d9e0"
+      ]
+    }
+  ],
+  "selection": null,
+  "request": {
+    "invocation_id": "c77e06cd-7b47-5f8d-9157-18619827cbe2",
+    "company_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+    "descriptor_sha256": null,
+    "filters": [],
+    "group_by": null,
+    "selected_row": null,
+    "contributor_index": 0
+  }
+}

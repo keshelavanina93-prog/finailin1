@@ -1,0 +1,112 @@
+{
+  "state": "LOCAL_INTEGRATED_HTTP_PASS",
+  "recorded_at": "2026-09-07T19:46:13.880798+00:00",
+  "api": "http://127.0.0.1:8062",
+  "writes_performed": false,
+  "invocation_id": "c77e06cd-7b47-5f8d-9157-18619827cbe2",
+  "receipt_hash": "3e28e02466e715f328a44a325263de64cd4003a147c5596e24acbb8036f3a98b",
+  "run_id": "fcr_096db6c75e79757cd87cfd58f01f25646c1cae81af9356be4a94af5d3f6fdb91",
+  "function": {
+    "resource_id": "983c1f84-5cf0-557f-b5cd-8656a746f209",
+    "version_id": "ec3eeed2-39ee-518b-aae9-1661d147c45a",
+    "content_hash": "7351b8cd225dda67fbf6001e9c974263076bf22d0a08c7c34f0df6ddab56d5ea"
+  },
+  "company": {
+    "resource_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+    "version_id": "928f83fe-09a5-5f73-82ad-83fcfa77af7b",
+    "content_hash": "f1c3000ff2997d128f0d60f6f11197a9f2f720adf1949427e77993ed08516fcf"
+  },
+  "descriptor_sha256": "dc57ccc8d8702134cf1bdd3be0212b88c97950942f042a28acc2aabbfbcde450",
+  "object_count": 38,
+  "all_object_pins_match_retained_output": true,
+  "measure": null,
+  "visual": "NONE",
+  "filter_resume_verified": true,
+  "selected_account": {
+    "resource_id": "509b173e-0883-52e9-8603-02fccda048c8",
+    "version_id": "02b10e2c-5ad8-56bb-82dd-c0f1f7777113",
+    "content_hash": "91b48a8d4db20b66214e3e882db767345aae08d19ea4327af9b57c34fd2d058d"
+  },
+  "selected_definition": {
+    "resource_id": "3a6c0fb2-47af-584f-acbf-415801c7ebd5",
+    "version_id": "93eb5aae-9e04-5a5b-8595-c483d895737d",
+    "content_hash": "9ee8927baae6f07b24806efca09e24263a25c40e187b8302cd14ee2b40895c27"
+  },
+  "original_chart_sha256": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df",
+  "original_cell": {
+    "label": "Sheet1!B189 · Original worksheet value",
+    "value": "1210",
+    "coordinate": "Sheet1!B189",
+    "formula": null
+  },
+  "trace_edges_verified": [
+    "FIELD:chart_id",
+    "FIELD:legal_entity_id",
+    "BOUND_SOURCE"
+  ],
+  "refusals": {
+    "wrong_company": 404,
+    "stale_descriptor": 409,
+    "forbidden_aggregate": 422,
+    "anonymous": 401
+  },
+  "requests": [
+    {
+      "path": "functions/invocations/c77e06cd-7b47-5f8d-9157-18619827cbe2",
+      "status": 200,
+      "seconds": 0.501
+    },
+    {
+      "path": "analysis/project",
+      "status": 200,
+      "seconds": 28.169
+    },
+    {
+      "path": "analysis/project",
+      "status": 200,
+      "seconds": 22.202
+    },
+    {
+      "path": "analysis/project",
+      "status": 200,
+      "seconds": 25.718
+    },
+    {
+      "path": "operator/resources/509b173e-0883-52e9-8603-02fccda048c8?version_id=02b10e2c-5ad8-56bb-82dd-c0f1f7777113&known_at=2026-09-07T23%3A43%3A27.370797%2B04%3A00",
+      "status": 200,
+      "seconds": 0.265
+    },
+    {
+      "path": "operator/trace/509b173e-0883-52e9-8603-02fccda048c8?version_id=02b10e2c-5ad8-56bb-82dd-c0f1f7777113&known_at=2026-09-07T23%3A43%3A27.370797%2B04%3A00",
+      "status": 200,
+      "seconds": 0.186
+    },
+    {
+      "path": "operator/resources/3a6c0fb2-47af-584f-acbf-415801c7ebd5?version_id=93eb5aae-9e04-5a5b-8595-c483d895737d&known_at=2026-09-07T23%3A43%3A27.370797%2B04%3A00",
+      "status": 200,
+      "seconds": 0.085
+    },
+    {
+      "path": "analysis/project",
+      "status": 404,
+      "seconds": 0.691
+    },
+    {
+      "path": "analysis/project",
+      "status": 409,
+      "seconds": 23.693
+    },
+    {
+      "path": "analysis/project",
+      "status": 422,
+      "seconds": 0.019
+    },
+    {
+      "path": "analysis/project",
+      "status": 401,
+      "seconds": 0.024
+    }
+  ],
+  "browser_acceptance": "PENDING",
+  "release_accepted": false
+}
