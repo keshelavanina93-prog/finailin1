@@ -18,6 +18,7 @@ from finai_api.services import (
     source_financial_facts,
 )
 from finai_api.services.company_source import inspect_companies, propose_companies
+from finai_api.services.seg_chart_binding import ChartSelection
 from finai_api.services.source_document_preview import preview
 from finai_api.services.source_documents import document_bytes, list_documents, retain_document
 from finai_api.services.workspace import WorkspaceError
@@ -80,6 +81,19 @@ class SourceContextRead(BaseModel):
 
 class SourceContextWrite(SourceContextRead):
     selection: source_accounting_context.ContextSelection
+
+
+class SourceChartWrite(SourceContextRead):
+    selection: ChartSelection
+
+
+@router.post("/{identity}/accounting-context/chart-proposal")
+def propose_source_chart(principal: User, identity: str, request: SourceChartWrite):
+    from finai_api.services import seg_chart_binding
+
+    return seg_chart_binding.propose(
+        principal, identity, request.sheet, request.profile, request.company_id, request.selection
+    )
 
 
 class SourceSetupWrite(SourceContextRead):
