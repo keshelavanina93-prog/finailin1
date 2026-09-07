@@ -30,6 +30,12 @@ class TemporalExtent(BaseModel):
     field: str = Field(min_length=1, max_length=128)
 
 
+class Materialization(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    max_objects: int = Field(strict=True, ge=1, le=1000)
+    max_pages: int = Field(strict=True, ge=1, le=10)
+
+
 class FunctionImplementation(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     implementation_id: Literal["ontology.object-set-derived/v1"]
@@ -44,9 +50,16 @@ class FunctionImplementation(BaseModel):
     retained_properties: list[VersionReference] = Field(
         default_factory=list, max_length=8, exclude_if=lambda value: not value
     )
+    materialization: Materialization | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
     @model_validator(mode="after")
     def unique_properties(self) -> "FunctionImplementation":
+        if self.materialization and (
+            self.derived_property_ids or self.group_count or self.retained_properties
+        ):
+            raise ValueError("Materialization supports original objects and temporal extent only")
         if len(set(self.derived_property_ids)) != len(self.derived_property_ids):
             raise ValueError("Function derived property identities must be unique")
         if len({ref.resource_id for ref in self.retained_properties}) != len(

@@ -1,0 +1,21 @@
+# Bounded source materialization through shared Functions
+
+The authentic retained source cohort is SourceJournalMovement with evidence `71f45f39-35fb-56c1-b4b7-61e7edc56368`, source family `1c_journal:45011b3a149ecfd09a21c7d90c6119830fac1f04352a089c5c5fbe28e3691e1d:TR`, and posting dates in `[2025-11-01, 2025-12-01)`. Read-only API discovery returned 246 unique canonical object/version pairs over pages of 200 and 46. Earliest November 1 has two witnesses; latest November 30 has 140. These are retained source observations, not proof of accounting-period completeness.
+
+`scripts/verify-object-set-materialization-runtime.py` prepares a reviewed ObjectSet and two Functions under `sog-source-dates:materialization:v1`. Each Function declares materialization limits of 300 objects and two pages, with invocation page size 200 and initial offset zero. The Transformation budgets 600 returned rows across the two results, zero derived evaluations and 2,000,000 published-result bytes. The second Function consumes the exact first Function receipt and calculates the temporal extent from its retained objects.
+
+The helper checks the complete ordered page pin list, unique object/version identities, page coordinates, common query times and filters, exact downstream manifest reuse, all 142 tied boundary witnesses and original values. It traces one representative observation per boundary to its exact SourceEvidence version and workbook hash. Page-hash values and the declared hashing algorithm are retained; independent SQL integrity checks establish hash enforcement, rather than the helper's hash-length check alone.
+
+Preparation is separate from `--start` or browser request adoption with `--request-id`. `--read-only` compares immutable Function receipts and the single retained publication after restart.
+
+## Verified authentic execution
+
+[Runtime evidence](evidence/nin47-object-set-materialization-runtime.json) records `OBJECT_SET_MATERIALIZATION_VERIFIED` for browser-started request `b179b12c-6353-4894-a7b8-b743dc3ac7d0`, with valid and known time frozen at `2026-09-07T15:09:52.204000Z`. The ObjectSet is `73ea9048-5ca6-545e-8efe-7a3b0097a721` / version `5693f073-f8a4-54c7-83a6-15a341d5ad83`; the Transformation is `5caf1f3d-9116-5c82-b42e-598b50ddf3c7` / version `c538b345-f42e-5a61-ac49-a505f53fcd40`.
+
+Both Functions completed and retained one publication, `pub_ff4d6b4bd60c356554097dc1083366aa18e05c209aea566beea42c70227c234b`. The helper verified 246 objects across pages of 200 and 46, exact downstream receipt and manifest reuse, all 142 tied boundary witnesses and representative exact source evidence. After an API and worker restart, the same read-only checks preserved the complete immutable receipts and publication.
+
+The [browser evidence](evidence/nin47-object-set-materialization-browser.json) records full reload, login and reopening of the same build. Coverage, page hashes, extent and the 246-row result text matched the retained capture exactly. Inspection of the November 1 observation at TR row 4 opened NYX and its source graph; closing the trace preserved page provenance and expanded witnesses. The [materialization capture](evidence/nin47-object-set-materialization-browser.png) and [date capture](evidence/nin47-object-set-materialization-dates-browser.png) were visually inspected.
+
+Five unit tests and one native case passed; the native case completed in 74.49 seconds using 205 synthetic objects over pages of 200 and 5. It exercised omitted and duplicate objects, changed context and hash forgeries through service and SQL guards, overflow failure without retained output, and downstream reuse with the collector prohibited from running. Two focused budget tests also passed. Targeted typing, lint and the production web build passed. Synthetic guard checks and authentic source execution are separate evidence; completed-result restart readback does not prove arbitrary mid-step recovery.
+
+Coverage is `COMPLETE_BOUNDED_MATERIALIZATION` for the selected query only. Temporal authority remains `OBSERVATION_EXTENT_ONLY`, with current-use and business-effect authorization false. This is not a financial aggregate, certified accounting period, general scale result or release acceptance.
