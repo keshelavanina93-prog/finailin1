@@ -398,6 +398,8 @@ def inspect(principal, document_id, sheet, profile, company_id):
             and r["attributes"]["chart_id"] == attrs["chart_id"]
         )
     ]
+    from finai_api.services.posted_movements_function import discover
+
     return {
         "scope_id": str(identity),
         "binding_id": str(binding_id),
@@ -405,6 +407,9 @@ def inspect(principal, document_id, sheet, profile, company_id):
         "source_coordinate": coordinate,
         "scope": effective.get(str(identity)),
         "binding": effective.get(str(binding_id)),
+        "posted_movement_functions": discover(principal, str(binding_id), document_id, sheet)
+        if effective.get(str(binding_id))
+        else [],
         "candidates": candidates,
         "chart": chart,
         "financial_eligibility": "NOT_CERTIFIED",

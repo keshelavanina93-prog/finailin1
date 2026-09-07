@@ -1,7 +1,7 @@
 """Typed Function DAG definitions; dependencies are completion barriers, not data ports."""
 
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -133,6 +133,9 @@ class TransformationDefinition(BaseModel):
     definition: TransformationGraph
     resource_budget: TransformationResourceBudget
     evidence_id: UUID | None = None
+    minimum_authority_state: Literal["OBSERVED"] | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     publication_review: PublicationReview | None = Field(
         default=None, exclude_if=lambda value: value is None
     )

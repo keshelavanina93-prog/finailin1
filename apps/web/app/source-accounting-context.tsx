@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
 import SourceAccountingSetup from "./source-accounting-setup";
+import PostedMovementReport from "./posted-movement-report";
+import type { PostedFunction } from "./posted-movement-report";
 import SegAccountObservations from "./seg-account-observations";
 import type { SourceAccountNavigation } from "./seg-account-observations";
 
 type Resource = { resource_id: string; version_id: string; display_name: string; attributes: Record<string, string> };
 type SourceObservations = { source_sha256: string; construction_receipt_id?: string; source_snapshot?: { source_use?: string }; row_count: number; granularity?: string; deepest_valid_drill?: string; unresolved?: string[]; sample_rows?: { row: number; numeric_observations: Record<string, { coordinate: string; value: string }> }[] };
 type CompanyBinding = { accepted: boolean; can_propose: boolean; company: Pick<Resource, "resource_id" | "display_name"> | null; source_label: string; alias: Resource | null; reason?: string };
-type Context = { chart?: Resource|null; scope_id: string; observed: Record<string, string>; source_coordinate?: string; source_company_label?: string; canonical_ready?: boolean; unresolved?: string[]; source_observations?: SourceObservations; company_binding?: CompanyBinding; accounting_eligibility?: { state: string; reason: string; eligible_for_accounting: boolean; effective_from: string | null; effective_to: string | null; known_from: string | null }; scope: Resource | null; binding: Resource | null; candidates: Record<string, Resource[]> };
+type Context = { posted_movement_functions?: PostedFunction[]; chart?: Resource|null; scope_id: string; observed: Record<string, string>; source_coordinate?: string; source_company_label?: string; canonical_ready?: boolean; unresolved?: string[]; source_observations?: SourceObservations; company_binding?: CompanyBinding; accounting_eligibility?: { state: string; reason: string; eligible_for_accounting: boolean; effective_from: string | null; effective_to: string | null; known_from: string | null }; scope: Resource | null; binding: Resource | null; candidates: Record<string, Resource[]> };
 const fields = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "transaction_currency_id", "reporting_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics", "vat_treatment", "supplementary_amount_field", "supplementary_amount_role"];
 const required = ["ledger_id", "book_id", "period_id", "currency_id", "currency_role", "functional_currency_id", "currency_policy", "account_mapping_id", "dimension_mapping_id", "granularity", "deepest_valid_drill", "amount_field", "amount_semantics"];
 
@@ -103,6 +105,11 @@ export default function SourceAccountingContext({ token, documentId, sheet, prof
     {busy && <p role="status">Resolving source accounting context…</p>}
     {error && <p role="alert">{error}</p>}
     {context && <>
+      {profile === "seg_expense_base" && context.binding && <PostedMovementReport
+        key={contextKey + context.binding.version_id} token={token} contextKey={contextKey}
+        functions={context.posted_movement_functions ?? []}
+        currency={candidates("Currency").find(row => row.resource_id === context.binding?.attributes.currency_id)?.display_name ?? "Reviewed currency"}
+        eligible={context.accounting_eligibility?.eligible_for_accounting === true}/>}
       {context.source_company_label && <p>Company reported by the source: <strong>{context.source_company_label}</strong></p>}
       <p>{context.observed.observed_from} → {context.observed.observed_through} · {context.observed.date_basis === "EXPLICIT_REPORT_PERIOD" ? "Period explicitly stated in the report" : "Extent of observed movement dates"}. Completeness remains unestablished.</p>
       <p>Evidence: {sheet}{context.source_coordinate ? ` · ${context.source_coordinate}` : ""}. Drill must remain within the retained evidence grain.</p>

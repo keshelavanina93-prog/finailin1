@@ -88,17 +88,51 @@ class WorksheetImplementation(BaseModel):
         return []
 
 
+class PostedMovementsImplementation(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    implementation_id: Literal["accounting.retained-posted-movements/v1"]
+    determinism: Literal["DETERMINISTIC_FOR_PINNED_INPUTS"]
+    code_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    dependency_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    document_id: str = Field(pattern=r"^(doc|ir)_[a-f0-9]{64}$")
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    sheet: str = Field(min_length=1, max_length=128)
+    max_source_rows: int = Field(strict=True, ge=1, le=1000)
+
+    @property
+    def derived_property_ids(self) -> list[UUID]:
+        return []
+
+
 class FunctionDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     object_set_id: UUID | None = None
-    definition: FunctionImplementation | WorksheetImplementation = Field(
-        discriminator="implementation_id"
+    definition: FunctionImplementation | WorksheetImplementation | PostedMovementsImplementation = (
+        Field(discriminator="implementation_id")
     )
     evidence_id: UUID | None = None
+    accounting_binding_id: UUID | None = Field(default=None, exclude_if=lambda value: value is None)
+    source_scope_id: UUID | None = Field(default=None, exclude_if=lambda value: value is None)
+    minimum_authority_state: Literal["OBSERVED"] | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
     @model_validator(mode="after")
     def adapter_inputs(self) -> "FunctionDefinition":
-        if isinstance(self.definition, WorksheetImplementation):
+        if isinstance(self.definition, PostedMovementsImplementation):
+            if (
+                self.object_set_id is not None
+                or self.evidence_id is None
+                or self.accounting_binding_id is None
+                or self.source_scope_id is None
+                or self.minimum_authority_state is None
+            ):
+                raise ValueError(
+                    "Posted movements require exact source, binding and authority inputs"
+                )
+        elif any((self.accounting_binding_id, self.source_scope_id, self.minimum_authority_state)):
+            raise ValueError("Accounting inputs require the posted movements adapter")
+        elif isinstance(self.definition, WorksheetImplementation):
             if self.evidence_id is None or self.object_set_id is not None:
                 raise ValueError("Worksheet Function requires SourceEvidence and no Object Set")
         elif self.object_set_id is None:
