@@ -15,7 +15,7 @@ from hashlib import sha256
 from pathlib import Path
 from time import perf_counter
 from urllib.error import HTTPError
-from urllib.parse import urlsplit
+from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 from uuid import UUID
 
@@ -244,9 +244,10 @@ def main():
     by_account = {m["account"]["resource_id"]: m for m in movements}
     for row in projected["rows"]:
         movement = by_account[row["values"]["account"]["value"]]
-        assert (
-            row["trace"] == row["values"]["account"]["reference"] == movement["account"]
-        )
+        assert row["trace"] == row["values"]["account"]["reference"]
+        assert {
+            key: row["trace"][key] for key in ("resource_id", "version_id")
+        } == movement["account"]
         for field in ("debit", "credit", "net"):
             assert (
                 row["values"][field + "_movement"]["value"]
@@ -256,8 +257,25 @@ def main():
     selected_movement = next(m for m in movements if m["account_code"] == "7310.02.1")
     assert Decimal(selected_movement["debit"]) == Decimal("58988.95")
     selected = next(
-        row for row in projected["rows"] if row["trace"] == selected_movement["account"]
+        row
+        for row in projected["rows"]
+        if row["trace"]["resource_id"] == selected_movement["account"]["resource_id"]
     )
+    retained_account = ok(
+        "operator/resources/"
+        + selected["trace"]["resource_id"]
+        + "?"
+        + urlencode(
+            {
+                "version_id": selected["trace"]["version_id"],
+                "known_at": descriptor["known_at"],
+            }
+        )
+    )["resource"]
+    assert selected["trace"] == {
+        key: retained_account[key]
+        for key in ("resource_id", "version_id", "content_hash")
+    }
     contributor_index = selected_movement["source_coordinates"].index("Base!S2")
     selection = {
         **base,
