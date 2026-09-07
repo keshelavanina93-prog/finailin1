@@ -1,0 +1,111 @@
+{
+  "mode": "APPLIED",
+  "schema_proposal_id": "890f9d0b-b18c-4548-8590-67744da0a7cb",
+  "family_proposal_id": "75746f18-56b5-4358-9d76-837557fd5104",
+  "same_actor_refusal": "A separate identity steward must review this proposal",
+  "family": {
+    "resource_id": "f3ce6cc0-04a1-50d8-ae11-6a64fccd18de",
+    "version_id": "99e799f1-99c1-5dba-b0b8-208d3d396fcf",
+    "content_hash": "150cac946bf84bf8aa529af988635b21737071b75f6c3c0efb6e280927d3bfa8"
+  },
+  "baseline": {
+    "binding": {
+      "resource_id": "f4cf95a5-9552-519c-8e59-96ee06bd4308",
+      "version_id": "8d08c8a1-3c38-53dc-aaf7-fd3a4c117910",
+      "content_hash": "4eec14a6560ee033238e8d9d1df16236f9e39b86bfd6855cba8a1d42d0773a82"
+    },
+    "scope": {
+      "resource_id": "23558068-046d-5fed-8582-3211ea2f2199",
+      "version_id": "e01fa38f-3a53-53bc-9f1d-a15bcca066b3",
+      "content_hash": "5a5b02787755d917147480c3b0ea3c916b4741598a3256af46220558b0a4cc6a"
+    },
+    "evidence": {
+      "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+      "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+      "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+    },
+    "company": {
+      "resource_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+      "version_id": "928f83fe-09a5-5f73-82ad-83fcfa77af7b",
+      "content_hash": "f1c3000ff2997d128f0d60f6f11197a9f2f720adf1949427e77993ed08516fcf"
+    },
+    "chart": {
+      "resource_id": "8156f21a-d5c0-5a45-9ec1-2b4513e73071",
+      "version_id": "ad4ba1e3-3258-58d9-b105-89e36391920c",
+      "content_hash": "9f9bd24cbb57b500763d06bf6ae48c99e2e9e91dbe53266814f45cf9694e3463"
+    },
+    "company_alias": {
+      "resource_id": "45a5248a-fee0-5bfe-b689-fb935d2345f1",
+      "version_id": "547799d3-f7c3-5ed4-83a9-8051a2de7031",
+      "content_hash": "c4c3e9f622085a4ec7348db6654741226cdf9347b79b9c3e53ff5563d427918f"
+    },
+    "period": {
+      "resource_id": "54e030e4-662d-545c-b9b9-991383faea94",
+      "version_id": "ed932880-1daa-5864-8726-923f86149393",
+      "content_hash": "d0dae0186ad48143b42ad7872f33233c885deaf7abc713937bdb3f5ae75b6e96"
+    },
+    "period_starts_on": "2025-01-01",
+    "period_ends_on": "2025-01-31",
+    "observed_from": "2025-01-01",
+    "observed_through": "2025-01-31",
+    "source_sha256": "d7c7e67c093b40b6f9209b301ca8fab7e4febc85c27d735babb95fa2028a8f0a",
+    "schema_sha256": "aa506fdbc8a4c54a265d2d67b900147a7e1bdc7adfbbf4a485e6b378c22da268",
+    "document_id": "ir_e630518b23cd9855216cf776fa87e51a5b3d964a912ebc480f47e910b6a073e6",
+    "worksheet": "Base",
+    "source_profile": "seg_expense_base",
+    "date_basis": "OBSERVED_MOVEMENT_DATE_EXTENT",
+    "source_rows": 596,
+    "coverage_state": "UNESTABLISHED",
+    "missing_amount_count": 1,
+    "missing_amount_coordinates": [
+      "Base!S288"
+    ],
+    "meaning": {
+      "ledger": {
+        "resource_id": "70f2a840-09d4-56af-9e5c-b7ac4b51ccbb",
+        "version_id": "b93d1afe-79ea-545c-a1da-77a4df4585e8",
+        "content_hash": "bd14360bb5a82ffc306fad63d1fb48dd316efb00e532a4f49caae340f657eddf"
+      },
+      "book": {
+        "resource_id": "305f1f70-24bd-5b55-8891-66631090b178",
+        "version_id": "4c6c7263-0627-51d3-a3a1-559f27cbb739",
+        "content_hash": "b08612a2eed9ec33d8bac729f756f9089bd600e9198a0f065991886d3f024e76"
+      },
+      "currency": {
+        "resource_id": "299a3497-aaee-5d63-bd3f-c4bd43c52aad",
+        "version_id": "905f4625-bc03-549d-9d7b-f17515aa4be5",
+        "content_hash": "3d28426d12be4ea57d269e31973e5131417861ec838a00174346c716dd9c1ed3"
+      },
+      "functional_currency": {
+        "resource_id": "299a3497-aaee-5d63-bd3f-c4bd43c52aad",
+        "version_id": "905f4625-bc03-549d-9d7b-f17515aa4be5",
+        "content_hash": "3d28426d12be4ea57d269e31973e5131417861ec838a00174346c716dd9c1ed3"
+      },
+      "account_mapping": {
+        "resource_id": "9298cf68-9450-5ede-9e63-f5111396d8f8",
+        "version_id": "6e072af8-46e6-52b7-970a-3c35676a1340",
+        "content_hash": "c5b0f01f5c2dc8d5e272abdb2fa11bb4dcf20842b4da4e06719a74edc61feb22"
+      },
+      "dimension_mapping": {
+        "resource_id": "4325b874-7a7b-5519-814f-242cff3d4a28",
+        "version_id": "e15cbf81-28a3-56a5-a8de-b8180bf68d48",
+        "content_hash": "7b634bea916f273c73ad6b6cb8c427ecac2eea643bb362a3a483a3ef239895b1"
+      },
+      "transaction_currency": null,
+      "reporting_currency": null,
+      "currency_role": "FUNCTIONAL",
+      "currency_policy": "SOURCE_AMOUNT_ONLY",
+      "granularity": "SOURCE_ROW",
+      "deepest_valid_drill": "SOURCE_CELL",
+      "amount_field": "source_amount",
+      "amount_semantics": "DEBIT_CREDIT",
+      "vat_treatment": "AS_POSTED",
+      "supplementary_amount_field": "annotated_amount",
+      "supplementary_amount_role": "NON_AUTHORITATIVE_SOURCE_OBSERVATION"
+    }
+  },
+  "exact_dependency_count": 51,
+  "adoption_published": false,
+  "authentic_later_source_acceptance": false,
+  "accounting_aggregation_authorized": false
+}

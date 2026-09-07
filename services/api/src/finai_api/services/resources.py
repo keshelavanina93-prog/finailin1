@@ -253,6 +253,8 @@ def _validate(
     ) and "ontology_admin" not in principal.permissions:
         raise WorkspaceError(403, "Tenant-wide ontology administration permission required")
     mutations = {str(item.resource_id): item for item in proposal.mutations}
+    if sum(item.object_type == "SourceSnapshotAdoption" for item in proposal.mutations) > 1:
+        raise WorkspaceError(422, "Review one recurring-source transition per change set")
     mutation_scopes = {
         identifier: item.access_entity or proposal.access_entity
         for identifier, item in mutations.items()
@@ -566,6 +568,10 @@ def _validate(
                 from finai_api.services.source_accounting_context import validate_context
 
                 validate_context(principal, item, target)
+            if item.object_type in {"SourceFamily", "SourceSnapshotAdoption"}:
+                from finai_api.services.source_adoption import validate
+
+                validate(conn, principal, item, target, previous, access_entity)
             if (
                 item.object_type == "Alias"
                 and item.attributes.get("source_system") == "RETAINED_ACCOUNTING_COMPANY"

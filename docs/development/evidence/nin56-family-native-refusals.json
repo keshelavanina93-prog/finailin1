@@ -1,0 +1,42 @@
+{
+  "family": {
+    "resource_id": "f3ce6cc0-04a1-50d8-ae11-6a64fccd18de",
+    "version_id": "99e799f1-99c1-5dba-b0b8-208d3d396fcf",
+    "content_hash": "150cac946bf84bf8aa529af988635b21737071b75f6c3c0efb6e280927d3bfa8"
+  },
+  "native_checks": [
+    {
+      "tamper": "source_sha256",
+      "status": 422,
+      "refusal": "Recurring-source contract differs from retained bytes and reviewed meaning"
+    },
+    {
+      "tamper": "schema_sha256",
+      "status": 422,
+      "refusal": "Recurring-source contract differs from retained bytes and reviewed meaning"
+    },
+    {
+      "tamper": "source_rows",
+      "status": 422,
+      "refusal": "Recurring-source contract differs from retained bytes and reviewed meaning"
+    },
+    {
+      "tamper": "missing_amounts",
+      "status": 422,
+      "refusal": "Recurring-source contract differs from retained bytes and reviewed meaning"
+    },
+    {
+      "tamper": "amount_field",
+      "status": 422,
+      "refusal": "Recurring-source contract differs from retained bytes and reviewed meaning"
+    },
+    {
+      "foreign_entity": "REFUSED",
+      "status": 404
+    }
+  ],
+  "original_family_unchanged": true,
+  "invalid_proposals_retained": false,
+  "adoption_published": false,
+  "authentic_later_source_acceptance": false
+}
