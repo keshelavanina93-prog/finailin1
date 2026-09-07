@@ -5,6 +5,7 @@ manifest publishes the complete declared set. Publication never promotes authori
 """
 
 import json
+from collections.abc import Callable
 from hashlib import sha256
 from typing import Any
 
@@ -69,7 +70,13 @@ def stage(
     return {"event_id": key, "sha256": payload["sha256"]}
 
 
-def publish(principal: Principal, identity: str, generation: int) -> dict[str, Any]:
+def publish(
+    principal: Principal,
+    identity: str,
+    generation: int,
+    *,
+    event_writer: Callable[[Principal, str, str, dict], None] | None = None,
+) -> dict[str, Any]:
     require_permission(principal, "read")
     require_permission(principal, "ingest")
     record = records.read(principal, identity)
@@ -107,7 +114,7 @@ def publish(principal: Principal, identity: str, generation: int) -> dict[str, A
     manifest["publication_id"] = "pub_" + digest(manifest)
     # The one-row insert is the commit point; all referenced staging rows are immutable.
     # A timeout after commit is safely retried under the same stable event identity.
-    records.event(
+    (event_writer or records.event)(
         principal,
         identity,
         f"publication:{generation}",

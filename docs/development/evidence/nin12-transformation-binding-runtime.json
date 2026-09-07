@@ -1,0 +1,3582 @@
+{
+  "phase": "REVIEWED_BUILD_PUBLICATION_VERIFIED",
+  "prepared": {
+    "source": {
+      "resource_id": "2bd64825-e320-5039-b163-2064a1a71c82",
+      "version_id": "a68b80b7-ebea-5eb1-b218-8d0164940c38",
+      "object_type": "CompanyDimension",
+      "identity_key": "source-dimension:2bd64825-e320-5039-b163-2064a1a71c82",
+      "display_name": "Department",
+      "access_entity": "entity-ge-001",
+      "schema_version_id": "914769e4-20d9-5d01-967d-43de86255079",
+      "attributes": {
+        "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+        "dimension_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+        "source_column": "AA",
+        "source_header": "Department",
+        "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+        "source_record_id": "f5c0a28c-9b2b-55fc-8b1f-09a93f5ea87b"
+      },
+      "content_hash": "46fa9712f215d547d488686e9a3259258b9eaf0ca2f6cbb47d0c9a00e1cf3e35",
+      "valid_from": "2026-09-06T11:12:51.691974+04:00",
+      "valid_to": null,
+      "system_from": "2026-09-06T11:12:59.750152+04:00",
+      "authority_state": "APPROVED",
+      "evidence_class": "SOURCE_BOUND",
+      "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3"
+    },
+    "target": {
+      "resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+      "version_id": "1662a12b-9bd6-5755-8e4a-80fc89bec7e2",
+      "object_type": "DimensionDefinition",
+      "identity_key": "source-dimension:1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+      "display_name": "Department",
+      "access_entity": "entity-ge-001",
+      "schema_version_id": "d91f5128-5461-58d7-b217-55dcfc812a09",
+      "attributes": {
+        "code": "c6f87828-9609-5b35-afa6-e894a0acfe41:Department",
+        "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+      },
+      "content_hash": "d7cb1c774c915ad5dd1900da3e4465ee3d6536242780497d4c5be07a0bcbf510",
+      "valid_from": "2026-09-06T11:12:51.691974+04:00",
+      "valid_to": null,
+      "system_from": "2026-09-06T11:12:59.616018+04:00",
+      "authority_state": "APPROVED",
+      "evidence_class": "SOURCE_BOUND",
+      "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3"
+    },
+    "property": {
+      "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+      "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891"
+    },
+    "binding": {
+      "resource_id": "f009bb61-de2d-5346-be1e-d03198fb18fe",
+      "version_id": "f6248e89-6fdb-5149-9eb0-f6451873e0a4"
+    },
+    "function": {
+      "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+      "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7"
+    },
+    "transformation": {
+      "resource_id": "bca03792-34c5-5ae1-ac7f-4c4c75ac2408",
+      "version_id": "97be2c1d-94ee-5029-9fcd-9ca3d10ad844"
+    },
+    "expected_display": "Department · source column AA"
+  },
+  "request": {
+    "known_at": "2026-09-07T12:28:27.382000Z",
+    "valid_at": "2026-09-07T12:28:27.381000Z",
+    "request_id": "1a9d5584-1469-453b-8b36-e7ff5c8e6c52",
+    "transformation": {
+      "version_id": "97be2c1d-94ee-5029-9fcd-9ca3d10ad844",
+      "resource_id": "bca03792-34c5-5ae1-ac7f-4c4c75ac2408"
+    }
+  },
+  "invocation": {
+    "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548",
+    "purpose": "HISTORICAL_INVOCATION_EVIDENCE",
+    "status": "SUCCEEDED",
+    "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+    "receipt": {
+      "mode": "EVIDENCE_ANALYSIS_ONLY",
+      "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9",
+      "status": "SUCCEEDED",
+      "request": {
+        "limit": 1,
+        "offset": 0,
+        "function": {
+          "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+          "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b"
+        },
+        "known_at": "2026-09-07T12:28:27.382000Z",
+        "valid_at": "2026-09-07T12:28:27.381000Z",
+        "request_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+      },
+      "function": {
+        "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+        "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+        "content_hash": "3dc7f2c4e8df60604d5d5842c0606a8a0325e7c9dd734e4c447bf8a782f86979"
+      },
+      "plan_hash": "9590a6a393c93cf130e92522c266396905bffb7318b370bc48cc4aea3e19f861",
+      "request_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548",
+      "started_at": "2026-09-07T12:29:21.137004+00:00",
+      "exact_scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "completed_at": "2026-09-07T12:29:21.767309+00:00",
+      "implementation": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+        "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+        "capabilities": {
+          "cdc": false,
+          "read": true,
+          "query": true,
+          "write": false,
+          "delete": false,
+          "limits": {
+            "coverage": "QUERY_PAGE_ONLY",
+            "returned_rows": 200,
+            "grouping_fields": 4,
+            "traversal_steps": 4,
+            "query_predicates": 20,
+            "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "derived_properties": 8,
+            "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+            "database_scan_limit": null
+          },
+          "stream": false,
+          "update": false,
+          "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+          "reversal": false,
+          "snapshot": true,
+          "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+          "simulation": false,
+          "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+          "incremental": false,
+          "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+          "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+          "formula_execution": false,
+          "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+          "source_write_exactly_once": false,
+          "grouped_observation_counts": true,
+          "typed_relationship_filters": true,
+          "versioned_interface_inputs": true,
+          "composed_derived_properties": true,
+          "versioned_type_group_inputs": true
+        },
+        "maximum_rows": 200,
+        "dependency_sha256": "209e6c3ad01b880feb1459ce57ad3794dc378559cc0f2fe82035c5e79b19cca6",
+        "implementation_id": "ontology.object-set-derived/v1",
+        "maximum_properties": 8
+      },
+      "current_use_authorized": false,
+      "business_effect_authorized": false,
+      "proof_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+      "recorded_at": "2026-09-07T16:29:21.826930+04:00"
+    },
+    "output": {
+      "mode": "EVIDENCE_ANALYSIS_ONLY",
+      "query": {
+        "limit": 1,
+        "offset": 0,
+        "search": "",
+        "filters": [],
+        "known_at": "2026-09-07T12:28:27.382000Z",
+        "valid_at": "2026-09-07T12:28:27.381000Z",
+        "traversal": [],
+        "object_type": "CompanyDimension",
+        "resource_ids": [
+          "2bd64825-e320-5039-b163-2064a1a71c82"
+        ]
+      },
+      "scope": {
+        "period": "2026-08",
+        "currency": "GEL",
+        "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+        "legal_entity_id": "entity-ge-001"
+      },
+      "total": 1,
+      "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9",
+      "objects": [
+        {
+          "valid_to": null,
+          "attributes": {
+            "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368",
+            "dimension_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+            "source_column": "AA",
+            "source_header": "Department",
+            "legal_entity_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+            "source_record_id": "f5c0a28c-9b2b-55fc-8b1f-09a93f5ea87b"
+          },
+          "valid_from": "2026-09-06T11:12:51.691974+04:00",
+          "version_id": "a68b80b7-ebea-5eb1-b218-8d0164940c38",
+          "object_type": "CompanyDimension",
+          "proposal_id": "3ac27c15-b40f-454b-8ede-4d77d7d17ca3",
+          "resource_id": "2bd64825-e320-5039-b163-2064a1a71c82",
+          "system_from": "2026-09-06T11:12:59.750152+04:00",
+          "content_hash": "46fa9712f215d547d488686e9a3259258b9eaf0ca2f6cbb47d0c9a00e1cf3e35",
+          "display_name": "Department",
+          "identity_key": "source-dimension:2bd64825-e320-5039-b163-2064a1a71c82",
+          "access_entity": "entity-ge-001",
+          "evidence_class": "SOURCE_BOUND",
+          "authority_state": "APPROVED",
+          "schema_version_id": "914769e4-20d9-5d01-967d-43de86255079"
+        }
+      ],
+      "contract": "function-result/1",
+      "coverage": "QUERY_PAGE_ONLY",
+      "function": {
+        "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+        "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+        "content_hash": "3dc7f2c4e8df60604d5d5842c0606a8a0325e7c9dd734e4c447bf8a782f86979"
+      },
+      "plan_hash": "9590a6a393c93cf130e92522c266396905bffb7318b370bc48cc4aea3e19f861",
+      "next_offset": null,
+      "definition_id": "484cd6bf-6571-5dbf-a8e2-109d6ef35070",
+      "used_versions": [
+        {
+          "known_at": "2026-09-07T12:28:27.382000+00:00",
+          "version_id": "a68b80b7-ebea-5eb1-b218-8d0164940c38",
+          "resource_id": "2bd64825-e320-5039-b163-2064a1a71c82",
+          "content_hash": "46fa9712f215d547d488686e9a3259258b9eaf0ca2f6cbb47d0c9a00e1cf3e35",
+          "material_state": "UNESTABLISHED"
+        }
+      ],
+      "counts_by_type": {
+        "CompanyDimension": 1
+      },
+      "derived_values": [
+        {
+          "kind": "text",
+          "name": "source_department_display",
+          "value": "Department · source column AA",
+          "status": "AVAILABLE",
+          "object_id": "2bd64825-e320-5039-b163-2064a1a71c82",
+          "definition_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+          "epistemic_state": "DERIVED",
+          "object_version_id": "a68b80b7-ebea-5eb1-b218-8d0164940c38",
+          "definition_version_id": "230cfba6-ea43-5a1a-963e-d3d695955891"
+        }
+      ],
+      "implementation": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+        "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+        "capabilities": {
+          "cdc": false,
+          "read": true,
+          "query": true,
+          "write": false,
+          "delete": false,
+          "limits": {
+            "coverage": "QUERY_PAGE_ONLY",
+            "returned_rows": 200,
+            "grouping_fields": 4,
+            "traversal_steps": 4,
+            "query_predicates": 20,
+            "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+            "derived_properties": 8,
+            "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+            "database_scan_limit": null
+          },
+          "stream": false,
+          "update": false,
+          "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+          "reversal": false,
+          "snapshot": true,
+          "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+          "simulation": false,
+          "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+          "incremental": false,
+          "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+          "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+          "formula_execution": false,
+          "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+          "source_write_exactly_once": false,
+          "grouped_observation_counts": true,
+          "typed_relationship_filters": true,
+          "versioned_interface_inputs": true,
+          "composed_derived_properties": true,
+          "versioned_type_group_inputs": true
+        },
+        "maximum_rows": 200,
+        "dependency_sha256": "209e6c3ad01b880feb1459ce57ad3794dc378559cc0f2fe82035c5e79b19cca6",
+        "implementation_id": "ontology.object-set-derived/v1",
+        "maximum_properties": 8
+      },
+      "read_permissions": [
+        "ontology_read",
+        "read"
+      ],
+      "calculation_runtime": "shared-functions/1",
+      "static_dependencies": [
+        {
+          "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891",
+          "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+          "content_hash": "d0adb28ff3ced4e2e74114424bf094b183e9924d0ea3e7611dd3a714fdf6b6f9"
+        },
+        {
+          "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+          "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+          "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+        },
+        {
+          "version_id": "8d823fb1-18ab-5b17-b54b-6ff0d78706a5",
+          "resource_id": "484cd6bf-6571-5dbf-a8e2-109d6ef35070",
+          "content_hash": "b0e92c0d5bcc1779d63f25a33d8489b0b86aa63d0e194878be5d4c15eb7cad27"
+        }
+      ],
+      "invocation_plan_hash": "9590a6a393c93cf130e92522c266396905bffb7318b370bc48cc4aea3e19f861",
+      "definition_version_id": "8d823fb1-18ab-5b17-b54b-6ff0d78706a5",
+      "invocation_request_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548",
+      "current_use_authorized": false,
+      "filter_schema_versions": [],
+      "read_permission_contract": "SHARED_FUNCTION_READ_CAPABILITIES_V1",
+      "business_effect_authorized": false
+    },
+    "current_use_authorized": false,
+    "business_effect_authorized": false
+  },
+  "pending": {
+    "operation": {
+      "operation_id": "opa_94045467250f823df4e54a01725b10fbac7e6583965ab18f17a0207383b89e39",
+      "state": "PENDING_REVIEW",
+      "proposal": {
+        "proposal": {
+          "proposal_id": "006b87e4-4f55-59df-a4cc-44f55b3a6b6c",
+          "title": "Apply ontology binding: Propose calculated display for the existing Department dimension",
+          "rationale": "Review only the calculated Department display from its retained source header and column; preserve all target attributes and source observations.",
+          "access_entity": "entity-ge-001",
+          "mutations": [
+            {
+              "resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+              "expected_version_id": "1662a12b-9bd6-5755-8e4a-80fc89bec7e2",
+              "object_type": "DimensionDefinition",
+              "identity_key": "source-dimension:1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+              "display_name": "Department · source column AA",
+              "attributes": {
+                "code": "c6f87828-9609-5b35-afa6-e894a0acfe41:Department",
+                "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+              },
+              "valid_from": "2026-09-07T12:29:23.473693Z",
+              "valid_to": null,
+              "authority_state": "APPROVED",
+              "evidence_class": "SOURCE_BOUND"
+            }
+          ],
+          "source_versions": {
+            "1751ddc9-6ff0-57c9-8d22-cfaade27b62c": {
+              "2bd64825-e320-5039-b163-2064a1a71c82": "a68b80b7-ebea-5eb1-b218-8d0164940c38",
+              "ef14f98a-cd4f-5dcc-85d1-4409f8c6204a": "d91f5128-5461-58d7-b217-55dcfc812a09",
+              "f009bb61-de2d-5346-be1e-d03198fb18fe": "f6248e89-6fdb-5149-9eb0-f6451873e0a4"
+            }
+          },
+          "calculated_bindings": {
+            "1751ddc9-6ff0-57c9-8d22-cfaade27b62c": {
+              "binding": {
+                "resource_id": "f009bb61-de2d-5346-be1e-d03198fb18fe",
+                "version_id": "f6248e89-6fdb-5149-9eb0-f6451873e0a4"
+              },
+              "input_result": {
+                "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+              },
+              "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+              "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9",
+              "source": {
+                "resource_id": "2bd64825-e320-5039-b163-2064a1a71c82",
+                "version_id": "a68b80b7-ebea-5eb1-b218-8d0164940c38"
+              },
+              "properties": [
+                {
+                  "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+                  "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891",
+                  "content_hash": "d0adb28ff3ced4e2e74114424bf094b183e9924d0ea3e7611dd3a714fdf6b6f9"
+                }
+              ],
+              "query": {
+                "object_type": "CompanyDimension",
+                "resource_ids": [
+                  "2bd64825-e320-5039-b163-2064a1a71c82"
+                ],
+                "filters": [],
+                "traversal": [],
+                "search": "",
+                "limit": 1,
+                "offset": 0,
+                "valid_at": "2026-09-07T12:28:27.381000Z",
+                "known_at": "2026-09-07T12:28:27.382000Z"
+              }
+            }
+          }
+        },
+        "submitted_by": "bootstrap-e9c67bab62119cae3b026aa3",
+        "created_at": "2026-09-07T16:29:26.859590+04:00",
+        "decision": null,
+        "reviewed_by": null,
+        "review_rationale": null,
+        "recorded_at": null,
+        "validation": {
+          "impact": [
+            {
+              "name": "Department · source column AA",
+              "operation": "UPDATE",
+              "resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+              "access_entity": "entity-ge-001",
+              "semantic_diff": {
+                "changes": [
+                  {
+                    "path": "/display_name",
+                    "after": {
+                      "value": "Department · source column AA",
+                      "present": true
+                    },
+                    "before": {
+                      "value": "Department",
+                      "present": true
+                    },
+                    "category": "PRESENTATION",
+                    "operation": "CHANGE"
+                  },
+                  {
+                    "path": "/valid_from",
+                    "after": {
+                      "value": "2026-09-07T12:29:23.473693+00:00",
+                      "present": true
+                    },
+                    "before": {
+                      "value": "2026-09-06T07:12:51.691974+00:00",
+                      "present": true
+                    },
+                    "category": "EFFECTIVE_TIME",
+                    "operation": "CHANGE"
+                  }
+                ],
+                "format_version": 1,
+                "base_version_id": "1662a12b-9bd6-5755-8e4a-80fc89bec7e2"
+              },
+              "fields_changed": []
+            }
+          ],
+          "evaluation": {
+            "scope": "Structural contract checks; domain evaluations are not certified.",
+            "checks": [
+              "schema compatibility",
+              "identity cycles",
+              "dependency version pins",
+              "impact"
+            ],
+            "status": "PASS",
+            "evaluator": "canonical-structural-contract/v1",
+            "recorded_at": "2026-09-07T12:29:26.857533+00:00",
+            "binding_hash": "d9a5fcb46cd2dd6e34301ac13147c0e4943c99eb66f8947b397a2e9c99d90fda",
+            "expectations": [],
+            "proposal_hash": "d94c03aaa09acab061654c78b107a1b59b26622efebfd98a7dd80ff9bb47893c"
+          },
+          "dependencies": {
+            "1751ddc9-6ff0-57c9-8d22-cfaade27b62c": [
+              {
+                "relation": "USES_SCHEMA",
+                "version_id": "d91f5128-5461-58d7-b217-55dcfc812a09",
+                "resource_id": "ef14f98a-cd4f-5dcc-85d1-4409f8c6204a"
+              },
+              {
+                "relation": "FIELD:evidence_id",
+                "version_id": "01578cee-e347-5cd5-ad29-2b2e1bc9c932",
+                "resource_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+              },
+              {
+                "relation": "BOUND_SOURCE:2bd64825-e320-5039-b163-2064a1a71c82",
+                "version_id": "a68b80b7-ebea-5eb1-b218-8d0164940c38",
+                "resource_id": "2bd64825-e320-5039-b163-2064a1a71c82"
+              },
+              {
+                "relation": "BOUND_SOURCE:ef14f98a-cd4f-5dcc-85d1-4409f8c6204a",
+                "version_id": "d91f5128-5461-58d7-b217-55dcfc812a09",
+                "resource_id": "ef14f98a-cd4f-5dcc-85d1-4409f8c6204a"
+              },
+              {
+                "relation": "BOUND_SOURCE:f009bb61-de2d-5346-be1e-d03198fb18fe",
+                "version_id": "f6248e89-6fdb-5149-9eb0-f6451873e0a4",
+                "resource_id": "f009bb61-de2d-5346-be1e-d03198fb18fe"
+              },
+              {
+                "relation": "SOURCE_EVIDENCE",
+                "version_id": "01578cee-e347-5cd5-ad29-2b2e1bc9c932",
+                "resource_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+              },
+              {
+                "relation": "CALCULATED_BINDING:f009bb61-de2d-5346-be1e-d03198fb18fe",
+                "version_id": "f6248e89-6fdb-5149-9eb0-f6451873e0a4",
+                "resource_id": "f009bb61-de2d-5346-be1e-d03198fb18fe"
+              },
+              {
+                "relation": "CALCULATED_BINDING:286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+                "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+                "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b"
+              },
+              {
+                "relation": "CALCULATED_BINDING:2bd64825-e320-5039-b163-2064a1a71c82",
+                "version_id": "a68b80b7-ebea-5eb1-b218-8d0164940c38",
+                "resource_id": "2bd64825-e320-5039-b163-2064a1a71c82"
+              },
+              {
+                "relation": "CALCULATED_BINDING:325d38f6-b261-55e5-b879-e7886db74b57",
+                "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891",
+                "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57"
+              }
+            ]
+          },
+          "compatibility": "PASS",
+          "identity_cycles": "NONE",
+          "resource_scopes": {
+            "1751ddc9-6ff0-57c9-8d22-cfaade27b62c": "entity-ge-001"
+          },
+          "schema_versions": {
+            "1751ddc9-6ff0-57c9-8d22-cfaade27b62c": "d91f5128-5461-58d7-b217-55dcfc812a09"
+          },
+          "dependency_heads": {
+            "286bb55a-cd2c-5178-b9a4-fcb140e4d96b": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+            "2bd64825-e320-5039-b163-2064a1a71c82": "a68b80b7-ebea-5eb1-b218-8d0164940c38",
+            "325d38f6-b261-55e5-b879-e7886db74b57": "230cfba6-ea43-5a1a-963e-d3d695955891",
+            "71f45f39-35fb-56c1-b4b7-61e7edc56368": "01578cee-e347-5cd5-ad29-2b2e1bc9c932",
+            "ef14f98a-cd4f-5dcc-85d1-4409f8c6204a": "d91f5128-5461-58d7-b217-55dcfc812a09",
+            "f009bb61-de2d-5346-be1e-d03198fb18fe": "f6248e89-6fdb-5149-9eb0-f6451873e0a4"
+          },
+          "journal_balances": [],
+          "downstream_impact": {
+            "status": "COMPLETE",
+            "affected": [
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "8952d363-f49d-54d7-9a84-f803d2c716bd",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "003fb72e-d64f-5899-b926-714fa23194c1",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "0186012a-8291-5ca5-8972-757466e8fe69",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "00f85805-7955-543f-b331-64bc9c310187",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "9a6cc305-ba3c-5b40-a89a-8250bd48d8c4",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "01a5c9cc-eba0-59e6-bff3-bc194acb3b5e",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "23e9b230-45e2-561b-a9a7-2a8107b00d7e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "027233d4-0db8-5a1e-982d-00cb588b009f",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "d0fb038d-af48-5be3-803e-c6b4dcbc05c3",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0383843d-b24a-5c71-8373-d49a6ad17806",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "b687e1b1-6203-503d-a492-c73db88370f8",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "03b38a20-27ab-573d-8ee9-fb1fbb570c09",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "da34b527-8cc7-5b98-81d9-34344c5d564d",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "03b890d9-d510-5a46-aaa4-992c3f63ccde",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "4a498483-51d9-522b-9347-a534b85f347b",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "050abf1d-72fa-56bf-8bb1-34f96d665097",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "05322e90-3ee9-556e-94ca-53dd900d47ec",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "063a1e75-48bf-5c4f-ba6b-273865b8e6db",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "fcc1ed42-e005-51ee-8558-0905ee47bd6a",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0920fdb7-4d2c-57a9-aab9-ff837b9b8304",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "64a6ac18-7717-58a5-9e5f-4c8447d82eef",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "09af75fd-1e11-5d9a-a8df-808e7d6097dc",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "33cba033-a3ee-520d-9e4c-83aa7d031945",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0ac0c832-4749-53a1-8771-bcc89753ec60",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "5f440198-7dc6-55d6-a8c0-4803b8a0b36c",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0c34afec-1970-59bb-86ae-1ca95ac6b02c",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "e999e052-ddfe-5487-b95e-078c8bb7be8b",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0c450040-d234-5acd-97b2-3825f40f206a",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "3ddc07e6-002e-5c08-a5f8-332d497c7211",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0c64433d-8a51-5a5d-b0a5-524920381998",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "4a24c76d-b2ea-550d-b76c-da3a50ff48d2",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0dfe24d3-db63-5867-8cc2-f767b12ca621",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "b0d9f500-a554-5c96-a7f4-2b19938734c1",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0e14713b-7f4f-57f0-97bc-46c737d82fee",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "9d4cb96a-9be3-5eb0-846a-3b7a912c2235",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0e2cae92-eabb-509a-bcf9-100e839fc775",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "aec9dd98-155a-5fb1-9368-477fb9c79ce0",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0ea20917-61d6-5764-a160-32aeabf4b215",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ad43d416-8426-561d-868c-54452a7265f8",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "0f5f6935-4c13-5658-8df6-49c738062861",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "10623915-4ce1-5ebc-bfbd-6c83b5b5fdff",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "102dc18d-7625-5fa7-90fa-72ce975a8dec",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "93e9e736-854f-5c2d-bfb0-d2c0fa0c3eaa",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "1091aded-0750-5148-b815-4936c6b7ec0a",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "744c80dc-49db-5460-81c4-19849f1edd32",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "10fcd071-2e61-5c62-b71c-c0b51c06b672",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "a7f7efd0-1558-5bfb-bda4-19728fbc4119",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "110944e1-2d6a-5baf-8f80-e1b29ceee16a",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "194dcb7e-d489-587e-974f-d2ed5c2c8a16",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "11302e8f-83cc-5548-bcb9-402cfccabff4",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "a95ad5e7-42a5-5eca-9795-1988d927f956",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "1140f0db-5e1f-5d6d-befd-3513cd470d38",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f3e5be24-1026-5e9a-8c46-6192c1501f65",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "13e22f95-3413-5f58-972d-8df22b7d93d6",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "25d694d4-8147-5207-80fd-1a63cb5b61ea",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "1441f183-0c18-53e7-ae17-6195dccccf65",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "00ea1589-572f-5de8-9225-1866da0ceda2",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "1508474e-3a4a-5cb2-9db6-50a4b6c3d5ea",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "57c410c4-b191-53c6-9516-94126de9833f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "1530c48f-8db9-53bd-a9a5-efd00840c538",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "13c9a4fc-49bc-5af7-807e-4cb3db5ca51a",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "154c4fa4-dde7-5a97-9cb3-3586139a12aa",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "PROPOSED",
+                "version_id": "7c7ce91a-df47-564e-b9e9-9eb777b8628d",
+                "object_type": "DimensionDefinition",
+                "resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+                "display_name": "Department · source column AA",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "03decaf4-1c5c-5aec-9df7-bcbaeaf27854",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "1a867c32-20e0-5907-b42a-9cd00dbcf563",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "54e39fd2-8229-52f3-a7dd-a263557b2a5f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "1ccb4a2a-3dc5-53d4-b897-e9465f83ca0b",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "2589af49-ba6e-508c-a48a-d022519b6ce5",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "1dc92218-0eab-5200-ba85-2c84edd6f8a6",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "1d50b758-20d0-5474-bd58-f579b0faea2e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "1e696583-c8b6-55f4-9116-6dbb14152ea8",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "555b51de-fb01-564d-95cc-72b8a48ed3f0",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "1f57277e-c907-5c48-91b6-324073143259",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "170c7c5c-4302-5394-9a48-404da72bc934",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "237d9a02-b6e1-5b7a-a64a-f6f51fe5893f",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "4cebe5c5-92a8-5b58-8932-d694363316e9",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "2481e197-9554-59e8-afca-bba66cd96646",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "e83b80ce-d764-538f-a8b1-3c6efad443c0",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "2515cab5-c55f-5a82-a190-1e5580c13c28",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "e4cd2fe5-5d39-59e8-aa59-6bd3f69d46e1",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "25361fba-8438-5f02-88c6-bc96ac3ec2ea",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "7461d66c-85ba-5d29-a9fe-db7ad50f3734",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "264e7bd5-f675-5e64-8728-3dd66cec8189",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "5259fcf9-9632-5c5c-8b38-6c5c6d800306",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "27232d91-fe25-58be-a849-445674a3676b",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "92593be1-17ac-58ab-b0b9-85de462cb4ac",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "27ccc9b9-9eee-5871-8f3e-e6229fd063d9",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "bc0b5fd4-47af-51f9-a86a-2c700126c49d",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "28191a66-d6a8-5847-ae58-c1db26237114",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 3,
+                "state": "CURRENT",
+                "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+                "object_type": "FunctionDefinition",
+                "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+                "display_name": "Calculate Department display for independent review",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 1,
+                "state": "CURRENT",
+                "version_id": "a68b80b7-ebea-5eb1-b218-8d0164940c38",
+                "object_type": "CompanyDimension",
+                "resource_id": "2bd64825-e320-5039-b163-2064a1a71c82",
+                "display_name": "Department",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "073bfbdb-2913-5500-8b68-625a2d4a421b",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "2c4cce58-22d6-57da-8cc3-c6821c2ba4db",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "7d64ad16-7993-54ec-b891-44e1c4bfa742",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "2e456638-46ca-569e-8880-5be9677065ae",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "defa1b3c-2045-5a40-87ce-53890f2d51ae",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "2eecc221-0772-5b01-8cd7-387bbd6d2809",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "0d5658e9-6a78-55d0-99e5-744fb072a7cc",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "2fd478ff-78df-553f-bf02-18cdc6c448a4",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "35911d9f-cfdc-5dd6-9ea9-55cd98a8dc1c",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "30a98bd8-8881-5d3b-a49b-f6fcf7ad0574",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "b9b29135-c50b-5958-b69d-fbeb4a11e250",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "315d669e-78fd-5a9b-8ff9-36bff8457ba4",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "943065a6-348f-5653-b50f-aec8094c0f3f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "31dd7fe3-5632-5ab5-94cb-9d0504cc87f0",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "059d5bee-f725-5ead-b39b-0c4177ad0e55",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3292bce3-4de1-5efd-963a-d9c6bade5345",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "cf05d748-c907-5965-9595-793da5ece241",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3367259f-6aef-503d-814a-dce7f5c796c0",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "b078d73a-1f8c-53ff-bf4c-b3ff96129185",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "35b3ac26-e0a9-539c-8964-258506af12ff",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "b439ec29-751f-5d7e-b4c6-d89319b56073",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "391fd449-c001-5b2b-b32b-427b89588ef0",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "eeaca29e-ec0d-528f-8581-b0c0bca3aa25",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3a7b0017-0702-5860-ad77-da2802ff0ca7",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "fffe821a-94ac-5ca3-bd01-b739e4f450af",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3aa7c94d-06e3-5c23-a2a4-d28aadee155a",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "20710384-f688-56c5-9085-751935488ccc",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3ac4c0fc-7f39-51a8-bb6b-7ffa670e0bcf",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "58f975e4-efb4-5fa8-879c-b077193b933b",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3aefd109-f8a2-5c62-ba45-08a3cd973ea4",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "9a1d38a6-3600-51a0-8e3d-9c82058706bb",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3b104214-e923-53b6-802f-5718b7091b54",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "c304ca37-a9c9-5b34-9c31-2db391a744c6",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3b84b798-d410-5b4d-81e2-edaa2f4b75a6",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ee1458ba-2952-5ce7-936f-8ab646bb4740",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3cb317ca-124c-5a9e-b778-ba363bccdfd1",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "640fec99-a09e-56ae-a433-202c294c1cff",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3d3a66fb-3671-5954-bf23-8962c3b89e8d",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "a7b8d05a-997a-5b74-aedf-07e61f43df38",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3fe880a2-d502-5015-bf5c-5da898b5e95d",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "fcef08a0-5877-532e-a088-e6ab1f8490bd",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "3ff51ddc-e8aa-5841-aaf5-2ceed3396a01",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "86aef7f2-95fe-5601-a8b6-f21a721bcb02",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "401de80c-b9b7-5b82-9a15-7f244c777f48",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ddc16e3a-0746-56d0-9eaa-2d5a550d0309",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "409cca8b-a579-54ae-b011-8d39f0d38415",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "a87026f9-6363-51e5-99cc-ad3a8ca72e8e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "420e4b83-0c07-511a-9578-8b5f4e32bb1c",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "131f0ed4-1cfb-5efb-a2fa-914e9a082261",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "427d75e6-709f-5826-8ca3-c0bebe3f252a",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "7891dd1f-c3a5-54f9-8ed5-25241f467f65",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "42d81c67-3904-528a-8599-8595c48ec859",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "523cdb2b-c6db-59f8-b451-bd1a595126ed",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "4338c2a0-60f6-5de9-ac3f-4a8c4fdbd2bd",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "0ca40006-b53e-5b82-8368-cc627ba42d48",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "4717852e-621f-524b-91bc-01dd6049e407",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "7c54d9a0-4962-5f75-9ef4-f11052f21677",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "47518536-3f20-5606-b215-04ec362d93af",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "8d823fb1-18ab-5b17-b54b-6ff0d78706a5",
+                "object_type": "ObjectSetDefinition",
+                "resource_id": "484cd6bf-6571-5dbf-a8e2-109d6ef35070",
+                "display_name": "Original Department source context",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "08091dad-2e29-50b8-8a5d-0dd8489802e7",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "4a316b60-4065-521b-b6ed-1338d8aa9bd9",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "79a3b7a5-e111-57c1-bd0c-5fb37f40ef09",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "4aecba8f-7a7e-56cf-9541-584513a5e5e0",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "9e11eb7d-12e6-5cf7-b549-e084d5a7d85f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "4b2bf827-bb65-54c5-b71b-30df86cc72e1",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "9c07fb8b-d6a1-5514-8c05-1515b42949ce",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "4e14634d-5fb0-5829-bc99-c096fae85095",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "e685ebb7-fde8-5f90-bf7e-d293bc3a5a9d",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "4e25570d-8f48-57bb-9ffa-341f8b758421",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "c748f8f8-be0a-5671-bfd0-6f173df5007a",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "4fa3e938-7584-5496-8546-ffd91cd61db2",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "8f9b27e9-f13e-55d4-af90-7912a078f8c7",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "514e2aa2-4bd6-5f97-835b-f8dc4587df7a",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "abe172cf-a73f-583b-a27f-bd79512a90b6",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "52930470-2f74-5e6f-8506-7a14a5b4137a",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 1,
+                "state": "CURRENT",
+                "version_id": "e6dee400-84b6-583c-ae0d-d0fe493f11e1",
+                "object_type": "DimensionMember",
+                "resource_id": "53a432a6-2321-5150-a195-c97b2beda22f",
+                "display_name": "Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "2a1a47b7-f41c-5b3f-a6b2-19d975c65c07",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "55043afd-3e3a-5248-997e-08da6f08bd7d",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "dde24f88-d9a9-5cb9-92d5-537246dbe879",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "565c287d-4d02-5df4-872a-c9f5051e0f88",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "5ba25df8-2dc9-5ea9-8926-206a45d8c870",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "5688a34b-1192-5575-9788-eae00c4d3d4b",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "2eb221e7-953d-5683-a361-e94df1418605",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "5b0cfbdf-d2cb-598a-8ec2-efe1fda8d6c1",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "5a47962d-01eb-5e9f-9c26-82f24ff60794",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "5dd68f9d-4bda-534f-a4dc-458e0133d7f3",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "42c9ba5f-83d3-53ad-b962-feb35c72fe05",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "5e37490d-6a5b-5dd1-b879-69ad9549ce28",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "e99de419-cc81-59a0-a330-55270ccbf654",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "5ff35dfc-c152-5e8c-ac41-a9bb5614605a",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "3684b4fa-40d1-5c31-9c0b-5b1392609701",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "606d8dde-93dc-5019-a4d8-306a0478c0e1",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "baed8481-a5a9-5eee-a166-a236428b0b93",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "60e6007f-cc67-5906-acac-ce4d474daa78",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "04d7dc60-e916-53f6-a755-a29b7e616c0e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "65240c69-38c6-547e-a3ea-f2bfb982a52a",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "955882c5-d043-5b60-9797-24d1829a4a82",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "6552cff3-62d6-56ae-b09b-60343211f849",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "83ea79ae-e720-504f-a2fe-6b8995b463ab",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "65c5e6a0-e06a-550f-b6e9-85b9da5c313d",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "1ec148bf-f9c5-53d7-9727-76be2d00ec07",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "66c827a5-6d50-5310-b00c-08f728191b7e",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "0b72b971-87e4-5b54-b434-dfa1b99e5ed5",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "67c11767-2ba0-5f12-8201-bdd7c8cd1bdf",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "8a5c038d-5f64-591b-b602-18d3ca83481e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "68f55324-c245-570c-b610-77770f855bfb",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f0ec0c10-1385-5181-8019-cc999866874e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "690c5177-3404-5127-814c-088baa7ddf25",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "fa47dc0e-5abc-5ba1-a458-83c3d4b21b4b",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "691f00eb-4cc1-5bee-be84-a426776ab935",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "3b16f6a7-1787-5caa-8864-38f97f13b1e4",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "6acc91ee-65fa-5705-9447-3f4939065275",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "0a10e483-5d83-52d1-8f66-463f8e370cfe",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "6c37da95-444c-51a1-9a5a-28692858fc1a",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "009e61cb-f2cf-5124-aff6-96591990bb80",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "6e8c7186-457c-584c-b1b8-c95d4f6cb62f",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "15928b39-b2e0-5bd4-b3f6-2a0a0a734b61",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "6ff11ce5-efcc-52e8-9e6b-5c8baa2e889c",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "0bf994c5-71d5-5a03-b61a-51405a130d2e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "70c7ee55-4f04-59f8-908f-27ee4954cb7f",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "0898131b-2e9a-5806-aeaa-1a8a37254a73",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "70e59d4f-ae2b-58e3-a3bc-ebc0687e99c0",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "4434fef6-2870-5a79-85c7-80e7c725a1f2",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "71793571-9d72-5f9d-8e81-bee59d482f99",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "9f3a85c8-b435-592f-92ed-32f64bb404b4",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "71838d90-ebfa-5d36-a7bc-a17081b46a8d",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "58534772-f3ed-5832-8b02-db67f29de29b",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "73e8bf55-8189-5270-92ce-80266da468cf",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f1b41f30-a402-5318-8cf9-93e3d5d6dffe",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "75b340ab-3c70-538f-9cf1-ba8178d0b713",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "d4d22610-1a87-5cf1-9117-89877a1deb8b",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "75ca16b9-9842-5d34-a439-3e3e52d26277",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f4037f04-093c-5d08-90a6-147f204452d3",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "761826b3-c227-5c73-a42d-47f042688945",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "99501232-b69a-5274-87fd-e9b739a594a8",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7671c0dd-947b-5882-ac8b-512ee5f4d3f2",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "a54615fa-30d8-59dc-b9fb-61bb1076822b",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7a1b02bf-02f7-5ce1-84f7-b81358d9954c",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "26061086-9c40-5437-a481-22493b54edfb",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7b4b021c-fd72-5b8e-91c2-0b1b55e76daf",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "6f011da5-1f29-50e4-b618-9a4d3c41e3f5",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7b82df04-0df1-5b5d-b9c8-d364d42a4278",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "c9265b87-e0f3-5a56-8794-2171a084685e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7bfc7ad6-a16c-5d3c-adcf-6efd34898475",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "823e28c7-5b86-5e53-8cc9-edfe0a9cb0d8",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7c68a152-0810-5a95-bf9e-3a306e7cf2f5",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "be6ad895-1c14-547f-a9e5-ec885768ba44",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7cc1ae45-8e05-53db-ab2f-7f4ed42c36b3",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "57056369-7749-57a0-90b7-bdb739ab83f9",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7d6183cb-bfce-5537-ae81-ed18bb842c64",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "5d631b4e-2c84-528c-9cab-086f3f7e4816",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7daa9145-2999-54f0-a0c7-5999dfbf7431",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "efc510f8-113a-56f5-9a91-a0f23f68c41c",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7e825705-e1a4-5573-aa3a-dd76c3f78f9e",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "8c38090a-3664-5b46-be0a-1e85295f81d6",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7ea54baf-ccea-597c-b07a-db2eeca47565",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "82f131d0-37c4-526d-97e2-e5c4d2d63661",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7ea9b279-07a4-510b-9e31-58316971d06f",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "4f931630-e441-53b7-9717-23b9517707df",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7ec9d60d-cc1a-577a-a55e-9b7c6f687acf",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ed41224c-d13e-5258-9908-7574f3640c19",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "7fbd6861-4999-5d45-a84b-4df31bdc871f",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "19351586-5f31-571c-9127-34876032d6c8",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "80020f9b-63c2-5d11-a620-04ea6dd729e7",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "6d307c5f-1c49-5d8e-b12d-02ad66894645",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "801822fe-6af3-532e-a0af-274321428d30",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "5c7ea5b2-8257-55d0-9476-22f06877331f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "804057f7-b18a-52e3-9b80-9af94e894901",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ef8a9c11-39c0-5955-9508-42897e6764c5",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "80e9c9f1-803b-5bc1-a33d-1b87ecc770c4",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "d19d2391-4f5b-588c-b191-686502195f4f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "81361db8-3f3f-5170-9b35-f6da339b39a4",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 1,
+                "state": "CURRENT",
+                "version_id": "ff0e1ba3-0ebc-58d8-9370-ffd156cddb84",
+                "object_type": "DimensionMember",
+                "resource_id": "82cdbe96-6ac5-58b0-99fc-9e86a3a2b696",
+                "display_name": "Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "a38aead3-80fb-54cd-951c-4d6072af4215",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "82e101bf-8cf2-5e30-b371-8fa4bc107ca1",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "e4edd40e-3478-5ae2-b1c6-9e255d2561e0",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "83a73535-ef08-550a-82bf-3d814ebe0839",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "5101fe9b-9d7e-5f73-911e-a26792502fa3",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "8568a4bd-5e09-52d7-9a8f-7d8faf393a36",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "8a527ff1-3504-592f-af98-44d2a851287f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "857a481a-988b-5535-9cd1-d57b4221e462",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "1a0c0507-00e6-5c7b-b902-fd836595ebe1",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "85a9147a-6733-5a2f-b30d-af931014f68b",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "371084dd-8ce2-5fa0-8a8c-a52efb01a5d4",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "85eeabd6-a866-5802-80e0-aaface0de63d",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f86490d9-c471-5b88-9b77-bf155f601bf5",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "86155f77-be84-5ce7-a819-93e1cae823fc",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "6e22f78e-5e11-5b8f-89ee-fa453110cb9e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "8629240b-3c84-5aa4-add6-46654871c73d",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "95e14b55-6544-55d7-a08e-1a6cd6088ec1",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "871e7952-96be-59ea-8701-f59343353b65",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "e314b6c3-51b2-5bf4-8a28-fe8b16167664",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "873b8900-d64a-5ff9-9605-70e4478af009",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "de9a9dbc-c7a0-57e4-983e-9ba8322e510a",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "87478922-2e6e-5df6-b392-89ea4c8d5599",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "96e9be0c-51e5-5828-9c49-b4c1024edcdf",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "876e4cea-3eea-510a-9db2-d89997b3ae7e",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ba086f5b-86fb-5928-949a-d58ed045e6e0",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "89c2ab3c-aa75-5f49-9fc6-07e4445d22b0",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ff19f959-df17-579a-8a6e-76d67758ab52",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "8b76d8a4-959e-501d-aea1-3f283640c4c6",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "d21728ed-5da5-554d-8f39-5baac5bd3209",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "8c9fc2f7-2d70-5cd2-9fe7-c359d0e405f4",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "fca32c4a-92fc-5b4a-994b-6365ae2dcf4c",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "8cff5fcd-1b66-581e-8dcb-78aa0d5c1a6b",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "8e862ba9-112f-58d2-9f01-62902feb70bc",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "8e256e82-b2a8-5fee-8e04-de7565c77ca6",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "60786ebb-b97b-578e-9ac5-7469e50b1870",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "8e3bc446-7c53-58e7-a25a-d3494132c80b",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "6a4267db-88da-58e2-9692-c07a7f050ddc",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "9164a916-76c0-5433-aba1-7b6a3f515d88",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "bee9699a-7e2e-57a9-9da2-f0e408d360cb",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "91cc19d7-6641-5855-aa5f-7c8ad6cce6cf",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f81e00bf-8576-5557-9c26-5454b883e0ab",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "9882f92c-ab4b-5f0e-9e04-521d2159622b",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "69da9724-c4f7-5154-8794-b1491faac505",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "99184adf-a6f5-5d3d-a347-ce0cb6461820",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "097050b4-27d3-592b-b72f-6e9d62653136",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "99c09980-d6be-5318-aa64-772f1171f2bc",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "7bd586e5-55d1-5271-9587-054d798e8604",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "9b079269-4271-54cf-b6d3-2bc1bc80e88c",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "7bb0bbfd-a1cd-5c3f-b27e-a865ffe183d0",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "9b75c14e-95c0-5ccd-bca8-01e806d9b9b3",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "27b74452-35ba-5dab-816c-36c8505e88bd",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "9cc34e20-c5d9-55b8-9e3e-8ede8a4631e4",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "3c968460-507c-594f-a45b-0fc88569ba43",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "9ef8b868-d1d2-5325-996b-e9f20b1539a7",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "25aa812b-b5f3-5480-90c9-24c1ad0e571e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "9efb4c21-f7e7-54fa-a799-738406be8d85",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "16049837-1df6-5d47-80e2-c81ccc4695e6",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "9fd6cac8-4f2a-52df-a300-a762646d1938",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "3cc7718c-0d6b-5283-9f4f-a00bd4b3b86f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "a096c46c-c6ec-53a4-bf56-cd5879ad31dc",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "c339389f-1e7c-5638-80ed-a8f41a5aa252",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "a1987950-ec56-592e-a446-6ac59551e1bf",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "dffb890e-6a8f-53a7-9d41-760698ff6ef7",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "a1e628b5-5e4d-59cd-a891-7e32c82925f5",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "18262642-fea5-5cdd-b6e8-471967ec5bb4",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "a2764ed0-4b9a-510b-acce-3103105bfbdf",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "55b5fb29-4666-5137-8aa0-a85f0485ae11",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "a2ebbff9-ac5e-5c0d-b0f9-c0bdf1ada14f",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "df85e837-2015-5da0-b85c-cc31c7dfa8e3",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "a38ce21f-b86a-5938-beef-8152bc951c4c",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "7e6864df-2239-5aa7-9676-690ad4f11c6c",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "a4a9b06b-94d7-5817-a572-032c4a63da14",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "4c793ff4-bacd-53c3-9fd4-34d15ffe5237",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "a4ecbd99-1f64-5058-ae49-e02fe3ac3613",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "78c80684-a718-57b4-a5ae-ed120d88f1ad",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "a6454648-a8d4-585c-944b-7c366f8dc147",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "0e89e7aa-c7bf-57ab-98ea-9863bd9929bd",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "a9495f8d-9dc9-5ff5-9182-9d8b8e08c801",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "51227139-d5f4-5dc4-9151-5c226ce62c63",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "aadb8712-8790-53c9-a5e7-6e0ef9491f86",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "2e68f790-af54-57d7-890d-42ee609aca21",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "aaffba2d-175e-523d-bfd7-c0dec7b02e31",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "364d0d06-c25b-578a-9335-e5c673d2e079",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "ab88b2f0-a47c-5b23-8a69-2bb84104fc58",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "1d54b12e-0bbf-5cf1-aafe-9a7338bd74be",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "abbf7ad7-4025-50d6-84c8-ed38b97ae194",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "a8dd219b-8c56-57fc-a750-fbf3a99e363f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "ac462712-73fe-52dc-b5e9-a9071717b0a6",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "322f0de1-7275-55ed-b871-40119bf41286",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "adb86228-708c-5e51-b183-4b2792b64f8e",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "73d3c67b-fda8-58cf-8871-119e408e6b08",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "aed14843-b0dc-52c7-8014-fe48dd23f7a1",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "052e1783-aada-5c1e-886a-6b7394ece2e6",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "b0c0c533-4611-50cf-9eba-449183686bb6",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "73eefbce-b834-54d8-9ba3-534c8cbb815d",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "b0c12b70-e319-5848-981c-c197c4f1a077",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ee63be89-b005-510e-9dd8-d75bf9991c02",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "b68acceb-5f9f-589c-9ecb-9e29e854c523",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f52b362b-4f6b-573c-9a56-e3cd31635232",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "b7321fb1-3e7b-5c29-8962-72a4a4ee0ef1",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f2885a26-123a-57b3-a645-7092bca21ce5",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "b8517bcc-1aae-5125-aa0c-6ddf6d9a2bf6",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 4,
+                "state": "CURRENT",
+                "version_id": "97be2c1d-94ee-5029-9fcd-9ca3d10ad844",
+                "object_type": "TransformationDefinition",
+                "resource_id": "bca03792-34c5-5ae1-ac7f-4c4c75ac2408",
+                "display_name": "Calculate Department display and wait for canonical review",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "769f54fe-eec2-529e-994c-eee10f321dc6",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "bec946bd-a078-5155-92a7-4231dbec5b85",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "1347ef5e-e3af-5c7e-a827-c21d5770cda1",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "bfb8b75f-7c30-5f02-8bf1-f97b7b1a77d2",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "8086b452-e4e3-5410-9cdc-1243dc953615",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "c0761384-9d64-5d02-b399-58bf3eba61a2",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "faab2af4-1a50-5399-8012-83c63c476a6a",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "c3d5535d-bb84-57a0-80ec-a2b8744f4354",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "a116721c-efda-5f03-807f-d8235ce1a5b4",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "c5815ffe-7399-5768-9fad-40115b221bb2",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "8936fecd-66a1-5011-919a-9062b65f0133",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "c62bd839-71c1-54d6-a3b6-879f2d86bfdf",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ee62db1f-8b2f-5c60-8e37-3b15f399b4e7",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "c7f8f4b2-3bc1-5680-9926-5c0066c711c7",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "b80a3d1f-bb14-581a-8b72-4e93288e9287",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "c8262724-8b32-5baf-a889-6aa1294d99c2",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f5e49c6c-89f1-5003-a966-4820792a994d",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "c8ce78ed-9199-538e-9e39-4c15431d32ae",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "6d5392d4-4fbf-5920-a6f1-7d8089aabcd1",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "ca666be2-3681-5fb8-be18-0faf6ea60ee4",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "914a8f12-7ed6-5f43-8e99-d72ee3d43d7a",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "cafc7201-8ff8-5edb-9fa5-dd8835930949",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "d9b18004-78aa-5239-a45e-39fa3c6f8850",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "cbd45d4c-b00d-59c6-bf22-862723b66856",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "c8167277-e80f-5361-9b9a-ae732ffb193d",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "cde2f7a6-4261-544a-84c3-b05e57da5195",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "35f5ab61-a801-5894-bd28-ddf342fb030c",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "d0a3b4ea-edbf-52a3-be40-4df4c8919066",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "3b7abc0d-8f21-5095-b4c9-31a30b80b379",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "d1864a5b-e18a-59f6-a86d-ba5022b57015",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "a2fb8a92-1640-5dea-a80d-cd2308734f09",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "d225aa48-3a5d-5f03-99ce-7ba324e06a44",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "c07cb457-64ec-5957-b704-f21fffd7a9b7",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "d252f02e-a57c-522b-bae9-da76da771066",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "9ed78871-6dfb-5741-8155-df17d2ea8d4f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "d398895f-4e02-543d-8780-9eb5d95297dc",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "5969bef6-ff6f-5bb0-a5fc-1b3abf025088",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "d4f23837-e4d5-56bc-b2c7-c10842a564b8",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "24ba6e38-f22c-52f5-accc-2903c5ccc736",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "d5e182d1-bf29-5407-b727-2d5e2cb47a51",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "b1c96d2a-0f9e-52c4-866e-ab836a691ef8",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "d6f3ac15-d0ce-5bfd-8be8-031091afadac",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "05c64c45-c150-5a6e-93df-828bcf4d5ea0",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "d76a7e5d-bbd0-5041-b776-f08337f51099",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "0fd7337c-3a3f-5fc5-885c-9464484cfb68",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "d8f1ea5a-0adf-5892-8bc1-5a46940f43e3",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "e01bb815-7454-5812-94ff-71338f71c7f4",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "dc8c7e5a-9c03-5ab5-8e12-6786f8393a60",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "7430d58d-0cc5-5ebd-a932-ad207170ed33",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "dcee1f1b-8059-5c7d-99d7-dc176f82e430",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "025782d6-f514-5562-87f7-a6927231c4d8",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "df45c2c7-633e-5b99-99b7-e614b09d3b71",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f8938169-b080-5268-b68b-e5b6f6260315",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e0ea5f33-7ba9-598c-85e9-3ba36f4ea7fd",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "6fefc8bf-aba6-506b-b426-009ecc18919e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e1236bdd-6c14-5c89-b636-5a8d1a0e4030",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "3ab16792-3974-5bf1-a0e8-374639f78e43",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e128fcd0-a810-5b9b-a6d6-0a5ea96e601e",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "d88c0436-9682-52e5-adb6-aad8dc60169d",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e1a9d7d0-7a31-51c9-aceb-bd1bf03eafd1",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "46215b7a-503c-57f7-b6c2-53ffd7b5195b",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e1cd97c8-717d-58a4-927a-156f5b6945ce",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "a1d7fb0a-ab50-5ac0-a41f-a907532c4820",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e2647971-b013-560d-a0a7-3acd25549aba",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "11598d83-c8f6-5fb6-9712-f9b021f436fe",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e47e4cb9-5135-5f8d-a02f-1bf1c2e9c2ca",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "b4060be9-d03c-5e71-9c2c-48f809d16ec2",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e506e5a9-cd06-5c29-87d7-64c467586759",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "be40510e-c9ad-5c75-892f-4cc038655813",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e5364715-aa94-5c1b-93c6-836ea6131ac3",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "62d2ce06-e248-5f96-a5cf-67913b5ca0e4",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e54de6fa-bd9d-5ac4-b537-566b4349c9ab",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "cf9ea9c0-0b56-58c1-8e04-b0a826a4d2a5",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e57e48a4-edf9-5a0c-8589-bf09e37244b1",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "bf6d725b-0fd3-5c2c-87ca-59f2eac65da4",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e75815ed-96e4-5076-8070-74b32d16f819",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "c6ed131e-3cd5-500f-bb63-cb37c032fd74",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e8070a35-8616-5b3a-9333-d7fa2b807441",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "57eecea3-0fbc-5146-b564-c066ea922ed6",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e8f8adaf-fd95-5dd1-ba7b-b0771cb3f52b",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "aa5777aa-939e-575f-a0f6-9a0d851cf3c1",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "e9ea8f0e-3aca-5449-bf57-6308da55f7f0",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "e07f175e-7ec7-5ba5-a46c-532bb2899e8e",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "ea5f8470-de5c-5c22-a565-496089531323",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "62ad6510-bf56-5ea8-a70f-14c6bbfddbb4",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "eb1dd69a-228e-574f-b0d9-ea98f4c63bdf",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f1be5393-9f6f-579f-bd8e-07328b03734c",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "ebb589bc-6cee-5f45-93dc-c194d8e95e96",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "d2e3f94e-7d49-5fe7-9e91-eaa4c41a5b56",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "eda31168-9e96-510e-b318-932b92f68fcb",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "532c52bc-cf21-5842-8145-c25039213381",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "ef55048a-48ac-5b4e-844b-736cb0dd9652",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "8201ebb0-3f7e-5068-93d7-c2f5d90c9eb9",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "ef92e184-801e-5ac3-8183-075407356348",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "3046aa18-de3f-59af-bd71-b4ac898168cf",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "f11456d3-e791-5ed3-b568-2da0cd31ed07",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f7ba5a51-0728-5bc5-8011-621d503e2c06",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "f1655334-5983-5f44-be37-9985548717f0",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "63714285-c5d4-52ed-93b7-5811734cd3ee",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "f352c7d7-da62-5c76-9a1b-fc0cabdb2808",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ce259c2f-7b9e-56c1-ac6e-09d2be4b72bf",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "f5f9122b-c3ad-5c95-8776-ee2e0f3cc698",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "607983b0-f5f1-585b-8871-35fdeb835500",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "f6ced218-d91d-53f4-9fcc-1a0cb3fc7bbe",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "2b46d355-5c74-5dd7-aa47-107b27c031c2",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "f73d95c6-4894-529c-a2d9-f84dede35575",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ff17dbaf-c7df-5265-821f-f372db8bd0be",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "f7ef3bf0-358b-5d18-ae44-428b1800b879",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "4a363ad1-938f-5251-9861-4b840f1078c5",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "f7f0df6d-52a7-54c4-aea3-ca9c3fb58650",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "21c82d92-3ed8-52f0-937c-08c44b6f57a3",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "f83ecf69-d6e6-57b1-810e-1b623976edb6",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "daa03e94-5de8-549b-a55c-33376001c596",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "f899f73d-c157-52ab-8cc3-df74017fd9b1",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ea990c8f-129c-5f1d-91e6-35e6fb201b29",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "fa7cd70b-ce14-5efd-83d8-f9b4fcba5260",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "81f8205e-1e2a-5c6a-a710-972bd4bd6458",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "fc353666-f863-584f-b747-90ed11846f30",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "68c2b973-241d-50a5-983f-653c6a099234",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "fc725d38-22a5-5aee-87bf-78f61f439931",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "f202d65e-e7c9-5b29-b843-7b730ad47f7c",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "fcdac833-dbaf-56c0-8022-4fa1f5a7a3f8",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "cc0a4f3d-dcc0-5ba6-a2af-4a4972666175",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "fd8f72ff-f931-58bc-8e93-869434956c44",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "44fc0eed-1e4d-59cd-a7d8-6f931c3e3a6d",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "fe76b358-8742-57ad-aac1-ee43d42f8184",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "b7a7b1a2-61bc-5b85-9866-ee2a43a355bd",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "ff2fb4fd-12e0-57a2-a105-1031c3cc410b",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "ca5fce1b-23cf-5928-bf1f-c52eead3da3f",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "ff5154f9-9822-538e-82eb-7967523e1949",
+                "display_name": "Department: Auto Park",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              },
+              {
+                "depth": 2,
+                "state": "CURRENT",
+                "version_id": "81ca79fb-581d-53ca-9136-b04d666828fe",
+                "object_type": "SourceDimensionAssignment",
+                "resource_id": "ffbf76f0-3806-58e5-bac1-e454edd9b312",
+                "display_name": "Department: Procurement",
+                "root_resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c"
+              }
+            ],
+            "max_depth": 16,
+            "selection": "CURRENT_ACCEPTED_HEADS_AND_PROPOSED",
+            "max_resources": 1000,
+            "requires_tenant_steward": false,
+            "fingerprint": "05804379efefd0672960eba86ad1d74c14994279177e2b7ef555f6d8536852a3"
+          }
+        }
+      },
+      "definition": {
+        "kind": "OBJECT_BINDING",
+        "effect": "CANONICAL_RESOURCE_PROPOSAL",
+        "version": "ontology-action/1",
+        "binding_id": "f009bb61-de2d-5346-be1e-d03198fb18fe",
+        "publication": "EXISTING_RESOURCE_REVIEW",
+        "binding_version_id": "f6248e89-6fdb-5149-9eb0-f6451873e0a4"
+      },
+      "events": [
+        {
+          "event_id": "attempt:9f90ce95-d30a-4a86-9ae0-68fab1097bd6",
+          "state": "STARTED",
+          "actor_id": "bootstrap-e9c67bab62119cae3b026aa3",
+          "proposal_id": "006b87e4-4f55-59df-a4cc-44f55b3a6b6c",
+          "created_at": "2026-09-07T16:29:23.579894+04:00"
+        },
+        {
+          "event_id": "proposal-receipt",
+          "state": "PROPOSAL_RETAINED",
+          "proposal_id": "006b87e4-4f55-59df-a4cc-44f55b3a6b6c",
+          "request_hash": "d94c03aaa09acab061654c78b107a1b59b26622efebfd98a7dd80ff9bb47893c",
+          "created_at": "2026-09-07T16:29:27.023597+04:00"
+        }
+      ],
+      "prepared_proposal_id": "006b87e4-4f55-59df-a4cc-44f55b3a6b6c"
+    },
+    "binding_review": {
+      "binding": {
+        "version_id": "f6248e89-6fdb-5149-9eb0-f6451873e0a4",
+        "resource_id": "f009bb61-de2d-5346-be1e-d03198fb18fe",
+        "content_hash": "1cb46fccc11f9da356d517462bcb8874d81d9465927894494ce74cfbc4d99c9f"
+      },
+      "rationale": "Review only the calculated Department display from its retained source header and column; preserve all target attributes and source observations.",
+      "source_node_id": "department_display",
+      "operation_request_id": "fb71cef1-ba4c-57d3-9377-25cfeb1142a2",
+      "state": "PENDING",
+      "operation_id": "opa_94045467250f823df4e54a01725b10fbac7e6583965ab18f17a0207383b89e39",
+      "proposal_id": "006b87e4-4f55-59df-a4cc-44f55b3a6b6c",
+      "input_result": {
+        "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548",
+        "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+        "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9"
+      },
+      "decision": null,
+      "reviewed_by": null,
+      "proposal_history_independent": true
+    },
+    "proposal": {
+      "proposal_id": "006b87e4-4f55-59df-a4cc-44f55b3a6b6c",
+      "title": "Apply ontology binding: Propose calculated display for the existing Department dimension",
+      "rationale": "Review only the calculated Department display from its retained source header and column; preserve all target attributes and source observations.",
+      "access_entity": "entity-ge-001",
+      "mutations": [
+        {
+          "resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+          "expected_version_id": "1662a12b-9bd6-5755-8e4a-80fc89bec7e2",
+          "object_type": "DimensionDefinition",
+          "identity_key": "source-dimension:1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+          "display_name": "Department · source column AA",
+          "attributes": {
+            "code": "c6f87828-9609-5b35-afa6-e894a0acfe41:Department",
+            "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+          },
+          "valid_from": "2026-09-07T12:29:23.473693Z",
+          "valid_to": null,
+          "authority_state": "APPROVED",
+          "evidence_class": "SOURCE_BOUND"
+        }
+      ],
+      "source_versions": {
+        "1751ddc9-6ff0-57c9-8d22-cfaade27b62c": {
+          "2bd64825-e320-5039-b163-2064a1a71c82": "a68b80b7-ebea-5eb1-b218-8d0164940c38",
+          "ef14f98a-cd4f-5dcc-85d1-4409f8c6204a": "d91f5128-5461-58d7-b217-55dcfc812a09",
+          "f009bb61-de2d-5346-be1e-d03198fb18fe": "f6248e89-6fdb-5149-9eb0-f6451873e0a4"
+        }
+      },
+      "calculated_bindings": {
+        "1751ddc9-6ff0-57c9-8d22-cfaade27b62c": {
+          "binding": {
+            "resource_id": "f009bb61-de2d-5346-be1e-d03198fb18fe",
+            "version_id": "f6248e89-6fdb-5149-9eb0-f6451873e0a4"
+          },
+          "input_result": {
+            "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+          },
+          "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+          "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9",
+          "source": {
+            "resource_id": "2bd64825-e320-5039-b163-2064a1a71c82",
+            "version_id": "a68b80b7-ebea-5eb1-b218-8d0164940c38"
+          },
+          "properties": [
+            {
+              "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+              "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891",
+              "content_hash": "d0adb28ff3ced4e2e74114424bf094b183e9924d0ea3e7611dd3a714fdf6b6f9"
+            }
+          ],
+          "query": {
+            "object_type": "CompanyDimension",
+            "resource_ids": [
+              "2bd64825-e320-5039-b163-2064a1a71c82"
+            ],
+            "filters": [],
+            "traversal": [],
+            "search": "",
+            "limit": 1,
+            "offset": 0,
+            "valid_at": "2026-09-07T12:28:27.381000Z",
+            "known_at": "2026-09-07T12:28:27.382000Z"
+          }
+        }
+      }
+    }
+  },
+  "checked_at": "2026-09-07T12:33:34.503543+00:00",
+  "financial_authority_established": false,
+  "completed": {
+    "workflow_id": "transformation:1a9d5584-1469-453b-8b36-e7ff5c8e6c52",
+    "request": {
+      "definition": {
+        "nodes": [
+          {
+            "node_id": "department_display",
+            "function": {
+              "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+              "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+              "content_hash": "3dc7f2c4e8df60604d5d5842c0606a8a0325e7c9dd734e4c447bf8a782f86979"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+                "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b"
+              },
+              "known_at": "2026-09-07T12:28:27.382000Z",
+              "valid_at": "2026-09-07T12:28:27.381000Z",
+              "request_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+                  "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b"
+                },
+                "known_at": "2026-09-07T12:28:27.382000Z",
+                "valid_at": "2026-09-07T12:28:27.381000Z",
+                "request_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+                "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+                "content_hash": "3dc7f2c4e8df60604d5d5842c0606a8a0325e7c9dd734e4c447bf8a782f86979"
+              },
+              "plan_hash": "9590a6a393c93cf130e92522c266396905bffb7318b370bc48cc4aea3e19f861",
+              "object_set": {
+                "version_id": "8d823fb1-18ab-5b17-b54b-6ff0d78706a5",
+                "resource_id": "484cd6bf-6571-5dbf-a8e2-109d6ef35070",
+                "content_hash": "b0e92c0d5bcc1779d63f25a33d8489b0b86aa63d0e194878be5d4c15eb7cad27"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "209e6c3ad01b880feb1459ce57ad3794dc378559cc0f2fe82035c5e79b19cca6",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [
+                {
+                  "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891",
+                  "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+                  "content_hash": "d0adb28ff3ced4e2e74114424bf094b183e9924d0ea3e7611dd3a714fdf6b6f9"
+                }
+              ],
+              "static_dependencies": [
+                {
+                  "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891",
+                  "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+                  "content_hash": "d0adb28ff3ced4e2e74114424bf094b183e9924d0ea3e7611dd3a714fdf6b6f9"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                },
+                {
+                  "version_id": "8d823fb1-18ab-5b17-b54b-6ff0d78706a5",
+                  "resource_id": "484cd6bf-6571-5dbf-a8e2-109d6ef35070",
+                  "content_hash": "b0e92c0d5bcc1779d63f25a33d8489b0b86aa63d0e194878be5d4c15eb7cad27"
+                }
+              ]
+            }
+          }
+        ],
+        "outputs": {
+          "department_display": "function-invocation/1"
+        },
+        "version": "transformation-functions/1"
+      },
+      "request_hash": "6d148cfb97371ea04c1ba6fcd7dafbc08c1c1582e4cf75a4f79d2f64f035353f",
+      "compiled_plan": {
+        "mode": "EVIDENCE_ANALYSIS_ONLY",
+        "nodes": [
+          {
+            "node_id": "department_display",
+            "function": {
+              "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+              "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+              "content_hash": "3dc7f2c4e8df60604d5d5842c0606a8a0325e7c9dd734e4c447bf8a782f86979"
+            },
+            "depends_on": [],
+            "invocation": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+                "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b"
+              },
+              "known_at": "2026-09-07T12:28:27.382000Z",
+              "valid_at": "2026-09-07T12:28:27.381000Z",
+              "request_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+            },
+            "function_plan": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "request": {
+                "limit": 1,
+                "offset": 0,
+                "function": {
+                  "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+                  "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b"
+                },
+                "known_at": "2026-09-07T12:28:27.382000Z",
+                "valid_at": "2026-09-07T12:28:27.381000Z",
+                "request_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+              },
+              "contract": "function-plan/1",
+              "function": {
+                "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+                "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+                "content_hash": "3dc7f2c4e8df60604d5d5842c0606a8a0325e7c9dd734e4c447bf8a782f86979"
+              },
+              "plan_hash": "9590a6a393c93cf130e92522c266396905bffb7318b370bc48cc4aea3e19f861",
+              "object_set": {
+                "version_id": "8d823fb1-18ab-5b17-b54b-6ff0d78706a5",
+                "resource_id": "484cd6bf-6571-5dbf-a8e2-109d6ef35070",
+                "content_hash": "b0e92c0d5bcc1779d63f25a33d8489b0b86aa63d0e194878be5d4c15eb7cad27"
+              },
+              "exact_scope": {
+                "period": "2026-08",
+                "currency": "GEL",
+                "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+                "legal_entity_id": "entity-ge-001"
+              },
+              "implementation": {
+                "mode": "EVIDENCE_ANALYSIS_ONLY",
+                "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+                "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+                "capabilities": {
+                  "cdc": false,
+                  "read": true,
+                  "query": true,
+                  "write": false,
+                  "delete": false,
+                  "limits": {
+                    "coverage": "QUERY_PAGE_ONLY",
+                    "returned_rows": 200,
+                    "grouping_fields": 4,
+                    "traversal_steps": 4,
+                    "query_predicates": 20,
+                    "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                    "derived_properties": 8,
+                    "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                    "database_scan_limit": null
+                  },
+                  "stream": false,
+                  "update": false,
+                  "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                  "reversal": false,
+                  "snapshot": true,
+                  "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                  "simulation": false,
+                  "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                  "incremental": false,
+                  "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                  "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                  "formula_execution": false,
+                  "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                  "source_write_exactly_once": false,
+                  "grouped_observation_counts": true,
+                  "typed_relationship_filters": true,
+                  "versioned_interface_inputs": true,
+                  "composed_derived_properties": true,
+                  "versioned_type_group_inputs": true
+                },
+                "maximum_rows": 200,
+                "dependency_sha256": "209e6c3ad01b880feb1459ce57ad3794dc378559cc0f2fe82035c5e79b19cca6",
+                "implementation_id": "ontology.object-set-derived/v1",
+                "maximum_properties": 8
+              },
+              "derived_properties": [
+                {
+                  "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891",
+                  "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+                  "content_hash": "d0adb28ff3ced4e2e74114424bf094b183e9924d0ea3e7611dd3a714fdf6b6f9"
+                }
+              ],
+              "static_dependencies": [
+                {
+                  "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891",
+                  "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+                  "content_hash": "d0adb28ff3ced4e2e74114424bf094b183e9924d0ea3e7611dd3a714fdf6b6f9"
+                },
+                {
+                  "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                  "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                  "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+                },
+                {
+                  "version_id": "8d823fb1-18ab-5b17-b54b-6ff0d78706a5",
+                  "resource_id": "484cd6bf-6571-5dbf-a8e2-109d6ef35070",
+                  "content_hash": "b0e92c0d5bcc1779d63f25a33d8489b0b86aa63d0e194878be5d4c15eb7cad27"
+                }
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "node_id": "department_display",
+            "output_id": "department_display"
+          }
+        ],
+        "request": {
+          "known_at": "2026-09-07T12:28:27.382000Z",
+          "valid_at": "2026-09-07T12:28:27.381000Z",
+          "request_id": "1a9d5584-1469-453b-8b36-e7ff5c8e6c52",
+          "transformation": {
+            "version_id": "97be2c1d-94ee-5029-9fcd-9ca3d10ad844",
+            "resource_id": "bca03792-34c5-5ae1-ac7f-4c4c75ac2408"
+          }
+        },
+        "contract": "transformation-plan/1",
+        "coverage": "DECLARED_QUERY_PAGES_ONLY",
+        "plan_hash": "96138a75af50b05dad88f95c529e20cba4f3215b879b0e7921a2f8b40323804b",
+        "node_order": [
+          "department_display"
+        ],
+        "exact_scope": {
+          "period": "2026-08",
+          "currency": "GEL",
+          "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+          "legal_entity_id": "entity-ge-001"
+        },
+        "binding_review": {
+          "binding": {
+            "version_id": "f6248e89-6fdb-5149-9eb0-f6451873e0a4",
+            "resource_id": "f009bb61-de2d-5346-be1e-d03198fb18fe",
+            "content_hash": "1cb46fccc11f9da356d517462bcb8874d81d9465927894494ce74cfbc4d99c9f"
+          },
+          "rationale": "Review only the calculated Department display from its retained source header and column; preserve all target attributes and source observations.",
+          "source_node_id": "department_display",
+          "operation_request_id": "fb71cef1-ba4c-57d3-9377-25cfeb1142a2"
+        },
+        "estimated_work": {
+          "returned_rows": 1,
+          "derived_evaluations": 1
+        },
+        "transformation": {
+          "version_id": "97be2c1d-94ee-5029-9fcd-9ca3d10ad844",
+          "resource_id": "bca03792-34c5-5ae1-ac7f-4c4c75ac2408",
+          "content_hash": "3382c49a04c71b943416c5d74211db287f6cf5307a55e0dd9ee520f343dc0d4a"
+        },
+        "resource_budget": {
+          "max_returned_rows": 1,
+          "max_derived_evaluations": 1,
+          "max_published_result_bytes": 1000000
+        },
+        "dependency_semantics": "COMPLETION_BARRIER_ONLY",
+        "current_use_authorized": false,
+        "result_bytes_accounting": "POSTGRES_JSONB_TEXT_UTF8_V1",
+        "business_effect_authorized": false
+      }
+    },
+    "actor_id": "bootstrap-e9c67bab62119cae3b026aa3",
+    "created_at": "2026-09-07T16:29:17.695521+04:00",
+    "definition": {
+      "nodes": [
+        {
+          "node_id": "department_display",
+          "function": {
+            "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+            "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+            "content_hash": "3dc7f2c4e8df60604d5d5842c0606a8a0325e7c9dd734e4c447bf8a782f86979"
+          },
+          "depends_on": [],
+          "invocation": {
+            "limit": 1,
+            "offset": 0,
+            "function": {
+              "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+              "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b"
+            },
+            "known_at": "2026-09-07T12:28:27.382000Z",
+            "valid_at": "2026-09-07T12:28:27.381000Z",
+            "request_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+          },
+          "function_plan": {
+            "mode": "EVIDENCE_ANALYSIS_ONLY",
+            "request": {
+              "limit": 1,
+              "offset": 0,
+              "function": {
+                "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+                "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b"
+              },
+              "known_at": "2026-09-07T12:28:27.382000Z",
+              "valid_at": "2026-09-07T12:28:27.381000Z",
+              "request_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+            },
+            "contract": "function-plan/1",
+            "function": {
+              "version_id": "c1ffdac0-afd5-5041-ba4a-f12b4a6ea9e7",
+              "resource_id": "286bb55a-cd2c-5178-b9a4-fcb140e4d96b",
+              "content_hash": "3dc7f2c4e8df60604d5d5842c0606a8a0325e7c9dd734e4c447bf8a782f86979"
+            },
+            "plan_hash": "9590a6a393c93cf130e92522c266396905bffb7318b370bc48cc4aea3e19f861",
+            "object_set": {
+              "version_id": "8d823fb1-18ab-5b17-b54b-6ff0d78706a5",
+              "resource_id": "484cd6bf-6571-5dbf-a8e2-109d6ef35070",
+              "content_hash": "b0e92c0d5bcc1779d63f25a33d8489b0b86aa63d0e194878be5d4c15eb7cad27"
+            },
+            "exact_scope": {
+              "period": "2026-08",
+              "currency": "GEL",
+              "tenant_id": "805d8a32-d12b-4268-a236-b0b16e59da9f",
+              "legal_entity_id": "entity-ge-001"
+            },
+            "implementation": {
+              "mode": "EVIDENCE_ANALYSIS_ONLY",
+              "code_sha256": "bdc02e1d8f7377cc26262f4e18f42986cab068a258aff9920dba48b60505e7f2",
+              "determinism": "DETERMINISTIC_FOR_PINNED_INPUTS",
+              "capabilities": {
+                "cdc": false,
+                "read": true,
+                "query": true,
+                "write": false,
+                "delete": false,
+                "limits": {
+                  "coverage": "QUERY_PAGE_ONLY",
+                  "returned_rows": 200,
+                  "grouping_fields": 4,
+                  "traversal_steps": 4,
+                  "query_predicates": 20,
+                  "grouping_coverage": "COMPLETE_BOUNDED_OBJECT_SET",
+                  "derived_properties": 8,
+                  "grouping_semantics": "EXACT_TYPED_STORED_VALUES",
+                  "database_scan_limit": null
+                },
+                "stream": false,
+                "update": false,
+                "readback": "SHARED_IMMUTABLE_FUNCTION_RESULT",
+                "reversal": false,
+                "snapshot": true,
+                "atomicity": "NO_SOURCE_WRITE; SHARED_IMMUTABLE_TERMINAL_RECEIPT",
+                "simulation": false,
+                "idempotency": "SHARED_INVOCATION_REQUEST_ID_AND_PINNED_PLAN_REPLAY",
+                "incremental": false,
+                "transaction": "NO_SOURCE_WRITE_TRANSACTION",
+                "acknowledgement": "RETAINED_COMPUTATION_RECEIPT_ONLY",
+                "formula_execution": false,
+                "snapshot_semantics": "CANONICAL_VALID_AND_KNOWN_TIME_QUERY",
+                "source_write_exactly_once": false,
+                "grouped_observation_counts": true,
+                "typed_relationship_filters": true,
+                "versioned_interface_inputs": true,
+                "composed_derived_properties": true,
+                "versioned_type_group_inputs": true
+              },
+              "maximum_rows": 200,
+              "dependency_sha256": "209e6c3ad01b880feb1459ce57ad3794dc378559cc0f2fe82035c5e79b19cca6",
+              "implementation_id": "ontology.object-set-derived/v1",
+              "maximum_properties": 8
+            },
+            "derived_properties": [
+              {
+                "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891",
+                "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+                "content_hash": "d0adb28ff3ced4e2e74114424bf094b183e9924d0ea3e7611dd3a714fdf6b6f9"
+              }
+            ],
+            "static_dependencies": [
+              {
+                "version_id": "230cfba6-ea43-5a1a-963e-d3d695955891",
+                "resource_id": "325d38f6-b261-55e5-b879-e7886db74b57",
+                "content_hash": "d0adb28ff3ced4e2e74114424bf094b183e9924d0ea3e7611dd3a714fdf6b6f9"
+              },
+              {
+                "version_id": "6a3b68ba-affa-54e7-8ff9-038fc71f2036",
+                "resource_id": "85954ef2-e1aa-5adf-b933-c5a0f91fd199",
+                "content_hash": "1e4fc6477f8c00041a6dfc3479d32bbcda8cb8a23ad8df5942c90453ca53b6fd"
+              },
+              {
+                "version_id": "8d823fb1-18ab-5b17-b54b-6ff0d78706a5",
+                "resource_id": "484cd6bf-6571-5dbf-a8e2-109d6ef35070",
+                "content_hash": "b0e92c0d5bcc1779d63f25a33d8489b0b86aa63d0e194878be5d4c15eb7cad27"
+              }
+            ]
+          }
+        }
+      ],
+      "outputs": {
+        "department_display": "function-invocation/1"
+      },
+      "version": "transformation-functions/1"
+    },
+    "events": [
+      {
+        "event_id": "node:department_display:started",
+        "node": "department_display",
+        "state": "RUNNING",
+        "created_at": "2026-09-07T16:29:20.144244+04:00"
+      },
+      {
+        "event_id": "node:department_display:terminal",
+        "node": "department_display",
+        "state": "COMPLETED",
+        "usage": {
+          "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+          "returned_rows": 1,
+          "derived_evaluations": 1,
+          "published_result_bytes": 5248
+        },
+        "output": {
+          "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9",
+          "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+          "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+        },
+        "new_run_required": false,
+        "created_at": "2026-09-07T16:29:22.098741+04:00"
+      },
+      {
+        "event_id": "output:e7faa00b901824ca01b1a1f16cf4583da7bd8e65e4c3e087284c4394117354b6",
+        "node": "department_display",
+        "state": "STAGED",
+        "value": {
+          "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9",
+          "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+          "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+        },
+        "sha256": "7cdda024ba7dcba554faf797608590b63ac91af10834b842b775f00f7be47e84",
+        "generation": 0,
+        "artifact_type": "function-invocation/1",
+        "created_at": "2026-09-07T16:29:22.228062+04:00"
+      },
+      {
+        "event_id": "binding-review:prepared",
+        "state": "PENDING",
+        "proposal_id": "006b87e4-4f55-59df-a4cc-44f55b3a6b6c",
+        "input_result": {
+          "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9",
+          "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+          "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+        },
+        "operation_id": "opa_94045467250f823df4e54a01725b10fbac7e6583965ab18f17a0207383b89e39",
+        "source_node_id": "department_display",
+        "created_at": "2026-09-07T16:29:27.242886+04:00"
+      },
+      {
+        "event_id": "publication:0",
+        "node": "publication",
+        "state": "PUBLISHED",
+        "manifest": {
+          "outputs": [
+            {
+              "slot": "department_display",
+              "value": {
+                "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9",
+                "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+                "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+              },
+              "sha256": "7cdda024ba7dcba554faf797608590b63ac91af10834b842b775f00f7be47e84",
+              "event_id": "output:e7faa00b901824ca01b1a1f16cf4583da7bd8e65e4c3e087284c4394117354b6",
+              "artifact_type": "function-invocation/1"
+            }
+          ],
+          "protocol": "execution-publication/1",
+          "authority": "EXECUTION_ONLY",
+          "generation": 0,
+          "workflow_id": "transformation:1a9d5584-1469-453b-8b36-e7ff5c8e6c52",
+          "publication_id": "pub_188104531131c0b2169ce22a91711fe54a8fba6cdac540759f5fdcb99355ee65",
+          "definition_sha256": "500e30e3f6e2529616cad2e4da7292d8e9973927e4c39a9b7a6634058e0b2f07"
+        },
+        "created_at": "2026-09-07T16:32:11.033826+04:00"
+      }
+    ],
+    "publications": [
+      {
+        "outputs": [
+          {
+            "slot": "department_display",
+            "value": {
+              "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9",
+              "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+              "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548"
+            },
+            "sha256": "7cdda024ba7dcba554faf797608590b63ac91af10834b842b775f00f7be47e84",
+            "event_id": "output:e7faa00b901824ca01b1a1f16cf4583da7bd8e65e4c3e087284c4394117354b6",
+            "artifact_type": "function-invocation/1"
+          }
+        ],
+        "protocol": "execution-publication/1",
+        "authority": "EXECUTION_ONLY",
+        "generation": 0,
+        "workflow_id": "transformation:1a9d5584-1469-453b-8b36-e7ff5c8e6c52",
+        "publication_id": "pub_188104531131c0b2169ce22a91711fe54a8fba6cdac540759f5fdcb99355ee65",
+        "definition_sha256": "500e30e3f6e2529616cad2e4da7292d8e9973927e4c39a9b7a6634058e0b2f07"
+      }
+    ],
+    "publication_review": null,
+    "binding_review": {
+      "binding": {
+        "version_id": "f6248e89-6fdb-5149-9eb0-f6451873e0a4",
+        "resource_id": "f009bb61-de2d-5346-be1e-d03198fb18fe",
+        "content_hash": "1cb46fccc11f9da356d517462bcb8874d81d9465927894494ce74cfbc4d99c9f"
+      },
+      "rationale": "Review only the calculated Department display from its retained source header and column; preserve all target attributes and source observations.",
+      "source_node_id": "department_display",
+      "operation_request_id": "fb71cef1-ba4c-57d3-9377-25cfeb1142a2",
+      "state": "APPROVED",
+      "operation_id": "opa_94045467250f823df4e54a01725b10fbac7e6583965ab18f17a0207383b89e39",
+      "proposal_id": "006b87e4-4f55-59df-a4cc-44f55b3a6b6c",
+      "input_result": {
+        "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548",
+        "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+        "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9"
+      },
+      "decision": "APPROVED",
+      "reviewed_by": "local-steward-reviewer",
+      "proposal_history_independent": true
+    },
+    "current_use_authorized": false,
+    "business_effect_authorized": false,
+    "runtime_status": "COMPLETED",
+    "execution": {
+      "cancel_requested": false,
+      "pause_requested": false,
+      "result": {
+        "binding_review": {
+          "binding": {
+            "content_hash": "1cb46fccc11f9da356d517462bcb8874d81d9465927894494ce74cfbc4d99c9f",
+            "resource_id": "f009bb61-de2d-5346-be1e-d03198fb18fe",
+            "version_id": "f6248e89-6fdb-5149-9eb0-f6451873e0a4"
+          },
+          "decision": "APPROVED",
+          "input_result": {
+            "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548",
+            "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+            "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9"
+          },
+          "operation_id": "opa_94045467250f823df4e54a01725b10fbac7e6583965ab18f17a0207383b89e39",
+          "operation_request_id": "fb71cef1-ba4c-57d3-9377-25cfeb1142a2",
+          "proposal_history_independent": true,
+          "proposal_id": "006b87e4-4f55-59df-a4cc-44f55b3a6b6c",
+          "rationale": "Review only the calculated Department display from its retained source header and column; preserve all target attributes and source observations.",
+          "reviewed_by": "local-steward-reviewer",
+          "source_node_id": "department_display",
+          "state": "APPROVED"
+        },
+        "department_display": {
+          "new_run_required": false,
+          "node": "department_display",
+          "output": {
+            "invocation_id": "5ed2f11c-26f3-5d56-9b39-3990a8920548",
+            "receipt_hash": "9169bd5db359cd9140f4cb2a700888526d39163768ce0eb253dc662b331a169f",
+            "run_id": "fcr_ddedb44e6c287d4e6c24d2ccdd4633600407c2452be19eec84cf5328d3447cb9"
+          },
+          "state": "COMPLETED",
+          "usage": {
+            "derived_evaluations": 1,
+            "measurement": "POSTGRES_JSONB_TEXT_UTF8_V1",
+            "published_result_bytes": 5248,
+            "returned_rows": 1
+          }
+        },
+        "publication": {
+          "generation": 0,
+          "publication_id": "pub_188104531131c0b2169ce22a91711fe54a8fba6cdac540759f5fdcb99355ee65"
+        }
+      },
+      "state": "COMPLETED"
+    }
+  },
+  "published_target": {
+    "resource_id": "1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+    "version_id": "7c7ce91a-df47-564e-b9e9-9eb777b8628d",
+    "object_type": "DimensionDefinition",
+    "identity_key": "source-dimension:1751ddc9-6ff0-57c9-8d22-cfaade27b62c",
+    "display_name": "Department · source column AA",
+    "access_entity": "entity-ge-001",
+    "schema_version_id": "d91f5128-5461-58d7-b217-55dcfc812a09",
+    "attributes": {
+      "code": "c6f87828-9609-5b35-afa6-e894a0acfe41:Department",
+      "evidence_id": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+    },
+    "content_hash": "a35deffd8f1a34f991e886034cab11b8a1009cff34507d7a2dc61024ca863af4",
+    "valid_from": "2026-09-07T16:29:23.473693+04:00",
+    "valid_to": null,
+    "system_from": "2026-09-07T16:32:05.190187+04:00",
+    "authority_state": "APPROVED",
+    "evidence_class": "SOURCE_BOUND",
+    "proposal_id": "006b87e4-4f55-59df-a4cc-44f55b3a6b6c"
+  }
+}

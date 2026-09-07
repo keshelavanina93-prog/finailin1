@@ -104,6 +104,23 @@ class PublicationReview(BaseModel):
         return value
 
 
+class TransformationBindingReview(BaseModel):
+    """One shared canonical proposal after all calculation nodes have completed."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    binding_id: UUID
+    source_node_id: NodeId
+    rationale: str = Field(min_length=10, max_length=2000)
+
+    @field_validator("rationale")
+    @classmethod
+    def meaningful_rationale(cls, value: str) -> str:
+        value = value.strip()
+        if len(value) < 10:
+            raise ValueError("Binding review rationale requires ten non-padding characters")
+        return value
+
+
 class TransformationDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     definition: TransformationGraph
@@ -112,6 +129,27 @@ class TransformationDefinition(BaseModel):
     publication_review: PublicationReview | None = Field(
         default=None, exclude_if=lambda value: value is None
     )
+    binding_review: TransformationBindingReview | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+
+    @model_validator(mode="after")
+    def valid_binding_review(self) -> "TransformationDefinition":
+        if self.binding_review is not None:
+            source = next(
+                (
+                    node
+                    for node in self.definition.nodes
+                    if node.node_id == self.binding_review.source_node_id
+                ),
+                None,
+            )
+            if source is None or source.offset != 0 or source.limit > 100:
+                raise ValueError(
+                    "Binding review requires an existing source node with a complete "
+                    "zero-offset page of at most 100 objects"
+                )
+        return self
 
 
 class TransformationRunRequest(BaseModel):

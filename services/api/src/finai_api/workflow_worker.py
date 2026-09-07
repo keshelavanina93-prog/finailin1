@@ -14,7 +14,7 @@ from finai_api.report_workflow import ReportSourceWorkflow
 from finai_api.security import require_permission
 from finai_api.services import execution_publication as publication
 from finai_api.services import report_workflows as records
-from finai_api.services import transformation_runs
+from finai_api.services import transformation_bindings, transformation_runs
 from finai_api.services.regulatory_monitors import check as regulatory_source_check
 from finai_api.services.report_inputs import ReportInputRequest, retain_assessment
 from finai_api.services.tb_frontier import analyze
@@ -147,6 +147,7 @@ async def main() -> None:
                 transformation_runs.execute_node,
                 transformation_runs.publish,
                 transformation_runs.publication_review,
+                transformation_bindings.prepare,
             ],
             activity_executor=executor,
         )

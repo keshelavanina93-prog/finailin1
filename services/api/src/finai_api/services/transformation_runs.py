@@ -108,6 +108,8 @@ def retain(principal: Principal, request: TransformationRunRequest) -> str:
 
 
 def read(principal: Principal, identity: str) -> dict:
+    from finai_api.services.transformation_bindings import projection as binding_projection
+
     require_permission(principal, "ontology_read")
     result = records.read(principal, identity)
     if result["definition"].get("version") != VERSION:
@@ -153,6 +155,7 @@ def read(principal: Principal, identity: str) -> dict:
         **result,
         "publications": manifests,
         "publication_review": review_projection(result),
+        "binding_review": binding_projection(principal, result),
         "current_use_authorized": False,
         "business_effect_authorized": False,
     }
@@ -267,7 +270,13 @@ def decide_review(
 
 @activity.defn(name="transformation_publication_review")
 def publication_review(context: dict) -> dict:
+    from finai_api.services.transformation_bindings import record_event
+
     principal, retained = _context(context)
+    if retained["binding_review"] is not None and retained["binding_review"]["state"] != "APPROVED":
+        raise WorkspaceError(
+            409, "Publication review requires the canonical binding proposal approval"
+        )
     review = retained["publication_review"]
     if review is None:
         return {"state": "NOT_REQUIRED"}
@@ -289,7 +298,8 @@ def publication_review(context: dict) -> dict:
         }
         for output in sorted(compiled["outputs"], key=lambda output: output["output_id"])
     ]
-    records.event(
+    writer = record_event if retained["binding_review"] is not None else records.event
+    writer(
         principal,
         context["workflow_id"],
         "publication-review:task",
@@ -320,6 +330,7 @@ def load(context: dict) -> dict:
         "node_order": compiled["node_order"],
         "dependencies": {node["node_id"]: node["depends_on"] for node in compiled["nodes"]},
         **({"publication_review": True} if compiled.get("publication_review") else {}),
+        **({"binding_review": True} if compiled.get("binding_review") else {}),
     }
 
 
@@ -422,6 +433,9 @@ def publish(context: dict) -> dict:
         raise WorkspaceError(409, "Transformation is incomplete; publication refused")
     compiled = retained["request"]["compiled_plan"]
     review = retained["publication_review"]
+    binding_review = retained["binding_review"]
+    if binding_review is not None and binding_review["state"] != "APPROVED":
+        raise WorkspaceError(409, "Publication requires the canonical binding proposal approval")
     if review is not None and review["state"] != "APPROVED":
         raise WorkspaceError(409, "Publication requires its retained independent approval")
     if review is not None and not retained["publications"]:
@@ -434,5 +448,12 @@ def publish(context: dict) -> dict:
             cumulative_usage(usage_events), compiled["resource_budget"]
         ):
             raise WorkspaceError(409, "Transformation publication budget is not satisfied")
-    manifest = publication.publish(principal, context["workflow_id"], 0)
+    from finai_api.services.transformation_bindings import record_event
+
+    manifest = publication.publish(
+        principal,
+        context["workflow_id"],
+        0,
+        event_writer=record_event if binding_review is not None else records.event,
+    )
     return {"publication_id": manifest["publication_id"], "generation": 0}

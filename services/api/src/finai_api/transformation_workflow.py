@@ -79,6 +79,34 @@ class TransformationWorkflow:
                 completed.add(node_id)
             if not await self._boundary():
                 return self.result
+            if workflow.patched("transformation-binding-review-v1") and topology.get(
+                "binding_review"
+            ):
+                while True:
+                    notification = self.review_notification
+                    review = await workflow.execute_activity(
+                        "transformation_binding_review", context, **options
+                    )
+                    self.result["binding_review"] = review
+                    if review["state"] == "APPROVED":
+                        break
+                    if review["state"] in ("REJECTED", "CANCELLED"):
+                        self.state = review["state"]
+                        return self.result
+                    self.state = "AWAITING_BINDING_REVIEW"
+
+                    def binding_notified(notification: int = notification) -> bool:
+                        return self.review_notification != notification or self.cancelled
+
+                    with suppress(TimeoutError):
+                        await workflow.wait_condition(
+                            binding_notified,
+                            timeout=timedelta(seconds=30),
+                        )
+                    if not await self._boundary():
+                        return self.result
+                if not await self._boundary():
+                    return self.result
             if workflow.patched("transformation-publication-review-v1") and topology.get(
                 "publication_review"
             ):

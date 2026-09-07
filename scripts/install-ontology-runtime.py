@@ -129,7 +129,7 @@ def main() -> None:
                 and spec["identity_key"] == "TransformationDefinition"
                 and any(
                     field not in previous["attributes"]["fields"]
-                    for field in ("resource_budget", "publication_review")
+                    for field in ("resource_budget", "publication_review", "binding_review")
                 )
             ):
                 attributes = {
@@ -138,7 +138,7 @@ def main() -> None:
                         **previous["attributes"]["fields"],
                         **{
                             field: spec["attributes"]["fields"][field]
-                            for field in ("resource_budget", "publication_review")
+                            for field in ("resource_budget", "publication_review", "binding_review")
                             if field not in previous["attributes"]["fields"]
                         },
                     },

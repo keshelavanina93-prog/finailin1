@@ -56,6 +56,27 @@ def validate_transformation(
                 or source.object_set_id != destination.object_set_id
             ):
                 raise WorkspaceError(409, "Retained input requires compatible ontology Object Sets")
+    if definition.binding_review is not None:
+        from finai_api.services.calculated_bindings import binding_properties
+
+        gate = definition.binding_review
+        binding = target(
+            str(gate.binding_id), str(item.resource_id), "TRANSFORMATION_BINDING_REVIEW"
+        )
+        if binding["object_type"] != "ObjectBinding":
+            raise WorkspaceError(409, "Transformation binding review requires an ObjectBinding")
+        properties = binding_properties(binding["attributes"]["definition"])
+        source = functions[gate.source_node_id]
+        if (
+            not properties
+            or source.definition.implementation_id != function_execution.IMPLEMENTATION_ID
+            or any(
+                ref.resource_id not in source.definition.derived_property_ids for ref in properties
+            )
+        ):
+            raise WorkspaceError(
+                409, "Binding review requires calculated properties declared by its source Function"
+            )
 
 
 def estimate_work(definition: TransformationDefinition, nodes: list[dict]) -> dict[str, int]:
@@ -189,5 +210,43 @@ def plan(p: Principal, request: TransformationRunRequest) -> dict[str, Any]:
         result["input_semantics"] = "EXPLICIT_RETAINED_RESULT"
     if definition.publication_review is not None:
         result["publication_review"] = definition.publication_review.model_dump(mode="json")
+    if definition.binding_review is not None:
+        from finai_api.services.calculated_bindings import binding_properties
+
+        require_permission(p, "ontology_propose")
+        gate = definition.binding_review
+        binding_pins = [
+            row for row in dependencies if row["relation"] == "TRANSFORMATION_BINDING_REVIEW"
+        ]
+        if (
+            len(binding_pins) != 1
+            or binding_pins[0]["resource_id"] != gate.binding_id
+            or binding_pins[0]["object_type"] != "ObjectBinding"
+        ):
+            raise WorkspaceError(409, "Binding review lacks its exact reviewed binding pin")
+        binding = binding_pins[0]
+        properties = binding_properties(binding["attributes"]["definition"])
+        source_plan = next(
+            node["function_plan"] for node in nodes if node["node_id"] == gate.source_node_id
+        )
+        roots = {
+            (pin["resource_id"], pin["version_id"]) for pin in source_plan["derived_properties"]
+        }
+        if (
+            not properties
+            or source_plan["implementation"]["implementation_id"]
+            != function_execution.IMPLEMENTATION_ID
+            or any((str(ref.resource_id), str(ref.version_id)) not in roots for ref in properties)
+        ):
+            raise WorkspaceError(
+                409,
+                "Binding review requires exact calculated outputs from its pinned source Function",
+            )
+        result["binding_review"] = {
+            "binding": function_execution._pin(binding),
+            "source_node_id": gate.source_node_id,
+            "rationale": gate.rationale,
+            "operation_request_id": str(uuid5(request.request_id, "binding-review")),
+        }
     result["plan_hash"] = function_execution._digest(result)
     return result
