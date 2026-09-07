@@ -1,0 +1,50 @@
+{
+  "saved_in": {
+    "captured_at": "2026-09-07T13:48:02.740Z",
+    "comparisons": "Applied comparisons\n\nevidence id · Equals · 71f45f39-35fb-56c1-b4b7-61e7edc56368\n\nsource column · Is one of · \"Y\"\n\"AA\"",
+    "rows": "OBJECT\tTYPE\tAUTHORITY & INVESTIGATION\tVALUES & PROVENANCE\nDepartmentsource-dimension:2bd64825-e320-5039-b163-2064a1a71c82\tCompany Dimension\tAPPROVED - SOURCE BOUND\nInspect\nHistory\nTrace evidence\n\t\nInspect returned version\n\nRegionsource-dimension:7959af7f-a1bb-5573-8006-d1fc14f58681\tCompany Dimension\tAPPROVED - SOURCE BOUND\nInspect\nHistory\nTrace evidence\n\t\nInspect returned version",
+    "definition": "Published query - exact retained version\nInspect definition\nDefinition history\nTrace definition\nPublished definition reference",
+    "values": [
+      {
+        "field": "evidence_id",
+        "operator": "eq",
+        "value": "71f45f39-35fb-56c1-b4b7-61e7edc56368"
+      },
+      {
+        "field": "source_column",
+        "operator": "in",
+        "value": "Y\nAA"
+      }
+    ],
+    "query": "Reusable query contractTime is fixed across pages. Run Explore objects again to refresh.{\n  \"object_type\": \"CompanyDimension\",\n  \"resource_ids\": null,\n  \"filters\": [\n    {\n      \"field\": \"evidence_id\",\n      \"value\": \"71f45f39-35fb-56c1-b4b7-61e7edc56368\"\n    },\n    {\n      \"field\": \"source_column\",\n      \"value\": [\n        \"Y\",\n        \"AA\"\n      ],\n      \"operator\": \"in\"\n    }\n  ],\n  \"traversal\": [],\n  \"search\": \"\",\n  \"limit\": 50,\n  \"offset\": 0,\n  \"valid_at\": \"2026-09-07T13:47:21.517248Z\",\n  \"known_at\": \"2026-09-07T13:47:21.517248Z\"\n}"
+  },
+  "edited_not_in": {
+    "captured_at": "2026-09-07T13:48:39.665Z",
+    "comparisons": "Applied comparisons\n\nevidence id · Equals · 71f45f39-35fb-56c1-b4b7-61e7edc56368\n\nsource column · Is not one of · \"Z\"",
+    "rows": [
+      "Departmentsource-dimension:2bd64825-e320-5039-b163-2064a1a71c82Company DimensionAPPROVED  -  SOURCE BOUNDInspectHistoryTrace evidenceInspect returned versionevidence id71f45f39-35fb-56c1-b4b7-61e7edc56368dimension id1751ddc9-6ff0-57c9-8d22-cfaade27b62csource columnAAsource headerDepartmentlegal entity idc6f87828-9609-5b35-afa6-e894a0acfe41source record idf5c0a28c-9b2b-55fc-8b1f-09a93f5ea87bObject: 2bd64825-e320-5039-b163-2064a1a71c82Version: be4e133b-4b38-5c53-b830-b22e80d6f259Evidence: SOURCE BOUNDEffective from: 2026-09-07T17:05:39.84519+04:00",
+      "Regionsource-dimension:7959af7f-a1bb-5573-8006-d1fc14f58681Company DimensionAPPROVED  -  SOURCE BOUNDInspectHistoryTrace evidenceInspect returned versionevidence id71f45f39-35fb-56c1-b4b7-61e7edc56368dimension ide241052e-4f47-56b6-b1ea-fab72d17f0a7source columnYsource headerRegionlegal entity idc6f87828-9609-5b35-afa6-e894a0acfe41source record id545d6e2c-2dde-5559-9b61-9a3b3298e6d5Object: 7959af7f-a1bb-5573-8006-d1fc14f58681Version: 62b8c68e-fc16-59b5-a483-04d7d1b28561Evidence: SOURCE BOUNDEffective from: 2026-09-07T17:05:39.370206+04:00"
+    ],
+    "query": "Reusable query contractTime is fixed across pages. Run Explore objects again to refresh.{\n  \"object_type\": \"CompanyDimension\",\n  \"resource_ids\": null,\n  \"filters\": [\n    {\n      \"field\": \"evidence_id\",\n      \"value\": \"71f45f39-35fb-56c1-b4b7-61e7edc56368\"\n    },\n    {\n      \"field\": \"source_column\",\n      \"value\": [\n        \"Z\"\n      ],\n      \"operator\": \"not_in\"\n    }\n  ],\n  \"traversal\": [],\n  \"search\": \"\",\n  \"limit\": 50,\n  \"offset\": 0,\n  \"valid_at\": \"2026-09-07T13:48:03.989981Z\",\n  \"known_at\": \"2026-09-07T13:48:03.989981Z\"\n}"
+  },
+  "after_navigation": {
+    "captured_at": "2026-09-07T13:49:25.162Z",
+    "comparisons": "Applied comparisons\n\nevidence id · Equals · 71f45f39-35fb-56c1-b4b7-61e7edc56368\n\nsource column · Is not one of · \"Z\"",
+    "query": "Reusable query contractTime is fixed across pages. Run Explore objects again to refresh.{\n  \"object_type\": \"CompanyDimension\",\n  \"resource_ids\": null,\n  \"filters\": [\n    {\n      \"field\": \"evidence_id\",\n      \"value\": \"71f45f39-35fb-56c1-b4b7-61e7edc56368\"\n    },\n    {\n      \"field\": \"source_column\",\n      \"value\": [\n        \"Z\"\n      ],\n      \"operator\": \"not_in\"\n    }\n  ],\n  \"traversal\": [],\n  \"search\": \"\",\n  \"limit\": 50,\n  \"offset\": 0,\n  \"valid_at\": \"2026-09-07T13:48:03.989981Z\",\n  \"known_at\": \"2026-09-07T13:48:03.989981Z\"\n}"
+  },
+  "after_restart_reload": {
+    "captured_at": "2026-09-07T13:51:14.426Z",
+    "comparisons": "Applied comparisons\n\nevidence id · Equals · 71f45f39-35fb-56c1-b4b7-61e7edc56368\n\nsource column · Is not one of · \"Z\"",
+    "rows": [
+      "Departmentsource-dimension:2bd64825-e320-5039-b163-2064a1a71c82Company DimensionAPPROVED  -  SOURCE BOUNDInspectHistoryTrace evidenceInspect returned versionevidence id71f45f39-35fb-56c1-b4b7-61e7edc56368dimension id1751ddc9-6ff0-57c9-8d22-cfaade27b62csource columnAAsource headerDepartmentlegal entity idc6f87828-9609-5b35-afa6-e894a0acfe41source record idf5c0a28c-9b2b-55fc-8b1f-09a93f5ea87bObject: 2bd64825-e320-5039-b163-2064a1a71c82Version: be4e133b-4b38-5c53-b830-b22e80d6f259Evidence: SOURCE BOUNDEffective from: 2026-09-07T17:05:39.84519+04:00",
+      "Regionsource-dimension:7959af7f-a1bb-5573-8006-d1fc14f58681Company DimensionAPPROVED  -  SOURCE BOUNDInspectHistoryTrace evidenceInspect returned versionevidence id71f45f39-35fb-56c1-b4b7-61e7edc56368dimension ide241052e-4f47-56b6-b1ea-fab72d17f0a7source columnYsource headerRegionlegal entity idc6f87828-9609-5b35-afa6-e894a0acfe41source record id545d6e2c-2dde-5559-9b61-9a3b3298e6d5Object: 7959af7f-a1bb-5573-8006-d1fc14f58681Version: 62b8c68e-fc16-59b5-a483-04d7d1b28561Evidence: SOURCE BOUNDEffective from: 2026-09-07T17:05:39.370206+04:00"
+    ],
+    "query": "Reusable query contractTime is fixed across pages. Run Explore objects again to refresh.{\n  \"object_type\": \"CompanyDimension\",\n  \"resource_ids\": null,\n  \"filters\": [\n    {\n      \"field\": \"evidence_id\",\n      \"value\": \"71f45f39-35fb-56c1-b4b7-61e7edc56368\"\n    },\n    {\n      \"field\": \"source_column\",\n      \"value\": [\n        \"Z\"\n      ],\n      \"operator\": \"not_in\"\n    }\n  ],\n  \"traversal\": [],\n  \"search\": \"\",\n  \"limit\": 50,\n  \"offset\": 0,\n  \"valid_at\": \"2026-09-07T13:48:03.989981Z\",\n  \"known_at\": \"2026-09-07T13:48:03.989981Z\"\n}"
+  },
+  "authored_multiline": {
+    "captured_at": "2026-09-07T13:52:10.949Z",
+    "comparisons": "Applied comparisons\n\nevidence id · Equals · 71f45f39-35fb-56c1-b4b7-61e7edc56368\n\nsource column · Is one of · \"Y\"\n\"AA\"",
+    "heading": "2 matching object versions",
+    "query": "{\n  \"object_type\": \"CompanyDimension\",\n  \"resource_ids\": null,\n  \"filters\": [\n    {\n      \"field\": \"evidence_id\",\n      \"value\": \"71f45f39-35fb-56c1-b4b7-61e7edc56368\"\n    },\n    {\n      \"field\": \"source_column\",\n      \"value\": [\n        \"Y\",\n        \"AA\"\n      ],\n      \"operator\": \"in\"\n    }\n  ],\n  \"traversal\": [],\n  \"search\": \"\",\n  \"limit\": 50,\n  \"offset\": 0,\n  \"valid_at\": \"2026-09-07T13:51:52.398984Z\",\n  \"known_at\": \"2026-09-07T13:51:52.398984Z\"\n}"
+  }
+}

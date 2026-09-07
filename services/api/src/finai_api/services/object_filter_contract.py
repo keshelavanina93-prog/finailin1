@@ -17,6 +17,7 @@ RANGE_PATTERNS = {
         r"(?:\.[0-9]{1,6})?(?:Z|[+-][0-9]{2}:[0-9]{2})"
     ),
 }
+RANGE_OPERATORS = {"lt", "lte", "gt", "gte"}
 
 
 def validate_filters(filters: list[PropertyFilter], fields: dict[str, Any]) -> None:
@@ -24,7 +25,14 @@ def validate_filters(filters: list[PropertyFilter], fields: dict[str, Any]) -> N
         spec = fields.get(condition.field)
         if spec is None:
             raise WorkspaceError(422, "Object Set filter references an undeclared property")
-        if condition.operator != "eq":
+        if condition.operator in {"in", "not_in"}:
+            assert isinstance(condition.value, list)
+            if not all(_check_scalar(spec["kind"], value) for value in condition.value):
+                raise WorkspaceError(
+                    422, f"Membership {condition.field} requires canonical {spec['kind']} values"
+                )
+            continue
+        if condition.operator in RANGE_OPERATORS:
             kind = spec["kind"]
             if (
                 kind not in {"integer", "decimal", "date", "datetime"}
@@ -49,12 +57,12 @@ def validate_filters(filters: list[PropertyFilter], fields: dict[str, Any]) -> N
             raise WorkspaceError(
                 422, f"Filter {condition.field} requires a canonical {spec['kind']} value"
             )
-        if condition.operator != "eq" and spec["kind"] == "decimal":
+        if condition.operator in RANGE_OPERATORS and spec["kind"] == "decimal":
             parts = Decimal(str(condition.value)).as_tuple()
             exponent = int(parts.exponent)
             if len(parts.digits) + exponent > 131072 or -exponent > 16383:
                 raise WorkspaceError(422, "Range threshold exceeds exact numeric representation")
-        if condition.operator != "eq" and spec["kind"] == "datetime":
+        if condition.operator in RANGE_OPERATORS and spec["kind"] == "datetime":
             offset = datetime.fromisoformat(str(condition.value)).utcoffset()
             if offset is None or abs(offset) > timedelta(hours=15, minutes=59):
                 raise WorkspaceError(422, "Range timestamp offset exceeds supported representation")

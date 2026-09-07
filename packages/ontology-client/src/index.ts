@@ -81,13 +81,30 @@ function checkQuery(q: unknown, status = 400): asserts q is ObjectSetQuery {
     fail('Invalid exact interface root', status);
   }
   if (query.type_group && query.object_type !== 'ObjectTypeGroup') fail('Invalid exact type group root', status);
-  if ((query.filters ?? []).length + (query.traversal ?? []).reduce((n, s) => n + (s.filters ?? []).length, 0) > 20) {
+  const predicates = [...(query.filters ?? []), ...(query.traversal ?? []).flatMap(s => s.filters ?? [])];
+  if (predicates.length > 20) {
     fail('Ontology queries permit at most twenty predicates', status);
   }
-  if ([...(query.filters ?? []), ...(query.traversal ?? []).flatMap(s => s.filters ?? [])]
-    .some(f => typeof f.value === 'number' && !Number.isSafeInteger(f.value))) {
-    fail('Numeric filter values must be exact safe integers; decimal thresholds use strings', status);
+  let candidates = 0;
+  for (const predicate of predicates) {
+    const membership = predicate.operator === 'in' || predicate.operator === 'not_in';
+    const values = Array.isArray(predicate.value) ? predicate.value : [predicate.value];
+    if (membership) {
+      if (!Array.isArray(predicate.value) || values.length < 1 || values.length > 100
+        || values.some(v => v === null || !['string', 'number', 'boolean'].includes(typeof v))
+        || new Set(values.map(v => typeof v)).size !== 1
+        || new Set(values.map(canonical)).size !== values.length) {
+        fail('Membership filters require one to one hundred distinct values of the same scalar kind', status);
+      }
+      candidates += values.length;
+    } else if (Array.isArray(predicate.value)) {
+      fail('Only membership filters accept a list of values', status);
+    }
+    if (values.some(v => typeof v === 'number' && !Number.isSafeInteger(v))) {
+      fail('Numeric filter values must be exact safe integers; decimal thresholds use strings', status);
+    }
   }
+  if (candidates > 100) fail('Ontology root and traversal membership filters share a hundred-value limit', status);
 }
 function checkBindings(result: ObjectSetResult) {
   const q = result.query;

@@ -1,11 +1,8 @@
 import type { CanonicalResource, SchemaField } from './ontology.js';
+import type { WirePropertyFilter } from './ontology-wire.js';
 
 /** Portable queries over canonical resources; scalar values keep their declared type. */
-export interface ObjectSetFilter {
-  field: string;
-  operator?: 'eq' | 'lt' | 'lte' | 'gt' | 'gte';
-  value: string | number | boolean | null;
-}
+export type ObjectSetFilter = WirePropertyFilter;
 
 export interface ObjectSetTraversal {
   kind: 'reference' | 'link';

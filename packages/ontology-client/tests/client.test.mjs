@@ -161,3 +161,52 @@ test('invalid requests are rejected before authentication or transport', async (
   await rejects(() => sdk.runSavedSet({resource_id: id(1)}), 400);
   assert.equal(calls.length, 0);
 });
+
+test('membership values remain exact through asynchronous capture, saved-set paging and hop predicates', async () => {
+  const q = query({filters: [{field: 'source_column', operator: 'in', value: ['Y', 'AA']}],
+    traversal: [{kind: 'reference', name: 'source_record_id', direction: 'outgoing',
+      filters: [{field: 'sheet', operator: 'not_in', value: ['Excluded', ' Excluded ']}]}]});
+  const expected = structuredClone(q);
+  const {sdk, calls} = client((url, init) => json(init.method === 'GET'
+    ? {...result(expected), definition_id: reference.resource_id, definition_version_id: reference.version_id}
+    : result(JSON.parse(init.body))), async () => {
+    q.filters[0].value.push('Z');
+    q.traversal[0].filters[0].value[0] = 'changed';
+    return 'token';
+  });
+  const direct = await sdk.query(q);
+  assert.deepEqual(direct.query, expected);
+  assert.deepEqual(JSON.parse(calls[0].init.body), expected);
+  const saved = await sdk.runSavedSet(reference, {limit: 1, valid_at: time, known_at: time});
+  const next = await sdk.nextPage(saved);
+  assert.deepEqual(next.query, {...expected, offset: 1});
+  assert.equal(next.definition_version_id, reference.version_id);
+  const changed = client((url, init) => {
+    const response = result(JSON.parse(init.body));
+    response.query.filters[0].value = ['Y', 'Z'];
+    return json(response);
+  });
+  await rejects(() => changed.sdk.query(expected));
+});
+
+test('membership rejects ambiguous scalar lists and shared budget overflow before authentication', async () => {
+  let auth = 0;
+  const {sdk, calls} = client(() => {throw Error('must not fetch');}, () => {auth++; return 'token';});
+  for (const filter of [
+    {field: 'code', operator: 'in', value: 'Y'},
+    {field: 'code', operator: 'in', value: []},
+    {field: 'code', operator: 'not_in', value: ['Y', 'Y']},
+    {field: 'code', operator: 'in', value: [null]},
+    {field: 'code', operator: 'in', value: [true, 1]},
+    {field: 'code', operator: 'in', value: [Number.MAX_SAFE_INTEGER + 1]},
+    {field: 'code', operator: 'eq', value: ['Y']},
+    {field: 'code', operator: 'gte', value: [1, 2]},
+  ]) await rejects(() => sdk.query(query({filters: [filter]})), 400);
+  await rejects(() => sdk.query(query({
+    filters: [{field: 'code', operator: 'in', value: Array.from({length: 60}, (_, i) => String(i))}],
+    traversal: [{name: 'company_id', filters: [{field: 'code', operator: 'not_in',
+      value: Array.from({length: 41}, (_, i) => String(i))}]}],
+  })), 400);
+  assert.equal(auth, 0);
+  assert.equal(calls.length, 0);
+});

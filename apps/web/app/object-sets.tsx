@@ -8,8 +8,10 @@ import DerivedPropertyRun from "./derived-property-run";
 import OntologyDefinitionEditor from "./ontology-definition-editor";
 import "./object-sets.css";
 
-type FilterOperator="eq"|"lt"|"lte"|"gt"|"gte";
-const operators:Record<FilterOperator,string>={eq:"Equals",lt:"Less than / before",lte:"At most / on or before",gt:"Greater than / after",gte:"At least / on or after"};
+type FilterOperator="eq"|"lt"|"lte"|"gt"|"gte"|"in"|"not_in";
+const operators:Record<FilterOperator,string>={eq:"Equals",lt:"Less than / before",lte:"At most / on or before",gt:"Greater than / after",gte:"At least / on or after",in:"Is one of",not_in:"Is not one of"};
+const membershipKinds=new Set(["text","identifier","reference","integer","decimal","boolean","date","datetime"]);
+const membership=(operator:string)=>operator==="in"||operator==="not_in";
 const rangeKinds=new Set(["integer","decimal","date","datetime"]);
 
 export type Query = ObjectSetQuery;
@@ -19,22 +21,29 @@ const label = (value: string) => value.replaceAll("_", " ").replace(/([a-z])([A-
 export type ObjectSetInvestigationContext = {valid_at?:string;known_at?:string;definition_id?:string;definition_version_id?:string};
 type InvestigationAction = (node:CanonicalResource, context:ObjectSetInvestigationContext)=>void;
 type FilterSchema=Pick<SchemaField,"kind"|"target_type">;
-type FilterRow={field:string;operator:FilterOperator;value:string|null};
+type FilterRow={field:string;operator:FilterOperator;value:string|null;retained?:Query["filters"][number]["value"]};
 type StepRow={kind:"reference"|"link";name:string;direction:"outgoing"|"incoming";filters:FilterRow[]};
-const restoreFilters=(filters:Query["filters"])=>filters.map(filter=>({field:filter.field,operator:filter.operator??"eq",value:filter.value===null?null:String(filter.value)}));
+const restoreFilters=(filters:Query["filters"])=>filters.map(filter=>({field:filter.field,operator:filter.operator??"eq",value:filter.value===null?null:Array.isArray(filter.value)?filter.value.map(String).join("\n"):String(filter.value),...(membership(filter.operator??"eq")?{retained:filter.value}:{})}));
 const restoreSteps=(steps:Query["traversal"]):StepRow[]=>steps.map(step=>({...step,filters:restoreFilters(step.filters??[])}));
+function validFilter(filter:Query["filters"][number]):boolean {
+ if(!filter||typeof filter.field!=="string"||filter.field.length>128||!Object.hasOwn(operators,filter.operator??"eq"))return false;
+ const scalar=(value:unknown)=>typeof value==="string"||typeof value==="boolean"||typeof value==="number"&&Number.isSafeInteger(value);
+ if(membership(filter.operator??"eq"))return Array.isArray(filter.value)?filter.value.length>=1&&filter.value.length<=100&&filter.value.every(scalar)&&new Set(filter.value.map(value=>typeof value)).size===1&&new Set(filter.value.map(value=>JSON.stringify(value))).size===filter.value.length:false;
+ return !Array.isArray(filter.value)&&(filter.value===null||["string","boolean"].includes(typeof filter.value)||typeof filter.value==="number"&&Number.isFinite(filter.value));
+}
+
 type SavedExecution = {query:Query;family:"sets"|"groups"|null;definition_id?:string;definition_version_id?:string};
 function restoreExecution(key?:string):SavedExecution|null {
   if(!key||typeof window==="undefined")return null;
   try {
-    const raw=sessionStorage.getItem(key);if(!raw||raw.length>20000)return null;
+    const raw=sessionStorage.getItem(key);if(!raw||raw.length>131072)return null;
     const data=JSON.parse(raw) as SavedExecution;
     const query=data.query;
     if(!query||typeof query.object_type!=="string"||typeof query.search!=="string"||!Array.isArray(query.filters)||!Array.isArray(query.traversal)||!Number.isInteger(query.offset)||query.offset<0||!Number.isInteger(query.limit)||query.limit<1||query.limit>200||!query.valid_at||!query.known_at||!Number.isFinite(Date.parse(query.valid_at))||!Number.isFinite(Date.parse(query.known_at)))return null;
-    if(query.filters.length>20||query.filters.some(filter=>!filter||typeof filter.field!=="string"||filter.field.length>128||!Object.hasOwn(operators,filter.operator??"eq")||filter.value!==null&&!["string","number","boolean"].includes(typeof filter.value)||typeof filter.value==="number"&&!Number.isFinite(filter.value)))return null;
+    if(query.filters.length>20||query.filters.some(filter=>!validFilter(filter)))return null;
     if(query.traversal.length>4||query.traversal.some(step=>!step||!["reference","link"].includes(step.kind)||!["outgoing","incoming"].includes(step.direction)||typeof step.name!=="string"||step.name.length>128||step.filters!==undefined&&!Array.isArray(step.filters)))return null;
     const allFilters=[...query.filters,...query.traversal.flatMap(step=>step.filters??[])];
-    if(allFilters.length>20||allFilters.some(filter=>!filter||typeof filter.field!=="string"||filter.field.length>128||!Object.hasOwn(operators,filter.operator??"eq")||filter.value!==null&&!["string","number","boolean"].includes(typeof filter.value)||typeof filter.value==="number"&&!Number.isFinite(filter.value)))return null;
+    if(allFilters.length>20||allFilters.some(filter=>!validFilter(filter))||allFilters.reduce((count,filter)=>count+(membership(filter.operator??"eq")?(Array.isArray(filter.value)?filter.value.length:1):0),0)>100)return null;
     if(query.resource_ids!==undefined&&query.resource_ids!==null&&(!Array.isArray(query.resource_ids)||query.resource_ids.length>100||query.resource_ids.some(id=>typeof id!=="string"||!/^[a-f0-9-]{36}$/i.test(id))))return null;
     if(![null,"sets","groups"].includes(data.family))return null;
     const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
@@ -151,20 +160,40 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
   const predicateCount=filterRows.length+steps.reduce((count,step)=>count+step.filters.length,0);
   function filterEditor(rows:FilterRow[],specs:Record<string,FilterSchema>,update:(rows:FilterRow[])=>void,scope:string){return <fieldset className="object-set-filters"><legend>{scope} · all conditions must match</legend>{rows.map((row,index)=><div className="object-set-filter-row" key={index}>
     <label>Property<select value={row.field} onChange={event=>update(rows.map((item,i)=>i===index?{field:event.target.value,operator:"eq",value:specs[event.target.value]?.kind==="boolean"?"true":""}:item))}><option value="">Choose property</option>{row.field&&!specs[row.field]&&<option value={row.field}>{label(row.field)} · schema unavailable</option>}{Object.entries(specs).filter(([,spec])=>!["money","quantity","geometry","geojson","definition"].includes(spec.kind)).map(([name])=><option key={name} value={name}>{label(name)}</option>)}</select></label>
-    <label>Comparison<select value={row.operator} onChange={event=>update(rows.map((item,i)=>i===index?{...item,operator:event.target.value as FilterOperator}:item))}>{(Object.keys(operators) as FilterOperator[]).filter(item=>item==="eq"||item===row.operator||rangeKinds.has(specs[row.field]?.kind)).map(item=><option key={item} value={item}>{operators[item]}</option>)}</select></label>
-    <label>Value{row.value===null?<input readOnly value="Null"/>:specs[row.field]?.kind==="boolean"?<select value={row.value} onChange={event=>update(rows.map((item,i)=>i===index?{...item,value:event.target.value}:item))}><option value="true">True</option><option value="false">False</option></select>:<input required maxLength={256} value={row.value} type={specs[row.field]?.kind==="date"?"date":"text"} placeholder={specs[row.field]?.kind==="datetime"?"YYYY-MM-DDTHH:mm:ss+04:00":specs[row.field]?.kind==="decimal"?"Exact decimal text":"Exact value"} onChange={event=>update(rows.map((item,i)=>i===index?{...item,value:event.target.value}:item))}/>}</label>
+    <label>Comparison<select value={row.operator} onChange={event=>update(rows.map((item,i)=>i===index?{...item,operator:event.target.value as FilterOperator,retained:membership(item.operator)&&membership(event.target.value)?item.retained:undefined,value:membership(item.operator)&&!membership(event.target.value)||item.value===null&&membership(event.target.value)?"":item.value}:item))}>{(Object.keys(operators) as FilterOperator[]).filter(item=>item==="eq"||item===row.operator||(membership(item)?membershipKinds.has(specs[row.field]?.kind):rangeKinds.has(specs[row.field]?.kind))).map(item=><option key={item} value={item}>{operators[item]}</option>)}</select></label>
+    <label>{membership(row.operator)?"Values — one per line":"Value"}{membership(row.operator)?<><textarea required rows={3} maxLength={25700} value={row.value??""} placeholder={specs[row.field]?.kind==="boolean"?"true\nfalse":"One exact value per line"} onChange={event=>update(rows.map((item,i)=>i===index?{...item,value:event.target.value,retained:undefined}:item))}/><small>1–100 unique values; 100 across the whole query. Blank lines are rejected. Null/missing source values never match. Text spaces are preserved; one final newline is allowed.</small>{row.retained!==undefined&&<details><summary>Exact retained membership values</summary>{(Array.isArray(row.retained)?row.retained:[row.retained]).map((value,i)=><pre key={i}>{JSON.stringify(value)}</pre>)}</details>}</>:row.value===null?<input readOnly value="Null"/>:specs[row.field]?.kind==="boolean"?<select value={row.value} onChange={event=>update(rows.map((item,i)=>i===index?{...item,value:event.target.value}:item))}><option value="true">True</option><option value="false">False</option></select>:<input required maxLength={256} value={row.value} type={specs[row.field]?.kind==="date"?"date":"text"} placeholder={specs[row.field]?.kind==="datetime"?"YYYY-MM-DDTHH:mm:ss+04:00":specs[row.field]?.kind==="decimal"?"Exact decimal text":"Exact value"} onChange={event=>update(rows.map((item,i)=>i===index?{...item,value:event.target.value}:item))}/>}</label>
     <button type="button" disabled={row.operator!=="eq"} onClick={()=>update(rows.map((item,i)=>i===index?{...item,value:item.value===null?"":null}:item))}>{row.value===null?"Use a value":"Match null"}</button>
     <button type="button" onClick={()=>update(rows.filter((_,i)=>i!==index))} aria-label={`Remove ${scope} filter ${index+1}`}>Remove</button>
   </div>)}<button type="button" disabled={predicateCount>=20||!Object.keys(specs).length} onClick={()=>update([...rows,{field:"",operator:"eq",value:""}])}>Add property filter</button></fieldset>;}
   function parseFilters(rows:FilterRow[],specs:Record<string,FilterSchema>):Query["filters"]{
     return rows.map(row=>{
-      const {field,operator}=row;let value:string|number|boolean|null=row.value;const spec=specs[field];
-      if(!field||!spec||operator!=="eq"&&!rangeKinds.has(spec.kind))throw Error("Choose an available schema property and supported comparison for every filter. Ambiguous targets require common typed properties.");
-      if(value===null){if(operator!=="eq")throw Error("Null comparisons support equality only.");return {field,value:null};}
-      if(spec.kind==="datetime"&&operator!=="eq"&&!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/i.test(value))throw Error("Enter timestamps with seconds and an explicit timezone; values are sent unchanged.");
-      if(spec.kind==="integer"){if(!/^-?\d+$/.test(value)||!Number.isSafeInteger(Number(value)))throw Error("Integer input must be exact and between -9007199254740991 and 9007199254740991.");value=Number(value);}
-      if(spec.kind==="boolean"){if(value!=="true"&&value!=="false")throw Error("Choose true or false.");value=value==="true";}
-      return {field,value,...(operator!=="eq"?{operator}:{})};
+      const {field,operator}=row;const spec=specs[field];
+      if(!field||!spec||operator!=="eq"&&!(membership(operator)?membershipKinds.has(spec.kind):rangeKinds.has(spec.kind)))throw Error("Choose an available schema property and supported comparison for every filter. Ambiguous targets require common typed properties.");
+      function scalar(text:string):string|number|boolean {
+        if(spec.kind==="datetime"&&operator!=="eq"&&!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/i.test(text))throw Error("Enter timestamps with seconds and an explicit timezone; values are sent unchanged.");
+        if(membership(operator)&&spec.kind==="date"&&!/^\d{4}-\d{2}-\d{2}$/.test(text))throw Error("Use YYYY-MM-DD for every date. Values are sent unchanged.");
+        if(membership(operator)&&spec.kind==="decimal"&&!/^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/.test(text))throw Error("Every decimal must be exact finite decimal text.");
+        if(spec.kind==="integer"){if(!/^-?\d+$/.test(text)||!Number.isSafeInteger(Number(text)))throw Error("Integer input must be exact and between -9007199254740991 and 9007199254740991.");return Number(text);}
+        if(spec.kind==="boolean"){if(text!=="true"&&text!=="false")throw Error("Enter true or false exactly, one value per line.");return text==="true";}
+        return text;
+      }
+      if(membership(operator)) {
+        if(row.value===null)throw Error("Membership excludes null and missing values; enter explicit values.");
+        let value:Query["filters"][number]["value"];
+        if(row.retained!==undefined){
+          const originals=Array.isArray(row.retained)?row.retained:[row.retained];
+          for(const original of originals){if(original===null||Array.isArray(original)||scalar(String(original))!==original)throw Error("The retained membership type does not match this canonical property. Edit the values explicitly before running.");}
+          value=row.retained;
+        }else{
+          const lines=row.value.replace(/\r\n/g,"\n").split("\n");if(lines.at(-1)==="")lines.pop();
+          if(!lines.length||lines.length>100||lines.some(line=>line.length===0||line.includes("\r")))throw Error("Enter 1–100 values with no blank lines. A single final newline is allowed.");
+          value=lines.map(scalar);
+        }
+        const filter={field,operator,value};if(!validFilter(filter))throw Error("Membership values must be non-null, typed, unique, and bounded to 100 values.");
+        return filter;
+      }
+      if(row.value===null){if(operator!=="eq")throw Error("Null comparisons support equality only.");return {field,value:null};}
+      return {field,value:scalar(row.value),...(operator!=="eq"?{operator}:{})};
     });
   }
 
@@ -240,7 +269,10 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
         const filters=parseFilters(step.filters,stages[index].fields);
         return {kind:step.kind,name:step.name,direction:step.direction,...(filters.length?{filters}:{})};
       });
-      void run({object_type:kind,...(interfaceRoot?{interface:interfaceRoot}:{}),...(groupRoot?{type_group:groupRoot}:{}),...(rootIds!==undefined?{resource_ids:rootIds}:{}),search:String(data.get("search")??""),filters:parseFilters(filterRows,fields),traversal,offset:0,limit:50});
+      const rootFilters=parseFilters(filterRows,fields);
+      const membershipCount=[...rootFilters,...traversal.flatMap(step=>step.filters??[])].reduce((count,filter)=>count+(membership(filter.operator??"eq")?(Array.isArray(filter.value)?filter.value.length:1):0),0);
+      if(membershipCount>100)throw Error("Membership filters support at most 100 values across starting objects and all relationship steps.");
+      void run({object_type:kind,...(interfaceRoot?{interface:interfaceRoot}:{}),...(groupRoot?{type_group:groupRoot}:{}),...(rootIds!==undefined?{resource_ids:rootIds}:{}),search:String(data.get("search")??""),filters:rootFilters,traversal,offset:0,limit:50});
     }catch(cause){setError(cause instanceof Error?cause.message:"Query choices are unavailable.");}
   }
 
@@ -279,8 +311,8 @@ export default function ObjectSets({ token, catalog: suppliedCatalog, onProposal
       {result.definition_id&&<div className="object-set-definition"><strong>Published query  -  exact retained version</strong><span className="object-set-actions">{onInspect&&<button onClick={()=>void inspectDefinition(onInspect)}>Inspect definition</button>}{onHistory&&<button onClick={()=>void inspectDefinition(onHistory)}>Definition history</button>}{onTrace&&<button onClick={()=>void inspectDefinition(onTrace)}>Trace definition</button>}</span><details><summary>Published definition reference</summary><code>{result.definition_id}<br/>{result.definition_version_id}</code></details></div>}
       <div className="toolbar"><h3>{result.total.toLocaleString()} matching object versions</h3><span>{Object.entries(result.counts_by_type).map(([type, count]) => `${label(type)}: ${count}`).join(" · ")}</span></div>
       <p className="muted">{result.query.traversal.length ? "Relationships return the exact versions they reference, which may differ from today's values. " : "Effective objects at the query time. "}Counts cover the full result, not just this page.</p>
-      {!!result.query.filters.length&&<section aria-label="Applied property comparisons"><h4>Applied comparisons</h4>{result.query.filters.map((filter,index)=><p key={index}>{label(filter.field)} · {operators[filter.operator??"eq"]} · <code>{String(filter.value)}</code></p>)}</section>}
-      {!!result.query.traversal.length&&<section aria-label="Applied relationship steps"><h4>Applied relationship steps</h4>{result.query.traversal.map((step,index)=><div key={index}><p>Step {index+1} · {label(step.name)} · {step.direction} {step.kind}</p>{step.filters?.map((filter,i)=><p key={i}>{label(filter.field)} · {operators[filter.operator??"eq"]} · <code>{String(filter.value)}</code></p>)}</div>)}</section>}
+      {!!result.query.filters.length&&<section aria-label="Applied property comparisons"><h4>Applied comparisons</h4>{result.query.filters.map((filter,index)=><p key={index}>{label(filter.field)} · {operators[filter.operator??"eq"]} · <code style={{whiteSpace:"pre-wrap"}}>{Array.isArray(filter.value)?filter.value.map(value=>JSON.stringify(value)).join("\n"):String(filter.value)}</code></p>)}</section>}
+      {!!result.query.traversal.length&&<section aria-label="Applied relationship steps"><h4>Applied relationship steps</h4>{result.query.traversal.map((step,index)=><div key={index}><p>Step {index+1} · {label(step.name)} · {step.direction} {step.kind}</p>{step.filters?.map((filter,i)=><p key={i}>{label(filter.field)} · {operators[filter.operator??"eq"]} · <code style={{whiteSpace:"pre-wrap"}}>{Array.isArray(filter.value)?filter.value.map(value=>JSON.stringify(value)).join("\n"):String(filter.value)}</code></p>)}</div>)}</section>}
       {!!result.traversal_schema_versions?.length&&<details><summary>Reached-object query-time schema versions</summary>{result.traversal_schema_versions.map(schema=><p key={`${schema.step}:${schema.version_id}`}>Step {schema.step} · {label(schema.object_type)} · <code>{schema.resource_id} · {schema.version_id}</code></p>)}</details>}
       {!!result.filter_schema_versions?.length && <details><summary>Property filters validated against the query-time schema</summary>{result.filter_schema_versions.map(schema=><p key={schema.version_id}>{label(schema.object_type)} · Schema version <code>{schema.version_id}</code></p>)}</details>}
       {result.query.type_group&&<section className="object-set-interface-values" aria-label="Type-group schema compatibility"><h4>Type-group member compatibility</h4><p>Member records keep their original business identities. Compatibility is checked against the schemas retained by the exact group definition.</p>{result.query.traversal.length?<p>The result contains reached endpoints. Starting-group compatibility receipts are not assigned to these endpoint objects.</p>:<div className="data-scroll"><table><thead><tr><th>Original member</th><th>Schema compatibility</th><th>Retained schema references</th></tr></thead><tbody>{result.type_group_values?.map(value=>{

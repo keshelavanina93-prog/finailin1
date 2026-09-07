@@ -14,7 +14,11 @@ from finai_api.domain.object_sets import (
     TraversalSchemaVersion,
 )
 from finai_api.domain.review import Principal
-from finai_api.services.object_filter_contract import RANGE_PATTERNS, validate_filters
+from finai_api.services.object_filter_contract import (
+    RANGE_OPERATORS,
+    RANGE_PATTERNS,
+    validate_filters,
+)
 from finai_api.services.resources import resource_connection
 from finai_api.services.workspace import WorkspaceError
 
@@ -34,11 +38,24 @@ def _schema_compat_sql(alias, schema_cte, field, args):
 def _filter_sql(filters, alias, schema_cte, args, exact_schema=False):
     predicate = ""
     for condition in filters:
-        if exact_schema:
+        if exact_schema or condition.operator in {"in", "not_in"}:
             predicate += " AND " + _schema_compat_sql(alias, schema_cte, condition.field, args)
         if condition.operator == "eq":
             predicate += " AND attributes @> %s::jsonb"
             args.append(Jsonb({condition.field: condition.value}))
+        elif condition.operator in {"in", "not_in"}:
+            predicate += f" AND {alias}.attributes->%s IS NOT NULL"
+            predicate += f" AND {alias}.attributes->%s <> 'null'::jsonb"
+            args += [condition.field, condition.field]
+            negation = "NOT " if condition.operator == "not_in" else ""
+            predicate += (
+                f" AND {negation}EXISTS (SELECT 1 FROM "
+                "jsonb_array_elements(%s::jsonb) membership_value"
+            )
+            predicate += (
+                f" WHERE {alias}.attributes @> jsonb_build_object(%s::text,membership_value.value))"
+            )
+            args += [Jsonb(condition.value), condition.field]
         else:
             operator = {"lt": "<", "lte": "<=", "gt": ">", "gte": ">="}[condition.operator]
             predicate += f" AND EXISTS (SELECT 1 FROM {schema_cte} fs "
@@ -144,7 +161,7 @@ def _stage_contracts(conn, principal, request, root_types, binding=None):
                     raise WorkspaceError(
                         422, "Traversal filters require compatible destination field kinds"
                     )
-                if condition.operator != "eq":
+                if condition.operator in RANGE_OPERATORS:
                     kind = selected[0]["attributes"]["fields"][condition.field]["kind"]
                     sql_type = {
                         "integer": "numeric",
@@ -482,7 +499,7 @@ def _query_objects(
         }
         if binding:
             kinds = {binding["fields"][condition.field]["kind"]}
-        for kind in kinds if condition.operator != "eq" else ():
+        for kind in kinds if condition.operator in RANGE_OPERATORS else ():
             threshold_type = {
                 "integer": "numeric",
                 "decimal": "numeric",
@@ -515,7 +532,7 @@ def _query_objects(
             )
         for condition in request.filters if not binding else []:
             if (
-                condition.operator != "eq"
+                condition.operator in RANGE_OPERATORS
                 and len(
                     {
                         schema["attributes"]["fields"][condition.field]["kind"]

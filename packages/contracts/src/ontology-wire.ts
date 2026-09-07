@@ -4,13 +4,13 @@
 
 export const ontologyQueryWireVersion = "ontology-object-set/1";
 
-export const ontologyQuerySchemaSha256 = "18a3518a22bd12a35d47592e99da78558b7cb3aab985ecd63bb25a13f47eba1c";
+export const ontologyQuerySchemaSha256 = "48e3cf41ea7f44db64e83a1b6f9fa30cf81194779cfadc1daac37db60a91ed27";
 
 export type WireInterfacePin = { "resource_id" : string; "version_id" : string; };
 
 export type WireInterfaceRoot = { "resource_id" : string; "version_id" : string; "implementations" : Array<WireInterfacePin>; };
 
-export type WirePropertyFilter = { "field" : string; "value" : (string | number | boolean | null); "operator"?: "eq" | "lt" | "lte" | "gt" | "gte"; };
+export type WirePropertyFilter = { "field" : string; "value" : (string | number | boolean | Array<(string | number | boolean)> | null); "operator"?: "eq" | "lt" | "lte" | "gt" | "gte" | "in" | "not_in"; };
 
 export type WireTraversal = { "kind"?: "reference" | "link"; "name" : string; "direction"?: "outgoing" | "incoming"; "filters"?: Array<WirePropertyFilter>; };
 
@@ -120,6 +120,24 @@ export const querySchema = {
               "type": "boolean"
             },
             {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "maxItems": 100,
+              "minItems": 1,
+              "type": "array"
+            },
+            {
               "type": "null"
             }
           ],
@@ -132,7 +150,9 @@ export const querySchema = {
             "lt",
             "lte",
             "gt",
-            "gte"
+            "gte",
+            "in",
+            "not_in"
           ],
           "title": "Operator",
           "type": "string"
@@ -565,6 +585,24 @@ export const responseSchema = {
               "type": "boolean"
             },
             {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "maxItems": 100,
+              "minItems": 1,
+              "type": "array"
+            },
+            {
               "type": "null"
             }
           ],
@@ -577,7 +615,9 @@ export const responseSchema = {
             "lt",
             "lte",
             "gt",
-            "gte"
+            "gte",
+            "in",
+            "not_in"
           ],
           "title": "Operator",
           "type": "string"
@@ -1371,6 +1411,24 @@ export const definedResponseSchema = {
               "type": "boolean"
             },
             {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "maxItems": 100,
+              "minItems": 1,
+              "type": "array"
+            },
+            {
               "type": "null"
             }
           ],
@@ -1383,7 +1441,9 @@ export const definedResponseSchema = {
             "lt",
             "lte",
             "gt",
-            "gte"
+            "gte",
+            "in",
+            "not_in"
           ],
           "title": "Operator",
           "type": "string"

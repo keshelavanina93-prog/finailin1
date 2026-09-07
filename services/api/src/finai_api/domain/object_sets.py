@@ -1,7 +1,7 @@
 """Portable ontology queries; no SQL or application-specific joins in callers."""
 
 from datetime import datetime
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from pydantic import (
@@ -19,10 +19,29 @@ from pydantic import (
 class PropertyFilter(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     field: str = Field(min_length=1, max_length=128)
-    value: StrictStr | StrictInt | StrictBool | None
-    operator: Literal["eq", "lt", "lte", "gt", "gte"] = Field(
+    value: (
+        StrictStr
+        | StrictInt
+        | StrictBool
+        | Annotated[list[StrictStr | StrictInt | StrictBool], Field(min_length=1, max_length=100)]
+        | None
+    )
+    operator: Literal["eq", "lt", "lte", "gt", "gte", "in", "not_in"] = Field(
         default="eq", exclude_if=lambda value: value == "eq"
     )
+
+    @model_validator(mode="after")
+    def membership_values(self):
+        if self.operator in {"in", "not_in"}:
+            if not isinstance(self.value, list) or not 1 <= len(self.value) <= 100:
+                raise ValueError("Membership requires a list of 1 to 100 scalar values")
+            if len({type(value) for value in self.value}) != 1:
+                raise ValueError("Membership values must have the same strict scalar type")
+            if len({(type(value), value) for value in self.value}) != len(self.value):
+                raise ValueError("Membership values must be unique")
+        elif isinstance(self.value, list):
+            raise ValueError("Scalar filters cannot receive a list")
+        return self
 
 
 class Traversal(BaseModel):
@@ -75,6 +94,13 @@ class ObjectSetQuery(BaseModel):
             raise ValueError("A pinned interface root requires object_type ObjectInterface")
         if len(self.filters) + sum(len(step.filters) for step in self.traversal) > 20:
             raise ValueError("Object Set root and traversal filters share a 20-predicate limit")
+        conditions = self.filters + [
+            condition for step in self.traversal for condition in step.filters
+        ]
+        if sum(len(c.value) for c in conditions if isinstance(c.value, list)) > 100:
+            raise ValueError(
+                "Object Set root and traversal membership values share a 100-value limit"
+            )
         return self
 
     @field_validator("valid_at", "known_at")
