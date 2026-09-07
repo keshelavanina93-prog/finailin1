@@ -1,0 +1,26 @@
+{
+  "kind": "COMMITTED_SOURCE_WEB_BUILD",
+  "commit": "7c26eebc2681b04d97d9da06744cf5079a483185",
+  "archive_sha256": "135531cd50aae31df4449ab99cc463c705c6362c27d3ebe114863385016bd15a",
+  "source_directory": "D:\\FinAI\\finailinear1\\.finai\\artifacts\\build-inputs\\source-1exi2jzm\\source",
+  "node_version": "22.22.2",
+  "pnpm_version": "9.15.4",
+  "dependency_install": {
+    "frozen_lockfile": true,
+    "offline": true,
+    "reused_packages": 368,
+    "downloaded_packages": 0
+  },
+  "contracts_build_exit_code": 0,
+  "next_build_exit_code": 0,
+  "next_version": "16.3.4",
+  "next_build_id": "mjrWM3NwhP2zN7VL_sL10",
+  "typescript_build_passed": true,
+  "static_generation_completed": true,
+  "tracked_input_post_build_verification": "PASS_ALL_584_INPUTS",
+  "standalone_artifact_identity": "REFUSED_NESTED_OUTER_CHECKOUT_TRACING_ROOT",
+  "network_isolation": false,
+  "runtime_verified": false,
+  "frontend_acceptance": false,
+  "release_accepted": false
+}
