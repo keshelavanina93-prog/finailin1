@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-08T09:38:41.303363+00:00",
+  "state": "FROZEN_GREEN_CODE_REFERENCE_NOT_PRODUCT_ACCEPTED",
+  "worktree": "D:\\FinAI\\g8-nin59-route-native",
+  "branch": "development/nin59-route-native-workspace",
+  "base_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+  "code_sha": "f7ff931e8db4f803955071a347710965d1a6c374",
+  "tree_sha": "5d553942be0b7fa1973b065faa4c994154aff557",
+  "issues": [
+    "NIN-59",
+    "NIN-46",
+    "NIN-63"
+  ],
+  "previous_candidate": {
+    "code_sha": "cef6439296724889e331113c3b4767908bf728a5",
+    "manifest": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\docs\\development\\evidence\\nin59-product-cef6439.json",
+      "sha256": "b4936da4d1431994876de1e2513343d9ecc7025c7c70b9a1c5538d79bab73e76"
+    },
+    "inherited_evidence": "Prior source/native/CI evidence remains attributed to its original SHA; not rerun or promoted to browser acceptance."
+  },
+  "historical_manifest": {
+    "path": "D:\\FinAI\\g8-nin59-route-native\\docs\\development\\evidence\\nin59-viewport-candidate.json",
+    "sha256": "da00ddbff9d8101dc00a71713151cd83d508d4d7c0e74d1dbb499341410da3ad",
+    "modified": false,
+    "acceptance_reused": false
+  },
+  "implementation": [
+    "Home and Company360 journal review keeps the same mounted company surface, exact company version/content and valid/known cutoffs, accounting entry, queue filters, page and scroll.",
+    "One scoped in-memory navigation entry carries references only; browser history contains only its locator. Foreign/session-changed/abandoned/reloaded/malformed entries refuse rather than substituting latest state.",
+    "Current review decisions refresh at return; stale controls are withheld. Focus returns to the originating review or to an explicit unavailable-selection queue state.",
+    "Right NYX retains the exact origin company; current proposal decisions are separately described. Trace and History open in the visible foreground.",
+    "Accepted review requests expose unique retained source invocations for journal analysis without a prior Home pin. Clicking opens a fresh fixed journal snapshot; no background publication or accounting calculation."
+  ],
+  "candidate_ci": {
+    "run": 34210057730,
+    "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34210057730",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "web-and-contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "api",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "focused_verification": {
+    "reference_handoff_and_queue": "10 tests passed; exact scope/time, malformed history, display:contents restoration model, unavailable row and hidden/inert/detached refusal",
+    "discovery_and_queue": "13 tests passed; shared 5 queue tests overlap the handoff run",
+    "types_lint": "PASS",
+    "production_build": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\.finai\\tmp\\company-review-roundtrip-build.log",
+      "sha256": "417e8b5358220064129d23ebcb39db5f503a94cc6e5222c27663932da567bec7"
+    },
+    "independent_code_review": "No remaining concrete blocker reported after stale-current-work and visibility fixes; not browser acceptance",
+    "actual_retained_payload_reference_check": {
+      "frontend_sha": "f7ff931e8db4f803955071a347710965d1a6c374",
+      "scope": "Current frontend reference helper consuming retained cef6439 native company payload; no fresh native API or browser request",
+      "helper_sha256": "796127a80f70aa2c8c4cb98943bcaaf864377c1f7da966a250a0919691ebd311",
+      "cases": [
+        {
+          "company_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+          "proposal_id": "1b23895a-e339-593c-9fc8-d1c7eef7eb41",
+          "valid_at": "2026-09-08T06:27:31.055053Z",
+          "known_at": "2026-09-08T06:27:31.055053Z",
+          "exact_origin": "PASS",
+          "foreign_session_and_changed_content": "REFUSED",
+          "history_roundtrip": "MODEL_PASS"
+        }
+      ],
+      "browser_acceptance": "ENVIRONMENT_BLOCKED"
+    },
+    "discovery_existing_native_compatibility": {
+      "scope": "Existing retained native payload compatibility only; no API request or publication",
+      "queue_candidate": "cef6439296724889e331113c3b4767908bf728a5",
+      "journal_payload_candidate": "d75bf09bd6929b2839276ef5cd261321b7f134b6",
+      "source_sha256": {
+        "apps/web/app/company-journal-analysis-entry-state.ts": "fb02e6b82782575cc8063dc404157d2e5a9e677e8ba43c749acb6a8f47228686",
+        "apps/web/app/company-journal-analysis-entry.tsx": "241ef496787cf5ebe544305f75202bbffa9d72393087ba1ce7410e32800791dc",
+        "apps/web/app/accepted-journal-review.ts": "eac618ff8defe7585cc2dba3c3f01675e498f51db294da6e45b6a90cf7a6c7e0"
+      },
+      "cases": [
+        {
+          "company_id": "365aa5d9-c2ec-52e1-867a-50fe3415f486",
+          "observed_at": "2026-09-08T09:09:12.913986Z",
+          "state": "AVAILABLE",
+          "source_count": 1,
+          "truncated": false,
+          "sources": [
+            {
+              "invocation_id": "60703b36-2243-568f-804b-c622b6365fc4",
+              "accepted_review_count": 1,
+              "row_count": 2,
+              "descriptor_sha256": "9fc20fab5deb1f40aa4a9e204a7ac77e70a6ee186633f84646ef505591891252",
+              "receipt_hash": "65cf489579108d82ccd866d0fe2fd084aaa2711d337991e3dee5560c857e0560",
+              "journal_snapshot": "2026-09-08T08:27:45.133958Z",
+              "exact_target": "PASS"
+            }
+          ]
+        },
+        {
+          "company_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+          "observed_at": "2026-09-08T09:09:14.632145Z",
+          "state": "AVAILABLE",
+          "source_count": 0,
+          "truncated": false,
+          "sources": []
+        }
+      ],
+      "browser_acceptance": "NOT_RUN"
+    }
+  },
+  "next_consumer_baseline": {
+    "api_code_sha": "f7ff931e8db4f803955071a347710965d1a6c374",
+    "read_only_enforced": true,
+    "server_started": false,
+    "business_effects": false,
+    "company_id": "c6f87828-9609-5b35-afa6-e894a0acfe41",
+    "workflow_id": "opa_ca5eced6def25c9076a13dad5e22a0edac5cd0b5e7e6a0771643aac671f52abf",
+    "proposal_id": "c220506f-1f18-540f-9ff9-fb138694ebc1",
+    "queue_family": "ontology",
+    "queue_binding": "EXPLICIT_INVOCATION",
+    "operation_state": "PUBLISHED",
+    "proposal_decision": "APPROVED",
+    "foreign_company_queue_excludes_workflow": true,
+    "anonymous_status": 401,
+    "elapsed_seconds": 0.99,
+    "source_hashes": {
+      "services/api/src/finai_api/services/operator_workbench.py": "6563701d860dbfce834edd6c5602d724b5e0c4f2f8f528c5e801cd533fbb554b",
+      "services/api/src/finai_api/services/ontology_operations.py": "47e27dc16aa5c9f44d9bf8e9b2b6a325229b23cd889a5702a1026b1ce68b0a40",
+      "services/api/src/finai_api/services/report_workflows.py": "ce1648e75640de72a66181d58ae0a3c2563e839e5a26d4ed5dfd03765f1bfbdd"
+    },
+    "authority": "Historical original licence issuance evidence only; no current licence validity, operating or tariff authority",
+    "browser_acceptance": "NOT_RUN"
+  },
+  "browser": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "exact_candidate_mounted": false,
+    "reason": "Automatic approval review rejected isolated preview starts as blocked by policy; no retry or bypass.",
+    "viewports": [
+      {
+        "requested_width": 1920,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1440,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1280,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 820,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 768,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      }
+    ]
+  },
+  "canonical_integration": {
+    "performed": false,
+    "branch": "development/enterprise-hydration-foundation",
+    "last_rechecked_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+    "runtime_changed": false,
+    "business_data_changed": false,
+    "requires": "Exact independent acceptance gates and preservation of canonical dirty files; this manifest does not authorize substituting native model checks for browser acceptance."
+  },
+  "open_gates": [
+    "Actual responsive browser restoration and virtual-grid proof",
+    "Generic company-work workflow drill still loses origin; successor implementation in progress",
+    "Independent NIN-50 acceptance and canonical integration",
+    "Populated live operations and canonical full financial statements/metrics authority",
+    "Full issue and release acceptance"
+  ],
+  "changed_files_since_previous_candidate": [
+    {
+      "path": "apps/web/app/company-condition.tsx",
+      "sha256_git_blob": "e7dc81e2c76d5bb8fefa3d701604c9fd2abe302f2681eef514a32354c9a5e6d1"
+    },
+    {
+      "path": "apps/web/app/company-home.tsx",
+      "sha256_git_blob": "6c4d19b69284d03bd14057a87fdcfa90e2ce38fd6a7a90552fa2584169b5b1e0"
+    },
+    {
+      "path": "apps/web/app/company-journal-analysis-entry-state.ts",
+      "sha256_git_blob": "d655121bffe11b3461910d634b8bd0f4e33fb1930b8380b7d7b17beb50ef079f"
+    },
+    {
+      "path": "apps/web/app/company-journal-analysis-entry.css",
+      "sha256_git_blob": "f9147c40ef98a0a4c860dc4392ce6bc6dd9e56e4d62cf3f1cc53da71dcf85b66"
+    },
+    {
+      "path": "apps/web/app/company-journal-analysis-entry.tsx",
+      "sha256_git_blob": "a5f329d48db3b598cb8bc133f4da2cc98bfdbeb14110e75cc6de9230059876cb"
+    },
+    {
+      "path": "apps/web/app/company-journal-review-work.tsx",
+      "sha256_git_blob": "dbf6eaa97bd7541a7f9b21a8ee81e2e502d23de4e64b596ffbb190b252513d03"
+    },
+    {
+      "path": "apps/web/app/company-operating-workspace.tsx",
+      "sha256_git_blob": "a4d3455647e14126fa6f6187671d09daebede069edf2f666a5fe3ee74640b249"
+    },
+    {
+      "path": "apps/web/app/company-workspace.tsx",
+      "sha256_git_blob": "a26cc068864283976e9a1d57f050b441f2f3941458d3fe6b57ea8d87c7ae3d16"
+    },
+    {
+      "path": "apps/web/app/g8-workspace.tsx",
+      "sha256_git_blob": "372f972a890eef5847acd70b7168c7db2a05e797059fe438bc7732af6152127f"
+    },
+    {
+      "path": "apps/web/app/journal-review-handoff.ts",
+      "sha256_git_blob": "796127a80f70aa2c8c4cb98943bcaaf864377c1f7da966a250a0919691ebd311"
+    },
+    {
+      "path": "apps/web/tests/company-journal-analysis-entry.test.mjs",
+      "sha256_git_blob": "1e09489b9a9124230650bab244fdadd0075f8001db1743219115a2ff346afe31"
+    },
+    {
+      "path": "apps/web/tests/journal-review-handoff.test.mjs",
+      "sha256_git_blob": "d798bacdabf6006e9959cc03a191b64502ce631fdea6fd9fab7494b964512d3c"
+    },
+    {
+      "path": "docs/development/evidence/nin59-product-cef6439.json",
+      "sha256_git_blob": "2bee8a016a796beafdd2743b0da450c1ee811a0d8e40af60d66ffba1f6a32dce"
+    }
+  ],
+  "continuation": "Extend the same origin navigation to the authentic SOG licence-issuance workflow using canonical company queue membership and exact operation/proposal readback; no new ontology imports or business effects."
+}
