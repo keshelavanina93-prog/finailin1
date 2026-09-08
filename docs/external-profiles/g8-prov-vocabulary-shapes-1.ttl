@@ -1,0 +1,30 @@
+# G8-authored selected vocabulary checks against retained PROV-O 2013-04-30.
+# This is not a W3C conformance suite or validation of provenance instance data.
+# No company facts, accounting authority, causal truth, lineage completeness,
+# inference, or complete PROV compliance is established by this profile.
+@prefix g8: <urn:g8:ontology:prov-vocabulary:1:> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+g8: a owl:Ontology ;
+    rdfs:label "G8 selected PROV vocabulary checks, version 1" ;
+    rdfs:comment "G8 expectations for five selected vocabulary terms in original PROV-O 2013-04-30; no provenance instance, business fact or full standard conformance authority." .
+
+g8:CoreClasses a sh:NodeShape ;
+    sh:targetNode prov:Entity, prov:Activity, prov:Agent ;
+    sh:property [ sh:path rdf:type ; sh:hasValue owl:Class ] .
+
+g8:Usage a sh:NodeShape ;
+    sh:targetNode prov:used ;
+    sh:property [ sh:path rdf:type ; sh:hasValue owl:ObjectProperty ] ;
+    sh:property [ sh:path rdfs:domain ; sh:hasValue prov:Activity ] ;
+    sh:property [ sh:path rdfs:range ; sh:hasValue prov:Entity ] .
+
+g8:Derivation a sh:NodeShape ;
+    sh:targetNode prov:wasDerivedFrom ;
+    sh:property [ sh:path rdf:type ; sh:hasValue owl:ObjectProperty ] ;
+    sh:property [ sh:path rdfs:domain ; sh:hasValue prov:Entity ] ;
+    sh:property [ sh:path rdfs:range ; sh:hasValue prov:Entity ] .
