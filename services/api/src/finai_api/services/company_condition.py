@@ -20,7 +20,13 @@ from finai_api.domain.company_condition import (
 from finai_api.domain.resources import CanonicalResource
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
-from finai_api.services import company_context, ontology_operations, operator_workbench, resources
+from finai_api.services import (
+    company_context,
+    company_journal_reviews,
+    ontology_operations,
+    operator_workbench,
+    resources,
+)
 from finai_api.services.operations_map import ASSET_TYPES
 from finai_api.services.workspace import WorkspaceError
 
@@ -227,5 +233,6 @@ def describe(
             LicenceEvidence.model_validate(row) for row in context["licence_evidence"]
         ],
         work=work,
+        journal_reviews=company_journal_reviews.observe(principal, company_id),
         unavailable=[UnavailableCondition.model_validate(row) for row in unavailable],
     )

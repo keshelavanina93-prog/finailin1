@@ -55,6 +55,29 @@ class CompanyWork(Model):
     limit: Literal[25] = 25
 
 
+class CompanyJournalReviewItem(Model):
+    request_id: UUID
+    proposal_id: UUID
+    company_id: UUID
+    invocation_id: UUID
+    coordinate: str = Field(min_length=1, max_length=512)
+    title: str = Field(max_length=200)
+    state: Literal["PREPARED", "PENDING_REVIEW", "PUBLISHED", "REJECTED"]
+    created_at: AwareDatetime
+    reason: str = Field(max_length=2000)
+    basis: Literal["EXPLICIT_JOURNAL_PRODUCTION_REQUEST"] = "EXPLICIT_JOURNAL_PRODUCTION_REQUEST"
+
+
+class CompanyJournalReviews(Model):
+    state: Literal["AVAILABLE", "UNAVAILABLE"] = "AVAILABLE"
+    reason: str | None = None
+    observed_at: AwareDatetime
+    authority: Literal["CURRENT_CANONICAL_JOURNAL_REVIEW"] = "CURRENT_CANONICAL_JOURNAL_REVIEW"
+    items: list[CompanyJournalReviewItem] = Field(max_length=25)
+    truncated: bool
+    limit: Literal[25] = 25
+
+
 class UnavailableCondition(Model):
     key: Literal[
         "financial_performance", "live_operations", "findings", "investigations",
@@ -77,6 +100,7 @@ class CompanyConditionDescriptor(Model):
     products: ResourceGroup
     licence_evidence: list[LicenceEvidence]
     work: CompanyWork
+    journal_reviews: CompanyJournalReviews
     unavailable: list[UnavailableCondition]
     current_use_authorized: Literal[False] = False
     business_effect_authorized: Literal[False] = False

@@ -12,6 +12,7 @@ from psycopg.errors import QueryCanceled
 from test_company_home import resource, uid
 
 from finai_api.api.company_condition_routes import router
+from finai_api.domain.company_condition import CompanyJournalReviews
 from finai_api.domain.ontology_catalog import TYPE_FIELDS
 from finai_api.domain.resources import CanonicalResource
 from finai_api.domain.review import Principal
@@ -62,6 +63,11 @@ def case(monkeypatch):
     monkeypatch.setattr(service, "connection_snapshot", connection_snapshot)
     monkeypatch.setattr(service.operator_workbench, "listing", listing)
     monkeypatch.setattr(service.ontology_operations, "read", read)
+    monkeypatch.setattr(
+        service.company_journal_reviews, "observe", lambda *_: CompanyJournalReviews(
+            observed_at=datetime.now(UTC), items=[], truncated=False,
+        ),
+    )
     return dict(company=company, principal=principal, snapshot=snapshot, nodes=nodes,
                 pins=pins, calls=calls, queue=queue, operations=operations)
 
@@ -84,6 +90,18 @@ def link(case, source, target, name="Association"):
 
 def describe(case):
     return service.describe(case["principal"], case["company"].resource_id)
+
+
+def test_journal_observer_unavailable_does_not_replace_company_snapshot_or_work(case, monkeypatch):
+    missing = CompanyJournalReviews(
+        state="UNAVAILABLE", reason="Canonical decisions unavailable",
+        observed_at=datetime.now(UTC), items=[], truncated=False,
+    )
+    monkeypatch.setattr(service.company_journal_reviews, "observe", lambda *_: missing)
+    result = describe(case)
+    assert result.journal_reviews == missing
+    assert result.company == case["company"] and result.work.state == "AVAILABLE"
+    assert result.known_at.isoformat() == case["snapshot"]["known_at"]
 
 
 def test_only_explicit_accepted_connections_establish_groups(case):

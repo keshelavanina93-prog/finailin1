@@ -249,7 +249,7 @@ export interface SourcePreview {
 export type {AnalysisScalar,AnalysisPin,AnalysisDecimalPresentation,AnalysisValue,AnalysisFilter,AnalysisRequest,AnalysisField,AnalysisRow,AnalysisContributor,AnalysisDescriptor,AnalysisProjection} from "./semantic-analysis.js";
 
 export type {CompanyHomeDescriptor} from "./company-home.js";
-export type {CompanyConditionDescriptor,CompanyConditionConnection,CompanyConditionResourceGroup,CompanyConditionWorkItem} from "./company-condition.js";
+export type {CompanyConditionDescriptor,CompanyConditionConnection,CompanyConditionResourceGroup,CompanyConditionWorkItem,CompanyJournalReviewItem,CompanyJournalReviews} from "./company-condition.js";
 
 export type {CompanyChangesRequest,CompanyChangesDescriptor,CompanyContextChange} from "./company-changes.js";
 export type {CompanyRegulationPage} from "./regulatory-context.js";

@@ -21,6 +21,18 @@ export interface CompanyConditionDescriptor {
  products:CompanyConditionResourceGroup;
  licence_evidence:Array<{binding:CanonicalResource;notice:CanonicalResource|null;licence:CanonicalResource|null}>;
  work:{state:"AVAILABLE"|"UNAVAILABLE";reason:string|null;observed_at:string;authority:"CURRENT_RETAINED_WORK";items:CompanyConditionWorkItem[];truncated:boolean;limit:25};
+ journal_reviews:CompanyJournalReviews;
  unavailable:Array<{key:"financial_performance"|"live_operations"|"findings"|"investigations"|"regulatory_compliance";label:string;reason:string}>;
  current_use_authorized:false;business_effect_authorized:false;
+}
+
+export interface CompanyJournalReviewItem {
+ request_id:string;proposal_id:string;company_id:string;invocation_id:string;
+ coordinate:string;title:string;state:"PREPARED"|"PENDING_REVIEW"|"PUBLISHED"|"REJECTED";
+ created_at:string;reason:string;basis:"EXPLICIT_JOURNAL_PRODUCTION_REQUEST";
+}
+export interface CompanyJournalReviews {
+ state:"AVAILABLE"|"UNAVAILABLE";reason:string|null;observed_at:string;
+ authority:"CURRENT_CANONICAL_JOURNAL_REVIEW";items:CompanyJournalReviewItem[];
+ truncated:boolean;limit:25;
 }

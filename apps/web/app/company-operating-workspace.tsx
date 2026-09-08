@@ -5,6 +5,7 @@ import {assertCompanyCondition,operatingResourceKey,rankCompanyWork} from "./com
 import {parseOperatingView,operatingViewPage,operatingViewSelection} from "./company-operating-view";
 import {displayName} from "./display-name";
 import CompanyRegulation from "./company-regulation";
+import CompanyJournalReviewWork from "./company-journal-review-work";
 import "./company-operating-workspace.css";
 
 type ResourceAction=(resource:CanonicalResource,knownAt:string)=>void;
@@ -47,6 +48,7 @@ function OperatingWorkspace({token,viewStateKey,companyId,snapshot,compact=false
  return <section className={`company-operating-workspace${compact?" company-operating-compact":""}`} aria-label="Company operating workbench">
   <header><div><p className="overline">COMPANY WORK & OPERATING CONTEXT</p><h2>Decisions, obligations & connected resources</h2></div><button onClick={retry}>Refresh retained context</button></header>
   {selected&&!selectedResource&&<p className="company-operating-limitation" role="status">The saved resource selection is unavailable in this exact company group and snapshot. <button onClick={()=>setSelected("")}>Clear unavailable selection</button></p>}
+  <CompanyJournalReviewWork companyId={companyId} value={result.journal_reviews} compact={compact} onProposal={onProposal}/>
   <section className="company-operating-work" aria-label="Current company work"><header><h3>Work requiring review and recent outcomes</h3><span>Observed {stamp(result.work.observed_at)}</span></header><p className="company-operating-note">Current retained work explicitly linked to this company. This queue is separate from the historical company snapshot.</p>
    <div className="company-operating-signals">{result.unavailable.filter(item=>item.key==="findings"||item.key==="investigations").map(item=><p key={item.key}><strong>{item.label} unavailable.</strong> {item.reason}</p>)}</div>
    {result.work.state==="AVAILABLE"&&<div className="company-operating-toolbar"><label>Priority within returned queue<select value={workFilter} onChange={event=>{setWorkFilter(event.target.value as "ALL"|CompanyConditionWorkItem["state"]);setWorkPage(0);}}><option value="ALL">All returned work</option>{(["PENDING_REVIEW","PREPARED","REJECTED","PUBLISHED"] as const).map(state=><option key={state} value={state}>{human(state)}</option>)}</select></label><label>Find work<input maxLength={200} value={workSearch} onChange={event=>{setWorkSearch(event.target.value.slice(0,200));setWorkPage(0);}} placeholder="Title or reason"/></label><span className="company-operating-note">Review priority; no financial materiality ranking</span></div>}
