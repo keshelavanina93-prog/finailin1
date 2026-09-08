@@ -24,6 +24,17 @@ def require(condition):
         raise WorkspaceError(409, "Accepted movement worksheet differs from retained evidence")
 
 
+def reference_cell(resolver, reference, kind, label):
+    node = resolver.version(reference.model_dump(mode="json"))
+    exact = pin(node)
+    require(
+        node["object_type"] == kind
+        and exact.resource_id == reference.resource_id
+        and exact.version_id == reference.version_id
+    )
+    return EvidenceCell(label=label, value=node["display_name"], reference=exact)
+
+
 def build(history, plan, resolver, company_id):
     from finai_api.services import semantic_analysis
     from finai_api.services.semantic_analysis_movements import build as source_build
@@ -156,16 +167,12 @@ def project_retained(
                     cells=[
                         EvidenceCell(label="Source coordinate", value=journal.source_coordinate),
                         *[
-                            EvidenceCell(
-                                label="Journal line version",
-                                value=f"{ref.resource_id}@{ref.version_id}",
-                            )
+                            reference_cell(resolver, ref, "JournalLine", "Journal line")
                             for ref in journal.lines
                         ],
                         *[
-                            EvidenceCell(
-                                label="Dimension policy version",
-                                value=f"{ref.resource_id}@{ref.version_id}",
+                            reference_cell(
+                                resolver, ref, "AccountDimensionPolicy", "Dimension policy"
                             )
                             for ref in journal.dimension_policies
                         ],
