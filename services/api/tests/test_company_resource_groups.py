@@ -128,3 +128,125 @@ def test_response_contract_requires_bounded_exact_self_pin(failure):
         payload["definition_pins"] = [pins[0]] + [pins[1]] * 201
     with pytest.raises(ValidationError):
         CompanyOperatingResourceGroup.model_validate(payload)
+
+
+def pack_definition(kind="MeterReading"):
+    group, schema, _ = definition(kind)
+    pack = resource(
+        "Operating semantics",
+        "DomainPack",
+        {
+            "code": "OPERATING",
+            "version": "2",
+            "membership_group_id": group["resource_id"],
+        },
+    )
+    pack["dependencies"] = [{**group, "relation": "FIELD:membership_group_id"}]
+    records = {r["resource_id"]: r for r in [pack, group, schema]}
+    return pack, group, schema, records
+
+
+@pytest.mark.parametrize("kind", ["MeterReading", "SafetyInspection"])
+def test_pack_delegates_exact_group_and_retains_original_members(case, kind):
+    pack, group, schema, records = pack_definition(kind)
+
+    def load(identity, version):
+        return records.get(str(identity))
+
+    member = node(case, "Connected observation", kind)
+    member = member.model_copy(update={"schema_version_id": uid(kind + ":version")})
+    case["nodes"][-1] = member
+    link(case, case["company"], member)
+    edges = service.connected(case["company"], case["nodes"], case["pins"], {kind})
+    now = datetime.now().astimezone()
+    result = groups.project(groups.resolve_definitions([pack], load), edges, now, now)[0]
+    assert result.state == "AVAILABLE" and result.resources == [member]
+    assert [str(p.resource_id) for p in result.definition_pins] == [
+        pack["resource_id"],
+        group["resource_id"],
+        schema["resource_id"],
+    ]
+    assert result.count == 1 and result.key == pack["resource_id"]
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [
+        "ambiguous",
+        "missing_pin",
+        "wrong_identity",
+        "wrong_version",
+        "wrong_hash",
+        "revoked",
+        "template",
+        "nested_pack",
+    ],
+)
+def test_pack_refuses_unreviewed_or_mismatched_membership(failure):
+    pack, group, _schema, records = pack_definition()
+    if failure == "ambiguous":
+        pack["attributes"]["membership_interface_id"] = str(uid("interface"))
+    elif failure == "missing_pin":
+        pack["dependencies"] = []
+    elif failure == "wrong_identity":
+        pack["attributes"]["membership_group_id"] = str(uid("other"))
+    elif failure == "wrong_version":
+        group["version_id"] = str(uid("changed version"))
+    elif failure == "wrong_hash":
+        group["content_hash"] = "b" * 64
+    elif failure == "revoked":
+        group["authority_state"] = "REVOKED"
+    elif failure == "template":
+        group["evidence_class"] = "REFERENCE_TEMPLATE"
+    else:
+        group["object_type"] = "DomainPack"
+    now = datetime.now().astimezone()
+    result = groups.project(
+        groups.resolve_definitions([pack], lambda i, v: records.get(str(i))), [], now, now
+    )[0]
+    assert result.state == "UNAVAILABLE" and result.count is None and not result.resources
+    assert len(result.definition_pins) == 1
+
+
+@pytest.mark.parametrize("implementation_count,expected", [(1, "EMPTY"), (100, "UNAVAILABLE")])
+def test_pack_interface_shared_validation_and_composed_pin_bound(implementation_count, expected):
+    field = {"kind": "text", "required": True, "semantic_id": str(uid("classification"))}
+    interface = resource(
+        "Inspectable objects", "ObjectInterface", {"definition": {"fields": {"state": field}}}
+    )
+    interface["dependencies"] = []
+    pack = resource(
+        "Inspection pack",
+        "DomainPack",
+        {"code": "INSPECTION", "version": "1", "membership_interface_id": interface["resource_id"]},
+    )
+    pack["dependencies"] = [{**interface, "relation": "FIELD:membership_interface_id"}]
+    rows = [pack, interface]
+    for i in range(implementation_count):
+        schema = resource(f"InspectionType{i}", "SchemaDefinition", {"fields": {"status": field}})
+        implementation = resource(
+            f"Implementation{i}",
+            "ObjectTypeImplementation",
+            {
+                "interface_id": interface["resource_id"],
+                "schema_id": schema["resource_id"],
+                "definition": {"fields": {"state": "status"}},
+            },
+        )
+        implementation["dependencies"] = [
+            {**interface, "relation": "FIELD:interface_id"},
+            {**schema, "relation": "FIELD:schema_id"},
+        ]
+        rows.extend([schema, implementation])
+    records = {r["resource_id"]: r for r in rows}
+    visible = [r for r in rows if r["object_type"] != "SchemaDefinition"]
+    now = datetime.now().astimezone()
+    result = groups.project(
+        groups.resolve_definitions(visible, lambda i, v: records.get(str(i))), [], now, now
+    )[0]
+    assert result.state == expected, result.reason
+    if expected == "EMPTY":
+        assert len(result.definition_pins) == 4 and result.count == 0
+    else:
+        assert "bound" in result.reason and result.count is None
+        assert len(result.definition_pins) == 1
