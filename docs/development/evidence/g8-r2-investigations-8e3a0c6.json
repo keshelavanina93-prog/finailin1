@@ -1,0 +1,574 @@
+{
+  "contract": "g8-integration-candidate/1",
+  "recorded_at": "2026-09-08T17:42:48.909084+00:00",
+  "state": "CODE_FROZEN_CI_GREEN_NOT_PRODUCT_ACCEPTED",
+  "worktree": "D:\\FinAI\\g8-investigation-convergence",
+  "branch": "development/investigation-convergence",
+  "code_sha": "8e3a0c60b4fa56eac0402524455719b06a06a998",
+  "tree_sha": "a4a8e9b3ce11e7c61f41692d69fb42eab7f75075",
+  "base_sha": "629fd66de8633e05466eb1f40d9d1168bb165609",
+  "canonical_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+  "changed_files": [
+    {
+      "path": "apps/web/app/action-model.ts",
+      "git_blob_sha256": "ab4a5be4f61a946fdf6518d096599ba88cf6a654e9423000e8323ff57d525686"
+    },
+    {
+      "path": "apps/web/app/api/ontology/[...path]/route.ts",
+      "git_blob_sha256": "a1abf1412af999a2074224b1801ab55a34e7b8a23f0329ac6fbba31e1d3f9ded"
+    },
+    {
+      "path": "apps/web/app/company-financial-metrics.tsx",
+      "git_blob_sha256": "625de65f3f6a71e2c7fd66cebdcdf7b04aac23aa36528ac3dd0fb6ded85c0ae8"
+    },
+    {
+      "path": "apps/web/app/company-home.tsx",
+      "git_blob_sha256": "0203f930b592e1412b70196b328b4cc17643a57f5c617da341a6ef77713ba427"
+    },
+    {
+      "path": "apps/web/app/company-operating-state.ts",
+      "git_blob_sha256": "9cb358cc9e7ffb891357df378598ceb885bea765930d50df99058025d4ba7009"
+    },
+    {
+      "path": "apps/web/app/company-operating-view.ts",
+      "git_blob_sha256": "067ef0389dc6b9fd97b8f594b58c7cc684ee1746ee8af0cc565cd5d8dca10673"
+    },
+    {
+      "path": "apps/web/app/company-operating-workspace.css",
+      "git_blob_sha256": "920e964ed13168c6a6bedc0415664414be438cb22dcfeb2a661079ea497b43b2"
+    },
+    {
+      "path": "apps/web/app/company-operating-workspace.tsx",
+      "git_blob_sha256": "0647a27096953805cdfce53da52d0859eee93448ee18fafa53ca3e468ac97187"
+    },
+    {
+      "path": "apps/web/app/company-work-attention.ts",
+      "git_blob_sha256": "738584ee00bd22b4e56d92effca8752650ea0c4c8d8bc5560b51748c7b5db667"
+    },
+    {
+      "path": "apps/web/app/company-workflow-review.ts",
+      "git_blob_sha256": "0938c5c7a756d0f9048a5cfe965b474883d61eb330f1a5494b68625f6f5341d7"
+    },
+    {
+      "path": "apps/web/app/g8-workspace.tsx",
+      "git_blob_sha256": "d4b6b733c9a07155aaa217a88bc0232859a91696099529dbb2d3a58bc71b7b5c"
+    },
+    {
+      "path": "apps/web/app/journal-review-handoff.ts",
+      "git_blob_sha256": "05a9d2844131f5e952d3be353f5c2d55c7fc7fef47b105305909c731f6a98803"
+    },
+    {
+      "path": "apps/web/app/source-exception-review.css",
+      "git_blob_sha256": "1dccea71a7a805f4004f8a454c247cd386198f98b544016ca5a8fd6371d73438"
+    },
+    {
+      "path": "apps/web/app/source-exception-review.tsx",
+      "git_blob_sha256": "998d5d74a83f68ccaf60b03204a5f6e47fe1e3f33aca503ae3c371f241e5ff33"
+    },
+    {
+      "path": "apps/web/app/source-exception-state.ts",
+      "git_blob_sha256": "9cba2a0182a0447610fa7425922777ae220ec09695df8ea61a2b4b3cd7a5889c"
+    },
+    {
+      "path": "apps/web/tests/company-work-attention.test.mjs",
+      "git_blob_sha256": "386ab2a18e4423ee589babfbcad30de72d5172d4d146253ce41565530f77afb5"
+    },
+    {
+      "path": "apps/web/tests/company-workflow-review.test.mjs",
+      "git_blob_sha256": "5690cc6ebd49deea5b1ee28200d7262b6f9848709fd1b627f196550b26f8501d"
+    },
+    {
+      "path": "apps/web/tests/source-exception-proxy.test.mjs",
+      "git_blob_sha256": "4407856866e85851da653ddffe573de649777ae4c37b19dfcc94fba7c3ec5202"
+    },
+    {
+      "path": "apps/web/tests/source-exception-state.test.mjs",
+      "git_blob_sha256": "a6c5baf81f2cd66250faf633a41814d5b47f08c3857b1845a26f1a9f1858035c"
+    },
+    {
+      "path": "packages/contracts/src/company-condition.ts",
+      "git_blob_sha256": "ab23a79c7d755d73e7556599bb1fccde5980df8339a202faf1e62922688c85fe"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "git_blob_sha256": "2ed81f1b9db576c972d3ac3401e2f4d9729cb6c0a8c59689550ac6ef3c1d73b0"
+    },
+    {
+      "path": "packages/contracts/src/source-exceptions.ts",
+      "git_blob_sha256": "1bce72c5f602ec7eb3db395e2d1f999a4debd6f213b7be069bdf0250e1155ac7"
+    },
+    {
+      "path": "services/api/src/finai_api/api/ontology_operation_routes.py",
+      "git_blob_sha256": "529740f2d73ffb866d4a683e68277c3194195b1a7f9be8f2908f6b036b497544"
+    },
+    {
+      "path": "services/api/src/finai_api/api/source_exception_routes.py",
+      "git_blob_sha256": "e3a0b1cff021df647d2321223a0edc9d18b5de40e8fa12c2d9e2389bacf38afd"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/company_condition.py",
+      "git_blob_sha256": "abd93013f74d31bec2472c22b2f50f53072fcde6c5d5a8ef5591e230692ba80f"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/investigation.py",
+      "git_blob_sha256": "b6e84d62e31207cb1b49d816187f35d8e24dd1651cb08ec1ddc6e90e3970255f"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/ontology_catalog.py",
+      "git_blob_sha256": "6e0609f95d0be2d403019bd35da26b9761e75c91bb9f48bc30b8f54a185c43e7"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/source_reconciliation_exception.py",
+      "git_blob_sha256": "ece5a105935ae7233c84da1ef840f0a098a49627d7f77ccc204056dc70d99ab9"
+    },
+    {
+      "path": "services/api/src/finai_api/main.py",
+      "git_blob_sha256": "9e6c7aa813f8692b7fee779279135387f5b3aa68fefb9d8c4a9404a1e859e1f3"
+    },
+    {
+      "path": "services/api/src/finai_api/services/company_condition.py",
+      "git_blob_sha256": "a560a5567b101441fe2993d92db17cbb809d468b456f8d7cd9fa0c387d0fa4c3"
+    },
+    {
+      "path": "services/api/src/finai_api/services/investigation_actions.py",
+      "git_blob_sha256": "14f6e59d565854397b469fd7b35ea60454b11003fdb0cf8e7df19959634f281c"
+    },
+    {
+      "path": "services/api/src/finai_api/services/ontology_definition_validation.py",
+      "git_blob_sha256": "41c57cc578fe281d760fe9f0c3d9bc618758cfcb624282779654b4ef6220e40e"
+    },
+    {
+      "path": "services/api/src/finai_api/services/ontology_operations.py",
+      "git_blob_sha256": "4a48c769924dec3b0441a304cfad0abfc0f13dc4e4a520f4660ad691c384950f"
+    },
+    {
+      "path": "services/api/src/finai_api/services/operator_workbench.py",
+      "git_blob_sha256": "dbbc7b49ffd71449de2e354f014218c89e36079c45ab2f70916e7cbbca4a792c"
+    },
+    {
+      "path": "services/api/src/finai_api/services/resources.py",
+      "git_blob_sha256": "1edbe26d443db08e7d46e9bb0512c1f6c6d7486bfb343883811f70738de75bb5"
+    },
+    {
+      "path": "services/api/src/finai_api/services/source_reconciliation_exception.py",
+      "git_blob_sha256": "369d06308588f8af9cf7d1688fb985b64e360a2e8a1869dda1f396446397e377"
+    },
+    {
+      "path": "services/api/tests/test_company_condition.py",
+      "git_blob_sha256": "cd60225c52e3cd75ab617096fccd76b09c25c3a999f4ccbe78541166d0272324"
+    },
+    {
+      "path": "services/api/tests/test_investigation_actions.py",
+      "git_blob_sha256": "0827cf3884c8e7b908ac886b547dda5993b596baca7da17013fdee777132990d"
+    },
+    {
+      "path": "services/api/tests/test_operator_workbench.py",
+      "git_blob_sha256": "1f6c27fe56aeb6b46bfab3ff80f8c8ad3bc89768a9044f91a5acae4a597cc720"
+    },
+    {
+      "path": "services/api/tests/test_source_exception_routes.py",
+      "git_blob_sha256": "7b1d5be893b17793e4a0b273d32637e2df3beeb54cde8963a462fe44703ec281"
+    },
+    {
+      "path": "services/api/tests/test_source_reconciliation_exception.py",
+      "git_blob_sha256": "b2c52a91076cb27190c11e8dbb6a0d9a6a33c0437af8b5d78781da6c09315012"
+    }
+  ],
+  "migrations": {
+    "changed": false,
+    "files": [
+      {
+        "path": "services/api/migrations/001_hydration.sql",
+        "git_blob_sha256": "87e836dab944ae40549f130092977ddc3b78f3e594346d199480b2bfa6692094"
+      },
+      {
+        "path": "services/api/migrations/002_construction_review.sql",
+        "git_blob_sha256": "e7836346aa7ff5c26d92ce601420ac4a2620e76d5707b5fc8f985303f4b2ffa7"
+      },
+      {
+        "path": "services/api/migrations/003_approval_integrity.sql",
+        "git_blob_sha256": "462746a02a853a5e2801d4037aac43d7966d59a7c92d613ec0333e95cb7137f3"
+      },
+      {
+        "path": "services/api/migrations/004_canonical_resource_kernel.sql",
+        "git_blob_sha256": "2a13160b8de9ba282c139798f850f518783d6118b83aa3c771f4265ef214a002"
+      },
+      {
+        "path": "services/api/migrations/005_resource_acceptance_integrity.sql",
+        "git_blob_sha256": "00ef1be94bbea4229fcc8a14c67ab9c18aa72eed6c20dab9f5b0840edb660279"
+      },
+      {
+        "path": "services/api/migrations/006_company_industry_capabilities.sql",
+        "git_blob_sha256": "317c087d0b916ca2107da793ae5f57dd4ee422788befbce097e743af7e84d3a9"
+      },
+      {
+        "path": "services/api/migrations/007_downstream_impact_visibility.sql",
+        "git_blob_sha256": "1a1f25a6a5e12f6061d40cf048b87bdcde405a5e9ff9f0710f9cb744dc5adcb2"
+      },
+      {
+        "path": "services/api/migrations/008_private_evidence_objects.sql",
+        "git_blob_sha256": "b1845be9fa90035acfd9de31552a66a2e8e9c5abf0a34237455e9e5bb6a405a5"
+      },
+      {
+        "path": "services/api/migrations/009_atomic_mixed_policy_proposals.sql",
+        "git_blob_sha256": "26e1f596823279b679a69f89ead7dd27fac044a186b810ce5bf16f017b697ed0"
+      },
+      {
+        "path": "services/api/migrations/010_resource_lifecycle.sql",
+        "git_blob_sha256": "6354edab90ec106f0bcd4aed828cb121d47d5c35f6e7d7a38d4cdb8d1d99b8b1"
+      },
+      {
+        "path": "services/api/migrations/011_runtime_schema_readiness.sql",
+        "git_blob_sha256": "f4824e0ca7196738472fe8ef94dbdc8bc456c26788956791e6e796fc40ff0b33"
+      },
+      {
+        "path": "services/api/migrations/012_lifecycle_quality_amendments.sql",
+        "git_blob_sha256": "6aa5ce793349a7530f8f08fb79190476439f6b0bf683ea7957f9b32c9d4e5b0b"
+      },
+      {
+        "path": "services/api/migrations/013_workbook_source_evidence.sql",
+        "git_blob_sha256": "840bbb6919bc9e9b0fa797b8e9fce90e5f94829c91a7f3412a8bf074d7d49e76"
+      },
+      {
+        "path": "services/api/migrations/014_report_source_assessments.sql",
+        "git_blob_sha256": "0f758c7eae77a8a626d10828bb38dfa47501d45e8e1b24845a3144b0ba889b2d"
+      },
+      {
+        "path": "services/api/migrations/015_durable_report_workflows.sql",
+        "git_blob_sha256": "666265d1aff9de75c3eb4cfd628583095fb5c7fb05ba5a3a1e4211cb410ac693"
+      },
+      {
+        "path": "services/api/migrations/016_guarded_consumption_receipts.sql",
+        "git_blob_sha256": "24a9e4cdbf01c3c9f6537a32ad3eb71ec959764ef778721f7eaed6fb1d0b68b3"
+      },
+      {
+        "path": "services/api/migrations/017_consumption_state_integrity.sql",
+        "git_blob_sha256": "56525b720673d26f784fc2d299f4aaeb3079f8078bdae74a732650ff957041b4"
+      },
+      {
+        "path": "services/api/migrations/018_consumption_upstream_integrity.sql",
+        "git_blob_sha256": "8417c645ee1c43f6104c0b631d19844f1e4713fe0822d06f51d48e33f65543ed"
+      },
+      {
+        "path": "services/api/migrations/019_retained_event_time.sql",
+        "git_blob_sha256": "af7b07a974f29387bbb3f41800b908523c41aaa54484d44284c743a8f8537104"
+      },
+      {
+        "path": "services/api/migrations/020_canonical_field_read_policy.sql",
+        "git_blob_sha256": "1d256a030aabf6cba807d0f03436afb8df497a998857667ac62974cf69dec9cd"
+      },
+      {
+        "path": "services/api/migrations/021_field_policy_audit_metadata.sql",
+        "git_blob_sha256": "3e5a1225e8777f4c7103bac7e71ce1843b3bdbf4e96d0179b4bf9edc640cc153"
+      },
+      {
+        "path": "services/api/migrations/022_field_policy_review_history.sql",
+        "git_blob_sha256": "c9e6c3ac089b974618bff506a35a6df7517eea4201d80f6f2d5190545ff34a19"
+      },
+      {
+        "path": "services/api/migrations/023_proposal_evaluation.sql",
+        "git_blob_sha256": "e5fec83ad904a3074183f05a8dda540ac2e2a3c118cc6748f3ccc39642fbba57"
+      },
+      {
+        "path": "services/api/migrations/024_proposal_read_deduplication.sql",
+        "git_blob_sha256": "cfa80e211fc01dee4a0bbf59c7dcd8f428281151642bdfd14d6d63e12b1b7d94"
+      },
+      {
+        "path": "services/api/migrations/025_fact_calculation_runs.sql",
+        "git_blob_sha256": "ca33893fe8d2a02944d22eefcf0109eacd46fe043577727808dacae6493ab7a4"
+      },
+      {
+        "path": "services/api/migrations/026_source_documents.sql",
+        "git_blob_sha256": "81b5e7003ac5c60c0e6ab60e099ff3716bf271d21a1953630b3c0b3e06a2fb44"
+      },
+      {
+        "path": "services/api/migrations/027_dependency_pin_validation.sql",
+        "git_blob_sha256": "5da4f4244c65f5caccaa35a868e93315bf4753921a17fa32a78755fa2dfccbb0"
+      },
+      {
+        "path": "services/api/migrations/028_proposal_lineage_union.sql",
+        "git_blob_sha256": "2080ca7b6809e5361cec32547ca66aea83877f59bc2615b622f01235bf244984"
+      },
+      {
+        "path": "services/api/migrations/029_unrestricted_schema_read_fast_path.sql",
+        "git_blob_sha256": "6d1787cae36b9e1db3bdc49ed948010f09d2a1889344c75df9f1cc84f09b0b82"
+      },
+      {
+        "path": "services/api/migrations/030_ontology_inventory_indexes.sql",
+        "git_blob_sha256": "4a0f880ed966c53ca8d4b369b11b3e6a92be7d0433163f09d36b066878984ea1"
+      },
+      {
+        "path": "services/api/migrations/031_bounded_lineage_version_lookup.sql",
+        "git_blob_sha256": "3a67c3354f13fe89bd00d22a69f922f66b03f158c8f709786856ee407c49c94b"
+      },
+      {
+        "path": "services/api/migrations/032_current_effective_authority.sql",
+        "git_blob_sha256": "20bb6486067ae11f37ebf297f22a4bfdd713a566551bf9bdb3ed8ecb751cbbd2"
+      },
+      {
+        "path": "services/api/migrations/033_effective_event_policy.sql",
+        "git_blob_sha256": "d7ad77397660d557785e94c0b72a252415dd60b48544d225ffc4e4851b29e079"
+      },
+      {
+        "path": "services/api/migrations/034_certification_receipts.sql",
+        "git_blob_sha256": "c0ede0b0de2e50350ddbdc8307d6782aa79b648d1fc7c7d4254686c28a643347"
+      },
+      {
+        "path": "services/api/migrations/035_certification_lineage_integrity.sql",
+        "git_blob_sha256": "977c7a4650e5004d60b11d47364c10d1eb454b6b7ee4c1615d72ac89ae1c53fa"
+      },
+      {
+        "path": "services/api/migrations/036_certification_publication_integrity.sql",
+        "git_blob_sha256": "d8ebdf07b3804119498084cfe10525af72eb18296c990c4ca44e0f6d8c3ab570"
+      },
+      {
+        "path": "services/api/migrations/037_certified_lifecycle.sql",
+        "git_blob_sha256": "563b719ed67c022dccf0a5df21ceb7b467bc78a6d31b44eb09d00ae8aef6c310"
+      },
+      {
+        "path": "services/api/migrations/038_certified_consumption.sql",
+        "git_blob_sha256": "5d07b2cf54c2339eda7da1a54cefdb5ae6fa54be90d69401d60567e023190aa9"
+      },
+      {
+        "path": "services/api/migrations/039_artifact_retention_evaluations.sql",
+        "git_blob_sha256": "fa97e72200d1c86df9b6b7ab50a32701aeef38a49d893a8d3d807f4d014a9fea"
+      },
+      {
+        "path": "services/api/migrations/040_retention_ancestor_certification_guard.sql",
+        "git_blob_sha256": "9770a88cdd036c48c5ca3666a8d5ea81f392d3fc6599442952e2bbf36fe46c24"
+      },
+      {
+        "path": "services/api/migrations/041_artifact_retention_history_index.sql",
+        "git_blob_sha256": "fa93755b266c0d2602c98130a9aa40c23f53d55b5944e7d12bdc446d306b499e"
+      },
+      {
+        "path": "services/api/migrations/042_function_invocations.sql",
+        "git_blob_sha256": "28bd04ddde0b0e1b3cb386ceb14928fb1091cd8c7ccf1408393809be2591b822"
+      },
+      {
+        "path": "services/api/migrations/043_transformation_intents.sql",
+        "git_blob_sha256": "8e6ebdfce9581f55f707b04ef1d6c5d6dc8d73dab923a5bb175f9f040a6c7989"
+      },
+      {
+        "path": "services/api/migrations/044_transformation_history_index.sql",
+        "git_blob_sha256": "47786855ab7dca41562a3537892980594bdf34fbfad9e14ca1730c4a3ca910ed"
+      },
+      {
+        "path": "services/api/migrations/045_transformation_budgets.sql",
+        "git_blob_sha256": "29a4786fe6a590eba1a3b3c50590824a30d9e8c319d9b0e51cd31bf06b79dd19"
+      },
+      {
+        "path": "services/api/migrations/046_retained_worksheet_functions.sql",
+        "git_blob_sha256": "2187215c8f847ae6eaa3698b4f1a3d1eef950b5d6676540a0a7a272e8b16d0ce"
+      },
+      {
+        "path": "services/api/migrations/047_runtime_observations.sql",
+        "git_blob_sha256": "4d9df4b86d9a9bf357be97c6713cdbc384429c7a223a0d119a667f35bdae8af7"
+      },
+      {
+        "path": "services/api/migrations/048_retained_function_inputs.sql",
+        "git_blob_sha256": "f95d3eca82652b90ed822986a25bce028df28489ab7725e4cdcd74591fb5ca19"
+      },
+      {
+        "path": "services/api/migrations/049_transformation_publication_review.sql",
+        "git_blob_sha256": "a199dfeb0925ea64571ddf1af64c482fcf95d86324028f151ca9a484e2cbcdc7"
+      },
+      {
+        "path": "services/api/migrations/050_grouped_observation_counts.sql",
+        "git_blob_sha256": "dd9f5b4e955d16d2e91045305ef1cbe19b99fd5a7ac72b8295022788fb512d81"
+      },
+      {
+        "path": "services/api/migrations/051_grouped_observation_lookup.sql",
+        "git_blob_sha256": "b86af274dfc0e4c34e671da1b7df6397370be38dcc645fbfc2c617e57fb16f66"
+      },
+      {
+        "path": "services/api/migrations/052_period_posting_control.sql",
+        "git_blob_sha256": "f5eb990b188dd87738c5eb2677048d41150f9e24fc47aeae6313721c63c9304d"
+      },
+      {
+        "path": "services/api/migrations/053_effective_version_schema_resolution.sql",
+        "git_blob_sha256": "f41fd1823f0372858bdaf0c2b1b8f7f01c3fa89f3ba340d81d7a99702f12076e"
+      },
+      {
+        "path": "services/api/migrations/054_account_rule_completeness.sql",
+        "git_blob_sha256": "f9dbe6f28c4dbd8f30e5979dca696e70610df30075b126442e3108360a48936c"
+      },
+      {
+        "path": "services/api/migrations/055_retained_calculated_inputs.sql",
+        "git_blob_sha256": "e3c70f938cca07264bb2b299cf62a356bd307d404c1690093a77c054700c94ea"
+      },
+      {
+        "path": "services/api/migrations/056_calculated_binding_promotion.sql",
+        "git_blob_sha256": "9e1488fd20be51d0bec437906d276ac3f34e2ac9117ff911df3fc0a15a746064"
+      },
+      {
+        "path": "services/api/migrations/057_transformation_binding_review.sql",
+        "git_blob_sha256": "c3eb1edf9b2df1c9f2daf95af1363b8145fcb5d651a5c55880c608a13201af28"
+      },
+      {
+        "path": "services/api/migrations/058_transformation_execution_policy.sql",
+        "git_blob_sha256": "67f3e63afbd2c6197badadfad89211121b3cf51f60444fbf210d5f02facd2469"
+      },
+      {
+        "path": "services/api/migrations/059_temporal_observation_extent.sql",
+        "git_blob_sha256": "515f4a05ac45c6741a0ec88927d6511d152c5a6ee45c22188c332756511db569"
+      },
+      {
+        "path": "services/api/migrations/060_object_set_materialization.sql",
+        "git_blob_sha256": "78c3ce422b80290045164ea887d69bfda4f909d85094889c5e97eed797c500d9"
+      },
+      {
+        "path": "services/api/migrations/061_materialized_observation_counts.sql",
+        "git_blob_sha256": "b191a0e0820e2fbd97e8ae44bfdd728c87f955fe05f4fbf1f9927de75c136418"
+      },
+      {
+        "path": "services/api/migrations/062_retained_posted_movements.sql",
+        "git_blob_sha256": "2e494b94b672f5477f244282b35d2550b8577c83cd6a921495af5e4fb462ed4e"
+      },
+      {
+        "path": "services/api/migrations/063_journal_production_attempts.sql",
+        "git_blob_sha256": "27366a46430ac8bc3b71adfb870a82720cb896439a0f6d9f1ac18793f837cb83"
+      }
+    ]
+  },
+  "ci": {
+    "run_id": 34257491466,
+    "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34257491466",
+    "head_sha": "8e3a0c60b4fa56eac0402524455719b06a06a998",
+    "api": "SUCCESS",
+    "web_and_contracts": "SUCCESS"
+  },
+  "local_build": {
+    "state": "PASS",
+    "source_sha": "8e3a0c60b4fa56eac0402524455719b06a06a998",
+    "directory": "D:\\FinAI\\g8-investigation-convergence\\apps\\web\\.next-investigation",
+    "build_id": "mTuPlU1XPGiC_L1clfzoF",
+    "artifacts": [
+      {
+        "path": "D:\\FinAI\\g8-investigation-convergence\\apps\\web\\.next-investigation\\BUILD_ID",
+        "sha256": "b8da5f9046f6f1d999f4ede99ae6235f7ab7ca7f81352ec17e832d6488ef2921"
+      },
+      {
+        "path": "D:\\FinAI\\g8-investigation-convergence\\apps\\web\\.next-investigation\\build-manifest.json",
+        "sha256": "079d340618b8889b7ef9c13e12a96ee8602fc67bcf809db9bb55ee37903c817f"
+      },
+      {
+        "path": "D:\\FinAI\\g8-investigation-convergence\\apps\\web\\.next-investigation\\required-server-files.json",
+        "sha256": "32611b4f3ea94e685d61ad89d5fcf4cb625f18c0f10cca345498a8c668056685"
+      },
+      {
+        "path": "D:\\FinAI\\g8-investigation-convergence\\apps\\web\\.next-investigation\\standalone\\apps\\web\\server.js",
+        "sha256": "3e3e411beb5eb471531eaec7ec2e593e33d2c4edec0079488c90874db6af2c8f"
+      }
+    ],
+    "log": "D:\\FinAI\\g8-investigation-convergence\\.finai\\tmp\\investigation-build-8e3a0c6.log"
+  },
+  "focused_verification": [
+    {
+      "source_sha": "3a9c1cf6dad190564ff517889eb1b7d1c5a4a319",
+      "backend_tests": 69,
+      "frontend_tests": 59,
+      "python_type_files": 212,
+      "typecheck": "PASS",
+      "changed_source_lint": "PASS",
+      "limitation": "Predecessor checks missed UUID document fixture mismatch; not acceptance for fixed guard."
+    },
+    {
+      "source_sha": "8e3a0c60b4fa56eac0402524455719b06a06a998",
+      "source_exception_consumer_tests": 30,
+      "lint": "PASS",
+      "local_standalone_build": "PASS",
+      "fixed_defect": "Canonical doc_/ir_ document IDs accepted; UUID/short/nonhex rejected even if both envelopes agree."
+    }
+  ],
+  "independent": {
+    "task_id": "01a07c7d-9a29-7d92-82ca-068bee49a02f",
+    "results": [
+      {
+        "source_sha": "e0d0121e9393fdd33c7f61cd038b47aa34e9b262",
+        "offline_tests": 58,
+        "result": "PASS"
+      },
+      {
+        "source_sha": "8e3a0c60b4fa56eac0402524455719b06a06a998",
+        "targeted_document_boundary_tests": 5,
+        "result": "CORRECTION_PASS"
+      }
+    ],
+    "limitations": [
+      "Synthetic fixtures and isolated persistence",
+      "No native browser or live discovery acceptance"
+    ]
+  },
+  "producer_consumer_wire": {
+    "state": "PASS",
+    "producer_code_sha": "e0d0121e9393fdd33c7f61cd038b47aa34e9b262",
+    "consumer_code_sha": "8e3a0c60b4fa56eac0402524455719b06a06a998",
+    "input": "D:\\FinAI\\g8-source-exceptions\\.finai\\tmp\\producer-consumer-e0d0121\\producer-consumer.json",
+    "sha256": "13d0e8cf65af025a757d3ee175fa7f4e9088401268d44f7f6f47c4c7e5f67e2f",
+    "checker": "D:\\FinAI\\g8-investigation-convergence\\.finai\\tmp\\check-investigation-wire.mjs",
+    "checker_sha256": "52d8fdd9d113b57a39ee11d248b300e3058346c81971b20f1d32782a118a34b4",
+    "checks": [
+      "Actual Function history derives expected MetricSource",
+      "Exact source exception request and observation accepted",
+      "Actual B pending proposal and exact pair publication envelope accepted",
+      "Reference-only saved exception reopens"
+    ],
+    "limitations": [
+      "Existing synthetic source fixture with one unmatched row and zero accepted journals",
+      "Memory-only retained fact-run persistence",
+      "Synthetic publication records passed through real publication_bundle",
+      "No journal/Finding/Investigation publication occurred"
+    ]
+  },
+  "implemented": [
+    "Retained per-coordinate source exception from exact reconciliation and source Function",
+    "Explicit governed canonical Finding/Investigation proposal via shared semantic-effect and actor-intent authority",
+    "Existing independent ResourceProposal review with exact paired publication readback",
+    "Home progressive-depth source exception consumer, evidence and history",
+    "Server-derived My Work company attribution and exact company handoff"
+  ],
+  "not_claimed": [
+    "Resolution or financial correction",
+    "Direct unmatched-row worksheet navigation; current opener is broader account source review",
+    "Full canonical intelligence collections",
+    "Financial impact/materiality assessment or complete statements",
+    "Native, browser, approved-design, generalization, scale or release acceptance"
+  ],
+  "runtime": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "identity": "3061/8061 are G8 financial repository worktrees, not CDD",
+    "excluded": [
+      "3061",
+      "8061",
+      "Associated PostgreSQL/MinIO/evidence stores"
+    ],
+    "preview_denial": "Historical 3074/3080 launch blocked by policy; no bypass",
+    "calls_this_continuation": "No local runtime/browser/DB/storage calls",
+    "new_publications": false
+  },
+  "preserved": [
+    "NIN-22 REFERENCE_ONLY",
+    "NIN-62 stage-2 freeze",
+    "Existing accepted-journal implementation; no f003399 replay",
+    "Historical a166/6aa/viewport and R1 manifests immutable",
+    "D-only new development and artifacts"
+  ],
+  "review": {
+    "pr": "https://github.com/keshelavanina93-prog/finailin1/pull/4",
+    "base_branch": "development/product-convergence",
+    "state": "DRAFT_UNMERGED"
+  },
+  "continuation": {
+    "branch": "development/investigation-resolution-product",
+    "shared_contract_commit": "c98e69c9ce3612992887911db93fe066b8508b78",
+    "owners": {
+      "A": "API/proxy/TS/company attribution/integration",
+      "B": "Resolution producer and publication validation",
+      "E": "Product resolution consumer",
+      "C": "Financial source producer; wire check delivered",
+      "D": "Independent acceptance"
+    },
+    "scope": "Explicit reviewed same-identity resolution from compatible later matched evidence; implementation ongoing, not R2 closure"
+  }
+}
