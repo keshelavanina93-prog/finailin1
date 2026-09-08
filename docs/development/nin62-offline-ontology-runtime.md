@@ -14,6 +14,8 @@ Default importer budgets: 16 artifacts, 8 MiB original bytes, 50,000 quads, 10,0
 
 Index inspection returns at most 100 subject quads and 256 KiB. An intact exact rebuild reuses its verified generation. Corrupt-index recovery retains at most two generations per key and refuses further rebuilds until an operator safely evicts the disposable cache while readers are stopped. No live generation is automatically deleted. The initial runtime uses one API process: its serialized storage reservation checks a 1 GiB root budget, with 256 MiB per index. Multiple independent API processes sharing a cache can race the reservation; a cross-process quota is required before enabling that deployment topology. Each read verifies the indexed dataset hash in a capped worker before returning its selected quads.
 
+Linux index workers use a 128-descriptor ceiling and two glibc allocation arenas; the parser retains its 32-descriptor ceiling. The index keeps the 512 MiB address-space cap, 8 CPU seconds and 10-second wall timeout. Oxigraph requires at least 96 descriptors for a persistent store. The early CI platform probe verifies actual capped index creation and reopening before the expensive integration suite; it does not waive the later coverage or correctness gate.
+
 ## Operator sequence
 
 Run from the D: checkout after the ordinary packaged environment/bootstrap and canonical definition installation. Supply an existing operator credential through `G8_ONTOLOGY_TOKEN`; the CLI neither chooses another actor nor prints credentials. All generated evidence/runtime/index files remain on D: on Windows.
@@ -42,6 +44,8 @@ Example term inspection request (replace all three pin values with actual retain
 ```
 
 `CURRENT_RELEASE` checks current effective release/publisher authority and availability before and after index work. `HISTORICAL_INSPECTION` instead requires an aware `known_at` and selects an exact retained version through the existing historical inspection authority. A subsequent publisher change does not erase historical inspection. Every response declares no business effect and no current consumption authority; inspecting an old term is not permission to use it as current truth.
+
+Cross-company reuse remains a separate authority boundary. A canonical `SourceEvidence` identity already held under another company's policy is not duplicated or silently shared. An ordinary importer may prepare a proposal without seeing that hidden reservation, but publication then refuses with a non-disclosing 409 and rolls back the decision and all versions. A tenant administrator cannot discard the original dependency's company boundary either. Early hidden-reservation checks and reviewed shared-reference access require a shared canonical policy contract before multi-company standards reuse is accepted; this foundation does not claim that capability.
 
 ## API and SDK
 

@@ -299,3 +299,47 @@ def test_global_cache_reservation_and_engine_version_key_are_explicit(dataset, m
     first = index._key(scope, index.OntologyIndexLimits())
     monkeypatch.setattr(index, "_ENGINE_VERSION", "future-pinned-version")
     assert index._key(scope, index.OntologyIndexLimits()) != first
+
+
+def test_index_allocator_environment_is_static_minimal_and_linux_only(tmp_path, monkeypatch):
+    monkeypatch.setenv("MALLOC_ARENA_MAX", "unbounded-parent-value")
+    monkeypatch.setenv("FINAI_DATABASE_URL", "private-test-secret")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "private-test-secret")
+    monkeypatch.setattr(index.sys, "platform", "linux")
+    environment = index._index_environment(tmp_path)
+    assert environment["MALLOC_ARENA_MAX"] == "2"
+    assert set(environment) <= {"SYSTEMROOT", "WINDIR", "TEMP", "TMP", "TMPDIR", "MALLOC_ARENA_MAX"}
+    assert "private-test-secret" not in str(environment)
+    monkeypatch.setattr(index.sys, "platform", "win32")
+    assert "MALLOC_ARENA_MAX" not in index._index_environment(tmp_path)
+
+
+def test_index_requests_128_descriptors_without_changing_memory_or_cpu(
+    dataset, tmp_path, monkeypatch
+):
+    scope, data, _ = dataset
+    limits = index.OntologyIndexLimits()
+    request, response = tmp_path / "caps-request.json", tmp_path / "caps-response.json"
+    request.write_bytes(
+        index._json(
+            {
+                "operation": "build",
+                "scope": asdict(scope),
+                "limits": asdict(limits),
+                "store": str(tmp_path / "caps-store"),
+                "canonical_nquads": base64.b64encode(data).decode(),
+            }
+        )
+    )
+    monkeypatch.setattr(
+        index.sys,
+        "argv",
+        ["worker", str(request), str(response), "8", str(512 * 1024**2), str(256 * 1024**2)],
+    )
+    calls = []
+    monkeypatch.setattr(
+        index, "apply_resource_caps", lambda *args, **kwargs: calls.append((args, kwargs))
+    )
+    assert index._main() == 0
+    assert calls == [((8, 512 * 1024**2, 256 * 1024**2), {"file_descriptors": 128})]
+    assert json.loads(response.read_bytes())["quad_count"] == 4

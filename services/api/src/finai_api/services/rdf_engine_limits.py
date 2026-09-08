@@ -5,7 +5,11 @@ import sys
 _job_handle = None  # Keep the Windows kill-on-close job alive for the worker lifetime.
 
 
-def apply_resource_caps(cpu_seconds: int, memory_bytes: int, output_bytes: int) -> str:
+def apply_resource_caps(
+    cpu_seconds: int, memory_bytes: int, output_bytes: int, *, file_descriptors: int = 32
+) -> str:
+    if type(file_descriptors) is not int or not 32 <= file_descriptors <= 128:
+        raise ValueError("RDF file-descriptor budget must be between 32 and 128")
     if sys.platform == "win32":
         _windows_caps(cpu_seconds, memory_bytes)
         return "WINDOWS_JOB_PROCESS_TIME_MEMORY_ACTIVE_PROCESS"
@@ -15,7 +19,7 @@ def apply_resource_caps(cpu_seconds: int, memory_bytes: int, output_bytes: int) 
         resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, cpu_seconds))
         resource.setrlimit(resource.RLIMIT_AS, (memory_bytes, memory_bytes))
         resource.setrlimit(resource.RLIMIT_FSIZE, (output_bytes, output_bytes))
-        resource.setrlimit(resource.RLIMIT_NOFILE, (32, 32))
+        resource.setrlimit(resource.RLIMIT_NOFILE, (file_descriptors, file_descriptors))
         resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
         return "LINUX_RLIMIT_CPU_AS_FSIZE_NOFILE_CORE"
     raise OSError("Required RDF resource caps are unsupported on this platform")

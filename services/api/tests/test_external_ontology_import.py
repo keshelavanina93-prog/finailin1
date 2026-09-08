@@ -662,3 +662,91 @@ def test_expensive_rdf_replay_happens_before_tenant_publication_lock(native_impo
     approve(case.checker, proposal.proposal_id)
     assert len(checks) > after_propose  # Independent approval replays the exact bytes again.
     assert all(checks)
+
+
+@DB
+def test_same_bytes_in_second_company_return_private_identity_conflict_without_partial_release(
+    native_import, monkeypatch
+):
+    case = native_import
+    first = imports.prepare(case.maker, case.request)
+    approve(case.checker, proposal_from(first).proposal_id)
+    evidence_id = canonical_id(case.maker.scope.tenant_id, "SourceEvidence", case.document.sha256)
+    original_evidence = resources.get_resource(case.reader, evidence_id)["resource"]
+
+    second_maker = case.maker.model_copy(
+        update={
+            "actor_id": "synthetic-second-company-maker",
+            "scope": case.maker.scope.model_copy(
+                update={
+                    "legal_entity_id": "synthetic-second-import-" + uuid4().hex,
+                }
+            ),
+            "permissions": ("ontology_read", "ontology_propose", "ontology_review", "ingest"),
+        }
+    )
+    second_checker = second_maker.model_copy(
+        update={"actor_id": "synthetic-second-company-checker"}
+    )
+    source_proposal = imports.propose_source(second_maker, case.definition)
+    approve(second_checker, source_proposal.proposal.proposal_id)
+    second_source = resources.get_resource(
+        second_maker, source_proposal.proposal.mutations[0].resource_id
+    )["resource"]
+    second_document = imports.retained(second_maker, "synthetic-same-bytes.ttl", case.raw)
+    assert second_document.sha256 == case.document.sha256
+    assert second_document.document_id != case.document.document_id
+    assert resources.current_resources(second_maker, [evidence_id]) == {}
+    second_request = request_for(
+        resource_pin(second_source),
+        case.definition,
+        second_document.model_dump(mode="json"),
+        case.namespace,
+    )
+    prepared = imports.prepare(second_maker, second_request)
+    proposal = proposal_from(prepared)
+    assert any(item.resource_id == evidence_id for item in proposal.mutations)
+    before = scoped_versions(second_maker)
+    monkeypatch.setenv(
+        "FINAI_ACCESS_TOKENS",
+        json.dumps(
+            {
+                "synthetic-second-reviewer": second_checker.model_dump(mode="json"),
+            }
+        ),
+    )
+    get_settings.cache_clear()
+    with TestClient(app, headers={"Authorization": "Bearer synthetic-second-reviewer"}) as client:
+        response = client.post(
+            f"/v1/ontology/proposals/{proposal.proposal_id}/decision",
+            json={
+                "decision": "APPROVED",
+                "rationale": REASON,
+            },
+        )
+    assert response.status_code == 409, response.text
+    assert response.json() == {
+        "detail": "Canonical identity or access boundary conflict; steward review required",
+    }
+    for private_identifier in (
+        str(case.maker.scope.tenant_id),
+        case.maker.scope.legal_entity_id,
+        second_maker.scope.legal_entity_id,
+        str(evidence_id),
+    ):
+        assert private_identifier not in response.text
+    assert resources.proposal_detail(second_maker, proposal.proposal_id).decision is None
+    assert scoped_versions(second_maker) == before
+    with pytest.raises(WorkspaceError) as unpublished:
+        resources.get_resource(second_maker, UUID(prepared["release_id"]))
+    assert unpublished.value.status == 404
+    assert resources.get_resource(case.reader, evidence_id)["resource"] == original_evidence
+    admin = second_maker.model_copy(
+        update={
+            "actor_id": "synthetic-second-company-steward",
+            "permissions": (*second_maker.permissions, "ontology_admin"),
+        }
+    )
+    with pytest.raises(WorkspaceError, match="dependency's entity access boundary") as denied:
+        imports.prepare(admin, second_request)
+    assert denied.value.status == 403

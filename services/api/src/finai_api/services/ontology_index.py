@@ -161,6 +161,14 @@ def _root(index_root: Path) -> Path:
     return root
 
 
+def _index_environment(scratch: Path) -> dict[str, str]:
+    environment = _child_environment(scratch)
+    if sys.platform == "linux":
+        # Bound glibc per-thread arenas so native store startup fits the address-space cap.
+        environment["MALLOC_ARENA_MAX"] = "2"
+    return environment
+
+
 def _worker(payload: dict[str, Any], scratch: Path, limits: OntologyIndexLimits) -> dict[str, Any]:
     if not _WORKERS.acquire(blocking=False):
         raise OntologyIndexError("BUSY")
@@ -181,7 +189,7 @@ def _worker(payload: dict[str, Any], scratch: Path, limits: OntologyIndexLimits)
         with subprocess.Popen(
             command,
             cwd=scratch,
-            env=_child_environment(scratch),
+            env=_index_environment(scratch),
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
@@ -518,7 +526,8 @@ def _main() -> int:
     response = Path(sys.argv[2])
     try:
         try:
-            apply_resource_caps(*(int(value) for value in sys.argv[3:6]))
+            # Oxigraph 0.5.11 requires >=96 descriptors, including its 48-descriptor reserve.
+            apply_resource_caps(*(int(value) for value in sys.argv[3:6]), file_descriptors=128)
         except (OSError, ValueError):
             raise OntologyIndexError("RESOURCE_CAP_UNAVAILABLE") from None
         payload = json.loads(Path(sys.argv[1]).read_bytes())

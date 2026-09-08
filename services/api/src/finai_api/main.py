@@ -75,6 +75,17 @@ async def workspace_error(_request: Request, exc: WorkspaceError) -> JSONRespons
 
 @app.exception_handler(psycopg.Error)
 async def database_error(_request: Request, exc: psycopg.Error) -> JSONResponse:
+    if (
+        isinstance(exc, psycopg.errors.RaiseException)
+        and exc.diag.message_primary
+        == "Canonical identity type and access boundary are immutable"
+    ):
+        return JSONResponse(
+            status_code=409,
+            content={
+                "detail": "Canonical identity or access boundary conflict; steward review required"
+            },
+        )
     if isinstance(exc, psycopg.errors.UniqueViolation):
         return JSONResponse(
             status_code=409,

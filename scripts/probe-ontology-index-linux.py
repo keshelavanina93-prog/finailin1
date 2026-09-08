@@ -74,9 +74,11 @@ def main() -> int:
         for name, descriptors, memory, arena in (
             ("current-32fd-512MiB", 32, 512, None),
             ("128fd-512MiB", 128, 512, None),
+            ("128fd-1024MiB", 128, 1024, None),
             ("32fd-2048MiB", 32, 2048, None),
             ("128fd-2048MiB", 128, 2048, None),
             ("32fd-512MiB-2arenas", 32, 512, "2"),
+            ("128fd-512MiB-2arenas", 128, 512, "2"),
         ):
             environment = {
                 "TEMP": str(scratch),
