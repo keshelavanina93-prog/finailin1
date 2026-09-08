@@ -1,0 +1,69 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {loadTypeScript} from "./load-typescript.mjs";
+const s=await loadTypeScript(new URL("../app/metric-observation-state.ts",import.meta.url));
+const id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
+const pin=n=>({resource_id:id(n),version_id:id(n+100),content_hash:String(n%10).repeat(64)});
+const old="2026-08-01T08:00:00.000001Z",now="2026-09-08T10:00:00.000001Z",hash="a".repeat(64),plan="b".repeat(64),run=`fcr_${"c".repeat(64)}`;
+const flags={current_use_authorized:false,business_effect_authorized:false};
+function fixture(){
+ const fn=pin(1),company=pin(2),member=pin(3),metric=pin(4);
+ const definition={contract:"metric-definition/1",selector:{kind:"OBJECT_COUNT",company_field:"legal_entity"},unit:{kind:"COUNT",symbol:"objects"},grain:"OBJECT_SET_SNAPSHOT",dimensions:[],aggregation:"non_additive"};
+ const query={valid_at:old,known_at:old,offset:0,limit:50};
+ const scope={tenant_id:id(20),legal_entity_id:company.resource_id,ledger_id:id(21),book_id:id(22)};
+ const output={...flags,scope,contract:"function-result/1",calculation_runtime:"shared-functions/1",function:fn,run_id:run,invocation_request_id:id(5),invocation_plan_hash:plan,query,coverage:"COMPLETE_BOUNDED_MATERIALIZATION",objects:[{...member,attributes:{legal_entity:company.resource_id}}],total:1,next_offset:null};
+ const invocation={...flags,invocation_id:id(5),status:"SUCCEEDED",receipt_hash:hash,receipt:{...flags,exact_scope:scope,run_id:run,plan_hash:plan,function:fn,request:{request_id:id(5),...query}},output};
+ const item={metric,display_name:"Selected source objects",function:fn,company,definition,definition_snapshot:{valid_at:now,known_at:now},definition_temporal:{valid_from:now,system_from:now,valid_to:null}};
+ const source=s.completedMetricSource(invocation),request=s.metricObservationRequest(item,source);
+ const observation={...flags,contract:"metric-observation/1",calculation_runtime:"metric-observations/1",run_id:`fcr_${"d".repeat(64)}`,metric,function:fn,invocation_id:source.invocationId,input_run_id:run,input_receipt_hash:hash,input_plan_hash:plan,definition,definition_snapshot:item.definition_snapshot,observation:{key:"object_count",state:"VALUE",value:"1",unit:definition.unit,grain:definition.grain,dimensions:[],company,valid_at:old,known_at:old,coverage:"COMPLETE",contributors:[member]},source_result:output};
+ return {fn,company,item,invocation,source,request,observation};
+}
+test("canonical comparison is object-order independent and preserves arrays",()=>{assert.equal(s.metricCanonical({b:1,a:2}),'{"a":2,"b":1}');assert.notEqual(s.metricCanonical([1,2]),s.metricCanonical([2,1]));});
+test("new definition snapshot does not rewrite historical source clocks",()=>{const f=fixture();assert.equal(f.request.known_at,old);assert.equal(f.request.valid_at,old);assert.equal(f.request.definition_snapshot.known_at,now);s.assertMetricObservation(f.observation,f.source,f.request,f.company.resource_id,f.item);});
+for(const [label,mutate] of [
+ ["failed invocation",v=>v.status="FAILED"],
+ ["missing runtime",v=>delete v.output.calculation_runtime],
+ ["different Function hash",v=>v.receipt.function={...v.receipt.function,content_hash:"e".repeat(64)}],
+ ["different run",v=>v.receipt.run_id=`fcr_${"e".repeat(64)}`],
+ ["different plan",v=>v.output.invocation_plan_hash="e".repeat(64)],
+ ["different request identity",v=>v.receipt.request.request_id=id(99)],
+ ["different source microsecond",v=>v.receipt.request.known_at="2026-08-01T08:00:00.000002Z"],
+ ["promoted output",v=>v.output.current_use_authorized=true],
+])test(`source refuses ${label}`,()=>{const f=fixture();mutate(f.invocation);assert.throws(()=>s.completedMetricSource(f.invocation));});
+test("equivalent aware timestamps are accepted without losing microseconds",()=>{const f=fixture();f.invocation.receipt.request.known_at="2026-08-01T12:00:00.000001+04:00";s.completedMetricSource(f.invocation);});
+test("catalog preserves empty filtered pages with a continuation",()=>{const f=fixture();s.assertMetricCatalog({...flags,contract:"metric-catalog/1",items:[],next_cursor:id(9)},f.source,f.company.resource_id,null);});
+for(const [label,mutate] of [
+ ["foreign company",item=>item.company=pin(9)],
+ ["other Function hash",item=>item.function={...item.function,content_hash:"e".repeat(64)}],
+ ["missing definition snapshot",item=>delete item.definition_snapshot],
+ ["invalid measurement selector",item=>item.definition.selector={kind:"MEASURE",key:"1invalid"}],
+])test(`catalog refuses ${label}`,()=>{const f=fixture();mutate(f.item);assert.throws(()=>s.assertMetricCatalog({...flags,contract:"metric-catalog/1",items:[f.item],next_cursor:null},f.source,f.company.resource_id,null));});
+test("request contains only exact pins and separate clocks",()=>{const f=fixture();f.item.metric.value="DO NOT SAVE";f.item.definition_snapshot.response="DO NOT SAVE";const r=s.metricObservationRequest(f.item,f.source);assert.deepEqual(Object.keys(r).sort(),["definition_snapshot","expected_receipt_hash","invocation_id","known_at","metric","valid_at"]);assert.equal(JSON.stringify(r).includes("DO NOT SAVE"),false);});
+test("saved historical reference excludes source, values and extra pin properties",()=>{const f=fixture();f.request.extra={value:20};f.request.metric.value=20;f.observation.function.privateValues=[2];f.observation.observation.company.other="payload";const saved=s.savedMetricObservation(f.observation,f.request),raw=JSON.stringify(saved);assert.equal(raw.includes('"value"'),false);assert.equal(raw.includes('source_result'),false);assert.equal(raw.includes('privateValues'),false);assert.equal(raw.includes('payload'),false);const parsed=s.parseSavedMetricObservation(raw,f.source,f.company.resource_id);assert.ok(parsed);assert.deepEqual(parsed.request.definition_snapshot,{valid_at:now,known_at:now});});
+test("historical reopen verifies saved run and definition time without today's catalog",()=>{const f=fixture(),saved=s.savedMetricObservation(f.observation,f.request);s.assertMetricObservation(f.observation,f.source,saved.request,f.company.resource_id,saved);const altered=structuredClone(f.observation);altered.run_id=`fcr_${"f".repeat(64)}`;assert.throws(()=>s.assertMetricObservation(altered,f.source,saved.request,f.company.resource_id,saved));});
+test("saved reference refuses other company and stale source receipt",()=>{const f=fixture(),raw=JSON.stringify(s.savedMetricObservation(f.observation,f.request));assert.equal(s.parseSavedMetricObservation(raw,f.source,id(98)),null);assert.equal(s.parseSavedMetricObservation(raw,{...f.source,receiptHash:"e".repeat(64)},f.company.resource_id),null);});
+for(const [label,mutate] of [
+ ["source receipt",v=>v.input_receipt_hash="e".repeat(64)],
+ ["definition time",v=>v.definition_snapshot={valid_at:old,known_at:old}],
+ ["foreign company",v=>v.observation.company=pin(9)],
+ ["unit",v=>v.observation.unit={kind:"COUNT",symbol:"rows"}],
+ ["value prefix",v=>v.observation.value="x1"],
+ ["count changed",v=>v.observation.value="2"],
+ ["contributor version",v=>v.observation.contributors=[pin(9)]],
+ ["retained source changed",v=>v.source_result={...v.source_result,total:2}],
+ ["authority promoted",v=>v.business_effect_authorized=true],
+])test(`observation refuses changed ${label}`,()=>{const f=fixture();mutate(f.observation);assert.throws(()=>s.assertMetricObservation(f.observation,f.source,f.request,f.company.resource_id,f.item));});
+function measureFixture(){const f=fixture();f.item.definition={...f.item.definition,selector:{kind:"MEASURE",key:"accepted_debit"},unit:{kind:"CURRENCY",reference:pin(7)},grain:"COMPANY_MOVEMENTS"};f.observation.definition=f.item.definition;f.observation.observation={...f.observation.observation,key:"accepted_debit",unit:f.item.definition.unit,grain:f.item.definition.grain,value:"0.00"};f.source.output.metric_outputs=[structuredClone(f.observation.observation)];f.observation.source_result=f.source.output;return f;}
+test("exact server decimal zero survives without frontend accounting",()=>{const f=measureFixture();s.assertMetricObservation(f.observation,f.source,f.request,f.company.resource_id,f.item);assert.equal(f.observation.observation.value,"0.00");});
+test("unavailable is distinct from zero; substituted unavailable value refuses",()=>{const f=measureFixture();f.observation.observation.state="UNAVAILABLE";f.observation.observation.value=null;f.source.output.metric_outputs=[structuredClone(f.observation.observation)];s.assertMetricObservation(f.observation,f.source,f.request,f.company.resource_id,f.item);f.observation.observation.value="0";assert.throws(()=>s.assertMetricObservation(f.observation,f.source,f.request,f.company.resource_id,f.item));});
+test("measurement cannot differ from exact declared Function output",()=>{const f=measureFixture();f.observation.observation.value="2.00";assert.throws(()=>s.assertMetricObservation(f.observation,f.source,f.request,f.company.resource_id,f.item));});
+function financeFixture(){const f=fixture();const choice={reference:{resource_id:f.fn.resource_id,version_id:f.fn.version_id},content_hash:f.fn.content_hash,display_name:"Accepted movements",attributes:{definition:{implementation_id:"finance.accepted-journal-movements/v1",company:{resource_id:f.company.resource_id,version_id:f.company.version_id},determinism:"DETERMINISTIC_FOR_PINNED_INPUTS",code_sha256:hash,dependency_sha256:plan}}};const metrics={company_id:f.company.resource_id,invocation_id:id(11),snapshot_at:now,reconciliation_receipt_hash:hash,result_sha256:plan};const request=s.acceptedMetricFunctionRequest(id(5),choice,metrics,f.company,old,old);f.invocation.receipt.request=request;f.invocation.output.accepted_movements={source_invocation_id:id(11),company_id:f.company.resource_id,journal_observed_at:now,reconciliation_receipt_hash:hash,result_sha256:plan};return {...f,choice,metrics,request};}
+test("finance request freezes new identity, separate clocks and expected hashes only",()=>{const f=financeFixture();assert.notEqual(f.request.request_id,f.metrics.invocation_id);assert.equal(f.request.known_at,old);assert.equal(f.request.accepted_movements.journal_snapshot_at,now);assert.equal(f.request.limit,50);assert.equal(f.request.offset,0);assert.equal('input_result' in f.request,false);assert.equal('content_hash' in f.request.function,false);assert.equal('metrics' in f.request,false);s.assertAcceptedMetricFunction(f.invocation,f.request,f.fn);});
+test("finance completed echo accepts equivalent snapshot timezone representation",()=>{const f=financeFixture();f.invocation.receipt.request=structuredClone(f.request);f.invocation.receipt.request.accepted_movements.journal_snapshot_at="2026-09-08T14:00:00.000001+04:00";s.assertAcceptedMetricFunction(f.invocation,f.request,f.fn);});
+test("finance rejects old source identity, wrong company version, and changed result receipt",()=>{const f=financeFixture();assert.throws(()=>s.acceptedMetricFunctionRequest(f.metrics.invocation_id,f.choice,f.metrics,f.company,old,old));assert.throws(()=>s.acceptedMetricFunctionRequest(id(5),f.choice,f.metrics,{...f.company,version_id:id(90)},old,old));f.invocation.output.accepted_movements.reconciliation_receipt_hash="e".repeat(64);assert.throws(()=>s.assertAcceptedMetricFunction(f.invocation,f.request,f.fn));});
+
+test("company-null count cannot cross the UI company selection",()=>{const f=fixture();f.item.company=null;f.observation.observation.company=null;const saved=s.savedMetricObservation(f.observation,f.request);assert.throws(()=>s.assertMetricCatalog({...flags,contract:"metric-catalog/1",items:[f.item],next_cursor:null},f.source,id(99),null));assert.throws(()=>s.assertMetricObservation(f.observation,f.source,f.request,id(99),f.item));assert.equal(s.parseSavedMetricObservation(JSON.stringify(saved),f.source,id(99)),null);assert.throws(()=>s.assertMetricCompany(f.source,""));});
+test("source scope must match every retained receipt scope field",()=>{const f=fixture();f.invocation.receipt.exact_scope={...f.invocation.receipt.exact_scope,ledger_id:id(99)};assert.throws(()=>s.completedMetricSource(f.invocation));delete f.invocation.output.scope;assert.throws(()=>s.completedMetricSource(f.invocation));});
+test("finance historical source reference restores without the current Function catalog",()=>{const f=financeFixture(),source=s.completedMetricSource(f.invocation),saved=s.savedFinancialMeasurementSource(source,f.request);const parsed=s.parseFinancialMeasurementSource(JSON.stringify(saved),f.metrics,f.company,old,old);assert.deepEqual(parsed,saved);s.assertAcceptedMetricFunction(f.invocation,parsed.request,parsed.function);});
+test("finance saved references cannot cross source revision, company or journal clock",()=>{const f=financeFixture(),saved=s.savedFinancialMeasurementSource(s.completedMetricSource(f.invocation),f.request),raw=JSON.stringify(saved);assert.equal(s.parseFinancialMeasurementSource(raw,{...f.metrics,result_sha256:"e".repeat(64)},f.company,old,old),null);assert.equal(s.parseFinancialMeasurementSource(raw,f.metrics,pin(9),old,old),null);assert.equal(s.parseFinancialMeasurementSource(raw,{...f.metrics,snapshot_at:old},f.company,old,old),null);});
+test("finance saved references strip accidental amounts and raw response properties",()=>{const f=financeFixture();f.request.accepted_movements.value="123";f.request.function.response={private:"value"};const saved=s.savedFinancialMeasurementSource(s.completedMetricSource(f.invocation),f.request);assert.equal(JSON.stringify(saved).includes('"value"'),false);assert.equal(JSON.stringify(saved).includes('response'),false);saved.request.financial_metrics={value:"123"};const parsed=s.parseFinancialMeasurementSource(JSON.stringify(saved),f.metrics,f.company,old,old);assert.equal(JSON.stringify(parsed).includes('financial_metrics'),false);});

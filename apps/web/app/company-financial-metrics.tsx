@@ -1,4 +1,5 @@
 "use client";
+import {AcceptedMovementMetricReview} from "./metric-observation-review";
 import {CaretDown,CaretRight} from "@phosphor-icons/react";
 import {useEffect,useMemo,useRef,useState} from "react";
 import type {AnalysisProjection,FinancialMetricResult} from "@finai/contracts";
@@ -54,6 +55,7 @@ export default function CompanyFinancialMetrics({token,companyId,reviews,onData}
    {expanded&&children.length>6&&<nav className="home-account-pages" aria-label="Contributing accounts"><button disabled={currentPage===0} onClick={()=>setPage(currentPage-1)}>Previous accounts</button><span>{currentPage*6+1}–{Math.min((currentPage+1)*6,children.length)} of {children.length} matching accounts</span><button disabled={(currentPage+1)*6>=children.length} onClick={()=>setPage(currentPage+1)}>Next accounts</button></nav>}
    <footer className="home-metric-footer"><span>{result.coverage.accepted_journals} accepted journals · {result.coverage.unmatched_source_rows} unmatched source rows · {result.coverage.excluded_source_rows} excluded</span><button className="g8-link" onClick={()=>review()}>Open financial source review</button></footer>
    <p className="home-scope-note">Accepted movements only. Opening/closing balances and financial statements are not established.</p><details className="home-metric-provenance"><summary>Advanced · exact authority, coverage and revision</summary><p>Code-defined movement recipe; no new canonical MetricDefinition has been published.</p><pre>{JSON.stringify({selection:result.selection,display_context:result.display_context,binding:result.binding,source_function:result.source_function,definitions:result.definitions,coverage:result.coverage,result_sha256:result.result_sha256,implementation_sha256:result.implementation_sha256,reconciliation_receipt_hash:result.reconciliation_receipt_hash,journals:result.journals},null,2)}</pre></details>
+   <AcceptedMovementMetricReview token={token} companyId={companyId} metrics={result} projection={shown.projection} onSource={()=>review()}/>
   </>}
  </div>;
 }
