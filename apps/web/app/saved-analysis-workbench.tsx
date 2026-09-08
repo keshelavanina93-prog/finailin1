@@ -4,7 +4,7 @@ import type {CanonicalResource,ObjectSetQuery} from "@finai/contracts";
 import {financeReportReference,type FinanceReportReference} from "./finance-report-reference";
 import RetainedBindingAction from "./retained-binding-action";
 import WorksheetAnalysisResult,{type WorksheetResult} from "./worksheet-analysis-result";
-import SemanticAnalysisWorkspace from "./semantic-analysis-workspace";
+import {useSourceReview} from "./source-review-navigation";
 import {displayName} from "./display-name";
 import "./saved-analysis-workbench.css";
 type Pin={resource_id:string;version_id:string};
@@ -33,7 +33,8 @@ function retainedInput(output:BaseOutput):boolean {return (output.coverage==="RE
 type Invocation={invocation_id:string;status:"SUCCEEDED"|"FAILED"|"INTENT_RETAINED";receipt_hash:string|null;receipt:{request?:Request;recorded_at?:string;failure_code?:string};output:Output|null;current_use_authorized:false;business_effect_authorized:false};
 type Props={onInspectAnalysis?:(reference:{resource_id:string;version_id:string;known_at:string})=>void;companyId?:string;onOpenFinance?:(reference:FinanceReportReference)=>void;onProposal?:(id:string)=>void;initialInvocationId?:string;token:string;companyName:string;onInspect:(resource:CanonicalResource,knownAt:string)=>void;onTrace:(resource:CanonicalResource,knownAt:string)=>void};
 export default function SavedAnalysisWorkbench(props:Props){return <Workbench key={`${props.token}:${props.initialInvocationId??""}`} {...props}/>;}
-function Workbench({onInspectAnalysis,companyId,onOpenFinance,initialInvocationId,token,companyName,onInspect,onTrace,onProposal}:Props){
+function Workbench({companyId,onOpenFinance,initialInvocationId,token,companyName,onInspect,onTrace,onProposal}:Props){
+ const openSourceReview=useSourceReview();
  const [financeResult,setFinanceResult]=useState<FinanceReportReference|null>(null);
  const [library,setLibrary]=useState<SavedFunction[]>([]);const [after,setAfter]=useState<string|null>(null);const [next,setNext]=useState<string|null>(null);const [libraryRevision,setLibraryRevision]=useState(0);const [libraryBusy,setLibraryBusy]=useState(true);const [libraryError,setLibraryError]=useState("");
  const [selected,setSelected]=useState("");const [validAt,setValidAt]=useState(()=>new Date().toISOString());const [knownAt,setKnownAt]=useState(()=>new Date().toISOString());
@@ -67,7 +68,7 @@ function Workbench({onInspectAnalysis,companyId,onOpenFinance,initialInvocationI
   <div className="saved-analysis-actions">{!request?<button disabled={busy||!selected} onClick={start}>Run and retain analysis</button>:<><button disabled={busy} onClick={()=>run(request)}>{result?.status==="INTENT_RETAINED"?"Resume retained intent":"Retry exact run"}</button><button disabled={busy} onClick={()=>{setRequest(null);setResult(null);setError("");}}>Start a new analysis</button></>}</div>
   <details open={result||financeResult?false:undefined}><summary>Advanced: reopen a retained invocation</summary><label>Invocation reference<input value={saved} disabled={busy} onChange={event=>setSaved(event.target.value)}/></label><button disabled={busy||!/^[a-f0-9-]{36}$/i.test(saved)} onClick={()=>{setRequest(null);run(null,saved);}}>Reopen retained result</button></details>
   {busy&&<p role="status">Awaiting the retained run response…</p>}{error&&<p role="alert">{error}</p>}{result&&<><p>{result.status==="INTENT_RETAINED"?"Invocation intent is retained; completion is not established.":result.status==="FAILED"?`Execution failed: ${result.receipt.failure_code??"reason unavailable"}.` :"Analysis result retained."}</p><details><summary>Exact invocation evidence</summary><p>{result.invocation_id}</p><p>{result.receipt_hash??"No terminal receipt hash"}</p>{output&&<p>{output.run_id}</p>}</details></>}
-  {companyId&&(result?.status==="SUCCEEDED"||financeResult)&&<SemanticAnalysisWorkspace onInspect={onInspectAnalysis} token={token} companyId={companyId} invocationId={financeResult?.invocationId??result!.invocation_id}/> }
+  {companyId&&(result?.status==="SUCCEEDED"||financeResult)&&<div className="saved-analysis-actions"><button disabled={busy} onClick={()=>openSourceReview({companyId,invocationId:financeResult?.invocationId??result!.invocation_id})}>Open source review</button></div>}
   <details><summary>Advanced retained result details</summary>
   {financeResult&&<section aria-label="Retained financial report"><h4>Posted account movements</h4><p>The retained workflow result is available with its account breakdown, coverage and original source cells.</p>{onOpenFinance?<button onClick={()=>onOpenFinance(financeResult)}>Open in Finance</button>:<p>Open Finance for the company that owns this reviewed source.</p>}</section>}
   {output&&output.retained_provenance_authority!==undefined&&<SourceHistoryAuthority rows={output.retained_provenance_authority}/>}
