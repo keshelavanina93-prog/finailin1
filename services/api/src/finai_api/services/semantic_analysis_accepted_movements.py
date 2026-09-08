@@ -156,12 +156,16 @@ def project_retained(
                     cells=[
                         EvidenceCell(label="Source coordinate", value=journal.source_coordinate),
                         *[
-                            EvidenceCell(label="Journal line version", value=f"{ref.resource_id}@{ref.version_id}")
+                            EvidenceCell(
+                                label="Journal line version",
+                                value=f"{ref.resource_id}@{ref.version_id}",
+                            )
                             for ref in journal.lines
                         ],
                         *[
                             EvidenceCell(
-                                label="Dimension policy version", value=f"{ref.resource_id}@{ref.version_id}"
+                                label="Dimension policy version",
+                                value=f"{ref.resource_id}@{ref.version_id}",
                             )
                             for ref in journal.dimension_policies
                         ],
