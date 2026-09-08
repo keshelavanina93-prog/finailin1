@@ -1,4 +1,11 @@
-"""Versioned platform definitions, never enterprise/company facts."""
+"""Versioned platform definitions, never enterprise/company facts.
+
+Finance object/link API names used by hydration live in
+packages/contracts/catalog/ontology-catalog.g8-finance.v1.json
+and are loaded via finance_catalog_loader. That JSON is the compiler
+pin. This module remains the platform SchemaDefinition/LinkType seed.
+Company and CoA instances belong in constructions/candidate/, not here.
+"""
 
 from typing import Any
 from uuid import UUID, uuid5

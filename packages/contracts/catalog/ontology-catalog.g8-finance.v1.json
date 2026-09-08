@@ -1,0 +1,442 @@
+{
+  "catalog_id": "g8.ontology.finance.v1",
+  "catalog_version": 1,
+  "status": "SPEC_ACCEPTED",
+  "coa_pin_sha256": "607e37da8aa8e05687c9898cc1577db070c082ece8281c7bd3a43e725aac73df",
+  "interfaces": [
+    {
+      "api_name": "IResource",
+      "properties": [
+        { "name": "id", "value_type": "string", "required": true },
+        { "name": "type", "value_type": "string", "required": true },
+        { "name": "tenant_id", "value_type": "string", "required": true },
+        { "name": "version_id", "value_type": "string", "required": true },
+        { "name": "authority_state", "value_type": "enum:CANDIDATE|REVIEWED|ACCEPTED|REJECTED|SUPERSEDED|WITHDRAWN", "required": true },
+        { "name": "epistemic", "value_type": "enum:OBSERVED|DERIVED|INFERRED|UNAVAILABLE", "required": true },
+        { "name": "valid_from", "value_type": "datetime" },
+        { "name": "valid_to", "value_type": "datetime" },
+        { "name": "known_at", "value_type": "datetime" },
+        { "name": "recorded_at", "value_type": "datetime" }
+      ]
+    },
+    { "api_name": "IVersioned", "properties": [{ "name": "supersedes_version_id", "value_type": "string" }] },
+    { "api_name": "IIdentified", "properties": [{ "name": "display_name", "value_type": "string", "required": true }] },
+    { "api_name": "ISourced", "properties": [{ "name": "source_record_ids", "value_type": "string[]", "required": true }] },
+    { "api_name": "IDimensioned", "properties": [{ "name": "dimension_bindings", "value_type": "DimensionBinding[]" }] },
+    { "api_name": "IMonetary", "properties": [
+      { "name": "amount", "value_type": "decimal_string", "required": true },
+      { "name": "currency_id", "value_type": "string", "required": true },
+      { "name": "scale", "value_type": "integer", "required": true }
+    ]},
+    { "api_name": "IAlignable", "properties": [{ "name": "alignment_ids", "value_type": "string[]" }] },
+    { "api_name": "IPublishable", "properties": [{ "name": "publication_id", "value_type": "string" }] },
+    { "api_name": "IQueryable", "properties": [] }
+  ],
+  "object_types": [
+    {
+      "api_name": "LegalEntity",
+      "type_group": "g8.enterprise",
+      "implements": ["IResource", "IIdentified", "IVersioned", "IAlignable"],
+      "primary_key": "id",
+      "title_property": "legal_name",
+      "properties": [
+        { "name": "legal_name", "value_type": "string", "required": true },
+        { "name": "short_code", "value_type": "string" },
+        { "name": "registration_id", "value_type": "string" },
+        { "name": "tax_id", "value_type": "string" },
+        { "name": "functional_currency_id", "value_type": "string", "required": true },
+        { "name": "is_consolidation_parent", "value_type": "boolean" },
+        { "name": "domain_pack", "value_type": "enum:PETROLEUM|GAS|SHARED_FINANCE|NONE" }
+      ]
+    },
+    {
+      "api_name": "EnterpriseGroup",
+      "type_group": "g8.enterprise",
+      "implements": ["IResource", "IIdentified"],
+      "primary_key": "id",
+      "title_property": "legal_name",
+      "properties": [
+        { "name": "legal_name", "value_type": "string", "required": true },
+        { "name": "presentation_currency_id", "value_type": "string" }
+      ]
+    },
+    {
+      "api_name": "Ledger",
+      "type_group": "g8.finance",
+      "implements": ["IResource", "IIdentified"],
+      "primary_key": "id",
+      "title_property": "code",
+      "properties": [
+        { "name": "legal_entity_id", "value_type": "string", "required": true },
+        { "name": "code", "value_type": "string", "required": true },
+        { "name": "book_kind", "value_type": "enum:STATUTORY|TAX|MANAGEMENT|BUDGET|CONSOLIDATION", "required": true }
+      ]
+    },
+    {
+      "api_name": "FiscalPeriod",
+      "type_group": "g8.time",
+      "implements": ["IResource"],
+      "primary_key": "id",
+      "title_property": "code",
+      "properties": [
+        { "name": "code", "value_type": "string", "required": true },
+        { "name": "kind", "value_type": "enum:MONTH|YEAR", "required": true },
+        { "name": "start_date", "value_type": "date", "required": true },
+        { "name": "end_date", "value_type": "date", "required": true },
+        { "name": "is_closed", "value_type": "boolean" }
+      ]
+    },
+    {
+      "api_name": "ScenarioVersion",
+      "type_group": "g8.time",
+      "implements": ["IResource", "IIdentified"],
+      "primary_key": "id",
+      "title_property": "code",
+      "properties": [
+        { "name": "code", "value_type": "string", "required": true },
+        { "name": "kind", "value_type": "enum:ACTUAL|BUDGET|FORECAST|ADJUSTMENT", "required": true }
+      ]
+    },
+    {
+      "api_name": "Currency",
+      "type_group": "g8.money",
+      "implements": ["IResource"],
+      "primary_key": "id",
+      "title_property": "iso_code",
+      "properties": [
+        { "name": "iso_code", "value_type": "string", "pattern": "^[A-Z]{3}$", "required": true }
+      ]
+    },
+    {
+      "api_name": "Party",
+      "type_group": "g8.party",
+      "implements": ["IResource", "IIdentified", "IAlignable"],
+      "primary_key": "id",
+      "title_property": "display_name",
+      "properties": [
+        { "name": "party_kind", "value_type": "enum:LEGAL_ENTITY|COUNTERPARTY|EMPLOYEE|REGULATOR|OTHER", "required": true },
+        { "name": "tax_id", "value_type": "string" }
+      ]
+    },
+    {
+      "api_name": "Product",
+      "type_group": "g8.product",
+      "implements": ["IResource", "IIdentified"],
+      "primary_key": "id",
+      "title_property": "display_name",
+      "properties": [
+        { "name": "unit_id", "value_type": "string" },
+        { "name": "family", "value_type": "enum:PETROL|DIESEL|BITUMEN|CNG|LPG|NATURAL_GAS|OTHER|UNKNOWN" },
+        { "name": "channel", "value_type": "enum:WHOLESALE|RETAIL|SOCIAL|COMMERCIAL|DISTRIBUTION|OTHER|UNKNOWN" },
+        { "name": "restricted_entity_id", "value_type": "string" }
+      ]
+    },
+    {
+      "api_name": "Segment",
+      "type_group": "g8.product",
+      "implements": ["IResource"],
+      "primary_key": "id",
+      "title_property": "code",
+      "properties": [
+        { "name": "code", "value_type": "enum:SOCIAL|COMMERCIAL_RETAIL|COMMERCIAL_WHOLESALE|DISTRIBUTION|CORPORATE|OTHER", "required": true }
+      ]
+    },
+    {
+      "api_name": "LocalChartOfAccounts",
+      "type_group": "g8.finance",
+      "implements": ["IResource", "ISourced"],
+      "primary_key": "id",
+      "title_property": "id",
+      "properties": [
+        { "name": "legal_entity_id", "value_type": "string" },
+        { "name": "source_hash", "value_type": "sha256", "required": true },
+        { "name": "account_count_observed", "value_type": "integer" }
+      ]
+    },
+    {
+      "api_name": "LocalAccount",
+      "type_group": "g8.finance",
+      "implements": ["IResource", "IIdentified", "ISourced"],
+      "primary_key": "id",
+      "title_property": "code",
+      "properties": [
+        { "name": "chart_id", "value_type": "string", "required": true },
+        { "name": "code", "value_type": "string", "required": true },
+        { "name": "name_ka", "value_type": "string" },
+        { "name": "name_ru", "value_type": "string" },
+        { "name": "nature", "value_type": "enum:A|P|AP" },
+        { "name": "off_balance", "value_type": "boolean" },
+        { "name": "currency_flag", "value_type": "boolean" },
+        { "name": "quantity_flag", "value_type": "boolean" },
+        { "name": "is_group", "value_type": "boolean" }
+      ]
+    },
+    {
+      "api_name": "GroupAccount",
+      "type_group": "g8.finance",
+      "implements": ["IResource", "IIdentified"],
+      "primary_key": "id",
+      "title_property": "code",
+      "properties": [
+        { "name": "code", "value_type": "string", "required": true },
+        { "name": "ifrs_class", "value_type": "string" }
+      ]
+    },
+    {
+      "api_name": "FinancialStatementItem",
+      "type_group": "g8.report",
+      "implements": ["IResource"],
+      "primary_key": "id",
+      "title_property": "code",
+      "properties": [
+        { "name": "statement_id", "value_type": "enum:IS|BS|CF|EQUITY", "required": true },
+        { "name": "code", "value_type": "string", "required": true },
+        { "name": "sign", "value_type": "enum:NATURAL|REVERSE" },
+        { "name": "is_parent_control", "value_type": "boolean" }
+      ]
+    },
+    {
+      "api_name": "ReportingLine",
+      "type_group": "g8.report",
+      "implements": ["IResource"],
+      "primary_key": "id",
+      "title_property": "code",
+      "properties": [
+        { "name": "projection_id", "value_type": "string", "required": true },
+        { "name": "fs_item_id", "value_type": "string" },
+        { "name": "formula_ref", "value_type": "string" }
+      ]
+    },
+    {
+      "api_name": "AccountMappingVersion",
+      "type_group": "g8.finance",
+      "implements": ["IResource", "IVersioned", "ISourced"],
+      "primary_key": "id",
+      "title_property": "id",
+      "properties": [
+        { "name": "local_account_id", "value_type": "string", "required": true },
+        { "name": "group_account_id", "value_type": "string" },
+        { "name": "fs_item_id", "value_type": "string" },
+        { "name": "reporting_line_id", "value_type": "string" },
+        { "name": "projection_code", "value_type": "enum:CORPORATE_MR|PETROLEUM_OPERATING_PL|GAS_GROUP_PL|STATUTORY_BS|STATUTORY_IS|GAS_CF" }
+      ]
+    },
+    {
+      "api_name": "AccountDimensionPolicy",
+      "type_group": "g8.dimension",
+      "implements": ["IResource", "IVersioned"],
+      "primary_key": "id",
+      "title_property": "account_family_pattern",
+      "properties": [
+        { "name": "account_family_pattern", "value_type": "string", "required": true },
+        { "name": "required_dimension_ids", "value_type": "string[]", "required": true },
+        { "name": "evidence_state", "value_type": "enum:OBSERVED_LABEL_ONLY|RULE_EVIDENCED|UNKNOWN", "required": true },
+        { "name": "slot_note", "value_type": "string" }
+      ]
+    },
+    {
+      "api_name": "CanonicalJournalEntry",
+      "type_group": "g8.finance",
+      "implements": ["IResource", "ISourced"],
+      "primary_key": "id",
+      "title_property": "id",
+      "properties": [
+        { "name": "legal_entity_id", "value_type": "string", "required": true },
+        { "name": "ledger_id", "value_type": "string", "required": true },
+        { "name": "period_id", "value_type": "string", "required": true },
+        { "name": "effective_date", "value_type": "date", "required": true },
+        { "name": "source_module", "value_type": "enum:M1|M2|M3|M4|M5|M6|M7|M8|M9|M10|M11|M12|M13|M14|M15", "required": true },
+        { "name": "scenario_version_id", "value_type": "string", "required": true },
+        { "name": "mapping_version_id", "value_type": "string" }
+      ]
+    },
+    {
+      "api_name": "CanonicalJournalLine",
+      "type_group": "g8.finance",
+      "implements": ["IResource", "ISourced", "IDimensioned", "IMonetary"],
+      "primary_key": "id",
+      "title_property": "id",
+      "properties": [
+        { "name": "entry_id", "value_type": "string", "required": true },
+        { "name": "line_no", "value_type": "integer", "required": true },
+        { "name": "side", "value_type": "enum:DR|CR", "required": true },
+        { "name": "local_account_id", "value_type": "string", "required": true },
+        { "name": "amount_transaction", "value_type": "decimal_string", "required": true },
+        { "name": "currency_transaction_id", "value_type": "string", "required": true },
+        { "name": "amount_functional", "value_type": "decimal_string" },
+        { "name": "currency_functional_id", "value_type": "string" },
+        { "name": "quantity", "value_type": "decimal_string" },
+        { "name": "unit_id", "value_type": "string" },
+        { "name": "intercompany_partner_id", "value_type": "string" },
+        { "name": "grain", "value_type": "const:JOURNAL_LINE", "required": true }
+      ]
+    },
+    {
+      "api_name": "AccountPeriodFact",
+      "type_group": "g8.fact",
+      "implements": ["IResource", "ISourced", "IMonetary"],
+      "primary_key": "id",
+      "title_property": "id",
+      "properties": [
+        { "name": "grain", "value_type": "const:ACCOUNT_PERIOD", "required": true },
+        { "name": "local_account_id", "value_type": "string", "required": true },
+        { "name": "period_id", "value_type": "string", "required": true },
+        { "name": "opening", "value_type": "decimal_string" },
+        { "name": "debit_turn", "value_type": "decimal_string" },
+        { "name": "credit_turn", "value_type": "decimal_string" },
+        { "name": "closing", "value_type": "decimal_string" },
+        { "name": "scenario_version_id", "value_type": "string", "required": true }
+      ]
+    },
+    {
+      "api_name": "ReportLinePeriodFact",
+      "type_group": "g8.fact",
+      "implements": ["IResource", "ISourced", "IMonetary"],
+      "primary_key": "id",
+      "title_property": "id",
+      "properties": [
+        { "name": "grain", "value_type": "const:REPORT_LINE_PERIOD", "required": true },
+        { "name": "projection_code", "value_type": "string", "required": true },
+        { "name": "reporting_line_id", "value_type": "string", "required": true },
+        { "name": "period_id", "value_type": "string", "required": true },
+        { "name": "scenario_version_id", "value_type": "string", "required": true },
+        { "name": "mapping_version_id", "value_type": "string", "required": true }
+      ]
+    },
+    {
+      "api_name": "PlanningCellFact",
+      "type_group": "g8.fact",
+      "implements": ["IResource", "ISourced"],
+      "primary_key": "id",
+      "title_property": "id",
+      "properties": [
+        { "name": "grain", "value_type": "const:PLANNING_CELL", "required": true },
+        { "name": "budget_article_id", "value_type": "string", "required": true },
+        { "name": "legal_entity_id", "value_type": "string", "required": true },
+        { "name": "period_id", "value_type": "string", "required": true },
+        { "name": "measure", "value_type": "enum:GEL|M3|PRICE|QTY" }
+      ]
+    },
+    {
+      "api_name": "SourceEvidence",
+      "type_group": "g8.evidence",
+      "implements": ["IResource", "IAlignable"],
+      "primary_key": "id",
+      "title_property": "filename",
+      "properties": [
+        { "name": "filename", "value_type": "string", "required": true },
+        { "name": "bytes_hash", "value_type": "sha256", "required": true }
+      ]
+    },
+    {
+      "api_name": "SourceRecord",
+      "type_group": "g8.evidence",
+      "implements": ["IResource", "IAlignable"],
+      "primary_key": "id",
+      "title_property": "id",
+      "properties": [
+        { "name": "evidence_id", "value_type": "string", "required": true },
+        { "name": "sheet", "value_type": "string" },
+        { "name": "row", "value_type": "integer" },
+        { "name": "content_hash", "value_type": "sha256" }
+      ]
+    },
+    {
+      "api_name": "Facility",
+      "type_group": "g8.enterprise",
+      "implements": ["IResource", "IIdentified", "IAlignable"],
+      "primary_key": "id",
+      "title_property": "display_name",
+      "properties": [
+        { "name": "location_kind", "value_type": "enum:REGION|STATION|WAREHOUSE|TERMINAL|OFFICE|NETWORK" }
+      ]
+    },
+    {
+      "api_name": "OntologyAlignment",
+      "type_group": "g8.federation",
+      "implements": ["IResource", "IVersioned"],
+      "primary_key": "id",
+      "title_property": "id",
+      "properties": [
+        { "name": "g8_type", "value_type": "string", "required": true },
+        { "name": "external_iri", "value_type": "string", "required": true },
+        { "name": "relation", "value_type": "enum:ADOPTS|SPECIALIZES|IMPLEMENTS|EXACT_MATCH|CLOSE_MATCH|BROADER|NARROWER|RELATED", "required": true },
+        { "name": "release_tag", "value_type": "string" }
+      ]
+    }
+  ],
+  "link_types": [
+    { "api_name": "HAS_LEGAL_ENTITY", "from_type": "EnterpriseGroup", "to_type": "LegalEntity", "cardinality": "ONE_TO_MANY" },
+    { "api_name": "HAS_LEDGER", "from_type": "LegalEntity", "to_type": "Ledger", "cardinality": "ONE_TO_MANY" },
+    { "api_name": "USES_FUNCTIONAL_CURRENCY", "from_type": "LegalEntity", "to_type": "Currency", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "USES_CHART_OF_ACCOUNTS", "from_type": "Ledger", "to_type": "LocalChartOfAccounts", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "IN_CHART", "from_type": "LocalAccount", "to_type": "LocalChartOfAccounts", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "HAS_POLICY", "from_type": "LocalAccount", "to_type": "AccountDimensionPolicy", "cardinality": "ONE_TO_MANY" },
+    { "api_name": "MAPS_TO", "from_type": "LocalAccount", "to_type": "GroupAccount", "cardinality": "MANY_TO_MANY", "constraint": "via AccountMappingVersion" },
+    { "api_name": "MAPS_FS", "from_type": "LocalAccount", "to_type": "FinancialStatementItem", "cardinality": "MANY_TO_MANY", "constraint": "via AccountMappingVersion" },
+    { "api_name": "BELONGS_TO_ENTITY", "from_type": "CanonicalJournalEntry", "to_type": "LegalEntity", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "IN_LEDGER", "from_type": "CanonicalJournalEntry", "to_type": "Ledger", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "IN_PERIOD", "from_type": "CanonicalJournalEntry", "to_type": "FiscalPeriod", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "IN_SCENARIO", "from_type": "CanonicalJournalEntry", "to_type": "ScenarioVersion", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "HAS_LINE", "from_type": "CanonicalJournalEntry", "to_type": "CanonicalJournalLine", "cardinality": "ONE_TO_MANY" },
+    { "api_name": "POSTED_ON", "from_type": "CanonicalJournalLine", "to_type": "LocalAccount", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "CONCERNS_PARTY", "from_type": "CanonicalJournalLine", "to_type": "Party", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "CONCERNS_PRODUCT", "from_type": "CanonicalJournalLine", "to_type": "Product", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "INTERCOMPANY_WITH", "from_type": "CanonicalJournalLine", "to_type": "LegalEntity", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "DERIVED_FROM", "from_type": "ISourced", "to_type": "SourceRecord", "cardinality": "MANY_TO_MANY" },
+    { "api_name": "RECORD_IN", "from_type": "SourceRecord", "to_type": "SourceEvidence", "cardinality": "MANY_TO_ONE" },
+    { "api_name": "ALIGNED_TO", "from_type": "IAlignable", "to_type": "OntologyAlignment", "cardinality": "ONE_TO_MANY" },
+    { "api_name": "PARENT_OF", "from_type": "FinancialStatementItem", "to_type": "FinancialStatementItem", "cardinality": "ONE_TO_MANY", "constraint": "parent is reconciliation control" }
+  ],
+  "object_sets": [
+    { "api_name": "OS.LegalEntities.Tenant", "base_type": "LegalEntity", "default_filters": ["tenant"] },
+    { "api_name": "OS.Entities.GasGroup", "base_type": "LegalEntity", "default_filters": ["domain_pack=GAS"] },
+    { "api_name": "OS.Entities.Petroleum", "base_type": "LegalEntity", "default_filters": ["domain_pack=PETROLEUM"] },
+    { "api_name": "OS.Accounts.Chart", "base_type": "LocalAccount", "default_filters": ["chart_id"] },
+    { "api_name": "OS.Journals.Accepted", "base_type": "CanonicalJournalLine", "default_filters": ["authority_state=ACCEPTED"] },
+    { "api_name": "OS.Facts.AccountPeriod", "base_type": "AccountPeriodFact", "default_filters": ["grain=ACCOUNT_PERIOD"] },
+    { "api_name": "OS.Facts.NoAccountCode", "base_type": "CanonicalJournalLine", "default_filters": ["local_account_id unknown"] },
+    { "api_name": "OS.Reports.CorporateMR", "base_type": "ReportLinePeriodFact", "default_filters": ["projection_code=CORPORATE_MR"] },
+    { "api_name": "OS.Reports.PetroleumPL", "base_type": "ReportLinePeriodFact", "default_filters": ["projection_code=PETROLEUM_OPERATING_PL"] },
+    { "api_name": "OS.Reports.GasPL", "base_type": "ReportLinePeriodFact", "default_filters": ["projection_code=GAS_GROUP_PL"] }
+  ],
+  "functions": [
+    { "api_name": "fn.tb_from_journal", "input_grain": "JOURNAL_LINE", "output": "ACCOUNT_PERIOD", "forbidden": "invent TRANSACTION from TB" },
+    { "api_name": "fn.ytd_flow", "input_grain": "ACCOUNT_PERIOD movements", "output": "YTD flow", "forbidden": "YTD of YTD" },
+    { "api_name": "fn.closing_as_of", "input_grain": "ACCOUNT_PERIOD", "output": "stock", "forbidden": "sum closings across periods" },
+    { "api_name": "fn.classify_fact", "input_grain": "chaotic row", "output": "CANDIDATE line slots", "forbidden": "coerce unknown to 0" },
+    { "api_name": "fn.validate_dimensions", "input_grain": "JOURNAL_LINE", "output": "pass|fail", "forbidden": "universal subkonto 1/2/3" },
+    { "api_name": "fn.petroleum_pl", "input_grain": "classified lines", "output": "PETROLEUM_OPERATING_PL snapshot", "forbidden": "mix CORPORATE_MR formulas" },
+    { "api_name": "fn.corporate_mr", "input_grain": "FS mappings", "output": "CORPORATE_MR snapshot", "forbidden": "mix petroleum tree" },
+    { "api_name": "fn.reconcile_parent", "input_grain": "FS_ITEM_PERIOD", "output": "control variance", "forbidden": "treat parent as additive fact" }
+  ],
+  "actions": [
+    { "api_name": "act.promote_object_version", "changes_authority": true, "nyx_may_execute": false },
+    { "api_name": "act.rollback_publication", "changes_authority": true, "nyx_may_execute": false },
+    { "api_name": "act.accept_mapping_version", "changes_authority": true, "nyx_may_execute": false },
+    { "api_name": "act.propose_alignment", "changes_authority": false, "nyx_may_execute": true },
+    { "api_name": "act.classify_chaotic_row", "changes_authority": false, "nyx_may_execute": true }
+  ],
+  "invariants": [
+    "Same LocalAccount.code in two LegalEntities are two resources.",
+    "Off-balance excluded from statutory BS totals.",
+    "Parent FS totals are reconciliation controls until proven.",
+    "Unknown stays unknown.",
+    "No TRANSACTION drill invented from ACCOUNT_PERIOD.",
+    "Do not sum closing across periods.",
+    "Do not accumulate YTD from YTD.",
+    "TB does not authorize CF or full statement.",
+    "CORPORATE_MR and PETROLEUM_OPERATING_PL are separate MappingVersions.",
+    "Subkonto label is not a posting rule until RULE_EVIDENCED.",
+    "Do not mix TB + GL + sales + inventory as one fact.",
+    "External IRIs never replace G8 IDs.",
+    "NYX cannot promote authority.",
+    "January2026 source_use is WITHDRAWN.",
+    "gist is not loaded. FIBO master_2026Q2 is pin-only."
+  ],
+  "federation": {
+    "fibo_release_tag": "master_2026Q2",
+    "gist": "DO_NOT_LOAD",
+    "first_slice_alignments_status": "DRAFT_CANDIDATE"
+  }
+}

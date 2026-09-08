@@ -1,0 +1,72 @@
+{
+  "construction_id": "g8.candidate.seg-entities",
+  "status": "CANDIDATE",
+  "epistemic": "OBSERVED",
+  "not_catalog": true,
+  "note": "Public-site structure only. No ownership percents. Kulevi is not under Energy Georgia. SGGD/Sakorggazi/Telavgazi stay separate.",
+  "mutations": [
+    {
+      "object_type": "EnterpriseGroup",
+      "identity_key": "SEG-GROUP",
+      "display_name": "SOCAR Energy Georgia Group",
+      "authority_state": "CANDIDATE",
+      "attributes": { "legal_name": "SOCAR Energy Georgia", "jurisdiction": "GE" }
+    },
+    {
+      "object_type": "LegalEntity",
+      "identity_key": "SEG",
+      "display_name": "SOCAR Energy Georgia LLC",
+      "authority_state": "CANDIDATE",
+      "attributes": { "legal_name": "SOCAR Energy Georgia LLC", "short_code": "SEG", "domain_pack": "SHARED_FINANCE", "role": "GROUP_PARENT", "est": "2006" }
+    },
+    {
+      "object_type": "LegalEntity",
+      "identity_key": "SGP",
+      "display_name": "SOCAR Georgia Petroleum LLC",
+      "authority_state": "CANDIDATE",
+      "attributes": { "legal_name": "SOCAR Georgia Petroleum LLC", "short_code": "SGP", "domain_pack": "PETROLEUM", "role": "OIL_DOWNSTREAM", "est": "2006", "parent_key": "SEG" }
+    },
+    {
+      "object_type": "LegalEntity",
+      "identity_key": "SGG",
+      "display_name": "SOCAR Georgia Gas LLC",
+      "authority_state": "CANDIDATE",
+      "attributes": { "legal_name": "SOCAR Georgia Gas LLC", "short_code": "SGG", "domain_pack": "GAS", "role": "DSO_AND_SUPPLIER", "est": "2007", "parent_key": "SEG", "gnerc": "DISTRIBUTION_LICENSEE" }
+    },
+    {
+      "object_type": "LegalEntity",
+      "identity_key": "SGGD",
+      "display_name": "SOCAR Georgia Gas Distribution JSC",
+      "authority_state": "CANDIDATE",
+      "attributes": { "legal_name": "SOCAR Georgia Gas Distribution JSC", "short_code": "SGGD", "domain_pack": "GAS", "role": "GAS_TRADER", "former_name": "Itera-Georgia", "rename": "2013-05", "parent_key": null }
+    },
+    {
+      "object_type": "LegalEntity",
+      "identity_key": "SOG",
+      "display_name": "Sakorggazi JSC",
+      "authority_state": "CANDIDATE",
+      "attributes": { "legal_name": "Sakorggazi JSC", "short_code": "SOG", "domain_pack": "GAS", "role": "DSO_AND_SUPPLIER", "gnerc": "DISTRIBUTION_LICENSEE", "parent_key": null }
+    },
+    {
+      "object_type": "LegalEntity",
+      "identity_key": "TELAVGAS",
+      "display_name": "Telavgazi LLC",
+      "authority_state": "CANDIDATE",
+      "attributes": { "legal_name": "Telavgazi LLC", "short_code": "TELAVGAS", "domain_pack": "GAS", "role": "LOCAL_DSO", "gnerc": "DISTRIBUTION_LICENSEE", "geography": "Telavi", "acquired_by_key_reported": "SGG", "acquired_year_reported": 2018 }
+    },
+    {
+      "object_type": "LegalEntity",
+      "identity_key": "SGS",
+      "display_name": "SOCAR Georgia Security",
+      "authority_state": "CANDIDATE",
+      "attributes": { "legal_name": "SOCAR Georgia Security", "short_code": "SGS", "domain_pack": "SHARED_FINANCE", "role": "SECURITY", "parent_key": "SEG" }
+    },
+    {
+      "object_type": "LegalEntity",
+      "identity_key": "BST",
+      "display_name": "Black Sea Terminal LLC",
+      "authority_state": "CANDIDATE",
+      "attributes": { "legal_name": "Black Sea Terminal LLC", "short_code": "BST", "role": "KULEVI_TERMINAL", "parent_key": "SOCAR_BAKU_NOT_SEG", "note": "Not a child of Energy Georgia" }
+    }
+  ]
+}

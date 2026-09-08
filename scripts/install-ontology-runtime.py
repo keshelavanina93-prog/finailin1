@@ -1,4 +1,11 @@
-"""Install missing ontology contracts through the existing independent publication path."""
+"""Install missing ontology contracts through the existing independent publication path.
+
+Hydration compiler pin for finance object/link API names:
+  packages/contracts/catalog/ontology-catalog.g8-finance.v1.json
+loaded by finai_api.domain.finance_catalog_loader.
+
+Do not install constructions/candidate/* as PLATFORM_DEFINITION.
+"""
 
 import json
 import os

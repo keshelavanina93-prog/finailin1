@@ -1,0 +1,18 @@
+{
+  "status": "DRAFT_CANDIDATE",
+  "release_pins": {
+    "fibo": "master_2026Q2",
+    "geosparql": "1.1",
+    "prov_o": "2013-04-30",
+    "gist": "DO_NOT_LOAD"
+  },
+  "alignments": [
+    { "g8_type": "LegalEntity", "external_iri": "https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/LegalPersons/LegalPerson", "relation": "CLOSE_MATCH" },
+    { "g8_type": "Party", "external_iri": "https://spec.edmcouncil.org/fibo/ontology/FND/Parties/Parties/Party", "relation": "SPECIALIZES" },
+    { "g8_type": "SourceEvidence", "external_iri": "http://www.w3.org/ns/prov#Entity", "relation": "RELATED" },
+    { "g8_type": "SourceRecord", "external_iri": "http://www.w3.org/ns/prov#Entity", "relation": "RELATED" },
+    { "g8_type": "Facility", "external_iri": "http://www.opengis.net/ont/geosparql#Feature", "relation": "RELATED" },
+    { "g8_type": "Location", "external_iri": "http://www.opengis.net/ont/geosparql#Feature", "relation": "RELATED" }
+  ],
+  "note": "References only. Do not set owl:equivalentClass. Do not change G8 IDs."
+}
