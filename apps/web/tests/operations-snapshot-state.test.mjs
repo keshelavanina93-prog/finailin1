@@ -1,8 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {loadTypeScript} from "./load-typescript.mjs";
-const {assertMapSnapshot}=await loadTypeScript(new URL("../app/operations-snapshot-state.ts",import.meta.url));
+const {assertMapSnapshot,mapSelectionInSnapshot}=await loadTypeScript(new URL("../app/operations-snapshot-state.ts",import.meta.url));
 function fixture(){const scope={companyId:"company-a",lens:"enterprise_assets",validAt:"2024-01-01T00:00:00.123456Z",knownAt:"2025-02-01T00:00:00.654321Z"};return {scope,data:{type:"FeatureCollection",company_id:scope.companyId,lens:scope.lens,valid_at:scope.validAt,known_at:scope.knownAt,features:[],unmapped:[],counts:{assets:0,mapped_in_bounds:0,outside_bounds:0,unmapped:0},completeness:{snapshot_bounded:false,features_truncated:false,unmapped_truncated:false,scan_limit:5000,limit:500}}};}
+test("map selection uses returned exact evidence, refuses version and microsecond drift, and preserves the original reference",()=>{
+ const {data,scope}=fixture();const resource={resource_id:"asset-a",version_id:"version-a",content_hash:"hash-a",display_name:"Returned asset"};
+ data.features=[{properties:{resource}}];const selection={resource:{...resource,display_name:"Old label"},validAt:scope.validAt,knownAt:scope.knownAt};
+ assert.equal(mapSelectionInSnapshot(selection,data).resource,resource);
+ assert.equal(mapSelectionInSnapshot({...selection,validAt:"2024-01-01T04:00:00.123456+04:00"},data).resource,resource);
+ for(const patch of [{validAt:"2024-01-01T00:00:00.123457Z"},{knownAt:"2025-02-01T00:00:00.654322Z"},{resource:{...resource,version_id:"new-version"}},{resource:{...resource,content_hash:"new-hash"}},{resource:{...resource,resource_id:"other-asset"}}])assert.equal(mapSelectionInSnapshot({...selection,...patch},data),null);
+ assert.equal(mapSelectionInSnapshot(selection,null),null);
+ data.features=[];assert.equal(mapSelectionInSnapshot(selection,data),null);
+ data.unmapped=[{resource,reason:"No geography"}];assert.equal(mapSelectionInSnapshot(selection,data).resource,resource);
+ assert.equal(selection.resource.display_name,"Old label");
+});
 test("company map validates its exact scope and microsecond snapshot even when empty",()=>{
  const {scope,data}=fixture();assert.doesNotThrow(()=>assertMapSnapshot(data,scope));
  data.valid_at="2024-01-01T04:00:00.123456+04:00";assert.doesNotThrow(()=>assertMapSnapshot(data,scope));

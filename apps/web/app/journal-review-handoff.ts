@@ -8,20 +8,22 @@ export type JournalReviewEntry={entryId:string;token:string;returnView:"home"|"c
 export type CompanyWorkflowReference=Pick<JournalReviewReference,"company"|"validAt"|"knownAt">&{kind:"workflow";workflowId:string;proposalId:string;observedAt:string};
 export type CompanyWorkReference=JournalReviewReference|CompanyWorkflowReference;
 export type CompanyWorkEntry=Omit<JournalReviewEntry,"reference">&{reference:CompanyWorkReference};
+export type CompanyOriginReference=Pick<JournalReviewReference,"company"|"validAt"|"knownAt">;
+export type CompanyOriginEntry=Omit<JournalReviewEntry,"reference">&{reference:CompanyOriginReference};
 const operationId=/^opa_[a-f0-9]{64}$/;
 const uuid=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i,hash=/^[a-f0-9]{64}$/;
 export function journalReviewReference(company:CanonicalResource,validAt:string,knownAt:string,item:CompanyJournalReviewItem):JournalReviewReference {
  if(company?.object_type!=="LegalEntity"||company.authority_state!=="APPROVED"||company.evidence_class==="REFERENCE_TEMPLATE"||!companyCutoffs({validAt,knownAt})||!uuid.test(company.resource_id)||!uuid.test(company.version_id)||!hash.test(company.content_hash)||typeof company.display_name!=="string"||item.company_id!==company.resource_id||item.basis!=="EXPLICIT_JOURNAL_PRODUCTION_REQUEST"||!["PENDING_REVIEW","PUBLISHED","REJECTED"].includes(item.state)||![item.proposal_id,item.request_id,item.invocation_id].every(value=>uuid.test(value)))throw Error("The journal review does not retain this company snapshot and submitted proposal.");
  return {company:{resource_id:company.resource_id,version_id:company.version_id,content_hash:company.content_hash,display_name:company.display_name},validAt,knownAt,proposalId:item.proposal_id,requestId:item.request_id,invocationId:item.invocation_id};
 }
-export function journalReviewEntryForSession<T extends CompanyWorkEntry>(value:T|null,token:string,companyId:string,view:string):T|null {
+export function journalReviewEntryForSession<T extends CompanyOriginEntry>(value:T|null,token:string,companyId:string,view:string):T|null {
  return value?.token===token&&value.reference.company.resource_id===companyId&&value.returnView===view&&uuid.test(value.entryId)?value:null;
 }
 /** The origin is navigation context only; current proposal decisions retain their own observation time. */
 export function journalReviewOriginMatches(reference:Pick<JournalReviewReference,"company"|"validAt"|"knownAt">,context:CompanyNyxContext|null):boolean {
  return context?.status==="ready"&&context.companyId===reference.company.resource_id&&context.company.version_id===reference.company.version_id&&context.company.content_hash===reference.company.content_hash&&restorationInstant(context.validAt)===restorationInstant(reference.validAt)&&restorationInstant(context.knownAt)===restorationInstant(reference.knownAt);
 }
-export function journalReviewHistoryMode(state:unknown,entry:CompanyWorkEntry|null):"review"|"return"|"refused"|null {
+export function journalReviewHistoryMode(state:unknown,entry:CompanyOriginEntry|null):"review"|"return"|"refused"|null {
  if(!state||typeof state!=="object")return null;
  const value=state as Record<string,unknown>;
  const review=value.g8JournalReview,back=value.g8JournalReturn;

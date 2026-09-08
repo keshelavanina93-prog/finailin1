@@ -9,7 +9,7 @@ import type {Company360Descriptor} from "./company-360-descriptor";
 import type {MapSelection,MapWorkspaceState} from "./operations-model";
 
 type Lens="overview"|"structure"|"accounting"|"evidence";
-type Props={token:string;viewStateKey?:string;descriptor:Company360Descriptor;onLens:(lens:Lens)=>void;onInspect:(node:CanonicalResource,knownAt?:string)=>void;onTrace?:(node:CanonicalResource,knownAt?:string)=>void;onHistory?:(node:CanonicalResource,knownAt?:string)=>void;onProposal?:(id:string)=>void;onJournalReview?:(reference:JournalReviewReference)=>void;onCompanyWorkflow?:(reference:CompanyWorkflowReference)=>void;onWorkflow?:(id:string)=>void;onSelect:(node:CanonicalResource)=>void;onData:()=>void;onRegulation:()=>void;onWork:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void};
+type Props={token:string;viewStateKey?:string;descriptor:Company360Descriptor;onLens:(lens:Lens)=>void;onInspect:(node:CanonicalResource,knownAt?:string)=>void;onTrace?:(node:CanonicalResource,knownAt?:string)=>void;onHistory?:(node:CanonicalResource,knownAt?:string)=>void;onProposal?:(id:string)=>void;onJournalReview?:(reference:JournalReviewReference)=>void;onCompanyWorkflow?:(reference:CompanyWorkflowReference)=>void;onWorkflow?:(id:string)=>void;onSelect:(node:CanonicalResource)=>void;onData:()=>void;onRegulation:()=>void;onWork:()=>void;onOperations:(state:MapWorkspaceState,selection?:MapSelection|null)=>void;onMapSelection:(selection:MapSelection|null)=>void};
 const human=(value:string)=>value.replace(/([a-z])([A-Z])/g,"$1 $2").replaceAll("_"," ").toLowerCase();
 const stamp=(value:string)=>new Date(value).toLocaleString();
 

@@ -1,7 +1,16 @@
-import type {MapSnapshot,MapWorkspaceState} from "./operations-model";
+import type {MapSnapshot,MapWorkspaceState,MapSelection} from "./operations-model";
 import {restorationInstant} from "./definition-restoration-time";
 
 export type MapQueryScope={companyId?:string;lens:MapWorkspaceState["lens"];validAt:string;knownAt:string};
+/** A retained selection is highlighted only when this exact map readback includes it. */
+export function mapSelectionInSnapshot(selection:MapSelection|null|undefined,snapshot:MapSnapshot|null):MapSelection|null {
+ if(!selection||!snapshot)return null;
+ const valid=restorationInstant(selection.validAt),known=restorationInstant(selection.knownAt);
+ if(!valid||!known||valid!==restorationInstant(snapshot.valid_at)||known!==restorationInstant(snapshot.known_at))return null;
+ const candidates=[...snapshot.features.map(feature=>feature.properties.resource),...(snapshot.unmapped??[]).map(item=>item.resource)];
+ const resource=candidates.find(item=>item.resource_id===selection.resource.resource_id&&item.version_id===selection.resource.version_id&&item.content_hash===selection.resource.content_hash);
+ return resource?{resource,validAt:snapshot.valid_at,knownAt:snapshot.known_at}:null;
+}
 /** Verify projection scope before any geography, count or resource reaches the canvas. */
 export function assertMapSnapshot(value:MapSnapshot,scope:MapQueryScope):void {
  const fail=()=>{throw Error("Map response did not preserve the requested company, lens and exact snapshot.");};

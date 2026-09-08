@@ -9,7 +9,7 @@ export interface MapSnapshot extends FeatureCollection<Geometry,MapProperties> {
  unmapped?:Array<{resource:CanonicalResource;reason:string}>;
  warnings?:string[];
 }
-export interface MapWorkspaceState {lens:"enterprise_assets"|"gas_network";validAt:string;knownAt:string;center:[number,number];zoom:number}
+export interface MapWorkspaceState {lens:"enterprise_assets"|"gas_network";validAt:string;knownAt:string;center:[number,number];zoom:number;bbox?:string;search?:string}
 export const initialMapState:MapWorkspaceState={lens:"enterprise_assets",validAt:"",knownAt:"",center:[43.5,42.1],zoom:6};
 export interface MapSelection {resource:CanonicalResource;validAt:string;knownAt:string}
 export async function operationsRequest<T>(path:string,token:string,signal?:AbortSignal,body?:unknown):Promise<T>{
