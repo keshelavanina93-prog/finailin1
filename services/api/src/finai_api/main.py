@@ -24,6 +24,7 @@ from finai_api.api.period_control_routes import router as period_control_router
 from finai_api.api.proposal_queue_routes import router as proposal_queue_router
 from finai_api.api.regulation_routes import router as regulation_router
 from finai_api.api.reporting_routes import router as reporting_router
+from finai_api.api.retained_analysis_routes import router as retained_analysis_router
 from finai_api.api.retention_routes import router as retention_router
 from finai_api.api.routes import router
 from finai_api.api.runtime_observation_routes import router as runtime_observation_router
@@ -52,6 +53,7 @@ app.include_router(ontology_definition_router)
 app.include_router(lifecycle_router)
 app.include_router(certification_router)
 app.include_router(retention_router)
+app.include_router(retained_analysis_router)
 app.include_router(function_router)
 app.include_router(ontology_import_router)
 app.include_router(runtime_observation_router)

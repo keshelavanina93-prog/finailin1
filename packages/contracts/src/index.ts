@@ -253,3 +253,5 @@ export type {CompanyConditionDescriptor,CompanyConditionConnection,CompanyCondit
 
 export type {CompanyChangesRequest,CompanyChangesDescriptor,CompanyContextChange} from "./company-changes.js";
 export type {CompanyRegulationPage} from "./regulatory-context.js";
+
+export type {RetainedAnalysisReference,RetainedAnalysisPage} from "./retained-analyses.js";

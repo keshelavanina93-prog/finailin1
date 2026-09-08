@@ -4,6 +4,7 @@ import {useEffect,useLayoutEffect,useState} from "react";
 import type {CompanyHomeDescriptor,CanonicalResource} from "@finai/contracts";
 import CompanyChanges from "./company-changes";
 import CompanyFinancialContext from "./company-financial-context";
+import RetainedCompanyAnalyses from "./retained-company-analyses";
 import HomeSourceAnalyses from "./home-source-analyses";
 import CompanyOperatingWorkspace from "./company-operating-workspace";
 import {companyNyxContext,type CompanyNyxContext} from "./company-nyx-context";
@@ -46,7 +47,7 @@ function Home({onContext,token,companyId,snapshot,onData,onOperations,onMapSelec
    <div className="home-financial-tabs" aria-label="Financial view">{result.unavailable_financials.map(item=><button key={item.key} aria-pressed={financial===item.key} onClick={()=>setFinancial(item.key)}>{item.label}</button>)}</div>
    {unavailable&&<p className="home-dependency"><strong>{unavailable.label} unavailable.</strong> {unavailable.reason}</p>}
    <CompanyFinancialContext context={result.financial_context} knownAt={result.known_at} onInspect={onInspect} onAccounting={onAccounting?()=>onAccounting(companyAccountingHandoff(result)):undefined}/>
-   <details className="home-source-analysis-depth" onToggle={event=>{if(event.currentTarget.open)setSourcesVisited(true);}}><summary>Source analysis & supporting evidence</summary>{sourcesVisited&&<HomeSourceAnalyses projectionGroup="sources" token={token} companyId={companyId} onData={onData}/>}</details>
+   <details className="home-source-analysis-depth" onToggle={event=>{if(event.currentTarget.open)setSourcesVisited(true);}}><summary>Source analysis & supporting evidence</summary>{sourcesVisited&&<><RetainedCompanyAnalyses token={token} companyId={companyId}/><HomeSourceAnalyses projectionGroup="sources" token={token} companyId={companyId} onData={onData}/></>}</details>
   </section>
   <section className="home-operations" aria-label="Company operations"><header><div><p className="overline">OPERATIONS</p><h2>{result.domain_packs.length?result.domain_packs.map(pack=>displayName(pack.display_name)).join(" · "):"Company operating context"}</h2></div><span className="home-status-neutral">Accepted geography</span></header><p>{result.operations.limitation}</p><HomeMap key={`${companyId}:${result.operations.valid_at}:${result.operations.known_at}`} token={token} companyId={companyId} descriptor={result} onOpen={onOperations} onSelect={onMapSelection}/><p className="home-scope-note">Operations as of {stamp(result.operations.valid_at)} · known {stamp(result.operations.known_at)}. Separate from each financial result’s period.</p></section>
  </div>;

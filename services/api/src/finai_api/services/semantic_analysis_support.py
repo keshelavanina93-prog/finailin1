@@ -9,6 +9,7 @@ from uuid import UUID
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.semantic_analysis import Pin, Value
+from finai_api.read_budget import remaining_ms
 from finai_api.services.workspace import WorkspaceError
 
 
@@ -88,12 +89,18 @@ class Resolver:
     @contextmanager
     def database(self):
         if self._cursor is not None:
+            timeout = remaining_ms()
+            if timeout is not None:
+                self._cursor.execute(
+                    "SELECT set_config('statement_timeout',%s,true)", (str(timeout),)
+                )
             yield self._cursor
         else:
             with self.read_session():
                 yield self._cursor
 
     def version(self, reference):
+        remaining_ms()
         if isinstance(reference, Pin):
             reference = reference.model_dump(mode="json")
         rid, vid = UUID(str(reference["resource_id"])), UUID(str(reference["version_id"]))
