@@ -35,6 +35,7 @@
 .posted-cells th,.posted-cells td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--g8-border);overflow-wrap:anywhere}
 .posted-cells th{background:var(--g8-nav);font-weight:500;white-space:nowrap}
 .posted-cells caption{text-align:left;color:var(--g8-muted);padding:8px 0}
+.posted-journal-review{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--g8-border)}.posted-journal-review small{color:var(--g8-muted);font-size:11px}.posted-journal-review [role=alert]{flex-basis:100%;margin:0;color:#efb4b4}
 @media(max-width:800px){.posted-source-dialog{width:100vw;max-width:100vw}.posted-grid th:first-child{width:42%}.posted-grid tbody th span{display:block}.posted-amount small{display:none}}
 
 .posted-amount>span{flex:1;text-align:right}.posted-amount small{min-width:48px;text-align:right}.posted-grid thead th:not(:first-child){padding-right:70px}@media(max-width:800px){.posted-grid thead th:not(:first-child){padding-right:12px}}

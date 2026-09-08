@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
-import {readFileSync} from "node:fs";
 import test from "node:test";
-import ts from "typescript";
-const source=readFileSync(new URL("../app/source-review-origin.ts",import.meta.url),"utf8");
-const {parseSourceReviewOrigin,sourceReviewViews}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
+import {loadTypeScript} from "./load-typescript.mjs";
+const {parseSourceReviewOrigin,sourceReviewViews}=await loadTypeScript(new URL("../app/source-review-origin.ts",import.meta.url));
 const id=n=>`${String(n).repeat(8)}-${String(n).repeat(4)}-4${String(n).repeat(3)}-8${String(n).repeat(3)}-${String(n).repeat(12)}`;
 const sessionId=id(1),target={companyId:id(2),invocationId:id(3)};
 const origin={version:1,sessionId,entryId:id(4),...target,view:"companies",scroll:842};
@@ -17,4 +15,12 @@ test("direct links, other sessions and mixed source/company entries have no retu
 test("return references bound scroll and strip arbitrary URLs, tokens and business values",()=>{
  for(const scroll of [NaN,Infinity,-1,10000001,"40"])assert.equal(parseSourceReviewOrigin({...origin,scroll},sessionId),null);
  assert.deepEqual(parseSourceReviewOrigin({...origin,url:"https://example.com",token:"secret",amount:500},sessionId,target),origin);
+});
+
+test("return references bind journal snapshot separately from original source and other snapshots",()=>{
+ const snapshot="2026-09-08T00:00:00.123456Z",journal={...target,journalSnapshot:snapshot},entry={...origin,journalSnapshot:snapshot};
+ assert.equal(parseSourceReviewOrigin(entry,sessionId,journal).view,"companies");
+ assert.equal(parseSourceReviewOrigin(entry,sessionId,target),null);
+ assert.equal(parseSourceReviewOrigin(origin,sessionId,journal),null);
+ assert.equal(parseSourceReviewOrigin(entry,sessionId,{...journal,journalSnapshot:"2026-09-08T00:00:00.123457Z"}),null);
 });

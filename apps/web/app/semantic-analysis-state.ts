@@ -1,3 +1,4 @@
+import {journalSnapshot as exactJournalSnapshot} from "./analysis-projection-identity";
 import type {AnalysisContributor,AnalysisField,AnalysisPin,AnalysisProjection,AnalysisRequest,AnalysisRow,AnalysisValue} from "@finai/contracts";
 
 const hash=/^[a-f0-9]{64}$/;
@@ -47,7 +48,7 @@ function validValue(value:AnalysisValue,field:AnalysisField):boolean {
   default:return false;
  }
 }
-export type AnalysisView={version:1;request:AnalysisRequest;valid_at:string;known_at:string;receipt_hash:string;columns:string[];visual:boolean;pane:"evidence"|"trace";scroll:number;workspace?:{grid:{widths:Record<string,number>;pinned:string[];focus:{row:string;column:string}|null;left:number;search:string};dock:"right"|"bottom";collapsed:boolean;size:number}};
+export type AnalysisView={version:1;journalSnapshot?:string;request:AnalysisRequest;valid_at:string;known_at:string;receipt_hash:string;columns:string[];visual:boolean;pane:"evidence"|"trace";scroll:number;workspace?:{grid:{widths:Record<string,number>;pinned:string[];focus:{row:string;column:string}|null;left:number;search:string};dock:"right"|"bottom";collapsed:boolean;size:number}};
 export function requestKey(request:AnalysisRequest):string {
  return JSON.stringify([request.company_id,request.invocation_id,request.descriptor_sha256??null,request.filters??[],request.group_by??null,request.selected_row??null,request.contributor_index??0]);
 }
@@ -72,10 +73,12 @@ export function assertProjection(value:AnalysisProjection,request:AnalysisReques
  if(request.selected_row&&!value.selection)throw Error("The selected contributor is unavailable in this retained result.");
 }
 /** Allowlist local preferences so response values or credentials cannot be persisted. */
-export function parseView(raw:string,companyId:string,invocationId?:string):AnalysisView|null {
+export function parseView(raw:string,companyId:string,invocationId?:string,journalSnapshot?:string):AnalysisView|null {
  try {const v=JSON.parse(raw);const r=v.request;
+  const snapshot=journalSnapshot===undefined?undefined:exactJournalSnapshot(journalSnapshot);
+  if(snapshot===undefined?"journalSnapshot" in v:!("journalSnapshot" in v)||exactJournalSnapshot(v.journalSnapshot)!==snapshot||r?.filters?.length||r?.group_by)return null;
   if(!uuid.test(companyId)||v.version!==1||!r||r.company_id!==companyId||!uuid.test(r.invocation_id)||(invocationId!==undefined&&r.invocation_id!==invocationId)||!hash.test(r.descriptor_sha256)||!instant(v.valid_at)||!instant(v.known_at)||!hash.test(v.receipt_hash)||!Array.isArray(r.filters)||r.filters.length>4||r.filters.some((f:{field:string;state:string;value:unknown})=>typeof f.field!=="string"||f.field.length>128||!["VALUE","NULL","MISSING"].includes(f.state)||f.value!==null&&!["string","number","boolean"].includes(typeof f.value))||r.selected_row!=null&&!rowId.test(r.selected_row)||!Number.isInteger(r.contributor_index)||r.contributor_index<0||r.contributor_index>999||r.group_by!=null&&(typeof r.group_by!=="string"||r.group_by.length>128))return null;
-  return {version:1,request:{company_id:companyId,invocation_id:r.invocation_id,descriptor_sha256:r.descriptor_sha256,filters:r.filters.map((f:{field:string;state:"VALUE"|"NULL"|"MISSING";value:string|number|boolean|null})=>({field:f.field,state:f.state,value:f.value})),group_by:r.group_by??null,selected_row:r.selected_row??null,contributor_index:r.contributor_index},valid_at:v.valid_at,known_at:v.known_at,receipt_hash:v.receipt_hash,columns:Array.isArray(v.columns)?v.columns.filter((key:unknown)=>typeof key==="string").slice(0,100):[],visual:v.visual!==false,pane:v.pane==="trace"?"trace":"evidence",workspace:parseWorkspace(v.workspace),scroll:typeof v.scroll==="number"&&Number.isFinite(v.scroll)?Math.max(0,v.scroll):0};
+  return {version:1,...(snapshot===undefined?{}:{journalSnapshot:snapshot}),request:{company_id:companyId,invocation_id:r.invocation_id,descriptor_sha256:r.descriptor_sha256,filters:r.filters.map((f:{field:string;state:"VALUE"|"NULL"|"MISSING";value:string|number|boolean|null})=>({field:f.field,state:f.state,value:f.value})),group_by:r.group_by??null,selected_row:r.selected_row??null,contributor_index:r.contributor_index},valid_at:v.valid_at,known_at:v.known_at,receipt_hash:v.receipt_hash,columns:Array.isArray(v.columns)?v.columns.filter((key:unknown)=>typeof key==="string").slice(0,100):[],visual:v.visual!==false,pane:v.pane==="trace"?"trace":"evidence",workspace:parseWorkspace(v.workspace),scroll:typeof v.scroll==="number"&&Number.isFinite(v.scroll)?Math.max(0,v.scroll):0};
  }catch{return null;}
 }
 

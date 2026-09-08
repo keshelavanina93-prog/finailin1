@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
-import {readFile} from "node:fs/promises";
 import test from "node:test";
-import ts from "typescript";
-const source=await readFile(new URL("../app/semantic-analysis-state.ts",import.meta.url),"utf8");
-const {assertProjection,evidenceCaption,formatAnalysisDecimal,hasUsefulMagnitude,parseView,requestKey,worksheetTabStop,worksheetRowMatches}=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
+import {loadTypeScript} from "./load-typescript.mjs";
+const {assertProjection,evidenceCaption,formatAnalysisDecimal,hasUsefulMagnitude,parseView,requestKey,worksheetTabStop,worksheetRowMatches}=await loadTypeScript(new URL("../app/semantic-analysis-state.ts",import.meta.url));
 const id="11111111-1111-4111-8111-111111111111",hash="a".repeat(64),row="row_"+hash,time="2025-01-31T00:00:00Z";
 const pin={resource_id:id,version_id:id,content_hash:hash};
 const field={key:"units",label:"Units",kind:"decimal",role:"MEASURE",aggregation:"RETAINED_VALUE_ONLY",definition:pin,filterable:false,groupable:false,options:[]};

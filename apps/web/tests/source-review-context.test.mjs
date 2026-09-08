@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
-import {readFileSync} from "node:fs";
 import test from "node:test";
-import ts from "typescript";
-const compile=source=>`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`;
-const stateUrl=compile(readFileSync(new URL("../app/semantic-analysis-state.ts",import.meta.url),"utf8"));
-const source=readFileSync(new URL("../app/source-review-context.ts",import.meta.url),"utf8").replace('import {assertProjection,type AnalysisView} from "./semantic-analysis-state";',`const {assertProjection}=await import(${JSON.stringify(stateUrl)});`);
-const {sourceReviewContext,activeSourceReviewContext,sourceReviewForSession,explainSourceReview}=await import(compile(source));
+import {loadTypeScript} from "./load-typescript.mjs";
+const {sourceReviewContext,activeSourceReviewContext,sourceReviewForSession,explainSourceReview}=await loadTypeScript(new URL("../app/source-review-context.ts",import.meta.url));
 const id="11111111-1111-4111-8111-111111111111",other="22222222-2222-4222-8222-222222222222",hash="a".repeat(64),time="2025-01-31T00:00:00Z",row="row_"+hash;
 const pin={resource_id:id,version_id:other,content_hash:hash},scope={companyId:id,invocationId:id},request={company_id:id,invocation_id:id,descriptor_sha256:hash,selected_row:row,contributor_index:0};
 const contributor={reference:pin,label:"Source evidence",basis:"ORIGINAL_SOURCE",cells:[{label:"Amount",value:"9007199254740993.125",coordinate:"A1",formula:null}]};
@@ -40,4 +36,16 @@ test("historical replies retain old immutable references and v2 retains canonica
  const first=sourceReviewContext(fixture(),request,ready),snapshot=structuredClone(first),projection=fixture();
  projection.descriptor.contract="semantic-analysis/2";projection.descriptor.row_noun="objects";projection.descriptor.visual="NONE";projection.descriptor.measure=null;projection.descriptor.fields=[{...field,role:"ATTRIBUTE",aggregation:"NONE"}];projection.selection={...projection.selection,contributor:{...contributor,basis:"CANONICAL_DEFINITION"}};
  const next=sourceReviewContext(projection,request,ready);assert.equal(next.status,"ready");assert.match(explainSourceReview(next),/original source cells are not established/);assert.deepEqual(first,snapshot);
+});
+
+test("NYX scopes journal readback to exact projection identity and refuses mismatched transport evidence",()=>{
+ const journalSnapshot="2026-09-08T00:00:00.123456Z",p=fixture();p.descriptor.contract="semantic-analysis/2";p.descriptor.row_noun="objects";p.descriptor.visual="NONE";p.descriptor.measure=null;p.descriptor.fields=[{...field,role:"ATTRIBUTE",aggregation:"NONE"}];p.descriptor.coverage=[{label:"Snapshot",value:journalSnapshot}];
+ const value=sourceReviewContext(p,request,{...ready,journalSnapshot});
+ assert.equal(value.status,"ready");assert.equal(value.journalSnapshot,journalSnapshot);
+ assert.equal(activeSourceReviewContext(value,scope).status,"updating");
+ assert.equal(activeSourceReviewContext(sourceReviewContext(fixture(),request,ready),{...scope,journalSnapshot}).status,"updating");
+ assert.equal(activeSourceReviewContext(value,{...scope,journalSnapshot:"2026-09-08T00:00:00.123457Z"}).status,"updating");
+ assert.match(explainSourceReview(value),/Accepted journals snapshot/);
+ assert.equal(sourceReviewContext(p,request,{...ready,journalSnapshot:"2026-09-08T00:00:00.123457Z"}).status,"unavailable");
+ assert.equal(sourceReviewContext(p,request,{...ready,busy:true,journalSnapshot}).status,"updating");
 });

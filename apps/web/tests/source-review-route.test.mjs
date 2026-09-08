@@ -1,12 +1,8 @@
 import assert from "node:assert/strict";
-import {readFileSync} from "node:fs";
 import test from "node:test";
-import ts from "typescript";
-const moduleUrl=source=>`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`;
-const stateUrl=moduleUrl(readFileSync(new URL("../app/semantic-analysis-state.ts",import.meta.url),"utf8"));
-const {assertProjection,parseView}=await import(stateUrl);
-const source=readFileSync(new URL("../app/source-review-route.ts",import.meta.url),"utf8").replace('import {assertProjection,parseView,type AnalysisView} from "./semantic-analysis-state";',`const {assertProjection,parseView}=await import(${JSON.stringify(stateUrl)});`);
-const {displayedAnalysisView,sourceReviewUrl,sourceReviewTarget}=await import(moduleUrl(source));
+import {loadTypeScript} from "./load-typescript.mjs";
+const {displayedAnalysisView,sourceReviewUrl,sourceReviewTarget,sourceReviewRouteRefused}=await loadTypeScript(new URL("../app/source-review-route.ts",import.meta.url));
+const {assertProjection,parseView}=await loadTypeScript(new URL("../app/semantic-analysis-state.ts",import.meta.url));
 const id="11111111-1111-4111-8111-111111111111",other="22222222-2222-4222-8222-222222222222",hash="a".repeat(64),time="2025-01-31T00:00:00Z",row="row_"+hash;
 const pin={resource_id:id,version_id:id,content_hash:hash},target={companyId:id,invocationId:id};
 function fixture(version){
@@ -37,4 +33,46 @@ test("existing direct result entries remain supported and cannot inherit another
  const url=sourceReviewUrl(target,new URL("https://g8.example/?analysis_view=stale"));
  assert.equal(url.searchParams.has("analysis_view"),false);
  assert.deepEqual(sourceReviewTarget(url.pathname),target);
+});
+
+const snapshot="2026-09-08T05:06:07.123456Z";
+function journal(){const p=fixture(2);p.descriptor.coverage=[{label:"Snapshot",value:snapshot}];return p;}
+test("journal route and saved view have distinct exact identity from the original source",()=>{
+ const projection=journal(),view=displayedAnalysisView(projection,id,snapshot),url=sourceReviewUrl({...target,journalSnapshot:snapshot,view},new URL("https://g8.example/"));
+ assert.deepEqual(sourceReviewTarget(url.pathname),{...target,journalSnapshot:snapshot});
+ assert.equal(parseView(url.searchParams.get("analysis_view"),id,id),null);
+ assert.equal(parseView(url.searchParams.get("analysis_view"),id,id,snapshot).journalSnapshot,snapshot);
+ assert.throws(()=>sourceReviewUrl({...target,view},url));
+ assert.throws(()=>sourceReviewUrl({...target,journalSnapshot:snapshot,view:displayedAnalysisView(fixture(2),id)},url));
+ assert.throws(()=>sourceReviewUrl({...target,journalSnapshot:"2026-09-08T05:06:07.123457Z",view},url));
+ assert.equal(view.valid_at,time);assert.equal(view.known_at,time);
+ assert.equal(parseView(JSON.stringify({...view,request:{...view.request,group_by:"units"}}),id,id,snapshot),null);
+ assert.equal(parseView(JSON.stringify({...view,request:{...view.request,filters:[{field:"units",state:"VALUE",value:"1"}]}}),id,id,snapshot),null);
+});
+test("journal route accepts equivalent offsets without losing microseconds and refuses naive or invalid dates",()=>{
+ const view=displayedAnalysisView(journal(),id,snapshot),url=sourceReviewUrl({...target,journalSnapshot:"2026-09-08T09:06:07.123456+04:00",view},new URL("https://g8.example/"));
+ assert.equal(sourceReviewTarget(url.pathname).journalSnapshot,snapshot);
+ for(const bad of ["2026-02-30T00:00:00Z","2026-09-08T05:06:07","", "2026-09-08T05:06:07.1234567Z"]){
+  assert.throws(()=>sourceReviewUrl({...target,journalSnapshot:bad},url));
+  assert.equal(sourceReviewTarget(`/source-review/${id}/${id}/accepted-journals/${encodeURIComponent(bad)}`),null);
+ }
+ assert.equal(sourceReviewTarget(`/source-review/${id}/${id}/accepted-journals/%`),null);
+});
+test("fixed journal transport validates response snapshot and does not confuse source cutoffs",async()=>{
+ const {projectionEndpoint,assertProjectionTransport}=await loadTypeScript(new URL("../app/analysis-projection-identity.ts",import.meta.url));
+ assert.equal(projectionEndpoint(),"/api/ontology/analysis/project");
+ assert.equal(new URL(projectionEndpoint(snapshot),"https://g8.example").searchParams.get("snapshot_at"),snapshot);
+ assert.doesNotThrow(()=>assertProjectionTransport(journal(),snapshot));
+ for(const coverage of [[],[{label:"Snapshot",value:"2026-09-08T05:06:07.123457Z"}],[{label:"Snapshot",value:snapshot},{label:"Snapshot",value:snapshot}]]){
+  const changed=journal();changed.descriptor.coverage=coverage;assert.throws(()=>assertProjectionTransport(changed,snapshot));
+ }
+ assert.throws(()=>displayedAnalysisView(fixture(1),id,snapshot));
+});
+
+test("malformed review-family URLs are refused before mounting saved business or NYX context",()=>{
+ const prefix=`/source-review/${id}/${id}`;
+ for(const path of ["/source-review", "/source-review/", "/source-review/not-a-company/not-a-result",`${prefix}/accepted-journals/not-a-time`,`${prefix}/accepted-journals/2026-09-08T12:00:00`,`${prefix}/accepted-journals/2026-02-30T00:00:00Z`,`${prefix}/accepted-journals/%`,`${prefix}/accepted-journals/`]){
+  assert.equal(sourceReviewRouteRefused(path),true);assert.equal(sourceReviewTarget(path),null);
+ }
+ for(const path of ["/",prefix,`${prefix}/accepted-journals/${encodeURIComponent(snapshot)}`])assert.equal(sourceReviewRouteRefused(path),false);
 });

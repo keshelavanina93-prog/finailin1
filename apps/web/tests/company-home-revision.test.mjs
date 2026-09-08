@@ -84,3 +84,30 @@ test("revision intent is cloned before key derivation; invalid new metadata fail
  await assert.rejects(()=>pins.pinHomeAnalysis("a",{companyId:id(1),invocationId:id(2),revision:null}),/invalid/);
  assert.deepEqual([...store.entries()],before);
 });
+
+test("original and journal snapshots coexist without identity collapse or legacy journal substitution",async t=>{
+ const store=storage(t),journalSnapshot="2026-09-08T01:02:03.123456Z",base={companyId:id(1),invocationId:id(2),revision:revision()};
+ await pins.pinHomeAnalysis("a",base);
+ await pins.pinHomeAnalysis("a",{...base,journalSnapshot});
+ await pins.pinHomeAnalysis("a",{...base,journalSnapshot:"2026-09-08T05:02:03.123456+04:00"});
+ const refs=await pins.homeAnalysisReferences("a",id(1));
+ assert.equal(refs.length,2);assert.equal(refs[0].journalSnapshot,journalSnapshot);assert.equal(refs[1].journalSnapshot,undefined);
+ assert.deepEqual(await pins.homeAnalysisPins("a",id(1)),[id(2)]);
+ const before=JSON.stringify([...store]);
+ await assert.rejects(()=>pins.pinHomeAnalysis("a",{companyId:id(1),invocationId:id(2),journalSnapshot}));
+ await assert.rejects(()=>pins.pinHomeAnalysis("a",{...base,journalSnapshot:"2026-02-30T00:00:00Z"}));
+ assert.equal(JSON.stringify([...store]),before);
+ const p={descriptor_sha256:base.revision.descriptorSha256,descriptor:{contract:"semantic-analysis/2",receipt_hash:base.revision.receiptHash,valid_at:base.revision.validAt,known_at:base.revision.knownAt,coverage:[{label:"Snapshot",value:journalSnapshot}]}};
+ assert.doesNotThrow(()=>assertHomeRevision(p,refs[0]));
+ p.descriptor.coverage[0].value="2026-09-08T01:02:03.123457Z";
+ assert.throws(()=>assertHomeRevision(p,refs[0]));
+ assert.throws(()=>parseHomeAnalysisReferences([{invocationId:id(2),revision:revision(),journalSnapshot:"2026-02-30T00:00:00Z"}]));
+});
+
+test("financial placement selects journal transport references before fetch; source and legacy stay supporting references",async()=>{
+ const {homeReferencesForGroup}=await loadTypeScript(new URL("../app/company-home-revision.ts",import.meta.url));
+ const refs=parseHomeAnalysisReferences([id(1),{invocationId:id(2),revision:revision()},{invocationId:id(2),revision:revision(),journalSnapshot:"2026-09-08T00:00:00Z"}]);
+ assert.deepEqual(homeReferencesForGroup(refs),refs);
+ assert.deepEqual(homeReferencesForGroup(refs,"sources"),refs.slice(0,2));
+ assert.deepEqual(homeReferencesForGroup(refs,"journals"),refs.slice(2));
+});

@@ -8,6 +8,7 @@ import "./posted-movement-report.css";
 
 import {useSourceReview} from "./source-review-navigation";
 import {financeReportReference} from "./finance-report-reference";
+import AcceptedJournalReviewAction from "./accepted-journal-review-action";
 
 export type PostedFunction = { resource_id: string; version_id: string; display_name: string };
 type Group = PostingGroup;
@@ -115,6 +116,7 @@ export default function PostedMovementReport({ token, contextKey, functions, cur
     {busy&&<p role="status">Checking the retained report…</p>}
     {error&&<p role="alert">{error}</p>}
     <button className="posted-primary" disabled={busy} onClick={()=>openSourceReview({companyId:expectedSource.company_id,invocationId:report.invocation_id})}>Open source review</button>
+    <AcceptedJournalReviewAction token={token} companyId={expectedSource.company_id} invocationId={report.invocation_id} disabled={busy}/>
   </section>;
   return <section className="posted-worksheet" aria-label="Posted account movements">
     <h3>Posted account movements · {saved?.key===contextKey?saved.currency:currency}</h3>
