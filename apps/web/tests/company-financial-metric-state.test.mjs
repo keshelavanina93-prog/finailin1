@@ -91,3 +91,10 @@ test("provided offline metric/projection pair passes exact guards and every acco
  const d=projection.descriptor,reference={kind:"EXACT",invocationId:result.invocation_id,journalSnapshot:result.snapshot_at,revision:{descriptorSha256:projection.descriptor_sha256,receiptHash:d.receipt_hash,validAt:d.valid_at,knownAt:d.known_at}};
  for(const account of result.nodes.filter(node=>node.kind==="ACCOUNT_MOVEMENTS")){const row=projection.rows.find(row=>row.key===account.analysis_row_key),target=homeAnalysisRowTarget(projection,reference,result.company_id,account.analysis_row_key);if(row.contributor_count===0)assert.equal(target,null);else{assert.equal(target.view.request.selected_row,account.analysis_row_key);assert.equal(target.view.receipt_hash,result.reconciliation_receipt_hash);assert.equal(target.journalSnapshot,result.snapshot_at);}}
 });
+
+test("business context uses exact selection pins and keeps missing labels unavailable",()=>{
+ const {result,request,projection}=fixture();
+ result.display_context={ledger_id:{reference:{...result.selection.ledger_id},label:"მთავარი წიგნი — Главная книга"},book_id:{reference:{...result.selection.book_id},label:null},period_id:{reference:{...result.selection.period_id},label:"January 2025"}};
+ assert.doesNotThrow(()=>assertHomeFinancialMetrics(result,request,projection));
+ for(const mutate of [r=>r.display_context.period_id.reference.version_id=id(99),r=>r.display_context.ledger_id.reference.resource_id=id(99),r=>r.display_context.book_id.label=" ",r=>r.display_context.extra={label:"Current period"},r=>r.display_context.period_id.label=2025]){const changed=structuredClone(result);mutate(changed);assert.throws(()=>assertHomeFinancialMetrics(changed,request,projection));}
+});
