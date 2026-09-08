@@ -29,7 +29,7 @@ async function forward(request: NextRequest, context: Context) {
   const authorization = request.headers.get("authorization");
   if (!authorization) return Response.json({ detail: "Identity required" }, { status: 401 });
   const binary = route === "source-documents";
-  const bodyLimit = binary ? 32_000_000 : route === "context/source-accounts" ? 22_000_000 : 1_000_000;
+  const bodyLimit = binary ? 32_000_000 : retainedReports ? 22_000_000 : route === "context/source-accounts" ? 22_000_000 : 1_000_000;
   let body: Uint8Array<ArrayBuffer> | undefined;
   if (request.method === "POST" && request.body) {
     const reader = request.body.getReader(); const chunks: Uint8Array[] = []; let size = 0;
@@ -50,7 +50,7 @@ async function forward(request: NextRequest, context: Context) {
       cache: "no-store", signal: AbortSignal.timeout(30_000),
     });
     const headers = new Headers({"Content-Type":result.headers.get("content-type") ?? "application/json", "Cache-Control":"no-store"});
-    for (const name of ["content-disposition", "x-source-sha256"]) { const value=result.headers.get(name); if(value)headers.set(name,value); }
+    for (const name of ["content-disposition", "x-source-sha256", "x-content-sha256", "x-report-content-hash", "x-report-proposal-id", "content-length"]) { const value=result.headers.get(name); if(value)headers.set(name,value); }
     return new Response(result.body, { status: result.status, headers });
   } catch { return Response.json({ detail: "Ontology service unavailable" }, { status: 503 }); }
 }
