@@ -168,7 +168,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
     const key=JSON.stringify([token,accountingEntryId]);
     try{const handoff=accountingContinuation(context,companyId);setAccountingReadback({key,context});if(handoff)setJournalReviewEntry(current=>current?.entryId===accountingEntryId&&current.token===token&&isCompanyAccountingOrigin(current.reference)&&current.reference.company.resource_id===companyId&&JSON.stringify(current.accountingHandoff)!==JSON.stringify(handoff)?{...current,accountingHandoff:handoff}:current);}
     catch{setAccountingReadback({key,context:{companyId,status:"unavailable"}});}
-  },[token,accountingEntryId,companyId]);
+  },[token,accountingEntryId,companyId,setAccountingReadback,setJournalReviewEntry]);
   const foregroundAccountingContext=accountingForegroundContext(accountingReadback,accountingReadbackKey,companyId);
   const companyContext=journalForeground&&!journalOriginVerified?null:companyAccounting&&journalForeground?foregroundAccountingContext:displayedCompanyContext;
   const [rawTrace,setTrace]=useState<TraceSelection|null>(savedContext.trace);const trace=rawTrace?.company_id===companyId?rawTrace:null;
@@ -215,7 +215,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
     const read=resourceRead.current;resourceRead.current=null;setResourceInspectionEntry(null);cancelAnimationFrame(resourceFocusFrame.current);
     if(!read)return;const cancelled=cancelResourceInspectionRead(read,detailRequest.current);detailRequest.current=cancelled.requestId;
     if(cancelled.clearReadback){setSelected(null);setDetailError("");setDetailBusy(false);}
-  },[]);
+  },[setResourceInspectionEntry]);
   useLayoutEffect(()=>()=>cancelResourceInspection(),[companySurfaceKey,cancelResourceInspection]);
   const clearSelection = useCallback(() => {cancelResourceInspection();setDetailScope(companyId);setHistory(null);setTrace(null);setMapSelection(null);detailRequest.current++;setSelected(null);setWork(null);setReceipt(null);setProposal(null);setDetailError("");setDetailBusy(false);},[cancelResourceInspection,companyId,setHistory,setTrace,setMapSelection,setWork,setProposal,setSelected,setReceipt,setDetailScope,setDetailError,setDetailBusy]);
   const [engineering,setEngineering] = useState<{view:EngineeringView;receiptId?:string;proposalId?:string}>({view:"intake"});
@@ -484,7 +484,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
     try {if(item.kind === "evidence") {const value=await get<ReceiptDetail>(`workspace/constructions/${item.id}`,token);if(request===detailRequest.current)setReceipt(value);}else {const value=await get<ResourceProposalDetail>(`ontology/proposals/${item.id}`,token);if(request===detailRequest.current)setProposal(value);}}
     catch(error){if(request===detailRequest.current)setDetailError(error instanceof Error ? error.message : "Could not inspect work");}
     finally {if(request===detailRequest.current)setDetailBusy(false);}
-  },[token,companyId,setBuildTarget,setWork,setProposal,setRail,setNyxFolded,cancelResourceInspection]);
+  },[token,companyId,setBuildTarget,setWork,setProposal,setRail,setNyxFolded,cancelResourceInspection,setSourceSelectionKey]);
   const inspectSource = useCallback((source:IntakeItem) => {void inspectWork(workItems([source],[])[0],false);},[inspectWork]);
   const selectMap = (selection:MapSelection|null) => {clearSelection();setMapSelection(selection);if(selection){setNyxTab("context");setNyxFolded(false);setRail(true);}};
   const mapScope=companyMapScope(companyId,currentCompany?.resource_id,companyDirectory.data!==null,workspaceMapSession===token);
