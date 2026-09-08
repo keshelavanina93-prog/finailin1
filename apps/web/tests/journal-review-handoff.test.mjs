@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {loadTypeScript} from "./load-typescript.mjs";
-const {journalReviewReference,journalReviewEntryForSession,journalReviewOriginMatches,journalReviewHistoryMode,restoreJournalReviewFocus}=await loadTypeScript(new URL("../app/journal-review-handoff.ts",import.meta.url));
+const {journalReviewReference,journalReviewEntryForSession,journalReviewOriginMatches,journalReviewHistoryMode,restoreJournalReviewFocus,restoreCompanyWorkFocus,companyWorkflowReference}=await loadTypeScript(new URL("../app/journal-review-handoff.ts",import.meta.url));
 const id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
 const company={resource_id:id(1),version_id:id(2),content_hash:"a".repeat(64),display_name:"Retained company",object_type:"LegalEntity",authority_state:"APPROVED",evidence_class:"SOURCE_BOUND",attributes:{amount:"must not persist"}};
 const validAt="2025-01-01T00:00:00.123456Z",knownAt="2026-01-01T00:00:00.654321Z";
@@ -44,4 +44,23 @@ test("filtered/removed row returns focus to queue; hidden, inert or detached ori
  const d=dom();d.row.getClientRects=()=>[];assert.equal(restoreJournalReviewFocus(d.origin,d.main,id(4)),true);assert.equal(d.calls.at(-1)[0],"queue");
  for(const patch of [{hidden:true},{inert:true},{isConnected:false}]){const candidate=dom();Object.assign(candidate.element,patch);assert.equal(restoreJournalReviewFocus(candidate.origin,candidate.main,id(4)),false);assert.deepEqual(candidate.calls,[]);}
  const detached=dom();detached.queue.isConnected=false;assert.equal(restoreJournalReviewFocus(detached.origin,detached.main,id(4)),false);
+});
+
+const workflowId=`opa_${"a".repeat(64)}`;
+const work={company_id:id(1),workflow_id:workflowId,proposal_id:id(4),state:"PREPARED",basis:"EXPLICIT_INVOCATION",reason:"must not persist"};
+const observedAt="2026-09-08T12:30:00.123456Z";
+test("canonical workflow shares the exact origin contract while retaining its separate observation time",()=>{
+ const reference=companyWorkflowReference(company,validAt,knownAt,observedAt,work);
+ assert.equal(reference.workflowId,workflowId);assert.equal(reference.proposalId,id(4));assert.equal(reference.observedAt,observedAt);assert.equal(reference.knownAt,knownAt);assert.equal(JSON.stringify(reference).includes("must not persist"),false);
+ const value={...entry(),reference};assert.equal(journalReviewOriginMatches(reference,context()),true);assert.equal(journalReviewEntryForSession(value,"session",id(1),"companies"),value);
+ assert.equal(journalReviewHistoryMode({g8JournalReturn:value.entryId},value),"return");assert.equal(journalReviewEntryForSession(value,"other",id(1),"companies"),null);
+ for(const patch of [{company_id:id(9)},{workflow_id:id(8)},{workflow_id:workflowId+'/'},{proposal_id:null},{basis:"INFERRED"},{state:"CURRENT_LICENCE"}])assert.throws(()=>companyWorkflowReference(company,validAt,knownAt,observedAt,{...work,...patch}));
+ assert.throws(()=>companyWorkflowReference(company,validAt,knownAt,"2026-02-30T12:00:00Z",work));
+ assert.throws(()=>companyWorkflowReference(company,validAt,"2026-01-01T00:00:00",observedAt,work));
+});
+test("workflow return reuses scroll restoration and selects its exact canonical operation row",()=>{
+ const d=dom();let selector;d.queue.querySelector=value=>{selector=value;return d.row;};
+ assert.equal(restoreCompanyWorkFocus(d.origin,d.main,{workflowId,proposalId:id(4)}),true);assert.equal(selector,`[data-company-workflow="${workflowId}"]`);assert.equal(d.calls.at(-1)[0],"row");
+ d.row.getClientRects=()=>[];assert.equal(restoreCompanyWorkFocus(d.origin,d.main,{workflowId,proposalId:id(4)}),true);assert.equal(d.calls.at(-1)[0],"queue");
+ assert.equal(restoreCompanyWorkFocus(d.origin,d.main,{workflowId:'opa_"invalid',proposalId:id(4)}),false);
 });

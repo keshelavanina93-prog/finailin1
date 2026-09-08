@@ -1,5 +1,5 @@
 "use client";
-import type {JournalReviewReference} from "./journal-review-handoff";
+import type {CompanyWorkflowReference,JournalReviewReference} from "./journal-review-handoff";
 import {useEffect,useLayoutEffect,useState} from "react";
 import type {CompanyHomeDescriptor,CanonicalResource} from "@finai/contracts";
 import CompanyChanges from "./company-changes";
@@ -16,9 +16,9 @@ import {displayName} from "./display-name";
 import "./company-home.css";
 
 const stamp=(value:string)=>new Date(value).toLocaleString();
-type Props={onContext?:(context:CompanyNyxContext)=>void;token:string;companyId:string;snapshot?:{validAt:string;knownAt:string};onData:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void;onInspect?:(node:CanonicalResource,knownAt:string)=>void;onAccounting?:(handoff:CompanyAccountingHandoff)=>void;showWork?:boolean;onTrace?:(node:CanonicalResource,knownAt:string)=>void;onHistory?:(node:CanonicalResource,knownAt:string)=>void;onProposal?:(id:string)=>void;onJournalReview?:(reference:JournalReviewReference)=>void;onWorkflow?:(id:string)=>void};
+type Props={onContext?:(context:CompanyNyxContext)=>void;token:string;companyId:string;snapshot?:{validAt:string;knownAt:string};onData:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void;onInspect?:(node:CanonicalResource,knownAt:string)=>void;onAccounting?:(handoff:CompanyAccountingHandoff)=>void;showWork?:boolean;onTrace?:(node:CanonicalResource,knownAt:string)=>void;onHistory?:(node:CanonicalResource,knownAt:string)=>void;onProposal?:(id:string)=>void;onJournalReview?:(reference:JournalReviewReference)=>void;onCompanyWorkflow?:(reference:CompanyWorkflowReference)=>void;onWorkflow?:(id:string)=>void};
 export default function CompanyHome(props:Props){return <Home key={`${props.token}:${props.companyId}:${props.snapshot?.validAt??"current"}:${props.snapshot?.knownAt??"current"}`} {...props}/>;}
-function Home({onContext,token,companyId,snapshot,onData,onOperations,onMapSelection,onInspect,onAccounting,showWork=false,onTrace,onHistory,onProposal,onJournalReview,onWorkflow}:Props){
+function Home({onContext,token,companyId,snapshot,onData,onOperations,onMapSelection,onInspect,onAccounting,showWork=false,onTrace,onHistory,onProposal,onJournalReview,onCompanyWorkflow,onWorkflow}:Props){
  const [sourcesVisited,setSourcesVisited]=useState(false);const validAt=snapshot?.validAt,knownAt=snapshot?.knownAt;
  const [result,setResult]=useState<CompanyHomeDescriptor|null>(null),[error,setError]=useState("");
  const [revision,setRevision]=useState(0),[financial,setFinancial]=useState("profit_loss");
@@ -39,7 +39,7 @@ function Home({onContext,token,companyId,snapshot,onData,onOperations,onMapSelec
  if(!result)return <p role="status">Resolving company capabilities and retained analyses…</p>;
  const unavailable=result.unavailable_financials.find(item=>item.key===financial);
  return <div className="company-home">
-  {showWork&&onInspect&&<CompanyOperatingWorkspace compact token={token} companyId={companyId} snapshot={{validAt:result.valid_at,knownAt:result.known_at}} onInspect={onInspect} onTrace={onTrace} onHistory={onHistory} onProposal={onProposal} onJournalReview={onJournalReview} onWorkflow={onWorkflow}/>}
+  {showWork&&onInspect&&<CompanyOperatingWorkspace compact token={token} companyId={companyId} snapshot={{validAt:result.valid_at,knownAt:result.known_at}} onInspect={onInspect} onTrace={onTrace} onHistory={onHistory} onProposal={onProposal} onJournalReview={onJournalReview} onCompanyWorkflow={onCompanyWorkflow} onWorkflow={onWorkflow}/>}
   {onInspect&&<CompanyChanges compact={showWork} token={token} companyId={companyId} validAt={result.valid_at} knownAt={result.known_at} onInspect={onInspect} onTrace={onTrace}/>}
   <section className="home-financials" aria-label="Key financials"><header><div><p className="overline">KEY FINANCIALS</p><h2>Financial condition</h2></div><button className="g8-link" onClick={onData}>Explore source analyses</button></header>
    <div className="home-journal-facts"><HomeSourceAnalyses projectionGroup="journals" token={token} companyId={companyId} onData={onData}/></div>
