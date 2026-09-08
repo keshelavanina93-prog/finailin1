@@ -1,3 +1,4 @@
+export type {ReportSectionReference,ReportComposition,ReportSectionResult,RetainedReportSnapshot,ReportPreview,SaveRetainedReport,ReportVersionReference,ReportArtifactMetadata,RetainedReport,RetainedReportListItem,RetainedReportPage} from "./retained-reports.js";
 export type { HistorySearchResult } from "./history-search.js";
 export type {CompanyFinancialResults} from "./company-financial-results.js";
 export type {
