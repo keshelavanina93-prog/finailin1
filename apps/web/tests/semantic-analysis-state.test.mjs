@@ -121,3 +121,9 @@ test("presentation is optional and cannot override currency, type or authority s
  assert.throws(()=>assertProjection({...candidate,descriptor:{...candidate.descriptor,visual:"HORIZONTAL_BARS",measure:"units"}},request));
  assert.doesNotThrow(()=>assertProjection({...projection,descriptor:{...projection.descriptor,fields:[{...presentedField,role:"MEASURE",aggregation:"RETAINED_VALUE_ONLY"}]}},request));
 });
+
+test("source-review route refuses a saved result for a different invocation in the same company",()=>{
+ const view={version:1,request,valid_at:time,known_at:time,receipt_hash:hash,columns:["units"],visual:false,pane:"evidence",scroll:0};
+ assert.ok(parseView(JSON.stringify(view),id,id));
+ assert.equal(parseView(JSON.stringify(view),id,"22222222-2222-4222-8222-222222222222"),null);
+});
