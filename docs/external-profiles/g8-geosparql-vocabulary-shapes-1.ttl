@@ -1,0 +1,38 @@
+# G8-authored selected vocabulary checks. This is not the OGC conformance suite.
+# No company facts, geometry validity, spatial functions, CRS compatibility,
+# inference, or complete GeoSPARQL compliance is evaluated by this profile.
+@prefix g8: <urn:g8:ontology:geosparql-vocabulary:1:> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix sf: <http://www.opengis.net/ont/sf#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+g8: a owl:Ontology ;
+    rdfs:label "G8 selected GeoSPARQL vocabulary checks, version 1" ;
+    rdfs:comment "G8 expectations for explicitly selected vocabulary statements; no spatial or accounting authority." .
+
+g8:CoreClasses a sh:NodeShape ;
+    sh:targetNode geo:Feature, geo:Geometry ;
+    sh:property [ sh:path rdf:type ; sh:hasValue owl:Class ] .
+
+g8:FeatureGeometryLinks a sh:NodeShape ;
+    sh:targetNode geo:hasGeometry, geo:hasDefaultGeometry ;
+    sh:property [ sh:path rdf:type ; sh:hasValue owl:ObjectProperty ] ;
+    sh:property [ sh:path rdfs:domain ; sh:hasValue geo:Feature ] ;
+    sh:property [ sh:path rdfs:range ; sh:hasValue geo:Geometry ] .
+
+g8:WktSerialization a sh:NodeShape ;
+    sh:targetNode geo:asWKT ;
+    sh:property [ sh:path rdf:type ; sh:hasValue owl:DatatypeProperty ] ;
+    sh:property [ sh:path rdfs:domain ; sh:hasValue geo:Geometry ] ;
+    sh:property [ sh:path rdfs:range ; sh:hasValue geo:wktLiteral ] .
+
+g8:WktDatatype a sh:NodeShape ;
+    sh:targetNode geo:wktLiteral ;
+    sh:property [ sh:path rdf:type ; sh:hasValue rdfs:Datatype ] .
+
+g8:SimpleFeatureClasses a sh:NodeShape ;
+    sh:targetNode sf:Point, sf:LineString, sf:Polygon ;
+    sh:property [ sh:path rdf:type ; sh:hasValue owl:Class ] .

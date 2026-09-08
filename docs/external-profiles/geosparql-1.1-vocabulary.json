@@ -1,0 +1,42 @@
+{
+  "contract": "g8-offline-vocabulary-preparation/1",
+  "profile_key": "ogc.geosparql-1.1-vocabulary",
+  "upstream_repository": "https://github.com/opengeospatial/geosemantics-semantic-resources",
+  "upstream_commit": "ac303373bd0cf149d31f110cf8c1ed281ff66c60",
+  "standard_reference": "http://www.opengis.net/doc/IS/geosparql/1.1",
+  "metadata_version": "1.1.1",
+  "version_info_prefix": "1.1.1 - 2026-02 - minor metadata changes to ensure Rainbow display",
+  "publisher": "Open Geospatial Consortium (OGC)",
+  "publisher_iri": "https://defs.opengis.net/org/ogc",
+  "declared_license_iri": "http://purl.org/NET/rdflicense/:APACHE2.0",
+  "license_verification": "EXACT_UPSTREAM_DECLARATION_ONLY",
+  "release_label": "OGC GeoSPARQL 1.1 vocabulary; metadata 1.1.1; ac303373bd0cf149d31f110cf8c1ed281ff66c60",
+  "publication_status": "DEVELOPMENT",
+  "purpose": "Reviewed GeoSPARQL and Simple Features vocabulary meaning from exact retained OGC artifacts. This profile authorizes neither company facts nor spatial function execution, inference, SHACL validation or full GeoSPARQL standard conformance.",
+  "artifacts": [
+    {
+      "file": "geo.ttl",
+      "source_url": "https://raw.githubusercontent.com/opengeospatial/geosemantics-semantic-resources/ac303373bd0cf149d31f110cf8c1ed281ff66c60/resources/geosparql-swg/geosparql-1.1/ontologies/geo.ttl",
+      "sha256": "7a8028dba554f069265a244d7899afb3fb97bf66795c65f7be676984d39289d7",
+      "byte_length": 40988,
+      "artifact_iri": "http://www.opengis.net/ont/geosparql",
+      "owned_namespaces": ["http://www.opengis.net/ont/geosparql#"],
+      "version_iri": "http://www.opengis.net/ont/geosparql#1.1",
+      "version_iri_turtle": "owl:versionIRI :1.1",
+      "format": "TURTLE",
+      "permitted_import_iris": []
+    },
+    {
+      "file": "sf_geometries.ttl",
+      "source_url": "https://raw.githubusercontent.com/opengeospatial/geosemantics-semantic-resources/ac303373bd0cf149d31f110cf8c1ed281ff66c60/resources/geosparql-swg/geosparql-1.1/ontologies/sf_geometries.ttl",
+      "sha256": "8dfb6539cee91933b05fa64d5393ee6b0057d78ad441934a90979a435083e1a4",
+      "byte_length": 16523,
+      "artifact_iri": "http://www.opengis.net/ont/sf",
+      "owned_namespaces": ["http://www.opengis.net/ont/sf#"],
+      "version_iri": "http://www.opengis.net/ont/sf/1.1.1",
+      "version_iri_turtle": "owl:versionIRI <http://www.opengis.net/ont/sf/1.1.1>",
+      "format": "TURTLE",
+      "permitted_import_iris": []
+    }
+  ]
+}
