@@ -60,3 +60,22 @@ export type InvestigationActionRequest = {
   | { expected_finding_version_id?: null; expected_investigation_version_id?: null }
   | { expected_finding_version_id: string; expected_investigation_version_id: string }
 );
+
+/** Readback from the existing shared Action/proposal authority. */
+export type InvestigationOperation = {
+  operation_id: string;
+  intent_id: string | null;
+  intent_request: InvestigationActionRequest | null;
+  state: "PREPARED" | "PENDING_REVIEW" | "REJECTED" | "PUBLISHED" | "PUBLICATION_UNAVAILABLE";
+  proposal: Record<string, unknown> | null;
+  prepared_proposal_id: string;
+  definition: Record<string, unknown>;
+  events: Record<string, unknown>[];
+  finding_id: string;
+  investigation_id: string;
+  frozen_rationale: string;
+  publication: { finding: AnalysisPin; investigation: AnalysisPin } | null;
+  publication_limitation: string | null;
+  current_use_authorized: false;
+  business_effect_authorized: false;
+};
