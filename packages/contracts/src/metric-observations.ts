@@ -1,5 +1,6 @@
 /** Exact retained evidence. Values are decimal strings; no client-side aggregation. */
-export type MetricPin = { resource_id: string; version_id: string; content_hash: string };
+import type { AnalysisPin } from "./semantic-analysis.js";
+export type MetricPin = AnalysisPin;
 export type MetricUnit = { kind: "COUNT"; symbol: "objects" } | { kind: "CURRENCY"; reference: MetricPin };
 export type MetricSelector = { kind: "OBJECT_COUNT"; company_field?: string | null } | { kind: "MEASURE"; key: string };
 export type MetricDefinition = {
