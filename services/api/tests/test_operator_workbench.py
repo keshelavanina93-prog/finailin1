@@ -45,3 +45,58 @@ def test_investigation_company_comes_from_server_prepared_evidence_not_browser_l
     payload["prepared_proposal"]["mutations"][0]["attributes"]["legal_entity_id"] = "foreign"
     with pytest.raises(WorkspaceError):
         summarize("opa_" + "b" * 64, payload, "now")
+
+
+def resolution_payload():
+    from copy import deepcopy
+    from uuid import uuid4
+
+    company = str(uuid4())
+    prior = {name: {"resource_id": str(uuid4()), "version_id": str(uuid4()),
+                    "content_hash": "a" * 64} for name in ("prior_finding", "prior_investigation")}
+    proof = {**prior, "unmatched_exception_run_id": "fcr_" + "b" * 64,
+             "matched_exception_run_id": "fcr_" + "c" * 64,
+             "unmatched_evidence": {"company": {"resource_id": company}},
+             "matched_evidence": {"company": {"resource_id": company}}}
+    metadata = {"version": "ontology-action/1", "kind": "SOURCE_EXCEPTION_INVESTIGATION",
+                "operation": "RESOLVE", "company_id": company, **prior,
+                "exception_run_id": proof["unmatched_exception_run_id"],
+                "matched_exception_run_id": proof["matched_exception_run_id"]}
+    mutations = [{"object_type": kind, "resource_id": prior["prior_" + kind.lower()]["resource_id"],
+                  "expected_version_id": prior["prior_" + kind.lower()]["version_id"],
+                  "attributes": {"legal_entity_id": company, "definition": {
+                      "state": "RESOLVED", "exception_run_id": metadata["exception_run_id"],
+                      "evidence": deepcopy(proof["unmatched_evidence"]),
+                      "resolution": deepcopy(proof)}}} for kind in ("Finding", "Investigation")]
+    return {"definition": metadata, "prepared_proposal": {
+        "access_entity": company, "title": "Resolve source reconciliation finding",
+        "mutations": mutations}}
+
+
+def test_resolution_stays_in_same_explicit_company_queue():
+    payload = resolution_payload()
+    result = summarize("opa_" + "d" * 64, payload, "now")
+    assert result["company_id"] == payload["definition"]["company_id"]
+    assert result["company_binding"] == "EXPLICIT_RETAINED_EXCEPTION"
+
+
+@pytest.mark.parametrize("field", ["matched_company", "old_company", "matched_run",
+                                    "different_proofs", "prior_pair", "expected_head"])
+def test_resolution_queue_refuses_unbound_or_mixed_proof(field):
+    payload = resolution_payload()
+    mutations = payload["prepared_proposal"]["mutations"]
+    if field in ("matched_company", "old_company"):
+        evidence = "matched_evidence" if field == "matched_company" else "unmatched_evidence"
+        for mutation in mutations:
+            mutation["attributes"]["definition"]["resolution"][evidence]["company"][
+                "resource_id"] = "foreign"
+    elif field == "matched_run":
+        payload["definition"]["matched_exception_run_id"] = "fcr_" + "f" * 64
+    elif field == "different_proofs":
+        mutations[1]["attributes"]["definition"]["resolution"]["matched_exception_run_id"] = "bad"
+    elif field == "prior_pair":
+        payload["definition"]["prior_finding"] = payload["definition"]["prior_investigation"]
+    else:
+        mutations[0]["expected_version_id"] = "foreign"
+    with pytest.raises(WorkspaceError):
+        summarize("opa_" + "d" * 64, payload, "now")
