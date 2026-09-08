@@ -9,6 +9,7 @@ from uuid import uuid4
 import pytest
 from test_entity_movement_review import fixture
 from test_semantic_entity_movements import case as workspace_case  # noqa: F401
+from test_source_journal_compatibility import compatibility_case
 
 from finai_api.domain.journal_production import JournalProductionRequest, SidePolicies
 from finai_api.domain.resources import ResourceReview
@@ -214,3 +215,70 @@ def test_request_cannot_supply_amounts_or_duplicate_rows():
         JournalProductionRequest.model_validate({**value, "amount": "999"})
     with pytest.raises(ValueError):
         JournalProductionRequest.model_validate({**value, "coordinates": ["Base!S2", "Base!S2"]})
+
+
+def test_compatibility_compiler_preserves_family_and_refuses_stale_or_wrong_cell():
+    from finai_api.domain.resource_lifecycle import VersionReference
+
+    pair, source, targets, req = synthetic_candidate()
+    authority, _, _, _ = compatibility_case(source, targets)
+    ref = VersionReference(resource_id=authority.resource_id, version_id=uuid4())
+    targets[str(ref.resource_id)] = {
+        **ref.model_dump(mode="json"),
+        "object_type": "SourceJournalCompatibility",
+        "authority_state": "APPROVED",
+        "evidence_class": "USER_ASSERTED",
+        "attributes": authority.attributes,
+    }
+    req = req.model_copy(update={"compatibility": ref})
+    result, proposal = service.compile_row(pair, source, targets, req, "test")
+    assert result["state"] == "CANDIDATE" and proposal is not None, result
+    authority.attributes["definition"]["amount_column"] = "AD"
+    result, proposal = service.compile_row(pair, source, targets, req, "test")
+    assert proposal is None and result["blockers"][0]["code"] == "SOURCE_COMPATIBILITY_INVALID"
+    targets[str(ref.resource_id)]["version_id"] = str(uuid4())
+    result, proposal = service.compile_row(pair, source, targets, req, "test")
+    assert proposal is None and "version changed" in result["blockers"][0]["detail"]
+
+
+def test_preview_requires_canonical_guard_and_retains_missing_row(workspace_case, monkeypatch):
+    from contextlib import nullcontext
+
+    history, original = workspace_case
+    req = request(original.company_id).model_copy(update={"invocation_id": original.invocation_id})
+    p = SimpleNamespace(
+        permissions=["ontology_propose"],
+        scope=SimpleNamespace(legal_entity_id="test", tenant_id="test"),
+    )
+    pair, source, targets, candidate_request = synthetic_candidate()
+    row, proposal = service.compile_row(pair, source, targets, candidate_request, "test")
+    descriptor, _, _ = service.build(
+        history, *service.semantic_analysis.load(p, original.invocation_id)[1:], original.company_id
+    )
+    monkeypatch.setattr(service, "build", lambda *_: (descriptor, [], {}))
+    history["output"]["entity_movement_review"]["reconciliation"]["excluded_rows"] = [
+        {"coordinate": "Base!S288", "row": 288, "reason": "MISSING_LITERAL_POSTED_AMOUNT"}
+    ]
+    monkeypatch.setattr(service, "compile_row", lambda *_: (deepcopy(row), proposal))
+    monkeypatch.setattr(
+        service.resources,
+        "resource_connection",
+        lambda *_: nullcontext(SimpleNamespace(execute=lambda *_: None)),
+    )
+
+    def refuse(*_):
+        raise WorkspaceError(409, "Posting period is locked")
+
+    monkeypatch.setattr(service.resources, "_validate", refuse)
+    manifest, proposals = service.prepare(p, req)
+    assert not proposals
+    assert (
+        next(r for r in manifest["rows"] if r["coordinate"] == "Base!S2")["blockers"][0]["code"]
+        == "CANONICAL_PUBLICATION_GUARD_REFUSED"
+    )
+    assert (
+        next(r for r in manifest["rows"] if r["coordinate"] == "Base!S288")["state"] == "EXCLUDED"
+    )
+    monkeypatch.setattr(service.resources, "_validate", lambda *_: None)
+    manifest, proposals = service.prepare(p, req)
+    assert proposals and manifest["advisory"] is True and manifest["published_journal_count"] == 0

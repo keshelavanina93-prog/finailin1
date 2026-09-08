@@ -4,6 +4,7 @@
 import pytest
 from test_semantic_entity_movements import case  # noqa: F401
 
+from finai_api.domain.semantic_analysis import FieldDefinition, Value
 from finai_api.services import semantic_analysis
 from finai_api.services.journal_projection import build_projection
 from finai_api.services.semantic_analysis_movements import build
@@ -13,6 +14,30 @@ from finai_api.services.workspace import WorkspaceError
 def test_accepted_subset_exact_cells_and_stale_selection(case):
     history, request = case
     source = semantic_analysis.project(None, request)
+    source = source.model_copy(
+        update={
+            "descriptor": source.descriptor.model_copy(
+                update={
+                    "fields": [
+                        *source.descriptor.fields,
+                        FieldDefinition(
+                            key="account_code",
+                            label="Account code",
+                            kind="identifier",
+                            role="ATTRIBUTE",
+                            definition=source.descriptor.function,
+                        ),
+                    ]
+                }
+            ),
+            "rows": [
+                r.model_copy(
+                    update={"values": {**r.values, "account_code": Value(value="synthetic-code")}}
+                )
+                for r in source.rows
+            ],
+        }
+    )
     _, plan, resolver = semantic_analysis.load(None, request.invocation_id)
     _, _, contributors = build(history, plan, resolver, request.company_id)
     movement = history["output"]["entity_movement_review"]["movements"][0]
@@ -25,6 +50,7 @@ def test_accepted_subset_exact_cells_and_stale_selection(case):
     }
     result = build_projection(source, receipt, contributors, request)
     assert len(result.rows) == 1
+    assert result.rows[0].values["account_code"].value == "synthetic-code"
     assert result.rows[0].values["debit_movement"].value == movement["debit"]
     selected = request.model_copy(
         update={"selected_row": result.rows[0].key, "descriptor_sha256": result.descriptor_sha256}

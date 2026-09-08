@@ -27,7 +27,7 @@ def build_projection(source_projection, receipt, contributors, request):
                 trace=original.trace,
                 contributor_count=len(retained[original.key]),
                 values={
-                    "account": original.values["account"],
+                    **original.values,
                     "debit_movement": Value(value=movement["debit"]),
                     "credit_movement": Value(value=movement["credit"]),
                     "net_movement": Value(value=movement["net_movement"]),
