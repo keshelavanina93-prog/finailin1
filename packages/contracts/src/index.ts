@@ -260,4 +260,4 @@ export type { MetricPin, MetricUnit, MetricSelector, MetricDefinition, MetricOut
 export type { AcceptedMovementFunctionInvocation } from "./accepted-movement-function.js";
 export type { MetricCatalogItem, MetricCatalog, MetricCatalogRequest } from "./metric-observations.js";
 export type { MetricDefinitionSnapshot } from "./metric-observations.js";
-export type { SourceExceptionRequest, SourceExceptionObservation, RetainedSourceException, InvestigationActionRequest } from "./source-exceptions.js";
+export type { SourceExceptionRequest, SourceExceptionObservation, RetainedSourceException, InvestigationActionRequest, InvestigationOperation } from "./source-exceptions.js";
