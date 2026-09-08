@@ -148,6 +148,7 @@ def test_wrong_company_tampered_receipt_and_changed_proposal_fail_closed():
 
 def test_reader_uses_prepared_fallback_and_only_selects_exact_proposal_versions(monkeypatch):
     from contextlib import nullcontext
+
     from finai_api.services import journal_production_dispositions as service
 
     data = case()
