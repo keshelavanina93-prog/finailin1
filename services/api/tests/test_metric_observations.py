@@ -1,13 +1,14 @@
 """Offline contract checks; never open the product database or execute a Function."""
 
+from contextlib import contextmanager
 from copy import deepcopy
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from uuid import UUID
 
 import pytest
 
-from finai_api.domain.metric_execution import ObserveRequest
+from finai_api.domain.metric_execution import DefinitionSnapshot, ObserveRequest
 from finai_api.domain.review import Principal
 from finai_api.services import metric_execution as metrics
 from finai_api.services.workspace import WorkspaceError
@@ -36,7 +37,7 @@ def case(monkeypatch):
             tenant_id=UUID(int=1), legal_entity_id="company", period="2026-09", currency="GEL"
         ),
     )
-    when = datetime(2026, 9, 8, tzinfo=UTC)
+    when = datetime.now(UTC) - timedelta(days=2)
     fn = {
         **exact(2),
         "object_type": "FunctionDefinition",
@@ -269,3 +270,149 @@ def test_observe_reuses_history_and_existing_retention(case, monkeypatch):
     assert len(writes) == 1
     assert writes[0][0] == p and writes[0][2] == metrics.RUNTIME
     assert writes[0][1]["input_run_id"] == retained["output"]["run_id"]
+
+
+def catalog_connection(monkeypatch, rows):
+    calls = []
+    by_version = {str(row["version_id"]): row["dependencies"] for row in rows}
+
+    class Cursor:
+        def execute(self, sql, parameters):
+            calls.append((sql, parameters))
+            result = by_version[str(parameters[1])] if "SELECT d.relation" in sql else rows
+            return SimpleNamespace(fetchall=lambda: result)
+
+    @contextmanager
+    def cursor(**kwargs):
+        yield Cursor()
+
+    @contextmanager
+    def connection(*args, **kwargs):
+        yield SimpleNamespace(cursor=cursor)
+
+    monkeypatch.setattr(metrics.resources, "resource_connection", connection)
+    monkeypatch.setattr(metrics, "_current", lambda *args: None)
+    return calls
+
+
+def test_catalog_exact_function_filter_and_shared_wire(case, monkeypatch):
+    p, _, metric, _ = case
+    metric["display_name"] = "Retained count"
+    calls = catalog_connection(monkeypatch, [metric])
+    result = metrics.discover(
+        p,
+        function_resource_id=UUID(int=2),
+        function_version_id=UUID(int=102),
+        function_content_hash=exact(2)["content_hash"],
+    )
+    assert result["contract"] == "metric-catalog/1"
+    assert result["items"][0]["metric"] == exact(3)
+    assert result["items"][0]["function"] == exact(2)
+    assert result["items"][0]["company"] is None
+    assert result["next_cursor"] is None
+    assert result["current_use_authorized"] is result["business_effect_authorized"] is False
+    assert "LIMIT 51" in calls[0][0]
+    assert "d.relation='FIELD:function_id'" in calls[0][0]
+    assert calls[0][1][-3:] == (UUID(int=2), UUID(int=102), exact(2)["content_hash"])
+    assert not metrics.discover(
+        p,
+        function_resource_id=UUID(int=2),
+        function_version_id=UUID(int=999),
+        function_content_hash=exact(2)["content_hash"],
+    )["items"]
+
+
+def test_catalog_requires_complete_filter_before_database(case):
+    p, _, _, _ = case
+    with pytest.raises(WorkspaceError) as error:
+        metrics.discover(p, function_resource_id=UUID(int=2))
+    assert error.value.status == 422
+
+
+def test_catalog_pagination_advances_when_page_is_nonexecutable(case, monkeypatch):
+    p, _, metric, _ = case
+    rows = []
+    for n in range(51):
+        row = deepcopy(metric)
+        row.update(exact(n + 200), display_name="Legacy")
+        row["attributes"].pop("definition")
+        rows.append(row)
+    calls = catalog_connection(monkeypatch, rows)
+    result = metrics.discover(p, after_resource_id=UUID(int=100))
+    assert result["items"] == []
+    assert result["next_cursor"] == rows[49]["resource_id"]
+    assert len(calls) == 51  # One candidate query plus exactly fifty dependency reads.
+    assert calls[0][1][4:6] == (UUID(int=100), UUID(int=100))
+
+
+def test_catalog_refuses_foreign_company_and_withdrawn_metric(case, monkeypatch):
+    p, _, metric, _ = case
+    metric["display_name"] = "Company count"
+    company = {
+        **exact(8),
+        "relation": "FIELD:legal_entity_id",
+        "object_type": "LegalEntity",
+        "authority_state": "APPROVED",
+    }
+    metric["dependencies"].append(company)
+    metric["attributes"]["legal_entity_id"] = company["resource_id"]
+    metric["attributes"]["definition"]["selector"]["company_field"] = "legal_entity_id"
+    catalog_connection(monkeypatch, [metric])
+    assert metrics.discover(p)["items"] == []
+    selected = p.model_copy(
+        update={"scope": p.scope.model_copy(update={"legal_entity_id": str(UUID(int=8))})}
+    )
+    assert metrics.discover(selected)["items"][0]["company"] == exact(8)
+
+    def withdrawn(*args):
+        raise WorkspaceError(409, "withdrawn")
+
+    monkeypatch.setattr(metrics, "_current", withdrawn)
+    assert metrics.discover(selected)["items"] == []
+
+
+def test_new_definition_can_select_old_source_only_with_explicit_definition_snapshot(case):
+    p, req, metric, retained = case
+    later = req.known_at + timedelta(days=1)
+    metric.update(system_from=later, valid_from=later)
+    with pytest.raises(WorkspaceError):
+        metrics.assemble(*case)
+    request = req.model_copy(
+        update={"definition_snapshot": DefinitionSnapshot(valid_at=later, known_at=later)}
+    )
+    result = metrics.assemble(p, request, metric, retained)
+    assert result["definition_snapshot"]["known_at"] == later.isoformat().replace("+00:00", "Z")
+    assert result["observation"]["known_at"] == req.known_at.isoformat().replace("+00:00", "Z")
+    assert result["source_result"] == retained["output"]
+    assert result["metric"] == req.metric.model_dump(mode="json")
+    expired = deepcopy(metric)
+    expired["valid_to"] = later
+    with pytest.raises(WorkspaceError):
+        metrics.assemble(p, request, expired, retained)
+    future = datetime.now(UTC) + timedelta(days=1)
+    request = req.model_copy(
+        update={"definition_snapshot": DefinitionSnapshot(valid_at=later, known_at=future)}
+    )
+    with pytest.raises(WorkspaceError):
+        metrics.assemble(p, request, metric, retained)
+
+
+def test_catalog_supplies_current_definition_snapshot_for_old_retained_input(case, monkeypatch):
+    p, req, metric, retained = case
+    metric.update(
+        display_name="New count",
+        system_from=req.known_at + timedelta(days=1),
+        valid_from=req.valid_at + timedelta(days=1),
+    )
+    catalog_connection(monkeypatch, [metric])
+    item = metrics.discover(p)["items"][0]
+    assert item["definition_temporal"]["system_from"] == metric["system_from"].isoformat()
+    request = req.model_copy(
+        update={
+            "definition_snapshot": DefinitionSnapshot.model_validate(item["definition_snapshot"])
+        }
+    )
+    assert (
+        metrics.assemble(p, request, metric, retained)["definition_snapshot"]
+        == item["definition_snapshot"]
+    )
