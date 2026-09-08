@@ -45,6 +45,100 @@ def run(tmp_path, item, **kwargs):
     return canonicalize_rdf([item], root_iris=[item.artifact_iri], work_dir=tmp_path, **kwargs)
 
 
+def serialized_worker_request(item):
+    # Exercise the actual JSON protocol: Python tuples must not mask wire-shape mistakes.
+    return json.loads(
+        json.dumps(
+            {
+                "artifacts": [{**asdict(item), "content": base64.b64encode(item.content).decode()}],
+                "root_iris": [item.artifact_iri],
+                "limits": asdict(RdfLimits()),
+            }
+        )
+    )
+
+
+def test_serialized_worker_foreign_policy_matches_exact_retained_protocol(tmp_path):
+    """Direct execution verifies protocol semantics; isolated execution verifies the real path."""
+    annotation = statement(subject="urn:foreign:A", value='"retained annotation"')
+    declaration = RdfForeignAssertion(
+        "urn:foreign:B", TYPE, f"<{OWL}Class>", "FOREIGN_VOCABULARY_DECLARATION", REASON
+    )
+    item = artifact(
+        [declaration, annotation],
+        text=(
+            f"<urn:foreign:B> <{TYPE}> <{OWL}Class> .\n"
+            f'<urn:foreign:A> <{RDFS}comment> "retained annotation" .\n'
+            '<urn:owned:C> <urn:owned:predicate> "owned value" .\n'
+        ),
+    )
+    expected = (
+        f'<urn:foreign:A> <{RDFS}comment> "retained annotation" <urn:owned:module> .\n'
+        f"<urn:foreign:B> <{TYPE}> <{OWL}Class> <urn:owned:module> .\n"
+        '<urn:owned:C> <urn:owned:predicate> "owned value" <urn:owned:module> .\n'
+    ).encode()
+    direct = rdf_engine_worker.process(serialized_worker_request(item), "PROTOCOL_ONLY")
+    isolated = run(tmp_path, item)
+    assert base64.b64decode(direct["canonical_nquads"]) == expected
+    assert isolated.canonical_nquads == expected
+    expected_hash = hashlib.sha256(expected).hexdigest()
+    assert direct["canonical_sha256"] == isolated.canonical_sha256 == expected_hash
+    expected_report = [
+        {
+            "artifact_iri": "urn:owned:module",
+            "source_sha256": hashlib.sha256(item.content).hexdigest(),
+            "assertions": [asdict(annotation), asdict(declaration)],
+            "ownership_authorized": False,
+            "equivalence_authorized": False,
+        }
+    ]
+    assert direct["foreign_assertions"] == list(isolated.foreign_assertions) == expected_report
+    assert direct["artifacts"] == [
+        {
+            "artifact_iri": "urn:owned:module",
+            "sha256": hashlib.sha256(item.content).hexdigest(),
+            "imports": [],
+            "quad_count": 3,
+        }
+    ]
+    assert direct["quad_count"] == isolated.quad_count == 3
+    assert direct["manifest"] == isolated.manifest
+    assert direct["manifest"]["foreign_assertion_count"] == 2
+    assert direct["manifest"]["foreign_assertion_policy"] == (
+        "EXACT_FOREIGN_ANNOTATIONS_DECLARATIONS/1"
+    )
+    assert (
+        not {"owned_namespaces", "canonical_term_id", "business_effect_authorized"} & direct.keys()
+    )
+
+
+@pytest.mark.parametrize(
+    "declarations,code",
+    [
+        (
+            [replace(statement(), object_ntriples='"private unterminated')],
+            "FOREIGN_ASSERTION_POLICY",
+        ),
+        ([replace(statement(), object_ntriples="_:unscoped")], "FOREIGN_ASSERTION_POLICY"),
+        (
+            [replace(statement(), predicate_iri=OWL + "sameAs", object_ntriples="<urn:owned:C>")],
+            "FOREIGN_ASSERTION_POLICY",
+        ),
+        ([statement(), statement()], "FOREIGN_ASSERTION_POLICY"),
+        ([statement(subject="urn:owned:C")], "FOREIGN_ASSERTION_POLICY"),
+        ([statement(), statement(subject="urn:foreign:Unused")], "UNUSED_FOREIGN_ASSERTION"),
+    ],
+)
+def test_serialized_worker_policy_refusals_match_isolated_controller(tmp_path, declarations, code):
+    item = artifact(declarations)
+    with pytest.raises(RdfEngineError) as direct:
+        rdf_engine_worker.process(serialized_worker_request(item), "PROTOCOL_ONLY")
+    with pytest.raises(RdfEngineError) as isolated:
+        run(tmp_path, item)
+    assert direct.value.code == isolated.value.code == code
+    assert "private" not in str(direct.value) and "private" not in str(isolated.value)
+
+
 def test_exact_exception_preserves_graph_and_adds_no_ownership(tmp_path):
     item = artifact()
     result = run(tmp_path, item)
@@ -150,6 +244,9 @@ def test_no_exception_worker_wire_matches_pre_extension_golden_bytes(tmp_path):
         "limits": asdict(RdfLimits()),
     }
     output = rdf_engine_worker.process(payload, "TEST")
+    assert "foreign_assertions" not in output
+    assert "foreign_assertion_policy" not in output["manifest"]
+    assert "foreign_assertion_count" not in output["manifest"]
     assert hashlib.sha256(ontology_import.encoded(output)).hexdigest() == (
         "740103a8ed9e6bc4bab367fce49af66213cf678d81f2153db555204a7ba12e67"
     )
