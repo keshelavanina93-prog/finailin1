@@ -33,7 +33,7 @@ export function evidenceCaption(basis:AnalysisContributor["basis"]):string {
  return basis==="CANONICAL_DEFINITION"?"Retained canonical definition":basis==="UNAVAILABLE"?"Original source unavailable":"Original retained evidence";
 }
 function validContributor(value:AnalysisContributor):boolean {
- return Boolean(value&&pin(value.reference)&&[undefined,"ORIGINAL_SOURCE","CANONICAL_DEFINITION","UNAVAILABLE"].includes(value.basis)&&Array.isArray(value.cells)&&value.cells.length<=256&&value.cells.every(cell=>cell&&typeof cell.label==="string"&&(cell.value===null||typeof cell.value==="string"||typeof cell.value==="boolean"||typeof cell.value==="number"&&Number.isSafeInteger(cell.value))));
+ return Boolean(value&&pin(value.reference)&&[undefined,"ORIGINAL_SOURCE","CANONICAL_DEFINITION","UNAVAILABLE"].includes(value.basis)&&Array.isArray(value.cells)&&value.cells.length<=256&&value.cells.every(cell=>cell&&typeof cell.label==="string"&&(cell.reference==null||pin(cell.reference))&&(cell.value===null||typeof cell.value==="string"||typeof cell.value==="boolean"||typeof cell.value==="number"&&Number.isSafeInteger(cell.value))));
 }
 function validValue(value:AnalysisValue,field:AnalysisField):boolean {
  if(!value||!["VALUE","NULL","MISSING"].includes(value.state)||value.label!==null&&typeof value.label!=="string"||value.reference!==null&&!pin(value.reference))return false;

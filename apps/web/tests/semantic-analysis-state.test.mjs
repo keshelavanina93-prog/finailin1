@@ -7,6 +7,24 @@ const pin={resource_id:id,version_id:id,content_hash:hash};
 const field={key:"units",label:"Units",kind:"decimal",role:"MEASURE",aggregation:"RETAINED_VALUE_ONLY",definition:pin,filterable:false,groupable:false,options:[]};
 const request={company_id:id,invocation_id:id,descriptor_sha256:hash,filters:[],group_by:null,selected_row:null,contributor_index:0};
 const projection={descriptor:{contract:"semantic-analysis/1",invocation_id:id,company:{resource_id:id},receipt_hash:hash,valid_at:time,known_at:time,recorded_at:time,current_use_authorized:false,business_effect_authorized:false,visual:"HORIZONTAL_BARS",filtering:"RETAINED_GROUP_SELECTION",grouping:"RETAINED_ROWS_WITHOUT_AGGREGATION",measure:"units",fields:[field]},descriptor_sha256:hash,request,total_rows:1,rows:[{key:row,label:"Retained group",trace:pin,contributor_count:1,values:{units:{state:"VALUE",value:"9007199254740993.125",label:null,reference:null}}}],sections:[{label:"all",row_keys:[row]}],selection:null};
+
+test("optional evidence cell references preserve old cells and validate exact pins in both contracts",()=>{
+ for(const contract of ["semantic-analysis/1","semantic-analysis/2"]){
+  const p=structuredClone(projection);p.request.selected_row=row;
+  if(contract==="semantic-analysis/2"){Object.assign(p.descriptor,{contract,measure:null,visual:"NONE",row_noun:"objects"});Object.assign(p.descriptor.fields[0],{role:"ATTRIBUTE",aggregation:"NONE"});}
+  const cell={label:"Retained definition",value:"Exact reference",coordinate:null,formula:null};
+  const contributor={basis:"CANONICAL_DEFINITION",label:"Accepted journal",reference:pin,cells:[cell]};
+  p.selection={row_key:row,contributor_index:0,contributor_count:1,contributor};
+  const original=JSON.stringify(p);
+  assert.doesNotThrow(()=>assertProjection(p,p.request));assert.equal(JSON.stringify(p),original);
+  for(const reference of [null,pin]){cell.reference=reference;assert.doesNotThrow(()=>assertProjection(p,p.request));}
+  for(const reference of [{},[],false,"reference",{...pin,content_hash:"invalid"},{...pin,resource_id:"invalid"},{...pin,version_id:null}]){
+   cell.reference=reference;assert.throws(()=>assertProjection(p,p.request));
+   const excluded={...p,request,selection:null,descriptor:{...p.descriptor,excluded_evidence:[contributor]}};
+   assert.throws(()=>assertProjection(excluded,request));
+  }
+ }
+});
 test("Find searches only returned row labels and visible recorded field values without numeric conversion",()=>{
  const original=JSON.stringify(projection),retained=projection.rows[0];
  for(const query of [" retained GROUP ","9007199254740993.125","Units:",""])assert.equal(worksheetRowMatches(retained,[field],query),true);
