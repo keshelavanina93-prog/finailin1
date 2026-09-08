@@ -6,12 +6,14 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from finai_api.domain.journal_dimensions import LineDimensions
+from finai_api.domain.resource_lifecycle import VersionReference
 
 
 class SidePolicies(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     debit: LineDimensions
     credit: LineDimensions
+    source_record: VersionReference | None = None
 
 
 class JournalProductionRequest(BaseModel):

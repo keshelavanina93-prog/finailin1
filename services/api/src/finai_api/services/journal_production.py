@@ -70,6 +70,30 @@ def compile_row(pair, source, targets, request, access_entity):
         (record_id, "SourceRecord", record_attrs),
         (identity, "JournalEntry", entry_attrs),
     ]
+    if dimensions.source_record is not None:
+        reference = dimensions.source_record
+        retained = targets[str(reference.resource_id)]
+        if (
+            str(retained["version_id"]) != str(reference.version_id)
+            or retained["object_type"] != "SourceRecord"
+            or retained["authority_state"] != "APPROVED"
+            or retained["evidence_class"] != "SOURCE_BOUND"
+            or retained["attributes"] != record_attrs
+        ):
+            return {
+                "coordinate": coordinate,
+                "state": "BLOCKED",
+                "blockers": [
+                    blocker(
+                        "EXACT_SOURCE_RECORD_REQUIRED",
+                        "SourceRecord",
+                        "Reviewed record must identify this exact retained source cell",
+                        **reference.model_dump(mode="json"),
+                    )
+                ],
+            }, None
+        record_id = reference.resource_id
+        definitions = definitions[1:]
     for line in pair["lines"]:
         policy = getattr(dimensions, line["side"].lower())
         definitions.append(
@@ -96,7 +120,9 @@ def compile_row(pair, source, targets, request, access_entity):
         },
     }
     try:
-        for key, kind, attrs in definitions[1:]:
+        for key, kind, attrs in definitions:
+            if kind == "SourceRecord":
+                continue
             validate_journal(
                 SimpleNamespace(resource_id=key, object_type=kind, attributes=attrs),
                 lambda identifier, *_: nodes[str(identifier)],
@@ -164,6 +190,21 @@ def prepare(principal, request):
         request.coordinates
     ):
         raise WorkspaceError(422, "Select retained coordinates before supplying side policies")
+    record_errors = {}
+    for coordinate, policy in request.policies.items():
+        if policy.source_record is not None:
+            try:
+                node = resources.get_resource(principal, policy.source_record.resource_id)[
+                    "resource"
+                ]
+                targets[str(node["resource_id"])] = node
+            except WorkspaceError as exc:
+                record_errors[coordinate] = blocker(
+                    "EXACT_SOURCE_RECORD_REQUIRED",
+                    "SourceRecord",
+                    exc.detail,
+                    **policy.source_record.model_dump(mode="json"),
+                )
     rows, proposals = [], {}
     for excluded in review["reconciliation"]["excluded_rows"]:
         rows.append(
@@ -182,6 +223,15 @@ def prepare(principal, request):
             }
         )
     for pair in review["pairs"]:
+        if pair["source_coordinate"] in record_errors:
+            rows.append(
+                {
+                    "coordinate": pair["source_coordinate"],
+                    "state": "BLOCKED",
+                    "blockers": [record_errors[pair["source_coordinate"]]],
+                }
+            )
+            continue
         row, proposal = compile_row(pair, source, targets, request, principal.scope.legal_entity_id)
         rows.append(row)
         if proposal is not None:
@@ -282,7 +332,10 @@ def check(principal, proposal_id, request):
     require_permission(principal, "ontology_review")
     detail = resources.proposal_detail(principal, proposal_id)
     kinds = [item.object_type for item in detail.proposal.mutations]
-    if sorted(kinds) != ["JournalEntry", "JournalLine", "JournalLine", "SourceRecord"]:
+    if sorted(kinds) not in (
+        ["JournalEntry", "JournalLine", "JournalLine", "SourceRecord"],
+        ["JournalEntry", "JournalLine", "JournalLine"],
+    ):
         raise WorkspaceError(422, "Journal checker requires a complete source-row journal bundle")
     # Shared review rejects same-maker approval and changed dependencies; it is
     # the only operation here that can publish canonical journal versions.

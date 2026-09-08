@@ -85,6 +85,33 @@ def test_missing_side_authority_is_never_an_implicit_empty_policy():
     assert [b["required_authority"]["side"] for b in row["blockers"]] == ["DEBIT", "CREDIT"]
 
 
+def test_existing_source_record_reuse_preserves_reviewed_dimension_provenance():
+    from finai_api.domain.resource_lifecycle import VersionReference
+
+    pair, source, targets, req = synthetic_candidate()
+    reference = VersionReference(resource_id=uuid4(), version_id=uuid4())
+    targets[str(reference.resource_id)] = {
+        **reference.model_dump(mode="json"),
+        "object_type": "SourceRecord",
+        "authority_state": "APPROVED",
+        "evidence_class": "SOURCE_BOUND",
+        "attributes": {"evidence_id": source["evidence"]["resource_id"], "coordinate": "Base!S2"},
+    }
+    req.policies["Base!S2"] = req.policies["Base!S2"].model_copy(
+        update={"source_record": reference}
+    )
+    _, proposal = service.compile_row(pair, source, targets, req, "test")
+    assert len(proposal.mutations) == 3
+    assert all(
+        m.attributes["source_record_id"] == str(reference.resource_id)
+        for m in proposal.mutations
+        if m.object_type == "JournalLine"
+    )
+    targets[str(reference.resource_id)]["attributes"]["coordinate"] = "Base!S288"
+    row, proposal = service.compile_row(pair, source, targets, req, "test")
+    assert proposal is None and row["blockers"][0]["code"] == "EXACT_SOURCE_RECORD_REQUIRED"
+
+
 def test_source_profile_refusal_names_required_reviewed_scope():
     parsed, source, targets, ids = fixture()
     pair = review(parsed, source, targets, {})["pairs"][0]
