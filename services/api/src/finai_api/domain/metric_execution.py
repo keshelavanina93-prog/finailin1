@@ -1,4 +1,5 @@
 """Versioned Metric selectors over completed shared Function evidence, never formulas."""
+
 from typing import Annotated, Literal
 from uuid import UUID
 
@@ -40,6 +41,7 @@ class Measure(Model):
 
 class MetricDefinition(Model):
     """Select one retained scalar; never aggregate across observations or grains."""
+
     contract: Literal["metric-definition/1"]
     selector: Annotated[ObjectCount | Measure, Field(discriminator="kind")]
     unit: Unit
@@ -52,7 +54,8 @@ class MetricDefinition(Model):
         if len(self.dimensions) != len(set(self.dimensions)):
             raise ValueError("Metric dimensions must be unique")
         if isinstance(self.selector, ObjectCount) and (
-            not isinstance(self.unit, CountUnit) or self.grain != "OBJECT_SET_SNAPSHOT"
+            not isinstance(self.unit, CountUnit)
+            or self.grain != "OBJECT_SET_SNAPSHOT"
             or self.dimensions
         ):
             raise ValueError("Object count requires object units and dimensionless snapshot grain")
@@ -88,4 +91,3 @@ class MetricOutput(Model):
         if len(ids) != len(set(ids)) or len(self.dimensions) != len(set(self.dimensions)):
             raise ValueError("Contributors and dimensions must be unique")
         return self
-

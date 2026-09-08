@@ -29,6 +29,11 @@ def validate_definition(
     links: dict[str, str],
     target: Callable[..., dict[str, Any]],
 ) -> None:
+    if item.object_type == "MetricDefinition":
+        from finai_api.services.metric_execution import validate_publication
+
+        validate_publication(item, target)
+        return
     if item.object_type == "DomainPack":
         # Normal resource validation captures typed, exact FIELD dependency pins.
         # A pack chooses one executable membership basis; it cannot union two

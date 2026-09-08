@@ -247,7 +247,13 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "binding_review?": "OntologyDefinition",
         "execution_policy?": "OntologyDefinition",
     },
-    "MetricDefinition": {"code": "Identifier", "function_reference": "Identifier"},
+    "MetricDefinition": {
+        "code": "Identifier",
+        "function_reference": "Identifier",
+        "function_id?": "@FunctionDefinition",
+        "definition?": "OntologyDefinition",
+        "legal_entity_id?": "@LegalEntity",
+    },
     "ReportSnapshot": {
         "legal_entity_id": "@LegalEntity",
         "period_id": "@FiscalPeriod",
