@@ -41,6 +41,7 @@ export interface CompanyJournalReviews {
 /** Exact accepted definition and members; count is not a complete company inventory. */
 export interface CompanyOperatingResourceGroup {
  key:string;label:string;definition:CanonicalResource;
+ /** 1..201 pins, including exactly one matching definition identity/version/hash. */
  definition_pins:Array<{resource_id:string;version_id:string;content_hash:string}>;
  state:"AVAILABLE"|"EMPTY"|"UNAVAILABLE";resources:CanonicalResource[];
  valid_at:string;known_at:string;count:number|null;

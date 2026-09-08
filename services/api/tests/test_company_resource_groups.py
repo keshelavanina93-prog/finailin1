@@ -97,3 +97,34 @@ def test_schema_changed_member_refuses_count(case):
         datetime.now().astimezone(),
     )[0]
     assert result.state == "UNAVAILABLE" and result.count is None and result.resources == []
+
+
+@pytest.mark.parametrize(
+    "failure",
+    ["empty", "missing_self", "wrong_version", "wrong_hash", "duplicate_self", "over_bound"],
+)
+def test_response_contract_requires_bounded_exact_self_pin(failure):
+    from pydantic import ValidationError
+
+    from finai_api.domain.company_condition import CompanyOperatingResourceGroup
+
+    group, _, load = definition()
+    now = datetime.now().astimezone()
+    payload = groups.project(groups.resolve_definitions([group], load), [], now, now)[
+        0
+    ].model_dump()
+    pins = payload["definition_pins"]
+    if failure == "empty":
+        payload["definition_pins"] = []
+    elif failure == "missing_self":
+        payload["definition_pins"] = pins[1:]
+    elif failure == "wrong_version":
+        pins[0]["version_id"] = uid("other version")
+    elif failure == "wrong_hash":
+        pins[0]["content_hash"] = "b" * 64
+    elif failure == "duplicate_self":
+        pins.append(dict(pins[0]))
+    else:
+        payload["definition_pins"] = [pins[0]] + [pins[1]] * 201
+    with pytest.raises(ValidationError):
+        CompanyOperatingResourceGroup.model_validate(payload)
