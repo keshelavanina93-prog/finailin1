@@ -128,6 +128,8 @@ def assemble(principal, request: ObserveRequest, metric: dict[str, Any], history
             if attrs.get("legal_entity_id")
             else None
         )
+        if company and str(company.resource_id) != principal.scope.legal_entity_id:
+            raise ValueError("Metric company differs from selected company scope")
         if isinstance(spec.unit, CurrencyUnit) and (
             pin(dependency(metric, "METRIC_UNIT", spec.unit.reference.resource_id, "Currency"))
             != spec.unit.reference
@@ -140,6 +142,12 @@ def assemble(principal, request: ObserveRequest, metric: dict[str, Any], history
         ):
             raise ValueError("Completed invocation receipt differs")
         receipt, output = history["receipt"], history["output"]
+        if any(
+            evidence.get(flag) is not False
+            for evidence in (receipt, output)
+            for flag in ("current_use_authorized", "business_effect_authorized")
+        ):
+            raise ValueError("Metric requires explicitly non-authoritative source evidence")
         scope = principal.scope.model_dump(mode="json")
         if (
             receipt["exact_scope"] != scope
