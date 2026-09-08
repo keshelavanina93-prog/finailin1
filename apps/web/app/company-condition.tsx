@@ -1,4 +1,5 @@
 "use client";
+import type {JournalReviewReference} from "./journal-review-handoff";
 import {useState} from "react";
 import type {CanonicalResource} from "@finai/contracts";
 import CompanyHome from "./company-home";
@@ -8,11 +9,11 @@ import type {Company360Descriptor} from "./company-360-descriptor";
 import type {MapSelection,MapWorkspaceState} from "./operations-model";
 
 type Lens="overview"|"structure"|"accounting"|"evidence";
-type Props={token:string;viewStateKey?:string;descriptor:Company360Descriptor;onLens:(lens:Lens)=>void;onInspect:(node:CanonicalResource,knownAt?:string)=>void;onTrace?:(node:CanonicalResource,knownAt?:string)=>void;onHistory?:(node:CanonicalResource,knownAt?:string)=>void;onProposal?:(id:string)=>void;onWorkflow?:(id:string)=>void;onSelect:(node:CanonicalResource)=>void;onData:()=>void;onRegulation:()=>void;onWork:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void};
+type Props={token:string;viewStateKey?:string;descriptor:Company360Descriptor;onLens:(lens:Lens)=>void;onInspect:(node:CanonicalResource,knownAt?:string)=>void;onTrace?:(node:CanonicalResource,knownAt?:string)=>void;onHistory?:(node:CanonicalResource,knownAt?:string)=>void;onProposal?:(id:string)=>void;onJournalReview?:(reference:JournalReviewReference)=>void;onWorkflow?:(id:string)=>void;onSelect:(node:CanonicalResource)=>void;onData:()=>void;onRegulation:()=>void;onWork:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void};
 const human=(value:string)=>value.replace(/([a-z])([A-Z])/g,"$1 $2").replaceAll("_"," ").toLowerCase();
 const stamp=(value:string)=>new Date(value).toLocaleString();
 
-export default function CompanyCondition({token,viewStateKey,descriptor:d,onLens,onInspect,onTrace,onHistory,onProposal,onWorkflow,onSelect,onData,onRegulation,onWork,onOperations,onMapSelection}:Props){
+export default function CompanyCondition({token,viewStateKey,descriptor:d,onLens,onInspect,onTrace,onHistory,onProposal,onJournalReview,onWorkflow,onSelect,onData,onRegulation,onWork,onOperations,onMapSelection}:Props){
  const [search,setSearch]=useState(""),[page,setPage]=useState(0);
  const query=search.trim().toLocaleLowerCase();
  const connections=d.connections.filter(row=>`${row.source.display_name} ${row.target.display_name} ${row.kind}`.toLocaleLowerCase().includes(query));
@@ -20,7 +21,7 @@ export default function CompanyCondition({token,viewStateKey,descriptor:d,onLens
  return <div className="c360-condition">
   <nav className="c360-condition-actions" aria-label="Company work"><button onClick={onData}>Review source analyses</button><button onClick={()=>onLens("accounting")}>Ledger & close</button><button onClick={onWork}>Work & decisions</button><button onClick={()=>onLens("evidence")}>Evidence & licences</button></nav>
   <CompanyHome token={token} companyId={d.company.resource_id} snapshot={{validAt:d.validAt,knownAt:d.knownAt}} onData={onData} onOperations={onOperations} onMapSelection={onMapSelection} onInspect={onInspect} onTrace={onTrace} onAccounting={()=>onLens("accounting")}/>
-  <CompanyOperatingWorkspace token={token} viewStateKey={viewStateKey} companyId={d.company.resource_id} snapshot={{validAt:d.validAt,knownAt:d.knownAt}} onInspect={onInspect} onTrace={onTrace} onHistory={onHistory} onProposal={onProposal} onWorkflow={onWorkflow}/>
+  <CompanyOperatingWorkspace token={token} viewStateKey={viewStateKey} companyId={d.company.resource_id} snapshot={{validAt:d.validAt,knownAt:d.knownAt}} onInspect={onInspect} onTrace={onTrace} onHistory={onHistory} onProposal={onProposal} onJournalReview={onJournalReview} onWorkflow={onWorkflow}/>
   <details className="c360-depth"><summary>Company model, structure & source boundaries</summary><section className="c360-condition-model" aria-label="Company operating model"><header><div><p className="c360-eyebrow">CONNECTED BUSINESS CONTEXT</p><h3>How this company operates</h3></div><span>Snapshot {stamp(d.validAt)}</span></header>
    <div className="c360-business-context"><div><span>Accounting</span>{d.ledgers.length?<><strong>{d.ledgers.map(row=>displayName(row.ledger.display_name)).join(" · ")}</strong><button onClick={()=>onLens("accounting")}>Inspect books, periods & authority</button></>:<p>No accepted ledger linked. Financial authority remains unestablished.</p>}</div><div><span>Operating resources</span>{d.operatingResources.length?<><strong>{d.operatingResources.length} connected resources</strong><button onClick={()=>onLens("structure")}>Explore operating relationships</button></>:<p>No operating resource is linked in this company snapshot.</p>}</div><div><span>Regulatory evidence</span>{d.licences.length?<><strong>{d.licences.length} retained licence bindings</strong><button onClick={onRegulation}>Review regulatory context</button></>:<p>No licence evidence linked. Current licence status is not established here.</p>}</div></div>
    <p className="c360-condition-note">Company relationships describe accepted structure. They do not establish live operating condition, ownership beyond the stated relation, or consolidation scope.</p>

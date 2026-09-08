@@ -1,25 +1,27 @@
 "use client";
+import {journalReviewReference,type JournalReviewReference} from "./journal-review-handoff";
 import {useEffect,useState} from "react";
 import type {CanonicalResource,CompanyConditionDescriptor,CompanyConditionWorkItem} from "@finai/contracts";
 import {assertCompanyCondition,operatingResourceKey,rankCompanyWork} from "./company-operating-state";
 import {parseOperatingView,operatingViewPage,operatingViewSelection} from "./company-operating-view";
 import {displayName} from "./display-name";
 import CompanyRegulation from "./company-regulation";
+import CompanyJournalAnalysisEntry from "./company-journal-analysis-entry";
 import CompanyJournalReviewWork from "./company-journal-review-work";
 import "./company-operating-workspace.css";
 
 type ResourceAction=(resource:CanonicalResource,knownAt:string)=>void;
-export type CompanyOperatingProps={token:string;viewStateKey?:string;companyId:string;snapshot:{validAt:string;knownAt:string};compact?:boolean;onInspect:ResourceAction;onTrace?:ResourceAction;onHistory?:ResourceAction;onProposal?:(id:string)=>void;onWorkflow?:(id:string)=>void};
+export type CompanyOperatingProps={token:string;viewStateKey?:string;companyId:string;snapshot:{validAt:string;knownAt:string};compact?:boolean;onInspect:ResourceAction;onTrace?:ResourceAction;onHistory?:ResourceAction;onProposal?:(id:string)=>void;onJournalReview?:(reference:JournalReviewReference)=>void;onWorkflow?:(id:string)=>void};
 const human=(value:string)=>value.replace(/([a-z])([A-Z])/g,"$1 $2").replaceAll("_"," ").toLowerCase();
 const stamp=(value:string)=>new Date(value).toLocaleString();
 const inventoryGroups=[{key:"assets",label:"Assets & facilities"},{key:"products",label:"Products"},{key:"parties",label:"Business parties"},{key:"contracts",label:"Contracts"}] as const;
 
 export default function CompanyOperatingWorkspace(props:CompanyOperatingProps){return <OperatingWorkspace key={`${props.token}:${props.companyId}:${props.snapshot.validAt}:${props.snapshot.knownAt}`} {...props}/>;}
-function OperatingWorkspace({token,viewStateKey,companyId,snapshot,compact=false,onInspect,onTrace,onHistory,onProposal,onWorkflow}:CompanyOperatingProps){
+function OperatingWorkspace({token,viewStateKey,companyId,snapshot,compact=false,onInspect,onTrace,onHistory,onProposal,onJournalReview,onWorkflow}:CompanyOperatingProps){
  const {validAt,knownAt}=snapshot;
  const storageKey=!compact&&viewStateKey?`${viewStateKey}:operating-v1:${companyId}`:null;
  const [restored]=useState(()=>{if(!storageKey)return null;try{return parseOperatingView(sessionStorage.getItem(storageKey)??"",{companyId,validAt,knownAt});}catch{return null;}});
- const [result,setResult]=useState<CompanyConditionDescriptor|null>(null),[error,setError]=useState("");const [revision,setRevision]=useState(0);
+ const [result,setResult]=useState<CompanyConditionDescriptor|null>(null),[error,setError]=useState("");const [revision,setRevision]=useState(0);const [settledRevision,setSettledRevision]=useState<number|null>(null);
  const [workFilter,setWorkFilter]=useState<"ALL"|CompanyConditionWorkItem["state"]>(restored?.workFilter??"ALL"),[workSearch,setWorkSearch]=useState(restored?.workSearch??"");
  const [group,setGroup]=useState<"assets"|"products"|"parties"|"contracts">(restored?.group??"assets"),[search,setSearch]=useState(restored?.search??"");
  const [page,setPage]=useState(restored?.page??0),[workPage,setWorkPage]=useState(restored?.workPage??0),[licencePage,setLicencePage]=useState(restored?.licencePage??0),[selected,setSelected]=useState(restored?.selected?`${restored.selected.resourceId}:${restored.selected.versionId}`:"");
@@ -27,10 +29,12 @@ function OperatingWorkspace({token,viewStateKey,companyId,snapshot,compact=false
   const params=new URLSearchParams({company_id:companyId,valid_at:validAt,known_at:knownAt});
   void fetch(`/api/ontology/company-condition?${params}`,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",signal:controller.signal}).then(async response=>{
    const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:"Company operating context is unavailable.");
-   assertCompanyCondition(data,{companyId,validAt,knownAt});if(!disposed){setResult(data);setError("");}
-  }).catch(failure=>{if(!disposed){setResult(null);setError(controller.signal.aborted?"Company operating context timed out. Retry this snapshot.":failure instanceof Error?failure.message:"Company operating context is unavailable.");}}).finally(()=>clearTimeout(timer));
+   assertCompanyCondition(data,{companyId,validAt,knownAt});if(!disposed){setResult(data);setError("");setSettledRevision(revision);}
+  }).catch(failure=>{if(!disposed){setSettledRevision(revision);setError(controller.signal.aborted?"Company operating context timed out. Retry this snapshot.":failure instanceof Error?failure.message:"Company operating context is unavailable.");}}).finally(()=>clearTimeout(timer));
   return()=>{disposed=true;clearTimeout(timer);controller.abort();};
  },[token,companyId,validAt,knownAt,revision]);
+ useEffect(()=>{const refresh=(event:Event)=>{const value=(event as CustomEvent).detail;if(value?.companyId===companyId&&value.validAt===validAt&&value.knownAt===knownAt)setRevision(current=>current+1);};window.addEventListener("g8:refresh-journal-review-origin",refresh);return()=>window.removeEventListener("g8:refresh-journal-review-origin",refresh);},[companyId,validAt,knownAt]);
+ useEffect(()=>{if(settledRevision===revision)window.dispatchEvent(new CustomEvent("g8:journal-review-origin-settled",{detail:{companyId,validAt,knownAt}}));},[settledRevision,revision,companyId,validAt,knownAt]);
  const pageSize=compact?5:10,query=search.trim().toLocaleLowerCase();
  const resources=result?.[group].resources.filter(item=>`${item.display_name} ${item.object_type}`.toLocaleLowerCase().includes(query))??[];
  const orderedWork=rankCompanyWork(result?.work.items??[],workFilter,workSearch);
@@ -41,15 +45,17 @@ function OperatingWorkspace({token,viewStateKey,companyId,snapshot,compact=false
  function retry(){setResult(null);setError("");setRevision(value=>value+1);}
  function inspect(resource:CanonicalResource){if(result?.[group].resources.some(item=>operatingResourceKey(item)===operatingResourceKey(resource)))setSelected(operatingResourceKey(resource));onInspect(resource,knownAt);}
  function actions(resource:CanonicalResource){return <span className="company-operating-row-actions"><button onClick={()=>inspect(resource)}>Inspect</button>{onTrace&&<button onClick={()=>onTrace(resource,knownAt)}>Trace</button>}{onHistory&&<button onClick={()=>onHistory(resource,knownAt)}>History</button>}</span>;}
- if(error)return <section className="company-operating-error" role="alert"><h3>Company operating context unavailable</h3><p>{error}</p><button onClick={retry}>Retry exact snapshot</button></section>;
+ if(error&&!result)return <section className="company-operating-error" role="alert"><h3>Company operating context unavailable</h3><p>{error}</p><button onClick={retry}>Retry exact snapshot</button></section>;
  if(!result)return <p className="company-operating-loading" role="status">Resolving linked company resources, retained work and regulatory evidence…</p>;
  const work=orderedWork.slice(currentWorkPage*pageSize,(currentWorkPage+1)*pageSize);
  const selectedConnections=result.connections.filter(item=>[item.source,item.target].some(node=>operatingResourceKey(node)===selected));
  return <section className={`company-operating-workspace${compact?" company-operating-compact":""}`} aria-label="Company operating workbench">
   <header><div><p className="overline">COMPANY WORK & OPERATING CONTEXT</p><h2>Decisions, obligations & connected resources</h2></div><button onClick={retry}>Refresh retained context</button></header>
   {selected&&!selectedResource&&<p className="company-operating-limitation" role="status">The saved resource selection is unavailable in this exact company group and snapshot. <button onClick={()=>setSelected("")}>Clear unavailable selection</button></p>}
-  <CompanyJournalReviewWork companyId={companyId} value={result.journal_reviews} compact={compact} onProposal={onProposal}/>
-  <section className="company-operating-work" aria-label="Current company work"><header><h3>Work requiring review and recent outcomes</h3><span>Observed {stamp(result.work.observed_at)}</span></header><p className="company-operating-note">Current retained work explicitly linked to this company. This queue is separate from the historical company snapshot.</p>
+  <CompanyJournalAnalysisEntry token={token} companyId={companyId} value={result.journal_reviews} pending={settledRevision!==revision||Boolean(error)}/>
+  <CompanyJournalReviewWork companyId={companyId} value={result.journal_reviews} compact={compact} onProposal={onProposal} pending={settledRevision!==revision} error={error} onReview={onJournalReview?item=>onJournalReview(journalReviewReference(result.company,validAt,knownAt,item)):undefined}/>
+  {(settledRevision!==revision||error)&&<p role="status" className="company-operating-limitation">{error?"Current company work could not be refreshed. Earlier review decisions and controls are withheld.":"Refreshing current company work. Earlier review controls are withheld."}</p>}
+  <section hidden={settledRevision!==revision||Boolean(error)} inert={settledRevision!==revision||Boolean(error)} className="company-operating-work" aria-label="Current company work"><header><h3>Work requiring review and recent outcomes</h3><span>Observed {stamp(result.work.observed_at)}</span></header><p className="company-operating-note">Current retained work explicitly linked to this company. This queue is separate from the historical company snapshot.</p>
    <div className="company-operating-signals">{result.unavailable.filter(item=>item.key==="findings"||item.key==="investigations").map(item=><p key={item.key}><strong>{item.label} unavailable.</strong> {item.reason}</p>)}</div>
    {result.work.state==="AVAILABLE"&&<div className="company-operating-toolbar"><label>Priority within returned queue<select value={workFilter} onChange={event=>{setWorkFilter(event.target.value as "ALL"|CompanyConditionWorkItem["state"]);setWorkPage(0);}}><option value="ALL">All returned work</option>{(["PENDING_REVIEW","PREPARED","REJECTED","PUBLISHED"] as const).map(state=><option key={state} value={state}>{human(state)}</option>)}</select></label><label>Find work<input maxLength={200} value={workSearch} onChange={event=>{setWorkSearch(event.target.value.slice(0,200));setWorkPage(0);}} placeholder="Title or reason"/></label><span className="company-operating-note">Review priority; no financial materiality ranking</span></div>}
    {result.work.state==="UNAVAILABLE"?<p className="company-operating-limitation" role="status"><strong>Current company work is unavailable.</strong> {result.work.reason} Resource and licence context remain available below.</p>:work.length?<div className="company-operating-table"><table><thead><tr><th>Company work</th><th>Retained state</th><th>Why it matters</th><th>Open</th></tr></thead><tbody>{work.map(item=><tr key={item.workflow_id}><th scope="row">{displayName(item.title)}<small>Created {stamp(item.created_at)}</small></th><td><span className="company-operating-status" data-state={item.state}>{human(item.state)}</span></td><td>{item.reason}</td><td><span className="company-operating-row-actions">{item.state!=="PREPARED"&&item.proposal_id&&onProposal&&<button onClick={()=>onProposal(item.proposal_id!)}>Open review</button>}{onWorkflow&&<button onClick={()=>onWorkflow(item.workflow_id)}>Open workflow</button>}{!onWorkflow&&!(item.state!=="PREPARED"&&item.proposal_id&&onProposal)&&<span>Navigation unavailable</span>}</span></td></tr>)}</tbody></table></div>:<p className="company-operating-empty">{result.work.items.length?"No returned work matches these filters.":"No explicitly linked retained work was returned. This does not establish that the company has no outstanding obligations."}</p>}
