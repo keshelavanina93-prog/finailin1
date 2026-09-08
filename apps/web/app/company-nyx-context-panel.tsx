@@ -1,0 +1,7 @@
+import type {CompanyNyxContext} from "./company-nyx-context";
+import {displayName} from "./display-name";
+type Navigate=(resourceId:string,versionId:string,knownAt:string)=>void;
+export default function CompanyNyxContextPanel({value,onTrace,onHistory}:{value:CompanyNyxContext;onTrace?:Navigate;onHistory?:Navigate}){
+ if(value.status!=="ready")return <section className="g8-context-note" role="status"><small>COMPANY CANVAS</small><strong>{value.status==="updating"?"Exact company snapshot updating":"Exact company snapshot unavailable"}</strong><span>No prior company snapshot is used as current context.</span></section>;
+ return <section className="g8-context-note" aria-label="Exact company canvas context"><small>COMPANY CANVAS</small><strong>{displayName(value.company.display_name)}</strong><span>Effective {value.validAt}</span><span>Known {value.knownAt}</span><span>Accepted company definition · financial authority is separate</span><div>{onTrace&&<button onClick={()=>onTrace(value.company.resource_id,value.company.version_id,value.knownAt)}>Trace company snapshot</button>}{onHistory&&<button onClick={()=>onHistory(value.company.resource_id,value.company.version_id,value.knownAt)}>Company version history</button>}</div><details><summary>Advanced · exact company reference</summary><dl><dt>Company / version</dt><dd>{value.company.resource_id}<br/>{value.company.version_id}</dd><dt>Retained content hash</dt><dd>{value.company.content_hash}</dd></dl></details></section>;
+}

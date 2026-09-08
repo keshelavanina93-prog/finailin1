@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useId, useMemo, useState} from "react";
+import {useEffect, useLayoutEffect, useId, useMemo, useState} from "react";
 import type {CanonicalResource} from "@finai/contracts";
 import {ArrowRight, Buildings, ClockCounterClockwise, Database, MagnifyingGlass, ShieldCheck} from "@phosphor-icons/react";
 import {Badge} from "./g8-ui";
@@ -15,6 +15,7 @@ import CompanyCondition from "./company-condition";
 import {SelectedAccountingStrip} from "./company-financial-context";
 import {selectedAccountingContext} from "./company-accounting-selection";
 import {company360Descriptor,companyCutoffs,restoreCompanyCutoffs,type CompanyCutoffs} from "./company-360-descriptor";
+import {companyNyxContext,type CompanyNyxContext} from "./company-nyx-context";
 import {accountingCompanySnapshot,validateAccountingHandoff,type CompanyAccountingHandoff} from "./company-accounting-handoff";
 import type {MapSelection,MapWorkspaceState} from "./operations-model";
 
@@ -45,7 +46,7 @@ function restoreView(key:string|undefined,companyId:string):ViewState {
  } catch {return fallback;}
 }
 
-export default function CompanyWorkspace({token,index,companyId,onSelect,onInspect,onNavigate,onHistory,onTrace,onOperations,onMapSelection,viewStateKey,initialTab,initialAccountingHandoff,onProposal,onWorkflow,canPropose=false,onInspectResource,onTraceResource,onJournalInspect,onJournalTrace}:{token:string;index:CompanyIndex|null;companyId:string;onSelect:(node:Node)=>void;onInspect:(node:Node,knownAt?:string)=>void;onNavigate?:(destination:CompanyDestination)=>void;onHistory?:(node:Node,knownAt?:string)=>void;onTrace?:(node:Node,knownAt?:string)=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void;viewStateKey?:string;initialTab?:Tab;initialAccountingHandoff?:CompanyAccountingHandoff;onProposal?:(id:string)=>void;onWorkflow?:(id:string)=>void;canPropose?:boolean;onJournalInspect?:(resource:Node,knownAt:string)=>void;onJournalTrace?:(resource:Node,knownAt:string)=>void}&SourceAccountNavigation) {
+export default function CompanyWorkspace({onContext,token,index,companyId,onSelect,onInspect,onNavigate,onHistory,onTrace,onOperations,onMapSelection,viewStateKey,initialTab,initialAccountingHandoff,onProposal,onWorkflow,canPropose=false,onInspectResource,onTraceResource,onJournalInspect,onJournalTrace}:{onContext?:(context:CompanyNyxContext)=>void;token:string;index:CompanyIndex|null;companyId:string;onSelect:(node:Node)=>void;onInspect:(node:Node,knownAt?:string)=>void;onNavigate?:(destination:CompanyDestination)=>void;onHistory?:(node:Node,knownAt?:string)=>void;onTrace?:(node:Node,knownAt?:string)=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void;viewStateKey?:string;initialTab?:Tab;initialAccountingHandoff?:CompanyAccountingHandoff;onProposal?:(id:string)=>void;onWorkflow?:(id:string)=>void;canPropose?:boolean;onJournalInspect?:(resource:Node,knownAt:string)=>void;onJournalTrace?:(resource:Node,knownAt:string)=>void}&SourceAccountNavigation) {
  const [loaded,setLoaded]=useState<{key:string;context:Context|null;validAt:string;knownAt:string;error:string}|null>(null);
  const [refresh,setRefresh]=useState(0);
  const [restored]=useState(()=>restoreView(viewStateKey,companyId));
@@ -66,6 +67,7 @@ export default function CompanyWorkspace({token,index,companyId,onSelect,onInspe
  const validAt=loaded?.key===contextKey?loaded.validAt:"";const knownAt=loaded?.key===contextKey?loaded.knownAt:"";
  const error=loaded?.key===contextKey?loaded.error:"";
  const busy=Boolean(companyId)&&loaded?.key!==contextKey;
+ useLayoutEffect(()=>{onContext?.(companyNyxContext(companyId,context?.company??null,validAt,knownAt,busy?"updating":error||!context?"unavailable":"ready"));},[onContext,companyId,context,validAt,knownAt,busy,error]);
  const selected=choice.companyId===companyId?choice:{companyId,ledgerId:"",bookId:"",periodId:""};
  const {ledgerId,bookId,periodId}=selected;
  const selectionKey=JSON.stringify([contextKey,ledgerId,bookId,periodId]);
