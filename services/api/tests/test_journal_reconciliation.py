@@ -245,4 +245,10 @@ def test_existing_source_workspace_and_bounded_readback(workspace_case, monkeypa
         result = service.reconcile(None, request.invocation_id, request.company_id)
         assert result["source_projection"].descriptor.contract == "semantic-analysis/2"
         assert len(result["source_projection"].rows) == 2
+        for key in ("ledger_id", "book_id", "period_id"):
+            row = resolver.version(selected[key])
+            assert result["context_resources"][key] == {
+                **selected[key],
+                "display_name": row["display_name"],
+            }
         assert result["reconciliation"]["journal_debit_total"] is None

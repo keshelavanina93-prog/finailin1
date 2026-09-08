@@ -90,12 +90,20 @@ class FinancialMetricCoverage(Model):
     ledger_completeness: Literal["UNESTABLISHED"] = "UNESTABLISHED"
 
 
+class SelectionDisplay(Model):
+    reference: VersionReference
+    label: str | None = None
+
+
 class FinancialMetricResult(Model):
     contract: Literal["company-financial-metrics/1"] = "company-financial-metrics/1"
     invocation_id: UUID
     company_id: UUID
     snapshot_at: datetime
     selection: dict[str, VersionReference]
+    display_context: dict[Literal["ledger_id", "book_id", "period_id"], SelectionDisplay] = Field(
+        default_factory=dict
+    )
     binding: Pin
     source_function: Pin
     source_sha256: str

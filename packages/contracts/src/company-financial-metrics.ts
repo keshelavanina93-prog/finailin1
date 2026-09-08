@@ -22,6 +22,7 @@ export interface FinancialMetricNode {
 }
 export interface FinancialMetricResult {
   contract:'company-financial-metrics/1'; invocation_id:string; company_id:string; snapshot_at:string;
+  display_context?:Partial<Record<'ledger_id'|'book_id'|'period_id', {reference:JournalPin;label:string|null}>>;
   selection:JournalSelection; binding:AnalysisPin; source_function:AnalysisPin;
   source_sha256:string; source_receipt_hash:string; reconciliation_receipt_hash:string;
   implementation_sha256:string; result_sha256:string;

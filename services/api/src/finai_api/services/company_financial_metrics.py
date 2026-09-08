@@ -56,7 +56,23 @@ def unique(items, label):
     return set(items)
 
 
-def compute(request, reconciliation, source_projection):
+def display_context(selected, resources):
+    result = {}
+    for key in ("ledger_id", "book_id", "period_id"):
+        reference = selected[key]
+        row = (resources or {}).get(key, {})
+        exact = all(
+            str(row.get(field)) == str(reference[field]) for field in ("resource_id", "version_id")
+        )
+        label = row.get("display_name") if exact else None
+        result[key] = {
+            "reference": reference,
+            "label": label if isinstance(label, str) and label.strip() else None,
+        }
+    return result
+
+
+def compute(request, reconciliation, source_projection, context_resources=None):
     """Pure bounded calculation. Caller supplies a verified journal reconciliation result."""
     receipt = reconciliation
     try:
@@ -229,6 +245,7 @@ def compute(request, reconciliation, source_projection):
             company_id=request.company_id,
             snapshot_at=request.snapshot_at,
             selection=selected,
+            display_context=display_context(selected, context_resources),
             binding=receipt["binding"],
             source_function=source.descriptor.function,
             source_sha256=receipt["source_sha256"],
@@ -287,4 +304,9 @@ def produce(principal, request):
 
     require_permission(principal, "ontology_read")
     result = reconcile(principal, request.invocation_id, request.company_id, request.snapshot_at)
-    return compute(request, result["reconciliation"], result["source_projection"])
+    return compute(
+        request,
+        result["reconciliation"],
+        result["source_projection"],
+        result.get("context_resources"),
+    )

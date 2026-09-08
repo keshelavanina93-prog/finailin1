@@ -260,6 +260,13 @@ def reconcile(principal, invocation_id, company_id, snapshot_at=None):
     )
     return {
         "reconciliation": receipt,
+        "context_resources": {
+            key: {
+                **resource_pin(targets[selection[key]["resource_id"]]),
+                "display_name": targets[selection[key]["resource_id"]].get("display_name"),
+            }
+            for key in ("ledger_id", "book_id", "period_id")
+        },
         "source_projection": semantic_analysis.project(
             principal, ProjectionRequest(invocation_id=invocation_id, company_id=company_id)
         ),
