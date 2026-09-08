@@ -1,6 +1,18 @@
 "use client";
 import type {CanonicalResource,CompanyHomeDescriptor} from "@finai/contracts";
 import {displayName} from "./display-name";
+import type {SelectedAccountingContext} from "./company-accounting-selection";
+
+export function SelectedAccountingStrip({selection,onInspect,onAccounting}:{selection:SelectedAccountingContext;onInspect:(node:CanonicalResource,knownAt:string)=>void;onAccounting:()=>void}){
+ return <section className="c360-section" aria-label="Selected accounting context">
+  <header><h3>Selected accounting context</h3><button className="c360-text-button" onClick={onAccounting}>Choose accounting context</button></header>
+  {selection.state!=="VALIDATED"?<p className="c360-message" role="status"><strong>{selection.state==="UNSELECTED"?"No accounting selection":"Selection unavailable"}</strong> · {selection.reason}</p>:<>
+   <div className="c360-table-wrap"><table><caption className="c360-small">Validated for this company snapshot · accounting context only</caption><thead><tr><th>Ledger</th><th>Book</th><th>Fiscal period</th><th>Currency</th></tr></thead><tbody><tr>{[selection.ledger,selection.book,selection.period,selection.currency].map(node=><td key={node.version_id}><button className="c360-text-button" onClick={()=>onInspect(node,selection.knownAt)}>{displayName(node.display_name)}</button></td>)}</tr></tbody></table></div>
+   <details className="c360-message"><summary>Advanced · exact selection references & snapshot</summary><p>Effective {selection.validAt} · known {selection.knownAt}</p><dl>{Object.entries(selection.pins).map(([field,pin])=><div key={field}><dt>{field.replaceAll("_"," ")}</dt><dd><code>{pin.resource_id} · {pin.version_id}</code></dd></div>)}</dl></details>
+  </>}
+  <p className="c360-message">The fiscal period is the accounting selection. It does not change operational effective or known time, filter all company coverage, or certify balances or close.</p>
+ </section>;
+}
 
 type FinancialContext=CompanyHomeDescriptor["financial_context"];
 type Props={context:FinancialContext;knownAt:string;onInspect?:(node:CanonicalResource,knownAt:string)=>void;onAccounting?:()=>void};

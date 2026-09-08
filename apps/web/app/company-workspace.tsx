@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useId, useState} from "react";
+import {useEffect, useId, useMemo, useState} from "react";
 import type {CanonicalResource} from "@finai/contracts";
 import {ArrowRight, Buildings, ClockCounterClockwise, Database, MagnifyingGlass, ShieldCheck} from "@phosphor-icons/react";
 import {Badge} from "./g8-ui";
@@ -12,6 +12,8 @@ import CompanyPeriodControl from "./company-period-control";
 import CompanyJournalExplorer from "./company-journal-explorer";
 import CompanyStructureGraph from "./company-structure-graph";
 import CompanyCondition from "./company-condition";
+import {SelectedAccountingStrip} from "./company-financial-context";
+import {selectedAccountingContext} from "./company-accounting-selection";
 import {company360Descriptor,companySnapshot,companyCutoffs,restoreCompanyCutoffs,type CompanyCutoffs} from "./company-360-descriptor";
 import type {MapSelection,MapWorkspaceState} from "./operations-model";
 
@@ -67,6 +69,8 @@ export default function CompanyWorkspace({token,index,companyId,onSelect,onInspe
  const selectionKey=JSON.stringify([contextKey,ledgerId,bookId,periodId]);
  const selection=validated?.key===selectionKey?validated:null;
  const validating=Boolean(context&&ledgerId&&bookId&&periodId)&&!selection;
+ const accountingContext=useMemo(()=>selectedAccountingContext({companyId,choice:{companyId,ledgerId,bookId,periodId},context,validAt,knownAt,selectionKey,validation:validated}),[companyId,ledgerId,bookId,periodId,context,validAt,knownAt,selectionKey,validated]);
+ const accountingPins=accountingContext.state==="VALIDATED"?accountingContext.pins:null;
  useEffect(()=>{if(viewStateKey)try{sessionStorage.setItem(viewStateKey,JSON.stringify({companyId,tab,search,ledgerId,bookId,periodId,cutoffs}));}catch{/* Storage restrictions do not block company work. */}},[viewStateKey,companyId,tab,search,ledgerId,bookId,periodId,cutoffs]);
  useEffect(()=>{
   if(!companyId)return;
@@ -133,6 +137,7 @@ export default function CompanyWorkspace({token,index,companyId,onSelect,onInspe
     <details className="c360-filing" onToggle={event=>{if(event.currentTarget.open&&context&&!draftCutoffs.validAt&&!draftCutoffs.knownAt)setDraftCutoffs({validAt,knownAt});}}><summary>Company snapshot · {cutoffs?"Pinned effective and known time":"Latest accepted context"}</summary><p>Company structure, source boundaries and accounting selection use this snapshot. Financial results, live eligibility checks and the operational view retain their own stated times.</p><div className="c360-accounting-select"><label>Effective at · timezone required<input maxLength={40} value={draftCutoffs.validAt} onChange={event=>setDraftCutoffs({...draftCutoffs,validAt:event.target.value})} placeholder="YYYY-MM-DDTHH:mm:ss+04:00"/></label><label>Known at · timezone required<input maxLength={40} value={draftCutoffs.knownAt} onChange={event=>setDraftCutoffs({...draftCutoffs,knownAt:event.target.value})} placeholder="YYYY-MM-DDTHH:mm:ss+04:00"/></label><div className="c360-inline-actions"><button disabled={busy} onClick={applySnapshot}>Apply & save view</button><button disabled={busy} onClick={()=>{setCutoffs(null);setDraftCutoffs({validAt:"",knownAt:""});setSnapshotError("");setRefresh(value=>value+1);}}>Latest</button></div></div>{snapshotError&&<p role="alert">{snapshotError}</p>}{context&&<p>Displayed effective {validAt} · known {knownAt}. Saved view contains references and preferences only.</p>}</details>
     <nav className="c360-tabs" aria-label="Company workspace sections">{(["overview","structure","accounting","evidence"] as Tab[]).map(value=><button key={value} aria-pressed={tab===value} onClick={()=>setTab(value)}>{value==="overview"?"Company condition":value==="structure"?"Structure & relationships":value==="accounting"?"Finance & accounting":"Data & evidence"}</button>)}</nav>
     {busy&&<div className="c360-loading" role="status">Resolving accepted company relationships, source coverage and accounting context…</div>}
+    <SelectedAccountingStrip selection={accountingContext} onInspect={inspect} onAccounting={()=>setTab("accounting")}/>
     {error&&<div className="c360-error" role="alert"><h3>Company context could not be resolved</h3><p>{error}</p></div>}
     {context&&<div className="c360-content">
      {tab==="overview"&&<>{descriptor&&<CompanyCondition token={token} descriptor={descriptor} onLens={setTab} onInspect={inspect} onTrace={onTrace?trace:undefined} onHistory={onHistory?history:undefined} onProposal={onProposal} onWorkflow={onWorkflow} onSelect={pick} onData={()=>onNavigate?.("data")} onRegulation={()=>onNavigate?.("regulation")} onWork={()=>onNavigate?.("workflows")} onOperations={onOperations} onMapSelection={onMapSelection}/>}<details className="c360-depth"><summary>Accounting readiness & recent retained changes</summary>
@@ -154,8 +159,7 @@ export default function CompanyWorkspace({token,index,companyId,onSelect,onInspe
        </div>}
        {ledger&&<div className="c360-ledger-context"><dl className="c360-coverage"><div><dt>Chart of accounts</dt><dd>{ledger.chart_id?displayName(ledger.chart_id.display_name):"Unresolved"}</dd></div><div><dt>Fiscal calendar</dt><dd>{ledger.calendar_id?displayName(ledger.calendar_id.display_name):"Unresolved"}</dd></div><div><dt>Currency context</dt><dd>{ledger.currency_id?displayName(ledger.currency_id.display_name):"Unresolved"}</dd></div></dl>{actions(ledger.ledger)}</div>}
        {validating&&<p className="c360-message" role="status">Validating the selected company, ledger, book and period…</p>}{selection?.error&&<p className="c360-error" role="alert">{selection.error}</p>}
-       {selection?.pins&&<div className="c360-message"><p><ShieldCheck size={15}/> Selected accounting context validated by the server.</p><details><summary>Advanced · exact canonical version references</summary><dl>{Object.entries(selection.pins).map(([field,pin])=><div key={field}><dt>{readable(field)}</dt><dd><code>{pin.resource_id} · {pin.version_id}</code></dd></div>)}</dl></details></div>}
-      </section>{selection?.pins&&<CompanyPeriodControl token={token} selection={selection.pins} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onInspect={onJournalInspect} onTrace={onJournalTrace}/>} {selection?.pins&&onJournalInspect&&<CompanyJournalExplorer expectedSelection={selection.pins} key={selectionKey} token={token} companyId={companyId} ledgerId={ledgerId} bookId={bookId} periodId={periodId} currency={ledger?.currency_id??null} onInspect={onJournalInspect} onTrace={onJournalTrace}/>}<CompanySourceAccountingWorkbench token={token} context={context} viewStateKey={viewStateKey} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onInspect={inspect} onTrace={onTrace?trace:undefined} onHistory={onHistory?history:undefined} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>
+      </section>{accountingPins&&<CompanyPeriodControl token={token} selection={accountingPins} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onInspect={onJournalInspect} onTrace={onJournalTrace}/>} {accountingPins&&onJournalInspect&&<CompanyJournalExplorer expectedSelection={accountingPins} key={selectionKey} token={token} companyId={companyId} ledgerId={ledgerId} bookId={bookId} periodId={periodId} currency={ledger?.currency_id??null} onInspect={onJournalInspect} onTrace={onJournalTrace}/>}<CompanySourceAccountingWorkbench token={token} context={context} viewStateKey={viewStateKey} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onInspect={inspect} onTrace={onTrace?trace:undefined} onHistory={onHistory?history:undefined} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>
       <section className="c360-section"><header><h3>Analytical dimensions</h3></header>{context.dimensions.length?context.dimensions.map(node=><div className="c360-resource-row" key={node.resource_id}><div><strong>{displayName(node.display_name)}</strong>{Boolean(node.attributes.source_header)&&<small>Source label: {String(node.attributes.source_header)}</small>}</div>{actions(node)}</div>):<p className="c360-message">No source analytical dimension model is bound to this company.</p>}</section>
      </>}
      {tab==="evidence"&&<>
