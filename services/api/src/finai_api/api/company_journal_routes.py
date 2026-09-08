@@ -10,6 +10,18 @@ from finai_api.services import company_journals
 router = APIRouter(prefix="/v1/ontology/company-journals", tags=["company journal readback"])
 
 
+@router.get("/reconciliation/source/{invocation_id}")
+def source_reconciliation(
+    principal: User,
+    invocation_id: UUID,
+    company_id: UUID,
+    snapshot_at: datetime | None = None,
+):
+    from finai_api.services.journal_reconciliation import reconcile
+
+    return reconcile(principal, invocation_id, company_id, snapshot_at)
+
+
 @router.get("")
 def journals(
     principal: User,
