@@ -28,6 +28,7 @@
       "properties": {
         "name": { "type": "string" },
         "value_type": { "type": "string" },
+        "pattern": { "type": "string" },
         "required": { "type": "boolean" },
         "derived": { "type": "boolean" },
         "description": { "type": "string" }
