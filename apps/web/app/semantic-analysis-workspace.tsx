@@ -8,6 +8,7 @@ import {assertProjection,evidenceCaption,formatAnalysisDecimal,hasUsefulMagnitud
 import {displayPostedAmount} from "./posted-movement-presentation";
 import "./semantic-analysis-workspace.css";
 import {pinHomeAnalysis} from "./company-home-pins";
+import {sourceReviewContext,type SourceReviewContext} from "./source-review-context";
 import {sourceReviewTarget} from "./source-review-navigation";
 
 const OperatorTrace=dynamic(()=>import("./operator-trace"),{loading:()=> <p role="status">Opening retained trace…</p>});
@@ -15,7 +16,7 @@ const timeLabel=(value:string)=>new Intl.DateTimeFormat(undefined,{dateStyle:"me
 const contextLabel=(value:string)=>/^[A-Z][A-Z0-9_]+$/.test(value)?value.toLowerCase().replaceAll("_"," "):value;
 const contextValue=(value:string)=>/^(?:[a-f0-9]{64}|[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})$/i.test(value)?"Exact reference in Advanced":contextLabel(value);
 type Reference={resource_id:string;version_id:string;known_at:string};
-type Props={token:string;companyId:string;invocationId:string;onInspect?:(reference:Reference)=>void};
+type Props={token:string;companyId:string;invocationId:string;onContext?:(context:SourceReviewContext)=>void;onInspect?:(reference:Reference)=>void};
 function label(value:AnalysisValue,field?:AnalysisField):string {
  if(value.state!=="VALUE")return value.state==="NULL"?"Recorded null":"Not recorded";
  if(field?.presentation&&typeof value.value==="string")return formatAnalysisDecimal(value.value,field);
@@ -25,7 +26,7 @@ function label(value:AnalysisValue,field?:AnalysisField):string {
  return field?.role==="MEASURE"&&field.kind==="decimal"&&typeof value.value==="string"?displayPostedAmount(value.value):String(value.value);
 }
 export default function SemanticAnalysisWorkspace(props:Props){return <Workspace key={`${props.token}:${props.companyId}:${props.invocationId}`} {...props}/>;}
-function Workspace({token,companyId,invocationId,onInspect}:Props){
+function Workspace({token,companyId,invocationId,onInspect,onContext}:Props){
  const [request,setRequest]=useState<AnalysisRequest>({company_id:companyId,invocation_id:invocationId});
  const [response,setResponse]=useState<{key:string;data:AnalysisProjection|null;error:string}|null>(null);
  const [conflict,setConflict]=useState(false);
@@ -42,6 +43,7 @@ function Workspace({token,companyId,invocationId,onInspect}:Props){
  const workspace=useRef<HTMLElement>(null);const paneDrag=useRef<{start:number;size:number}|null>(null);
  useEffect(()=>{const el=workspace.current;if(!el)return;const observer=new ResizeObserver(()=>setNarrow(el.clientWidth<=900));observer.observe(el);return()=>observer.disconnect();},[]);
  const key=requestKey(request);const projection=response?.data??null;const error=response?.key===key?response.error:"";const busy=ready&&(!response||response.key!==key);
+ useLayoutEffect(()=>{onContext?.(sourceReviewContext(projection,request,{ready,busy,error:Boolean(error),saved:expected,excludedIndex:excluded}));},[onContext,projection,request,ready,busy,error,expected,excluded]);
  function restore(view:AnalysisView){restoreCell.current=true;setExcluded(null);setExpected(view);setRequest(view.request);setColumns(view.columns);setVisual(view.visual);setPane(view.pane);if(view.workspace){setLayout(view.workspace.grid);setDock(view.workspace.dock);setCollapsed(view.workspace.collapsed);setPaneSize(view.workspace.size);}else setLayout(current=>({...current,search:""}));restoreScroll.current=view.scroll;setNotice("Restoring exact saved references; checking access and revision…");}
  useEffect(()=>{
   let disposed=false;
@@ -63,7 +65,7 @@ function Workspace({token,companyId,invocationId,onInspect}:Props){
   }).catch(cause=>{if(!disposed){setNotice("");setResponse({key,data:null,error:controller.signal.aborted?"Analysis request timed out. Retry the exact selection.":String(cause)});}}).finally(()=>clearTimeout(timer));
   return()=>{disposed=true;clearTimeout(timer);controller.abort();};
  },[token,request,key,revision,expected,ready]);
- useEffect(()=>{if(!projection||busy)return;if(scroll.current&&restoreScroll.current!==null){scroll.current.scrollTop=restoreScroll.current;scroll.current.scrollLeft=layout.left;restoreScroll.current=null;}if(restoreCell.current&&layout.focus){const cell=layout.focus;const frame=requestAnimationFrame(()=>requestAnimationFrame(()=>{scroll.current?.querySelector<HTMLElement>(`[data-row="${cell.row}"][data-column="${CSS.escape(cell.column)}"]`)?.focus({preventScroll:true});restoreCell.current=false;}));return()=>cancelAnimationFrame(frame);}restoreCell.current=false;if(returnFocus.current){const frame=requestAnimationFrame(()=>{const target=activeControl.current?.isConnected?activeControl.current:lastButton.current;if(target?.isConnected)target.focus({preventScroll:true});returnFocus.current=false;});return()=>cancelAnimationFrame(frame);}},[projection,busy,layout.left,layout.focus]);
+ useEffect(()=>{if(!projection||busy)return;if(scroll.current&&restoreScroll.current!==null){scroll.current.scrollTop=restoreScroll.current;scroll.current.scrollLeft=layout.left;restoreScroll.current=null;}if(restoreCell.current&&layout.focus){const cell=layout.focus;let inner=0,disposed=false;const frame=requestAnimationFrame(()=>{inner=requestAnimationFrame(()=>{if(disposed)return;scroll.current?.querySelector<HTMLElement>(`[data-row="${cell.row}"][data-column="${CSS.escape(cell.column)}"]`)?.focus({preventScroll:true});restoreCell.current=false;});});return()=>{disposed=true;cancelAnimationFrame(frame);cancelAnimationFrame(inner);};}restoreCell.current=false;if(returnFocus.current){const frame=requestAnimationFrame(()=>{const target=activeControl.current?.isConnected?activeControl.current:lastButton.current;if(target?.isConnected)target.focus({preventScroll:true});returnFocus.current=false;});return()=>cancelAnimationFrame(frame);}},[projection,busy,layout.left,layout.focus]);
  function viewState(next:AnalysisRequest=request):AnalysisView|null {if(!projection)return null;return {version:1,request:{...next,descriptor_sha256:projection.descriptor_sha256,filters:next.filters??[],group_by:next.group_by??null,selected_row:next.selected_row??null,contributor_index:next.contributor_index??0},valid_at:projection.descriptor.valid_at,known_at:projection.descriptor.known_at,receipt_hash:projection.descriptor.receipt_hash,columns:columns??projection.descriptor.fields.map(f=>f.key),visual,pane,scroll:scroll.current?.scrollTop??0,workspace:{grid:layout,dock,collapsed,size:paneSize}};}
  // Capture only the history entry represented by this committed render. Never write on unmount.
  useLayoutEffect(()=>{
@@ -100,9 +102,10 @@ function Workspace({token,companyId,invocationId,onInspect}:Props){
  const trace=contributor?.reference??selected?.trace??d?.function;
  const usefulVisual=Boolean(projection&&hasUsefulMagnitude(projection));
  const magnitudes=measure?(projection?.rows.map(row=>{const value=row.values[measure.key];return value.state==="VALUE"?Math.abs(Number(value.value)):0;}).filter(Number.isFinite)??[]):[];const maximum=Math.max(0,...magnitudes);
+ async function pinCurrent(){if(!projection||busy||error||!ready)return;try{assertProjection(projection,request,expected);await pinHomeAnalysis(token,{companyId,invocationId,revision:{descriptorSha256:projection.descriptor_sha256,receiptHash:projection.descriptor.receipt_hash,validAt:projection.descriptor.valid_at,knownAt:projection.descriptor.known_at}});setNotice("Pinned to company Home on this device. Access and authority are checked when Home opens.");}catch(error){setNotice(String(error));}}
  function pick(row:AnalysisRow,button:HTMLButtonElement){setExcluded(null);setCollapsed(false);setPane("evidence");lastButton.current=button;if(row.contributor_count)change({selected_row:row.key,contributor_index:0},true);else setNotice("No retained contributor is available for this row.");}
  return <section ref={workspace} className="semantic-analysis" aria-label="Source review workspace" aria-busy={busy}>
-  <header><div><p className="overline">SOURCE REVIEW</p><h1>{d?.title??"Retained analysis"}</h1></div><div className="semantic-actions"><button disabled={!projection||busy} onClick={()=>void pinHomeAnalysis(token,{companyId,invocationId}).then(()=>setNotice("Pinned to company Home on this device. Access and authority are checked when Home opens.")).catch(error=>setNotice(String(error)))}>Pin to company Home</button><button disabled={!projection||busy||!storageKey} onClick={save}>Save view</button><button disabled={!savedAvailable} onClick={reopen}>Reopen saved view</button></div></header>
+  <header><div><p className="overline">SOURCE REVIEW</p><h1>{d?.title??"Retained analysis"}</h1></div><div className="semantic-actions"><button disabled={!projection||busy} onClick={()=>void pinCurrent()}>Pin to company Home</button><button disabled={!projection||busy||!storageKey} onClick={save}>Save view</button><button disabled={!savedAvailable} onClick={reopen}>Reopen saved view</button></div></header>
   {notice&&<p role="status">{notice}</p>}{(!ready||busy)&&<p role="status">Loading the exact analysis and its available operations…</p>}{error&&<p role="alert">{error} <button onClick={()=>{setResponse(null);setRevision(v=>v+1);}}>Retry exact request</button>{conflict&&<button onClick={()=>{const url=new URL(location.href);url.searchParams.delete("analysis_view");history.replaceState(history.state,"",url);setExpected(null);setResponse(null);setColumns(null);setExcluded(null);setConflict(false);setRequest({company_id:companyId,invocation_id:request.invocation_id});setNotice("Reviewing original result without saved filters. Your saved view is unchanged.");}}>Review original result</button>}</p>}
   {d&&projection&&<>
    <div className="semantic-review-context" aria-label="Source review context"><dl className="semantic-context"><div><dt>Company</dt><dd>{d.company_label}</dd></div>{d.context.map((item,index)=><div key={`${item.label}:${index}`}><dt>{contextLabel(item.label)}</dt><dd>{contextValue(item.value)}</dd></div>)}</dl><p className="semantic-authority"><span>Authority</span>{contextLabel(d.authority)}</p><details className="semantic-coverage"><summary>Coverage · {projection.rows.length} of {projection.total_rows} retained {noun}<span>View source boundaries</span></summary><dl className="semantic-context">{d.coverage.map((item,index)=><div key={`${item.label}:${index}`} data-status={/unestablished|not established|unresolved|partial|only|missing|excluded/i.test(item.value+" "+item.label)?"limited":"recorded"}><dt>{contextLabel(item.label)}</dt><dd>{contextValue(item.value)}</dd></div>)}</dl><p className="semantic-time">Effective <time dateTime={d.valid_at}>{timeLabel(d.valid_at)}</time> · Known <time dateTime={d.known_at}>{timeLabel(d.known_at)}</time> · Retained <time dateTime={d.recorded_at}>{timeLabel(d.recorded_at)}</time></p></details></div>

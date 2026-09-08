@@ -1,9 +1,7 @@
+import {loadTypeScript} from "./load-typescript.mjs";
+const pins=await loadTypeScript(new URL("../app/company-home-pins.ts",import.meta.url));
 import test from "node:test";
 import assert from "node:assert/strict";
-import {readFileSync} from "node:fs";
-import ts from "typescript";
-const source=readFileSync(new URL("../app/company-home-pins.ts",import.meta.url),"utf8");
-const pins=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
 const id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 function fixture(t){
