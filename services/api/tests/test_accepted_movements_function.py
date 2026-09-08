@@ -247,3 +247,12 @@ def test_partial_and_missing_outputs_preserve_coverage_and_null(
     output = adapter.execute(principal, request, plan)
     assert all(row["coverage"] == "PARTIAL" for row in output["metric_outputs"])
     assert all(row["value"] is None for row in output["metric_outputs"]) == (state == "UNAVAILABLE")
+
+
+def test_accepted_request_requires_default_complete_result_limit(accepted_case):
+    payload = accepted_case[1].model_dump(mode="json")
+    payload.pop("limit")
+    assert FunctionInvocation.model_validate(payload).limit == 50
+    assert FunctionInvocation.model_validate({**payload, "limit": 50}).limit == 50
+    with pytest.raises(ValidationError, match="limit 50"):
+        FunctionInvocation.model_validate({**payload, "limit": 1})

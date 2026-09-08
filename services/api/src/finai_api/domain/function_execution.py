@@ -217,8 +217,10 @@ class FunctionInvocation(BaseModel):
     @model_validator(mode="after")
     def complete_input_page(self) -> "FunctionInvocation":
         if self.accepted_movements is not None:
-            if self.input_result is not None or self.offset != 0:
-                raise ValueError("Accepted movements require a complete exclusive input")
+            if self.input_result is not None or self.offset != 0 or self.limit != 50:
+                raise ValueError(
+                    "Accepted movements require a complete exclusive input with limit 50"
+                )
             if self.accepted_movements.source_invocation_id == self.request_id:
                 raise ValueError("Function cannot consume its own result")
         if self.input_result is not None and self.offset != 0:
