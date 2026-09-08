@@ -9,7 +9,7 @@ from finai_api.services.workspace import WorkspaceError
 
 def resolve(principal, request):
     selected = request.accepted_movements
-    if selected is None or selected.company_id != principal.scope.legal_entity_id:
+    if selected is None or str(selected.company_id) != str(principal.scope.legal_entity_id):
         raise WorkspaceError(409, "Accepted movement input differs from selected company")
     history, _, resolver = semantic_analysis.load(principal, selected.source_invocation_id)
     query = history["output"].get("query", {})
