@@ -7,6 +7,7 @@ from finai_api.api.certification_routes import router as certification_router
 from finai_api.api.company_changes_routes import router as company_changes_router
 from finai_api.api.company_condition_routes import router as company_condition_router
 from finai_api.api.company_context_routes import router as company_context_router
+from finai_api.api.company_financial_result_routes import router as company_financial_result_router
 from finai_api.api.company_home_routes import router as company_home_router
 from finai_api.api.company_journal_routes import router as company_journal_router
 from finai_api.api.event_time_routes import router as event_time_router
@@ -73,6 +74,7 @@ app.include_router(source_exception_router)
 app.include_router(source_adoption_router)
 app.include_router(company_context_router)
 app.include_router(company_condition_router)
+app.include_router(company_financial_result_router)
 app.include_router(company_changes_router)
 app.include_router(company_home_router)
 app.include_router(company_journal_router)

@@ -1,4 +1,5 @@
 export type { HistorySearchResult } from "./history-search.js";
+export type {CompanyFinancialResults} from "./company-financial-results.js";
 export type {
   ObjectSetFilter, FilterExpression, ObjectSetTraversal, ObjectSetQuery, ObjectSetSchemaVersion,
   ObjectSetTraversalSchemaVersion, ObjectSetResult, ObjectSetInterfacePin,
