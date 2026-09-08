@@ -41,6 +41,28 @@ class MissingFinancial(Model):
     reason: str
 
 
+class HomeLedger(Model):
+    ledger: CanonicalResource
+    calendar: CanonicalResource | None
+    chart: CanonicalResource | None
+    currency: CanonicalResource | None
+    books: list[CanonicalResource]
+    periods: list[CanonicalResource]
+    context_ready: bool
+
+
+class HomeFinancialContext(Model):
+    authority: Literal["ACCOUNTING_CONTEXT_ONLY"] = "ACCOUNTING_CONTEXT_ONLY"
+    accounting_state: str
+    ledgers: list[HomeLedger]
+    source_scopes: list[CanonicalResource]
+    limitation: str = (
+        "Accepted accounting context and source boundaries are not balances, "
+        "posting permission, reconciliation or certified close. Select a ledger, "
+        "book and period to inspect the existing accounting controls."
+    )
+
+
 class CompanyHomeDescriptor(Model):
     contract: Literal["g8-company-home/1"] = "g8-company-home/1"
     company: CanonicalResource
@@ -50,6 +72,7 @@ class CompanyHomeDescriptor(Model):
     domain_packs: list[CanonicalResource]
     analyses: list[Projection] = Field(max_length=6)
     operations: HomeOperations
+    financial_context: HomeFinancialContext
     unavailable_financials: list[MissingFinancial]
     current_use_authorized: Literal[False] = False
     business_effect_authorized: Literal[False] = False

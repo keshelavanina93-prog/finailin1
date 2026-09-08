@@ -2,24 +2,26 @@
 import {useState} from "react";
 import type {CanonicalResource} from "@finai/contracts";
 import CompanyHome from "./company-home";
+import CompanyOperatingWorkspace from "./company-operating-workspace";
 import {displayName} from "./display-name";
 import type {Company360Descriptor} from "./company-360-descriptor";
 import type {MapSelection,MapWorkspaceState} from "./operations-model";
 
 type Lens="overview"|"structure"|"accounting"|"evidence";
-type Props={token:string;descriptor:Company360Descriptor;onLens:(lens:Lens)=>void;onInspect:(node:CanonicalResource)=>void;onTrace?:(node:CanonicalResource)=>void;onSelect:(node:CanonicalResource)=>void;onData:()=>void;onRegulation:()=>void;onWork:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void};
+type Props={token:string;descriptor:Company360Descriptor;onLens:(lens:Lens)=>void;onInspect:(node:CanonicalResource,knownAt?:string)=>void;onTrace?:(node:CanonicalResource,knownAt?:string)=>void;onHistory?:(node:CanonicalResource,knownAt?:string)=>void;onProposal?:(id:string)=>void;onWorkflow?:(id:string)=>void;onSelect:(node:CanonicalResource)=>void;onData:()=>void;onRegulation:()=>void;onWork:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void};
 const human=(value:string)=>value.replace(/([a-z])([A-Z])/g,"$1 $2").replaceAll("_"," ").toLowerCase();
 const stamp=(value:string)=>new Date(value).toLocaleString();
 
-export default function CompanyCondition({token,descriptor:d,onLens,onInspect,onTrace,onSelect,onData,onRegulation,onWork,onOperations,onMapSelection}:Props){
+export default function CompanyCondition({token,descriptor:d,onLens,onInspect,onTrace,onHistory,onProposal,onWorkflow,onSelect,onData,onRegulation,onWork,onOperations,onMapSelection}:Props){
  const [search,setSearch]=useState(""),[page,setPage]=useState(0);
  const query=search.trim().toLocaleLowerCase();
  const connections=d.connections.filter(row=>`${row.source.display_name} ${row.target.display_name} ${row.kind}`.toLocaleLowerCase().includes(query));
  const shown=connections.slice(page*20,(page+1)*20);
  return <div className="c360-condition">
   <nav className="c360-condition-actions" aria-label="Company work"><button onClick={onData}>Review source analyses</button><button onClick={()=>onLens("accounting")}>Ledger & close</button><button onClick={onWork}>Work & decisions</button><button onClick={()=>onLens("evidence")}>Evidence & licences</button></nav>
-  <CompanyHome token={token} companyId={d.company.resource_id} snapshot={{validAt:d.validAt,knownAt:d.knownAt}} onData={onData} onOperations={onOperations} onMapSelection={onMapSelection}/>
-  <section className="c360-condition-model" aria-label="Company operating model"><header><div><p className="c360-eyebrow">CONNECTED BUSINESS CONTEXT</p><h3>How this company operates</h3></div><span>Snapshot {stamp(d.validAt)}</span></header>
+  <CompanyHome token={token} companyId={d.company.resource_id} snapshot={{validAt:d.validAt,knownAt:d.knownAt}} onData={onData} onOperations={onOperations} onMapSelection={onMapSelection} onInspect={onInspect} onAccounting={()=>onLens("accounting")}/>
+  <CompanyOperatingWorkspace token={token} companyId={d.company.resource_id} snapshot={{validAt:d.validAt,knownAt:d.knownAt}} onInspect={onInspect} onTrace={onTrace} onHistory={onHistory} onProposal={onProposal} onWorkflow={onWorkflow}/>
+  <details className="c360-depth"><summary>Company model, structure & source boundaries</summary><section className="c360-condition-model" aria-label="Company operating model"><header><div><p className="c360-eyebrow">CONNECTED BUSINESS CONTEXT</p><h3>How this company operates</h3></div><span>Snapshot {stamp(d.validAt)}</span></header>
    <div className="c360-business-context"><div><span>Accounting</span>{d.ledgers.length?<><strong>{d.ledgers.map(row=>displayName(row.ledger.display_name)).join(" · ")}</strong><button onClick={()=>onLens("accounting")}>Inspect books, periods & authority</button></>:<p>No accepted ledger linked. Financial authority remains unestablished.</p>}</div><div><span>Operating resources</span>{d.operatingResources.length?<><strong>{d.operatingResources.length} connected resources</strong><button onClick={()=>onLens("structure")}>Explore operating relationships</button></>:<p>No operating resource is linked in this company snapshot.</p>}</div><div><span>Regulatory evidence</span>{d.licences.length?<><strong>{d.licences.length} retained licence bindings</strong><button onClick={onRegulation}>Review regulatory context</button></>:<p>No licence evidence linked. Current licence status is not established here.</p>}</div></div>
    <p className="c360-condition-note">Company relationships describe accepted structure. They do not establish live operating condition, ownership beyond the stated relation, or consolidation scope.</p>
    <div className="c360-connection-toolbar"><h4>Business relationships</h4><label>Find connection<input aria-label="Find company business relationship" value={search} onChange={event=>{setSearch(event.target.value);setPage(0);}} placeholder="Company, resource or relationship"/></label><button onClick={()=>onLens("structure")}>Explore structure</button></div>
@@ -27,6 +29,6 @@ export default function CompanyCondition({token,descriptor:d,onLens,onInspect,on
    {connections.length>20&&<div className="c360-pager"><button disabled={page===0} onClick={()=>setPage(value=>value-1)}>Previous</button><span>{page*20+1}–{Math.min((page+1)*20,connections.length)} of {connections.length}</span><button disabled={(page+1)*20>=connections.length} onClick={()=>setPage(value=>value+1)}>Next</button></div>}
   </section>
   <section className="c360-condition-sources" aria-label="Company source coverage"><header><div><p className="c360-eyebrow">EVIDENCE BEHIND THIS COMPANY</p><h3>Reviewed source boundaries</h3></div><button onClick={()=>onLens("evidence")}>All source evidence</button></header>{d.sources.length?<div className="c360-table-wrap"><table><thead><tr><th>Source</th><th>Observed period</th><th>Current accounting use</th><th>Investigate</th></tr></thead><tbody>{d.sources.slice(0,12).map(source=>{const eligible=source.bindings.some(binding=>source.binding_eligibility?.[binding.version_id]?.eligible_for_accounting===true);return <tr key={source.scope.version_id}><th scope="row">{displayName(source.scope.display_name)}<small>{String(source.scope.attributes.worksheet??"")}</small></th><td>{String(source.scope.attributes.observed_from??"Not recorded")} — {String(source.scope.attributes.observed_through??"Not recorded")}</td><td><span className={eligible?"c360-accepted-status":"c360-review-status"}>{eligible?"Eligible binding reported":"Review required"}</span><small>Execution rechecks eligibility</small></td><td><button onClick={()=>onInspect(source.scope)}>Inspect exact scope</button></td></tr>;})}</tbody></table></div>:<p className="c360-condition-note">No accounting source scope is linked. <button onClick={onData}>Open Data & evidence</button></p>}{d.sources.length>12&&<p className="c360-condition-note">First 12 of {d.sources.length} linked source scopes. <button onClick={()=>onLens("evidence")}>Review all sources</button></p>}</section>
-  <p className="c360-condition-note">Company model effective {stamp(d.validAt)} · known {stamp(d.knownAt)}. Financial results and operational views retain their own stated cutoffs.</p>
+  <p className="c360-condition-note">Company model effective {stamp(d.validAt)} · known {stamp(d.knownAt)}. Financial results and operational views retain their own stated cutoffs.</p></details>
  </div>;
 }

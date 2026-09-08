@@ -122,6 +122,74 @@ def request_for(case, **kwargs):
     return CompanyHomeRequest(company_id=case[1]["context"]["company"]["resource_id"], **kwargs)
 
 
+def financial_case(case):
+    context = case[1]["context"]
+    calendar = resource("Calendar", "FiscalCalendar")
+    chart = resource("Chart", "LocalChartOfAccounts")
+    currency = resource("Currency", "Currency")
+    ledger = resource("Ledger", "Ledger", {
+        "legal_entity_id": context["company"]["resource_id"],
+        "calendar_id": calendar["resource_id"], "chart_id": chart["resource_id"],
+        "currency_id": currency["resource_id"],
+    })
+    item = dict(ledger=ledger, calendar_id=calendar, chart_id=chart, currency_id=currency,
+                books=[resource("Book", "AccountingBook", {"ledger_id": ledger["resource_id"]})],
+                periods=[resource("Period", "FiscalPeriod", {
+                    "calendar_id": calendar["resource_id"],
+                })],
+                ready=True)
+    context["ledgers"] = [item]
+    context["accounting_state"] = "CONFIGURED"
+    context["accounting_sources"] = [{"scope": resource("Source", "SourceAccountingScope", {
+        "legal_entity_id": context["company"]["resource_id"],
+    })}]
+    return item
+
+
+def test_financial_context_retains_dependencies_without_amount_or_close_authority(case):
+    item = financial_case(case)
+    result = service.describe(case[0], request_for(case)).financial_context
+    assert result.authority == "ACCOUNTING_CONTEXT_ONLY"
+    assert result.accounting_state == "CONFIGURED"
+    assert result.ledgers[0].ledger.version_id == uid("Ledger:version")
+    assert result.ledgers[0].periods[0].version_id == uid("Period:version")
+    assert result.ledgers[0].context_ready
+    assert result.source_scopes[0].resource_id == uid("Source")
+    assert "balances" in result.limitation
+    assert result.ledgers[0].books[0].attributes == item["books"][0]["attributes"]
+
+
+@pytest.mark.parametrize("field", ["calendar_id", "chart_id", "currency_id"])
+def test_missing_ledger_dependency_remains_unready(case, field):
+    item = financial_case(case)
+    item[field] = None
+    if field == "calendar_id":
+        item["periods"] = []
+    result = service.describe(case[0], request_for(case)).financial_context
+    assert not result.ledgers[0].context_ready
+
+
+@pytest.mark.parametrize(
+    "target", ["company", "book", "period", "calendar", "chart", "currency", "source"]
+)
+def test_financial_context_rejects_foreign_dependency(case, target):
+    item = financial_case(case)
+    if target == "company":
+        item["ledger"]["attributes"]["legal_entity_id"] = str(uid("foreign"))
+    elif target == "book":
+        item["books"][0]["attributes"]["ledger_id"] = str(uid("foreign"))
+    elif target == "period":
+        item["periods"][0]["attributes"]["calendar_id"] = str(uid("foreign"))
+    elif target == "source":
+        source = case[1]["context"]["accounting_sources"][0]["scope"]
+        source["attributes"]["legal_entity_id"] = str(uid("foreign"))
+    else:
+        item["ledger"]["attributes"][target + "_id"] = str(uid("foreign"))
+    with pytest.raises(WorkspaceError) as failure:
+        service.describe(case[0], request_for(case))
+    assert failure.value.status == 409
+
+
 def test_retained_period_and_receipt_remain_independent_of_home_snapshot(case):
     invocation = uid("historical run")
     request = request_for(case, invocation_ids=[invocation])
