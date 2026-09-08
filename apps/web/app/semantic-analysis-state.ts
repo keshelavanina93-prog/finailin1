@@ -1,4 +1,4 @@
-import type {AnalysisContributor,AnalysisField,AnalysisPin,AnalysisProjection,AnalysisRequest,AnalysisValue} from "@finai/contracts";
+import type {AnalysisContributor,AnalysisField,AnalysisPin,AnalysisProjection,AnalysisRequest,AnalysisRow,AnalysisValue} from "@finai/contracts";
 
 const hash=/^[a-f0-9]{64}$/;
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
@@ -47,7 +47,7 @@ function validValue(value:AnalysisValue,field:AnalysisField):boolean {
   default:return false;
  }
 }
-export type AnalysisView={version:1;request:AnalysisRequest;valid_at:string;known_at:string;receipt_hash:string;columns:string[];visual:boolean;pane:"evidence"|"trace";scroll:number;workspace?:{grid:{widths:Record<string,number>;pinned:string[];focus:{row:string;column:string}|null;left:number};dock:"right"|"bottom";collapsed:boolean;size:number}};
+export type AnalysisView={version:1;request:AnalysisRequest;valid_at:string;known_at:string;receipt_hash:string;columns:string[];visual:boolean;pane:"evidence"|"trace";scroll:number;workspace?:{grid:{widths:Record<string,number>;pinned:string[];focus:{row:string;column:string}|null;left:number;search:string};dock:"right"|"bottom";collapsed:boolean;size:number}};
 export function requestKey(request:AnalysisRequest):string {
  return JSON.stringify([request.company_id,request.invocation_id,request.descriptor_sha256??null,request.filters??[],request.group_by??null,request.selected_row??null,request.contributor_index??0]);
 }
@@ -86,7 +86,15 @@ function parseWorkspace(value:unknown):AnalysisView["workspace"] {
  const finite=(n:unknown,min:number,max:number,fallback:number)=>typeof n==="number"&&Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback;
  const widths=Object.fromEntries(Object.entries(g.widths&&typeof g.widths==="object"?g.widths:{}).filter(([key,value])=>key.length<=128&&typeof value==="number"&&Number.isFinite(value)).slice(0,100).map(([key,value])=>[key,finite(value,88,600,160)]));
  const focus=g.focus as {row?:unknown;column?:unknown}|undefined;
- return {grid:{widths,pinned:Array.isArray(g.pinned)?g.pinned.filter((key:unknown)=>typeof key==="string"&&key.length<=128).slice(0,100):[],focus:focus&&typeof focus.row==="string"&&rowId.test(focus.row)&&typeof focus.column==="string"&&focus.column.length<=128?{row:focus.row,column:focus.column}:null,left:finite(g.left,0,100000,0)},dock:v.dock==="bottom"?"bottom":"right",collapsed:v.collapsed===true,size:finite(v.size,180,700,340)};
+ return {grid:{widths,pinned:Array.isArray(g.pinned)?g.pinned.filter((key:unknown)=>typeof key==="string"&&key.length<=128).slice(0,100):[],focus:focus&&typeof focus.row==="string"&&rowId.test(focus.row)&&typeof focus.column==="string"&&focus.column.length<=128?{row:focus.row,column:focus.column}:null,left:finite(g.left,0,100000,0),search:typeof g.search==="string"?g.search.slice(0,200):""},dock:v.dock==="bottom"?"bottom":"right",collapsed:v.collapsed===true,size:finite(v.size,180,700,340)};
+}
+
+/** Presentation search of returned values only; no numeric coercion or hidden field lookup. */
+export function worksheetRowMatches(row:AnalysisRow,fields:readonly AnalysisField[],query:string):boolean {
+ const search=query.slice(0,200).trim().toLocaleLowerCase();
+ if(!search)return true;
+ const values=[row.label,...fields.map(field=>{const value=row.values[field.key];if(!value)return "";const text=value.state==="NULL"?"Recorded null":value.state==="MISSING"?"Not recorded":`${value.label??""} ${String(value.value)}`;return `${field.label}: ${text}`;})];
+ return values.some(value=>value.toLocaleLowerCase().includes(search));
 }
 
 /** Keep one keyboard entry in the rendered window without changing evidence selection. */

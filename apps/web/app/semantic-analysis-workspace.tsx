@@ -36,13 +36,13 @@ function Workspace({token,companyId,invocationId,onInspect}:Props){
  const scroll=useRef<HTMLDivElement>(null);const restoreScroll=useRef<number|null>(null);const lastButton=useRef<HTMLButtonElement|null>(null);
  const evidenceToggle=useRef<HTMLButtonElement>(null),traceToggle=useRef<HTMLButtonElement>(null);
  const returnFocus=useRef(false);const activeControl=useRef<HTMLElement|null>(null);const restoreCell=useRef(false);
- const [layout,setLayout]=useState<WorksheetLayout>({widths:{},pinned:[],focus:null,left:0});
+ const [layout,setLayout]=useState<WorksheetLayout>({widths:{},pinned:[],focus:null,left:0,search:""});
  const [narrow,setNarrow]=useState(false);
  const [dock,setDock]=useState<"right"|"bottom">("right");const [collapsed,setCollapsed]=useState(true);const [paneSize,setPaneSize]=useState(340);
  const workspace=useRef<HTMLElement>(null);const paneDrag=useRef<{start:number;size:number}|null>(null);
  useEffect(()=>{const el=workspace.current;if(!el)return;const observer=new ResizeObserver(()=>setNarrow(el.clientWidth<=900));observer.observe(el);return()=>observer.disconnect();},[]);
  const key=requestKey(request);const projection=response?.data??null;const error=response?.key===key?response.error:"";const busy=ready&&(!response||response.key!==key);
- function restore(view:AnalysisView){restoreCell.current=true;setExcluded(null);setExpected(view);setRequest(view.request);setColumns(view.columns);setVisual(view.visual);setPane(view.pane);if(view.workspace){setLayout(view.workspace.grid);setDock(view.workspace.dock);setCollapsed(view.workspace.collapsed);setPaneSize(view.workspace.size);}restoreScroll.current=view.scroll;setNotice("Restoring exact saved references; checking access and revision…");}
+ function restore(view:AnalysisView){restoreCell.current=true;setExcluded(null);setExpected(view);setRequest(view.request);setColumns(view.columns);setVisual(view.visual);setPane(view.pane);if(view.workspace){setLayout(view.workspace.grid);setDock(view.workspace.dock);setCollapsed(view.workspace.collapsed);setPaneSize(view.workspace.size);}else setLayout(current=>({...current,search:""}));restoreScroll.current=view.scroll;setNotice("Restoring exact saved references; checking access and revision…");}
  useEffect(()=>{
   let disposed=false;
   void crypto.subtle.digest("SHA-256",new TextEncoder().encode(token)).then(bytes=>{
