@@ -5,6 +5,7 @@ import os
 from datetime import UTC, datetime
 from uuid import UUID
 
+from finai_api.domain.external_ontology import EXTERNAL_TYPES
 from finai_api.domain.ontology_catalog import canonical_id, platform_definitions
 from finai_api.domain.ontology_definitions import DEFINITION_MODELS
 from finai_api.domain.resources import (
@@ -35,6 +36,7 @@ def main() -> None:
         and {"ontology_admin", "ontology_review"}.issubset(p.permissions)
     )
     kinds = {
+        *EXTERNAL_TYPES,
         "Artifact",
         "JournalEntry",
         "JournalLine",
