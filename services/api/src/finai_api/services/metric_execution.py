@@ -40,8 +40,14 @@ def discover(
         raise WorkspaceError(422, "Function filter requires resource, version and content hash")
     try:
         selected = (
-            Pin(resource_id=parts[0], version_id=parts[1], content_hash=parts[2])
-            if parts[0] is not None
+            Pin(
+                resource_id=function_resource_id,
+                version_id=function_version_id,
+                content_hash=function_content_hash,
+            )
+            if function_resource_id is not None
+            and function_version_id is not None
+            and function_content_hash is not None
             else None
         )
     except ValidationError as exc:
