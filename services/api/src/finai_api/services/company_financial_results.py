@@ -17,6 +17,7 @@ from finai_api.domain.function_execution import (
 )
 from finai_api.domain.resources import ResourceMutation
 from finai_api.domain.review import Principal
+from finai_api.domain.semantic_analysis import Pin
 from finai_api.security import require_permission
 from finai_api.services import (
     company_context,
@@ -33,7 +34,12 @@ FINANCIAL_IMPLEMENTATIONS = (
 
 
 def pin(row: dict[str, Any]) -> dict[str, str]:
-    return {key: str(row[key]) for key in ("resource_id", "version_id", "content_hash")}
+    try:
+        return Pin.model_validate(
+            {key: row[key] for key in ("resource_id", "version_id", "content_hash")}
+        ).model_dump(mode="json")
+    except (KeyError, TypeError, ValueError) as exc:
+        raise WorkspaceError(409, "Financial discovery requires valid exact resource pins") from exc
 
 
 def capability(
@@ -45,6 +51,7 @@ def capability(
     attrs = item["attributes"]
     if attrs.get("definition", {}).get("implementation_id") not in FINANCIAL_IMPLEMENTATIONS:
         return None
+    reference = pin({**item["reference"], "content_hash": item["content_hash"]})
     spec = FunctionDefinition.model_validate(attrs)
     company = context["company"]
 
@@ -101,7 +108,7 @@ def capability(
     )
     available = source is None or bool(eligibility and eligibility.get("eligible_for_accounting"))
     return {
-        "function": {**item["reference"], "content_hash": item["content_hash"]},
+        "function": reference,
         "display_name": item["display_name"],
         "implementation_id": spec.definition.implementation_id,
         "kind": "SOURCE_POSTED_MOVEMENTS" if source else "ACCEPTED_JOURNAL_MOVEMENTS",
@@ -133,6 +140,12 @@ def _retained_item(
 ) -> dict[str, Any] | None:
     """Validate catalog metadata; actual reopening still uses retained history/projection guards."""
     plan, payload = row["plan"], row["payload"]
+    if (
+        not isinstance(plan, dict)
+        or not isinstance(payload, dict)
+        or not isinstance(plan.get("request"), dict)
+    ):
+        raise WorkspaceError(409, "Retained financial discovery metadata is invalid")
     scope = principal.scope.model_dump(mode="json")
     if row["exact_scope"] != scope or plan.get("exact_scope") != scope:
         raise WorkspaceError(409, "Retained financial result differs from exact access scope")

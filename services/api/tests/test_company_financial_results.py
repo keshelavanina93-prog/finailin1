@@ -304,3 +304,35 @@ def test_generic_source_cannot_borrow_posted_function_capability():
     context["accounting_sources"][0]["scope"]["attributes"]["source_profile"] = "generic_table"
     with pytest.raises(WorkspaceError, match="matching source"):
         service.capability(item, list(targets.values()), context)
+
+
+@pytest.mark.parametrize("field", ["plan", "request"])
+def test_retained_non_object_metadata_is_controlled_refusal(field):
+    principal, context, _, row = fixture()
+    if field == "plan":
+        row["plan"] = []
+    else:
+        row["plan"]["request"] = []
+        row["plan_hash"] = service.function_execution._digest(
+            {k: v for k, v in row["plan"].items() if k != "plan_hash"}
+        )
+        row["plan"]["plan_hash"] = row["plan_hash"]
+        row["payload"]["plan_hash"] = row["plan_hash"]
+        row["proof_hash"] = service.function_invocations._digest(row["payload"])
+    with pytest.raises(WorkspaceError, match="metadata is invalid") as caught:
+        service.retained_item(row, principal, UUID(context["company"]["resource_id"]))
+    assert caught.value.status == 409
+
+
+@pytest.mark.parametrize(
+    "field,value", [("version_id", "not-a-uuid"), ("content_hash", "not-a-hash")]
+)
+def test_capability_does_not_emit_malformed_exact_pin(field, value):
+    _, context, function, _ = fixture()
+    if field == "content_hash":
+        function[field] = value
+    else:
+        function["reference"][field] = value
+    with pytest.raises(WorkspaceError, match="valid exact resource pins") as caught:
+        service.capability(function, [context["company"]], context)
+    assert caught.value.status == 409
