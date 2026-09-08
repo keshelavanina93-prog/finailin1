@@ -64,3 +64,19 @@ test("workflow return reuses scroll restoration and selects its exact canonical 
  d.row.getClientRects=()=>[];assert.equal(restoreCompanyWorkFocus(d.origin,d.main,{workflowId,proposalId:id(4)}),true);assert.equal(d.calls.at(-1)[0],"queue");
  assert.equal(restoreCompanyWorkFocus(d.origin,d.main,{workflowId:'opa_"invalid',proposalId:id(4)}),false);
 });
+
+test("return reveals only the moved exact row's closed outcomes disclosure; ordinary returns keep captured scroll",()=>{
+ const d=dom(),outcomes={open:false};d.queue.contains=value=>value===outcomes;
+ d.row.closest=selector=>selector==="details[data-company-work-outcomes]"?outcomes:null;
+ d.row.getClientRects=()=>outcomes.open?[{}]:[];d.row.scrollIntoView=value=>d.calls.push(["reveal",value]);
+ assert.equal(restoreJournalReviewFocus(d.origin,d.main,id(4)),true);assert.equal(outcomes.open,true);
+ assert.deepEqual(d.calls,[["main",{top:720,behavior:"instant"}],["pane",{top:15,left:40,behavior:"instant"}],["reveal",{block:"nearest",inline:"nearest"}],["row",{preventScroll:true}]]);
+ d.calls.length=0;assert.equal(restoreJournalReviewFocus(d.origin,d.main,id(4)),true);assert.equal(d.calls.some(call=>call[0]==="reveal"),false);
+});
+test("withheld, filtered or unrelated outcome rows never open a disclosure or reset the queue",()=>{
+ for(const reason of ["withheld","unrelated","filtered"]){const d=dom(),outcomes={open:false};
+  d.queue.contains=()=>reason!=="unrelated";d.row.closest=selector=>selector==="details[data-company-work-outcomes]"?outcomes:reason==="withheld"?{}:null;d.row.getClientRects=()=>[];
+  if(reason==="filtered")d.queue.querySelector=()=>null;
+  assert.equal(restoreCompanyWorkFocus(d.origin,d.main,{workflowId,proposalId:id(4)}),true);assert.equal(outcomes.open,false);assert.equal(d.calls.at(-1)[0],"queue");
+ }
+});

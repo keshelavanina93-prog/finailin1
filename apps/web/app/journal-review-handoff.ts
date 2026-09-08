@@ -43,7 +43,13 @@ export function restoreCompanyWorkFocus(origin:JournalReviewDomOrigin,main:HTMLE
  main?.scrollTo({top:origin.scroll,behavior:"instant"});
  for(const item of origin.scrolls)if(item.element.isConnected)item.element.scrollTo({top:item.top,left:item.left,behavior:"instant"});
  const row=origin.queue.querySelector<HTMLElement>(`[${workflow?"data-company-workflow":"data-journal-proposal"}="${id}"]`);
- (row?.getClientRects().length?row:origin.queue).focus({preventScroll:true});
+ const outcomes=row?.closest?.<HTMLDetailsElement>("details[data-company-work-outcomes]");
+ const reveal=Boolean(outcomes&&!outcomes.open&&origin.queue.contains(outcomes)&&!row?.closest("[hidden],[inert]"));
+ if(reveal)outcomes!.open=true;
+ const target=row?.getClientRects().length?row:origin.queue;
+ // A newly completed item can move below the old viewport; only this deliberate reveal adjusts it.
+ if(reveal&&target===row)row!.scrollIntoView({block:"nearest",inline:"nearest"});
+ target.focus({preventScroll:true});
  return true;
 }
 
