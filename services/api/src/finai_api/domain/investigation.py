@@ -5,6 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from finai_api.domain.investigation_resolution import InvestigationResolutionAction
 from finai_api.domain.metric_execution import Pin
 from finai_api.domain.source_reconciliation_exception import SourceExceptionObservation
 
@@ -58,7 +59,7 @@ class InvestigationOperation(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     operation_id: str
     intent_id: str | None = None
-    intent_request: InvestigationAction | None = None
+    intent_request: InvestigationAction | InvestigationResolutionAction | None = None
     state: Literal["PREPARED", "PENDING_REVIEW", "REJECTED", "PUBLISHED", "PUBLICATION_UNAVAILABLE"]
     proposal: dict[str, Any] | None
     prepared_proposal_id: UUID
