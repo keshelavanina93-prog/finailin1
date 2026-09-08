@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import test from "node:test";
 import {loadTypeScript} from "./load-typescript.mjs";
-const {reportSectionFromProjection,reportCompositionReferences,sameReportComposition,reportCellLabel,reportEvidenceTarget,assertReportPreview}=await loadTypeScript(new URL("../app/retained-report-state.ts",import.meta.url));
+const {reportSectionFromProjection,reportCompositionReferences,sameReportComposition,reportCellLabel,reportEvidenceTarget,assertReportPreview,verifyReportDownload}=await loadTypeScript(new URL("../app/retained-report-state.ts",import.meta.url));
 const {projection:p}=JSON.parse(await readFile(new URL("./fixtures/retained-report-projection-synthetic.json",import.meta.url),"utf8"));
 const realPreview=JSON.parse(await readFile(new URL("./fixtures/report-preview-real-synthetic.json",import.meta.url),"utf8"));
 const company=p.descriptor.company.resource_id,id="11111111-1111-4111-8111-111111111111";
@@ -41,4 +41,13 @@ test("resolver-produced retained preview carries exact sections, rows and contri
  assert.equal(realPreview.snapshot.sections.length,1);
  assert.equal(realPreview.snapshot.sections[0].projection.rows.length,2);
  assert.equal(Object.keys(realPreview.snapshot.sections[0].contributors).length,2);
+});
+test("export bytes require the saved artifact, proposal identity, media type, length and digest",async()=>{
+ const bytes=new TextEncoder().encode("<html>retained report</html>");
+ const digest=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",bytes)),value=>value.toString(16).padStart(2,"0")).join("");
+ const artifact={media_type:"text/html",filename:"retained-report.html",size_bytes:bytes.byteLength,sha256:digest};
+ const reference={report_id:id,proposal_id:"22222222-2222-4222-8222-222222222222",content_hash:"b".repeat(64)};
+ const headers=new Headers({"content-type":"text/html; charset=utf-8","content-length":String(bytes.byteLength),"x-content-sha256":digest,"x-report-content-hash":reference.content_hash,"x-report-proposal-id":reference.proposal_id});
+ await verifyReportDownload(bytes.buffer,headers,artifact,reference);
+ await assert.rejects(()=>verifyReportDownload(bytes.buffer,new Headers(headers),{...artifact,sha256:"0".repeat(64)},reference));
 });

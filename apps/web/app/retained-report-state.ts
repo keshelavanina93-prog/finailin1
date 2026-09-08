@@ -63,6 +63,37 @@ export async function verifyReportDownload(bytes:ArrayBuffer,headers:Headers,art
  const digest=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",bytes)),byte=>byte.toString(16).padStart(2,"0")).join("");
  if(digest!==artifact.sha256)throw Error("Report download integrity check failed. No file was released.");
 }
+async function reportResponse<T>(response:Response,parse:(value:unknown)=>T):Promise<T>{
+ const value=await response.json().catch(()=>null);
+ if(!response.ok)throw Error(typeof (value as {detail?:unknown})?.detail==="string"?String((value as {detail:string}).detail):`Retained report request failed (${response.status}).`);
+ return parse(value);
+}
+export async function previewRetainedReport(token:string,composition:ReportComposition):Promise<ReportPreview>{
+ const response=await fetch("/api/ontology/retained-reports/preview",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify(reportCompositionReferences(composition)),cache:"no-store"});
+ return reportResponse(response,value=>{const preview=value as ReportPreview;assertReportPreview(preview,composition);return preview;});
+}
+export async function saveRetainedReport(token:string,composition:ReportComposition,preview:ReportPreview,previousProposalId:string|null=null):Promise<RetainedReport>{
+ const request=freezeReportSave(composition,preview,crypto.randomUUID(),previousProposalId,crypto.randomUUID());
+ const response=await fetch("/api/ontology/retained-reports",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify(request),cache:"no-store"});
+ return reportResponse(response,value=>{const report=value as RetainedReport;assertRetainedReport(report,composition.company_id,undefined,request,preview);return report;});
+}
+export async function listRetainedReports(token:string,companyId:string,cursor?:{created_at:string;proposal_id:string}):Promise<RetainedReportPage>{
+ const query=new URLSearchParams({company_id:companyId});if(cursor){query.set("cursor_created_at",cursor.created_at);query.set("cursor_proposal_id",cursor.proposal_id);}
+ const response=await fetch(`/api/ontology/retained-reports?${query}`,{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});
+ return reportResponse(response,value=>{const page=value as RetainedReportPage;assertReportPage(page,companyId);return page;});
+}
+export async function reopenRetainedReport(token:string,companyId:string,proposalId:string):Promise<RetainedReport>{
+ if(!uuid.test(companyId)||!uuid.test(proposalId))throw refused();
+ const response=await fetch(`/api/ontology/retained-reports/${encodeURIComponent(proposalId)}?company_id=${encodeURIComponent(companyId)}`,{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});
+ return reportResponse(response,value=>{const report=value as RetainedReport;assertRetainedReport(report,companyId);return report;});
+}
+export async function downloadRetainedReport(token:string,companyId:string,report:RetainedReport,format:"xlsx"|"html"):Promise<void>{
+ const artifact=report.exports[format];
+ const response=await fetch(`/api/ontology/retained-reports/${encodeURIComponent(report.reference.proposal_id)}/exports/${format}?company_id=${encodeURIComponent(companyId)}`,{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});
+ if(!response.ok)throw Error(`Retained ${format.toUpperCase()} export unavailable (${response.status}).`);
+ const bytes=await response.arrayBuffer();await verifyReportDownload(bytes,response.headers,artifact,report.reference);
+ const url=URL.createObjectURL(new Blob([bytes],{type:artifact.media_type}));const anchor=document.createElement("a");anchor.href=url;anchor.download=artifact.filename;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 export function reportCellLabel(value:AnalysisValue,field:AnalysisField):string {
  if(value.state!=="VALUE")return value.state==="NULL"?"Recorded null":"Not recorded";
  if(value.label!==null)return value.label;
