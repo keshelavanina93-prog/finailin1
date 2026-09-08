@@ -244,9 +244,9 @@ def test_historical_projection_survives_withdrawal_but_new_save_does_not(graph):
 
 
 def test_accepted_section_checks_source_and_exact_journal_line_policy_roots(graph, monkeypatch):
-    from finai_api.domain.retained_reports import ReportSectionReference
     from test_semantic_analysis_accepted_movements import case
 
+    from finai_api.domain.retained_reports import ReportSectionReference
     from finai_api.services import company_financial_metrics, journal_reconciliation
 
     history, plan, resolver, company, *_ = case.__wrapped__()
