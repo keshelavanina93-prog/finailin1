@@ -94,6 +94,8 @@ def case(monkeypatch):
         "function": exact(2),
         "implementation": manifest,
     }
+    for evidence in (receipt, output):
+        evidence.update(current_use_authorized=False, business_effect_authorized=False)
     h = {
         "status": "SUCCEEDED",
         "invocation_id": str(req.invocation_id),
@@ -130,6 +132,8 @@ def test_complete_count_and_zero_preserve_retained_context(case):
         lambda m, h: m["dependencies"][0].update(version_id=str(UUID(int=500))),
         lambda m, h: m.update(evidence_class="REFERENCE_TEMPLATE"),
         lambda m, h: m["attributes"].pop("definition"),
+        lambda m, h: h["output"].update(current_use_authorized=True),
+        lambda m, h: h["receipt"].update(business_effect_authorized=True),
     ],
 )
 def test_refuse_partial_wrong_scope_drift_or_legacy(case, change):
@@ -141,6 +145,11 @@ def test_refuse_partial_wrong_scope_drift_or_legacy(case, change):
 
 def test_measure_preserves_decimal_currency_company_coverage_and_account_tree(case):
     p, req, metric, h = case
+    p = p.model_copy(
+        update={"scope": p.scope.model_copy(update={"legal_entity_id": str(UUID(int=8))})}
+    )
+    h["receipt"]["exact_scope"] = p.scope.model_dump(mode="json")
+    h["output"]["scope"] = p.scope.model_dump(mode="json")
     company = {
         **exact(8),
         "relation": "FIELD:legal_entity_id",
@@ -177,10 +186,18 @@ def test_measure_preserves_decimal_currency_company_coverage_and_account_tree(ca
     h["output"].update(
         metric_outputs=[value], financial_metrics={"ledger_completeness": "UNESTABLISHED"}
     )
-    result = metrics.assemble(*case)
+    result = metrics.assemble(p, req, metric, h)
     assert result["observation"]["value"] == "-123.4500"
     assert result["observation"]["coverage"] == "PARTIAL"
     assert result["source_result"]["financial_metrics"]["ledger_completeness"] == "UNESTABLISHED"
+    foreign = p.model_copy(
+        update={"scope": p.scope.model_copy(update={"legal_entity_id": str(UUID(int=7))})}
+    )
+    foreign_history = deepcopy(h)
+    foreign_history["receipt"]["exact_scope"] = foreign.scope.model_dump(mode="json")
+    foreign_history["output"]["scope"] = foreign.scope.model_dump(mode="json")
+    with pytest.raises(WorkspaceError):
+        metrics.assemble(foreign, req, metric, foreign_history)
     for key, bad in [
         ("grain", "ACCOUNT"),
         ("company", exact(7)),
