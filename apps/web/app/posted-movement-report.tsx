@@ -110,7 +110,7 @@ export default function PostedMovementReport({ active=false,token, contextKey, f
   useEffect(()=>{if(initialInvocationId)void run(undefined,initialInvocationId);},[initialInvocationId,run]);
 
   if(report && expectedSource) return <section className="finance-retained-result" aria-label="Retained financial worksheet">
-    {busy&&<p role="status">Checking the retained report…</p>}
+    {busy&&<p role="status">Checking the retained reportâ€¦</p>}
     {error&&<p role="alert">{error}</p>}
     <SemanticAnalysisWorkspace owner="finance" expectedReceiptHash={report.receipt_hash} active={active} token={token} companyId={expectedSource.company_id} invocationId={report.invocation_id} onInspect={onInspectFunction} onOpenSourceReview={openSourceReview}/>
     <details className="finance-result-actions"><summary>Reviewed accounting actions</summary><AcceptedJournalReviewAction token={token} companyId={expectedSource.company_id} invocationId={report.invocation_id} disabled={busy}/></details>
