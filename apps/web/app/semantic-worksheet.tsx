@@ -2,6 +2,7 @@
 
 import {useEffect,useRef,useState,type RefObject,type CSSProperties} from "react";
 import type {AnalysisField,AnalysisProjection,AnalysisRow,AnalysisValue} from "@finai/contracts";
+import {worksheetReveal,worksheetFocusScheduler} from "./worksheet-navigation";
 import {worksheetTabStop,worksheetRowMatches} from "./semantic-analysis-state";
 
 export type WorksheetLayout={widths:Record<string,number>;pinned:string[];focus:{row:string;column:string}|null;left:number;search:string};
@@ -12,6 +13,9 @@ export default function SemanticWorksheet({projection,fields,columns,layout,onLa
  const [top,setTop]=useState(0);const [available,setAvailable]=useState(700);
  useEffect(()=>{const el=scroll.current;if(!el)return;let previousHeight=el.clientHeight;const observer=new ResizeObserver(()=>{setAvailable(el.clientWidth);const selected=el.querySelector<HTMLElement>("tr[aria-selected=true]");if(selected){const relative=selected.getBoundingClientRect().top-el.getBoundingClientRect().top;if(relative>=0&&relative<previousHeight&&relative+36>el.clientHeight)el.scrollBy({top:relative+36-el.clientHeight});}previousHeight=el.clientHeight;});observer.observe(el);return()=>observer.disconnect();},[scroll]);
  const searchInput=useRef<HTMLInputElement>(null);
+ const [navigationFocus]=useState(()=>worksheetFocusScheduler(callback=>requestAnimationFrame(callback),frame=>cancelAnimationFrame(frame)));
+ const navigationKey=JSON.stringify([projection.descriptor_sha256,projection.request,columns,layout.search,layout.pinned]);
+ useEffect(()=>{navigationFocus.cancel();return()=>navigationFocus.cancel();},[navigationFocus,navigationKey]);
  const drag=useRef<{key:string;x:number;width:number}|null>(null);
  const ordered=columns.map(key=>fields.find(field=>field.key===key)).filter((field):field is AnalysisField=>Boolean(field));
  const shown=[...ordered.filter(field=>layout.pinned.includes(field.key)),...ordered.filter(field=>!layout.pinned.includes(field.key))];
@@ -27,11 +31,24 @@ export default function SemanticWorksheet({projection,fields,columns,layout,onLa
  const start=Math.min(Math.max(0,rows.length-70),Math.max(0,Math.floor(top/36)-8)),end=Math.min(rows.length,start+70);
  const visibleRows=rows.slice(start,end);
  const tabStop=worksheetTabStop(layout.focus,visibleRows.map(({row})=>row.key),["$row",...shown.map(field=>field.key)]);
- function find(search:string){const next=search.slice(0,200);scroll.current?.scrollTo({top:0,behavior:"instant"});setTop(0);onLayout({...layout,search:next,focus:worksheetTabStop(layout.focus,returnedRows.filter(({row})=>worksheetRowMatches(row,shown,next)).map(({row})=>row.key),["$row",...shown.map(field=>field.key)])});}
- function changeColumns(keys:string[]){if(layout.search.trim()){scroll.current?.scrollTo({top:0,behavior:"instant"});setTop(0);}onColumns(keys);}
+ function find(search:string){navigationFocus.cancel();const next=search.slice(0,200);scroll.current?.scrollTo({top:0,behavior:"instant"});setTop(0);onLayout({...layout,search:next,focus:worksheetTabStop(layout.focus,returnedRows.filter(({row})=>worksheetRowMatches(row,shown,next)).map(({row})=>row.key),["$row",...shown.map(field=>field.key)])});}
+ function changeColumns(keys:string[]){navigationFocus.cancel();if(layout.search.trim()){scroll.current?.scrollTo({top:0,behavior:"instant"});setTop(0);}onColumns(keys);}
  function moveColumn(key:string,delta:number){const next=[...columns],index=next.indexOf(key),target=index+delta;if(target<0||target>=next.length)return;[next[index],next[target]]=[next[target],next[index]];changeColumns(next);}
- function focusCell(rowIndex:number,columnIndex:number){const row=rows[Math.max(0,Math.min(rows.length-1,rowIndex))]?.row;if(!row)return;const column=columnIndex<=0?"$row":shown[Math.min(shown.length,columnIndex)-1]?.key??"$row";onLayout({...layout,focus:{row:row.key,column}});const el=scroll.current;if(!el)return;const y=rowIndex*36;if(y<el.scrollTop)el.scrollTo({top:y});if(y+72>el.scrollTop+el.clientHeight)el.scrollTo({top:y+72-el.clientHeight});setTop(el.scrollTop);requestAnimationFrame(()=>{const cell=el.querySelector<HTMLElement>(`[data-row="${row.key}"][data-column="${CSS.escape(column)}"]`);cell?.focus({preventScroll:true});cell?.scrollIntoView({block:"nearest",inline:"nearest"});});}
- return <div className="semantic-worksheet">
+ function focusCell(rowIndex:number,columnIndex:number){
+  const index=Math.max(0,Math.min(rows.length-1,rowIndex)),row=rows[index]?.row;if(!row)return;
+  const column=columnIndex<=0?"$row":shown[Math.min(shown.length,columnIndex)-1]?.key??"$row";
+  onLayout({...layout,focus:{row:row.key,column}});const el=scroll.current;if(!el)return;
+  const y=index*36,active=document.activeElement;
+  if(y<el.scrollTop)el.scrollTo({top:y});if(y+78>el.scrollTop+el.clientHeight)el.scrollTo({top:y+78-el.clientHeight});setTop(el.scrollTop);
+  navigationFocus.schedule(()=>{
+   if(!el.isConnected||!el.getClientRects().length||document.activeElement!==active&&document.activeElement!==document.body)return;
+   const cell=el.querySelector<HTMLElement>(`[data-row="${row.key}"][data-column="${CSS.escape(column)}"]`);if(!cell||!cell.getClientRects().length)return;
+   const rect=cell.getBoundingClientRect(),viewport=el.getBoundingClientRect(),header=el.querySelector("thead")?.getBoundingClientRect().height??42;
+   const position=worksheetReveal({left:el.scrollLeft,top:el.scrollTop,width:el.clientWidth,height:el.clientHeight,stickyWidth:offset,headerHeight:header,cellLeft:rect.left-viewport.left-el.clientLeft+el.scrollLeft,cellTop:rect.top-viewport.top-el.clientTop+el.scrollTop,cellWidth:rect.width,cellHeight:rect.height,pinned:column==="$row"||offsets.has(column)});
+   cell.focus({preventScroll:true});el.scrollTo({...position,behavior:"instant"});setTop(el.scrollTop);
+  });
+ }
+ return <div className="semantic-worksheet" onPointerDownCapture={()=>navigationFocus.cancel()} onFocusCapture={event=>{if(!(event.target as HTMLElement).closest("[data-column]"))navigationFocus.cancel();}}>
   <div className="semantic-find"><label>Find in returned rows<input ref={searchInput} type="search" value={layout.search} maxLength={200} onChange={event=>find(event.target.value)} placeholder="Row label or visible recorded value"/></label>{layout.search&&<button onClick={()=>{searchInput.current?.focus({preventScroll:true});find("");}}>Clear search</button>}<span role="status">{rows.length} matching of {returnedRows.length} returned rows</span><small>Display search only · server filters and retained values unchanged</small></div>
   {hiddenSelection&&<p className="semantic-find-selection" role="status">The selected evidence row is hidden by Find. Its evidence selection remains active. <button onClick={()=>{searchInput.current?.focus({preventScroll:true});find("");}}>Clear search</button></p>}
   <details className="semantic-column-menu"><summary>Columns · {shown.length}</summary><div>{fields.map(field=>{const visible=columns.includes(field.key);return <div key={field.key}><label><input type="checkbox" checked={visible} onChange={()=>changeColumns(visible?columns.filter(key=>key!==field.key):[...columns,field.key])}/>{field.label}</label><button disabled={!visible||columns.indexOf(field.key)===0} aria-label={`Move ${field.label} left`} onClick={()=>moveColumn(field.key,-1)}>←</button><button disabled={!visible||columns.indexOf(field.key)===columns.length-1} aria-label={`Move ${field.label} right`} onClick={()=>moveColumn(field.key,1)}>→</button><button disabled={!visible} aria-pressed={layout.pinned.includes(field.key)} onClick={()=>onLayout({...layout,pinned:layout.pinned.includes(field.key)?layout.pinned.filter(key=>key!==field.key):[...layout.pinned,field.key]})}>Pin {field.label}</button></div>;})}</div></details>
