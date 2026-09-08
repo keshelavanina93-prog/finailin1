@@ -23,6 +23,7 @@ class JournalProductionRequest(BaseModel):
     company_id: UUID
     effective_at: datetime
     rationale: str = Field(min_length=10, max_length=2000)
+    compatibility: VersionReference | None = None
     # Explicit bounded selection for submission; preview still reports every row.
     coordinates: list[str] = Field(default_factory=list, max_length=20)
     policies: dict[str, SidePolicies] = Field(default_factory=dict, max_length=20)

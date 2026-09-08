@@ -144,6 +144,19 @@ def inspect_policy(conn, principal, policy, account, target, at, owner=None):
         ]:
             edge(conn, principal, policy, field, node)
     complete(conn, principal, account, definition.rules, at)
+    if definition.context is not None:
+        context = definition.context
+        if (
+            str(context.company.resource_id) != attrs["legal_entity_id"]
+            or str(context.chart.resource_id) != attrs["chart_id"]
+            or (context.state == "EXPLICIT_NO_ADDITIONAL_DIMENSIONS") != (not definition.rules)
+        ):
+            raise WorkspaceError(422, "Scoped account policy declaration differs from its rule set")
+        for name in ("company", "chart", "book", "period", "source_account", "evidence"):
+            ref = getattr(context, name)
+            node = target(str(ref.resource_id), owner, "POLICY_CONTEXT:" + name)
+            if pin(node) != ref.model_dump(mode="json"):
+                raise WorkspaceError(409, "Scoped account policy context version changed")
     rules = {}
     prefix = "DIMENSION_POLICY_RULE:" if policy.get("system_from") is None else "DIMENSION_RULE:"
     for ref in definition.rules:
@@ -163,6 +176,23 @@ def inspect_policy(conn, principal, policy, account, target, at, owner=None):
         if key in rules:
             raise WorkspaceError(422, "Account policy contains duplicate dimension requirements")
         rules[key] = (rule, dimension)
+    if definition.context is not None:
+        context = definition.context
+        source_account = target(
+            str(context.source_account.resource_id), owner, "POLICY_SOURCE_ACCOUNT"
+        )
+        if source_account["attributes"].get("account_code") != account["attributes"][
+            "account_code"
+        ] or source_account["attributes"].get("evidence_id") != str(context.evidence.resource_id):
+            raise WorkspaceError(422, "Policy chart evidence belongs to another account")
+        labels = {
+            entry["source_label"]
+            for entry in source_account["attributes"]["definition"]["analytics"]
+        }
+        if labels != {dimension["attributes"]["code"] for _, dimension in rules.values()}:
+            raise WorkspaceError(
+                422, "Scoped policy must explicitly cover the source chart analytics"
+            )
     return rules
 
 
@@ -215,6 +245,16 @@ def validate_line(conn, principal, item, target, proposal, at):
     if pin(policy) != definition.policy.model_dump(mode="json"):
         raise WorkspaceError(409, "Journal dimension policy version changed")
     rules = inspect_policy(conn, principal, policy, account, target, at, owner)
+    policy_definition = PolicyDefinition.model_validate(policy["attributes"]["definition"])
+    if policy_definition.context is not None:
+        binding = target(attrs["accounting_binding_id"], owner, "POLICY_ACCOUNTING_BINDING")
+        for field, ref in (
+            ("book_id", policy_definition.context.book),
+            ("period_id", policy_definition.context.period),
+        ):
+            node = target(binding["attributes"][field], owner, "POLICY_ACCOUNTING_" + field)
+            if pin(node) != ref.model_dump(mode="json"):
+                raise WorkspaceError(422, "Account dimension policy is outside this book or period")
     assigned = set()
     for assignment in definition.assignments:
         member = target(

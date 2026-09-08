@@ -612,6 +612,12 @@ def _validate(
                     from finai_api.services.journal_dimensions import validate_line
 
                     validate_line(conn, principal, item, target, proposal, validation_time)
+            if item.object_type == "SourceJournalCompatibility":
+                from finai_api.services.source_journal_compatibility import (
+                    validate as validate_compatibility,
+                )
+
+                validate_compatibility(item, target)
             if item.object_type == "AccountDimensionPolicy":
                 from finai_api.services.journal_dimensions import (
                     validate_policy as validate_dimension_policy,

@@ -28,8 +28,43 @@ def compile_row(pair, source, targets, request, access_entity):
     """Build one complete canonical proposal, or explicit source-policy blockers."""
     coordinate = pair["source_coordinate"]
     issues = []
+    entry_attrs = dict(pair["entry"])
+    if request.compatibility is not None:
+        authority = targets[str(request.compatibility.resource_id)]
+        from finai_api.services.source_journal_compatibility import require
+
+        try:
+            if str(authority["version_id"]) != str(request.compatibility.version_id):
+                raise WorkspaceError(409, "Source compatibility version changed")
+            entry_attrs["source_compatibility_id"] = str(request.compatibility.resource_id)
+            spec = require(
+                SimpleNamespace(resource_id=pair["proposed_entry_id"], attributes=entry_attrs),
+                targets[source["binding"]["resource_id"]],
+                targets[source["scope"]["resource_id"]],
+                lambda identity, *_: targets[str(identity)],
+            )
+            if (
+                spec.source_sha256 != source["sha256"]
+                or spec.sheet != source["sheet"]
+                or spec.amount_column + str(pair["source_row"]) != coordinate.split("!", 1)[1]
+            ):
+                raise WorkspaceError(
+                    409, "Compatibility does not identify this exact source amount cell"
+                )
+        except WorkspaceError as exc:
+            issues.append(
+                blocker(
+                    "SOURCE_COMPATIBILITY_INVALID",
+                    "SourceJournalCompatibility",
+                    exc.detail,
+                    **request.compatibility.model_dump(mode="json"),
+                )
+            )
     for issue in pair["promotion_blockers"]:
-        if issue["code"] == "JOURNAL_PUBLICATION_CONTEXT_UNAVAILABLE":
+        if (
+            issue["code"] == "JOURNAL_PUBLICATION_CONTEXT_UNAVAILABLE"
+            and request.compatibility is None
+        ):
             issues.append(
                 blocker(
                     "SOURCE_JOURNAL_SEMANTICS_UNSUPPORTED",
@@ -65,7 +100,6 @@ def compile_row(pair, source, targets, request, access_entity):
     identity = UUID(pair["proposed_entry_id"])
     record_id = uuid5(UUID(source["evidence"]["resource_id"]), coordinate)
     record_attrs = {"evidence_id": source["evidence"]["resource_id"], "coordinate": coordinate}
-    entry_attrs = pair["entry"]
     definitions = [
         (record_id, "SourceRecord", record_attrs),
         (identity, "JournalEntry", entry_attrs),
@@ -109,6 +143,11 @@ def compile_row(pair, source, targets, request, access_entity):
                     "accounting_binding_id": source["binding"]["resource_id"],
                     "dimension_policy_id": str(policy.policy.resource_id),
                     "dimensions": policy.model_dump(mode="json"),
+                    **(
+                        {"source_compatibility_id": str(request.compatibility.resource_id)}
+                        if request.compatibility
+                        else {}
+                    ),
                 },
             )
         )
@@ -184,6 +223,18 @@ def prepare(principal, request):
         raise WorkspaceError(404, "Retained source unavailable for this company")
     source = history["output"]["source_document"]
     review = history["output"]["entity_movement_review"]
+    if request.compatibility is not None:
+        authority = resources.get_resource(principal, request.compatibility.resource_id)["resource"]
+        targets[str(authority["resource_id"])] = authority
+        from finai_api.domain.source_journal_compatibility import CompatibilityDefinition
+
+        spec = CompatibilityDefinition.model_validate(authority["attributes"]["definition"])
+        header = history["output"]["source_headers"].get(f"{spec.sheet}!{spec.amount_column}1", {})
+        if header.get("value") != spec.amount_header or any(
+            row["attributes"].get("source_family") != spec.source_family
+            for row in history["output"]["source_rows"]
+        ):
+            raise WorkspaceError(409, "Compatibility header or family differs from retained rows")
     coordinates = {pair["source_coordinate"] for pair in review["pairs"]}
     coordinates.update(row["coordinate"] for row in review["reconciliation"]["excluded_rows"])
     if not set(request.coordinates).issubset(coordinates) or not set(request.policies).issubset(
@@ -233,6 +284,9 @@ def prepare(principal, request):
             )
             continue
         row, proposal = compile_row(pair, source, targets, request, principal.scope.legal_entity_id)
+        from finai_api.services.journal_amount_classification import classify
+
+        row["amount_classification"] = classify(pair["lines"][0]["amount"]["amount"])
         rows.append(row)
         if proposal is not None:
             # Full existing profile, dimension, period, source, schema and bundle

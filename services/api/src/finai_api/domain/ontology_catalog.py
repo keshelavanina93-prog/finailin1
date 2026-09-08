@@ -203,7 +203,14 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "local_account_id": "@LocalAccount",
         "group_account_id": "@GroupAccount",
     },
+    "SourceJournalCompatibility": {
+        "accounting_binding_id": "@SourceAccountingBinding", "scope_id": "@SourceAccountingScope",
+        "legal_entity_id": "@LegalEntity", "ledger_id": "@Ledger", "book_id": "@AccountingBook",
+        "period_id": "@FiscalPeriod", "currency_id": "@Currency",
+        "definition": "OntologyDefinition",
+    },
     "JournalEntry": {
+        "source_compatibility_id?": "@SourceJournalCompatibility",
         "posting_date?": "Date",
         "definition?": "OntologyDefinition",
         "accounting_binding_id?": "@SourceAccountingBinding",
@@ -213,6 +220,7 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "reference": "Identifier",
     },
     "JournalLine": {
+        "source_compatibility_id?": "@SourceJournalCompatibility",
         "dimension_policy_id?": "@AccountDimensionPolicy",
         "dimensions?": "OntologyDefinition",
         "side?": "Identifier",
