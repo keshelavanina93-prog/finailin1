@@ -53,6 +53,12 @@ class Resolver:
         self.cache = {}
         self.dependency_cache = {}
         self.source_cache = {}
+        self.source_documents = {}
+        self.source_pages = {}
+        self.source_page_bytes = 0
+        self.source_row_bytes = 0
+        self.source_page_sizes = {}
+        self.source_preview_calls = 0
         self.construction_sources = {}
         self._cursor = None
 
@@ -70,6 +76,14 @@ class Resolver:
                 yield self
             finally:
                 self._cursor = None
+                self.source_cache.clear()
+                self.source_documents.clear()
+                self.source_pages.clear()
+                self.source_page_bytes = 0
+                self.source_row_bytes = 0
+                self.source_page_sizes.clear()
+                self.source_preview_calls = 0
+                self.construction_sources.clear()
 
     @contextmanager
     def database(self):
@@ -146,7 +160,9 @@ class Resolver:
 
     def source_cells(self, evidence_pin, coordinate):
         """Resolve original evidence by exact hash and scope, never a guessed document ID."""
-        from finai_api.services.source_document_preview import preview
+        if self._cursor is None:
+            with self.read_session():
+                return self.source_cells(evidence_pin, coordinate)
 
         evidence = self.version(evidence_pin)
         if evidence["object_type"] != "SourceEvidence":
@@ -157,38 +173,50 @@ class Resolver:
         sheet, column, number = match.groups()
         digest_value = evidence["attributes"]["sha256"]
         scope = self.principal.scope.model_dump(mode="json")
-        cache_key = (digest_value, sheet, number)
+        evidence_key = (
+            str(evidence["resource_id"]),
+            str(evidence["version_id"]),
+            evidence["content_hash"],
+            digest_value,
+        )
+        cache_key = (*evidence_key, sheet, number)
         if cache_key not in self.source_cache:
             if len(self.source_cache) >= 1000:
                 raise WorkspaceError(422, "Original cell inspection budget exceeded")
-            with self.database() as c:
-                matches = c.execute(
-                    "SELECT document_id FROM source_documents WHERE tenant_id=%s "
-                    "AND exact_scope=%s AND source_sha256=%s LIMIT 2",
-                    (self.principal.scope.tenant_id, Jsonb(scope), digest_value),
-                ).fetchall()
-            if not matches:
-                self.source_cache[cache_key] = self._construction_cells(digest_value, sheet, number)
-            elif len(matches) != 1:
-                raise WorkspaceError(409, "Original evidence document is ambiguous")
+            if evidence_key not in self.source_documents:
+                with self.database() as c:
+                    matches = c.execute(
+                        "SELECT document_id FROM source_documents WHERE tenant_id=%s "
+                        "AND exact_scope=%s AND source_sha256=%s LIMIT 2",
+                        (self.principal.scope.tenant_id, Jsonb(scope), digest_value),
+                    ).fetchall()
+                if len(matches) > 1:
+                    raise WorkspaceError(409, "Original evidence document is ambiguous")
+                self.source_documents[evidence_key] = matches[0]["document_id"] if matches else None
+            document_id = self.source_documents[evidence_key]
+            if document_id is None:
+                page = self._construction_cells(digest_value, sheet, number)
             else:
-                try:
-                    page = preview(
-                        self.principal, matches[0]["document_id"], sheet, int(number) - 1, 1
-                    )
-                except WorkspaceError as exc:
-                    if exc.status not in (404, 422):
-                        raise
-                    page = None
-                if page is not None and page["sha256"] != digest_value:
-                    raise WorkspaceError(409, "Original cells differ from their source evidence")
-                self.source_cache[cache_key] = page
+                page = self._source_page(document_id, digest_value, sheet, int(number))
+            # Retain only the requested row, never an evicted page's other rows.
+            if page is not None:
+                page = {
+                    "document_id": page["document_id"],
+                    "sha256": page["sha256"],
+                    "rows": [row for row in page["rows"] if row["row"] == int(number)],
+                }
+            size = self._source_size(page)
+            if not self._source_room(size):
+                raise WorkspaceError(422, "Original worksheet byte inspection budget exceeded")
+            self.source_cache[cache_key] = page
+            self.source_row_bytes += size
         page = self.source_cache[cache_key]
         if page is None:
             return None
         cells = [
             cell
             for row in page["rows"]
+            if row["row"] == int(number)
             for cell in row["cells"]
             if column is None or cell["coordinate"] == coordinate
         ]
@@ -211,6 +239,64 @@ class Resolver:
                 for cell in cells
             ],
         }
+
+    @staticmethod
+    def _source_size(value):
+        return len(json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+
+    def _evict_source_page(self):
+        oldest = next(iter(self.source_pages))
+        self.source_pages.pop(oldest)
+        self.source_page_bytes -= self.source_page_sizes.pop(oldest)
+
+    def _source_room(self, size):
+        while (
+            self.source_pages
+            and self.source_row_bytes + self.source_page_bytes + size > 8 * 1024 * 1024
+        ):
+            self._evict_source_page()
+        return self.source_row_bytes + self.source_page_bytes + size <= 8 * 1024 * 1024
+
+    def _source_page(self, document_id, source_sha256, sheet, number):
+        """Bound resident pages, not sparse row positions; never share outside a read session."""
+        from finai_api.services.source_document_preview import preview
+
+        offset = ((number - 1) // 50) * 50
+        key = (document_id, source_sha256, sheet, offset)
+        if key in self.source_pages:
+            page = self.source_pages.pop(key)
+            self.source_pages[key] = page
+            return page
+        if self.source_preview_calls >= 1000:
+            raise WorkspaceError(422, "Original worksheet read inspection budget exceeded")
+        self.source_preview_calls += 1
+        try:
+            page = preview(self.principal, document_id, sheet, offset, 50)
+        except WorkspaceError as exc:
+            if exc.status not in (404, 422):
+                raise
+            page = None
+        if page is not None and (
+            page["sha256"] != source_sha256 or page["document_id"] != document_id
+        ):
+            raise WorkspaceError(409, "Original cells differ from their source evidence")
+        size = self._source_size(page)
+        while self.source_pages and (
+            len(self.source_pages) >= 20
+            or len(
+                {(entry[0], entry[1]) for entry in self.source_pages}
+                | {(document_id, source_sha256)}
+            )
+            > 8
+        ):
+            self._evict_source_page()
+        if self._source_room(size):
+            self.source_pages[key] = page
+            self.source_page_sizes[key] = size
+            self.source_page_bytes += size
+        # A large neighboring row must not make a small requested row unavailable.
+        # Oversized pages are returned for exact row extraction, but never cached.
+        return page
 
     def _construction_cells(self, source_sha256, sheet, number):
         """Read an existing construction's OOXML bytes through the shared source authority."""
