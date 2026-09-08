@@ -1,8 +1,9 @@
 "use client";
+import SourceExceptionReview from "./source-exception-review";
 import {AcceptedMovementMetricReview} from "./metric-observation-review";
 import {CaretDown,CaretRight} from "@phosphor-icons/react";
 import {useEffect,useMemo,useRef,useState} from "react";
-import type {AnalysisProjection,FinancialMetricResult} from "@finai/contracts";
+import type {AnalysisPin,AnalysisProjection,FinancialMetricResult} from "@finai/contracts";
 import {companyJournalAnalysisEntries} from "./company-journal-analysis-entry-state";
 import {homeAnalysisReferences,subscribeHomeAnalysisPins} from "./company-home-pins";
 import {assertHomeRevision,homeAnalysisRequest,type HomeAnalysisReference} from "./company-home-revision";
@@ -16,7 +17,7 @@ import {useSourceReview} from "./source-review-navigation";
 type Choice={key:string;invocation:string;snapshot:string;label:string;reference?:HomeAnalysisReference};
 type Loaded={key:string;metrics:FinancialMetricResult;projection:AnalysisProjection;reference:HomeAnalysisReference};
 const stamp=(s:string)=>new Date(s).toLocaleString();
-export default function CompanyFinancialMetrics({token,companyId,reviews,onData}:{token:string;companyId:string;reviews:unknown;onData:()=>void}){
+export default function CompanyFinancialMetrics({token,companyId,reviews,onData,onProposal,onInspectReference}:{onProposal?:(id:string)=>void;onInspectReference?:(pin:AnalysisPin,knownAt:string)=>void;token:string;companyId:string;reviews:unknown;onData:()=>void}){
  const open=useSourceReview(),[pins,setPins]=useState<HomeAnalysisReference[]>([]),[pinError,setPinError]=useState("");
  const [selected,setSelected]=useState(""),[loaded,setLoaded]=useState<Loaded|null>(null),[error,setError]=useState(""),[busy,setBusy]=useState(false),[revision,setRevision]=useState(0),[expanded,setExpanded]=useState(true),[search,setSearch]=useState(""),[page,setPage]=useState(0);
  const expectedMetric=useRef<{key:string;hash:string}|null>(null);
@@ -55,6 +56,7 @@ export default function CompanyFinancialMetrics({token,companyId,reviews,onData}
    {expanded&&children.length>6&&<nav className="home-account-pages" aria-label="Contributing accounts"><button disabled={currentPage===0} onClick={()=>setPage(currentPage-1)}>Previous accounts</button><span>{currentPage*6+1}–{Math.min((currentPage+1)*6,children.length)} of {children.length} matching accounts</span><button disabled={(currentPage+1)*6>=children.length} onClick={()=>setPage(currentPage+1)}>Next accounts</button></nav>}
    <footer className="home-metric-footer"><span>{result.coverage.accepted_journals} accepted journals · {result.coverage.unmatched_source_rows} unmatched source rows · {result.coverage.excluded_source_rows} excluded</span><button className="g8-link" onClick={()=>review()}>Open financial source review</button></footer>
    <p className="home-scope-note">Accepted movements only. Opening/closing balances and financial statements are not established.</p><details className="home-metric-provenance"><summary>Advanced · exact authority, coverage and revision</summary><p>Code-defined movement recipe; no new canonical MetricDefinition has been published.</p><pre>{JSON.stringify({selection:result.selection,display_context:result.display_context,binding:result.binding,source_function:result.source_function,definitions:result.definitions,coverage:result.coverage,result_sha256:result.result_sha256,implementation_sha256:result.implementation_sha256,reconciliation_receipt_hash:result.reconciliation_receipt_hash,journals:result.journals},null,2)}</pre></details>
+   <SourceExceptionReview token={token} companyId={companyId} metrics={result} projection={shown.projection} onProposal={onProposal} onInspectReference={onInspectReference} onSource={()=>review()}/>
    <AcceptedMovementMetricReview token={token} companyId={companyId} metrics={result} projection={shown.projection} onSource={()=>review()}/>
   </>}
  </div>;
