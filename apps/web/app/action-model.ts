@@ -1,9 +1,10 @@
-import type {ResourceProposalDetail} from "@finai/contracts";
+import type {AnalysisPin,ResourceProposalDetail} from "@finai/contracts";
 export type WorkFamily="source"|"ontology"|"monitor"|"build"|"unsupported";
 export type ActionItem={workflow_id:string;family:WorkFamily;title:string;publication_review_state?:"NOT_REQUESTED"|"PENDING"|"APPROVED"|"REJECTED"|"CANCELLED";request_id?:string;transformation?:{resource_id:string;version_id:string;content_hash?:string};company_id:string|null;created_at:string;period:string|null;currency:string|null;company_binding:string};
 export type WorkEvent={event_id:string;created_at:string;node?:string;state?:string;command?:string;reason?:string;actor_id?:string;document_id?:string;document?:{document_id:string;filename:string;sha256:string};assessment_id?:string};
 export type WorkRun={workflow_id?:string;operation_id?:string;actor_id?:string;state?:string;runtime_status?:string;runtime?:{state:string;next_checks?:string[]};execution?:{state:string};source_health?:string;freshness?:string;
- request?:{report?:{receipt_ids:string[]};document_id?:string};definition:{version:string;nodes?:{id:string;depends_on:string[];function:string}[]};events:WorkEvent[];
+  request?:{report?:{receipt_ids:string[]};document_id?:string};definition:{version:string;kind?:string;operation?:string;exception_run_id?:string;matched_exception_run_id?:string;prior_finding?:AnalysisPin;prior_investigation?:AnalysisPin;company_id?:string;nodes?:{id:string;depends_on:string[];function:string}[]};events:WorkEvent[];
+  publication?:{finding:AnalysisPin;investigation:AnalysisPin}|null;
  proposal?:ResourceProposalDetail|null;
  publications?:{publication_id:string;generation:number;authority:string;outputs:{slot:string;sha256:string}[]}[]};
 export const workState=(family:WorkFamily,run:WorkRun)=>family==="monitor"?run.runtime?.state??"UNOBSERVABLE":family==="ontology"?run.state??"UNOBSERVABLE":run.execution?.state??"UNOBSERVABLE";
