@@ -58,6 +58,8 @@ jobs:
           cache: pip
           cache-dependency-path: services/api/pyproject.toml
       - run: python -m pip install -e "services/api[dev]"
+      - name: Verify capped RDF index before service setup
+        run: python scripts/probe-ontology-index-linux.py --verify
       - name: Check native packaging paths before service setup
         run: >-
           python -m pytest --no-cov
