@@ -496,11 +496,18 @@ def validate_accounting_proposal(
             def evidence_target(
                 identity: str, source: str, relation: str, root: Pin = key
             ) -> dict[str, Any]:
-                matches = {
-                    target
-                    for origin, target, _ in edges
-                    if origin == root and str(target[0]) == str(identity)
-                }
+                if source != str(root[0]):
+                    _deny("investigation evidence requested for another proposed resource")
+                if relation == "RESOLUTION_PAIRED_MUTATION":
+                    # Co-publication is a typed proposal constraint, not a causal edge.
+                    # The shared resolution validator below rederives the exact pair.
+                    matches = {pin for pin in proposed if str(pin[0]) == str(identity)}
+                else:
+                    matches = {
+                        target
+                        for origin, target, _ in edges
+                        if origin == root and str(target[0]) == str(identity)
+                    }
                 if len(matches) != 1:
                     _deny("investigation evidence lacks its exact validated dependency")
                 return rows[next(iter(matches))]
