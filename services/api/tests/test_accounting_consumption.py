@@ -180,3 +180,136 @@ def test_multi_date_aggregate_preserves_period_without_fabricated_posting_date()
     rows[derived]["attributes"]["posting_date"] = "2026-01-15"
     with pytest.raises(WorkspaceError, match="posting date disagrees"):
         validate_bindings(rows, edges, used, direct)
+
+
+def canonical_graph():
+    """Canonical header/lines use the source binding without copying source amounts."""
+    rows, edges, _, _, source, binding = fixture_graph()
+    config = rows[binding]["attributes"]
+    config["amount_field"] = "source_amount"
+    source_attrs = rows[source]["attributes"]
+    rows[source]["object_type"] = "SourceRecord"
+    source_attrs.pop("amount")
+    line_ids = [uuid4(), uuid4()]
+    header = (uuid4(), uuid4())
+    rows[header] = {
+        "object_type": "JournalEntry",
+        "authority_state": "APPROVED",
+        "attributes": {
+            "accounting_binding_id": str(binding[0]),
+            "legal_entity_id": source_attrs["legal_entity_id"],
+            "ledger_id": config["ledger_id"],
+            "period_id": config["period_id"],
+            "posting_date": source_attrs["posting_date"],
+            "definition": {"contract": "balanced-journal/1", "line_ids": list(map(str, line_ids))},
+        },
+    }
+    scope = next(
+        row["attributes"] for row in rows.values() if row["object_type"] == "SourceAccountingScope"
+    )
+    account = (uuid4(), uuid4())
+    rows[account] = {
+        "object_type": "LocalAccount",
+        "authority_state": "APPROVED",
+        "attributes": {"chart_id": scope["chart_id"]},
+    }
+    lines = []
+    edges.append((header, binding, "FIELD:accounting_binding_id"))
+    for identity, side in zip(line_ids, ("DEBIT", "CREDIT"), strict=True):
+        line = (identity, uuid4())
+        rows[line] = {
+            "object_type": "JournalLine",
+            "authority_state": "APPROVED",
+            "attributes": {
+                "accounting_binding_id": str(binding[0]),
+                "journal_id": str(header[0]),
+                "source_record_id": str(source[0]),
+                "account_id": str(account[0]),
+                "side": side,
+                "amount": {"amount": "12.01", "currency_id": config["currency_id"]},
+            },
+        }
+        for target, field in (
+            (binding, "accounting_binding_id"),
+            (header, "journal_id"),
+            (source, "source_record_id"),
+            (account, "account_id"),
+        ):
+            edges.append((line, target, "FIELD:" + field))
+        lines.append(line)
+    return rows, edges, binding, header, lines, source, account
+
+
+def test_canonical_journal_consumption_preserves_measure_free_header_and_line_money():
+    from copy import deepcopy
+
+    rows, edges, binding, header, lines, _, _ = canonical_graph()
+    before = deepcopy(rows)
+    result = validate_bindings(rows, edges, {header, *lines}, {binding})
+    assert result == [{"resource_id": str(binding[0]), "version_id": str(binding[1])}]
+    assert rows == before
+    assert "amount" not in rows[header]["attributes"]
+    assert "source_amount" not in rows[lines[0]]["attributes"]
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "line_company",
+        "line_evidence",
+        "line_date",
+        "line_currency",
+        "line_membership",
+        "source_evidence",
+        "account_chart",
+        "header_period",
+        "header_date",
+        "header_company",
+        "line_authority",
+        "header_authority",
+        "manifest",
+        "source_pin",
+    ],
+)
+def test_canonical_journal_cannot_relabel_or_omit_exact_context(change):
+    rows, edges, binding, header, lines, source, account = canonical_graph()
+    attrs = rows[lines[0]]["attributes"]
+    if change == "line_company":
+        attrs["legal_entity_id"] = str(uuid4())
+    elif change == "line_evidence":
+        attrs["evidence_id"] = str(uuid4())
+    elif change == "line_date":
+        attrs["posting_date"] = "2026-01-16"
+    elif change == "line_currency":
+        attrs["amount"]["currency_id"] = str(uuid4())
+    elif change == "line_membership":
+        rows[header]["attributes"]["definition"]["line_ids"][0] = str(uuid4())
+    elif change == "source_evidence":
+        rows[source]["attributes"]["evidence_id"] = str(uuid4())
+    elif change == "account_chart":
+        rows[account]["attributes"]["chart_id"] = str(uuid4())
+    elif change == "header_period":
+        rows[header]["attributes"]["period_id"] = str(uuid4())
+    elif change == "header_date":
+        rows[header]["attributes"]["posting_date"] = "2026-02-01"
+    elif change == "header_company":
+        rows[header]["attributes"]["legal_entity_id"] = str(uuid4())
+    elif change == "line_authority":
+        rows[lines[0]]["authority_state"] = "REVOKED"
+    elif change == "header_authority":
+        rows[header]["authority_state"] = "REVOKED"
+    elif change == "manifest":
+        rows[header]["attributes"]["definition"]["line_ids"] = []
+    else:
+        edges = [edge for edge in edges if edge[1] != source]
+    with pytest.raises(WorkspaceError):
+        validate_bindings(rows, edges, set(lines), {binding})
+
+
+def test_journal_ancestry_does_not_exempt_private_derived_amount():
+    rows, edges, binding, _, lines, _, _ = canonical_graph()
+    derived = (uuid4(), uuid4())
+    rows[derived] = {"object_type": "PrivateFinancialSummary", "attributes": {}}
+    edges.extend((derived, line, "INPUT") for line in lines)
+    with pytest.raises(WorkspaceError, match="amount"):
+        validate_bindings(rows, edges, {derived}, {binding})

@@ -1,6 +1,7 @@
 """Accounting ancestry requires exact, reviewed source-use authority at consumption."""
 
 from datetime import date
+from types import SimpleNamespace
 from typing import Any, NoReturn
 from uuid import UUID, uuid5
 
@@ -43,6 +44,8 @@ def validate_bindings(
     edges: list[tuple[Pin, Pin, str]],
     used: set[Pin],
     direct_pins: set[Pin],
+    *,
+    _validated_evidence_roots: frozenset[Pin] = frozenset(),
 ) -> list[dict[str, str]]:
     neighbors: dict[Pin, list[Pin]] = {}
     for source, target_pin, _ in edges:
@@ -112,6 +115,57 @@ def validate_bindings(
     for key in accounting:
         row, lineage = rows[key], [rows[k] for k in ancestry({key})]
         attrs, kind = row["attributes"], row["object_type"]
+        if kind in {"JournalEntry", "JournalLine"}:
+            from finai_api.domain.journal_balance import JournalManifest
+            from finai_api.services.accounting_promotion import validate_journal
+
+            def canonical_target(identity: str, *_: str, root: Pin = key) -> dict[str, Any]:
+                matches = [pin for pin in ancestry({root}) if str(pin[0]) == str(identity)]
+                if len(matches) != 1:
+                    _deny("canonical journal dependency is missing or ambiguous")
+                return rows[matches[0]]
+
+            if row["authority_state"] != "APPROVED":
+                _deny("canonical journal is not approved")
+            canonical_binding = validate_journal(
+                SimpleNamespace(object_type=kind, attributes=attrs, resource_id=key[0]),
+                canonical_target,
+            )
+            bound_scope = canonical_target(canonical_binding["attributes"]["scope_id"])
+            header = (
+                attrs
+                if kind == "JournalEntry"
+                else canonical_target(attrs["journal_id"])["attributes"]
+            )
+            try:
+                manifest = JournalManifest.model_validate(header["definition"])
+            except (KeyError, ValueError) as exc:
+                raise WorkspaceError(
+                    409, "Accounting consumption: invalid canonical journal manifest"
+                ) from exc
+            if kind == "JournalLine" and (
+                key[0] not in manifest.line_ids
+                or attrs.get("side") not in {"DEBIT", "CREDIT"}
+                or (
+                    attrs.get("posting_date") is not None
+                    and attrs["posting_date"] != header["posting_date"]
+                )
+            ):
+                _deny("canonical line differs from its exact journal membership or date")
+            for field, expected in {
+                "legal_entity_id": header["legal_entity_id"],
+                "evidence_id": bound_scope["attributes"]["evidence_id"],
+            }.items():
+                if attrs.get(field) is not None and str(attrs[field]) != str(expected):
+                    _deny("canonical journal context contradicts its exact parent or source")
+            # Canonical headers carry no amount; lines use canonical money. The binding
+            # amount_field describes source columns, never a made-up header resource.
+            attrs = {
+                **attrs,
+                "legal_entity_id": header["legal_entity_id"],
+                "posting_date": header["posting_date"],
+                "evidence_id": bound_scope["attributes"]["evidence_id"],
+            }
         company = attrs.get("legal_entity_id")
         if not company:
             companies = {
@@ -168,8 +222,8 @@ def validate_bindings(
                 "amount_semantics"
             ] not in {"DEBIT_CREDIT", "SIGNED_MOVEMENT"}:
                 continue
-            amount = attrs.get(binding["amount_field"])
-            if kind != "SourceAccountingScope" and amount is None:
+            amount = attrs.get("amount" if kind == "JournalLine" else binding["amount_field"])
+            if kind not in {"SourceAccountingScope", "JournalEntry"} and amount is None:
                 continue
             if isinstance(amount, dict) and not _money_matches(amount, binding, currency):
                 continue
@@ -223,6 +277,9 @@ def validate_bindings(
             }
             if source_dates != {values["posting_date"]}:
                 _deny("derived accounting posting date disagrees with its source dates")
+        if key in _validated_evidence_roots:
+            # Exact typed evidence was revalidated for this proposal.
+            continue
         if binding["amount_field"] not in values:
             _deny("derived accounting measure has no compatible source amount interpretation")
         amount = values[binding["amount_field"]]
@@ -247,7 +304,7 @@ def load_accounting_lineage(conn: Any, principal: Principal, roots: set[Pin]):
                 _deny("immutable accounting lineage exceeds the node bound")
             found = cursor.execute(
                 "SELECT resource_id,version_id,object_type,attributes,"
-                "authority_state,evidence_class,valid_from,valid_to "
+                "authority_state,evidence_class,valid_from,valid_to,content_hash "
                 "FROM resource_versions WHERE tenant_id=%s AND version_id=ANY(%s::uuid[])",
                 (principal.scope.tenant_id, [key[1] for key in pending]),
             ).fetchall()
@@ -432,7 +489,33 @@ def validate_accounting_proposal(
         material_inputs = {
             pin for pin in pins if rows[pin]["object_type"] != "SourceAccountingBinding"
         }
-        selected = validate_bindings(rows, edges, material_inputs if is_consumer else {key}, pins)
+        evidence_roots: frozenset[Pin] = frozenset()
+        if item.object_type in {"Finding", "Investigation"}:
+            from finai_api.services.investigation_actions import validate_publication
+
+            def evidence_target(
+                identity: str, source: str, relation: str, root: Pin = key
+            ) -> dict[str, Any]:
+                matches = {
+                    target
+                    for origin, target, _ in edges
+                    if origin == root and str(target[0]) == str(identity)
+                }
+                if len(matches) != 1:
+                    _deny("investigation evidence lacks its exact validated dependency")
+                return rows[next(iter(matches))]
+
+            # Re-run the shared typed retained-proof validator. An object name or
+            # caller-authored definition cannot opt itself out of amount validation.
+            validate_publication(item, evidence_target, principal)
+            evidence_roots = frozenset({key})
+        selected = validate_bindings(
+            rows,
+            edges,
+            material_inputs if is_consumer else {key},
+            pins,
+            _validated_evidence_roots=evidence_roots,
+        )
         if selected:
             from finai_api.services.accounting_promotion import validate_current_binding
 
