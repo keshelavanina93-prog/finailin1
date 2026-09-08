@@ -7,9 +7,19 @@ from fastapi import APIRouter, Query
 from finai_api.api.ontology_routes import User
 from finai_api.domain.journal_production import JournalProductionRequest
 from finai_api.domain.resources import ResourceReview
+from finai_api.domain.semantic_analysis import ProjectionRequest
 from finai_api.services import company_journals
 
 router = APIRouter(prefix="/v1/ontology/company-journals", tags=["company journal readback"])
+
+
+@router.post("/reconciliation/projection")
+def journal_projection(
+    principal: User, request: ProjectionRequest, snapshot_at: datetime | None = None
+):
+    from finai_api.services.journal_projection import project
+
+    return project(principal, request, snapshot_at)
 
 
 @router.post("/production/preview")
