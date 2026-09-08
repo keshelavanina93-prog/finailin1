@@ -30,7 +30,7 @@ test("empty, unavailable and overlapping groups retain distinct nonadditive coun
  assert.throws(()=>assertCompanyCondition({...fixture(),resource_groups:[{...unavailable,resources:[asset]}]},expected));
  assert.doesNotThrow(()=>assertCompanyCondition({...fixture(),resource_groups:[group([])]},expected));
  const otherDefinition={...definition,resource_id:"88888888-8888-4888-8888-888888888888"};
- assert.doesNotThrow(()=>assertCompanyCondition({...fixture(),connections:[connection()],resource_groups:[group(),{...group(),key:otherDefinition.resource_id,definition:otherDefinition}]},expected));
+ assert.doesNotThrow(()=>assertCompanyCondition({...fixture(),connections:[connection()],resource_groups:[group(),{...group(),key:otherDefinition.resource_id,definition:otherDefinition,definition_pins:[{resource_id:otherDefinition.resource_id,version_id:otherDefinition.version_id,content_hash:otherDefinition.content_hash}]}]},expected));
  assert.throws(()=>assertCompanyCondition({...fixture(),resource_groups_state:"UNAVAILABLE",resource_groups_reason:null},expected));
 });
 test("current work is separate from historical resources and requires explicit company provenance",()=>{
@@ -61,4 +61,14 @@ test("returned work priority is deterministic and filtered without inventing mat
  assert.equal(items[0].state,"PUBLISHED");
  assert.deepEqual(rankCompanyWork(items,"PREPARED").map(item=>item.state),["PREPARED"]);
  assert.equal(rankCompanyWork(items,"ALL","Work 3")[0].state,"PENDING_REVIEW");
+});
+
+test("definition pins require exact self identity, version and hash within producer bounds",()=>{
+ const own=group().definition_pins[0],foreign={...own,resource_id:asset.resource_id};
+ for(const pins of [[],[foreign],[{...own,version_id:asset.resource_id}],[{...own,content_hash:"b".repeat(64)}],[own,own]]){
+  assert.throws(()=>assertCompanyCondition({...fixture(),connections:[connection()],resource_groups:[{...group(),definition_pins:pins}]},expected),/definition pins/);
+ }
+ const dependencies=Array.from({length:200},(_,i)=>({...own,resource_id:`${(i+1).toString(16).padStart(8,"0")}-aaaa-4aaa-8aaa-aaaaaaaaaaaa`}));
+ assert.doesNotThrow(()=>assertCompanyCondition({...fixture(),connections:[connection()],resource_groups:[{...group(),definition_pins:[own,...dependencies]}]},expected));
+ assert.throws(()=>assertCompanyCondition({...fixture(),connections:[connection()],resource_groups:[{...group(),definition_pins:[own,...dependencies,foreign]}]},expected),/definition pins/);
 });
