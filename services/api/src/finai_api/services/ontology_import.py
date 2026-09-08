@@ -43,6 +43,14 @@ def normalize(request: ImportRequest) -> ImportRequest:
     for module in value["modules"]:
         module["owned_namespaces"].sort()
         module["permitted_import_iris"].sort()
+        if module.get("foreign_assertions"):
+            module["foreign_assertions"].sort(
+                key=lambda entry: (
+                    entry["subject_iri"],
+                    entry["predicate_iri"],
+                    entry["object_ntriples"],
+                )
+            )
     return ImportRequest.model_validate(value)
 
 
@@ -147,7 +155,12 @@ def check_module_publisher(module: Any, source: SourceDefinition) -> None:
 
 
 def compile_retained(principal: Principal, request: ImportRequest) -> tuple[Any, dict]:
-    from finai_api.services.rdf_engine import RdfArtifact, RdfLimits, canonicalize_rdf
+    from finai_api.services.rdf_engine import (
+        RdfArtifact,
+        RdfForeignAssertion,
+        RdfLimits,
+        canonicalize_rdf,
+    )
 
     limits = RdfLimits()
     if sum(module.document.byte_length for module in request.modules) > limits.max_input_bytes:
@@ -159,6 +172,10 @@ def compile_retained(principal: Principal, request: ImportRequest) -> tuple[Any,
             content=read_document(principal, module.document),
             owned_namespaces=tuple(module.owned_namespaces),
             permitted_import_iris=tuple(module.permitted_import_iris),
+            foreign_assertions=tuple(
+                RdfForeignAssertion(**assertion.model_dump())
+                for assertion in module.foreign_assertions or ()
+            ),
         )
         for module in request.modules
     ]
@@ -191,6 +208,8 @@ def compile_retained(principal: Principal, request: ImportRequest) -> tuple[Any,
         "constraint_validation": "NOT_PERFORMED",
         "business_effect_authorized": False,
     }
+    if result.foreign_assertions:
+        report["foreign_assertions"] = list(result.foreign_assertions)
     return result, report
 
 

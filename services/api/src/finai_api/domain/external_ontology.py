@@ -70,6 +70,25 @@ class SourceDefinition(Model):
         return [absolute_iri(value) for value in values]
 
 
+class ForeignAssertion(Model):
+    """An exact publisher assertion to retain, never a grant of vocabulary ownership."""
+
+    subject_iri: Iri
+    predicate_iri: Iri
+    object_ntriples: str = Field(min_length=1, max_length=16384)
+    classification: Literal["FOREIGN_ANNOTATION", "FOREIGN_VOCABULARY_DECLARATION"]
+    reason: str = Field(min_length=10, max_length=1000)
+
+    _iri = field_validator("subject_iri", "predicate_iri")(absolute_iri)
+
+    @field_validator("reason")
+    @classmethod
+    def substantive_reason(cls, value: str) -> str:
+        if len(value.strip()) < 10:
+            raise ValueError("A substantive exception rationale is required")
+        return value.strip()
+
+
 class ModuleInput(Model):
     source: Pin
     artifact_iri: Iri
@@ -80,6 +99,9 @@ class ModuleInput(Model):
     source_url: Iri
     license: str = Field(min_length=1, max_length=4000)
     retrieved_at: datetime
+    foreign_assertions: list[ForeignAssertion] | None = Field(
+        default=None, min_length=1, max_length=128, exclude_if=lambda value: value is None
+    )
 
     _url = field_validator("artifact_iri", "source_url")(absolute_iri)
 
@@ -96,6 +118,20 @@ class ModuleInput(Model):
         if value.tzinfo is None:
             raise ValueError("Retrieval time must include a timezone")
         return value
+
+    @model_validator(mode="after")
+    def exact_foreign_statements(self) -> "ModuleInput":
+        statements = self.foreign_assertions or []
+        keys = [(s.subject_iri, s.predicate_iri, s.object_ntriples) for s in statements]
+        if len(set(keys)) != len(keys):
+            raise ValueError("Foreign statement exceptions must be distinct exact triples")
+        if any(
+            s.subject_iri == self.artifact_iri
+            or any(s.subject_iri.startswith(namespace) for namespace in self.owned_namespaces)
+            for s in statements
+        ):
+            raise ValueError("Owned subjects and artifact descriptors cannot be foreign exceptions")
+        return self
 
 
 class ImportRequest(Model):

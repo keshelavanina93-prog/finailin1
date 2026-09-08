@@ -35,6 +35,9 @@ _ERRORS = {
     "WALL_TIMEOUT": "The isolated RDF worker exceeded its wall-clock budget.",
     "WORKER_FAILED": "The isolated RDF worker failed or exceeded an operating-system cap.",
     "ENGINE_VERSION": "The installed RDF engine does not match the pinned version.",
+    "FOREIGN_ASSERTION_POLICY": "A foreign assertion violates the exact retention policy.",
+    "UNUSED_FOREIGN_ASSERTION": "A declared foreign assertion is absent from the artifact.",
+    "FOREIGN_ASSERTION_BUDGET": "The foreign assertion declaration budget was exceeded.",
 }
 
 
@@ -47,12 +50,22 @@ class RdfEngineError(ValueError):
 
 
 @dataclass(frozen=True)
+class RdfForeignAssertion:
+    subject_iri: str
+    predicate_iri: str
+    object_ntriples: str
+    classification: Literal["FOREIGN_ANNOTATION", "FOREIGN_VOCABULARY_DECLARATION"]
+    reason: str
+
+
+@dataclass(frozen=True)
 class RdfArtifact:
     artifact_iri: str
     format: Literal["TURTLE", "RDF_XML"]
     content: bytes
     owned_namespaces: tuple[str, ...]
     permitted_import_iris: tuple[str, ...] = ()
+    foreign_assertions: tuple[RdfForeignAssertion, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -90,6 +103,7 @@ class RdfResult:
     blank_node_count: int
     literal_bytes: int
     manifest: dict[str, str | int | bool]
+    foreign_assertions: tuple[dict, ...] = ()
 
 
 def _validate_inputs(
@@ -122,6 +136,8 @@ def _validate_inputs(
         raise RdfEngineError("INPUT_BUDGET")
     identities: set[str] = set()
     total = 0
+    assertion_count = 0
+    assertion_bytes = 0
     for artifact in artifacts:
         if not isinstance(artifact, RdfArtifact) or not isinstance(artifact.content, bytes):
             raise RdfEngineError("INVALID_INPUT")
@@ -129,6 +145,26 @@ def _validate_inputs(
             raise RdfEngineError("INVALID_INPUT")
         if len(artifact.owned_namespaces) > 64 or len(artifact.permitted_import_iris) > 64:
             raise RdfEngineError("INVALID_INPUT")
+        if type(artifact.foreign_assertions) is not tuple or len(artifact.foreign_assertions) > 128:
+            raise RdfEngineError("FOREIGN_ASSERTION_BUDGET")
+        assertion_count += len(artifact.foreign_assertions)
+        for assertion in artifact.foreign_assertions:
+            if not isinstance(assertion, RdfForeignAssertion):
+                raise RdfEngineError("FOREIGN_ASSERTION_POLICY")
+            for name, maximum in (
+                ("subject_iri", 2048),
+                ("predicate_iri", 2048),
+                ("object_ntriples", 16384),
+                ("reason", 1000),
+            ):
+                value = getattr(assertion, name)
+                if not isinstance(value, str) or not 1 <= len(value) <= maximum:
+                    raise RdfEngineError("FOREIGN_ASSERTION_POLICY")
+                assertion_bytes += len(value.encode("utf-8"))
+            if len(assertion.reason.strip()) < 10 or assertion.reason != assertion.reason.strip():
+                raise RdfEngineError("FOREIGN_ASSERTION_POLICY")
+        if assertion_count > 512 or assertion_bytes > _MIB:
+            raise RdfEngineError("FOREIGN_ASSERTION_BUDGET")
         for iri in (
             artifact.artifact_iri,
             *artifact.owned_namespaces,
@@ -239,6 +275,7 @@ def canonicalize_rdf(
             return RdfResult(
                 canonical_nquads=canonical,
                 artifacts=records,
+                foreign_assertions=tuple(result.pop("foreign_assertions", ())),
                 **{**result, "import_closure": tuple(result["import_closure"])},
             )
         except (KeyError, TypeError, json.JSONDecodeError) as exc:

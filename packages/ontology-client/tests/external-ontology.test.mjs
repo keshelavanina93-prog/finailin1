@@ -42,6 +42,32 @@ function setup(change = value => value, custom = {}) {
 }
 const rejects = (fn, status = 502) => assert.rejects(fn, e => e instanceof ExternalOntologyClientError && e.status === status);
 
+test('exact foreign annotations stay explicit publisher assertions without namespace ownership', async () => {
+  const assertion = {subject_iri: 'http://www.w3.org/2000/01/rdf-schema#label',
+    predicate_iri: 'http://www.w3.org/2000/01/rdf-schema#comment', object_ntriples: '""@en',
+    classification: 'FOREIGN_ANNOTATION', reason: 'Retain an exact publisher annotation without vocabulary ownership.'};
+  const changed = (v, patch = {}) => {
+    v.definition.request.modules[0].foreign_assertions = [{...assertion, ...patch}];
+    v.definition.engine_manifest.foreign_assertion_policy = 'EXACT_FOREIGN_ANNOTATIONS_DECLARATIONS/1';
+    v.definition.engine_manifest.foreign_assertion_count = 1;
+    return v;
+  };
+  const value = await setup(v => changed(v)).client.inspectRelease({release});
+  assert.deepEqual(value.definition.request.modules[0].foreign_assertions, [assertion]);
+  assert.deepEqual(value.definition.request.modules[0].owned_namespaces, [graph]);
+  for (const patch of [
+    {predicate_iri: 'http://www.w3.org/2002/07/owl#equivalentClass'},
+    {predicate_iri: 'http://www.w3.org/2002/07/owl#imports'},
+    {predicate_iri: 'http://www.w3.org/2000/01/rdf-schema#subClassOf'},
+    {object_ntriples: '_:local'}, {object_ntriples: '"x" . <urn:x> <urn:p> "injected"'},
+    {subject_iri: graph + '#owned'}, {classification: 'OWNER'}, {reason: 'short'},
+  ]) await rejects(() => setup(v => changed(v, patch)).client.inspectRelease({release}));
+  for (const assertions of [[], null, [assertion, assertion]]) {
+    await rejects(() => setup(v => {changed(v); v.definition.request.modules[0].foreign_assertions = assertions; return v;}).client.inspectRelease({release}));
+  }
+  await rejects(() => setup(v => {changed(v); v.definition.engine_manifest.foreign_assertion_count = 2; return v;}).client.inspectRelease({release}));
+});
+
 test('release, rebuild and subject reads use fresh auth and exactly bound retained data', async () => {
   let tokens = 0;
   const {client, calls} = setup(v => v, {getToken: () => `credential-${++tokens}`});

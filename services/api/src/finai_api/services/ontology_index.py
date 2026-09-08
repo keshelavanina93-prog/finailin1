@@ -28,6 +28,9 @@ _HASH = re.compile(r"^[a-f0-9]{64}$")
 _WORKERS = threading.BoundedSemaphore(2)
 _BUILD_LOCK = threading.Lock()
 _ENGINE_VERSION = "0.5.11"
+_INDEX_ENCODING = "canonical-nquad-envelope/1"
+_ENVELOPE_PREDICATE = "urn:g8:derived-index:canonical-quad"
+_XSD_STRING = "http://www.w3.org/2001/XMLSchema#string"
 _ERRORS = {
     "INVALID_INPUT": "The ontology index request or limits are invalid.",
     "DATASET_HASH": "Canonical dataset bytes do not match the exact release hash.",
@@ -142,7 +145,13 @@ def _key(scope: OntologyIndexScope, limits: OntologyIndexLimits) -> str:
     ):
         raise OntologyIndexError("INVALID_INPUT")
     return hashlib.sha256(
-        _json({"scope": asdict(scope), "engine_version": _ENGINE_VERSION})
+        _json(
+            {
+                "scope": asdict(scope),
+                "engine_version": _ENGINE_VERSION,
+                "index_encoding": _INDEX_ENCODING,
+            }
+        )
     ).hexdigest()
 
 
@@ -342,7 +351,15 @@ def _publish(
         destination = root / generation
         # Older generations remain disposable for concurrent readers; no in-place DB updates.
         pointer = scratch / "manifest.json"
-        pointer.write_bytes(_json({**asdict(manifest), "generation": generation}))
+        pointer.write_bytes(
+            _json(
+                {
+                    **asdict(manifest),
+                    "generation": generation,
+                    "index_encoding": _INDEX_ENCODING,
+                }
+            )
+        )
         if pointer.stat().st_size > limits.max_result_bytes:
             raise OntologyIndexError("RESULT_BUDGET")
         (scratch / "store").rename(destination)
@@ -383,6 +400,7 @@ def inspect_subject(
             manifest.get("scope") != asdict(scope)
             or manifest.get("index_key") != key
             or manifest.get("engine_version") != "0.5.11"
+            or manifest.get("index_encoding") != _INDEX_ENCODING
             or manifest.get("derived_only") is not True
             or not re.fullmatch(key + r"-[a-f0-9]{32}", manifest.get("generation", ""))
         ):
@@ -435,6 +453,55 @@ def _safe_tree(store: Path, limits: OntologyIndexLimits) -> None:
                 raise OntologyIndexError("DATASET_BUDGET")
 
 
+def _encode_envelope(quad: Any) -> Any:
+    import pyoxigraph as ox
+
+    raw = ox.serialize([quad], format=ox.RdfFormat.N_QUADS)
+    if not isinstance(raw, bytes):
+        raise OntologyIndexError("INVALID_DATASET")
+    return ox.Quad(
+        quad.subject,
+        ox.NamedNode(_ENVELOPE_PREDICATE),
+        ox.Literal(raw.decode("utf-8")),
+        quad.graph_name,
+    )
+
+
+def _decode_envelope(envelope: Any, remaining_bytes: int) -> tuple[Any, int]:
+    """Recover one exact original quad; no secondary digest can authorize its content."""
+    import pyoxigraph as ox
+
+    term = envelope.object
+    if (
+        envelope.predicate != ox.NamedNode(_ENVELOPE_PREDICATE)
+        or not isinstance(term, ox.Literal)
+        or term.datatype != ox.NamedNode(_XSD_STRING)
+        or term.language is not None
+        or term.direction is not None
+    ):
+        raise OntologyIndexError("INDEX_CORRUPT")
+    # Check before UTF-8 allocation, then account for multibyte text before parsing.
+    if len(term.value) > remaining_bytes:
+        raise OntologyIndexError("DATASET_BUDGET")
+    raw = term.value.encode("utf-8")
+    if len(raw) > remaining_bytes:
+        raise OntologyIndexError("DATASET_BUDGET")
+    try:
+        parsed = iter(ox.parse(raw, format=ox.RdfFormat.N_QUADS))
+        quad = next(parsed, None)
+        if (
+            quad is None
+            or next(parsed, None) is not None
+            or quad.subject != envelope.subject
+            or quad.graph_name != envelope.graph_name
+            or ox.serialize([quad], format=ox.RdfFormat.N_QUADS) != raw
+        ):
+            raise OntologyIndexError("INDEX_CORRUPT")
+    except SyntaxError:
+        raise OntologyIndexError("INDEX_CORRUPT") from None
+    return quad, len(raw)
+
+
 def _process(payload: dict[str, Any]) -> dict[str, Any]:
     import pyoxigraph as ox
 
@@ -462,9 +529,12 @@ def _process(payload: dict[str, Any]) -> dict[str, Any]:
         except (OSError, RuntimeError, ValueError):
             raise OntologyIndexError("INDEX_CORRUPT") from None
         dataset = ox.Dataset()
-        for index, quad in enumerate(store):
+        decoded_bytes = 0
+        for index, envelope in enumerate(store):
             if index >= limits.max_quads:
                 raise OntologyIndexError("DATASET_BUDGET")
+            quad, size = _decode_envelope(envelope, limits.max_bytes - decoded_bytes)
+            decoded_bytes += size
             dataset.add(quad)
     graphs: set[str] = set()
     for quad in dataset:
@@ -491,7 +561,9 @@ def _process(payload: dict[str, Any]) -> dict[str, Any]:
     }
     if payload["operation"] == "build":
         store = ox.Store(path)
-        store.extend(dataset)
+        # Store preserves strings, whereas native RDF numeric storage can normalize lexical
+        # forms and datatypes. Envelopes are disposable index records, never ontology facts.
+        store.extend(_encode_envelope(quad) for quad in dataset)
         store.flush()
         del store
         _safe_tree(path, limits)

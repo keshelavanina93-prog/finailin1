@@ -18,6 +18,75 @@ else:
     from finai_api.services.rdf_engine_limits import apply_resource_caps
 
 _OWL_IMPORTS = "http://www.w3.org/2002/07/owl#imports"
+_RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+_ANNOTATIONS = {
+    "http://www.w3.org/2000/01/rdf-schema#label",
+    "http://www.w3.org/2000/01/rdf-schema#comment",
+    "http://www.w3.org/2000/01/rdf-schema#isDefinedBy",
+    "http://www.w3.org/2000/01/rdf-schema#seeAlso",
+    "http://www.w3.org/2002/07/owl#versionInfo",
+}
+_DECLARATION_TYPES = {
+    "http://www.w3.org/2002/07/owl#Class",
+    "http://www.w3.org/2000/01/rdf-schema#Class",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+    "http://www.w3.org/2002/07/owl#AnnotationProperty",
+    "http://www.w3.org/2002/07/owl#ObjectProperty",
+    "http://www.w3.org/2002/07/owl#DatatypeProperty",
+    "http://www.w3.org/2002/07/owl#Ontology",
+}
+
+
+def _foreign_assertions(artifact: dict) -> dict[tuple[str, str, str], dict]:
+    import pyoxigraph as ox
+
+    declarations = {}
+    for declaration in artifact.get("foreign_assertions", ()):
+        try:
+            subject = ox.NamedNode(declaration["subject_iri"])
+            predicate = ox.NamedNode(declaration["predicate_iri"])
+            if subject.value == artifact["artifact_iri"] or any(
+                subject.value.startswith(namespace) for namespace in artifact["owned_namespaces"]
+            ):
+                raise RdfEngineError("FOREIGN_ASSERTION_POLICY")
+            triples = list(
+                ox.parse(
+                    f"{subject} {predicate} {declaration['object_ntriples']} .".encode(),
+                    format=ox.RdfFormat.N_TRIPLES,
+                )
+            )
+            if len(triples) != 1:
+                raise RdfEngineError("FOREIGN_ASSERTION_POLICY")
+            triple = triples[0]
+            term = triple.object
+            if (
+                triple.subject != subject
+                or triple.predicate != predicate
+                or not isinstance(term, (ox.NamedNode, ox.Literal))
+                or (isinstance(term, ox.Literal) and term.direction is not None)
+                or str(term) != declaration["object_ntriples"]
+            ):
+                raise RdfEngineError("FOREIGN_ASSERTION_POLICY")
+            expected = (
+                "FOREIGN_ANNOTATION"
+                if predicate.value in _ANNOTATIONS
+                else (
+                    "FOREIGN_VOCABULARY_DECLARATION"
+                    if predicate.value == _RDF_TYPE
+                    and isinstance(term, ox.NamedNode)
+                    and term.value in _DECLARATION_TYPES
+                    else None
+                )
+            )
+            if expected is None or declaration["classification"] != expected:
+                raise RdfEngineError("FOREIGN_ASSERTION_POLICY")
+            key = (subject.value, predicate.value, str(term))
+            if key in declarations:
+                raise RdfEngineError("FOREIGN_ASSERTION_POLICY")
+            declarations[key] = declaration
+        except (ValueError, KeyError, TypeError, SyntaxError):
+            raise RdfEngineError("FOREIGN_ASSERTION_POLICY") from None
+    return declarations
 
 
 def _xml_guard(content: bytes) -> None:
@@ -90,6 +159,7 @@ def process(payload: dict[str, Any], caps: str) -> dict[str, Any]:
     imports: dict[str, set[str]] = {iri: set() for iri in identities}
     dataset = ox.Dataset()
     records: list[dict[str, Any]] = []
+    foreign_report: list[dict[str, Any]] = []
     parsed_count = blank_count = literal_bytes = 0
     for artifact in artifacts:
         iri = artifact["artifact_iri"]
@@ -100,6 +170,8 @@ def process(payload: dict[str, Any], caps: str) -> dict[str, Any]:
         blanks: dict[str, ox.BlankNode] = {}
         graph = ox.NamedNode(iri)
         before = len(dataset)
+        exceptions = _foreign_assertions(artifact)
+        consumed: set[tuple[str, str, str]] = set()
         try:
             parsed = ox.parse(
                 input=content,
@@ -123,7 +195,10 @@ def process(payload: dict[str, Any], caps: str) -> dict[str, Any]:
                         for namespace in artifact["owned_namespaces"]
                     )
                 ):
-                    raise RdfEngineError("NAMESPACE_VIOLATION")
+                    key = (subject.value, quad.predicate.value, str(quad.object))
+                    if key not in exceptions:
+                        raise RdfEngineError("NAMESPACE_VIOLATION")
+                    consumed.add(key)
                 if quad.predicate.value == _OWL_IMPORTS:
                     if not isinstance(quad.object, ox.NamedNode):
                         raise RdfEngineError("IMPORT_NOT_PERMITTED")
@@ -152,6 +227,18 @@ def process(payload: dict[str, Any], caps: str) -> dict[str, Any]:
                 dataset.add(ox.Quad(terms[0], quad.predicate, terms[1], graph))
         except SyntaxError:
             raise RdfEngineError("MALFORMED_RDF") from None
+        if consumed != set(exceptions):
+            raise RdfEngineError("UNUSED_FOREIGN_ASSERTION")
+        if exceptions:
+            foreign_report.append(
+                {
+                    "artifact_iri": iri,
+                    "source_sha256": hashlib.sha256(content).hexdigest(),
+                    "assertions": [exceptions[key] for key in sorted(consumed)],
+                    "ownership_authorized": False,
+                    "equivalence_authorized": False,
+                }
+            )
         records.append(
             {
                 "artifact_iri": iri,
@@ -168,7 +255,7 @@ def process(payload: dict[str, Any], caps: str) -> dict[str, Any]:
     if len(serialized) > limits.max_output_bytes:
         raise RdfEngineError("OUTPUT_BUDGET")
     canonical = b"".join(line + b"\n" for line in sorted(serialized.split(b"\n")) if line)
-    return {
+    result: dict[str, Any] = {
         "canonical_nquads": base64.b64encode(canonical).decode("ascii"),
         "canonical_sha256": hashlib.sha256(canonical).hexdigest(),
         "artifacts": sorted(records, key=lambda record: record["artifact_iri"]),
@@ -193,6 +280,15 @@ def process(payload: dict[str, Any], caps: str) -> dict[str, Any]:
             "wall_timeout_seconds": str(limits.wall_timeout_seconds),
         },
     }
+    if foreign_report:
+        result["foreign_assertions"] = sorted(
+            foreign_report, key=lambda entry: entry["artifact_iri"]
+        )
+        result["manifest"]["foreign_assertion_policy"] = "EXACT_FOREIGN_ANNOTATIONS_DECLARATIONS/1"
+        result["manifest"]["foreign_assertion_count"] = sum(
+            len(entry["assertions"]) for entry in foreign_report
+        )
+    return result
 
 
 def main() -> int:
