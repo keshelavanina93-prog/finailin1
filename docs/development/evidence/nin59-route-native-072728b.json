@@ -1,0 +1,456 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_CODE_REFERENCE_NOT_PRODUCT_ACCEPTED",
+  "recorded_at": "2026-09-08T07:14:18.237382+00:00",
+  "issues": [
+    "NIN-59",
+    "NIN-46",
+    "NIN-63"
+  ],
+  "worktree": "D:\\FinAI\\g8-nin59-route-native",
+  "branch": "development/nin59-route-native-workspace",
+  "base_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+  "code_sha": "072728ba12e451512a34141c50491dfb922bb2b7",
+  "tree_sha": "bbf4be05a12617ded6cfe5ec52d66a532ba03676",
+  "historical_evidence": {
+    "path": "docs/development/evidence/nin59-viewport-candidate.json",
+    "sha256": "da00ddbff9d8101dc00a71713151cd83d508d4d7c0e74d1dbb499341410da3ad",
+    "code_sha": "dca2c9380f9092fd5408aa4b919ef92b5a4d0313",
+    "modified": false,
+    "acceptance_reused": false
+  },
+  "implementation": [
+    "Route-native full-canvas source review; ordinary embedded/expanded mode removed",
+    "NYX remains an independent resizable/collapsible right rail or narrow right overlay; legacy bottom preference migrates to right",
+    "Version-pinned generic worksheet with separate canonical account code/name, Find, retained-value filters, keyboard navigation, column controls and reference-only restoration",
+    "Origin workspace, nested scroll and focus references preserved during source-review navigation; exact displayed Home descriptor, receipt and cutoffs propagated",
+    "Company-adaptive Home, compact Company360 switcher, exact accounting selection, connected products/assets/parties/contracts, current retained work and independent licence/regulatory depth",
+    "Read-only company-context comparison and historical map connection drill; no financial materiality calculations",
+    "Regulatory interpretations consume existing authority and exact historical company; omitted activity remains incomplete context"
+  ],
+  "checks": {
+    "focused_frontend_guards": "PASS: saved state, revision/time, accounting pins, search, regulatory refusal and connection drill",
+    "focused_backend": "PASS: company changes, products, account-code semantics and 60 regulation checks including 13 historical company cases",
+    "frontend_typecheck_and_focused_lint": "PASS",
+    "contracts_and_production_web_build": {
+      "state": "PASS",
+      "log": ".finai/tmp/company-regulation-find-build.log"
+    },
+    "ci": {
+      "run_id": 34197979388,
+      "code_sha": "072728ba12e451512a34141c50491dfb922bb2b7",
+      "state_at_recording": "PENDING",
+      "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34197979388"
+    },
+    "native_scope": "Read-only in-process API checks against existing retained data; no mounted exact-candidate browser runtime",
+    "native_summary": {
+      "company_changes": "SEG 8 context additions; SOG 2 changed versions at recorded cutoffs; anonymous401 and unavailable404",
+      "posted_movements": "37 retained SEG rows; exact code/amount/pins/contributors and receipt preserved; old descriptor409",
+      "map_connections": "Both tested company snapshots return zero assets; authentic connection drill UNAVAILABLE",
+      "regulation": "Both tested company snapshots return zero rules; exact company versions and microsecond cutoffs, anonymous401/unavailable404; RLS and read-only enforced"
+    },
+    "native_artifacts": [
+      {
+        "path": ".finai/tmp/company-changes-native-proof.json",
+        "sha256": "c90b13d0461ede0f65357c7fc69e2346f4b0582c0a554454db03175cada9a0e9"
+      },
+      {
+        "path": ".finai/tmp/company-changes-native-guard.json",
+        "sha256": "8f6d68e067a2d14700b33aac3ff656b0172c18ef035999d1059afc9db7481dcf"
+      },
+      {
+        "path": ".finai/tmp/nin59-account-code-native.json",
+        "sha256": "e33bd969270174df9c1421a3be39340b32cfccf519f33bd3b23ed67c08759383"
+      },
+      {
+        "path": ".finai/tmp/operations-connections-native-proof.json",
+        "sha256": "2b7b86476390e03a18958aa512f13b6f159df9ef9789892cb5112b699e42ac44"
+      },
+      {
+        "path": ".finai/tmp/company-regulation-native-proof.json",
+        "sha256": "d288f6159c525a51b0e13f60ac60d14cbbe5d909f1c76a5d710b012a2c9af06b"
+      },
+      {
+        "path": ".finai/tmp/company-regulation-native-guard.json",
+        "sha256": "ba49503ce28e537d01554f6ee663c038883b7ef8edddfe05f78163855abca490"
+      }
+    ]
+  },
+  "browser": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "reason": "Earlier automatic approval review rejected isolated preview launches with blocked by policy; no retry/bypass attempted",
+    "exact_frontend_backend_candidate_mounted": false,
+    "captures": [
+      {
+        "requested_width": 1920,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1440,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1280,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 820,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 768,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      }
+    ]
+  },
+  "acceptance_gaps": [
+    "Responsive browser and pane/focus/scroll acceptance remain open",
+    "No authentic result over the historical 59-row maximum proven here",
+    "No company financial statements, live telemetry, accepted company metrics, populated map connections or regulatory interpretations established by these checks",
+    "No independent NIN50 acceptance, canonical integration, domain or release acceptance"
+  ],
+  "integration": {
+    "canonical_branch": "development/enterprise-hydration-foundation",
+    "canonical_rechecked_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+    "performed": false,
+    "requirements": [
+      "Full exact-candidate CI green",
+      "Browser result recorded and independent acceptance requirements resolved",
+      "Preserve canonical dirty files and apply exact reviewed code only"
+    ],
+    "runtime_changes": false,
+    "business_data_changes": false,
+    "nin62_expansion": false
+  },
+  "source_files": [
+    {
+      "path": "apps/web/app/api/ontology/[...path]/route.ts",
+      "sha256_git_blob": "de42a13bb3e7d9f5424ece788e2e4cf93f95c28d8d68f44b47ed30721489f2c6"
+    },
+    {
+      "path": "apps/web/app/company-360-descriptor.ts",
+      "sha256_git_blob": "e11cd7122ea11bf23a8f38a0297e35bc6890ecb013741ed0a7a380ea9ea9ff21"
+    },
+    {
+      "path": "apps/web/app/company-accounting-selection.ts",
+      "sha256_git_blob": "2005d395fb074288bd15a42d5b15b42952607585e7604154dd33fdaed3417861"
+    },
+    {
+      "path": "apps/web/app/company-changes-state.ts",
+      "sha256_git_blob": "7a95244a351d8acd4e77708b86de79e986cf9c03705a3120f7de9c698c4490af"
+    },
+    {
+      "path": "apps/web/app/company-changes.css",
+      "sha256_git_blob": "284f29ae0363b87d97e108eb98adf4d8537d00cbc5950f9c7e8294adf97d320f"
+    },
+    {
+      "path": "apps/web/app/company-changes.tsx",
+      "sha256_git_blob": "c271a4fdd127b27edebf36919a53b3a5605c9e82710ecd0fe0399a81adae8c7c"
+    },
+    {
+      "path": "apps/web/app/company-condition.tsx",
+      "sha256_git_blob": "366d420b289b6846b60563f60ec6ada197589172bbd415e19b47bfefa87cfaa6"
+    },
+    {
+      "path": "apps/web/app/company-financial-context.tsx",
+      "sha256_git_blob": "8daf947d4b2716d60127f3da08e6824f9877509cb94bb938fa981d4f44279966"
+    },
+    {
+      "path": "apps/web/app/company-home-pins.ts",
+      "sha256_git_blob": "4becf860d83de8ac0b9d3f5fe9291594b1e1773f7c62925de29133cc5658bb90"
+    },
+    {
+      "path": "apps/web/app/company-home-state.ts",
+      "sha256_git_blob": "2377b46a0fb3ed70d8478e3f638618f3ceb54c5a99f6c621afec2b9106f17d05"
+    },
+    {
+      "path": "apps/web/app/company-home.css",
+      "sha256_git_blob": "b4941175b7ba789807f0b03a509ef52a320bf0a4e0427a1932db364a86851d59"
+    },
+    {
+      "path": "apps/web/app/company-home.tsx",
+      "sha256_git_blob": "6a5480e13f6c417f87e3e313c38b4c248e3e8dc5021ea2159f68f6f5349136f8"
+    },
+    {
+      "path": "apps/web/app/company-operating-state.ts",
+      "sha256_git_blob": "37007b5dc9dfdb2b91c036f88e3a6f455fe31b74a7de87969970ce9ca77dd03a"
+    },
+    {
+      "path": "apps/web/app/company-operating-workspace.css",
+      "sha256_git_blob": "fd3ac2482484768ffb89ccc8b06d1d25d91ec07b6f97eff6ee7215eb9a82753e"
+    },
+    {
+      "path": "apps/web/app/company-operating-workspace.tsx",
+      "sha256_git_blob": "995b8e1be294500697dc2763e1b70c287a1bd219d7b8e549297f642534a788f8"
+    },
+    {
+      "path": "apps/web/app/company-regulation-state.ts",
+      "sha256_git_blob": "ec048e5ee4c984128fb21933fffb186f3fedec43ba17fa71aa1ab87821d7e578"
+    },
+    {
+      "path": "apps/web/app/company-regulation.tsx",
+      "sha256_git_blob": "22261a5b254418886fe743a5f6e2767bcafdb49c19d631dbc34e35cd5432f934"
+    },
+    {
+      "path": "apps/web/app/company-workspace.css",
+      "sha256_git_blob": "97904da9f96ebc2261f9279cd0b71c30921ce71d637c85324e1f894582247352"
+    },
+    {
+      "path": "apps/web/app/company-workspace.tsx",
+      "sha256_git_blob": "94436a3047e853e89bfec0ac198af2681b8c04e332302162af60187e2b35c013"
+    },
+    {
+      "path": "apps/web/app/g8-workspace.tsx",
+      "sha256_git_blob": "34d768a46c9426ca247aef5cd85a098580b96435ddf4371c7a806dc78f144261"
+    },
+    {
+      "path": "apps/web/app/home-source-analyses.tsx",
+      "sha256_git_blob": "1fd75ae553b4e32f0880ceb32f72b4c8913b733d3dcf442ac6c217008e8cf787"
+    },
+    {
+      "path": "apps/web/app/layout.tsx",
+      "sha256_git_blob": "a5ddba1e887c0dda3b65d342842a7037986a45323c8aa4e3ea748225f9c8ef16"
+    },
+    {
+      "path": "apps/web/app/operations-connections-state.ts",
+      "sha256_git_blob": "3b0910a2638cb6a578701c90af7abf39ba5f0e8354aed016292cb71e458f6ffd"
+    },
+    {
+      "path": "apps/web/app/operations-connections.tsx",
+      "sha256_git_blob": "725ce6fc4a7c9d9c25dbd5d0c75d48ba07e94c1d22724f34176e5ee41a2f40c0"
+    },
+    {
+      "path": "apps/web/app/operations-map.tsx",
+      "sha256_git_blob": "cade3b86e4b9d1a7813437036d9d877bb33b6363bc224e3221d0c23f54f91245"
+    },
+    {
+      "path": "apps/web/app/page.tsx",
+      "sha256_git_blob": "ce22080d63e2d6bed1170260538e6fa49885bb96a0bbe35c4323441df2b27b73"
+    },
+    {
+      "path": "apps/web/app/posted-movement-report.tsx",
+      "sha256_git_blob": "a42e7f6a5b34d8749a95a81cb15ebc6bee32dfb18019c6f32da195ec211523ec"
+    },
+    {
+      "path": "apps/web/app/saved-analysis-workbench.tsx",
+      "sha256_git_blob": "2f193e7d1f7b5c9c2257f25007bcd00b49f84eb8a69ed25019a1b502225cee96"
+    },
+    {
+      "path": "apps/web/app/semantic-analysis-state.ts",
+      "sha256_git_blob": "f5707b48b6d389ec07aa71fd7c487e408f6150aed5ebde08e0a69c627cff4a52"
+    },
+    {
+      "path": "apps/web/app/semantic-analysis-workspace.css",
+      "sha256_git_blob": "4166cce7e60bd0d7134217b1460081eb44bb9d40350049ea0cdd8ccf94166729"
+    },
+    {
+      "path": "apps/web/app/semantic-analysis-workspace.tsx",
+      "sha256_git_blob": "c50197f49310bdb3ecb46fe944aab4efc28fc87011fa7f39a060a90282e03671"
+    },
+    {
+      "path": "apps/web/app/semantic-worksheet.tsx",
+      "sha256_git_blob": "f1535a5afbd58aa8a66daf82630e6bf00ed690be9ed3c870a234792fac88fcec"
+    },
+    {
+      "path": "apps/web/app/source-review-navigation.tsx",
+      "sha256_git_blob": "0cbbbf06af8a414fb4001525eff0d757209fb6b232762f5525a3d2b43b2f3c77"
+    },
+    {
+      "path": "apps/web/app/source-review-origin.ts",
+      "sha256_git_blob": "be4aff8088ab213e4288289baaedbe84538d0673c5576c9e8c774c3ca3fb0cfb"
+    },
+    {
+      "path": "apps/web/app/source-review-route.ts",
+      "sha256_git_blob": "f955ef5791337c7f8916839b42029861769487e7240e8b24aa88218080b99041"
+    },
+    {
+      "path": "apps/web/app/source-review/[companyId]/[invocationId]/page.tsx",
+      "sha256_git_blob": "6c18d454f4bbaaa7dd03d820bae6242041f4db7d6c67179dca5bed1c22f36a39"
+    },
+    {
+      "path": "apps/web/app/styles.css",
+      "sha256_git_blob": "f576afa1ba344a79fe2db8507f07080580d9e0c7fbbf027ad315d3f11e16f125"
+    },
+    {
+      "path": "apps/web/tests/company-360-descriptor.test.mjs",
+      "sha256_git_blob": "d84d436ba8b737ac8a6dfcf96a6dfb15a7ff9122e57861f6e2ba6f4c5ac2f161"
+    },
+    {
+      "path": "apps/web/tests/company-accounting-selection.test.mjs",
+      "sha256_git_blob": "1f03f6be7bf708a81bf8f1199e8d67a9bf90ab7ef87901f068aaae6228184cab"
+    },
+    {
+      "path": "apps/web/tests/company-changes-state.test.mjs",
+      "sha256_git_blob": "98b1fd887215b1a6f5e8cebe60a7feede1b2c572da67da8a7869b4295c94724d"
+    },
+    {
+      "path": "apps/web/tests/company-home-pins.test.mjs",
+      "sha256_git_blob": "4c2a7d65c57982d47370e7116b9bd824d2c2c1fbba6155d1e615cf20b2ba6df0"
+    },
+    {
+      "path": "apps/web/tests/company-home-state.test.mjs",
+      "sha256_git_blob": "58d3cf851793a12f9fe0124264461272f4631adf058ad6294331e21bc54abb3c"
+    },
+    {
+      "path": "apps/web/tests/company-operating-state.test.mjs",
+      "sha256_git_blob": "98d834c8ba123e7fa65e727abca2196e5f0c29a33fe15908043b70ac93f36ca8"
+    },
+    {
+      "path": "apps/web/tests/company-regulation-state.test.mjs",
+      "sha256_git_blob": "b25f39332fcc6c1a76799a1f9ffbbd88f803c8ee48769e361c2f28cda4553a09"
+    },
+    {
+      "path": "apps/web/tests/operations-connections-state.test.mjs",
+      "sha256_git_blob": "9d859b713812c746ee8e1576ba5487778ccdd494342bef946a5ffde6eed18fc5"
+    },
+    {
+      "path": "apps/web/tests/semantic-analysis-state.test.mjs",
+      "sha256_git_blob": "50384b9fbd06b6ca82723fbc47f8edf9625f8fce5634181ae1784a9b5be7347b"
+    },
+    {
+      "path": "apps/web/tests/source-review-origin.test.mjs",
+      "sha256_git_blob": "2c0f68aac0f1dc88a4ae771946ed3ba358ad907651d2b08da8bd8aff7b904c8d"
+    },
+    {
+      "path": "apps/web/tests/source-review-route.test.mjs",
+      "sha256_git_blob": "c0b7ef7da804a089a14a33c38e03f6cb250bda24c27c1b711eefcda8d5ff4d06"
+    },
+    {
+      "path": "packages/contracts/src/company-changes.ts",
+      "sha256_git_blob": "43da22854cb4af5ed467e033b86f8d32f5de9109f4297aa73c41d51cfb8a58c2"
+    },
+    {
+      "path": "packages/contracts/src/company-condition.ts",
+      "sha256_git_blob": "520128928f970ae9ae9b893fbc963a3725d6294b44d2d38416e387475354729b"
+    },
+    {
+      "path": "packages/contracts/src/company-home.ts",
+      "sha256_git_blob": "ff026d726eac89417d5c9d8d5622e339f2c698012e8a1860cf54edd03d4c5bd0"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "sha256_git_blob": "18fcb1905835fca274b10ae1404b438df73a2f1b445ae366639b9188d040826c"
+    },
+    {
+      "path": "packages/contracts/src/regulatory-context.ts",
+      "sha256_git_blob": "8d2886424cabe5918f11e27e6f10658b68697bf4fcef23f501218926c1f0474d"
+    },
+    {
+      "path": "services/api/src/finai_api/api/company_changes_routes.py",
+      "sha256_git_blob": "5c970de9552d3c6aa944629fc6a09029886a948f1cd1d0803452ddd184eda8c2"
+    },
+    {
+      "path": "services/api/src/finai_api/api/company_condition_routes.py",
+      "sha256_git_blob": "9b9edba5f4527d4f40fe6e35d423681ce599568d60ce9b83b6ac1f8a82c4675f"
+    },
+    {
+      "path": "services/api/src/finai_api/api/company_home_routes.py",
+      "sha256_git_blob": "c4a039ea1cd172afc6caab0d9dbc4da9dd0e916560c322af9b4ef2466d4cbf8d"
+    },
+    {
+      "path": "services/api/src/finai_api/api/regulation_routes.py",
+      "sha256_git_blob": "9bc7aba76a568b30cee8ad5e127cb3e63d920ac3a00de6e6ac685a6651e5ee75"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/company_changes.py",
+      "sha256_git_blob": "05b0055f008ebc0ebf613b8bd181d7bc457f51c39101add2eec2584123cd2311"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/company_condition.py",
+      "sha256_git_blob": "dec85d809ecca0ecfd2dc9417b3e1614255241f2629cfeb90f2c6c3b796f9245"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/company_home.py",
+      "sha256_git_blob": "10e550c5a107962f359e7662705c2e3e5273bdd843e0b3459dde141d10a9de86"
+    },
+    {
+      "path": "services/api/src/finai_api/main.py",
+      "sha256_git_blob": "5c6c6f3013a1c2e37a88350e64d788fa5f00a806d710112b7a1df66765b7cd67"
+    },
+    {
+      "path": "services/api/src/finai_api/services/company_changes.py",
+      "sha256_git_blob": "11fd0ccd95df523fd42065fd3ab00be47434808deccc0b1d294a7a76a041fc20"
+    },
+    {
+      "path": "services/api/src/finai_api/services/company_condition.py",
+      "sha256_git_blob": "7bd94c315d08ea9e72ea466d6dc39338af76e3094d7bb816867990691c26ae1b"
+    },
+    {
+      "path": "services/api/src/finai_api/services/company_home.py",
+      "sha256_git_blob": "fa6c0019d6165e4654daa73e9468b57acb0ddcaf95ac119018be4908b3f5c8e9"
+    },
+    {
+      "path": "services/api/src/finai_api/services/semantic_analysis_movements.py",
+      "sha256_git_blob": "7bb91e4707dacb48f6c2d741fb988edc358019633cc8e42b666182a3d964444e"
+    },
+    {
+      "path": "services/api/tests/test_company_changes.py",
+      "sha256_git_blob": "72b426fbf9627e55309d4a64be514025382f6944063784c68a7a9884e566dd1a"
+    },
+    {
+      "path": "services/api/tests/test_company_condition.py",
+      "sha256_git_blob": "f8fc8f91918588b944c6a1b1c9aaa329dcd4282b5143cbbe894ba046daf967e5"
+    },
+    {
+      "path": "services/api/tests/test_company_home.py",
+      "sha256_git_blob": "5aab857ff1753bd22a53e9016708beb621a641a0d83fdcd24b32b23ba5217aa3"
+    },
+    {
+      "path": "services/api/tests/test_regulation_company_snapshot.py",
+      "sha256_git_blob": "76035eb6a3fcb214374aae244cc327b20f027ada9f4c2e305dca3a65c57ddd65"
+    },
+    {
+      "path": "services/api/tests/test_regulation_contract_edges.py",
+      "sha256_git_blob": "755fff00ad5d20a9789016eff63379cbae00bdc44c42ad65a67293e71977f456"
+    },
+    {
+      "path": "services/api/tests/test_semantic_decimal_presentation.py",
+      "sha256_git_blob": "1db20f67d9939407c5a3aae4c706d066cb0328ad89eed3b683021a8b8a2582aa"
+    },
+    {
+      "path": "services/api/tests/test_semantic_entity_movements.py",
+      "sha256_git_blob": "d6309f62d0f8b38ccda56be0cf974af30cd3ecab7a656d45ee19e17fd19c3a90"
+    }
+  ],
+  "continuation": "Product branch continues with exact-snapshot Company360 operating-view restoration; this record does not stop development or close the issues."
+}
