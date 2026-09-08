@@ -269,6 +269,23 @@ def test_company_work_uses_shared_retained_decision_and_proposal(case, state):
     assert item.basis == "EXPLICIT_INVOCATION"
 
 
+def test_retained_exception_work_preserves_missing_publication_and_company(case):
+    identity = add_work(case, state="PUBLICATION_UNAVAILABLE")
+    case["queue"]["items"][0]["company_binding"] = "EXPLICIT_RETAINED_EXCEPTION"
+    operation = case["operations"][identity]
+    operation["definition"] = {
+        "kind": "SOURCE_EXCEPTION_INVESTIGATION", "company_id": str(case["company"].resource_id)
+    }
+    operation["publication_limitation"] = "Exact published versions are unavailable"
+    item = describe(case).work.items[0]
+    assert item.state == "PUBLICATION_UNAVAILABLE"
+    assert item.basis == "EXPLICIT_RETAINED_EXCEPTION"
+    assert item.reason == operation["publication_limitation"]
+    operation["definition"]["company_id"] = str(uid("foreign"))
+    with pytest.raises(WorkspaceError):
+        describe(case)
+
+
 @pytest.mark.parametrize("change", [
     {"company_id": str(uid("foreign"))}, {"company_id": None}, {"company_binding": "UNBOUND"},
 ])

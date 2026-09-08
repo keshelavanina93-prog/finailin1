@@ -39,10 +39,10 @@ class CompanyWorkItem(Model):
     proposal_id: UUID | None
     company_id: UUID
     title: str
-    state: Literal["PREPARED", "PENDING_REVIEW", "PUBLISHED", "REJECTED"]
+    state: Literal["PREPARED", "PENDING_REVIEW", "PUBLISHED", "REJECTED", "PUBLICATION_UNAVAILABLE"]
     created_at: AwareDatetime
     reason: str
-    basis: Literal["EXPLICIT_INVOCATION"] = "EXPLICIT_INVOCATION"
+    basis: Literal["EXPLICIT_INVOCATION", "EXPLICIT_RETAINED_EXCEPTION"] = "EXPLICIT_INVOCATION"
 
 
 class CompanyWork(Model):

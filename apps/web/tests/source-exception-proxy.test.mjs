@@ -19,3 +19,17 @@ test("source exception proxy admits explicit retention and exact history only",a
   assert.equal(calls.length,2);
  }finally{globalThis.fetch=previous;}
 });
+
+test("investigation proxy admits explicit action but no implicit approval or journal effect",async()=>{
+ const previous=globalThis.fetch,calls=[],body={request_id:"frozen-request",exception_run_id:"fcr_"+"a".repeat(64),rationale:"Investigate this exact source evidence"};
+ globalThis.fetch=async(url,options)=>{calls.push({url,options});return Response.json({fixture:true});};
+ async function forward(method,path,auth=true){const r=new Request(`http://fixture.invalid/api/ontology/${path}`,{method,headers:auth?{authorization:"Bearer fixture"}:{},...(method==="POST"?{body:JSON.stringify(body)}:{})});r.nextUrl=new URL(r.url);return routes[method](r,{params:Promise.resolve({path:path.split("/")})});}
+ try{
+  assert.equal((await forward("POST","operations/investigations")).status,200);
+  assert.deepEqual(JSON.parse(new TextDecoder().decode(calls[0].options.body)),body);
+  assert.equal((await forward("GET","operations/investigations")).status,404);
+  for(const path of ["operations/investigations/approve","operations/investigations/post-journal"])assert.equal((await forward("POST",path)).status,404);
+  assert.equal((await forward("POST","operations/investigations",false)).status,401);
+  assert.equal(calls.length,1);
+ }finally{globalThis.fetch=previous;}
+});

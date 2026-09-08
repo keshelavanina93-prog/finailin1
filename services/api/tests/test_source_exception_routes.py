@@ -8,6 +8,7 @@ from finai_api.domain.authority import ExactScope
 from finai_api.domain.review import Principal
 from finai_api.main import app
 from finai_api.security import authenticated_principal
+from finai_api.services import investigation_actions
 from finai_api.services import source_reconciliation_exception as exceptions
 
 
@@ -34,6 +35,28 @@ def test_exception_routes_deny_before_reconciliation_or_storage(monkeypatch):
     for headers, status in [({}, 401), ({"Authorization": "Bearer test-token"}, 403)]:
         assert client.post(path, json=request(), headers=headers).status_code == status
         assert client.get(path + run, headers=headers).status_code == status
+
+
+def test_investigation_route_requires_proposal_permission_before_preparation(monkeypatch):
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("Denied action must not resolve or prepare canonical mutations")
+
+    principal = Principal(
+        actor_id="read-only", display_name="Read only", permissions=("ontology_read",),
+        scope=ExactScope(
+            tenant_id=uuid4(), legal_entity_id=str(uuid4()), period="2025-01", currency="GEL"
+        ),
+    )
+    monkeypatch.setattr(investigation_actions, "prepare", forbidden)
+    app.dependency_overrides[authenticated_principal] = lambda: principal
+    try:
+        response = TestClient(app).post("/v1/ontology/operations/investigations", json={
+            "request_id": str(uuid4()), "exception_run_id": "fcr_" + "a" * 64,
+            "rationale": "Inspect this exact retained exception",
+        })
+        assert response.status_code == 403
+    finally:
+        app.dependency_overrides.pop(authenticated_principal, None)
 
 
 def test_exception_routes_preserve_inputs_and_refuse_caller_facts(monkeypatch):

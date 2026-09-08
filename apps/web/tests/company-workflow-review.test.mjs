@@ -6,6 +6,20 @@ const company="00000000-0000-4000-8000-000000000001",proposal="00000000-0000-400
 const reference={company:{resource_id:company},workflowId:workflow,proposalId:proposal};
 const item={workflow_id:workflow,family:"ontology",company_id:company,company_binding:"EXPLICIT_INVOCATION"};
 const run={operation_id:workflow,prepared_proposal_id:proposal,state:"PUBLISHED",definition:{version:"ontology-action/1"},proposal:{proposal:{proposal_id:proposal},decision:"APPROVED"}};
+
+test("source investigation work requires company and publication evidence after approval",()=>{
+ const bound={...item,company_binding:"EXPLICIT_RETAINED_EXCEPTION"};
+ assert.equal(companyWorkflowQueueItem([bound],reference),bound);
+ const finding="00000000-0000-4000-8000-000000000003",investigation="00000000-0000-4000-8000-000000000004";
+ const changed={...run,definition:{version:"ontology-action/1",kind:"SOURCE_EXCEPTION_INVESTIGATION",company_id:company},proposal:{...run.proposal,proposal:{proposal_id:proposal,mutations:[{object_type:"Finding",resource_id:finding},{object_type:"Investigation",resource_id:investigation}]}},publication:null};
+ assert.throws(()=>assertCompanyWorkflowRun(changed,reference));
+ assert.doesNotThrow(()=>assertCompanyWorkflowRun({...changed,state:"PUBLICATION_UNAVAILABLE"},reference));
+ const pin=id=>({resource_id:id,version_id:proposal,content_hash:"b".repeat(64)});
+ changed.publication={finding:pin(finding),investigation:pin(investigation)};
+ assert.doesNotThrow(()=>assertCompanyWorkflowRun(changed,reference));
+ assert.throws(()=>assertCompanyWorkflowRun({...changed,definition:{...changed.definition,company_id:"foreign"}},reference));
+ assert.throws(()=>assertCompanyWorkflowRun({...changed,publication:{...changed.publication,finding:pin(investigation)}},reference));
+});
 test("exact bound queue membership is required before canonical operation detail",()=>{
  assert.equal(companyWorkflowQueueItem([item],reference),item);
  for(const items of [[],[item,item],[{...item,company_id:null}],[{...item,company_id:"foreign"}],[{...item,company_binding:"INFERRED"}],[{...item,family:"source"}],[{...item,workflow_id:`opa_${"b".repeat(64)}`}]] )assert.throws(()=>companyWorkflowQueueItem(items,reference));
