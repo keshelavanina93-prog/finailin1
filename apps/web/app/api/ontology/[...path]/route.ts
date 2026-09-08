@@ -14,7 +14,7 @@ async function forward(request: NextRequest, context: Context) {
   const functions = /^functions(?:\/(?:implementation|invocations(?:\/[a-fA-F0-9-]+)?))?$/.test(route);
   const runtimeObservations = request.method === "GET" && /^runtime-observations(?:\/[a-fA-F0-9-]+)?$/.test(route);
   const companyJournals = request.method === "GET" && /^company-journals(?:\/[a-fA-F0-9-]+)?$/.test(route);
-  const analysisProjection=request.method==="POST"&&route==="analysis/project";
+  const analysisProjection=request.method==="POST"&&(route==="analysis/project"||route==="company-home");
   const sourceAdoption=request.method==="POST"&&/^source-adoption\/(?:(?:families|transitions)\/(?:inspect|proposal)|successor)$/.test(route);
   const periodControl = (request.method === "GET" && route === "period-control") || (request.method === "POST" && route === "period-control/proposal");
   const accountDimensionPolicy = (request.method === "GET" && route === "account-dimension-policy") || (request.method === "POST" && route === "account-dimension-policy/proposal");

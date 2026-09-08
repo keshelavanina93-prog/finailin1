@@ -1,0 +1,24 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import ts from "typescript";
+const source=readFileSync(new URL("../app/company-home-pins.ts",import.meta.url),"utf8");
+const module=await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString("base64")}`);
+const company="365aa5d9-c2ec-52e1-867a-50fe3415f486";
+const id=index=>`00000000-0000-4000-8000-${String(index).padStart(12,"0")}`;
+test("Home stores bounded unique references, separates identities and never copies financial results",async()=>{
+ const store=new Map();globalThis.localStorage={getItem:key=>store.get(key)??null,setItem:(key,value)=>store.set(key,value),removeItem:key=>store.delete(key)};
+ for(let index=1;index<=8;index++)await module.pinHomeAnalysis("test-user",{companyId:company,invocationId:id(index)});
+ assert.deepEqual(await module.homeAnalysisPins("test-user",company),[8,7,6,5,4,3].map(id));
+ await module.pinHomeAnalysis("test-user",{companyId:company,invocationId:id(5)});
+ assert.deepEqual(await module.homeAnalysisPins("test-user",company),[5,8,7,6,4,3].map(id));
+ assert.deepEqual(await module.homeAnalysisPins("another-user",company),[]);
+ assert.deepEqual(await module.homeAnalysisPins("test-user",id(99)),[]);
+ assert.ok([...store.keys()].every(key=>!key.includes("test-user")));
+ assert.deepEqual(JSON.parse([...store.values()][0]),[5,8,7,6,4,3].map(id));
+ await assert.rejects(()=>module.pinHomeAnalysis("test-user",{companyId:company,invocationId:"not-an-invocation"}));
+ const key=[...store.keys()][0];store.set(key,JSON.stringify([id(1),id(1)]));
+ await assert.rejects(()=>module.homeAnalysisPins("test-user",company),/invalid/);
+ await module.clearHomeAnalysisPins("test-user",company);
+ assert.deepEqual(await module.homeAnalysisPins("test-user",company),[]);
+});
