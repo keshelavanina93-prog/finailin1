@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect,useMemo,useRef,useState} from "react";
+import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import type {AnalysisProjection,CompanyFinancialResults,ReportComposition,ReportPreview,ReportSectionReference,RetainedReport,RetainedReportPage} from "@finai/contracts";
 import SemanticWorksheet,{type WorksheetLayout} from "./semantic-worksheet";
 import {assertReportPreview,assertRetainedReport,downloadRetainedReport,listRetainedReports,reportCellLabel,reportCompositionReferences,reportEvidenceTarget,reportSectionFromProjection,reopenRetainedReport,saveRetainedReport,previewRetainedReport,sameReportComposition} from "./retained-report-state";
@@ -9,13 +9,15 @@ import "./semantic-analysis-workspace.css";
 import "./reporting-workspace.css";
 
 type ReportingProps={token:string;companyId:string;companyName:string};
-const api=async<T>(path:string,token:string,init?:RequestInit):Promise<T>=>{const response=await fetch(`/api/${path}`,{...init,headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json",...(init?.headers??{})},cache:"no-store"});const body=await response.json();if(!response.ok)throw Error(typeof body?.detail==="string"?body.detail:`Reporting request unavailable (${response.status})`);return body as T;};
+const api=async<T,>(path:string,token:string,init?:RequestInit):Promise<T>=>{const response=await fetch(`/api/${path}`,{...init,headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json",...(init?.headers??{})},cache:"no-store"});const body=await response.json();if(!response.ok)throw Error(typeof body?.detail==="string"?body.detail:`Reporting request unavailable (${response.status})`);return body as T;};
 
 /** Reporting stays a retained-result workflow: discover, inspect, preview, save and reopen. */
 export function ReportingWorkspace({token,companyId,companyName}:ReportingProps){
- const [discovery,setDiscovery]=useState<CompanyFinancialResults|null>(null);const [saved,setSaved]=useState<RetainedReportPage|null>(null);const [sections,setSections]=useState<Array<{reference:ReportSectionReference;projection:AnalysisProjection}>>([]);const [title,setTitle]=useState("");const [commentary,setCommentary]=useState("");const [preview,setPreview]=useState<ReportPreview|null>(null);const [busy,setBusy]=useState(false);const [error,setError]=useState("");
- const refresh=async()=>{if(!companyId)return;try{setError("");const [results,reports]=await Promise.all([api<CompanyFinancialResults>(`ontology/company-financial-results?company_id=${encodeURIComponent(companyId)}`,token),api<RetainedReportPage>(`ontology/retained-reports?company_id=${encodeURIComponent(companyId)}`,token)]);setDiscovery(results);setSaved(reports);if(!title)setTitle(`${companyName} financial review`);}catch(cause){setError(cause instanceof Error?cause.message:"Reporting context unavailable.");}};
- useEffect(()=>{setSections([]);setPreview(null);void refresh();},[companyId,token]);
+ const [discovery,setDiscovery]=useState<CompanyFinancialResults|null>(null);const [saved,setSaved]=useState<RetainedReportPage|null>(null);const [sections,setSections]=useState<Array<{reference:ReportSectionReference;projection:AnalysisProjection}>>([]);const [title,setTitle]=useState(()=>companyName?`${companyName} financial review`:"");const [commentary,setCommentary]=useState("");const [preview,setPreview]=useState<ReportPreview|null>(null);const [busy,setBusy]=useState(false);const [error,setError]=useState("");
+ const refresh=useCallback(async()=>{if(!companyId)return;try{setError("");const [results,reports]=await Promise.all([api<CompanyFinancialResults>(`ontology/company-financial-results?company_id=${encodeURIComponent(companyId)}`,token),api<RetainedReportPage>(`ontology/retained-reports?company_id=${encodeURIComponent(companyId)}`,token)]);setDiscovery(results);setSaved(reports);}catch(cause){setError(cause instanceof Error?cause.message:"Reporting context unavailable.");}},[companyId,token]);
+ // The effect subscribes to the selected company and applies the asynchronous server readback.
+ // eslint-disable-next-line react-hooks/set-state-in-effect
+ useEffect(()=>{void refresh();},[refresh]);
  const openResult=async(result:CompanyFinancialResults["results"][number])=>{try{setBusy(true);setError("");const projection=await api<AnalysisProjection>("ontology/analysis/project",token,{method:"POST",body:JSON.stringify({invocation_id:result.invocation_id,company_id:companyId})});setSections(current=>current.some(item=>item.projection.descriptor.invocation_id===projection.descriptor.invocation_id)?current:[...current,{projection,reference:reportSectionFromProjection(projection,companyId,crypto.randomUUID())}]);}catch(cause){setError(cause instanceof Error?cause.message:"This retained result could not be reopened.");}finally{setBusy(false);}};
  const composition=():ReportComposition=>reportCompositionReferences({company_id:companyId,valid_at:discovery?.valid_at??new Date(0).toISOString(),known_at:discovery?.known_at??new Date(0).toISOString(),title:title.trim(),commentary,sections:sections.map(item=>item.reference)});
  const previewReport=async()=>{try{setBusy(true);setError("");const result=await api<ReportPreview>("ontology/retained-reports/preview",token,{method:"POST",body:JSON.stringify(composition())});assertReportPreview(result,companyId?composition():composition());setPreview(result);}catch(cause){setPreview(null);setError(cause instanceof Error?cause.message:"Report preview unavailable.");}finally{setBusy(false);}};
@@ -54,9 +56,7 @@ export function RetainedReportingWorkspace({token,companyId,initialSections,acti
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");
  const [message,setMessage]=useState("");
- const initialKey=useMemo(()=>initialSections.map(item=>item.section.section_id).join("|"),[initialSections]);
  const composition=useMemo<ReportComposition>(()=>({company_id:companyId,valid_at:sections[0]?.projection.descriptor.valid_at??"",known_at:sections[0]?.projection.descriptor.known_at??"",title,commentary,sections:sections.map(item=>item.section)}),[companyId,title,commentary,sections]);
- useEffect(()=>{setSections(initialSections.slice(0,8));setPreview(null);setSaved(null);},[companyId,initialKey]);
  useEffect(()=>{if(!active)return;let cancelled=false;listRetainedReports(token,companyId).then(value=>{if(!cancelled)setPage(value);}).catch(cause=>{if(!cancelled)setError(String(cause));});return()=>{cancelled=true;};},[active,token,companyId]);
  const setSection=(index:number,section:ReportSectionReference)=>{setSections(current=>current.map((item,itemIndex)=>itemIndex===index?{...item,section}:item));setPreview(null);setSaved(null);setMessage("");};
  const runPreview=async()=>{setBusy(true);setError("");setMessage("");try{const next=reportCompositionReferences(composition);const value=await previewRetainedReport(token,next);assertReportPreview(value,next);setPreview(value);setMessage("Server preview verified for this exact composition.");}catch(cause){setPreview(null);setError(String(cause));}finally{setBusy(false);}};
