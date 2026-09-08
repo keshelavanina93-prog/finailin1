@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import type {CompanyHomeDescriptor,CanonicalResource} from "@finai/contracts";
+import CompanyChanges from "./company-changes";
 import CompanyFinancialContext from "./company-financial-context";
 import HomeSourceAnalyses from "./home-source-analyses";
 import CompanyOperatingWorkspace from "./company-operating-workspace";
@@ -33,6 +34,7 @@ function Home({token,companyId,snapshot,onData,onOperations,onMapSelection,onIns
  const unavailable=result.unavailable_financials.find(item=>item.key===financial);
  return <div className="company-home">
   {showWork&&onInspect&&<CompanyOperatingWorkspace compact token={token} companyId={companyId} snapshot={{validAt:result.valid_at,knownAt:result.known_at}} onInspect={onInspect} onTrace={onTrace} onHistory={onHistory} onProposal={onProposal} onWorkflow={onWorkflow}/>}
+  {onInspect&&<CompanyChanges compact={showWork} token={token} companyId={companyId} validAt={result.valid_at} knownAt={result.known_at} onInspect={onInspect} onTrace={onTrace}/>}
   <section className="home-financials" aria-label="Key financials"><header><div><p className="overline">KEY FINANCIALS</p><h2>Financial condition</h2></div><button className="g8-link" onClick={onData}>Explore source analyses</button></header>
    <div className="home-financial-tabs" aria-label="Financial view">{result.unavailable_financials.map(item=><button key={item.key} aria-pressed={financial===item.key} onClick={()=>setFinancial(item.key)}>{item.label}</button>)}</div>
    {unavailable&&<p className="home-dependency"><strong>{unavailable.label} unavailable.</strong> {unavailable.reason}</p>}

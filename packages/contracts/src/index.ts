@@ -250,3 +250,5 @@ export type {AnalysisScalar,AnalysisPin,AnalysisDecimalPresentation,AnalysisValu
 
 export type {CompanyHomeDescriptor} from "./company-home.js";
 export type {CompanyConditionDescriptor,CompanyConditionConnection,CompanyConditionResourceGroup,CompanyConditionWorkItem} from "./company-condition.js";
+
+export type {CompanyChangesRequest,CompanyChangesDescriptor,CompanyContextChange} from "./company-changes.js";
