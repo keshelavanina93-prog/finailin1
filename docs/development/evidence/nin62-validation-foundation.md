@@ -30,6 +30,14 @@ Refusal cases cover unsupported executable shapes, vacuous evaluation, recursive
 
 The Linux early probe must exercise the actual capped validator before the mandatory full API CI and unchanged 90% coverage gate. Local focused results do not replace that integration gate.
 
+## Exact coverage gate correction
+
+Candidate `2e264364de202b0d527b801de25278143dad6f11` failed run `34177228866`: 1,345 passed, 18 skipped and one native materialized-group-count failure. Its focused reproduction passed locally; no production defect was declared repaired. Diagnostic-only `fd7528580ff3cf068007a6234f902b8820539d6b` exposes sanitized failure stages without changing materialization behavior.
+
+Run `34178419126` then passed all 1,346 tests (18 skipped), but its GitHub success is not coverage acceptance. The report contains 16,177 statements and 1,620 missed: 89.98578% covered. pytest-cov used coverage's default zero-digit rounding for its exit decision, despite printing a below-90 failure message. The candidate remains excluded from canonical integration until exact count enforcement and a new full run pass. Neither denominator exclusions nor a reduced threshold are permitted.
+
+Ten focused orchestration cases now prove that exhausted activity failure and cancellation at every stage stop subsequent work and leave the workflow interrupted. Completed retained reports may contain CONFORMS, VIOLATES, NOT_EVALUATED or REFUSED; completion does not grant semantic or business authority. These are injected activity-boundary tests, distinct from the real Temporal execution proof above.
+
 Authenticated browser inspection reached the replacement G8 shell and real owner-scoped validation work list. Opening the report found a missing Next proxy allowlist entry. The fix permits only strict-UUID inspection GET and report-proposal POST, and rejects adjacent commands and malformed routes. The post-fix authenticated browser repeat remains unobserved; route tests and a successful build do not establish browser acceptance.
 
 All source/profile fixtures in this evidence are synthetic. Authentic selected FIBO/GeoSPARQL/PROV profiles, standards conformance, benchmark comparison, ontology upgrades, alignment, business/map consumers, browser acceptance and release acceptance remain open. This component is a real validation runtime; it is not completion of NIN-62 or the G8 product.

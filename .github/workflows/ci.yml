@@ -58,6 +58,8 @@ jobs:
           cache: pip
           cache-dependency-path: services/api/pyproject.toml
       - run: python -m pip install -e "services/api[dev]"
+      - name: Verify exact API coverage gate
+        run: python -m pytest --no-cov scripts/tests/test_check_api_coverage.py
       - name: Verify capped RDF index before service setup
         run: python scripts/probe-ontology-index-linux.py --verify
       - name: Verify capped ontology validator before service setup
@@ -106,7 +108,16 @@ jobs:
         run: python scripts/install-ontology.py
       - run: python -m ruff check services/api
       - run: python -m mypy services/api/src
-      - run: python -m pytest services/api/tests
+      - name: Test API and enforce exact statement coverage
+        run: |
+          mkdir -p .finai/artifacts
+          python -c "from pathlib import Path; Path('.finai/artifacts/api-coverage.json').unlink(missing_ok=True)"
+          test_status=0
+          python -m pytest services/api/tests --cov-report=json:.finai/artifacts/api-coverage.json || test_status=$?
+          coverage_status=0
+          python scripts/check-api-coverage.py .finai/artifacts/api-coverage.json || coverage_status=$?
+          if [ "$test_status" -ne 0 ]; then exit "$test_status"; fi
+          exit "$coverage_status"
       - name: Stop disposable evidence service
         if: always()
         run: |
