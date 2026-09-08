@@ -52,7 +52,28 @@ def build_projection(source_projection, receipt, contributors, request):
             "fields": fields,
             "coverage": [
                 Coverage(label="Accepted journals", value=str(len(receipt["accepted"]))),
-                Coverage(label="Source reconciliation", value=receipt["status"]),
+                Coverage(
+                    label="Source rows without an accepted journal",
+                    value=str(len(receipt["missing_coordinates"])),
+                ),
+                Coverage(
+                    label="Source rows excluded from matching",
+                    value=str(len(receipt["excluded_rows"])),
+                ),
+                Coverage(
+                    label="Journal candidates not matched",
+                    value=str(len(receipt["rejected"])),
+                ),
+                Coverage(
+                    label="Source reconciliation",
+                    value={
+                        "UNAVAILABLE": "No accepted journal movements available",
+                        "PARTIAL": "Partial source coverage; unresolved matching remains",
+                        "RECONCILED": (
+                            "Eligible source rows matched; full-ledger coverage unestablished"
+                        ),
+                    }[receipt["status"]],
+                ),
                 Coverage(label="Snapshot", value=receipt["snapshot_at"]),
             ],
             "unavailable_operations": [

@@ -44,6 +44,9 @@ def test_accepted_subset_exact_cells_and_stale_selection(case):
     receipt = {
         "movement_trial_balance": [movement],
         "accepted": [{}],
+        "missing_coordinates": ["Base!S3", "Base!S4"],
+        "excluded_rows": [{"coordinate": "Base!S288"}],
+        "rejected": [{"reason": "Retained test journal is outside the exact source"}],
         "status": "PARTIAL",
         "snapshot_at": "2026-09-08T00:00:00Z",
         "receipt_hash": "a" * 64,
@@ -52,6 +55,12 @@ def test_accepted_subset_exact_cells_and_stale_selection(case):
     assert len(result.rows) == 1
     assert result.rows[0].values["account_code"].value == "synthetic-code"
     assert result.rows[0].values["debit_movement"].value == movement["debit"]
+    coverage = {item.label: item.value for item in result.descriptor.coverage}
+    assert coverage["Source rows without an accepted journal"] == "2"
+    assert coverage["Source rows excluded from matching"] == "1"
+    assert coverage["Journal candidates not matched"] == "1"
+    assert "Partial source coverage" in coverage["Source reconciliation"]
+    assert result.descriptor.excluded_evidence == source.descriptor.excluded_evidence
     selected = request.model_copy(
         update={"selected_row": result.rows[0].key, "descriptor_sha256": result.descriptor_sha256}
     )
