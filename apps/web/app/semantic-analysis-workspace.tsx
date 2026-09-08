@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect,useRef,useState} from "react";
+import {useEffect,useLayoutEffect,useRef,useState} from "react";
 import dynamic from "next/dynamic";
 import SemanticWorksheet,{type WorksheetLayout} from "./semantic-worksheet";
 import type {AnalysisField,AnalysisProjection,AnalysisRequest,AnalysisRow,AnalysisValue} from "@finai/contracts";
@@ -8,6 +8,7 @@ import {assertProjection,evidenceCaption,formatAnalysisDecimal,hasUsefulMagnitud
 import {displayPostedAmount} from "./posted-movement-presentation";
 import "./semantic-analysis-workspace.css";
 import {pinHomeAnalysis} from "./company-home-pins";
+import {sourceReviewTarget} from "./source-review-navigation";
 
 const OperatorTrace=dynamic(()=>import("./operator-trace"),{loading:()=> <p role="status">Opening retained trace…</p>});
 const timeLabel=(value:string)=>new Intl.DateTimeFormat(undefined,{dateStyle:"medium",timeStyle:"short"}).format(new Date(value));
@@ -63,6 +64,30 @@ function Workspace({token,companyId,invocationId,onInspect}:Props){
  },[token,request,key,revision,expected,ready]);
  useEffect(()=>{if(!projection||busy)return;if(scroll.current&&restoreScroll.current!==null){scroll.current.scrollTop=restoreScroll.current;scroll.current.scrollLeft=layout.left;restoreScroll.current=null;}if(restoreCell.current&&layout.focus){const cell=layout.focus;const frame=requestAnimationFrame(()=>requestAnimationFrame(()=>{scroll.current?.querySelector<HTMLElement>(`[data-row="${cell.row}"][data-column="${CSS.escape(cell.column)}"]`)?.focus({preventScroll:true});restoreCell.current=false;}));return()=>cancelAnimationFrame(frame);}restoreCell.current=false;if(returnFocus.current){const frame=requestAnimationFrame(()=>{const target=activeControl.current?.isConnected?activeControl.current:lastButton.current;if(target?.isConnected)target.focus({preventScroll:true});returnFocus.current=false;});return()=>cancelAnimationFrame(frame);}},[projection,busy,layout.left,layout.focus]);
  function viewState(next:AnalysisRequest=request):AnalysisView|null {if(!projection)return null;return {version:1,request:{...next,descriptor_sha256:projection.descriptor_sha256,filters:next.filters??[],group_by:next.group_by??null,selected_row:next.selected_row??null,contributor_index:next.contributor_index??0},valid_at:projection.descriptor.valid_at,known_at:projection.descriptor.known_at,receipt_hash:projection.descriptor.receipt_hash,columns:columns??projection.descriptor.fields.map(f=>f.key),visual,pane,scroll:scroll.current?.scrollTop??0,workspace:{grid:layout,dock,collapsed,size:paneSize}};}
+ // Capture only the history entry represented by this committed render. Never write on unmount.
+ useLayoutEffect(()=>{
+  let observedHref=location.href;let frame=0,settledFrame=0;
+  const element=scroll.current;
+  function capture(){
+   if(!ready||busy||error||!projection||response?.key!==key||restoreScroll.current!==null||restoreCell.current)return;
+   const url=new URL(location.href),target=sourceReviewTarget(url.pathname);
+   if(url.href!==observedHref||target?.companyId!==companyId||target.invocationId!==invocationId)return;
+   const view=viewState();if(!view)return;
+   const raw=url.searchParams.get("analysis_view"),current=raw?parseView(raw,companyId,invocationId):null;
+   if(raw&&(!current||requestKey(current.request)!==requestKey(view.request)||current.receipt_hash!==view.receipt_hash||current.valid_at!==view.valid_at||current.known_at!==view.known_at))return;
+   try{
+    assertProjection(projection,request,expected);
+    if(view.workspace&&element)view.workspace={...view.workspace,grid:{...view.workspace.grid,left:element.scrollLeft}};
+    const safe=parseView(JSON.stringify(view),companyId,invocationId);if(!safe)return;
+    url.searchParams.set("analysis_view",JSON.stringify(safe));
+    if(url.href!==observedHref){history.replaceState(history.state,"",url);observedHref=url.href;}
+   }catch{/* Unsupported history or unverified references leave this entry unchanged. */}
+  }
+  function schedule(){cancelAnimationFrame(frame);cancelAnimationFrame(settledFrame);frame=requestAnimationFrame(()=>{settledFrame=requestAnimationFrame(capture);});}
+  window.addEventListener("g8:capture-source-review",capture);
+  element?.addEventListener("scroll",capture,{passive:true});capture();schedule();
+  return()=>{cancelAnimationFrame(frame);cancelAnimationFrame(settledFrame);window.removeEventListener("g8:capture-source-review",capture);element?.removeEventListener("scroll",capture);};
+ });
  function change(partial:Partial<AnalysisRequest>,openEvidence=false){if(!projection||busy)return;activeControl.current=document.activeElement instanceof HTMLElement?document.activeElement:null;returnFocus.current=true;const next={...request,descriptor_sha256:projection.descriptor_sha256,...partial};const v=viewState(next);if(v&&openEvidence){v.pane="evidence";if(v.workspace)v.workspace.collapsed=false;}if(v){const url=new URL(location.href);const previous=viewState();if(previous){url.searchParams.set("analysis_view",JSON.stringify(previous));history.replaceState(history.state,"",url);}url.searchParams.set("analysis_view",JSON.stringify(v));history.pushState(history.state,"",url);}restoreScroll.current=scroll.current?.scrollTop??0;setRequest(next);}
  function save(){const view=viewState();if(!view||!storageKey)return;try{localStorage.setItem(storageKey,JSON.stringify(view));setSavedAvailable(true);setNotice("Saved on this device. Reopening checks access and this exact revision.");const url=new URL(location.href);url.searchParams.set("analysis_view",JSON.stringify(view));history.replaceState(history.state,"",url);}catch{setNotice("Device storage is unavailable; the view was not saved.");}}
  function reopen(){try{const view=parseView(localStorage.getItem(storageKey)??"",companyId,invocationId);if(view){const url=new URL(location.href);url.searchParams.set("analysis_view",JSON.stringify(view));history.replaceState(history.state,"",url);setResponse(null);restore(view);setRevision(v=>v+1);}else setNotice("The saved view is invalid or belongs to another company or retained result.");}catch{setNotice("Device storage is unavailable.");}}

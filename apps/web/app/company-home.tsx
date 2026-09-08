@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import type {AnalysisField,AnalysisValue,CompanyHomeDescriptor} from "@finai/contracts";
+import {restorationInstant} from "./definition-restoration-time";
 import {assertProjection,formatAnalysisDecimal} from "./semantic-analysis-state";
 import {homeAnalysisPins,clearHomeAnalysisPins} from "./company-home-pins";
 import {useSourceReview} from "./source-review-navigation";
@@ -17,20 +18,21 @@ function cell(value:AnalysisValue,field:AnalysisField){
  if(field.presentation&&typeof value.value==="string")return formatAnalysisDecimal(value.value,field);
  return value.label??String(value.value);
 }
-type Props={token:string;companyId:string;onData:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void};
-export default function CompanyHome(props:Props){return <Home key={`${props.token}:${props.companyId}`} {...props}/>;}
-function Home({token,companyId,onData,onOperations,onMapSelection}:Props){
- const open=useSourceReview();
+type Props={token:string;companyId:string;snapshot?:{validAt:string;knownAt:string};onData:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void};
+export default function CompanyHome(props:Props){return <Home key={`${props.token}:${props.companyId}:${props.snapshot?.validAt??"current"}:${props.snapshot?.knownAt??"current"}`} {...props}/>;}
+function Home({token,companyId,snapshot,onData,onOperations,onMapSelection}:Props){
+ const open=useSourceReview();const validAt=snapshot?.validAt,knownAt=snapshot?.knownAt;
  const [result,setResult]=useState<CompanyHomeDescriptor|null>(null),[error,setError]=useState("");
  const [revision,setRevision]=useState(0),[financial,setFinancial]=useState("profit_loss");
  useEffect(()=>{if(!companyId)return;const controller=new AbortController();let disposed=false;const timer=setTimeout(()=>controller.abort(),25000);
-  async function load(){try{const invocation_ids=await homeAnalysisPins(token,companyId);const response=await fetch("/api/ontology/company-home",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({company_id:companyId,invocation_ids}),cache:"no-store",signal:controller.signal});const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:"Company Home is unavailable.");const home=data as CompanyHomeDescriptor;
+  async function load(){try{const invocation_ids=await homeAnalysisPins(token,companyId);const response=await fetch("/api/ontology/company-home",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({company_id:companyId,invocation_ids,...validAt?{valid_at:validAt,known_at:knownAt}:{}}),cache:"no-store",signal:controller.signal});const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:"Company Home is unavailable.");const home=data as CompanyHomeDescriptor;
    if(home.contract!=="g8-company-home/1"||home.company.resource_id!==companyId||home.current_use_authorized!==false||home.business_effect_authorized!==false||home.operations.authority!=="GEOGRAPHY_CONTEXT_ONLY"||home.analyses.length!==invocation_ids.length)throw Error("Home did not match the selected company and retained references.");
+   if(validAt&&(restorationInstant(home.valid_at)!==restorationInstant(validAt)||restorationInstant(home.known_at)!==restorationInstant(knownAt)))throw Error("Home did not preserve the requested company snapshot.");
    for(const [index,analysis] of home.analyses.entries())assertProjection(analysis,{company_id:companyId,invocation_id:invocation_ids[index]});
    if(!disposed){setResult(home);setError("");}
   }catch(failure){if(!disposed){setResult(null);setError(controller.signal.aborted?"Company Home timed out. Retry the same company context.":String(failure));}}finally{clearTimeout(timer);}}
   void load();return()=>{disposed=true;clearTimeout(timer);controller.abort();};
- },[token,companyId,revision]);
+ },[token,companyId,revision,validAt,knownAt]);
  if(!companyId)return <section className="company-home-state"><h2>Choose your company</h2><p>Financial results, operating context and review work use its canonical identity.</p></section>;
  if(error)return <section className="company-home-state" role="alert"><h2>Company Home unavailable</h2><p>{error}</p><button onClick={()=>setRevision(value=>value+1)}>Retry company Home</button><button onClick={()=>void clearHomeAnalysisPins(token,companyId).then(()=>setRevision(value=>value+1)).catch(failure=>setError(String(failure)))}>Clear saved Home references</button><p>Clearing device references does not delete retained analyses.</p></section>;
  if(!result)return <p role="status">Resolving company capabilities and retained analyses…</p>;
