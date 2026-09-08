@@ -12,6 +12,7 @@ from finai_api.api.history_search_routes import router as history_search_router
 from finai_api.api.lifecycle_routes import router as lifecycle_router
 from finai_api.api.object_set_routes import router as object_set_router
 from finai_api.api.ontology_definition_routes import router as ontology_definition_router
+from finai_api.api.ontology_import_routes import router as ontology_import_router
 from finai_api.api.ontology_operation_routes import router as ontology_operation_router
 from finai_api.api.ontology_routes import router as ontology_router
 from finai_api.api.operations_routes import router as operations_router
@@ -49,6 +50,7 @@ app.include_router(lifecycle_router)
 app.include_router(certification_router)
 app.include_router(retention_router)
 app.include_router(function_router)
+app.include_router(ontology_import_router)
 app.include_router(runtime_observation_router)
 app.include_router(semantic_analysis_router)
 app.include_router(transformation_router)

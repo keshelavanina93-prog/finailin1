@@ -66,6 +66,23 @@ def _latest(c: Any, p: Principal, version: UUID) -> dict[str, Any] | None:
     return dict(row) if row is not None else None
 
 
+def require_available_version(
+    conn: Any, principal: Principal, resource_id: UUID, version_id: UUID
+) -> dict[str, Any]:
+    """Shared current-effective and withdrawal check inside a caller's transaction."""
+    with conn.cursor(row_factory=dict_row) as cursor:
+        row = _version(cursor, principal, VersionReference(
+            resource_id=resource_id, version_id=version_id
+        ))
+        event = _latest(cursor, principal, version_id)
+        if event and (
+            event["payload"]["target_state"] in {"REVOKED", "SUPERSEDED"}
+            or event["payload"]["availability_state"] != "AVAILABLE"
+        ):
+            raise WorkspaceError(409, "Resource has recorded withdrawal or unavailability")
+        return row
+
+
 def _validate(c: Any, p: Principal, r: LifecycleRequest) -> dict[str, Any]:
     version = _version(c, p, r.subject)
     event = _latest(c, p, r.subject.version_id)

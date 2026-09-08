@@ -113,6 +113,8 @@ class ResourceProposal(BaseModel):
 
     @model_validator(mode="after")
     def unique_mutations(self) -> "ResourceProposal":
+        if sum(item.object_type == "ExternalOntologyRelease" for item in self.mutations) > 1:
+            raise ValueError("An offline ontology proposal may contain only one release")
         if len({item.resource_id for item in self.mutations}) != len(self.mutations):
             raise ValueError("A change set may contain only one version per canonical identity")
         mutation_ids = {item.resource_id for item in self.mutations}
