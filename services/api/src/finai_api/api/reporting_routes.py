@@ -1,22 +1,62 @@
 """Persisted, source-bound report reconstruction and dependency inspection."""
 
 import json
+from datetime import datetime
 from hashlib import sha256
 from typing import Annotated, Any
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Response
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel, ConfigDict, Field
 
+from finai_api.domain.retained_reports import ReportComposition, SaveRetainedReport
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal, require_permission
-from finai_api.services import workspace
+from finai_api.services import retained_reports, workspace
 from finai_api.services.petroleum_reporting import reconstruct
 from finai_api.services.report_export import operating_workbook
 from finai_api.storage import connection
 
 router = APIRouter(prefix="/v1/workspace/report-calculations", tags=["report calculations"])
 User = Annotated[Principal, Depends(authenticated_principal)]
+
+retained_router = APIRouter(prefix="/v1/ontology/retained-reports", tags=["retained reports"])
+
+
+@retained_router.post("/preview")
+def retained_preview(request: ReportComposition, principal: User) -> dict[str, Any]:
+    return retained_reports.preview(principal, request)
+
+
+@retained_router.post("")
+def retained_save(request: SaveRetainedReport, principal: User) -> dict[str, Any]:
+    return retained_reports.save(principal, request)
+
+
+@retained_router.get("")
+def retained_list(
+    principal: User,
+    company_id: UUID,
+    cursor_created_at: datetime | None = None,
+    cursor_proposal_id: UUID | None = None,
+) -> dict[str, Any]:
+    return retained_reports.list_reports(
+        principal, company_id, cursor_created_at, cursor_proposal_id
+    )
+
+
+@retained_router.get("/{proposal_id}/exports/{artifact_format}")
+def retained_export(
+    proposal_id: UUID, artifact_format: str, company_id: UUID, principal: User
+) -> Response:
+    content, headers = retained_reports.export(principal, proposal_id, company_id, artifact_format)
+    return Response(content=content, headers=headers)
+
+
+@retained_router.get("/{proposal_id}")
+def retained_read(proposal_id: UUID, company_id: UUID, principal: User) -> dict[str, Any]:
+    return retained_reports.read(principal, proposal_id, company_id)
 
 
 @router.get("/{calculation_id}/export")

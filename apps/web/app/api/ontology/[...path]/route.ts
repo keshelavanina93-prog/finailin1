@@ -4,7 +4,7 @@ import { backendBaseUrl } from "../../backend";
 type Context = { params: Promise<{ path: string[] }> };
 async function forward(request: NextRequest, context: Context) {
   const { path } = await context.params;
-  const route = path.join("/");
+  let route = path.join("/");
   const documents = /^source-documents(?:\/doc_[a-f0-9]{64}\/(?:content|preview|(?:companies|accounts|facts|dimensions|corporate|licence)\/(?:inspect|proposal)|facts\/reconcile|dimensions\/query|accounting-context\/(?:inspect|observations|account-observations|scope-proposal|binding-proposal|company-binding-proposal|setup-proposal)))?$/.test(route)
     || /^source-documents\/ir_[a-f0-9]{64}\/accounting-context\/(?:inspect|observations|account-observations|scope-proposal|binding-proposal|company-binding-proposal|setup-proposal)$/.test(route);
   const lifecycle = /^lifecycle\/(?:requests(?:\/[a-fA-F0-9-]+\/review)?|versions\/[a-fA-F0-9-]+|consumptions\/[a-fA-F0-9-]+(?:\/status)?|consume)$/.test(route);
@@ -18,6 +18,9 @@ async function forward(request: NextRequest, context: Context) {
   const metricObservations=(request.method==="GET"&&route==="metrics")||(request.method==="POST"&&route==="metrics/observations")||(request.method==="GET"&&/^metrics\/observations\/fcr_[a-f0-9]{64}$/.test(route));
   const analysisProjection=request.method==="POST"&&(route==="analysis/project"||route==="company-home"||route==="company-changes"||route==="company-journals/reconciliation/projection"||route==="company-journals/reconciliation/metrics");
   const companyFinancialResults=request.method==="GET"&&route==="company-financial-results";
+  const retainedReports = (request.method === "POST" && (route === "retained-reports" || route === "retained-reports/preview")) || (request.method === "GET" && /^retained-reports(?:\/[a-fA-F0-9-]+(?:\/exports\/(?:xlsx|html))?)?$/.test(route));
+  const requestedRoute = route;
+  if (retainedReports) route = "proposal-queue";
   const transformationPreview=request.method==="POST"&&["transformations/preview","transformations/previewed-runs"].includes(route);
   const companyCondition=request.method==="GET"&&route==="company-condition";
   const sourceExceptions=(request.method==="POST"&&route==="source-exceptions")||(request.method==="GET"&&/^source-exceptions\/fcr_[a-f0-9]{64}$/.test(route));
@@ -31,6 +34,7 @@ async function forward(request: NextRequest, context: Context) {
   if (route !== "proposal-queue" && route !== "history-search" && !/^operator\/(?:trace|resources)\/[a-fA-F0-9-]+$/.test(route) && !/^operations(?:\/(?:licence-notices|bindings|opa_[a-f0-9]{64}(?:\/resume)?))?$/.test(route) && !documents && !/^regulation\/(monitors(?:\/rgm_[a-f0-9]{64}(?:\/control)?)?|rules|proposals|impacts(?:\/fcr_[a-f0-9]{64})|assessments(?:\/fcr_[a-f0-9]{64})?|sources(?:\/(?:capture|proposals|compare|inspect|impact))?)$/.test(route) && !model && !lifecycle && !eventTime && !certification && !retention && !functions && !transformations && !runtimeObservations && !companyJournals && !journalDispositions && !periodControl && !accountDimensionPolicy && !sourceAdoption && !analysisProjection && !metricObservations && !sourceExceptions && !investigationActions && !sourceJournalReconciliation && !companyCondition && !companyFinancialResults && !transformationPreview && route !== "company-context" && route !== "object-sets/query" && !/^(catalog|context(?:\/(?:accounts|source-accounts))?|graph|aliases|reference-proposal|rollback-proposal|resources(?:\/[a-fA-F0-9-]+(?:\/graph)?)?|resolve\/[a-fA-F0-9-]+|proposals(?:\/[a-fA-F0-9-]+(?:\/(?:decision|promotion-check))?)?)$/.test(route)) {
     return Response.json({ detail: "Ontology route not found" }, { status: 404 });
   }
+  route = requestedRoute;
   const authorization = request.headers.get("authorization");
   if (!authorization) return Response.json({ detail: "Identity required" }, { status: 401 });
   const binary = route === "source-documents";
