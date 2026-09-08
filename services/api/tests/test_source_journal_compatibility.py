@@ -44,6 +44,7 @@ def test_reviewed_family_keeps_its_name_and_exact_binding_version():
         },
     }
     item = SimpleNamespace(resource_id=uuid4(), attributes=attrs)
+
     def read(key, *_):
         return targets[key]
 

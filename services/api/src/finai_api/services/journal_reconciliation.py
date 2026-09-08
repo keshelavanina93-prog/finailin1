@@ -54,7 +54,12 @@ def compile_reconciliation(review, source, targets, details, selection, snapshot
                         object_type="JournalEntry",
                         attributes=entry["attributes"],
                     ),
-                    lambda identity, *_: targets[str(identity)],
+                    lambda identity, *_, detail=detail: (
+                        detail["source_compatibility"]
+                        if detail.get("source_compatibility")
+                        and str(identity) == str(detail["source_compatibility"]["resource_id"])
+                        else targets[str(identity)]
+                    ),
                 )
                 lines = detail["lines"]
                 coordinates = {row["source_record"]["attributes"]["coordinate"] for row in lines}

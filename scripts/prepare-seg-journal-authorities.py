@@ -85,6 +85,7 @@ def main():
     proposals = []
 
     def publish(kind, identity, key, attrs, access=None, lineage=None):
+        attrs = json.loads(json.dumps(attrs, default=str))
         prior = resources.current_resources(maker, [identity]).get(str(identity))
         if prior and prior["attributes"] == attrs:
             return prior

@@ -53,6 +53,8 @@ def validate_journal(item, target):
     if config.get("granularity") != "SOURCE_ROW":
         raise WorkspaceError(422, "Journal publication requires source-row journal evidence")
     if scope["attributes"].get("source_profile") != "1c_journal":
+        if not attrs.get("source_compatibility_id"):
+            raise WorkspaceError(422, "Journal publication requires source-row journal evidence")
         from finai_api.services.source_journal_compatibility import require
 
         require(item, binding, scope, target)
