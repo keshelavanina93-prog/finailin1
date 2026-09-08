@@ -1,24 +1,162 @@
 """Retain exact Metric observations using existing Function evidence and fact-run storage."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
+from uuid import UUID
 
 from psycopg.rows import dict_row
 from pydantic import ValidationError
 
 from finai_api.domain.metric_execution import (
     CurrencyUnit,
+    DefinitionSnapshot,
     MetricDefinition,
     MetricOutput,
     ObjectCount,
     ObserveRequest,
     Pin,
 )
+from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.security import require_permission
 from finai_api.services import fact_runs, function_invocations, resources
+from finai_api.services.certification import _current
 from finai_api.services.workspace import WorkspaceError
 
 RUNTIME = "metric-observations/1"
+
+
+def discover(
+    principal,
+    after_resource_id: UUID | None = None,
+    *,
+    function_resource_id: UUID | None = None,
+    function_version_id: UUID | None = None,
+    function_content_hash: str | None = None,
+):
+    """Bounded canonical catalog; cursor advances over candidates even when none qualify."""
+    require_permission(principal, "ontology_read")
+    parts = (function_resource_id, function_version_id, function_content_hash)
+    if any(part is not None for part in parts) and not all(part is not None for part in parts):
+        raise WorkspaceError(422, "Function filter requires resource, version and content hash")
+    try:
+        selected = (
+            Pin(resource_id=parts[0], version_id=parts[1], content_hash=parts[2])
+            if parts[0] is not None
+            else None
+        )
+    except ValidationError as exc:
+        raise WorkspaceError(422, "Invalid exact Function filter") from exc
+    now = datetime.now(UTC)
+    snapshot = DefinitionSnapshot(valid_at=now, known_at=now)
+    with (
+        resources.resource_connection(principal, repeatable_read=True) as conn,
+        conn.cursor(row_factory=dict_row) as cur,
+    ):
+        rows = cur.execute(
+            "SELECT v.* FROM resource_versions v WHERE v.tenant_id=%s "
+            "AND v.access_entity IN (%s,'__TENANT__','__PLATFORM__') "
+            "AND v.object_type='MetricDefinition' AND v.authority_state='APPROVED' "
+            "AND v.evidence_class<>'REFERENCE_TEMPLATE' "
+            "AND v.version_id=g8_effective_version_id(v.tenant_id,v.resource_id,%s) "
+            "AND v.attributes ? 'function_id' AND v.attributes ? 'definition' "
+            "AND (v.attributes->>'legal_entity_id' IS NULL "
+            "OR v.attributes->>'legal_entity_id'=%s) "
+            "AND (%s::uuid IS NULL OR v.resource_id>%s) "
+            "AND (%s::uuid IS NULL OR EXISTS (SELECT 1 FROM resource_dependencies d "
+            "JOIN resource_versions f ON f.tenant_id=d.tenant_id "
+            "AND f.resource_id=d.target_resource_id AND f.version_id=d.target_version_id "
+            "WHERE d.tenant_id=v.tenant_id AND d.version_id=v.version_id "
+            "AND d.relation='FIELD:function_id' AND f.resource_id=%s "
+            "AND f.version_id=%s AND f.content_hash=%s)) "
+            "ORDER BY v.resource_id LIMIT 51",
+            (
+                principal.scope.tenant_id,
+                principal.scope.legal_entity_id,
+                now,
+                principal.scope.legal_entity_id,
+                after_resource_id,
+                after_resource_id,
+                function_resource_id,
+                function_resource_id,
+                function_version_id,
+                function_content_hash,
+            ),
+        ).fetchall()
+        page = rows[:50]
+        items = []
+        for row in page:
+            row["dependencies"] = cur.execute(
+                "SELECT d.relation,v.* FROM resource_dependencies d JOIN resource_versions v "
+                "ON v.tenant_id=d.tenant_id AND v.resource_id=d.target_resource_id "
+                "AND v.version_id=d.target_version_id "
+                "WHERE d.tenant_id=%s AND d.version_id=%s LIMIT 101",
+                (principal.scope.tenant_id, row["version_id"]),
+            ).fetchall()
+            try:
+                _current(
+                    cur,
+                    principal,
+                    VersionReference(resource_id=row["resource_id"], version_id=row["version_id"]),
+                )
+                item = catalog_item(principal, row, snapshot)
+            except WorkspaceError as exc:
+                if exc.status not in (404, 409):
+                    raise
+                continue
+            except (ValueError, KeyError, TypeError):
+                continue
+            if selected is None or Pin.model_validate(item["function"]) == selected:
+                items.append(item)
+    return {
+        "contract": "metric-catalog/1",
+        "items": items,
+        "next_cursor": str(page[-1]["resource_id"]) if len(rows) > 50 else None,
+        "current_use_authorized": False,
+        "business_effect_authorized": False,
+    }
+
+
+def catalog_item(principal, row, snapshot):
+    if (
+        row["object_type"] != "MetricDefinition"
+        or row["authority_state"] != "APPROVED"
+        or row.get("evidence_class") == "REFERENCE_TEMPLATE"
+        or len(row["dependencies"]) > 100
+    ):
+        raise ValueError("Accepted executable Metric unavailable")
+    validate_snapshot(row, snapshot)
+    attrs = row["attributes"]
+    spec = MetricDefinition.model_validate(attrs["definition"])
+    function = pin(dependency(row, "FIELD:function_id", attrs["function_id"], "FunctionDefinition"))
+    company = (
+        pin(dependency(row, "FIELD:legal_entity_id", attrs["legal_entity_id"], "LegalEntity"))
+        if attrs.get("legal_entity_id")
+        else None
+    )
+    if company and str(company.resource_id) != principal.scope.legal_entity_id:
+        raise ValueError("Metric company differs from selected scope")
+    if isinstance(spec.selector, ObjectCount) and bool(company) != bool(
+        spec.selector.company_field
+    ):
+        raise ValueError("Company count requires an explicit query field")
+    if isinstance(spec.unit, CurrencyUnit) and (
+        pin(dependency(row, "METRIC_UNIT", spec.unit.reference.resource_id, "Currency"))
+        != spec.unit.reference
+    ):
+        raise ValueError("Metric currency pin differs")
+    return {
+        "metric": pin(row).model_dump(mode="json"),
+        "display_name": row["display_name"],
+        "function": function.model_dump(mode="json"),
+        "company": company.model_dump(mode="json") if company else None,
+        "definition": spec.model_dump(mode="json"),
+        "definition_snapshot": snapshot.model_dump(mode="json"),
+        "definition_temporal": {
+            "system_from": timestamp(row["system_from"]).isoformat(),
+            "valid_from": timestamp(row["valid_from"]).isoformat(),
+            "valid_to": timestamp(row["valid_to"]).isoformat() if row.get("valid_to") else None,
+        },
+    }
 
 
 def pin(row):
@@ -106,6 +244,18 @@ def timestamp(value):
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
+def validate_snapshot(metric, snapshot):
+    now = datetime.now(UTC)
+    if snapshot.valid_at > now or snapshot.known_at > now:
+        raise ValueError("Metric definition snapshot cannot be in the future")
+    if (
+        timestamp(metric["system_from"]) > snapshot.known_at
+        or timestamp(metric["valid_from"]) > snapshot.valid_at
+        or (metric.get("valid_to") and timestamp(metric["valid_to"]) <= snapshot.valid_at)
+    ):
+        raise ValueError("Metric definition outside requested definition snapshot")
+
+
 def assemble(principal, request: ObserveRequest, metric: dict[str, Any], history):
     """Pure validation/composition; values originate only in the verified retained output."""
     try:
@@ -165,12 +315,10 @@ def assemble(principal, request: ObserveRequest, metric: dict[str, Any], history
         for key in ("valid_at", "known_at"):
             if timestamp(receipt["request"][key]) != getattr(request, key):
                 raise ValueError("Invocation time differs")
-        if (
-            timestamp(metric["system_from"]) > request.known_at
-            or timestamp(metric["valid_from"]) > request.valid_at
-            or (metric.get("valid_to") and timestamp(metric["valid_to"]) <= request.valid_at)
-        ):
-            raise ValueError("Metric definition outside requested snapshot")
+        definition_snapshot = request.definition_snapshot or DefinitionSnapshot(
+            valid_at=request.valid_at, known_at=request.known_at
+        )
+        validate_snapshot(metric, definition_snapshot)
         if isinstance(spec.selector, ObjectCount):
             if (
                 fn["attributes"]["definition"]["implementation_id"]
@@ -243,6 +391,7 @@ def assemble(principal, request: ObserveRequest, metric: dict[str, Any], history
             "input_receipt_hash": history["receipt_hash"],
             "input_plan_hash": receipt["plan_hash"],
             "definition": spec.model_dump(mode="json"),
+            "definition_snapshot": definition_snapshot.model_dump(mode="json"),
             "observation": value.model_dump(mode="json"),
             # Preserve complete source/accounting context, not only a selected display value.
             "source_result": output,
