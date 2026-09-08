@@ -112,10 +112,8 @@ def resolve_definitions(rows, load):
                     schemas[item["object_type"]] = item["schema"]["version_id"]
                     pins.extend([item["implementation"], item["schema"]])
             else:
-                reason = (
-                    "DomainPack has no executable group membership definition "
-                    "in the current contract."
-                )
+                schemas, dependencies = pack_membership(node, rows, load)
+                pins.extend(dependencies)
         except (WorkspaceError, ValidationError) as exc:
             reason = str(exc)
         resolved.append((node, schemas, pins, reason))
@@ -151,3 +149,55 @@ def project(resolved, connections, valid, known):
             )
         )
     return result
+
+
+def pack_membership(node, rows, load):
+    """A pack delegates membership to one reviewed definition, never a local type list."""
+    fields = {
+        "membership_group_id": "ObjectTypeGroup",
+        "membership_interface_id": "ObjectInterface",
+    }
+    selected = [field for field in fields if node.attributes.get(field) is not None]
+    if len(selected) != 1:
+        raise WorkspaceError(
+            409, "DomainPack requires exactly one accepted membership definition reference"
+        )
+    field = selected[0]
+    pack = load(node.resource_id, node.version_id)
+    if (
+        not pack
+        or str(pack["resource_id"]) != str(node.resource_id)
+        or str(pack["version_id"]) != str(node.version_id)
+        or pack["content_hash"] != node.content_hash
+        or pack["authority_state"] != "APPROVED"
+    ):
+        raise WorkspaceError(409, "DomainPack exact definition is unavailable")
+    refs = [p for p in pack.get("dependencies", []) if p["relation"] == "FIELD:" + field]
+    if len(refs) != 1 or str(refs[0]["resource_id"]) != str(node.attributes[field]):
+        raise WorkspaceError(409, "DomainPack membership requires one exact matching FIELD pin")
+    ref = refs[0]
+    target = load(ref["resource_id"], ref["version_id"])
+    if (
+        not target
+        or str(target["resource_id"]) != str(ref["resource_id"])
+        or str(target["version_id"]) != str(ref["version_id"])
+        or target["content_hash"] != ref["content_hash"]
+        or target["authority_state"] != "APPROVED"
+        or target["evidence_class"] == "REFERENCE_TEMPLATE"
+        or target["object_type"] != fields[field]
+    ):
+        raise WorkspaceError(
+            409, "DomainPack membership target differs from accepted exact definition"
+        )
+    # Reuse the same shared group/interface resolver; nested packs cannot recurse.
+    candidates = [
+        target,
+        *[row for row in rows if row["object_type"] == "ObjectTypeImplementation"],
+    ]
+    _, schemas, pins, reason = resolve_definitions(candidates, load)[0]
+    if reason:
+        raise WorkspaceError(409, "DomainPack membership unavailable: " + reason)
+    identities = [str(pin["resource_id"]) for pin in pins]
+    if len(pins) + 1 > 201 or len(set(identities)) != len(identities):
+        raise WorkspaceError(409, "DomainPack membership exceeds unique exact definition pin bound")
+    return schemas, pins
