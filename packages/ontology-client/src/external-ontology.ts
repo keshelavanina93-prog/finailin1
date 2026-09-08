@@ -9,10 +9,15 @@ export interface ExternalReleaseRequest {
   known_at?: string | null;
 }
 export interface ExternalSubjectRequest extends ExternalReleaseRequest {subject_iri: string; limit?: number;}
+export interface ExternalForeignAssertion {
+  subject_iri: string; predicate_iri: string; object_ntriples: string;
+  classification: 'FOREIGN_ANNOTATION' | 'FOREIGN_VOCABULARY_DECLARATION'; reason: string;
+}
 export interface ExternalModule {
   source: ExternalOntologyPin; artifact_iri: string; document: ExternalDocument;
   format: 'TURTLE' | 'RDF_XML'; owned_namespaces: string[]; permitted_import_iris: string[];
   source_url: string; license: string; retrieved_at: string;
+  foreign_assertions?: ExternalForeignAssertion[];
 }
 export interface ExternalReleaseDefinition {
   contract: 'external-ontology-release/1';
@@ -95,11 +100,35 @@ const iris = (v: unknown, max: number, min = 0): v is string[] => Array.isArray(
   && v.length >= min && v.length <= max && v.every(iri) && new Set(v).size === v.length;
 const moduleKeys = ['source', 'artifact_iri', 'document', 'format', 'owned_namespaces',
   'permitted_import_iris', 'source_url', 'license', 'retrieved_at'];
+const annotationPredicates = new Set(['label', 'comment', 'isDefinedBy', 'seeAlso'].map(name =>
+  'http://www.w3.org/2000/01/rdf-schema#' + name).concat('http://www.w3.org/2002/07/owl#versionInfo'));
+const declarationTypes = new Set(['Class', 'AnnotationProperty', 'ObjectProperty', 'DatatypeProperty', 'Ontology'].map(name =>
+  '<http://www.w3.org/2002/07/owl#' + name + '>').concat('<http://www.w3.org/2000/01/rdf-schema#Class>', '<http://www.w3.org/1999/02/22-rdf-syntax-ns#Property>'));
+function foreignAssertions(v: Obj): boolean {
+  if (!Object.hasOwn(v, 'foreign_assertions')) return true;
+  const entries = v.foreign_assertions;
+  if (!Array.isArray(entries) || !entries.length || entries.length > 128) return false;
+  const seen = new Set<string>();
+  for (const item of entries) {
+    if (!shape(item, ['subject_iri', 'predicate_iri', 'object_ntriples', 'classification', 'reason'])
+      || !iri(item.subject_iri) || !iri(item.predicate_iri) || !text(item.object_ntriples, 16384)
+      || !rdfTerm(item.object_ntriples) || item.object_ntriples.startsWith('_:')
+      || !text(item.reason, 1000) || item.reason.trim().length < 10 || item.reason !== item.reason.trim()
+      || item.subject_iri === v.artifact_iri || (v.owned_namespaces as string[]).some(ns => (item.subject_iri as string).startsWith(ns))) return false;
+    const classification = annotationPredicates.has(item.predicate_iri) ? 'FOREIGN_ANNOTATION'
+      : item.predicate_iri === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' && declarationTypes.has(item.object_ntriples)
+        ? 'FOREIGN_VOCABULARY_DECLARATION' : null;
+    const key = JSON.stringify([item.subject_iri, item.predicate_iri, item.object_ntriples]);
+    if (classification === null || item.classification !== classification || seen.has(key)) return false;
+    seen.add(key);
+  }
+  return true;
+}
 function module(v: unknown): v is Obj {
-  return shape(v, moduleKeys) && pin(v.source) && iri(v.artifact_iri) && doc(v.document)
+  return shape(v, [...moduleKeys, ...(record(v) && Object.hasOwn(v, 'foreign_assertions') ? ['foreign_assertions'] : [])]) && pin(v.source) && iri(v.artifact_iri) && doc(v.document)
     && ['TURTLE', 'RDF_XML'].includes(String(v.format)) && iris(v.owned_namespaces, 32, 1)
     && iris(v.permitted_import_iris, 16) && iri(v.source_url) && text(v.license, 4000)
-    && Boolean(v.license.trim()) && instant(v.retrieved_at) !== null;
+    && Boolean(v.license.trim()) && instant(v.retrieved_at) !== null && foreignAssertions(v);
 }
 function definition(v: unknown): v is Obj {
   if (!shape(v, ['contract', 'request', 'canonical_dataset', 'import_report', 'request_sha256',
@@ -110,12 +139,16 @@ function definition(v: unknown): v is Obj {
     || Object.keys(v.engine_manifest).length > 40 || !Object.values(v.engine_manifest).every(x =>
       typeof x === 'boolean' || typeof x === 'string' && x.length <= 4000 || typeof x === 'number' && Number.isSafeInteger(x))) return false;
   const r = v.request;
-  return shape(r, ['source', 'release_label', 'publication_status', 'modules']) && pin(r.source)
+  if (!(shape(r, ['source', 'release_label', 'publication_status', 'modules']) && pin(r.source)
     && text(r.release_label, 128) && Boolean(r.release_label.trim())
     && ['PRODUCTION', 'DEVELOPMENT'].includes(String(r.publication_status))
     && Array.isArray(r.modules) && r.modules.length > 0 && r.modules.length <= 16 && r.modules.every(module)
     && new Set(r.modules.map(m => m.artifact_iri)).size === r.modules.length
-    && r.modules.some(m => samePin(m.source, r.source as unknown as ExternalOntologyPin));
+    && r.modules.some(m => samePin(m.source, r.source as unknown as ExternalOntologyPin)))) return false;
+  const foreignCount = r.modules.reduce((total, m) => total + (Array.isArray(m.foreign_assertions) ? m.foreign_assertions.length : 0), 0);
+  return foreignCount <= 512 && (foreignCount === 0 ? !Object.hasOwn(v.engine_manifest, 'foreign_assertion_policy')
+    && !Object.hasOwn(v.engine_manifest, 'foreign_assertion_count') : v.engine_manifest.foreign_assertion_policy === 'EXACT_FOREIGN_ANNOTATIONS_DECLARATIONS/1'
+      && v.engine_manifest.foreign_assertion_count === foreignCount);
 }
 function fail(message: string, status = 502): never {throw new ExternalOntologyClientError(status, message);}
 const contextKeys = ['release', 'scope', 'mode', 'known_at', 'current_use_authorized', 'business_effect_authorized'];
