@@ -147,9 +147,17 @@ def test_mounted_routes_deny_anonymous_and_insufficient_permission_without_stora
         raise AssertionError("Denied requests must not reach storage")
 
     monkeypatch.setattr(metric_execution, "definition", forbidden)
+    monkeypatch.setattr(metric_execution.resources, "resource_connection", forbidden)
     monkeypatch.setattr(metric_execution.fact_runs, "read_run", forbidden)
     client = TestClient(app)
     path = "/v1/ontology/metrics/observations"
+    assert client.get("/v1/ontology/metrics").status_code == 401
+    assert (
+        client.get(
+            "/v1/ontology/metrics", headers={"Authorization": "Bearer test-token"}
+        ).status_code
+        == 403
+    )
     assert client.post(path, json=request.model_dump(mode="json")).status_code == 401
     assert client.get(path + "/fcr_" + "a" * 64).status_code == 401
     assert (

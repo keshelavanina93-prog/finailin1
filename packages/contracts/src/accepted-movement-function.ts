@@ -8,7 +8,7 @@ export interface AcceptedMovementFunctionInvocation {
   valid_at: string;
   known_at: string;
   offset?: 0;
-  limit?: number;
+  limit?: 50;
   input_result?: never;
   accepted_movements: {
     source_invocation_id: string;
