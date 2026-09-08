@@ -10,7 +10,9 @@ from pydantic import ValidationError
 from test_company_financial_metrics import metric_case, run  # noqa: F401
 from test_semantic_entity_movements import case as workspace_case  # noqa: F401
 
+from finai_api.domain.authority import ExactScope
 from finai_api.domain.function_execution import FunctionInvocation
+from finai_api.domain.review import Principal
 from finai_api.services import accepted_movements_function as adapter
 from finai_api.services import function_execution as functions
 from finai_api.services.workspace import WorkspaceError
@@ -54,13 +56,25 @@ def accepted_case(metric_case, monkeypatch):
         return metric
 
     monkeypatch.setattr(adapter.company_financial_metrics, "produce", produce)
-    principal = SimpleNamespace(scope=SimpleNamespace(legal_entity_id=original.company_id))
+    principal = Principal(
+        actor_id="adapter-test",
+        display_name="Adapter test",
+        permissions=("ontology_read",),
+        scope=ExactScope(
+            tenant_id=uuid4(),
+            legal_entity_id=str(original.company_id),
+            period="2025-01",
+            currency="GEL",
+        ),
+    )
     company = metric.nodes[0].subject.model_dump(mode="json")
     return principal, request, metric, company, history
 
 
 def test_input_plan_pins_source_and_journal_times_separately(accepted_case):
     principal, request, metric, company, history = accepted_case
+    assert isinstance(principal, Principal) and isinstance(principal.scope, ExactScope)
+    assert isinstance(principal.scope.legal_entity_id, str)
     plan = adapter.input_plan(principal, request, company)
     assert plan["source_invocation_receipt_hash"] == history["receipt_hash"]
     assert plan["source_receipt_hash"] == metric.source_receipt_hash
@@ -74,7 +88,9 @@ def test_input_plan_pins_source_and_journal_times_separately(accepted_case):
 def test_adapter_refuses_mismatched_authority_and_time(accepted_case, failure):
     principal, request, _metric, company, history = accepted_case
     if failure == "company":
-        principal.scope.legal_entity_id = uuid4()
+        principal = principal.model_copy(
+            update={"scope": principal.scope.model_copy(update={"legal_entity_id": str(uuid4())})}
+        )
     elif failure == "version":
         company["version_id"] = str(uuid4())
     elif failure == "time":
@@ -142,7 +158,7 @@ def registered_case(accepted_case, monkeypatch):
         **request.function.model_dump(mode="json"),
         "content_hash": "b" * 64,
         "object_type": "FunctionDefinition",
-        "access_entity": request.accepted_movements.company_id,
+        "access_entity": str(request.accepted_movements.company_id),
         "attributes": {"definition": definition},
     }
     canonical_company = {**company, "object_type": "LegalEntity"}
@@ -150,10 +166,6 @@ def registered_case(accepted_case, monkeypatch):
         execute=lambda *a: SimpleNamespace(fetchall=lambda: [canonical_company])
     )
     connection = SimpleNamespace(cursor=lambda **k: nullcontext(cursor))
-    principal.scope.tenant_id = uuid4()
-    principal.scope.model_dump = lambda **k: {
-        "legal_entity_id": str(principal.scope.legal_entity_id)
-    }
     monkeypatch.setattr(functions, "resource_connection", lambda *_: nullcontext(connection))
     monkeypatch.setattr(functions, "_current", lambda *_: function)
     monkeypatch.setattr(functions, "require_permission", lambda *_: None)
@@ -186,7 +198,9 @@ def test_shared_plan_refuses_wrong_company_or_adapter(registered_case, failure):
     if failure == "company_version":
         company["version_id"] = str(uuid4())
     elif failure == "company_scope":
-        principal.scope.legal_entity_id = uuid4()
+        principal = principal.model_copy(
+            update={"scope": principal.scope.model_copy(update={"legal_entity_id": str(uuid4())})}
+        )
     elif failure == "missing_input":
         request = request.model_copy(update={"accepted_movements": None})
     else:
