@@ -1,0 +1,10 @@
+.reporting-section{padding:8px;min-height:0;min-width:0;flex:1}
+.reporting-section>label{display:flex;align-items:center;gap:10px;flex:none;font-size:11px;color:var(--text)}
+.reporting-section>label>input{min-width:0;font-size:12px;padding:6px 8px}
+.reporting-section-filters{flex:none;font-size:11px}
+.reporting-section-filters[open]{max-height:25%;overflow:auto}
+.reporting-section-filters fieldset{display:flex;flex-wrap:wrap;gap:8px 12px;border:0;padding:4px 0;margin:0}
+.reporting-section-filters label{font-size:11px;min-width:0}
+.reporting-section-filters select{max-width:240px}
+.reporting-grid{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;padding:0;margin:0;border:0}
+@media(max-width:800px){.reporting-section>label{align-items:start;flex-direction:column;gap:4px}.reporting-section-filters select{max-width:180px}}
