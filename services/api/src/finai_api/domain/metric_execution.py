@@ -62,12 +62,18 @@ class MetricDefinition(Model):
         return self
 
 
+class DefinitionSnapshot(Model):
+    valid_at: AwareDatetime
+    known_at: AwareDatetime
+
+
 class ObserveRequest(Model):
     metric: Pin
     invocation_id: UUID
     expected_receipt_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     valid_at: AwareDatetime
     known_at: AwareDatetime
+    definition_snapshot: DefinitionSnapshot | None = None
 
 
 class MetricOutput(Model):
