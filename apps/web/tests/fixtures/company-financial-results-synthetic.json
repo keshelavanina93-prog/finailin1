@@ -1,0 +1,200 @@
+{
+  "mode": "SYNTHETIC_REPOSITORY_REAL_DISCOVERY",
+  "producer_sha": "ba47bb1",
+  "response": {
+    "contract": "company-financial-results/1",
+    "company": {
+      "resource_id": "302dcb6b-0fd2-4928-97a1-a87b88a94b42",
+      "version_id": "f877d2e8-690d-452f-b875-228e1b7a43ac",
+      "content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "object_type": "LegalEntity",
+      "attributes": {},
+      "display_name": "Synthetic LegalEntity",
+      "authority_state": "APPROVED",
+      "evidence_class": "USER_ASSERTED",
+      "identity_key": "synthetic:302dcb6b-0fd2-4928-97a1-a87b88a94b42",
+      "access_entity": "302dcb6b-0fd2-4928-97a1-a87b88a94b42",
+      "valid_from": "2025-01-01T00:00:00Z",
+      "valid_to": null,
+      "system_from": "2026-01-01T00:00:00Z",
+      "schema_version_id": null,
+      "proposal_id": null
+    },
+    "valid_at": "2026-09-08T00:00:00Z",
+    "known_at": "2026-09-08T00:00:00Z",
+    "catalog_checked_at": "2026-09-08T19:34:55.888504+00:00",
+    "sources": [
+      {
+        "scope": {
+          "attributes": {
+            "legal_entity_id": "302dcb6b-0fd2-4928-97a1-a87b88a94b42",
+            "chart_id": "69edcffa-81cd-4516-a270-af01c032d6ec",
+            "observed_from": "2025-11-01",
+            "observed_through": "2025-11-30",
+            "source_profile": "seg_expense_base",
+            "document_id": "doc_cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "worksheet": "Base",
+            "evidence_id": "fb93ef0d-ff80-4e46-82a8-6703f8422dad"
+          },
+          "evidence_class": "SOURCE_BOUND",
+          "object_type": "SourceAccountingScope",
+          "resource_id": "49a5a422-a0e9-4e5f-b8db-3a3f14aef558",
+          "version_id": "ad5b1b20-c6e3-40ef-9e41-b49e4d829c22",
+          "content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "authority_state": "APPROVED",
+          "display_name": "Synthetic SourceAccountingScope",
+          "identity_key": "synthetic:49a5a422-a0e9-4e5f-b8db-3a3f14aef558",
+          "access_entity": "302dcb6b-0fd2-4928-97a1-a87b88a94b42",
+          "valid_from": "2025-01-01T00:00:00Z",
+          "valid_to": null,
+          "system_from": "2026-01-01T00:00:00Z",
+          "schema_version_id": null,
+          "proposal_id": null
+        },
+        "bindings": [
+          {
+            "object_type": "SourceAccountingBinding",
+            "attributes": {
+              "scope_id": "49a5a422-a0e9-4e5f-b8db-3a3f14aef558",
+              "source_use": "ACCOUNTING_INPUT",
+              "contract_version": "2",
+              "functional_currency_id": "a2408251-aec6-4fb4-9162-dfc7c4040f46",
+              "currency_policy": "SOURCE_AMOUNT_ONLY",
+              "account_mapping_id": "c3abb7a3-02fa-47ca-a6b1-31560f2f5bcc",
+              "dimension_mapping_id": "29831303-0fd3-491d-864d-ce8568982913",
+              "granularity": "SOURCE_ROW",
+              "deepest_valid_drill": "SOURCE_ROW",
+              "amount_field": "source_amount",
+              "amount_semantics": "DEBIT_CREDIT",
+              "ledger_id": "f3afd3da-4978-4684-8f9d-7a1ddfed6558",
+              "book_id": "17641792-da61-4330-94a7-7b680f83be4f",
+              "period_id": "b43909d4-a60d-45bf-9e43-933712f84d9a",
+              "currency_id": "a2408251-aec6-4fb4-9162-dfc7c4040f46",
+              "currency_role": "FUNCTIONAL",
+              "rationale": "Explicit accounting configuration",
+              "vat_treatment": "AS_POSTED",
+              "supplementary_amount_field": "annotated_amount",
+              "supplementary_amount_role": "NON_AUTHORITATIVE_SOURCE_OBSERVATION"
+            },
+            "evidence_class": "USER_ASSERTED",
+            "resource_id": "6e027b8b-deb2-42fe-b2fc-aadeb63c4d21",
+            "version_id": "13070c1e-511e-4e49-966c-2f082026bef9",
+            "content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "authority_state": "APPROVED",
+            "display_name": "Synthetic SourceAccountingBinding",
+            "identity_key": "synthetic:6e027b8b-deb2-42fe-b2fc-aadeb63c4d21",
+            "access_entity": "302dcb6b-0fd2-4928-97a1-a87b88a94b42",
+            "valid_from": "2025-01-01T00:00:00Z",
+            "valid_to": null,
+            "system_from": "2026-01-01T00:00:00Z",
+            "schema_version_id": null,
+            "proposal_id": null
+          }
+        ],
+        "binding_eligibility": {
+          "13070c1e-511e-4e49-966c-2f082026bef9": {
+            "eligible_for_accounting": true,
+            "state": "ELIGIBLE_FOR_GUARDED_USE",
+            "binding_version_id": "13070c1e-511e-4e49-966c-2f082026bef9"
+          }
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "function": {
+          "resource_id": "89136681-b0ac-44fa-87b7-f716e3171e33",
+          "version_id": "8046c92c-5270-473c-aaef-5bbcc6afea78",
+          "content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "display_name": "Reviewed movements",
+        "implementation_id": "accounting.retained-posted-movements/v1",
+        "kind": "SOURCE_POSTED_MOVEMENTS",
+        "state": "DISCOVERED",
+        "reason": null,
+        "source_scope": {
+          "resource_id": "49a5a422-a0e9-4e5f-b8db-3a3f14aef558",
+          "version_id": "ad5b1b20-c6e3-40ef-9e41-b49e4d829c22",
+          "content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        },
+        "accounting_binding": {
+          "resource_id": "6e027b8b-deb2-42fe-b2fc-aadeb63c4d21",
+          "version_id": "13070c1e-511e-4e49-966c-2f082026bef9",
+          "content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        },
+        "document_id": "doc_cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "source_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "sheet": "Base",
+        "required_input": "REVIEWED_SOURCE_CONTEXT",
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      }
+    ],
+    "unavailable_capabilities": [],
+    "results": [
+      {
+        "invocation_id": "32e6f02e-3366-48be-9ed9-9c9a91f8f053",
+        "function": {
+          "resource_id": "44b126a9-d772-4642-ba8d-fbd647474461",
+          "version_id": "0ed22cc7-2be5-41ec-90a7-87356a0c55cf",
+          "content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "implementation_id": "finance.accepted-journal-movements/v1",
+        "receipt_hash": "5f8efebb4a833a1ba6fd2e2fac04f0c7c9498f3f5367ffc34ec89a7b0be9263a",
+        "recorded_at": "2026-09-08T19:34:55.078087+00:00",
+        "run_id": "fcr_dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "valid_at": "2025-01-31T00:00:00Z",
+        "known_at": "2026-09-08T00:00:00Z",
+        "source": {
+          "company_id": "302dcb6b-0fd2-4928-97a1-a87b88a94b42",
+          "source_invocation_id": "8f7db892-49ae-419f-87fa-cbb1c05e37a1",
+          "journal_observed_at": "2026-09-08T01:00:00Z"
+        },
+        "state": "RETAINED_RESULT_REFERENCE",
+        "reopen": "FUNCTION_HISTORY",
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      },
+      {
+        "invocation_id": "ea0d577a-c710-4304-afed-53570031e308",
+        "function": {
+          "resource_id": "89136681-b0ac-44fa-87b7-f716e3171e33",
+          "version_id": "8046c92c-5270-473c-aaef-5bbcc6afea78",
+          "content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "implementation_id": "accounting.retained-posted-movements/v1",
+        "receipt_hash": "3eeb90134be597a7a0b7afa3d2f6e58195080a0b6db88e2cda6211c4ac32d575",
+        "recorded_at": "2026-09-08T19:34:55.078087+00:00",
+        "run_id": "fcr_dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "valid_at": "2025-01-31T00:00:00Z",
+        "known_at": "2026-09-08T00:00:00Z",
+        "source": {
+          "company_id": "302dcb6b-0fd2-4928-97a1-a87b88a94b42",
+          "document_id": "doc_cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "sheet": "Base",
+          "scope": {
+            "resource_id": "49a5a422-a0e9-4e5f-b8db-3a3f14aef558",
+            "version_id": "ad5b1b20-c6e3-40ef-9e41-b49e4d829c22",
+            "content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+          },
+          "binding": {
+            "resource_id": "6e027b8b-deb2-42fe-b2fc-aadeb63c4d21",
+            "version_id": "13070c1e-511e-4e49-966c-2f082026bef9",
+            "content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+          },
+          "observed_from": "2025-11-01",
+          "observed_through": "2025-11-30"
+        },
+        "state": "RETAINED_RESULT_REFERENCE",
+        "reopen": "SEMANTIC_ANALYSIS",
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      }
+    ],
+    "next_function_cursor": null,
+    "next_invocation_cursor": null,
+    "current_use_authorized": false,
+    "business_effect_authorized": false
+  }
+}
