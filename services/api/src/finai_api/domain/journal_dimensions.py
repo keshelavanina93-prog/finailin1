@@ -19,9 +19,22 @@ class Reasoned(BaseModel):
         return value
 
 
+class PolicyContext(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    company: VersionReference
+    chart: VersionReference
+    book: VersionReference
+    period: VersionReference
+    source_account: VersionReference
+    evidence: VersionReference
+    additional_dimensions: Literal["PROHIBITED"] = "PROHIBITED"
+    state: Literal["REVIEWED_RULE_SET", "EXPLICIT_NO_ADDITIONAL_DIMENSIONS"]
+
+
 class PolicyDefinition(Reasoned):
     contract: Literal["account-dimension-policy/1"]
     rules: list[VersionReference] = Field(max_length=32)
+    context: PolicyContext | None = Field(default=None, exclude_if=lambda value: value is None)
 
     @field_validator("rules")
     @classmethod

@@ -389,6 +389,7 @@ def validate_accounting_proposal(
         # report authority and are not exempted from downstream consumption checks.
         "SourceFamily",
         "SourceSnapshotAdoption",
+        "SourceJournalCompatibility",
         "SourceJournalMovement",
         "SourceTrialBalanceRow",
         "SourceRecord",
