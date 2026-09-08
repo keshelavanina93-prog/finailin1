@@ -9,12 +9,17 @@ from temporalio.client import Client
 from temporalio.worker import Worker
 
 from finai_api.config import get_settings
+from finai_api.ontology_validation_workflow import OntologyValidationWorkflow
 from finai_api.regulatory_workflow import RegulatorySourceCheck
 from finai_api.report_workflow import ReportSourceWorkflow
 from finai_api.security import require_permission
 from finai_api.services import execution_publication as publication
+from finai_api.services import (
+    ontology_validation_runs,
+    transformation_bindings,
+    transformation_runs,
+)
 from finai_api.services import report_workflows as records
-from finai_api.services import transformation_bindings, transformation_runs
 from finai_api.services.regulatory_monitors import check as regulatory_source_check
 from finai_api.services.report_inputs import ReportInputRequest, retain_assessment
 from finai_api.services.tb_frontier import analyze
@@ -137,7 +142,10 @@ async def main() -> None:
         worker = Worker(
             client,
             task_queue=settings.temporal_task_queue,
-            workflows=[ReportSourceWorkflow, RegulatorySourceCheck, TransformationWorkflow],
+            workflows=[
+                ReportSourceWorkflow, RegulatorySourceCheck, TransformationWorkflow,
+                OntologyValidationWorkflow,
+            ],
             activities=[
                 coverage,
                 hierarchy,
@@ -148,6 +156,9 @@ async def main() -> None:
                 transformation_runs.publish,
                 transformation_runs.publication_review,
                 transformation_bindings.prepare,
+                ontology_validation_runs.load,
+                ontology_validation_runs.execute,
+                ontology_validation_runs.publish,
             ],
             activity_executor=executor,
         )

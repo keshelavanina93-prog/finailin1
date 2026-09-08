@@ -217,6 +217,9 @@ hatchling==1.27.0 \
     --hash=sha256:971c296d9819abb3811112fc52c7a9751c8d381898f36533bb16f9791e941fd6 \
     --hash=sha256:d3a2f3567c4f926ea39849cdf924c7e99e6686c9c8e288ae1037c8fa2a5d937b
     # via -r .finai/dependency-lock/tooling.txt
+html5rdf==1.2.1 \
+    --hash=sha256:1f519121bc366af3e485310dc8041d2e86e5173c1a320fac3dc9d2604069b83e
+    # via rdflib[html] (pyshacl)
 httpcore==1.0.9 \
     --hash=sha256:2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55 \
     --hash=sha256:6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8
@@ -521,6 +524,9 @@ openpyxl==3.1.5 \
     #   -c .finai/dependency-lock/installed.txt
     #   -r .finai/dependency-lock/installed.txt
     #   finai-api (services/api/pyproject.toml)
+owlrl==7.6.2 \
+    --hash=sha256:83347bf7f133979e87b2b18695d51d25510b99cec3f6919b5df05d4fbf058ae0
+    # via pyshacl
 packaging==26.3 \
     --hash=sha256:94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79 \
     --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
@@ -552,6 +558,9 @@ pluggy==1.6.0 \
     #   hatchling
     #   pytest
     #   pytest-cov
+prettytable==3.18.0 \
+    --hash=sha256:b3346e0e6f79180833aebaac088ae926340586cf6d7d991b9eb125b65f72313a
+    # via pyshacl
 protobuf==7.36.1 \
     --hash=sha256:0b53ce95272aad50ad25d7ff03373743209822e8ba42ea7fad27d2bee1547d00 \
     --hash=sha256:39c518c05586c016d7874ff6079ee115bcec1ea5fbb1d177fbf7867ef4c67e44 \
@@ -783,6 +792,12 @@ pygments==2.21.0 \
 pyoxigraph==0.5.11 \
     --hash=sha256:8aaebe4656b9e9d7ee575dad1c1fd810bb52bfa0690f13bdd408e975ae28b868
     # Windows CPython 3.13 AMD64 wheel; offline RDF engine and rebuildable index.
+pyparsing==3.3.2 \
+    --hash=sha256:850ba148bd908d7e2411587e247a1e4f0327839c40e2e5e6d05a007ecc69911d
+    # via rdflib
+pyshacl==0.40.1 \
+    --hash=sha256:27dd58c8ddfa103303b4a8c40b2c666332ffc912dbcd3137f7adc7b7bc5e6bda
+    # via finai-api (services/api/pyproject.toml); no optional js/http extras
 pytest==8.4.2 \
     --hash=sha256:86c0d0b93306b961d58d62a4db4879f27fe25513d4b969df351abdddb3c30e01 \
     --hash=sha256:872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79
@@ -891,6 +906,9 @@ pyyaml==6.0.3 \
     #   -c .finai/dependency-lock/installed.txt
     #   -r .finai/dependency-lock/installed.txt
     #   uvicorn
+rdflib==7.6.0 \
+    --hash=sha256:30c0a3ebf4c0e09215f066be7246794b6492e054e782d7ac2a34c9f70a15e0dd
+    # via owlrl, pyshacl (html extra)
 ruff==0.16.6 \
     --hash=sha256:0700580ed5303723cb3c11c2f1d2a8913ce77b7ea86646dddb887f5417a9ba70 \
     --hash=sha256:0b87d9d16fcb63e8018423ca1d50b7260f15cb2da33e30db4baad4183a948c25 \
@@ -1117,6 +1135,9 @@ watchfiles==1.2.0 \
     #   -c .finai/dependency-lock/installed.txt
     #   -r .finai/dependency-lock/installed.txt
     #   uvicorn
+wcwidth==0.8.3 \
+    --hash=sha256:d5b73dba6158a595ec9370350e7f2637bcac8d6c5e4fde34f30fcffb6103a5e4
+    # via prettytable
 websockets==17.1 \
     --hash=sha256:0014eaff8ad5b3b43feda2279f9d34bf2eaae040720b9fbbb55944b10f40b14d \
     --hash=sha256:00679b7468b4c2b12b0757118174e8eabac56bb2f579a928a104d9554a56e098 \

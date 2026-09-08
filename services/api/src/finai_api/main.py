@@ -15,6 +15,7 @@ from finai_api.api.ontology_definition_routes import router as ontology_definiti
 from finai_api.api.ontology_import_routes import router as ontology_import_router
 from finai_api.api.ontology_operation_routes import router as ontology_operation_router
 from finai_api.api.ontology_routes import router as ontology_router
+from finai_api.api.ontology_validation_routes import router as ontology_validation_router
 from finai_api.api.operations_routes import router as operations_router
 from finai_api.api.operator_routes import router as operator_router
 from finai_api.api.period_control_routes import router as period_control_router
@@ -51,6 +52,7 @@ app.include_router(certification_router)
 app.include_router(retention_router)
 app.include_router(function_router)
 app.include_router(ontology_import_router)
+app.include_router(ontology_validation_router)
 app.include_router(runtime_observation_router)
 app.include_router(semantic_analysis_router)
 app.include_router(transformation_router)

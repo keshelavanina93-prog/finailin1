@@ -8,6 +8,7 @@ from uuid import UUID
 from finai_api.domain.external_ontology import EXTERNAL_TYPES
 from finai_api.domain.ontology_catalog import canonical_id, platform_definitions
 from finai_api.domain.ontology_definitions import DEFINITION_MODELS
+from finai_api.domain.ontology_validation import VALIDATION_TYPES
 from finai_api.domain.resources import (
     ResourceMutation,
     ResourceProposal,
@@ -37,6 +38,7 @@ def main() -> None:
     )
     kinds = {
         *EXTERNAL_TYPES,
+        *VALIDATION_TYPES,
         "Artifact",
         "JournalEntry",
         "JournalLine",

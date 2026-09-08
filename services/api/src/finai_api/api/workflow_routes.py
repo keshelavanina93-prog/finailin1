@@ -76,8 +76,14 @@ def listing(principal: User) -> list[dict[str, Any]]:
         scope = records.set_scope(conn, principal)
         rows = conn.execute(
             "SELECT workflow_id,created_at FROM workflow_requests "
-            "WHERE tenant_id=%s AND exact_scope=%s ORDER BY created_at DESC LIMIT 50",
-            (principal.scope.tenant_id, Jsonb(scope)),
+            "WHERE tenant_id=%s AND exact_scope=%s "
+            "AND (%s OR definition_version<>'ontology-validation/1') "
+            "AND (definition_version<>'ontology-validation/1' OR actor_id=%s) "
+            "ORDER BY created_at DESC LIMIT 50",
+            (
+                principal.scope.tenant_id, Jsonb(scope),
+                "ontology_read" in principal.permissions, principal.actor_id,
+            ),
         ).fetchall()
         return [{"workflow_id": row[0], "created_at": row[1].isoformat()} for row in rows]
 

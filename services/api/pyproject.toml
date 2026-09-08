@@ -19,6 +19,7 @@ dependencies = [
   "temporalio==1.32.0",
   "httpx>=0.28,<1",
   "pyoxigraph==0.5.11",
+  "pyshacl==0.40.1",
 ]
 
 [project.optional-dependencies]

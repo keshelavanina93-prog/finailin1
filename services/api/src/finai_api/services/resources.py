@@ -248,6 +248,9 @@ def _validate(
     from finai_api.services.resource_rollback import validate_restoration
 
     validate_boundaries(proposal)
+    from finai_api.services.ontology_profiles import validate_boundaries as profile_boundaries
+
+    profile_boundaries(principal, proposal, conn=conn)
     validate_restoration(conn, principal, proposal)
     tenant = principal.scope.tenant_id
     if (
@@ -320,9 +323,16 @@ def _validate(
                 source_item.object_type == "ExternalOntologyRelease"
                 and relation.startswith("EXTERNAL_ONTOLOGY_SOURCE:")
             )
+            exact_ontology_profile = (
+                source_item.object_type in {
+                    "OntologyProfile", "ExternalConstraintProfile", "OntologyValidationReport",
+                }
+                and relation.startswith("ONTOLOGY_PROFILE:")
+            )
             if not (
                 exact_query or exact_property or exact_function_input
                 or exact_binding_property or exact_calculated_binding or exact_external_source
+                or exact_ontology_profile
             ):
                 raise WorkspaceError(422, "Exact ontology dependency is not supported here")
             head = _get(conn, tenant, UUID(identifier))
@@ -526,6 +536,14 @@ def _validate(
             from finai_api.services.ontology_definition_validation import validate_definition
 
             validate_definition(item, schema_by_name, link_by_name, target)
+            if item.object_type in {
+                "OntologyProfile", "ExternalConstraintProfile", "OntologyValidationReport",
+            }:
+                from finai_api.services.ontology_profiles import validate as validate_profile
+
+                validate_profile(
+                    principal, item, target, previous, access_entity, conn, external_proofs,
+                )
             if item.object_type in {
                 "ExternalOntologySource", "ExternalOntologyRelease",
                 "ExternalOntologyModule", "OntologyImportRun",
@@ -944,7 +962,7 @@ def propose(principal: Principal, proposal: ResourceProposal) -> ProposalDetail:
         "ontology_propose",
     }.issubset(principal.permissions):
         raise WorkspaceError(403, "Tenant proposals require an authorized ontology administrator")
-    from finai_api.services.external_ontology_validation import preflight
+    from finai_api.services.ontology_profiles import publication_preflight as preflight
 
     external_proofs = preflight(principal, proposal)
     with resource_connection(principal) as conn:
@@ -1108,7 +1126,7 @@ def _promotion_validation(
 
 def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
     """Read-only advisory check. Review rechecks everything under its own transaction."""
-    from finai_api.services.external_ontology_validation import preflight
+    from finai_api.services.ontology_profiles import publication_preflight as preflight
 
     detail = proposal_detail(principal, proposal_id)
     external_proofs = {}
@@ -1172,7 +1190,7 @@ def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
 
 
 def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> ProposalDetail:
-    from finai_api.services.external_ontology_validation import preflight
+    from finai_api.services.ontology_profiles import publication_preflight as preflight
 
     before = proposal_detail(principal, proposal_id)
     external_proofs = {}

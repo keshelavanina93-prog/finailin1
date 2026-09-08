@@ -30,6 +30,12 @@ def summarize(
             "request_id": compiled.get("request", {}).get("request_id"),
             "transformation": compiled.get("transformation"),
         }
+    elif version == "ontology-validation/1":
+        family, title = "validation", "Ontology profile validation"
+        build = {
+            "request_id": payload.get("request", {}).get("request_id"),
+            "validation_request": payload.get("request"),
+        }
     else:
         family = "source" if version.startswith("report-source-process/") else "unsupported"
         report = payload.get("report", {})
@@ -64,7 +70,8 @@ def listing(principal: Principal, company_id: UUID | None, include_unbound: bool
             "AND (%s::text IS NULL OR payload->'invocation'->>'company_id'=%s "
             "OR (%s AND payload->'invocation'->>'company_id' IS NULL)) "
             "AND (%s OR definition_version NOT IN "
-            "('ontology-action/1','transformation-functions/1')) "
+            "('ontology-action/1','transformation-functions/1','ontology-validation/1')) "
+            "AND (definition_version<>'ontology-validation/1' OR actor_id=%s) "
             "ORDER BY created_at DESC,workflow_id LIMIT 101",
             (
                 principal.scope.tenant_id,
@@ -73,6 +80,7 @@ def listing(principal: Principal, company_id: UUID | None, include_unbound: bool
                 str(company_id) if company_id else None,
                 include_unbound,
                 "ontology_read" in principal.permissions,
+                principal.actor_id,
             ),
         ).fetchall()
         review_ids = [

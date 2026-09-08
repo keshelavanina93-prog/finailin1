@@ -76,6 +76,9 @@ def test_runtime_installs_external_schemas_against_reviewed_semantics(monkeypatc
         "ExternalOntologyRelease",
         "ExternalOntologyModule",
         "OntologyImportRun",
+        "OntologyProfile",
+        "ExternalConstraintProfile",
+        "OntologyValidationReport",
     ):
         schema_id = canonical_id(tenant, "SchemaDefinition", kind)
         row = resources.get_resource(maker, schema_id)["resource"]
@@ -100,7 +103,10 @@ def test_runtime_installs_external_schemas_against_reviewed_semantics(monkeypatc
             assert row["attributes"]["fields"]["release_id"]["target_type"] == (
                 "ExternalOntologyRelease"
             )
-        if kind != "ExternalOntologySource":
+        if kind in {
+            "ExternalOntologyRelease", "ExternalOntologyModule", "OntologyImportRun",
+            "OntologyValidationReport",
+        }:
             assert row["attributes"]["fields"]["evidence_id"]["target_type"] == "SourceEvidence"
 
     def snapshot():
