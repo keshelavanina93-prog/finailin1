@@ -37,6 +37,17 @@ def case():
         ref = {**entry.journal.model_dump(mode="json"), "content_hash": "a" * 64}
         refs.append(ref)
         journals[ref["resource_id"]] = ref
+        for kind, pins in (
+            ("JournalLine", entry.lines),
+            ("AccountDimensionPolicy", entry.dimension_policies),
+        ):
+            for child in pins:
+                journals[str(child.resource_id)] = {
+                    **child.model_dump(mode="json"),
+                    "content_hash": "e" * 64,
+                    "object_type": kind,
+                    "display_name": "Reviewed " + kind,
+                }
     function = {"resource_id": str(uuid4()), "version_id": str(uuid4()), "content_hash": "b" * 64}
     frozen = {
         "company_id": str(request.company_id),
@@ -121,6 +132,58 @@ def test_retained_account_values_only_with_original_and_journal_evidence(case):
     assert any(c.label == "Journal observed at" for c in descriptor.context)
     assert not descriptor.current_use_authorized
     assert (case[0], case[1]) == before
+
+
+def test_typed_evidence_references_preserve_exact_versions_and_source_cells(case):
+    _, _, contributors = adapter.project_retained(*case)
+    for group in contributors.values():
+        source, journal = group
+        assert all("reference" not in c.model_dump(mode="json") for c in source.cells)
+        assert journal.cells[0].value == "Base!S2"
+        assert "reference" not in journal.cells[0].model_dump(mode="json")
+        for cell in journal.cells[1:]:
+            assert cell.reference is not None
+            node = case[2].version(cell.reference.model_dump(mode="json"))
+            assert cell.value == node["display_name"]
+            assert cell.reference.content_hash == node["content_hash"]
+            assert cell.model_dump(mode="json")["reference"] == {
+                k: node[k] for k in ("resource_id", "version_id", "content_hash")
+            }
+            assert "@" not in cell.value
+
+
+def test_absent_reference_preserves_existing_nested_evidence_serialization():
+    from finai_api.domain.semantic_analysis import Contributor
+
+    old = {
+        "label": "Business evidence",
+        "reference": {
+            "resource_id": str(uuid4()),
+            "version_id": str(uuid4()),
+            "content_hash": "f" * 64,
+        },
+        "cells": [
+            {"label": "Business value", "value": "731.97", "coordinate": None, "formula": None}
+        ],
+        "document_id": None,
+        "source_sha256": None,
+        "sheet": None,
+        "coordinate": None,
+        "basis": "CANONICAL_DEFINITION",
+    }
+    restored = Contributor.model_validate(old)
+    assert restored.model_dump(mode="json") == old
+    assert digest(restored.model_dump(mode="json")) == digest(old)
+
+
+@pytest.mark.parametrize("change", ["resource_id", "version_id", "object_type"])
+def test_reference_cell_refuses_wrong_retained_resource(case, change):
+    journal = case[0]["output"]["financial_metrics"]["journals"][0]
+    node = case[2].version(journal["lines"][0])
+    node[change] = str(uuid4()) if change != "object_type" else "LocalAccount"
+    with pytest.raises(WorkspaceError) as error:
+        adapter.project_retained(*case)
+    assert error.value.status == 409
 
 
 @pytest.mark.parametrize(
