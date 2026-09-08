@@ -5,12 +5,20 @@ from uuid import UUID
 from fastapi import APIRouter, Query
 
 from finai_api.api.ontology_routes import User
+from finai_api.domain.company_financial_metrics import FinancialMetricRequest, FinancialMetricResult
 from finai_api.domain.journal_production import JournalProductionRequest
 from finai_api.domain.resources import ResourceReview
 from finai_api.domain.semantic_analysis import ProjectionRequest
 from finai_api.services import company_journals
 
 router = APIRouter(prefix="/v1/ontology/company-journals", tags=["company journal readback"])
+
+
+@router.post("/reconciliation/metrics", response_model=FinancialMetricResult)
+def company_financial_metrics(principal: User, request: FinancialMetricRequest):
+    from finai_api.services.company_financial_metrics import produce
+
+    return produce(principal, request)
 
 
 @router.post("/reconciliation/projection")

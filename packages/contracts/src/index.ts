@@ -8,6 +8,7 @@ export type {
 } from "./object-sets.js";
 export type { AccountDimensionPolicyResponse, AccountDimensionPolicyProposalRequest, AccountDimensionPolicyProposalResponse, JournalDimensionReadback, JournalDimensionProvenance } from "./account-dimension-policy.js";
 export type { CompanyJournalListResponse, CompanyJournalDetailResponse, JournalSelection, JournalPin } from "./company-journals.js";
+export type { FinancialMetricKey, FinancialMetricRequest, FinancialMetricRecipe, FinancialMetricValue, FinancialMetricNode, FinancialMetricResult } from "./company-financial-metrics.js";
 export type { PeriodControlResponse, PeriodControlProposalRequest, PeriodControlProposalResponse } from "./period-control.js";
 export type { CertificationDefinition, CertificationContract, CertificationEvaluationRequest, DefinitionConformanceReceipt } from "./certification.js";
 export type { ProposalQueuePage, ProposalQueueCursor } from "./proposal-queue.js";
