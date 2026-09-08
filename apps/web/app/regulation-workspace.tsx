@@ -6,11 +6,19 @@ import "./regulation.css";
 import RegulatorySources from "./regulatory-sources";
 import RegulatoryInvestigation,{type RegulatoryNavigation} from "./regulatory-investigation";
 
+import {validateRegulationHandoff,regulationSnapshotKey,type CompanyRegulationHandoff} from "./company-regulation-handoff";
+
 type Rule = {resource:{resource_id:string;version_id:string;display_name:string;attributes:{definition:{provision:string;source_version:string;effective_from:string;deadline:string|null};act_id:string;evidence_id:string;licence_id:string}};assessment:{legal_state:string;applicability:string;effective_obligation:boolean;obligation:string;days_to_deadline:number|null;blocking_reasons?:string[]}};
 type Reference = {resource_id:string;display_name:string;object_type:string};
 export type Result = {rules:Rule[];next_offset:number|null;run_id?:string;no_rules_found?:boolean;company?:{display_name:string};assessment_context?:{activity:string;at:string;known_at:string;customer_count:number|null}};
 
-export default function RegulationWorkspace({token, companyId, onProposal,viewStateKey,...navigation}: RegulatoryNavigation&{token:string;companyId:string;onProposal:(id:string)=>void;viewStateKey?:string}) {
+type Props=RegulatoryNavigation&{token:string;companyId:string;onProposal:(id:string)=>void;viewStateKey?:string;handoff?:CompanyRegulationHandoff};
+export default function RegulationWorkspace(props:Props){
+ let handoff:CompanyRegulationHandoff|undefined;
+ try{handoff=props.handoff===undefined?undefined:validateRegulationHandoff(props.handoff,props.companyId);}catch{return <p role="alert">The Company 360 regulatory reference is invalid. Reopen the displayed company snapshot; current rules have not been substituted.</p>;}
+ return <Workspace key={JSON.stringify([props.token,props.companyId,regulationSnapshotKey(handoff)])} {...props} handoff={handoff}/>;
+}
+function Workspace({token,companyId,onProposal,viewStateKey,handoff,...navigation}:Props) {
   const scenarioRef=useRef<HTMLDetailsElement>(null);
   const [sourceToolsVisited,setSourceToolsVisited]=useState(false);
   const [proposalToolsVisited,setProposalToolsVisited]=useState(false);
@@ -52,7 +60,8 @@ export default function RegulationWorkspace({token, companyId, onProposal,viewSt
     try{const data=await request("proposals",{name:text("name"),key:text("key"),legal_entity_id:companyId,act_id:text("act_id"),licence_id:text("licence_id"),evidence_id:text("evidence_id"),rationale:text("rationale"),definition:{legal_status:text("legal_status"),source_version:text("source_version"),source_version_complete:f.get("complete")==="on",provision:text("provision"),activity:text("rule_activity"),effective_from:text("effective_from"),effective_to:text("effective_to")||null,minimum_customers:text("minimum_customers")?Number(text("minimum_customers")):null,obligation:text("obligation"),deadline:text("deadline")||null,first_reporting_year:null}});onProposal(data.proposal.proposal_id);}catch(e){setError(String(e));}finally{setBusy(false);}
   }
   return <>
-    <RegulatoryInvestigation viewStateKey={viewStateKey} token={token} companyId={companyId} assessment={result} onAssessment={()=>{if(scenarioRef.current){scenarioRef.current.open=true;scenarioRef.current.scrollIntoView({behavior:"smooth",block:"start"});scenarioRef.current.querySelector("summary")?.focus();}}} {...navigation}/>
+    <RegulatoryInvestigation handoff={handoff} viewStateKey={viewStateKey} token={token} companyId={companyId} assessment={result} onAssessment={()=>{if(scenarioRef.current){scenarioRef.current.open=true;scenarioRef.current.scrollIntoView({behavior:"smooth",block:"start"});scenarioRef.current.querySelector("summary")?.focus();}}} {...navigation}/>
+    {handoff&&<p className="regi-note">The rules above retain the Company 360 snapshot. Explicit scenario tools and publication monitoring below use their own stated observation times.</p>}
     <details className="regi-secondary" ref={scenarioRef}><summary>Assess or reopen an explicit company scenario</summary>
     <Panel title="Regulatory obligations">
       <label>Retained assessment ID<input value={savedAssessment} onChange={e=>setSavedAssessment(e.target.value)} placeholder="fcr_…"/></label><button disabled={busy||!/^fcr_[a-f0-9]{64}$/.test(savedAssessment)} onClick={async()=>{setBusy(true);setError("");try{setResult(await request(`assessments/${savedAssessment}`));}catch(e){setError(String(e));}finally{setBusy(false);}}}>Reopen assessment</button>
