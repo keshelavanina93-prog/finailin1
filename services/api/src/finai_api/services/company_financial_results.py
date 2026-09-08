@@ -205,9 +205,7 @@ def _retained_item(
             if key in source
         },
         "state": "RETAINED_RESULT_REFERENCE",
-        "reopen": "SEMANTIC_ANALYSIS"
-        if implementation == FINANCIAL_IMPLEMENTATIONS[0]
-        else "FUNCTION_HISTORY",
+        "reopen": "SEMANTIC_ANALYSIS",
         "current_use_authorized": False,
         "business_effect_authorized": False,
     }

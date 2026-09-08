@@ -125,7 +125,7 @@ def test_retained_result_keeps_own_clocks_and_does_not_need_current_catalog():
     value = service.retained_item(row, principal, UUID(context["company"]["resource_id"]))
     assert value["valid_at"] == "2025-01-31T00:00:00Z"
     assert value["source"]["journal_observed_at"] == "2026-09-08T01:00:00Z"
-    assert value["reopen"] == "FUNCTION_HISTORY"
+    assert value["reopen"] == "SEMANTIC_ANALYSIS"
     assert "contributors" not in value["source"]
     assert not value["current_use_authorized"]
     assert row == before
