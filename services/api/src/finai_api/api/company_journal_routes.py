@@ -5,9 +5,45 @@ from uuid import UUID
 from fastapi import APIRouter, Query
 
 from finai_api.api.ontology_routes import User
+from finai_api.domain.journal_production import JournalProductionRequest
+from finai_api.domain.resources import ResourceReview
 from finai_api.services import company_journals
 
 router = APIRouter(prefix="/v1/ontology/company-journals", tags=["company journal readback"])
+
+
+@router.post("/production/preview")
+def journal_preview(principal: User, request: JournalProductionRequest):
+    from finai_api.services.journal_production import prepare
+
+    return prepare(principal, request)[0]
+
+
+@router.get("/production/attempts/{request_id}")
+def journal_production_attempt(principal: User, request_id: UUID):
+    from finai_api.services.journal_production_history import history
+    from finai_api.services.workspace import WorkspaceError
+
+    result = history(principal, request_id)
+    if result is None:
+        result = history(principal, request_id, "PREPARED")
+    if result is None:
+        raise WorkspaceError(404, "Journal production attempt unavailable in this scope")
+    return result
+
+
+@router.post("/production/proposals")
+def journal_propose(principal: User, request: JournalProductionRequest):
+    from finai_api.services.journal_production import submit
+
+    return submit(principal, request)
+
+
+@router.post("/production/proposals/{proposal_id}/review")
+def journal_review(principal: User, proposal_id: UUID, request: ResourceReview):
+    from finai_api.services.journal_production import check
+
+    return check(principal, proposal_id, request)
 
 
 @router.get("/reconciliation/source/{invocation_id}")
