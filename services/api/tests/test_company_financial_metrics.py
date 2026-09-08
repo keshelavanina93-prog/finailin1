@@ -241,7 +241,9 @@ def test_read_producer_reuses_existing_reconciliation_scope(metric_case, monkeyp
     from finai_api.services import journal_reconciliation
 
     request, receipt, projection = metric_case
-    expected = run(metric_case)
+    run(metric_case)
+    resources = {"book_id": {**receipt["selection"]["book_id"], "display_name": "Book"}}
+    expected = metrics.compute(request, receipt, projection, resources)
 
     def reconcile(principal, invocation, company, at):
         assert (invocation, company, at) == (
@@ -249,7 +251,11 @@ def test_read_producer_reuses_existing_reconciliation_scope(metric_case, monkeyp
             request.company_id,
             request.snapshot_at,
         )
-        return {"reconciliation": receipt, "source_projection": projection}
+        return {
+            "reconciliation": receipt,
+            "source_projection": projection,
+            "context_resources": resources,
+        }
 
     monkeypatch.setattr(journal_reconciliation, "reconcile", reconcile)
     assert metrics.produce(SimpleNamespace(permissions=["ontology_read"]), request) == expected
@@ -271,3 +277,42 @@ def test_implementation_revision_includes_service_and_domain_despite_same_filena
 
     monkeypatch.setattr(Path, "read_text", changed)
     assert metrics.implementation_hash() != baseline
+
+
+def test_display_labels_are_exact_pinned_unicode_and_change_result_revision(metric_case):
+    request, receipt, projection = metric_case
+    baseline = run(metric_case)
+    resources = {
+        key: {**receipt["selection"][key], "display_name": label}
+        for key, label in zip(
+            ("ledger_id", "book_id", "period_id"),
+            ("\u10ec\u10d8\u10d2\u10dc\u10d8", "\u041a\u043d\u0438\u0433\u0430", "January 2025"),
+            strict=True,
+        )
+    }
+    result = metrics.compute(request, receipt, projection, resources)
+    for key, row in resources.items():
+        context = result.display_context[key]
+        assert context.reference.model_dump(mode="json") == receipt["selection"][key]
+        assert context.label == row["display_name"]
+    assert result.result_sha256 != baseline.result_sha256
+    assert result.contract == "company-financial-metrics/1"
+
+
+@pytest.mark.parametrize("failure", ["missing", "version", "resource", "blank", "non_text"])
+def test_unavailable_context_never_uses_snapshot_or_unpinned_source_labels(metric_case, failure):
+    request, receipt, projection = metric_case
+    run(metric_case)
+    row = {**receipt["selection"]["period_id"], "display_name": "January 2025"}
+    if failure == "missing":
+        row = {}
+    elif failure in ("version", "resource"):
+        row[failure + "_id"] = str(uuid4())
+    else:
+        row["display_name"] = "  " if failure == "blank" else 2025
+    result = metrics.compute(request, receipt, projection, {"period_id": row})
+    assert all(item.label is None for item in result.display_context.values())
+    assert (
+        result.display_context["period_id"].reference.model_dump(mode="json")
+        == receipt["selection"]["period_id"]
+    )
