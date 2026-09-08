@@ -42,6 +42,13 @@ def journal_production_attempt(principal: User, request_id: UUID):
     return result
 
 
+@router.get("/production/attempts/{request_id}/dispositions")
+def journal_dispositions(principal: User, request_id: UUID, company_id: UUID):
+    from finai_api.services.journal_production_dispositions import read
+
+    return read(principal, request_id, company_id)
+
+
 @router.post("/production/proposals")
 def journal_propose(principal: User, request: JournalProductionRequest):
     from finai_api.services.journal_production import submit
