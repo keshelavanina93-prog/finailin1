@@ -4,11 +4,12 @@ import type {MapSelection,MapWorkspaceState} from "./operations-model";
 import {restorationInstant} from "./definition-restoration-time";
 import {restoreCompanyInspectionFocus} from "./company-resource-inspection";
 import {isCompanyRegulationOrigin,type CompanyRegulationOrigin} from "./company-regulation-handoff";
+import {isCompanyAccountingOrigin,type CompanyAccountingOrigin,type CompanyAccountingHandoff} from "./company-accounting-handoff";
 export type CompanyMapHandoff=CompanyOriginReference&{kind:"map";state:MapWorkspaceState;selection:MapSelection|null};
-export type CompanyForegroundEntry=Omit<CompanyOriginEntry,"reference">&{reference:CompanyWorkReference|CompanyMapHandoff|CompanyRegulationOrigin;mapState?:MapWorkspaceState;mapSelection?:MapSelection|null};
+export type CompanyForegroundEntry=Omit<CompanyOriginEntry,"reference">&{reference:CompanyWorkReference|CompanyMapHandoff|CompanyRegulationOrigin|CompanyAccountingOrigin;mapState?:MapWorkspaceState;mapSelection?:MapSelection|null;accountingHandoff?:CompanyAccountingHandoff};
 const uuid=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i,hash=/^[a-f0-9]{64}$/;
 export const isCompanyMapHandoff=(value:CompanyForegroundEntry["reference"]):value is CompanyMapHandoff=>"kind" in value&&value.kind==="map";
-export const isCompanyExplorationHandoff=(value:CompanyForegroundEntry["reference"]):value is CompanyMapHandoff|CompanyRegulationOrigin=>isCompanyMapHandoff(value)||isCompanyRegulationOrigin(value);
+export const isCompanyExplorationHandoff=(value:CompanyForegroundEntry["reference"]):value is CompanyMapHandoff|CompanyRegulationOrigin|CompanyAccountingOrigin=>isCompanyMapHandoff(value)||isCompanyRegulationOrigin(value)||isCompanyAccountingOrigin(value);
 function stateReference(state:MapWorkspaceState):MapWorkspaceState {
  const bbox=state.bbox??"",search=state.search??"",bounds=bbox?bbox.split(",").map(Number):null;
  if(!["enterprise_assets","gas_network"].includes(state.lens)||!restorationInstant(state.validAt)||!restorationInstant(state.knownAt)||!Array.isArray(state.center)||state.center.length!==2||state.center.some(value=>!Number.isFinite(value))||Math.abs(state.center[0])>180||Math.abs(state.center[1])>90||!Number.isFinite(state.zoom)||state.zoom<0||state.zoom>24||typeof search!=="string"||search.length>200||typeof bbox!=="string"||bbox.length>200||bounds&&(bounds.length!==4||bounds.some(value=>!Number.isFinite(value))||Math.abs(bounds[0])>180||Math.abs(bounds[2])>180||Math.abs(bounds[1])>90||Math.abs(bounds[3])>90||bounds[0]>=bounds[2]||bounds[1]>=bounds[3]))throw Error("The map drill requires the displayed exact time, viewport and bounded filters.");
