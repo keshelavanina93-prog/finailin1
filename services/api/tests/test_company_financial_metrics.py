@@ -253,3 +253,21 @@ def test_read_producer_reuses_existing_reconciliation_scope(metric_case, monkeyp
 
     monkeypatch.setattr(journal_reconciliation, "reconcile", reconcile)
     assert metrics.produce(SimpleNamespace(permissions=["ontology_read"]), request) == expected
+
+
+def test_implementation_revision_includes_service_and_domain_despite_same_filename(monkeypatch):
+    from pathlib import Path
+
+    original = Path.read_text
+    baseline = metrics.implementation_hash()
+
+    def changed(path, *args, **kwargs):
+        text = original(path, *args, **kwargs)
+        return (
+            text + "\n# changed synthetic implementation"
+            if path == Path(metrics.__file__)
+            else text
+        )
+
+    monkeypatch.setattr(Path, "read_text", changed)
+    assert metrics.implementation_hash() != baseline
