@@ -250,3 +250,40 @@ def test_pack_interface_shared_validation_and_composed_pin_bound(implementation_
     else:
         assert "bound" in result.reason and result.count is None
         assert len(result.definition_pins) == 1
+
+
+@pytest.mark.parametrize("different_version", [False, True])
+def test_group_model_rejects_duplicate_dependency_identity(different_version):
+    from pydantic import ValidationError
+
+    from finai_api.domain.company_condition import CompanyOperatingResourceGroup
+
+    group, _, load = definition()
+    now = datetime.now().astimezone()
+    payload = groups.project(groups.resolve_definitions([group], load), [], now, now)[
+        0
+    ].model_dump()
+    duplicate = dict(payload["definition_pins"][1])
+    if different_version:
+        duplicate["version_id"] = uid("another dependency version")
+    payload["definition_pins"].append(duplicate)
+    with pytest.raises(ValidationError, match="identities must be unique"):
+        CompanyOperatingResourceGroup.model_validate(payload)
+
+
+@pytest.mark.parametrize(
+    "invalid_hash", ["", "a" * 63, "a" * 65, "g" * 64, "A" * 64, "a" * 64 + "\n"]
+)
+def test_group_model_rejects_malformed_dependency_hash(invalid_hash):
+    from pydantic import ValidationError
+
+    from finai_api.domain.company_condition import CompanyOperatingResourceGroup
+
+    group, _, load = definition()
+    now = datetime.now().astimezone()
+    payload = groups.project(groups.resolve_definitions([group], load), [], now, now)[
+        0
+    ].model_dump()
+    payload["definition_pins"][1]["content_hash"] = invalid_hash
+    with pytest.raises(ValidationError):
+        CompanyOperatingResourceGroup.model_validate(payload)

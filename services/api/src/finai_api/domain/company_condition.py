@@ -112,7 +112,7 @@ class CompanyConditionDescriptor(Model):
 class DefinitionPin(Model):
     resource_id: UUID
     version_id: UUID
-    content_hash: str
+    content_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
 
 
 class CompanyOperatingResourceGroup(Model):
@@ -133,6 +133,9 @@ class CompanyOperatingResourceGroup(Model):
 
     @model_validator(mode="after")
     def exact_definition_pin(self) -> "CompanyOperatingResourceGroup":
+        identities = [pin.resource_id for pin in self.definition_pins]
+        if len(identities) != len(set(identities)):
+            raise ValueError("Group definition dependency resource identities must be unique")
         own = [
             pin for pin in self.definition_pins if pin.resource_id == self.definition.resource_id
         ]
