@@ -16,7 +16,7 @@ from finai_api.services.workspace import WorkspaceError
 def implementation_hash():
     return digest(
         {
-            p.name: sha256(p.read_text(encoding="utf-8").encode()).hexdigest()
+            p.parent.name + "/" + p.name: sha256(p.read_text(encoding="utf-8").encode()).hexdigest()
             for p in (Path(__file__), Path(contract.__file__))
         }
     )
