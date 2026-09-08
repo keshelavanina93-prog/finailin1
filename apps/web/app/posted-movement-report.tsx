@@ -8,6 +8,7 @@ import "./posted-movement-report.css";
 
 import {useSourceReview} from "./source-review-navigation";
 import {financeReportReference} from "./finance-report-reference";
+import SemanticAnalysisWorkspace from "./semantic-analysis-workspace";
 import AcceptedJournalReviewAction from "./accepted-journal-review-action";
 
 export type PostedFunction = { resource_id: string; version_id: string; display_name: string };
@@ -20,8 +21,8 @@ type RetainedReport = { invocation_id: string; status: string; receipt_hash: str
   posted_movements: { groups: Group[]; coverage: { source_rows: number; included_rows: number; excluded_rows: number }; excluded_rows: { row: number; coordinate: string; reason: string }[] };
 } };
 
-export default function PostedMovementReport({ token, contextKey, functions, currency, eligible,expectedSource,initialInvocationId,onInspectFunction,onTraceFunction }: {
-  token: string; contextKey: string; functions: PostedFunction[]; currency: string; eligible: boolean;
+export default function PostedMovementReport({ active=false,token, contextKey, functions, currency, eligible,expectedSource,initialInvocationId,onInspectFunction,onTraceFunction }: {
+  active?:boolean;token: string; contextKey: string; functions: PostedFunction[]; currency: string; eligible: boolean;
   initialInvocationId?:string;
   expectedSource?:{company_id:string;document_id:string;scope_id:string;binding_id:string;binding_version_id:string;ledger_id:string;book_id:string;period_id:string;currency_id:string};
   onInspectFunction?:(reference:{resource_id:string;version_id:string;known_at?:string})=>void;
@@ -108,15 +109,11 @@ export default function PostedMovementReport({ token, contextKey, functions, cur
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(()=>{if(initialInvocationId)void run(undefined,initialInvocationId);},[initialInvocationId,run]);
 
-  if(report && expectedSource) return <section className="posted-worksheet" aria-label="Retained source review">
-    <h3>Posted account movements · {saved?.currency}</h3>
-    <p>{output?.source_document.filename}</p>
-    <p>The retained calculation is ready for source review. Its account movements, supporting evidence and coverage remain tied to the reviewed company and accounting context.</p>
-    {output&&<p><strong>Partial source coverage:</strong> {output.posted_movements.coverage.included_rows} of {output.posted_movements.coverage.source_rows} rows included. Full-ledger completeness and financial-statement classification are not established.</p>}
-    {busy&&<p role="status">Checking the retained report…</p>}
+  if(report && expectedSource) return <section className="finance-retained-result" aria-label="Retained financial worksheet">
+    {busy&&<p role="status">Checking the retained report�</p>}
     {error&&<p role="alert">{error}</p>}
-    <button className="posted-primary" disabled={busy} onClick={()=>openSourceReview({companyId:expectedSource.company_id,invocationId:report.invocation_id})}>Open source review</button>
-    <AcceptedJournalReviewAction token={token} companyId={expectedSource.company_id} invocationId={report.invocation_id} disabled={busy}/>
+    <SemanticAnalysisWorkspace owner="finance" expectedReceiptHash={report.receipt_hash} active={active} token={token} companyId={expectedSource.company_id} invocationId={report.invocation_id} onInspect={onInspectFunction} onOpenSourceReview={openSourceReview}/>
+    <details className="finance-result-actions"><summary>Reviewed accounting actions</summary><AcceptedJournalReviewAction token={token} companyId={expectedSource.company_id} invocationId={report.invocation_id} disabled={busy}/></details>
   </section>;
   return <section className="posted-worksheet" aria-label="Posted account movements">
     <h3>Posted account movements · {saved?.key===contextKey?saved.currency:currency}</h3>
