@@ -257,3 +257,4 @@ export type {CompanyRegulationPage} from "./regulatory-context.js";
 
 export type {RetainedAnalysisReference,RetainedAnalysisPage} from "./retained-analyses.js";
 export type { MetricPin, MetricUnit, MetricSelector, MetricDefinition, MetricOutput, MetricObservationRequest, MetricObservation } from "./metric-observations.js";
+export type { AcceptedMovementFunctionInvocation } from "./accepted-movement-function.js";
