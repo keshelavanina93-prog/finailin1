@@ -1,7 +1,11 @@
 """Grouped observation counts consume verified complete materializations."""
 
 # ruff: noqa:F811
+import json
 from copy import deepcopy
+from pathlib import Path
+from time import perf_counter
+from traceback import extract_tb
 from uuid import uuid4
 
 import psycopg
@@ -24,6 +28,55 @@ from finai_api.services import (
 )
 from finai_api.services.grouped_observations import count_observations
 from finai_api.services.workspace import WorkspaceError
+
+
+def invoke_with_failure_diagnostic(principal, request, monkeypatch):
+    """Keep swallowed execution failures observable without source values or secrets."""
+    failures = []
+
+    def observe(stage, operation):
+        def wrapped(*args, **kwargs):
+            started = perf_counter()
+            try:
+                return operation(*args, **kwargs)
+            except Exception as exc:
+                failures.append(
+                    {
+                        "stage": stage,
+                        "elapsed_seconds": round(perf_counter() - started, 3),
+                        "exception": type(exc).__name__,
+                        "sqlstate": getattr(exc, "sqlstate", None),
+                        "cause": type(exc.__cause__).__name__ if exc.__cause__ else None,
+                        "cause_sqlstate": getattr(exc.__cause__, "sqlstate", None),
+                        "frames": [
+                            f"{Path(frame.filename).name}:{frame.lineno}:{frame.name}"
+                            for frame in extract_tb(exc.__traceback__)
+                        ],
+                    }
+                )
+                raise
+
+        return wrapped
+
+    with monkeypatch.context() as diagnostic:
+        diagnostic.setattr(
+            function_execution, "execute_plan", observe("execute", function_execution.execute_plan)
+        )
+        diagnostic.setattr(fact_runs, "retain_run", observe("retain", fact_runs.retain_run))
+        result = function_invocations.invoke(principal, request)
+    if result["status"] != "SUCCEEDED":
+        pytest.fail(
+            json.dumps(
+                {
+                    "status": result["status"],
+                    "failure_code": result["receipt"].get("failure_code"),
+                    "failures": failures,
+                },
+                sort_keys=True,
+            ),
+            pytrace=False,
+        )
+    return result
 
 
 def test_materialized_counts_partition_and_legacy_refusal():
@@ -98,8 +151,7 @@ def test_reviewed_group_and_temporal_combination_preserves_calculation_refusal()
 @DB
 def test_native_materialized_group_counts_replay_and_sql_forgery(retained, monkeypatch):
     reader, source_request, _, config, schema_version = materialization_case(retained)
-    source = function_invocations.invoke(reader, source_request)
-    assert source["status"] == "SUCCEEDED", source
+    source = invoke_with_failure_diagnostic(reader, source_request, monkeypatch)
     with resources.resource_connection(reader) as conn:
         schema_id = conn.execute(
             "SELECT resource_id FROM resource_versions WHERE tenant_id=%s AND version_id=%s",
