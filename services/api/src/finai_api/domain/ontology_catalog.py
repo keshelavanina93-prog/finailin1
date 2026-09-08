@@ -144,7 +144,12 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
     "ConsolidationGroup": {"code": "Identifier"},
     "OperationalNetwork": {"code": "Identifier"},
     "AssetPortfolio": {"code": "Identifier"},
-    "DomainPack": {"code": "Identifier", "version": "Identifier"},
+    "DomainPack": {
+        "code": "Identifier",
+        "version": "Identifier",
+        "membership_group_id?": "@ObjectTypeGroup",
+        "membership_interface_id?": "@ObjectInterface",
+    },
     "Ledger": {
         "legal_entity_id": "@LegalEntity",
         "calendar_id": "@FiscalCalendar",
