@@ -43,6 +43,31 @@ PROV_NAMESPACE = "http://www.w3.org/ns/prov#"
 RDFS = "http://www.w3.org/2000/01/rdf-schema#"
 OWL = "http://www.w3.org/2002/07/owl#"
 RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+BASELINE_COMMIT = "e4a7e47eea5834773704f353c178a09014c2cfa1"
+BASELINE_TREE_SHA = "a0cc256680c7c055d30614fe0ea89f3e26ea1700f7a9c0ca2fd174975e75e574"
+
+
+def verified_baseline(path: Path, commit: str) -> Path:
+    """Verify every archived source file before executing the pinned legacy importer."""
+    assert commit == BASELINE_COMMIT, "The explicit pre-extension commit pin differs"
+    baseline = path.resolve(strict=True)
+    assert baseline.is_dir() and baseline.drive.lower() == "d:", "Baseline must reside on D:"
+    files = sorted(p for p in baseline.rglob("*") if p.is_file())
+    assert len(files) == 184, "Baseline source file inventory differs from the pinned commit"
+    records = []
+    for source in files:
+        assert not source.is_symlink() and not source.is_junction()
+        assert source.resolve().is_relative_to(baseline)
+        assert source.stat().st_size <= 2 * 1024 * 1024, "Unexpected baseline source size"
+        records.append(
+            source.relative_to(baseline).as_posix()
+            + "\0"
+            + sha256(source.read_bytes()).hexdigest()
+            + "\n"
+        )
+    actual = sha256("".join(sorted(records)).encode("utf-8")).hexdigest()
+    assert actual == BASELINE_TREE_SHA, "Baseline source hashes differ from the pinned commit"
+    return baseline
 
 
 @pytest.mark.skipif(
@@ -59,11 +84,9 @@ def test_original_prov_review_replay_withdrawal_and_pre_extension_release(reques
     artifact = Path(os.environ["G8_PROV_ARTIFACT_PATH"])
     original = artifact.read_bytes()
     assert sha256(original).hexdigest() == PROV_SHA
-    baseline = Path(os.environ["G8_PRE_EXTENSION_SRC"])
-    assert baseline.resolve() == Path("D:/FinAI/g8-ontology-import/services/api/src").resolve()
-    assert "class RdfForeignAssertion" not in (
-        baseline / "finai_api/services/rdf_engine.py"
-    ).read_text(encoding="utf-8")
+    baseline = verified_baseline(
+        Path(os.environ["G8_PRE_EXTENSION_SRC"]), os.environ["G8_PRE_EXTENSION_COMMIT"]
+    )
     # No fixture writes occur until the physical database and input hashes are verified.
     reader, _ = request.getfixturevalue("retained")
     entity = os.environ["G8_FOREIGN_ASSERTIONS_ENTITY"]

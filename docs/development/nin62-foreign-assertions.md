@@ -85,21 +85,50 @@ synthetic governance actors, not standards conformance or business authorization
 
 This opt-in proof requires `G8_FOREIGN_ASSERTIONS_NATIVE=1`, an explicitly configured
 synthetic `G8_FOREIGN_ASSERTIONS_ENTITY`, `G8_PROV_ARTIFACT_PATH`,
-`G8_PRE_EXTENSION_SRC`, and a D-only `G8_FOREIGN_ASSERTIONS_EVIDENCE` output. Reuse the
+`G8_PRE_EXTENSION_SRC`, `G8_PRE_EXTENSION_COMMIT`, and a D-only
+`G8_FOREIGN_ASSERTIONS_EVIDENCE` output. Reuse the
 same synthetic entity for these fixed public bytes: the existing canonical
 SourceEvidence identity is tenant plus content hash, and the authority guard
 correctly refuses reuse that would discard another entity's access boundary.
 
+The baseline must be an operator-supplied D: archive of commit
+`e4a7e47eea5834773704f353c178a09014c2cfa1`, not a mutable development checkout.
+Before any fixture writes or baseline execution, the proof verifies that explicit
+commit pin, all 184 source paths, and their exact byte hashes. The sorted manifest
+of `relative/path`, NUL, SHA256, newline has SHA256
+`a0cc256680c7c055d30614fe0ea89f3e26ea1700f7a9c0ca2fd174975e75e574`.
+Added, removed or modified source files refuse; line endings remain the archived
+Git bytes. `git show` of the pinned revision confirms the RDF worker SHA256
+`95787e896f5fea63ffb0315f15d24d9df384ef15e23f72e9bf1c17025d660153`.
+
+From this repository, create a fresh D: baseline using only the local pinned Git
+objects (no downloads). Choose an unused extraction directory; do not merge it with
+an existing checkout:
+
+```powershell
+$baselineCommit = 'e4a7e47eea5834773704f353c178a09014c2cfa1'
+$baselineArchive = 'D:\FinAI\g8-ontology-baseline-e4a7e47.zip'
+$baselineDirectory = 'D:\FinAI\g8-ontology-baseline-e4a7e47'
+if (Test-Path -LiteralPath $baselineDirectory) { throw 'Choose a fresh baseline directory' }
+git archive --format=zip --output=$baselineArchive $baselineCommit services/api/src
+if ($LASTEXITCODE -ne 0) { throw 'Pinned local Git archive failed' }
+Expand-Archive -LiteralPath $baselineArchive -DestinationPath $baselineDirectory
+$env:G8_PRE_EXTENSION_SRC = "$baselineDirectory\services\api\src"
+$env:G8_PRE_EXTENSION_COMMIT = $baselineCommit
+```
+
+The child disables bytecode writes, keeping the source inventory reproducible.
+
 ### Separate index blocker discovered
 
-The current Oxigraph index build succeeds, but its exact read correctly refuses
-`INDEX_CORRUPT` for this source. Oxigraph Store changes one original quad's object:
-`"0"^^xsd:nonNegativeInteger` becomes `"0"^^xsd:integer` on
-`_:c14n18 owl:maxCardinality` in the PROV graph. Store serialization has SHA256
+The pre-fix Oxigraph index build succeeded, but its exact read correctly refused
+`INDEX_CORRUPT` for this source. Oxigraph Store changed one original quad's object:
+`"0"^^xsd:nonNegativeInteger` became `"0"^^xsd:integer` on
+`_:c14n18 owl:maxCardinality` in the PROV graph. Store serialization had SHA256
 `a4caeca67d9be3e9f5bab46fbcd4d2c4a5f908647153c9341220d8849cd82ec1`,
-which differs from the retained canonical dataset. RDFC recanonicalization cannot
-restore an altered datatype. No hash guard was weakened and no index production
-code was changed in this patch. Exact retained publication/replay is proven;
-successful PROV index inspection was blocked pending a lossless projection fix.
-The companion [lossless index change](nin62-lossless-ontology-index.md) now records
-the bounded fix and successful exact historical native inspection separately.
+which differed from the retained canonical dataset. RDFC recanonicalization could
+not restore the altered datatype. The combined implementation includes the
+[lossless index fix](nin62-lossless-ontology-index.md), preserving the original
+quad text and checking the caller's exact retained hash without relaxation.
+Exact retained publication/replay and historical native PROV index inspection
+both passed; that companion record documents the index evidence separately.
