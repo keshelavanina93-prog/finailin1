@@ -6,6 +6,7 @@ import CompanyFinancialContext from "./company-financial-context";
 import HomeSourceAnalyses from "./home-source-analyses";
 import CompanyOperatingWorkspace from "./company-operating-workspace";
 import {assertHomeFinancialContext} from "./company-home-state";
+import {companyAccountingHandoff,type CompanyAccountingHandoff} from "./company-accounting-handoff";
 import {restorationInstant} from "./definition-restoration-time";
 import OperationsMap from "./operations-map";
 import {initialMapState,type MapSelection,type MapWorkspaceState} from "./operations-model";
@@ -13,7 +14,7 @@ import {displayName} from "./display-name";
 import "./company-home.css";
 
 const stamp=(value:string)=>new Date(value).toLocaleString();
-type Props={token:string;companyId:string;snapshot?:{validAt:string;knownAt:string};onData:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void;onInspect?:(node:CanonicalResource,knownAt:string)=>void;onAccounting?:()=>void;showWork?:boolean;onTrace?:(node:CanonicalResource,knownAt:string)=>void;onHistory?:(node:CanonicalResource,knownAt:string)=>void;onProposal?:(id:string)=>void;onWorkflow?:(id:string)=>void};
+type Props={token:string;companyId:string;snapshot?:{validAt:string;knownAt:string};onData:()=>void;onOperations:(state:MapWorkspaceState)=>void;onMapSelection:(selection:MapSelection|null)=>void;onInspect?:(node:CanonicalResource,knownAt:string)=>void;onAccounting?:(handoff:CompanyAccountingHandoff)=>void;showWork?:boolean;onTrace?:(node:CanonicalResource,knownAt:string)=>void;onHistory?:(node:CanonicalResource,knownAt:string)=>void;onProposal?:(id:string)=>void;onWorkflow?:(id:string)=>void};
 export default function CompanyHome(props:Props){return <Home key={`${props.token}:${props.companyId}:${props.snapshot?.validAt??"current"}:${props.snapshot?.knownAt??"current"}`} {...props}/>;}
 function Home({token,companyId,snapshot,onData,onOperations,onMapSelection,onInspect,onAccounting,showWork=false,onTrace,onHistory,onProposal,onWorkflow}:Props){
  const [sourcesVisited,setSourcesVisited]=useState(false);const validAt=snapshot?.validAt,knownAt=snapshot?.knownAt;
@@ -24,6 +25,7 @@ function Home({token,companyId,snapshot,onData,onOperations,onMapSelection,onIns
    if(home.contract!=="g8-company-home/1"||home.company.resource_id!==companyId||home.current_use_authorized!==false||home.business_effect_authorized!==false||home.operations.authority!=="GEOGRAPHY_CONTEXT_ONLY"||home.analyses.length!==0)throw Error("Home did not match the selected company and retained references.");
    if(validAt&&(restorationInstant(home.valid_at)!==restorationInstant(validAt)||restorationInstant(home.known_at)!==restorationInstant(knownAt)))throw Error("Home did not preserve the requested company snapshot.");
    assertHomeFinancialContext(home);
+   companyAccountingHandoff(home);
    if(!disposed){setResult(home);setError("");}
   }catch(failure){if(!disposed){setResult(null);setError(controller.signal.aborted?"Company Home timed out. Retry the same company context.":String(failure));}}finally{clearTimeout(timer);}}
   void load();return()=>{disposed=true;clearTimeout(timer);controller.abort();};
@@ -38,7 +40,7 @@ function Home({token,companyId,snapshot,onData,onOperations,onMapSelection,onIns
   <section className="home-financials" aria-label="Key financials"><header><div><p className="overline">KEY FINANCIALS</p><h2>Financial condition</h2></div><button className="g8-link" onClick={onData}>Explore source analyses</button></header>
    <div className="home-financial-tabs" aria-label="Financial view">{result.unavailable_financials.map(item=><button key={item.key} aria-pressed={financial===item.key} onClick={()=>setFinancial(item.key)}>{item.label}</button>)}</div>
    {unavailable&&<p className="home-dependency"><strong>{unavailable.label} unavailable.</strong> {unavailable.reason}</p>}
-   <CompanyFinancialContext context={result.financial_context} knownAt={result.known_at} onInspect={onInspect} onAccounting={onAccounting}/>
+   <CompanyFinancialContext context={result.financial_context} knownAt={result.known_at} onInspect={onInspect} onAccounting={onAccounting?()=>onAccounting(companyAccountingHandoff(result)):undefined}/>
    <details className="home-source-analysis-depth" onToggle={event=>{if(event.currentTarget.open)setSourcesVisited(true);}}><summary>Source analysis & supporting evidence</summary>{sourcesVisited&&<HomeSourceAnalyses token={token} companyId={companyId} onData={onData}/>}</details>
   </section>
   <section className="home-operations" aria-label="Company operations"><header><div><p className="overline">OPERATIONS</p><h2>{result.domain_packs.length?result.domain_packs.map(pack=>displayName(pack.display_name)).join(" · "):"Company operating context"}</h2></div><span className="home-status-neutral">Accepted geography</span></header><p>{result.operations.limitation}</p><HomeMap key={`${companyId}:${result.operations.valid_at}:${result.operations.known_at}`} token={token} companyId={companyId} descriptor={result} onOpen={onOperations} onSelect={onMapSelection}/><p className="home-scope-note">Operations as of {stamp(result.operations.valid_at)} · known {stamp(result.operations.known_at)}. Separate from each financial result’s period.</p></section>
