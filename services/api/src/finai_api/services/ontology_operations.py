@@ -116,7 +116,7 @@ def invoke_prepared(principal, request, prepare):
                 },
             )
     result = resume(principal, identity)
-    return {**result, "intent_id": intent_id}
+    return {**result, "intent_id": intent_id, "intent_request": invocation}
 
 
 def _retain_prepared_record(conn, principal, identity, scope, payload):
@@ -163,6 +163,11 @@ def read(principal, identity):
     # Resource detail enforces current authorized visibility of the shared effect.
     try:
         proposal = resources.proposal_detail(principal, prepared.proposal_id)
+        if (
+            record["definition"].get("kind") == "SOURCE_EXCEPTION_INVESTIGATION"
+            and proposal.proposal != prepared
+        ):
+            raise WorkspaceError(409, "Investigation proposal differs from its frozen Action")
         state = (
             "PUBLISHED"
             if proposal.decision == "APPROVED"
@@ -173,7 +178,7 @@ def read(principal, identity):
         if exc.status != 404:
             raise
         state, proposal_value = "PREPARED", None
-    return {
+    result = {
         "operation_id": identity,
         "state": state,
         "proposal": proposal_value,
@@ -181,6 +186,11 @@ def read(principal, identity):
         "events": record["events"],
         "prepared_proposal_id": str(prepared.proposal_id),
     }
+    if record["definition"].get("kind") == "SOURCE_EXCEPTION_INVESTIGATION":
+        from finai_api.services.investigation_actions import operation_detail
+
+        return operation_detail(principal, result, prepared)
+    return result
 
 
 def invoke(principal, request: BindingAction | LicenceAction):
