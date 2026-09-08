@@ -26,6 +26,7 @@ from finai_api.api.operator_routes import router as operator_router
 from finai_api.api.period_control_routes import router as period_control_router
 from finai_api.api.proposal_queue_routes import router as proposal_queue_router
 from finai_api.api.regulation_routes import router as regulation_router
+from finai_api.api.reporting_routes import retained_router
 from finai_api.api.reporting_routes import router as reporting_router
 from finai_api.api.retained_analysis_routes import router as retained_analysis_router
 from finai_api.api.retention_routes import router as retention_router
@@ -51,6 +52,7 @@ app = FastAPI(
 app.include_router(router)
 app.include_router(account_dimension_policy_router)
 app.include_router(reporting_router)
+app.include_router(retained_router)
 app.include_router(workspace_router)
 app.include_router(workflow_router)
 app.include_router(ontology_router)
@@ -97,8 +99,7 @@ async def workspace_error(_request: Request, exc: WorkspaceError) -> JSONRespons
 async def database_error(_request: Request, exc: psycopg.Error) -> JSONResponse:
     if (
         isinstance(exc, psycopg.errors.RaiseException)
-        and exc.diag.message_primary
-        == "Canonical identity type and access boundary are immutable"
+        and exc.diag.message_primary == "Canonical identity type and access boundary are immutable"
     ):
         return JSONResponse(
             status_code=409,

@@ -6,6 +6,7 @@ from uuid import UUID
 
 from pydantic import Field, field_validator, model_validator
 
+from finai_api.domain.authority import ExactScope
 from finai_api.domain.semantic_analysis import Contributor, Filter, Model, Pin, Projection
 
 
@@ -96,6 +97,7 @@ class ReportArtifact(Model):
 class RetainedReportDefinition(Model):
     contract: Literal["retained-report-definition/1"] = "retained-report-definition/1"
     report_id: UUID
+    exact_scope: ExactScope
     previous_proposal_id: UUID | None = None
     expected_preview_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     snapshot: RetainedReportSnapshot
