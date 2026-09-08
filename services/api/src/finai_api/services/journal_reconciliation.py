@@ -4,7 +4,7 @@ This consumes canonical journal readback, never publishes or repairs a journal.
 Source-pair candidates do not establish acceptance. Missing journals remain null.
 """
 
-from decimal import Decimal, Inexact, localcontext
+from decimal import Context, Decimal, Inexact, localcontext
 from types import SimpleNamespace
 from uuid import UUID
 
@@ -27,8 +27,7 @@ def compile_reconciliation(review, source, targets, details, selection, snapshot
     accepted: list[dict] = []
     rejected, seen = [], set()
     totals: dict[str, dict] = {}
-    with localcontext() as arithmetic:
-        arithmetic.prec = 50
+    with localcontext(Context(prec=50)) as arithmetic:
         arithmetic.traps[Inexact] = True
         debit = credit = matched = Decimal(0)
         for detail in sorted(details, key=lambda d: d["journal"]["resource_id"]):
