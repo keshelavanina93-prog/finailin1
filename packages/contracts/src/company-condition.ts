@@ -36,3 +36,21 @@ export interface CompanyJournalReviews {
  authority:"CURRENT_CANONICAL_JOURNAL_REVIEW";items:CompanyJournalReviewItem[];
  truncated:boolean;limit:25;
 }
+
+
+/** Exact accepted definition and members; count is not a complete company inventory. */
+export interface CompanyOperatingResourceGroup {
+ key:string;label:string;definition:CanonicalResource;
+ definition_pins:Array<{resource_id:string;version_id:string;content_hash:string}>;
+ state:"AVAILABLE"|"EMPTY"|"UNAVAILABLE";resources:CanonicalResource[];
+ valid_at:string;known_at:string;count:number|null;
+ count_basis:"EXPLICIT_CONNECTED_RESOURCE_SNAPSHOT";
+ completeness:"COMPLETE_WITHIN_CONNECTION_SNAPSHOT"|"UNAVAILABLE";reason:string;
+}
+export interface CompanyConditionDescriptorV2 extends Omit<CompanyConditionDescriptor,
+ "contract"|"assets"|"parties"|"contracts"|"products"> {
+ contract:"g8-company-condition/2";
+ resource_groups:CompanyOperatingResourceGroup[];
+ resource_groups_state:"AVAILABLE"|"UNAVAILABLE";
+ resource_groups_reason:string|null;
+}

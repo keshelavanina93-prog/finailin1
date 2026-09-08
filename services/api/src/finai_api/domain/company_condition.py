@@ -80,7 +80,10 @@ class CompanyJournalReviews(Model):
 
 class UnavailableCondition(Model):
     key: Literal[
-        "financial_performance", "live_operations", "findings", "investigations",
+        "financial_performance",
+        "live_operations",
+        "findings",
+        "investigations",
         "regulatory_compliance",
     ]
     label: str
@@ -98,6 +101,47 @@ class CompanyConditionDescriptor(Model):
     parties: ResourceGroup
     contracts: ResourceGroup
     products: ResourceGroup
+    licence_evidence: list[LicenceEvidence]
+    work: CompanyWork
+    journal_reviews: CompanyJournalReviews
+    unavailable: list[UnavailableCondition]
+    current_use_authorized: Literal[False] = False
+    business_effect_authorized: Literal[False] = False
+
+
+class DefinitionPin(Model):
+    resource_id: UUID
+    version_id: UUID
+    content_hash: str
+
+
+class CompanyOperatingResourceGroup(Model):
+    key: str
+    label: str
+    definition: CanonicalResource
+    definition_pins: list[DefinitionPin]
+    state: Literal["AVAILABLE", "EMPTY", "UNAVAILABLE"]
+    resources: list[CanonicalResource]
+    valid_at: AwareDatetime
+    known_at: AwareDatetime
+    count: int | None = Field(ge=0)
+    count_basis: Literal["EXPLICIT_CONNECTED_RESOURCE_SNAPSHOT"] = (
+        "EXPLICIT_CONNECTED_RESOURCE_SNAPSHOT"
+    )
+    completeness: Literal["COMPLETE_WITHIN_CONNECTION_SNAPSHOT", "UNAVAILABLE"]
+    reason: str
+
+
+class CompanyConditionDescriptorV2(Model):
+    contract: Literal["g8-company-condition/2"] = "g8-company-condition/2"
+    company: CanonicalResource
+    valid_at: AwareDatetime
+    known_at: AwareDatetime
+    connection_depth: Literal[2] = 2
+    connections: list[Connection]
+    resource_groups: list[CompanyOperatingResourceGroup]
+    resource_groups_state: Literal["AVAILABLE", "UNAVAILABLE"]
+    resource_groups_reason: str | None
     licence_evidence: list[LicenceEvidence]
     work: CompanyWork
     journal_reviews: CompanyJournalReviews
