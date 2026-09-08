@@ -6,6 +6,8 @@ from uuid import UUID
 from finai_api.domain.company_home import (
     CompanyHomeDescriptor,
     CompanyHomeRequest,
+    HomeFinancialContext,
+    HomeLedger,
     HomeOperations,
     MissingFinancial,
 )
@@ -26,6 +28,45 @@ def _accepted(value: Any, kind: str) -> CanonicalResource:
     ):
         raise WorkspaceError(409, "Company Home requires accepted canonical context")
     return resource
+
+
+def financial_context(context: dict[str, Any], company: CanonicalResource) -> HomeFinancialContext:
+    ledgers = []
+    for item in context.get("ledgers", []):
+        ledger = _accepted(item["ledger"], "Ledger")
+        if str(ledger.attributes.get("legal_entity_id")) != str(company.resource_id):
+            raise WorkspaceError(409, "Home ledger differs from the selected company")
+        calendar = _accepted(item["calendar_id"], "FiscalCalendar") if item["calendar_id"] else None
+        chart = _accepted(item["chart_id"], "LocalChartOfAccounts") if item["chart_id"] else None
+        currency = _accepted(item["currency_id"], "Currency") if item["currency_id"] else None
+        books = [_accepted(value, "AccountingBook") for value in item["books"]]
+        periods = [_accepted(value, "FiscalPeriod") for value in item["periods"]]
+        if any(str(book.attributes.get("ledger_id")) != str(ledger.resource_id) for book in books):
+            raise WorkspaceError(409, "Home accounting book differs from the retained ledger")
+        if any(
+            not calendar or str(period.attributes.get("calendar_id")) != str(calendar.resource_id)
+            for period in periods
+        ):
+            raise WorkspaceError(409, "Home period differs from the retained calendar")
+        dependencies = (("calendar_id", calendar), ("chart_id", chart), ("currency_id", currency))
+        for field, target in dependencies:
+            if target and str(ledger.attributes.get(field)) != str(target.resource_id):
+                raise WorkspaceError(409, "Home ledger dependency differs from retained context")
+        ledgers.append(HomeLedger(
+            ledger=ledger, calendar=calendar, chart=chart, currency=currency,
+            books=books, periods=periods,
+            context_ready=bool(item["ready"] and calendar and chart and currency and books),
+        ))
+    scopes = [_accepted(item["scope"], "SourceAccountingScope")
+              for item in context.get("accounting_sources", [])]
+    if any(
+        str(scope.attributes.get("legal_entity_id")) != str(company.resource_id) for scope in scopes
+    ):
+        raise WorkspaceError(409, "Home source boundary differs from the selected company")
+    return HomeFinancialContext(
+        accounting_state=context.get("accounting_state", "ACCOUNTING_CONFIGURATION_REQUIRED"),
+        ledgers=ledgers, source_scopes=scopes,
+    )
 
 
 def describe(principal: Principal, request: CompanyHomeRequest) -> CompanyHomeDescriptor:
@@ -94,6 +135,7 @@ def describe(principal: Principal, request: CompanyHomeRequest) -> CompanyHomeDe
         known_at=snapshot["known_at"],
         domain_packs=domain_packs,
         analyses=analyses,
+        financial_context=financial_context(context, company),
         operations=HomeOperations(
             lens="gas_network" if gas else "enterprise_assets",
             valid_at=snapshot["valid_at"],

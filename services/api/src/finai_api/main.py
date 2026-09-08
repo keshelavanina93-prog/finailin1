@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 from finai_api.api.account_dimension_policy_routes import router as account_dimension_policy_router
 from finai_api.api.certification_routes import router as certification_router
+from finai_api.api.company_condition_routes import router as company_condition_router
 from finai_api.api.company_context_routes import router as company_context_router
 from finai_api.api.company_home_routes import router as company_home_router
 from finai_api.api.company_journal_routes import router as company_journal_router
@@ -64,6 +65,7 @@ app.include_router(proposal_queue_router)
 app.include_router(source_document_router)
 app.include_router(source_adoption_router)
 app.include_router(company_context_router)
+app.include_router(company_condition_router)
 app.include_router(company_home_router)
 app.include_router(company_journal_router)
 app.include_router(period_control_router)
