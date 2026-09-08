@@ -14,12 +14,12 @@ Executed focused evidence:
 | Typed ontology SDK | 7 focused tests and strict TypeScript builds passed |
 | Actual backend JSON through SDK | 3 operations accepted; 8 scope/hash tamper cases refused |
 | API static checks | Ruff passed; mypy passed over 177 source files |
-| Operator CLI | Help/argument surface executed; no live CLI network claim |
+| Live local HTTP transport at candidate `e5b048d` | 3 CLI operations and 3 SDK operations passed against isolated API 8065; owned API stopped afterward |
 
 Native wire capture SHA256: `e8dcc229330deec2c8145caabe74dbbe63c0fa7e40b9a1742fec5b889d5a4b2ed`.
 
 Native cases include source withdrawal, future-effective editing heads with current-effective pins, same-proposal publisher changes, replay outside the shared publication lock, immutable release protection, cross-scope refusal, retained original-byte access before cache reads, historical preservation after publisher changes, and withdrawal between worker start and response. Index cases include physical database tampering, exact dataset-hash verification, generation reuse and bounded cache growth. Parser caps executed on Windows; Linux limits remain subject to CI execution.
 
-SDK native verification replays captured real API JSON through an injected fetch transport. It establishes the Python/TypeScript wire contract, not live network or browser acceptance. Synthetic fixtures establish no authentic publisher licensing, standards conformance, SOCAR alignment, accounting correctness, scale benchmark or release acceptance.
+The initial SDK wire verification replays captured real API JSON through an injected fetch transport. A subsequent isolated API process performed actual HTTP release inspection, index rebuild and bounded term inspection through both the CLI and SDK. Evidence is retained at `D:\FinAI\g8-ontology-import\.finai\artifacts\nin62-live-cli-sdk.json`; it records exact commit and resource pins. Both checks remain synthetic fixtures: neither establishes browser acceptance, authentic publisher licensing, standards conformance, SOCAR alignment, accounting correctness, scale benchmark or release acceptance.
 
 The full required CI/90% coverage gate must pass on the committed candidate before canonical integration. None of these focused runs replaces that gate. NIN-62 remains In Progress; validation/profiles, semantic diff/upgrades, alignment, authentic consumers, NYX serialization and product rendering remain unbuilt in this foundation.

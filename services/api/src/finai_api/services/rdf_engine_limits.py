@@ -61,7 +61,10 @@ def _windows_caps(cpu_seconds: int, memory_bytes: int) -> None:
             ("peak_job_memory", ctypes.c_size_t),
         ]
 
-    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    loader = getattr(ctypes, "WinDLL", None)
+    if loader is None:
+        raise OSError("RDF Windows resource-cap loader is unavailable")
+    kernel = loader("kernel32", use_last_error=True)
     kernel.CreateJobObjectW.argtypes = [ctypes.c_void_p, wintypes.LPCWSTR]
     kernel.CreateJobObjectW.restype = wintypes.HANDLE
     kernel.SetInformationJobObject.argtypes = [
