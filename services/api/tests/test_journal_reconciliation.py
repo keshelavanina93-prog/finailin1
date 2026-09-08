@@ -107,6 +107,20 @@ def test_absent_journals_are_unavailable_not_zero():
     assert result["unmatched_source_amount"] == "731.97"
 
 
+def test_reconciliation_controls_ignore_ambient_precision_and_exponent_limits():
+    from decimal import Inexact, Rounded, localcontext
+
+    data = case()
+    expected = compile_case(data)
+    with localcontext() as caller:
+        caller.prec = 2
+        caller.Emax = 1
+        caller.Emin = -1
+        caller.traps[Inexact] = caller.traps[Rounded] = True
+        assert compile_case(data) == expected
+        assert caller.prec == 2 and caller.Emax == 1
+
+
 @pytest.mark.parametrize(
     "failure",
     [

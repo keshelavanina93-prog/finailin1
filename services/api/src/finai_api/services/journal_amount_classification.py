@@ -1,6 +1,6 @@
 """Lossless classification; numeric tails are observations, never rounding authority."""
 
-from decimal import Decimal, InvalidOperation
+from decimal import Context, Decimal, InvalidOperation, localcontext
 
 from finai_api.domain.journal_balance import balanced_amounts
 
@@ -22,7 +22,8 @@ def classify(literal):
             categories.append("SCALE_GREATER_THAN_SIX")
             # Only describes a small residual near two-decimal representation.
             # It does not infer its cause or authorize changing the amount.
-            residual = abs(amount - amount.quantize(Decimal("0.01")))
+            with localcontext(Context(prec=max(40, len(amount.as_tuple().digits) + 2))):
+                residual = abs(amount - amount.quantize(Decimal("0.01")))
             if residual and residual < Decimal("0.000001"):
                 categories.append("SOURCE_NUMERIC_TAIL")
         balanced_amounts(
