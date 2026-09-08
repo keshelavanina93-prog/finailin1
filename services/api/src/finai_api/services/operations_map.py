@@ -269,6 +269,7 @@ def map_view(
         )
     return {
         "type": "FeatureCollection",
+        "company_id": str(company_id) if company_id is not None else None,
         "features": features[:limit],
         "lens": lens,
         "valid_at": valid.isoformat(),

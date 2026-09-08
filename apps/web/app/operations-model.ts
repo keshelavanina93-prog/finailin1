@@ -3,6 +3,7 @@ import type {Geometry,Feature,FeatureCollection} from "geojson";
 export interface MapProperties {resource:CanonicalResource;geometry_resource_id?:string;geometry_version_id?:string}
 export type MapFeature=Feature<Geometry,MapProperties>;
 export interface MapSnapshot extends FeatureCollection<Geometry,MapProperties> {
+ company_id:string|null;
  valid_at:string;known_at:string;lens:string;completeness:{snapshot_bounded:boolean;features_truncated:boolean;unmapped_truncated:boolean;scan_limit:number;limit:number};
  counts:{assets:number;mapped_in_bounds:number;outside_bounds:number;unmapped:number};
  unmapped?:Array<{resource:CanonicalResource;reason:string}>;
