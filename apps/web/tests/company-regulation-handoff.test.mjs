@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {loadTypeScript} from "./load-typescript.mjs";
-const {companyRegulationHandoff,validateRegulationHandoff,regulationEntryForSession,regulationSnapshotKey,regulationRuleQuery,assertRegulationHandoffPage}=await loadTypeScript(new URL("../app/company-regulation-handoff.ts",import.meta.url));
+const {companyRegulationHandoff,validateRegulationHandoff,regulationEntryForSession,regulationSnapshotKey,regulationRuleQuery,assertRegulationHandoffPage,companyRegulationOrigin,isCompanyRegulationOrigin,regulationOriginViewKey}=await loadTypeScript(new URL("../app/company-regulation-handoff.ts",import.meta.url));
 const id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
 const company={resource_id:id(1),version_id:id(2),content_hash:"a".repeat(64),object_type:"LegalEntity",authority_state:"APPROVED",evidence_class:"SOURCE_BOUND",display_name:"Company snapshot",attributes:{private:"not copied"}};
 const validAt="2025-01-01T00:00:00.123456Z",knownAt="2025-02-01T00:00:00.654321Z";
@@ -39,4 +39,39 @@ test("company content and rules are jointly verified at the exact returned time"
 test("foreign or unaccepted rules and asserted applicability refuse the whole historical page",()=>{
  for(const patch of [{authority_state:"PROPOSED"},{attributes:{legal_entity_id:id(9),definition:{}}}]){const {page,inspection,expected}=fixture();Object.assign(page.rules[0].resource,patch);assert.throws(()=>assertRegulationHandoffPage(page,inspection,expected,0));}
  const {page,inspection,expected}=fixture();page.rules[0].assessment.effective_obligation=true;assert.throws(()=>assertRegulationHandoffPage(page,inspection,expected,0));
+});
+
+const {journalReviewEntryForSession,journalReviewOriginMatches,journalReviewHistoryMode}=await loadTypeScript(new URL("../app/journal-review-handoff.ts",import.meta.url));
+const {isCompanyMapHandoff,isCompanyExplorationHandoff,restoreCompanyExplorationFocus}=await loadTypeScript(new URL("../app/company-map-handoff.ts",import.meta.url));
+const originContext=()=>({status:"ready",companyId:company.resource_id,company,validAt,knownAt});
+test("regulation foreground requires the displayed company pin and exact time without inventing a rule or scenario",()=>{
+ const reference=companyRegulationOrigin(originContext(),handoff());
+ assert.equal(isCompanyRegulationOrigin(reference),true);assert.equal(isCompanyExplorationHandoff(reference),true);assert.equal(isCompanyMapHandoff(reference),false);
+ assert.deepEqual(Object.keys(reference).sort(),["company","handoff","kind","knownAt","validAt"]);
+ assert.equal(JSON.stringify(reference).includes("not copied"),false);
+ assert.equal(journalReviewOriginMatches(reference,originContext()),true);
+ for(const context of [null,{...originContext(),status:"updating"},{...originContext(),companyId:id(9)},{...originContext(),company:{...company,version_id:id(9)}},{...originContext(),company:{...company,content_hash:"b".repeat(64)}},{...originContext(),knownAt:"2025-02-01T00:00:00.654322Z"}])assert.throws(()=>companyRegulationOrigin(context,handoff()));
+ assert.doesNotThrow(()=>companyRegulationOrigin({...originContext(),knownAt:"2025-02-01T04:00:00.654321+04:00"},handoff()));
+});
+test("regulation reuses guarded live Back/Forward and a stable snapshot preference key separate from ordinary Regulation",()=>{
+ const reference=companyRegulationOrigin(originContext(),handoff()),entry={entryId:id(5),token:"active",returnView:"companies",reference};
+ assert.equal(journalReviewEntryForSession(entry,"active",id(1),"companies"),entry);
+ for(const args of [["other",id(1),"companies"],["active",id(9),"companies"],["active",id(1),"home"]])assert.equal(journalReviewEntryForSession(entry,...args),null);
+ assert.equal(journalReviewHistoryMode({g8JournalReview:id(5)},entry),"review");assert.equal(journalReviewHistoryMode({g8JournalReturn:id(5)},entry),"return");
+ for(const state of [{g8JournalReview:id(9)},{g8JournalReview:id(5),g8JournalReturn:id(5)}])assert.equal(journalReviewHistoryMode(state,entry),"refused");
+ assert.equal(journalReviewHistoryMode({g8JournalReview:id(5)},null),"refused");
+ const key=regulationOriginViewKey("actor-scope",reference);
+ assert.notEqual(key,`actor-scope:regulation:${id(1)}`);
+ assert.equal(key,regulationOriginViewKey("actor-scope",companyRegulationOrigin(originContext(),handoff())));
+ assert.equal(key,regulationOriginViewKey("actor-scope",companyRegulationOrigin(originContext(),{...handoff(),knownAt:"2025-02-01T04:00:00.654321+04:00"})));
+ assert.notEqual(key,regulationOriginViewKey("other-actor-scope",reference));
+ assert.throws(()=>regulationOriginViewKey("actor-scope",{...reference,knownAt:"2025-02-01T00:00:00.654322Z"}));
+ assert.throws(()=>regulationOriginViewKey("actor-scope",{...reference,company:{...reference.company,version_id:id(9)}}));
+});
+test("regulation returns directly to mounted company focus/scroll without waiting for a work queue",()=>{
+ const calls=[],focus={isConnected:true,closest:()=>null,getClientRects:()=>[{}],focus:value=>calls.push(["focus",value])};
+ const origin={element:{isConnected:true,hidden:false,inert:false,getClientRects:()=>[]},queue:focus,focus,scroll:730,scrolls:[{element:{isConnected:true,scrollTo:value=>calls.push(["nested",value])},top:90,left:20}]};
+ assert.equal(restoreCompanyExplorationFocus(origin,{scrollTo:value=>calls.push(["main",value])}),true);
+ assert.deepEqual(calls,[["main",{top:730,behavior:"instant"}],["nested",{top:90,left:20,behavior:"instant"}],["focus",{preventScroll:true}]]);
+ origin.element.hidden=true;assert.equal(restoreCompanyExplorationFocus(origin,null),false);
 });

@@ -3,6 +3,9 @@ import {companyCutoffs,type CompanyCutoffs} from "./company-360-descriptor";
 import {assertCompanyRegulation} from "./company-regulation-state";
 import {restorationInstant} from "./definition-restoration-time";
 
+import type {CompanyNyxContext} from "./company-nyx-context";
+import {journalReviewOriginMatches,type CompanyOriginReference} from "./journal-review-handoff";
+
 type CompanyPin=Pick<CanonicalResource,"resource_id"|"version_id"|"content_hash">;
 export type CompanyRegulationHandoff=CompanyCutoffs&{company:CompanyPin};
 export type CompanyRegulationEntry={token:string;entryId:string;handoff:CompanyRegulationHandoff};
@@ -32,4 +35,20 @@ export function assertRegulationHandoffPage(page:CompanyRegulationPage,inspectio
  const expected=validateRegulationHandoff(handoff,handoff.company.resource_id),company=inspection?.resource;
  if(!company||company.resource_id!==expected.company.resource_id||company.version_id!==expected.company.version_id||company.content_hash!==expected.company.content_hash||company.object_type!=="LegalEntity"||company.authority_state!=="APPROVED"||company.evidence_class==="REFERENCE_TEMPLATE"||restorationInstant(inspection.known_at)!==restorationInstant(expected.knownAt))throw Error("Regulatory review did not retain the Company 360 resource version and content.");
  assertCompanyRegulation(page,{company,validAt:expected.validAt,knownAt:expected.knownAt,offset});
+}
+
+export type CompanyRegulationOrigin=CompanyOriginReference&{kind:"regulation";handoff:CompanyRegulationHandoff};
+export const isCompanyRegulationOrigin=(value:CompanyOriginReference&{kind?:string}):value is CompanyRegulationOrigin=>value.kind==="regulation";
+/** A rules drill retains the displayed company snapshot; no rule selection or scenario is inferred. */
+export function companyRegulationOrigin(context:CompanyNyxContext|null,value:CompanyRegulationHandoff):CompanyRegulationOrigin {
+ if(context?.status!=="ready"||context.company.resource_id!==context.companyId)throw Error("The original company snapshot is unavailable. Current rules have not been substituted.");
+ const handoff=validateRegulationHandoff(value,context.companyId),company={...handoff.company,display_name:context.company.display_name};
+ const reference={kind:"regulation" as const,company,validAt:handoff.validAt,knownAt:handoff.knownAt,handoff};
+ if(!journalReviewOriginMatches(reference,context))throw Error("The regulatory drill does not match the displayed company version and time.");
+ return reference;
+}
+export function regulationOriginViewKey(contextKey:string,reference:CompanyRegulationOrigin):string {
+ const handoff=validateRegulationHandoff(reference.handoff,reference.company.resource_id);
+ if(reference.kind!=="regulation"||regulationSnapshotKey(handoff)!==regulationSnapshotKey(reference))throw Error("The regulatory origin snapshot is inconsistent.");
+ return `${contextKey}:regulation:${reference.company.resource_id}:company360:${regulationSnapshotKey(handoff)}`;
 }

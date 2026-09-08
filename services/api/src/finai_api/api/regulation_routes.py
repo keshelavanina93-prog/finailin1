@@ -350,8 +350,19 @@ def retain_assessment(principal: User, request: AssessmentRequest):
 
 
 @router.get("/assessments/{run_id}")
-def read_assessment(principal: User, run_id: str):
+def read_assessment(principal: User, run_id: str, legal_entity_id: UUID | None = None):
     result = read_run(principal, run_id)
     if result.get("contract") != "regulatory-assessment/1":
         raise WorkspaceError(404, "Regulatory assessment unavailable")
+    if legal_entity_id is not None:
+        company, context = result.get("company"), result.get("assessment_context")
+        if (
+            not isinstance(company, dict)
+            or not isinstance(context, dict)
+            or str(company.get("resource_id")) != str(legal_entity_id)
+            or str(context.get("legal_entity_id")) != str(legal_entity_id)
+        ):
+            raise WorkspaceError(404, "Regulatory assessment unavailable")
+    # Historical evidence keeps its original company version and scenario times.
+    # Omitted company preserves the existing exact-scope historical API contract.
     return result
