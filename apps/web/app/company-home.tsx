@@ -2,6 +2,7 @@
 import type {CompanyWorkflowReference,JournalReviewReference} from "./journal-review-handoff";
 import {useEffect,useLayoutEffect,useState} from "react";
 import type {CompanyHomeDescriptor,CanonicalResource} from "@finai/contracts";
+import CompanyFinancialMetrics from "./company-financial-metrics";
 import CompanyChanges from "./company-changes";
 import CompanyFinancialContext from "./company-financial-context";
 import RetainedCompanyAnalyses from "./retained-company-analyses";
@@ -22,7 +23,8 @@ export default function CompanyHome(props:Props){return <Home key={`${props.toke
 function Home({onContext,token,companyId,snapshot,onData,onOperations,onMapSelection,onInspect,onAccounting,showWork=false,onTrace,onHistory,onProposal,onJournalReview,onCompanyWorkflow,onWorkflow}:Props){
  const [sourcesVisited,setSourcesVisited]=useState(false);const validAt=snapshot?.validAt,knownAt=snapshot?.knownAt;
  const [result,setResult]=useState<CompanyHomeDescriptor|null>(null),[error,setError]=useState("");
- const [revision,setRevision]=useState(0),[financial,setFinancial]=useState("profit_loss");
+ const [revision,setRevision]=useState(0),[financial,setFinancial]=useState("accepted_movements");
+ const [journalSources,setJournalSources]=useState<unknown>(null);
  const [settledRevision,setSettledRevision]=useState<number|null>(null);
  useLayoutEffect(()=>{onContext?.(companyNyxContext(companyId,result?.company??null,result?.valid_at??"",result?.known_at??"",settledRevision!==revision?"updating":error||!result?"unavailable":"ready"));},[onContext,companyId,result,error,settledRevision,revision]);
  useEffect(()=>{if(!companyId)return;const controller=new AbortController();let disposed=false;const timer=setTimeout(()=>controller.abort(),25000);
@@ -41,14 +43,14 @@ function Home({onContext,token,companyId,snapshot,onData,onOperations,onMapSelec
  const unavailable=result.unavailable_financials.find(item=>item.key===financial);
  return <div className="company-home">
   <section className="home-financials" data-company-accounting-origin tabIndex={-1} aria-label="Key financials"><header><div><p className="overline">KEY FINANCIALS</p><h2>Financial condition</h2></div><button className="g8-link" onClick={onData}>Explore source analyses</button></header>
-   <div className="home-journal-facts"><HomeSourceAnalyses projectionGroup="journals" token={token} companyId={companyId} onData={onData}/></div>
-   <div className="home-financial-tabs" aria-label="Financial view">{result.unavailable_financials.map(item=><button key={item.key} aria-pressed={financial===item.key} onClick={()=>setFinancial(item.key)}>{item.label}</button>)}</div>
+   <div className="home-financial-tabs" aria-label="Financial view"><button aria-pressed={financial==="accepted_movements"} onClick={()=>setFinancial("accepted_movements")}>Accepted movements</button>{result.unavailable_financials.map(item=><button key={item.key} aria-pressed={financial===item.key} onClick={()=>setFinancial(item.key)}>{item.label}</button>)}</div>
+   {financial==="accepted_movements"&&<CompanyFinancialMetrics token={token} companyId={companyId} reviews={journalSources} onData={onData}/>}
    {unavailable&&<p className="home-dependency"><strong>{unavailable.label} unavailable.</strong> {unavailable.reason}</p>}
    <details className="home-accounting-depth"><summary>Accounting context & source readiness</summary><CompanyFinancialContext context={result.financial_context} knownAt={result.known_at} onInspect={onInspect} onAccounting={onAccounting?()=>onAccounting(companyAccountingHandoff(result)):undefined}/></details>
    <details className="home-source-analysis-depth" onToggle={event=>{if(event.currentTarget.open)setSourcesVisited(true);}}><summary>Source analysis & supporting evidence</summary>{sourcesVisited&&<><RetainedCompanyAnalyses token={token} companyId={companyId}/><HomeSourceAnalyses projectionGroup="sources" token={token} companyId={companyId} onData={onData}/></>}</details>
   </section>
   <section className="home-operations" data-company-map-origin tabIndex={-1} aria-label="Company operations"><header><div><p className="overline">OPERATIONS</p><h2>{result.domain_packs.length?result.domain_packs.map(pack=>displayName(pack.display_name)).join(" · "):"Company operating context"}</h2></div><span className="home-status-neutral">Accepted geography</span></header><p>{result.operations.limitation}</p><HomeMap key={`${companyId}:${result.operations.valid_at}:${result.operations.known_at}`} token={token} companyId={companyId} descriptor={result} onOpen={onOperations} onSelect={onMapSelection}/><p className="home-scope-note">Operations as of {stamp(result.operations.valid_at)} · known {stamp(result.operations.known_at)}. Separate from each financial result’s period.</p></section>
-  <div className="home-work-depth">{showWork&&onInspect&&<CompanyOperatingWorkspace compact token={token} companyId={companyId} snapshot={{validAt:result.valid_at,knownAt:result.known_at}} onInspect={onInspect} onTrace={onTrace} onHistory={onHistory} onProposal={onProposal} onJournalReview={onJournalReview} onCompanyWorkflow={onCompanyWorkflow} onWorkflow={onWorkflow}/>}</div>
+  <div className="home-work-depth">{showWork&&onInspect&&<CompanyOperatingWorkspace compact onJournalSources={setJournalSources} token={token} companyId={companyId} snapshot={{validAt:result.valid_at,knownAt:result.known_at}} onInspect={onInspect} onTrace={onTrace} onHistory={onHistory} onProposal={onProposal} onJournalReview={onJournalReview} onCompanyWorkflow={onCompanyWorkflow} onWorkflow={onWorkflow}/>}</div>
   <details className="home-changes-depth"><summary>Changes in retained company evidence</summary>{onInspect&&<CompanyChanges compact={showWork} token={token} companyId={companyId} validAt={result.valid_at} knownAt={result.known_at} onInspect={onInspect} onTrace={onTrace}/>}</details>
  </div>;
 }

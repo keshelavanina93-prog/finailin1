@@ -23,3 +23,29 @@
 .home-dependency{line-height:1.45;margin:8px 0;padding:8px 10px}
 .home-journal-facts{padding:0;background:transparent;border:0;margin-bottom:10px}
 @container(max-width:720px){.home-financials,.home-operations{min-height:0}}
+
+/* Server-owned financial hierarchy; source/authority details remain progressive. */
+.home-financial-metrics{min-width:0;padding-top:10px}
+.home-financial-controls,.home-metric-context,.home-metric-footer,.home-account-pages{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.home-financial-controls label{display:grid;gap:4px;min-width:0;flex:1;color:var(--g8-muted);font-size:10px}
+.home-financial-controls select{max-width:100%;width:100%;min-width:0;background:#0a1b26;border:1px solid #2b4555;color:var(--g8-text,#deebf3);border-radius:4px;padding:6px;font-size:11px}
+.home-financial-controls button,.home-account-pages button{font-size:10px;padding:6px 8px}
+.home-metric-context{justify-content:flex-start;padding:10px 0;color:var(--g8-muted);font-size:10px}
+.home-metric-context strong{color:#ace5d6;font-size:12px}.home-metric-context span+span{border-left:1px solid #294250;padding-left:8px}
+.home-account-search{display:flex;gap:8px;align-items:center;font-size:10px;color:var(--g8-muted);margin:0 0 8px}
+.home-account-search input{min-width:0;flex:1;background:#091720;border:1px solid #2b4555;color:var(--g8-text,#deebf3);padding:6px 8px;font-size:11px;border-radius:4px}
+.home-financial-metrics caption{text-align:left;font-size:9px;line-height:1.5;padding:0 0 7px;color:var(--g8-muted)}
+.home-financial-metrics .home-result-grid{border:1px solid #2b4352;border-radius:4px}
+.home-financial-metrics .home-result-grid [data-numeric=true]{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.home-financial-metrics .home-result-grid td{font-size:12px;color:#e3edf4}.home-financial-metrics .home-result-grid th{font-weight:500}
+.home-financial-metrics tbody th{max-width:260px;background:#0d1c27;overflow-wrap:anywhere}
+.home-financial-metrics tbody th button{display:flex;gap:8px;align-items:baseline;min-width:0;border:0;padding:0;background:transparent;font:inherit;color:#addbdc;text-align:left;line-height:1.5;cursor:pointer}
+.home-financial-metrics tbody th button:hover{text-decoration:underline}.home-financial-metrics tbody th button:focus-visible{outline:2px solid #5ddbc9;outline-offset:3px}
+.home-financial-metrics .home-metric-root th,.home-financial-metrics .home-metric-root td{background:#16303b;font-weight:650;color:#edf8ff}
+.home-account-code{font-variant-numeric:tabular-nums;flex-shrink:0;color:#dae8f2;font-size:11px}
+.home-metric-account th button{padding-left:12px!important}.home-metric-account:nth-child(odd) td{background:#0c1b25}
+.home-metric-footer,.home-account-pages{font-size:10px;color:var(--g8-muted);padding-top:8px;line-height:1.5}
+.home-metric-missing{font-size:11px;line-height:1.6;color:var(--g8-muted);padding:16px 0}
+.home-metric-provenance{border-top:1px solid var(--g8-border);font-size:10px;padding-top:7px;color:var(--g8-muted)}
+.home-metric-provenance summary{cursor:pointer}.home-metric-provenance pre{max-width:100%;max-height:320px;overflow:auto;font-size:10px}
+@media(max-width:650px){.home-account-search{display:grid}.home-financial-controls{align-items:stretch}.home-financial-metrics tbody th{min-width:170px}.home-financial-metrics .home-result-grid td,.home-financial-metrics .home-result-grid th{padding:7px}}
