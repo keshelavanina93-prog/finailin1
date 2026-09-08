@@ -1,7 +1,7 @@
 "use client";
 import SemanticAnalysisWorkspace from "./semantic-analysis-workspace";
 import {usePathname} from "next/navigation";
-import {SourceReviewNavigation,sourceReviewPath,sourceReviewTarget,type SourceReviewTarget} from "./source-review-navigation";
+import {SourceReviewNavigation,sourceReviewPath,sourceReviewTarget,sourceReviewUrl,type SourceReviewTarget} from "./source-review-navigation";
 import {parseView} from "./semantic-analysis-state";
 import {parseSourceReviewOrigin,type SourceReviewOrigin} from "./source-review-origin";
 import {displayName} from "./display-name";
@@ -353,6 +353,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
   function focusWorkQueue(){const panel=workRef.current?.closest("details");if(panel)panel.open=true;requestAnimationFrame(()=>{const queue=workRef.current;if(queue){queue.focus({preventScroll:true});queue.scrollIntoView({behavior:"smooth"});}});}
   const workTable = <>{queueAnchor!==null&&<p className="g8-subtle">Browsing older changes. Refresh workspace to return to the latest queue.</p>}<WorkQueue onLoadMoreProposals={()=>void loadOlderProposals()} proposalsHaveMore={paging?.page?.has_more??false} proposalsLoadingMore={paging?.loadingMore??false} proposalsPageError={paging?.page?paging.error:""} items={items} filter={workFilter} onFilter={setWorkFilter} onInspect={item=>{void inspectWork(item);setNyxTab("context");}} onHistory={()=>openEngineering("history")} loading={queuesLoading} errors={[snapshot.evidence.error?`Evidence queue unavailable: ${snapshot.evidence.error}`:"",snapshot.proposals.error?`Change queue unavailable: ${snapshot.proposals.error}`:""].filter(Boolean)} scope={companyMismatch?"Company exploration; unbound source evidence excluded":"Current authorized scope"}/></>;
   function openSourceReview(target:SourceReviewTarget){
+    const destination=sourceReviewUrl(target,new URL(location.href));
     window.dispatchEvent(new Event("g8:capture-source-review"));
     let origin:SourceReviewOrigin|null=null;
     if(!sourceReview&&target.companyId===companyId){
@@ -365,7 +366,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
         viewScroll.current[`${companyId}:${view}`]=origin.scroll;
       }
     }else if(reviewOrigin&&reviewOrigin.companyId===target.companyId)origin={...reviewOrigin,invocationId:target.invocationId};
-    setReviewOrigin(origin);clearSelection();setCompanyId(target.companyId);setMenu(false);setSearch("");const url=new URL(location.href);url.pathname=sourceReviewPath(target);url.searchParams.delete("analysis_view");window.history.pushState(origin?{g8SourceReviewOrigin:origin}:null,"",url);
+    setReviewOrigin(origin);clearSelection();setCompanyId(target.companyId);setMenu(false);setSearch("");window.history.pushState(origin?{g8SourceReviewOrigin:origin}:null,"",destination);
   }
   function returnFromSourceReview(){
     window.dispatchEvent(new Event("g8:capture-source-review"));
