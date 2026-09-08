@@ -1,6 +1,6 @@
-import type {AnalysisField,AnalysisProjection,AnalysisValue,ReportComposition,ReportSectionReference} from "@finai/contracts";
+import type {AnalysisField,AnalysisProjection,AnalysisValue,ReportComposition,ReportSectionReference,ReportPreview,RetainedReportSnapshot,RetainedReport,RetainedReportPage,ReportVersionReference,ReportArtifactMetadata,SaveRetainedReport} from "@finai/contracts";
 import {assertProjection,formatAnalysisDecimal} from "./semantic-analysis-state";
-import {metricCanonical} from "./metric-observation-state";
+import {metricCanonical,metricPin} from "./metric-observation-state";
 import {homeAnalysisRowTarget} from "./home-analysis-row";
 import {restorationInstant} from "./definition-restoration-time";
 
@@ -20,7 +20,48 @@ export function reportCompositionReferences(value:ReportComposition):ReportCompo
  })};
 }
 export function sameReportComposition(a:ReportComposition,b:ReportComposition):boolean {
- return metricCanonical(reportCompositionReferences(a))===metricCanonical(reportCompositionReferences(b));
+ const canonical=(value:ReportComposition)=>{const refs=reportCompositionReferences(value);return {...refs,valid_at:restorationInstant(refs.valid_at),known_at:restorationInstant(refs.known_at)};};
+ return metricCanonical(canonical(a))===metricCanonical(canonical(b));
+}
+
+const refused=()=>Error("The report does not match the selected company, composition or exact retained version.");
+function validReportReference(value:ReportVersionReference):boolean{return Boolean(value&&uuid.test(value.report_id)&&uuid.test(value.proposal_id)&&hash.test(value.content_hash));}
+export function assertReportSnapshot(value:RetainedReportSnapshot,companyId:string,composition?:ReportComposition):void {
+ if(!value||value.contract!=="retained-report-snapshot/1"||!metricPin(value.company)||value.company.resource_id!==companyId||value.composition?.company_id!==companyId||typeof value.company_label!=="string"||value.current_use_authorized!==false||value.business_effect_authorized!==false)throw refused();
+ const canonical=reportCompositionReferences(value.composition);
+ if(composition&&!sameReportComposition(canonical,composition)||!Array.isArray(value.sections)||value.sections.length!==canonical.sections.length)throw refused();
+ value.sections.forEach((section,index)=>{
+  const reference=canonical.sections[index],p=section.projection;
+  if(metricCanonical(section.reference)!==metricCanonical(reference)||section.current_use_authorized!==false||section.business_effect_authorized!==false||!p||p.descriptor.receipt_hash!==reference.receipt_hash||p.descriptor_sha256!==reference.descriptor_sha256||!section.contributors||Array.isArray(section.contributors)||!Array.isArray(section.authority_observation?.roots)||!section.authority_observation.roots.every(metricPin)||!Array.isArray(section.authority_observation.upstream))throw refused();
+  assertProjection(p,{...p.request,company_id:companyId,invocation_id:reference.invocation_id,descriptor_sha256:reference.descriptor_sha256,filters:reference.filters,group_by:reference.group_by});
+  if(reference.columns.some(key=>!p.descriptor.fields.some(field=>field.key===key))||Object.keys(section.contributors).length!==p.rows.length||Object.keys(section.contributors).some(key=>!p.rows.some(row=>row.key===key)))throw refused();
+  for(const row of p.rows){const contributors=section.contributors[row.key];if(!Array.isArray(contributors)||contributors.length!==row.contributor_count)throw refused();contributors.forEach((contributor,contributor_index)=>{const request={...p.request,selected_row:row.key,contributor_index};assertProjection({...p,request,selection:{row_key:row.key,contributor_index,contributor_count:contributors.length,contributor}},request);});}
+ });
+}
+export function assertReportPreview(value:ReportPreview,composition:ReportComposition):void {
+ if(!value||value.contract!=="retained-report-preview/1"||!hash.test(value.snapshot_sha256))throw refused();
+ assertReportSnapshot(value.snapshot,composition.company_id,composition);
+}
+export function freezeReportSave(composition:ReportComposition,preview:ReportPreview,reportId:string,previousProposalId:string|null,requestId:string):SaveRetainedReport {
+ assertReportPreview(preview,composition);
+ if(!uuid.test(reportId)||!uuid.test(requestId)||previousProposalId!==null&&!uuid.test(previousProposalId))throw refused();
+ return {request_id:requestId,report_id:reportId,previous_proposal_id:previousProposalId,expected_preview_sha256:preview.snapshot_sha256,composition:reportCompositionReferences(composition)};
+}
+export function assertRetainedReport(value:RetainedReport,companyId:string,expected?:ReportVersionReference,save?:SaveRetainedReport,preview?:ReportPreview):void {
+ if(!value||value.contract!=="retained-report/1"||!validReportReference(value.reference)||value.company_id!==companyId||!restorationInstant(value.created_at)||typeof value.title!=="string"||typeof value.created_by!=="string"||!["DRAFT","APPROVED","REJECTED"].includes(value.review_state)||value.current_use_authorized!==false||value.business_effect_authorized!==false||expected&&metricCanonical(value.reference)!==metricCanonical(expected)||save&&(value.reference.report_id!==save.report_id||value.previous_proposal_id!==save.previous_proposal_id))throw refused();
+ assertReportSnapshot(value.snapshot,companyId,save?.composition);
+ if(preview&&metricCanonical(value.snapshot)!==metricCanonical(preview.snapshot))throw refused();
+ for(const format of ["xlsx","html"] as const){const artifact=value.exports?.[format];if(!artifact||!Number.isSafeInteger(artifact.size_bytes)||artifact.size_bytes<1||artifact.size_bytes>16000000||!hash.test(artifact.sha256)||typeof artifact.filename!=="string"||!artifact.filename||/[\r\n/\\]/.test(artifact.filename)||artifact.media_type.split(";")[0]!== (format==="xlsx"?"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":"text/html"))throw refused();}
+}
+export function assertReportPage(value:RetainedReportPage,companyId:string):void {
+ if(!value||value.contract!=="retained-report-list/1"||value.company_id!==companyId||!Array.isArray(value.items)||new Set(value.items.map(item=>item.reference?.proposal_id)).size!==value.items.length)throw refused();
+ for(const item of value.items)if(item.company_id!==companyId||!validReportReference(item.reference)||!restorationInstant(item.created_at)||typeof item.title!=="string"||!["DRAFT","APPROVED","REJECTED"].includes(item.review_state)||item.current_use_authorized!==false||item.business_effect_authorized!==false)throw refused();
+ if(value.next_cursor!==null&&(!value.next_cursor||!restorationInstant(value.next_cursor.created_at)||!uuid.test(value.next_cursor.proposal_id)))throw refused();
+}
+export async function verifyReportDownload(bytes:ArrayBuffer,headers:Headers,artifact:ReportArtifactMetadata,reference:ReportVersionReference):Promise<void>{
+ if(headers.get("x-report-content-hash")!==reference.content_hash||headers.get("x-report-proposal-id")!==reference.proposal_id||headers.get("x-content-sha256")!==artifact.sha256||headers.get("content-type")?.split(";")[0]!==artifact.media_type.split(";")[0]||Number(headers.get("content-length"))!==artifact.size_bytes||bytes.byteLength!==artifact.size_bytes)throw Error("Report download identity or length changed. No file was released.");
+ const digest=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",bytes)),byte=>byte.toString(16).padStart(2,"0")).join("");
+ if(digest!==artifact.sha256)throw Error("Report download integrity check failed. No file was released.");
 }
 export function reportCellLabel(value:AnalysisValue,field:AnalysisField):string {
  if(value.state!=="VALUE")return value.state==="NULL"?"Recorded null":"Not recorded";

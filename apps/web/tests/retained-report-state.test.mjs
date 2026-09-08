@@ -2,8 +2,9 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import test from "node:test";
 import {loadTypeScript} from "./load-typescript.mjs";
-const {reportSectionFromProjection,reportCompositionReferences,sameReportComposition,reportCellLabel,reportEvidenceTarget}=await loadTypeScript(new URL("../app/retained-report-state.ts",import.meta.url));
+const {reportSectionFromProjection,reportCompositionReferences,sameReportComposition,reportCellLabel,reportEvidenceTarget,assertReportPreview}=await loadTypeScript(new URL("../app/retained-report-state.ts",import.meta.url));
 const {projection:p}=JSON.parse(await readFile(new URL("./fixtures/retained-report-projection-synthetic.json",import.meta.url),"utf8"));
+const realPreview=JSON.parse(await readFile(new URL("./fixtures/report-preview-real-synthetic.json",import.meta.url),"utf8"));
 const company=p.descriptor.company.resource_id,id="11111111-1111-4111-8111-111111111111";
 const section=reportSectionFromProjection(p,company,id);
 const composition={company_id:company,valid_at:"2026-09-09T00:00:00Z",known_at:"2026-09-09T00:00:00Z",title:"Retained financial review",commentary:"Operator commentary",sections:[section]};
@@ -33,4 +34,11 @@ test("report evidence drills reuse exact shared revision and original row identi
 test("report display preserves missing, null, empty text, false and literal decimals",()=>{
  const field={kind:"text",role:"ATTRIBUTE"};
  for(const [value,expected] of [[{state:"MISSING",value:null,label:null},"Not recorded"],[{state:"NULL",value:null,label:null},"Recorded null"],[{state:"VALUE",value:"",label:null},"Empty text"],[{state:"VALUE",value:false,label:null},"false"],[{state:"VALUE",value:"731.9700",label:null},"731.9700"]])assert.equal(reportCellLabel(value,field),expected);
+});
+test("resolver-produced retained preview carries exact sections, rows and contributor ownership",()=>{
+ assert.doesNotThrow(()=>reportCompositionReferences(realPreview.snapshot.composition));
+ assert.doesNotThrow(()=>assertReportPreview(realPreview,realPreview.snapshot.composition));
+ assert.equal(realPreview.snapshot.sections.length,1);
+ assert.equal(realPreview.snapshot.sections[0].projection.rows.length,2);
+ assert.equal(Object.keys(realPreview.snapshot.sections[0].contributors).length,2);
 });
