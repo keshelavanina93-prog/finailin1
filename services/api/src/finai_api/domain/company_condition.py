@@ -3,7 +3,7 @@
 from typing import Literal
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
 from finai_api.domain.resources import CanonicalResource
 
@@ -119,7 +119,7 @@ class CompanyOperatingResourceGroup(Model):
     key: str
     label: str
     definition: CanonicalResource
-    definition_pins: list[DefinitionPin]
+    definition_pins: list[DefinitionPin] = Field(min_length=1, max_length=201)
     state: Literal["AVAILABLE", "EMPTY", "UNAVAILABLE"]
     resources: list[CanonicalResource]
     valid_at: AwareDatetime
@@ -130,6 +130,21 @@ class CompanyOperatingResourceGroup(Model):
     )
     completeness: Literal["COMPLETE_WITHIN_CONNECTION_SNAPSHOT", "UNAVAILABLE"]
     reason: str
+
+    @model_validator(mode="after")
+    def exact_definition_pin(self) -> "CompanyOperatingResourceGroup":
+        own = [
+            pin for pin in self.definition_pins if pin.resource_id == self.definition.resource_id
+        ]
+        if (
+            len(own) != 1
+            or own[0].version_id != self.definition.version_id
+            or own[0].content_hash != self.definition.content_hash
+        ):
+            raise ValueError(
+                "Group requires exactly one matching definition identity/version/hash pin"
+            )
+        return self
 
 
 class CompanyConditionDescriptorV2(Model):
