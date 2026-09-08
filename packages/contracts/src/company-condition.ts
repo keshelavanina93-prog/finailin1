@@ -17,6 +17,8 @@ export interface CompanyConditionDescriptor {
  connection_depth:2;connections:CompanyConditionConnection[];
  assets:CompanyConditionResourceGroup;parties:CompanyConditionResourceGroup;
  contracts:CompanyConditionResourceGroup;
+ /** Required capability: absence is an unsupported server, never an empty product group. */
+ products:CompanyConditionResourceGroup;
  licence_evidence:Array<{binding:CanonicalResource;notice:CanonicalResource|null;licence:CanonicalResource|null}>;
  work:{state:"AVAILABLE"|"UNAVAILABLE";reason:string|null;observed_at:string;authority:"CURRENT_RETAINED_WORK";items:CompanyConditionWorkItem[];truncated:boolean;limit:25};
  unavailable:Array<{key:"financial_performance"|"live_operations"|"findings"|"investigations"|"regulatory_compliance";label:string;reason:string}>;

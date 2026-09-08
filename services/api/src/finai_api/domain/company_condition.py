@@ -74,6 +74,7 @@ class CompanyConditionDescriptor(Model):
     assets: ResourceGroup
     parties: ResourceGroup
     contracts: ResourceGroup
+    products: ResourceGroup
     licence_evidence: list[LicenceEvidence]
     work: CompanyWork
     unavailable: list[UnavailableCondition]

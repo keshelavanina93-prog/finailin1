@@ -9,13 +9,13 @@ type ResourceAction=(resource:CanonicalResource,knownAt:string)=>void;
 export type CompanyOperatingProps={token:string;companyId:string;snapshot:{validAt:string;knownAt:string};compact?:boolean;onInspect:ResourceAction;onTrace?:ResourceAction;onHistory?:ResourceAction;onProposal?:(id:string)=>void;onWorkflow?:(id:string)=>void};
 const human=(value:string)=>value.replace(/([a-z])([A-Z])/g,"$1 $2").replaceAll("_"," ").toLowerCase();
 const stamp=(value:string)=>new Date(value).toLocaleString();
-const inventoryGroups=[{key:"assets",label:"Assets & facilities"},{key:"parties",label:"Business parties"},{key:"contracts",label:"Contracts"}] as const;
+const inventoryGroups=[{key:"assets",label:"Assets & facilities"},{key:"products",label:"Products"},{key:"parties",label:"Business parties"},{key:"contracts",label:"Contracts"}] as const;
 
 export default function CompanyOperatingWorkspace(props:CompanyOperatingProps){return <OperatingWorkspace key={`${props.token}:${props.companyId}:${props.snapshot.validAt}:${props.snapshot.knownAt}`} {...props}/>;}
 function OperatingWorkspace({token,companyId,snapshot,compact=false,onInspect,onTrace,onHistory,onProposal,onWorkflow}:CompanyOperatingProps){
  const [result,setResult]=useState<CompanyConditionDescriptor|null>(null),[error,setError]=useState("");const [revision,setRevision]=useState(0);
  const [workFilter,setWorkFilter]=useState<"ALL"|CompanyConditionWorkItem["state"]>("ALL"),[workSearch,setWorkSearch]=useState("");
- const [group,setGroup]=useState<"assets"|"parties"|"contracts">("assets"),[search,setSearch]=useState("");
+ const [group,setGroup]=useState<"assets"|"products"|"parties"|"contracts">("assets"),[search,setSearch]=useState("");
  const [page,setPage]=useState(0),[workPage,setWorkPage]=useState(0),[licencePage,setLicencePage]=useState(0),[selected,setSelected]=useState("");
  const {validAt,knownAt}=snapshot;
  useEffect(()=>{const controller=new AbortController();let disposed=false;const timer=setTimeout(()=>controller.abort(),25000);

@@ -12,6 +12,7 @@ from psycopg.errors import QueryCanceled
 from test_company_home import resource, uid
 
 from finai_api.api.company_condition_routes import router
+from finai_api.domain.ontology_catalog import TYPE_FIELDS
 from finai_api.domain.resources import CanonicalResource
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal
@@ -141,6 +142,64 @@ def test_reversed_relationship_does_not_imply_ownership(case):
     asset = node(case, "Reversed asset", "Facility")
     link(case, asset, case["company"])
     assert describe(case).assets.resources == []
+
+
+def test_products_use_only_registered_type_and_exact_company_or_unit_connections(case):
+    assert service.PRODUCTS == {"Product"} <= TYPE_FIELDS.keys()
+    direct = node(case, "Direct product", "Product")
+    unit = node(case, "Product operating unit", "BusinessUnit")
+    unit_product = node(case, "Unit product", "Product")
+    node(case, "Unconnected product", "Product")
+    link(case, case["company"], direct, "Company product")
+    link(case, case["company"], unit, "Company unit")
+    link(case, unit, unit_product, "Unit product relationship")
+    result = describe(case)
+    assert result.products.state == "AVAILABLE"
+    assert result.products.resources == [direct, unit_product]
+    assert result.products.coverage == "EXPLICIT_CONNECTED_RESOURCE_SNAPSHOT"
+    assert "product availability" in result.products.reason
+    assert "Product" in service.KINDS
+    assert not result.current_use_authorized and not result.business_effect_authorized
+
+
+@pytest.mark.parametrize("field", ["source_id", "target_id", "relation_id"])
+@pytest.mark.parametrize("pin", ["missing", "stale"])
+def test_products_require_every_exact_accepted_relationship_pin(case, field, pin):
+    product = node(case, "Pinned product", "Product")
+    edge = link(case, case["company"], product)
+    key = (str(edge.version_id), field)
+    if pin == "missing":
+        del case["pins"][key]
+    else:
+        case["pins"][key] = str(uid("stale product link"))
+    result = describe(case)
+    assert result.products.state == "EMPTY" and result.products.resources == []
+
+
+@pytest.mark.parametrize("bridge", ["LegalEntity", "Supplier", "Product"])
+def test_product_connections_do_not_expand_through_foreign_company_party_or_product(case, bridge):
+    intermediary = node(case, "Foreign bridge", bridge)
+    foreign_product = node(case, "Foreign product", "Product")
+    link(case, case["company"], intermediary, "Bridge")
+    link(case, intermediary, foreign_product, "Foreign product")
+    assert foreign_product not in describe(case).products.resources
+
+
+@pytest.mark.parametrize("change", [{"authority_state": "REVOKED"},
+                                    {"evidence_class": "REFERENCE_TEMPLATE"}])
+def test_unaccepted_product_definitions_are_excluded(case, change):
+    product = node(case, "Unaccepted product", "Product")
+    link(case, case["company"], product)
+    case["nodes"][case["nodes"].index(product)] = product.model_copy(update=change)
+    assert describe(case).products.resources == []
+
+
+def test_product_family_and_reverse_links_do_not_establish_company_products(case):
+    family = node(case, "Unsupported family", "ProductFamily")
+    reverse = node(case, "Reverse product", "Product")
+    link(case, case["company"], family, "Family")
+    link(case, reverse, case["company"], "Reverse")
+    assert describe(case).products.resources == []
 
 
 def test_snapshot_company_version_mismatch_fails_closed(case):

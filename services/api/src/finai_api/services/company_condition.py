@@ -28,7 +28,9 @@ ASSETS = ASSET_TYPES - {"Location"} | {
     "AssetPortfolio", "BusinessUnit", "LicensedOperator", "ServiceCompany"
 }
 PARTIES = {"Party", "Customer", "Supplier", "Counterparty"}
-TARGETS = ASSETS | PARTIES | {"Contract"}
+# Product is the registered canonical type; no family or industry-specific identity is inferred.
+PRODUCTS = {"Product"}
+TARGETS = ASSETS | PARTIES | PRODUCTS | {"Contract"}
 KINDS = sorted(TARGETS | {"LegalEntity", "Relationship", "LinkType"})
 SCAN_LIMIT = 5000
 
@@ -183,7 +185,8 @@ def describe(
             state="AVAILABLE" if members else "EMPTY", resources=members,
             reason="Only accepted version-pinned outgoing relationships from this company or "
             "one connected operating unit are included. Association does not establish ownership, "
-            "contract performance, asset condition or complete business coverage.",
+            "contract performance, product availability, asset condition or complete business "
+            "coverage.",
         )
 
     unavailable: list[dict[str, Any]] = [
@@ -219,6 +222,7 @@ def describe(
     return CompanyConditionDescriptor(
         company=company, valid_at=valid, known_at=known, connections=connections,
         assets=group(ASSETS), parties=group(PARTIES), contracts=group({"Contract"}),
+        products=group(PRODUCTS),
         licence_evidence=[
             LicenceEvidence.model_validate(row) for row in context["licence_evidence"]
         ],
