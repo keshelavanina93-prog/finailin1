@@ -77,8 +77,8 @@ def test_retail_cash_register_profile_retains_shift_close_as_review_candidate():
     result = compile_source(
         request(
             "RETAIL_CASH_REGISTER",
-            "store_id,cash_register_id,shift_id,operator_id,event_time,currency,gross_amount,net_amount,payment_method,source_record_id,source_hash\n"
-            "STORE-1,TILL-2,SHIFT-9,OP-4,2026-08-12T22:00:00+04:00,GEL,1200.00,1180.00,CARD,Z-ROW-1,"
+            "store_id,cash_register_id,shift_id,operator_id,event_time,z_report_id,fiscal_close_status,currency,gross_amount,net_amount,payment_method,source_record_id,source_hash\n"
+            "STORE-1,TILL-2,SHIFT-9,OP-4,2026-08-12T22:00:00+04:00,Z-2026-08-12,CLOSED,GEL,1200.00,1180.00,CARD,Z-ROW-1,"
             + "a" * 64
             + "\n",
         )

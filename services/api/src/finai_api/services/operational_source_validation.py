@@ -57,6 +57,8 @@ RETAIL_REQUIRED = frozenset(
         "shift_id",
         "operator_id",
         "event_time",
+        "z_report_id",
+        "fiscal_close_status",
         "currency",
         "gross_amount",
         "net_amount",
@@ -177,6 +179,11 @@ def validate_row(source_system: str, row: dict[str, str], seen: set[str]) -> dic
             _decimal(row, "net_amount", reasons)
             if not re.fullmatch(r"[A-Z]{3}", row["currency"]):
                 reasons.append("INVALID_CURRENCY")
+            fiscal_status = row["fiscal_close_status"].upper()
+            if fiscal_status not in {"CLOSED", "REOPENED"}:
+                reasons.append("FISCAL_CLOSE_NOT_CONFIRMED")
+            elif fiscal_status == "REOPENED":
+                reasons.append("FISCAL_CLOSE_REOPENED")
     return {
         "status": "REJECTED" if reasons else "REVIEW_REQUIRED",
         "reasons": sorted(set(reasons)),
