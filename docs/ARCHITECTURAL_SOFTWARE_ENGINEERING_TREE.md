@@ -516,7 +516,7 @@ with Z-report identity, fiscal-close state, Store/CashRegister semantic-binding
 validation, evidence-linked promotion preview generation and the read-only
 revenue/volume/COGS/margin bridge.
 1C movement-register physical grain is now retained before journal reconciliation; the canonical checkout now exposes an accepted-resource movement-to-JournalLine reconciliation contract and operations panel with explicit match, missing, quantity-unavailable and mismatch states.
-Canonical operational promotion and the remaining decision/action planes
+Canonical operational publication still requires the independent review/promotion gate; proposal submission is now wired. The remaining decision/action planes
 are not. The NYX citation/refusal boundary is implemented, but it is not
 model-backed reasoning or consequential action execution. The worktree family and
 distributed implementation history must therefore be treated as source

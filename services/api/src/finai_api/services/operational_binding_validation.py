@@ -1,8 +1,11 @@
 """Resolve operational source identifiers against accepted ontology resources."""
 
 import json
+from datetime import UTC, datetime
 from typing import Any
+from uuid import NAMESPACE_URL, uuid5
 
+from finai_api.domain.resources import ProposalDetail, ResourceMutation, ResourceProposal
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
 from finai_api.services import resources
@@ -234,3 +237,51 @@ def promotion_preview(principal: Principal, receipt_id: str) -> dict[str, Any]:
         "business_effect_authorized": False,
         "candidates": candidates,
     }
+
+
+def submit_governed_proposal(principal: Principal, receipt_id: str) -> ProposalDetail:
+    """Persist eligible operational candidates as a reviewable proposal only."""
+    require_permission(principal, "ontology_propose")
+    preview = promotion_preview(principal, receipt_id)
+    if preview["status"] != "READY_FOR_GOVERNED_PROPOSAL":
+        raise WorkspaceError(409, "Operational intake has no eligible rows for proposal submission")
+    receipt = retrieve(principal.scope, receipt_id)
+    assert receipt is not None
+    mutations: list[ResourceMutation] = []
+    for candidate in preview["candidates"]:
+        values = candidate["values"]
+        raw_time = values.get("event_time") or values.get("measurement_timestamp")
+        if not raw_time:
+            raw_time = f"{receipt.scope.period}-01T00:00:00+00:00"
+        effective = datetime.fromisoformat(str(raw_time).replace("Z", "+00:00"))
+        if effective.tzinfo is None:
+            effective = effective.replace(tzinfo=UTC)
+        source_record_id = candidate["evidence"]["source_record_id"]
+        mutations.append(
+            ResourceMutation(
+                resource_id=uuid5(NAMESPACE_URL, f"g8:{receipt.receipt_id}:{source_record_id}"),
+                object_type=candidate["object_type"],
+                identity_key=candidate["identity_key"],
+                display_name=f"{candidate['object_type']} · {source_record_id}",
+                attributes={
+                    **values,
+                    "source_record_id": source_record_id,
+                    "source_hash": candidate["evidence"]["source_hash"],
+                    "source_receipt_id": receipt.receipt_id,
+                    "source_row": candidate["source_row"],
+                },
+                valid_from=effective,
+                evidence_class="SOURCE_BOUND",
+            )
+        )
+    proposal = ResourceProposal(
+        proposal_id=uuid5(NAMESPACE_URL, f"g8-operational-proposal:{receipt.receipt_id}"),
+        title=f"Operational intake proposal · {receipt.receipt_id}",
+        rationale=(
+            "Submit validated, semantically bound operational observations for "
+            "independent governed review; intake performs no canonical mutation."
+        ),
+        access_entity=str(principal.scope.legal_entity_id),
+        mutations=mutations,
+    )
+    return resources.propose(principal, proposal)

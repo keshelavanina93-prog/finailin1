@@ -153,3 +153,37 @@ def test_promotion_preview_is_proposal_only_and_preserves_evidence(monkeypatch):
     assert result["canonical_mutation"] is False
     assert result["candidates"][0]["object_type"] == "RetailSale"
     assert result["candidates"][0]["evidence"]["source_record_id"] == "ROW-1"
+
+
+def test_submit_governed_proposal_persists_review_packet_without_promotion(monkeypatch):
+    values = valid_orpak_values()
+    principal = Principal(
+        actor_id="maker",
+        display_name="Maker",
+        scope=SCOPE,
+        permissions=("ontology_read", "ontology_propose"),
+    )
+    monkeypatch.setattr(
+        operational_binding_validation, "retrieve", lambda scope, receipt_id: receipt(values)
+    )
+    monkeypatch.setattr(
+        operational_binding_validation.resources,
+        "list_resources",
+        lambda principal, object_type, query, offset, limit: [
+            resource(object_type, values[field])
+            for field, mapped_type in operational_binding_validation.LOOKUPS["ORPAK"].items()
+            if mapped_type == object_type
+        ],
+    )
+    captured = {}
+    monkeypatch.setattr(
+        operational_binding_validation.resources,
+        "propose",
+        lambda _principal, proposal: captured.setdefault("proposal", proposal),
+    )
+    result = operational_binding_validation.submit_governed_proposal(principal, "receipt-1")
+    proposal = captured["proposal"]
+    assert result is proposal
+    assert proposal.mutations[0].object_type == "RetailSale"
+    assert proposal.mutations[0].evidence_class == "SOURCE_BOUND"
+    assert proposal.mutations[0].attributes["source_record_id"] == "ROW-1"
