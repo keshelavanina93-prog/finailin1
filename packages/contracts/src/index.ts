@@ -261,3 +261,4 @@ export type { MetricPin, MetricUnit, MetricSelector, MetricDefinition, MetricOut
 export type { AcceptedMovementFunctionInvocation } from "./accepted-movement-function.js";
 export type { MetricCatalogItem, MetricCatalog, MetricCatalogRequest } from "./metric-observations.js";
 export type { MetricDefinitionSnapshot } from "./metric-observations.js";
+export type {CompanyFinancialResults} from "./company-financial-results.js";

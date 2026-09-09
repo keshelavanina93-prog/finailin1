@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, model_validator
 
-type Scalar = StrictStr | StrictInt | StrictBool | None
+Scalar = StrictStr | StrictInt | StrictBool | None
 
 
 class Model(BaseModel):
