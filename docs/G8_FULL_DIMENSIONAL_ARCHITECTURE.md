@@ -840,7 +840,7 @@ promotion previews now compile evidence-linked RetailSale, CashRegisterShiftClos
 promotion and live operational telemetry remain open.
 A citation-first NYX refusal/explanation boundary is now wired at
 `/v1/ontology/nyx/reason`; model-backed reasoning, multi-citation packets and
-proposal handoff execution remain open. The previous configured coverage result was 83.93% against
+NYX model-backed reasoning and proposal/action handoff execution remain open. The previous configured coverage result was 83.93% against
 a 90% gate. The protected
 `development/enterprise-hydration-foundation` branch remains at `4261fcb`, so
 this head is not the canonical merged release. This is a substantial converged
