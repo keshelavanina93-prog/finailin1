@@ -10,6 +10,7 @@ from finai_api.api.company_context_routes import router as company_context_route
 from finai_api.api.company_home_routes import router as company_home_router
 from finai_api.api.company_journal_routes import router as company_journal_router
 from finai_api.api.event_time_routes import router as event_time_router
+from finai_api.api.enterprise_diagnostics_routes import router as enterprise_diagnostics_router
 from finai_api.api.finance_ontology_routes import router as finance_ontology_router
 from finai_api.api.function_routes import router as function_router
 from finai_api.api.history_search_routes import router as history_search_router
@@ -70,6 +71,7 @@ app.include_router(runtime_observation_router)
 app.include_router(semantic_analysis_router)
 app.include_router(transformation_router)
 app.include_router(event_time_router)
+app.include_router(enterprise_diagnostics_router)
 app.include_router(history_search_router)
 app.include_router(operations_router)
 app.include_router(regulation_router)
