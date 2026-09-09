@@ -17,7 +17,7 @@ from datetime import UTC, datetime
 from hashlib import sha256
 from importlib.resources import files
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, cast
 from uuid import UUID, uuid5
 
 from finai_api.domain.finance_chartpack import (
@@ -153,7 +153,9 @@ def _classification(
     raw = "" if account_code is None else str(account_code)
     normalized = _normalize_account_code(account_code)
     if not normalized:
-        observation_codes = ["UNMAPPED_ACCOUNT_CODE"]
+        observation_codes: list[Literal["UNMAPPED_ACCOUNT_CODE", "UNMAPPED_SUBKONTO"]] = [
+            "UNMAPPED_ACCOUNT_CODE"
+        ]
         if _normalize_account_code(subkonto):
             observation_codes.append("UNMAPPED_SUBKONTO")
         return AccountClassification(
@@ -211,17 +213,17 @@ def _classification(
         (item for item in pack.analytic_policies if item.key == rule.analytic_policy), None
     )
     if policy:
-        analytic_dimension, analytic_mapping_state, observation_codes = _analytic_mapping(
+        analytic_dimension, analytic_mapping_state, analytic_codes = _analytic_mapping(
             policy, subkonto
         )
     elif subkonto is not None and _normalize_account_code(subkonto):
-        analytic_dimension, analytic_mapping_state, observation_codes = (
+        analytic_dimension, analytic_mapping_state, analytic_codes = (
             None,
             "UNMAPPED_OBSERVED",
             ["UNMAPPED_SUBKONTO"],
         )
     else:
-        analytic_dimension, analytic_mapping_state, observation_codes = None, "NOT_APPLICABLE", []
+        analytic_dimension, analytic_mapping_state, analytic_codes = None, "NOT_APPLICABLE", []
     return AccountClassification(
         account_code=raw,
         normalized_account_code=normalized,
@@ -233,8 +235,13 @@ def _classification(
         balance_measure=rule.balance_measure,
         analytic_policy=rule.analytic_policy,
         analytic_dimension=analytic_dimension,
-        analytic_mapping_state=analytic_mapping_state,
-        observation_codes=observation_codes,
+        analytic_mapping_state=cast(
+            Literal["NOT_APPLICABLE", "MAPPED_CANDIDATE", "UNMAPPED_OBSERVED"],
+            analytic_mapping_state,
+        ),
+        observation_codes=cast(
+            list[Literal["UNMAPPED_ACCOUNT_CODE", "UNMAPPED_SUBKONTO"]], analytic_codes
+        ),
         operating=rule.operating,
         additive_ok=additive_ok,
         duplicate_of=duplicate_of,
@@ -502,7 +509,7 @@ def prepare_classification_proposal(
         ),
         access_entity=principal.scope.legal_entity_id,
         mutations=mutations,
-        source_versions=dict(source_versions or {}),
+        source_versions={key: dict(value) for key, value in (source_versions or {}).items()},
     )
 
 

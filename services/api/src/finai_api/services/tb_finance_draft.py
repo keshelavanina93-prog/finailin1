@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 from collections import defaultdict
 from collections.abc import Iterable, Mapping, Sequence
+from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
 from io import BytesIO
@@ -131,6 +132,10 @@ def _load_months(
         seen_periods.add(month.period)
         months.append(month)
         ordered_receipts.append(str(row["receipt_id"]))
+        ingested_at = row.get("ingested_at")
+        ingested_at_text = (
+            ingested_at.isoformat() if isinstance(ingested_at, datetime) else ingested_at
+        )
         metadata.append(
             {
                 "receipt_id": str(row["receipt_id"]),
@@ -145,16 +150,8 @@ def _load_months(
                 # database intake timestamp is retained separately as known
                 # time and is never used to choose the accounting period.
                 "valid_at": month.period_end.isoformat(),
-                "known_at": (
-                    row.get("ingested_at").isoformat()
-                    if hasattr(row.get("ingested_at"), "isoformat")
-                    else row.get("ingested_at")
-                ),
-                "ingestion_timestamp": (
-                    row.get("ingested_at").isoformat()
-                    if hasattr(row.get("ingested_at"), "isoformat")
-                    else row.get("ingested_at")
-                ),
+                "known_at": ingested_at_text,
+                "ingestion_timestamp": ingested_at_text,
                 "prior_rejects": list(receipt.get("rejects", [])),
             }
         )
@@ -506,7 +503,7 @@ def _draft_sections(months: Sequence[TBMonth], pack, continuity: dict[str, Any])
                 for key, local_class in pnl_classes.items()
             }
         )
-    totals = defaultdict(Decimal)
+    totals: defaultdict[str, Decimal] = defaultdict(Decimal)
     ytd = []
     for item, natural in zip(pnl_monthly, natural_closing, strict=True):
         for key, value in item.items():
@@ -548,7 +545,7 @@ def _draft_sections(months: Sequence[TBMonth], pack, continuity: dict[str, Any])
             "cash_end": pulse["cash_end"],
             "monthly_net_change": _decimal(
                 Decimal(pulse["cash_end"])
-                - (Decimal(previous["cash_end"]) if index else Decimal(0))
+                - (Decimal(previous["cash_end"]) if previous is not None else Decimal(0))
             ),
             "label": "CASH_BRIDGE_FROM_TB",
             "certification": "NOT_CERTIFIED",

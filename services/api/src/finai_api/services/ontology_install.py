@@ -336,14 +336,16 @@ def _hidden_dependents(principal: Principal, root_ids: list) -> list[dict[str, A
     with resources.resource_connection(principal) as conn, conn.cursor(
         row_factory=dict_row
     ) as cursor:
-        has_batch_function = cursor.execute(
+        batch_probe = cursor.execute(
             "SELECT to_regprocedure("
             "'public.g8_hidden_current_dependents_for_roots(uuid[])'"
             ") AS function_name"
-        ).fetchone()["function_name"] is not None
-        has_detail_function = cursor.execute(
+        ).fetchone()
+        has_batch_function = bool(batch_probe and batch_probe["function_name"] is not None)
+        detail_probe = cursor.execute(
             "SELECT to_regprocedure('public.g8_hidden_current_dependents(uuid)') AS function_name"
-        ).fetchone()["function_name"] is not None
+        ).fetchone()
+        has_detail_function = bool(detail_probe and detail_probe["function_name"] is not None)
         if has_batch_function:
             values = cursor.execute(
                 "SELECT * FROM public.g8_hidden_current_dependents_for_roots(%s::uuid[])",
@@ -361,9 +363,10 @@ def _hidden_dependents(principal: Principal, root_ids: list) -> list[dict[str, A
                         ).fetchall()
                     )
                     continue
-                hidden = cursor.execute(
+                hidden_row = cursor.execute(
                     "SELECT public.g8_has_hidden_current_dependents(%s) AS hidden", (root_id,)
-                ).fetchone()["hidden"]
+                ).fetchone()
+                hidden = bool(hidden_row and hidden_row["hidden"])
                 values.extend(
                     [
                         {

@@ -16,6 +16,7 @@ from uuid import UUID
 from psycopg.rows import dict_row
 
 from finai_api.domain.enterprise_diagnostics import DiagnosticRequest
+from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
 from finai_api.services.resources import resource_connection
@@ -721,8 +722,8 @@ def evaluate(
             )
             break
         visited.add(version)
-        row = visible.get(version)
-        if row is None:
+        graph_row: dict | None = visible.get(version)
+        if graph_row is None:
             # Deliberately do not distinguish hidden data from absent data.
             findings.append(
                 _finding(
@@ -735,38 +736,38 @@ def evaluate(
                 )
             )
             continue
-        node_findings = _node_blockers(row, request, current)
+        node_findings = _node_blockers(graph_row, request, current)
         check = runtime_checks.get(version)
         if check and check.get("state") != "READY":
             node_findings.append(
                 _finding(
                     version + ":runtime",
-                    row.get("display_name", row["object_type"]),
+                    graph_row.get("display_name", graph_row["object_type"]),
                     check["state"],
                     check["reason"],
-                    resource_id=str(row["resource_id"]),
+                    resource_id=str(graph_row["resource_id"]),
                     version_id=version,
                 )
             )
         findings.extend(node_findings)
         nodes[version] = {
             "id": version,
-            "label": row.get("display_name", row["object_type"]),
+            "label": graph_row.get("display_name", graph_row["object_type"]),
             "state": next(
                 (s for s in STATES if any(f["state"] == s for f in node_findings)), "READY"
             ),
-            "object_type": row["object_type"],
-            "resource_id": str(row["resource_id"]),
+            "object_type": graph_row["object_type"],
+            "resource_id": str(graph_row["resource_id"]),
             "version_id": version,
-            "content_hash": row.get("content_hash"),
-            "authority_state": row.get("authority_state"),
-            "evidence_class": row.get("evidence_class"),
-            "valid_from": str(row["valid_from"]),
-            "valid_to": str(row["valid_to"]) if row.get("valid_to") else None,
-            "system_from": str(row["system_from"]),
+            "content_hash": graph_row.get("content_hash"),
+            "authority_state": graph_row.get("authority_state"),
+            "evidence_class": graph_row.get("evidence_class"),
+            "valid_from": str(graph_row["valid_from"]),
+            "valid_to": str(graph_row["valid_to"]) if graph_row.get("valid_to") else None,
+            "system_from": str(graph_row["system_from"]),
         }
         refs = adjacency.get(version, [])
-        for field, identity in row.get("attributes", {}).items():
+        for field, identity in graph_row.get("attributes", {}).items():
             if not field.endswith("_id") or not isinstance(identity, str):
                 continue
             try:
@@ -784,13 +785,13 @@ def evaluate(
                         "UNBOUND",
                         f"The declared {field.removesuffix('_id').replace('_', ' ')} "
                         "reference has no exact dependency pin.",
-                        resource_id=str(row["resource_id"]),
+                        resource_id=str(graph_row["resource_id"]),
                         version_id=version,
                         actions=[
                             _action(
                                 "REVIEW_BINDING",
                                 "Review the missing dependency link",
-                                resource_id=str(row["resource_id"]),
+                                resource_id=str(graph_row["resource_id"]),
                             )
                         ],
                     )
@@ -816,20 +817,20 @@ def evaluate(
             pending_nodes.append((target_version, [*path, version], depth + 1))
     # Kahn traversal detects cycles while allowing shared dependencies and diamonds.
     indegree = dict.fromkeys(visited, 0)
-    for source in visited:
-        for child in graph_neighbors.get(source, set()) & visited:
-            indegree[child] += 1
+    for source_id in visited:
+        for child_id in graph_neighbors.get(source_id, set()) & visited:
+            indegree[child_id] += 1
     ready = deque(v for v, degree in indegree.items() if degree == 0)
     longest = dict.fromkeys(visited, 0)
     removed = 0
     while ready:
         node = ready.popleft()
         removed += 1
-        for child in graph_neighbors.get(node, set()) & visited:
-            longest[child] = max(longest[child], longest[node] + 1)
-            indegree[child] -= 1
-            if indegree[child] == 0:
-                ready.append(child)
+        for child_version in graph_neighbors.get(node, set()) & visited:
+            longest[child_version] = max(longest[child_version], longest[node] + 1)
+            indegree[child_version] -= 1
+            if indegree[child_version] == 0:
+                ready.append(child_version)
     if removed != len(indegree):
         findings.append(
             _finding(
@@ -872,20 +873,25 @@ def evaluate(
         )
     findings = list({f["id"]: f for f in findings}.values())
     for finding in findings:
-        node = nodes.get(finding.get("version_id", ""))
-        if node and node["state"] == "READY":
-            node["state"] = finding["state"]
+        finding_node = nodes.get(finding.get("version_id", ""))
+        if finding_node and finding_node["state"] == "READY":
+            finding_node["state"] = finding["state"]
     # A ready parent cannot conceal a blocked dependency in either graph.
     for _ in range(MAX_DEPTH + 1):
         changed = False
         for edge in edges:
-            parent, child = nodes.get(edge["source"]), nodes.get(edge["target"])
-            if parent and child and parent["state"] == "READY" and child["state"] != "READY":
-                parent["state"] = "UNBOUND"
+            parent_node, child_node = nodes.get(edge["source"]), nodes.get(edge["target"])
+            if (
+                parent_node
+                and child_node
+                and parent_node["state"] == "READY"
+                and child_node["state"] != "READY"
+            ):
+                parent_node["state"] = "UNBOUND"
                 findings.append(
                     _finding(
-                        parent["id"] + ":upstream",
-                        parent["label"],
+                        parent_node["id"] + ":upstream",
+                        parent_node["label"],
                         "UNBOUND",
                         "An upstream dependency has not passed its declared input checks.",
                     )
@@ -1006,8 +1012,11 @@ def _runtime_check(principal: Principal, row: dict, request: DiagnosticRequest) 
                 "select that source scope before running this Function.",
             }
         try:
+            assert request.valid_at is not None and request.known_at is not None
             invocation = FunctionInvocation(
-                function={"resource_id": row["resource_id"], "version_id": row["version_id"]},
+                function=VersionReference.model_validate(
+                    {"resource_id": row["resource_id"], "version_id": row["version_id"]}
+                ),
                 valid_at=request.valid_at,
                 known_at=request.known_at,
                 limit=min(50, getattr(spec.definition, "row_count", 50)),
@@ -1182,7 +1191,7 @@ def diagnose(principal: Principal, request: DiagnosticRequest) -> dict:
         # Traverse all selected candidate inputs, with one batched SQL read per graph level.
         pending = set(versions)
         traversed: set[str] = set()
-        dependencies = []
+        dependencies: list[dict] = []
         for _depth in range(MAX_DEPTH + 1):
             if not pending:
                 break
@@ -1251,7 +1260,7 @@ def diagnose(principal: Principal, request: DiagnosticRequest) -> dict:
             "company_label": company_row["display_name"],
             "period": period,
             "currency": principal.scope.currency,
-            "valid_at": request.valid_at.isoformat(),
+                "valid_at": (request.valid_at or known).isoformat(),
             "known_at": known.isoformat(),
             "access_entity": principal.scope.legal_entity_id,
         }
