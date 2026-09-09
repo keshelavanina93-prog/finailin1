@@ -39,7 +39,14 @@ def summarize_receipts(rows: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
             for row in ordered
             if (row.get("request") or {}).get("source_use", "ACTUAL_INPUT") == "ACTUAL_INPUT"
         ]
-        selected = (actual or ordered)[0]
+        inline = [row for row in ordered if row.get("inline_storage") is True]
+        inline_actual = [
+            row
+            for row in inline
+            if (row.get("request") or {}).get("source_use", "ACTUAL_INPUT")
+            == "ACTUAL_INPUT"
+        ]
+        selected = (inline_actual or inline or actual or ordered)[0]
         working_periods = sorted(
             {
                 str((row.get("request") or {}).get("scope", {}).get("period"))
@@ -57,12 +64,17 @@ def summarize_receipts(rows: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
                 ],
                 "working_periods": working_periods,
                 "duplicate_count": len(ordered),
+                "inline_source_count": len(inline),
+                "external_source_count": sum(
+                    row.get("external_storage") is True for row in ordered
+                ),
                 "status": "DUPLICATE_CONTENT_REVIEW_REQUIRED"
                 if len(ordered) > 1
                 else "SINGLE_RETAINED_CONTENT",
                 "deterministic_candidate_receipt_id": str(selected.get("receipt_id")),
                 "selection_policy": (
-                    "PREFER_ACTUAL_INPUT_THEN_LEXICOGRAPHIC_RECEIPT_ID; REVIEW_REQUIRED_NO_MUTATION"
+                    "PREFER_INLINE_SOURCE_THEN_ACTUAL_INPUT_THEN_LEXICOGRAPHIC_RECEIPT_ID; "
+                    "REVIEW_REQUIRED_NO_MUTATION"
                 ),
             }
         )
@@ -85,7 +97,9 @@ def reconcile_retained_tb(principal: Principal) -> dict[str, Any]:
     scope = principal.scope.model_dump(mode="json")
     with connection(principal.scope) as conn, conn.cursor(row_factory=dict_row) as cursor:
         rows = cursor.execute(
-            "SELECT receipt_id, request, receipt, source_sha256, submitted_by, ingested_at "
+            "SELECT receipt_id, request, receipt, source_sha256, submitted_by, ingested_at, "
+            "(source_storage IS NOT NULL) AS external_storage, "
+            "(source_bytes IS NOT NULL) AS inline_storage "
             "FROM hydration_runs WHERE tenant_id=%s AND exact_scope=%s "
             "AND receipt->>'source_class'='TRIAL_BALANCE' "
             "ORDER BY ingested_at, receipt_id LIMIT 100",

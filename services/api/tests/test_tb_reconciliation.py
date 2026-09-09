@@ -33,3 +33,15 @@ def test_reconciliation_keeps_working_period_as_context_only():
 
     assert result["period_authority"] == "SOURCE_INTERNAL_HEADER"
     assert result["groups"][0]["working_periods"] == ["2026-08"]
+
+
+def test_reconciliation_prefers_a_readable_inline_source_candidate():
+    rows = [
+        {**_row("external", "2025-01", "a" * 64), "external_storage": True},
+        {**_row("inline", "2025-01", "a" * 64), "inline_storage": True},
+    ]
+
+    result = summarize_receipts(rows)
+    group = result["groups"][0]
+    assert group["deterministic_candidate_receipt_id"] == "inline"
+    assert group["inline_source_count"] == 1
