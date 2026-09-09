@@ -7,6 +7,9 @@ export type OutcomeDimensionRow = {
 
 export type OutcomeMeasurement = {
   contract: "outcome-measurement/1";
+  measurement_id: string;
+  observed_at: string;
+  scope: {legal_entity_id: string};
   plan_scenario: Record<string, unknown>;
   actual_scenario: Record<string, unknown>;
   rows: OutcomeDimensionRow[];

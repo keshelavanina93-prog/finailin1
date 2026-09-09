@@ -74,6 +74,9 @@ def test_actual_vs_plan_returns_decimal_variance(monkeypatch):
     result = outcomes.actual_vs_plan(principal, plan, actual)
     assert result["contract"] == "outcome-measurement/1"
     assert result["rows"][0]["variance"] == "2.25"
+    assert result["measurement_id"].startswith("om_")
+    assert result["scope"]["legal_entity_id"] == str(principal.scope.legal_entity_id)
+    assert isinstance(result["observed_at"], str) and result["observed_at"].endswith("+00:00")
     assert result["learning_candidate_created"] is False
 
 

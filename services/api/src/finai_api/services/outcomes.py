@@ -1,6 +1,7 @@
 """Deterministic, evidence-bound outcome measurement over accepted plan facts."""
 
 import json
+from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from typing import Any
@@ -74,8 +75,20 @@ def actual_vs_plan(principal, plan_scenario_id: UUID, actual_scenario_id: UUID) 
                 "variance": format(variance, "f"),
             }
         )
+    identity_material = {
+        "contract": "outcome-measurement/1",
+        "plan_scenario_id": str(plan_scenario_id),
+        "actual_scenario_id": str(actual_scenario_id),
+        "legal_entity_id": company_id,
+        "rows": rows,
+    }
     return {
         "contract": "outcome-measurement/1",
+        "measurement_id": "om_" + sha256(
+            json.dumps(identity_material, sort_keys=True).encode()
+        ).hexdigest(),
+        "observed_at": datetime.now(UTC).isoformat(),
+        "scope": {"legal_entity_id": company_id},
         "plan_scenario": scenarios[str(plan_scenario_id)],
         "actual_scenario": scenarios[str(actual_scenario_id)],
         "rows": rows,
