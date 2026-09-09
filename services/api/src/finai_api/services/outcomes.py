@@ -4,7 +4,7 @@ import json
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 from psycopg.types.json import Jsonb
@@ -222,6 +222,160 @@ def measurement_timeline(principal, limit: int = 50) -> dict[str, Any]:
         )
     return {
         "contract": "outcome-measurement-timeline/1",
+        "scope": {"legal_entity_id": str(principal.scope.legal_entity_id)},
+        "items": items,
+        "limit": bounded,
+    }
+
+
+def retain_learning_candidate(principal, evaluation: dict[str, Any]) -> dict[str, Any]:
+    """Retain a shadow evaluation as a governed candidate, without deploying it."""
+    require_permission(principal, "ontology_propose")
+    candidate_id = str(evaluation.get("candidate_id", ""))
+    if evaluation.get("contract") != "learning-evaluation/1" or not (
+        candidate_id.startswith("lc_") and len(candidate_id) == 67
+    ):
+        raise WorkspaceError(422, "Learning evaluation identity is invalid")
+    measurement = evaluation.get("measurement")
+    if not isinstance(measurement, dict) or measurement.get("scope") != {
+        "legal_entity_id": str(principal.scope.legal_entity_id)
+    }:
+        raise WorkspaceError(422, "Learning candidate is outside the authorized company scope")
+    event = {
+        "contract": "learning-candidate-event/1",
+        "candidate_id": candidate_id,
+        "event_type": "EVALUATED",
+        "evaluation": evaluation,
+        "promotion_executed": False,
+        "rollback_executed": False,
+        "production_policy_changed": False,
+        "production_model_changed": False,
+        "business_effect_authorized": False,
+    }
+    return _retain_learning_event(principal, event)
+
+
+def decide_learning_candidate(
+    principal,
+    candidate_id: str,
+    decision: Literal["PROMOTION_APPROVED", "REJECTED", "ROLLBACK_APPROVED"],
+    rationale: str,
+) -> dict[str, Any]:
+    """Record independent candidate governance; execution remains a separate disabled plane."""
+    require_permission(principal, "ontology_review")
+    if not (candidate_id.startswith("lc_") and len(candidate_id) == 67):
+        raise WorkspaceError(422, "Learning candidate identity is invalid")
+    rationale = rationale.strip()
+    if len(rationale) < 10:
+        raise WorkspaceError(422, "Learning candidate rationale needs at least 10 characters")
+    scope = principal.scope.model_dump(mode="json")
+    with connection(principal.scope, repeatable_read=True) as conn:
+        conn.execute("SELECT set_config('finai.exact_scope',%s,true)", (json.dumps(scope),))
+        row = conn.execute(
+            "SELECT payload,actor_id FROM learning_candidate_events "
+            "WHERE tenant_id=%s AND candidate_id=%s AND exact_scope=%s "
+            "ORDER BY recorded_at DESC,event_id DESC LIMIT 1",
+            (principal.scope.tenant_id, candidate_id, Jsonb(scope)),
+        ).fetchone()
+    if row is None:
+        raise WorkspaceError(404, "Learning candidate is unavailable in authorized scope")
+    current = dict(row[0])
+    if row[1] == principal.actor_id:
+        raise WorkspaceError(409, "Independent reviewer identity is required")
+    current_type = str(current.get("event_type"))
+    if decision == "ROLLBACK_APPROVED" and current_type != "PROMOTION_APPROVED":
+        raise WorkspaceError(409, "Only an approved promotion can be rolled back")
+    if decision == "PROMOTION_APPROVED" and current_type != "EVALUATED":
+        raise WorkspaceError(409, "Only an evaluated candidate can be approved")
+    if decision == "REJECTED" and current_type not in {"EVALUATED", "PROMOTION_APPROVED"}:
+        raise WorkspaceError(409, "Learning candidate is not reviewable in its current state")
+    event = {
+        "contract": "learning-candidate-event/1",
+        "candidate_id": candidate_id,
+        "event_type": decision,
+        "rationale": rationale,
+        "previous_event": current_type,
+        "promotion_executed": False,
+        "rollback_executed": False,
+        "production_policy_changed": False,
+        "production_model_changed": False,
+        "business_effect_authorized": False,
+    }
+    return _retain_learning_event(principal, event)
+
+
+def _retain_learning_event(principal, event: dict[str, Any]) -> dict[str, Any]:
+    scope = principal.scope.model_dump(mode="json")
+    content_hash = sha256(
+        json.dumps(event, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    event_id = "lce_" + sha256(
+        f"{event['candidate_id']}:{event['event_type']}:{content_hash}".encode()
+    ).hexdigest()
+    with connection(principal.scope) as conn:
+        conn.execute("SELECT set_config('finai.exact_scope',%s,true)", (json.dumps(scope),))
+        conn.execute(
+            "INSERT INTO learning_candidate_events "
+            "(tenant_id,event_id,candidate_id,event_type,exact_scope,payload,"
+            "content_hash,actor_id) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING",
+            (
+                principal.scope.tenant_id,
+                event_id,
+                event["candidate_id"],
+                event["event_type"],
+                Jsonb(scope),
+                Jsonb(event),
+                content_hash,
+                principal.actor_id,
+            ),
+        )
+        row = conn.execute(
+            "SELECT payload,content_hash,recorded_at FROM learning_candidate_events "
+            "WHERE tenant_id=%s AND event_id=%s AND exact_scope=%s",
+            (principal.scope.tenant_id, event_id, Jsonb(scope)),
+        ).fetchone()
+    if row is None or row[1] != content_hash:
+        raise WorkspaceError(409, "Learning candidate event integrity check failed")
+    return {
+        "event": dict(row[0]),
+        "event_id": event_id,
+        "content_hash": row[1],
+        "recorded_at": row[2].isoformat(),
+        "promotion_executed": False,
+        "rollback_executed": False,
+    }
+
+
+def learning_candidate_timeline(principal, limit: int = 50) -> dict[str, Any]:
+    require_permission(principal, "ontology_read")
+    bounded = max(1, min(limit, 100))
+    scope = principal.scope.model_dump(mode="json")
+    with connection(principal.scope, repeatable_read=True) as conn:
+        conn.execute("SELECT set_config('finai.exact_scope',%s,true)", (json.dumps(scope),))
+        rows = conn.execute(
+            "SELECT DISTINCT ON (candidate_id) payload,event_id,content_hash,recorded_at "
+            "FROM learning_candidate_events WHERE tenant_id=%s AND exact_scope=%s "
+            "ORDER BY candidate_id,recorded_at DESC,event_id DESC LIMIT %s",
+            (principal.scope.tenant_id, Jsonb(scope), bounded),
+        ).fetchall()
+    items = []
+    for payload, event_id, content_hash, recorded_at in rows:
+        if (
+            sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+            != content_hash
+        ):
+            raise WorkspaceError(409, "Learning candidate timeline integrity failed")
+        items.append(
+            {
+                "event": dict(payload),
+                "event_id": event_id,
+                "content_hash": content_hash,
+                "recorded_at": recorded_at.isoformat(),
+            }
+        )
+    return {
+        "contract": "learning-candidate-timeline/1",
         "scope": {"legal_entity_id": str(principal.scope.legal_entity_id)},
         "items": items,
         "limit": bounded,

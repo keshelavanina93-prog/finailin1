@@ -46,3 +46,17 @@ export type OutcomeMeasurementTimeline = {
   items: RetainedOutcomeMeasurement[];
   limit: number;
 };
+
+export type LearningCandidateEvent = {
+  contract: "learning-candidate-event/1";
+  candidate_id: string;
+  event_type: "EVALUATED" | "PROMOTION_APPROVED" | "REJECTED" | "ROLLBACK_APPROVED";
+  [key: string]: unknown;
+};
+
+export type LearningCandidateTimeline = {
+  contract: "learning-candidate-timeline/1";
+  scope: {legal_entity_id: string};
+  items: Array<{event: LearningCandidateEvent; event_id: string; content_hash: string; recorded_at: string}>;
+  limit: number;
+};

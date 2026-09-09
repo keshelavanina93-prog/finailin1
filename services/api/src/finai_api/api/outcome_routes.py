@@ -1,9 +1,10 @@
 """Exact-scope outcome measurement endpoints."""
 
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel, ConfigDict, Field
 
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal
@@ -40,3 +41,30 @@ def measurement_timeline(
     principal: User, limit: int = Query(default=50, ge=1, le=100)
 ) -> dict[str, Any]:
     return outcomes.measurement_timeline(principal, limit)
+
+
+@router.post("/learning-candidates")
+def retain_learning_candidate(evaluation: dict[str, Any], principal: User) -> dict[str, Any]:
+    return outcomes.retain_learning_candidate(principal, evaluation)
+
+
+class LearningCandidateDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    decision: Literal["PROMOTION_APPROVED", "REJECTED", "ROLLBACK_APPROVED"]
+    rationale: str = Field(min_length=10, max_length=2000)
+
+
+@router.post("/learning-candidates/{candidate_id}/decision")
+def decide_learning_candidate(
+    candidate_id: str, request: LearningCandidateDecision, principal: User
+) -> dict[str, Any]:
+    return outcomes.decide_learning_candidate(
+        principal, candidate_id, request.decision, request.rationale
+    )
+
+
+@router.get("/learning-candidates")
+def learning_candidate_timeline(
+    principal: User, limit: int = Query(default=50, ge=1, le=100)
+) -> dict[str, Any]:
+    return outcomes.learning_candidate_timeline(principal, limit)

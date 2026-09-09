@@ -297,8 +297,8 @@ export const DIMENSIONAL_SURFACES: readonly DimensionalSurface[] = [
     "Outcomes and governed learning",
     ["outcome_learning"],
     ["apps/web/app/planning-workspace.tsx", "apps/web/app/outcome-measurement-panel.tsx"],
-    ["/api/ontology/outcomes/actual-vs-plan", "/api/ontology/outcomes/learning-evaluation", "/api/ontology/outcomes/measurements"],
-    ["/v1/ontology/outcomes/actual-vs-plan", "/v1/ontology/outcomes/learning-evaluation", "/v1/ontology/outcomes/measurements"],
+    ["/api/ontology/outcomes/actual-vs-plan", "/api/ontology/outcomes/learning-evaluation", "/api/ontology/outcomes/measurements", "/api/ontology/outcomes/learning-candidates"],
+    ["/v1/ontology/outcomes/actual-vs-plan", "/v1/ontology/outcomes/learning-evaluation", "/v1/ontology/outcomes/measurements", "/v1/ontology/outcomes/learning-candidates"],
     [
       "ui_route",
       "context_inherited",
@@ -316,8 +316,7 @@ export const DIMENSIONAL_SURFACES: readonly DimensionalSurface[] = [
       "approval_boundary",
       "browser_proof",
       "restart_readback",
-      "learning candidate promotion/rollback",
-      "learning candidate promotion/rollback",
+      "production deployment executor and policy/model mutation",
     ],
   ),
 ];
