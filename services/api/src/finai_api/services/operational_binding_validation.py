@@ -9,6 +9,7 @@ from finai_api.domain.resources import ProposalDetail, ResourceMutation, Resourc
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
 from finai_api.services import resources
+from finai_api.services.operational_source_validation import profile_for
 from finai_api.services.workspace import WorkspaceError
 from finai_api.storage import retrieve
 
@@ -60,6 +61,8 @@ def validate(principal: Principal, receipt_id: str) -> dict[str, Any]:
     lookup = LOOKUPS.get(source_system)
     if lookup is None:
         raise WorkspaceError(409, "Receipt is not an ORPAK or gas telemetry operational profile")
+    source_contract = profile_for(source_system)
+    assert source_contract is not None
     accepted: dict[str, list[Any]] = {
         object_type: resources.list_resources(principal, object_type, "", 0, limit=1000)
         for object_type in set(lookup.values())
@@ -98,6 +101,9 @@ def validate(principal: Principal, receipt_id: str) -> dict[str, Any]:
         "contract": "operational-binding-validation/1",
         "receipt_id": receipt.receipt_id,
         "profile": profile,
+        "source_system": source_system,
+        "grain": source_contract["grain"],
+        "validation_stage": "SEMANTIC_BINDING",
         "rows": rows,
         "status": "VALIDATED"
         if rows and all(row["status"] == "VALIDATED" for row in rows)
@@ -241,6 +247,8 @@ def promotion_preview(principal: Principal, receipt_id: str) -> dict[str, Any]:
         "contract": "operational-promotion-preview/1",
         "receipt_id": receipt.receipt_id,
         "profile": profile,
+        "source_system": source_system,
+        "grain": (profile_for(source_system) or {}).get("grain", "UNKNOWN"),
         "status": "READY_FOR_GOVERNED_PROPOSAL" if candidates else "NO_ELIGIBLE_ROWS",
         "proposal_required": True,
         "canonical_mutation": False,

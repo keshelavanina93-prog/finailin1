@@ -78,6 +78,9 @@ def test_binding_validation_resolves_accepted_orpak_dimensions(monkeypatch):
     assert result["status"] == "VALIDATED"
     assert result["promotion_eligible"] is True
     assert result["canonical_promotion"] == "GOVERNED_REVIEW_REQUIRED"
+    assert result["source_system"] == "ORPAK"
+    assert result["grain"] == "ONE_FORECOURT_SALE_LINE"
+    assert result["validation_stage"] == "SEMANTIC_BINDING"
     assert all(result["rows"][0]["bindings"].values())
 
 
@@ -100,6 +103,8 @@ def test_binding_validation_requires_gas_meter_bindings(monkeypatch):
     result = operational_binding_validation.validate(PRINCIPAL, "receipt-1")
 
     assert result["profile"] == "gas-telemetry-measurement/1"
+    assert result["source_system"] == "GAS_TELEMETRY"
+    assert result["grain"] == "ONE_METER_MEASUREMENT_AT_ONE_TIME"
     assert result["status"] == "REVIEW_REQUIRED"
     assert "UNBOUND_METER_ID" in result["rows"][0]["reasons"]
 
@@ -151,6 +156,7 @@ def test_promotion_preview_is_proposal_only_and_preserves_evidence(monkeypatch):
     assert result["status"] == "READY_FOR_GOVERNED_PROPOSAL"
     assert result["proposal_required"] is True
     assert result["canonical_mutation"] is False
+    assert result["grain"] == "ONE_FORECOURT_SALE_LINE"
     assert result["candidates"][0]["object_type"] == "RetailSale"
     assert result["candidates"][0]["evidence"]["source_record_id"] == "ROW-1"
 
