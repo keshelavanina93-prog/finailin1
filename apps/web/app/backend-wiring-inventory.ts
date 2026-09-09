@@ -139,7 +139,15 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
     ["apps/web/app/nyx-interaction.tsx"],
     ["model-backed reasoning, multi-citation packets, proposal handoff execution"],
   ),
-  routeFamily("outcomes_learning", "Outcomes and governed learning", null, null, "target_only", [], ["outcomes/learning"]),
+  routeFamily(
+    "outcomes_learning",
+    "Outcomes and governed learning",
+    "/api/ontology/outcomes/actual-vs-plan",
+    "/v1/ontology/outcomes/actual-vs-plan",
+    "partial",
+    ["services/api/src/finai_api/services/outcomes.py"],
+    ["learning candidate evaluation/promotion and outcome timeline UI"],
+  ),
   routeFamily(
     "petroleum_telemetry_bridge",
     "Full petroleum telemetry bridge",
