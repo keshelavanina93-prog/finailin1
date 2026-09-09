@@ -90,7 +90,8 @@ def _receipt_rows(principal: Principal, receipt_ids: Sequence[str]) -> list[dict
     scope = principal.scope.model_dump(mode="json")
     with connection(principal.scope) as conn, conn.cursor(row_factory=dict_row) as cursor:
         rows = cursor.execute(
-            "SELECT receipt_id, request, receipt, exact_scope, source_storage, source_sha256 "
+            "SELECT receipt_id, request, receipt, exact_scope, source_storage, source_bytes, "
+            "source_sha256 "
             "FROM hydration_runs WHERE tenant_id=%s AND exact_scope=%s "
             "AND receipt_id=ANY(%s::text[])",
             (principal.scope.tenant_id, Jsonb(scope), list(receipt_ids)),
