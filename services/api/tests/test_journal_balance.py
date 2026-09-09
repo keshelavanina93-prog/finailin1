@@ -136,3 +136,17 @@ def test_existing_future_editing_head_and_reparenting_cannot_be_omitted():
     old["attributes"]["journal_id"] = str(uuid4())
     with pytest.raises(WorkspaceError, match="reparented"):
         validate(proposal, [old])
+
+
+def test_balanced_publication_does_not_inherit_callers_exponent_limits():
+    from decimal import Inexact, localcontext
+
+    from finai_api.domain.journal_balance import balanced_amounts
+
+    lines = [{"side": side, "amount": {"amount": "1731.97"}} for side in ("DEBIT", "CREDIT")]
+    with localcontext() as caller:
+        caller.prec = 2
+        caller.Emax = 2
+        caller.traps[Inexact] = True
+        assert balanced_amounts(lines) == {"debit": "1731.97", "credit": "1731.97"}
+        assert caller.prec == 2 and caller.Emax == 2

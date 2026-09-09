@@ -1,7 +1,7 @@
 """Exact decimal, complete double-entry bundle contract."""
 
 import re
-from decimal import Decimal, localcontext
+from decimal import Context, Decimal, localcontext
 from typing import Literal
 from uuid import UUID
 
@@ -22,8 +22,7 @@ class JournalManifest(BaseModel):
 
 
 def balanced_amounts(lines: list[dict]) -> dict:
-    with localcontext() as context:
-        context.prec = 40
+    with localcontext(Context(prec=40)):
         debit = credit = Decimal(0)
         for line in lines:
             amount = line.get("amount", {}).get("amount")
