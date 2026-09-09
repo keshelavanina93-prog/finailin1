@@ -79,7 +79,9 @@ def compatible_attributes(
     before = deepcopy(previous["attributes"])
     attributes = deepcopy(before)
     if spec["object_type"] != "SchemaDefinition":
-        return attributes
+        # Platform links and other catalog contracts are reviewed as semantic
+        # definitions; schema evolution remains the only additive-only path.
+        return deepcopy(spec["attributes"])
     fields = attributes["fields"]
     for name, definition in spec["attributes"]["fields"].items():
         if name not in fields:

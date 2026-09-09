@@ -435,11 +435,7 @@ def preflight(principal: Principal) -> dict[str, Any]:
             effective.scope.tenant_id, item["object_type"], item["identity_key"]
         )
         current = installed.get(str(identity))
-        exact = bool(
-            current
-            and current.get("authority_state") == "APPROVED"
-            and current.get("attributes") == item["attributes"]
-        )
+        exact = finance_ontology.accepted_definition_matches(item, current)
         status = "INSTALLED" if exact else "CHANGE_REQUIRED" if current else "NOT_INSTALLED"
         row = {
             "phase": item["object_type"]
