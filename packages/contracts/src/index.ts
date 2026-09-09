@@ -246,3 +246,5 @@ export interface SourcePreview {
   total_rows:number; matching_rows:number; offset:number; page_size:number; has_more:boolean;
   sha256:string; byte_length:number; integrity:"VERIFIED"; value_semantics:"SOURCE_TEXT";
 }
+
+export type {AnalysisScalar,AnalysisPin,AnalysisDecimalPresentation,AnalysisValue,AnalysisFilter,AnalysisRequest,AnalysisField,AnalysisRow,AnalysisContributor,AnalysisDescriptor,AnalysisProjection} from "./semantic-analysis.js";
