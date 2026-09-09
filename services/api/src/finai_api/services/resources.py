@@ -36,6 +36,23 @@ HEAD_SELECT = (
     "JOIN canonical_identities i USING(tenant_id,resource_id) "
 )
 
+PLATFORM_PUBLIC_TYPES = {
+    "SchemaDefinition",
+    "SemanticContract",
+    "LinkType",
+    "ObjectInterface",
+    "ObjectTypeGroup",
+    "ObjectTypeImplementation",
+    "ObjectSetDefinition",
+    "ObjectBinding",
+    "DerivedProperty",
+    "FactContract",
+    "FinanceCapabilityDefinition",
+    "FinanceClassificationPolicy",
+    "FinanceProjectionDefinition",
+    "CertificationContract",
+}
+
 
 @contextmanager
 def resource_connection(
@@ -468,9 +485,7 @@ def _validate(
             raise WorkspaceError(
                 403, "Schema, semantic and link definitions belong to the shared platform registry"
             )
-        if access_entity == "__PLATFORM__" and item.object_type not in (
-            meta_types | {"CertificationContract"}
-        ):
+        if access_entity == "__PLATFORM__" and item.object_type not in PLATFORM_PUBLIC_TYPES:
             raise WorkspaceError(403, "Enterprise facts cannot use platform-public policy")
         with conn.cursor(row_factory=dict_row) as cursor:
             previous = cursor.execute(
