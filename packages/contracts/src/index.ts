@@ -248,3 +248,6 @@ export interface SourcePreview {
 }
 
 export type {AnalysisScalar,AnalysisPin,AnalysisDecimalPresentation,AnalysisValue,AnalysisFilter,AnalysisRequest,AnalysisField,AnalysisRow,AnalysisContributor,AnalysisDescriptor,AnalysisProjection} from "./semantic-analysis.js";
+export type { FinancialMetricKey, FinancialMetricRequest, FinancialMetricRecipe, FinancialMetricValue, FinancialMetricNode, FinancialMetricResult } from "./company-financial-metrics.js";
+export type { MetricPin, MetricUnit, MetricSelector, MetricDefinition, MetricOutput, MetricObservationRequest, MetricObservation, MetricCatalogItem, MetricCatalog, MetricCatalogRequest, MetricDefinitionSnapshot } from "./metric-observations.js";
+export type { AcceptedMovementFunctionInvocation } from "./accepted-movement-function.js";
