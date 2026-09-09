@@ -7,7 +7,11 @@ from fastapi import APIRouter, Query, Response
 from finai_api.api.ontology_routes import User
 from finai_api.domain.resources import ProposalDetail
 from finai_api.security import require_permission
-from finai_api.services import operations_map, petroleum_reconciliation
+from finai_api.services import (
+    operational_binding_validation,
+    operations_map,
+    petroleum_reconciliation,
+)
 from finai_api.services.spatial_import import SpatialImportRequest
 from finai_api.services.spatial_import import import_proposal as create_import
 
@@ -55,6 +59,11 @@ def petroleum_lineage_view(
     principal: User, resource_id: UUID, company_id: UUID | None = None
 ) -> dict[str, Any]:
     return petroleum_reconciliation.lineage(principal, resource_id, company_id)
+
+
+@router.get("/petroleum/intake/{receipt_id}/validation")
+def petroleum_intake_validation(principal: User, receipt_id: str) -> dict[str, Any]:
+    return operational_binding_validation.validate(principal, receipt_id)
 
 
 @router.post("/import-proposal", response_model=ProposalDetail)

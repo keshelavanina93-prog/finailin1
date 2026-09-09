@@ -77,6 +77,7 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
       "/api/operations/import-proposal -> /v1/operations/import-proposal",
       "/api/operations/petroleum/reconciliation -> /v1/operations/petroleum/reconciliation",
       "/api/operations/petroleum/lineage/{resource_id} -> /v1/operations/petroleum/lineage/{resource_id}",
+      "/api/operations/petroleum/intake/{receipt_id}/validation -> /v1/operations/petroleum/intake/{receipt_id}/validation",
     ],
     ["ORPAK/SCADA retained measurement intake and movement lineage"],
   ),

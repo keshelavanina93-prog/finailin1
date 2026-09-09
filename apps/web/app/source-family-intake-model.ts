@@ -22,6 +22,8 @@ export type RequiredScopeDimension =
   | "fuel_grade"
   | "tank"
   | "pump"
+  | "dispenser"
+  | "nozzle"
   | "shift"
   | "operator"
   | "currency"

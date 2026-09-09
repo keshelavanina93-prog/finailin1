@@ -1,8 +1,9 @@
 "use client";
 
 import type { IngestReceipt, ReviewDecision } from "@finai/contracts";
+import OperationalBindingReview from "./operational-binding-review";
 
-export default function SourceInspection({ receipt, decision }: { receipt: IngestReceipt; decision?: ReviewDecision | null }) {
+export default function SourceInspection({ receipt, decision, token }: { receipt: IngestReceipt; decision?: ReviewDecision | null; token: string }) {
   const profile = receipt.source_profile;
   const proof = (profile as unknown as { aggregation_proof?: {
     state: string; selected_rows: number[]; account_totals: Record<string, string>;
@@ -11,6 +12,7 @@ export default function SourceInspection({ receipt, decision }: { receipt: Inges
     policy: string;
   } } | undefined)?.aggregation_proof;
   return <section aria-label="Source analysis and persisted process">
+    <OperationalBindingReview token={token} receiptId={receipt.receipt_id} profile={typeof profile?.profile === "string" ? profile.profile : undefined} />
     <h3>Upload process</h3>
     <p>Recorded execution and retained review state. Financial report generation remains unavailable until its source contracts are approved.</p>
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>

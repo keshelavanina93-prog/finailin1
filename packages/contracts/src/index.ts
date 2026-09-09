@@ -65,6 +65,7 @@ export interface IngestReceipt {
   scope: ExactScope;
   source_class: "TRIAL_BALANCE" | "UNFAMILIAR_TABULAR" | "WORKBOOK_PACKAGE";
   source_profile?: {
+    profile?: string;
     account_catalogs?: Array<{ sheet: string; account_count: number; company_binding: string; policy: string;
       findings: Array<{ code: string; coordinates: string[] }>;
       accounts: Array<{ account_code: string; source_name: string; coordinate: string;
