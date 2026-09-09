@@ -151,6 +151,7 @@ def invoke(principal: Principal, request: FunctionInvocation) -> dict:
         started = datetime.now(UTC).isoformat()
         run_id = None
         failure = None
+        failure_kind = None
         try:
             output = execute_plan(principal, frozen)
             retained = fact_runs.retain_run(
@@ -167,9 +168,13 @@ def invoke(principal: Principal, request: FunctionInvocation) -> dict:
             run_id = retained["run_id"]
         except WorkspaceError:
             failure = "EXECUTION_REJECTED"
-        except Exception:
+            failure_kind = "WorkspaceError"
+        except Exception as exc:
             # Do not persist exception messages containing source text or connection secrets.
             failure = "EXECUTION_FAILED"
+            # The class is a bounded diagnostic, not an exception message. It makes a
+            # failed retained invocation actionable without leaking source payloads.
+            failure_kind = type(exc).__name__
         payload = {
             "request": request.model_dump(mode="json"),
             "exact_scope": scope,
@@ -183,7 +188,11 @@ def invoke(principal: Principal, request: FunctionInvocation) -> dict:
             "mode": "EVIDENCE_ANALYSIS_ONLY",
             "current_use_authorized": False,
             "business_effect_authorized": False,
-            **({"failure_code": failure} if failure else {"run_id": run_id}),
+            **(
+                {"failure_code": failure, "failure_kind": failure_kind}
+                if failure
+                else {"run_id": run_id}
+            ),
         }
         with _database(principal) as cursor:
             cursor.execute(
