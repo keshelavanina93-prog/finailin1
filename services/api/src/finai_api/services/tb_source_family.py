@@ -189,10 +189,11 @@ def bind_source_family(
                 "source_sha256": month.source_sha256,
             }
         )
+        receipt_id = ids[index]
         snapshots.append(
             SourcePeriodSnapshot(
                 snapshot_id="sps_" + snapshot_key,
-                receipt_id=ids[index],
+                receipt_id=receipt_id,
                 filename=month.filename,
                 source_sha256=month.source_sha256,
                 observed_period=month.period,
@@ -210,8 +211,8 @@ def bind_source_family(
                 findings=tuple(findings),
                 valid_at=month.period_end.isoformat(),
                 known_at=(
-                    known_at_by_receipt.get(ids[index])
-                    if known_at_by_receipt and ids[index] is not None
+                    known_at_by_receipt.get(receipt_id)
+                    if known_at_by_receipt and receipt_id is not None
                     else None
                 ),
             )
