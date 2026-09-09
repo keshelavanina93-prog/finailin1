@@ -9,6 +9,8 @@ export type RequiredScopeDimension =
   | "legal_entity"
   | "business_unit"
   | "site"
+  | "meter"
+  | "asset"
   | "station"
   | "store"
   | "cash_register"
@@ -21,6 +23,8 @@ export type RequiredScopeDimension =
   | "item"
   | "fuel_grade"
   | "tank"
+  | "measurement_basis"
+  | "quality"
   | "pump"
   | "dispenser"
   | "nozzle"
@@ -232,7 +236,21 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
       "lineage_receipt",
     ],
     presentEvidence: ["source_file_hash", "schema_hash", "station_master", "fuel_grade_mapping", "lineage_receipt"],
-    routes: intakeRoutes(["/api/hydration", "/api/operations/petroleum/intake/{receipt_id}/validation"], ["/v1/hydration/ingest", "/v1/operations/petroleum/intake/{receipt_id}/validation"], "wired"),
+    routes: intakeRoutes(
+      [
+        "/api/hydration",
+        "/api/operations/petroleum/intake/{receipt_id}/validation",
+        "/api/operations/petroleum/intake/{receipt_id}/promotion-preview",
+        "/api/operations/petroleum/intake/{receipt_id}/promotion-proposal",
+      ],
+      [
+        "/v1/hydration/ingest",
+        "/v1/operations/petroleum/intake/{receipt_id}/validation",
+        "/v1/operations/petroleum/intake/{receipt_id}/promotion-preview",
+        "/v1/operations/petroleum/intake/{receipt_id}/promotion-proposal",
+      ],
+      "wired",
+    ),
     currentImplementationStatus: "partially-implemented",
     blockedOrMissingContracts: ["ORPAK sale-line, semantic binding, and governed proposal submission are wired; independent promotion and authentic connector readback remain open."],
   },
@@ -240,11 +258,29 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     id: "gas_telemetry",
     label: "Gas telemetry",
     systems: ["gas telemetry", "metering gateway", "SCADA export"],
-    requiredScopeDimensions: ["tenant", "legal_entity", "site", "tank", "fuel_grade", "period", "document", "lineage"],
-    implementedScopeDimensions: ["tenant", "legal_entity", "site", "tank", "fuel_grade", "period", "document", "lineage"],
+    requiredScopeDimensions: ["tenant", "legal_entity", "site", "meter", "asset", "tank", "measurement_basis", "quality", "period", "document", "lineage"],
+    implementedScopeDimensions: ["tenant", "legal_entity", "site", "meter", "asset", "tank", "fuel_grade", "measurement_basis", "quality", "period", "document", "lineage"],
     requiredEvidence: ["source_file_hash", "schema_hash", "row_count", "tank_level_reading", "external_reference", "lineage_receipt"],
     presentEvidence: ["source_file_hash", "schema_hash", "row_count", "tank_level_reading", "lineage_receipt"],
-    routes: intakeRoutes(["/api/hydration", "/api/operations/petroleum/intake/{receipt_id}/validation", "/api/operations/petroleum/reconciliation"], ["/v1/hydration/ingest", "/v1/operations/petroleum/intake/{receipt_id}/validation", "/v1/operations/petroleum/reconciliation"], "wired"),
+    routes: intakeRoutes(
+      [
+        "/api/hydration",
+        "/api/operations/petroleum/intake/{receipt_id}/validation",
+        "/api/operations/petroleum/intake/{receipt_id}/promotion-preview",
+        "/api/operations/petroleum/intake/{receipt_id}/promotion-proposal",
+        "/api/operations/petroleum/telemetry",
+        "/api/operations/petroleum/reconciliation",
+      ],
+      [
+        "/v1/hydration/ingest",
+        "/v1/operations/petroleum/intake/{receipt_id}/validation",
+        "/v1/operations/petroleum/intake/{receipt_id}/promotion-preview",
+        "/v1/operations/petroleum/intake/{receipt_id}/promotion-proposal",
+        "/v1/operations/petroleum/telemetry",
+        "/v1/operations/petroleum/reconciliation",
+      ],
+      "wired",
+    ),
     currentImplementationStatus: "partially-implemented",
     blockedOrMissingContracts: ["Telemetry, semantic binding and retained-series monotonicity checks are wired; live connector readback remains governed review work."],
   },
@@ -267,7 +303,21 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     implementedScopeDimensions: ["tenant", "legal_entity", "store", "cash_register", "shift", "operator", "currency", "period", "document", "lineage"],
     requiredEvidence: ["source_file_hash", "schema_hash", "pos_shift_close", "cash_register_z_report", "row_count", "lineage_receipt"],
     presentEvidence: ["source_file_hash", "schema_hash", "pos_shift_close", "cash_register_z_report"],
-    routes: intakeRoutes(["/api/hydration", "/api/operations/petroleum/intake/{receipt_id}/validation"], ["/v1/hydration/ingest", "/v1/operations/petroleum/intake/{receipt_id}/validation"], "wired"),
+    routes: intakeRoutes(
+      [
+        "/api/hydration",
+        "/api/operations/petroleum/intake/{receipt_id}/validation",
+        "/api/operations/petroleum/intake/{receipt_id}/promotion-preview",
+        "/api/operations/petroleum/intake/{receipt_id}/promotion-proposal",
+      ],
+      [
+        "/v1/hydration/ingest",
+        "/v1/operations/petroleum/intake/{receipt_id}/validation",
+        "/v1/operations/petroleum/intake/{receipt_id}/promotion-preview",
+        "/v1/operations/petroleum/intake/{receipt_id}/promotion-proposal",
+      ],
+      "wired",
+    ),
     currentImplementationStatus: "partially-implemented",
     blockedOrMissingContracts: ["Governed RetailSale proposal submission is wired; independent promotion and authentic register connector readback remain open."],
   },
