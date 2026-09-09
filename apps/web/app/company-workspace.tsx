@@ -1,6 +1,7 @@
 "use client";
+import type {CompanyWorkflowReference,JournalReviewReference} from "./journal-review-handoff";
 
-import {useEffect, useId, useState} from "react";
+import {useEffect, useLayoutEffect, useId, useMemo, useState} from "react";
 import type {CanonicalResource} from "@finai/contracts";
 import {ArrowRight, Buildings, ClockCounterClockwise, Database, MagnifyingGlass, ShieldCheck} from "@phosphor-icons/react";
 import {Badge} from "./g8-ui";
@@ -11,6 +12,15 @@ import CompanySourceAccountingWorkbench from "./company-source-accounting-workbe
 import CompanyPeriodControl from "./company-period-control";
 import CompanyJournalExplorer from "./company-journal-explorer";
 import CompanyStructureGraph from "./company-structure-graph";
+import CompanyCondition from "./company-condition";
+import {SelectedAccountingStrip} from "./company-financial-context";
+import {selectedAccountingContext} from "./company-accounting-selection";
+import {company360Descriptor,companyCutoffs,restoreCompanyCutoffs,type CompanyCutoffs} from "./company-360-descriptor";
+import {companyNyxContext,type CompanyNyxContext} from "./company-nyx-context";
+import {accountingCompanySnapshot,validateAccountingHandoff,type CompanyAccountingHandoff} from "./company-accounting-handoff";
+import type {MapSelection,MapWorkspaceState} from "./operations-model";
+
+import {companyRegulationHandoff,type CompanyRegulationHandoff} from "./company-regulation-handoff";
 
 type Node = CanonicalResource;
 export type CompanyIndex = {source_companies:Node[];workspaces:{configuration:Node;company:Node;enterprise:Node;domain_pack:Node}[];reported_groups?:{reporter:Node;reporting_year:number;members:{company:Node;binding:Node;reported_percent:string|null;former_indicator:string}[]}[]};
@@ -28,55 +38,66 @@ type Tab = "overview"|"structure"|"accounting"|"evidence";
 type Pins = Record<string,{resource_id:string;version_id:string}>;
 const readable = (value:string) => value.replaceAll("_"," ").toLowerCase();
 const date = (value:string) => Number.isFinite(Date.parse(value))?new Date(value).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"}):"Not retained";
-type ViewState={tab:Tab;search:string;companyId:string;ledgerId:string;bookId:string;periodId:string};
+type ViewState={tab:Tab;search:string;companyId:string;ledgerId:string;bookId:string;periodId:string;cutoffs:CompanyCutoffs|null};
 function restoreView(key:string|undefined,companyId:string):ViewState {
- const fallback:ViewState={tab:"overview",search:"",companyId,ledgerId:"",bookId:"",periodId:""};
+ const fallback:ViewState={tab:"overview",search:"",companyId,ledgerId:"",bookId:"",periodId:"",cutoffs:null};
  if(!key||typeof window==="undefined")return fallback;
  try {
   const saved=JSON.parse(sessionStorage.getItem(key)??"null") as Partial<ViewState>|null;
   if(!saved||saved.companyId!==companyId)return fallback;
-  return {...fallback,tab:(["overview","structure","accounting","evidence"] as unknown[]).includes(saved.tab)?saved.tab!:"overview",search:typeof saved.search==="string"?saved.search.slice(0,200):"",...Object.fromEntries(["ledgerId","bookId","periodId"].map(field=>[field,typeof saved[field as keyof ViewState]==="string"&&/^[\w-]{0,100}$/.test(saved[field as keyof ViewState]!)?saved[field as keyof ViewState]:""]))};
+  return {...fallback,cutoffs:restoreCompanyCutoffs(saved,companyId),tab:(["overview","structure","accounting","evidence"] as unknown[]).includes(saved.tab)?saved.tab!:"overview",search:typeof saved.search==="string"?saved.search.slice(0,200):"",...Object.fromEntries(["ledgerId","bookId","periodId"].map(field=>{const value=saved[field as "ledgerId"|"bookId"|"periodId"];return [field,typeof value==="string"&&/^[\w-]{0,100}$/.test(value)?value:""];}))};
  } catch {return fallback;}
 }
 
-export default function CompanyWorkspace({token,index,companyId,onSelect,onInspect,onNavigate,onHistory,onTrace,viewStateKey,initialTab,onProposal,canPropose=false,onInspectResource,onTraceResource,onJournalInspect,onJournalTrace}:{token:string;index:CompanyIndex|null;companyId:string;onSelect:(node:Node)=>void;onInspect:(node:Node)=>void;onNavigate?:(destination:CompanyDestination)=>void;onHistory?:(node:Node)=>void;onTrace?:(node:Node)=>void;viewStateKey?:string;initialTab?:Tab;onProposal?:(id:string)=>void;canPropose?:boolean;onJournalInspect?:(resource:Node,knownAt:string)=>void;onJournalTrace?:(resource:Node,knownAt:string)=>void}&SourceAccountNavigation) {
- const [loaded,setLoaded]=useState<{key:string;context:Context|null;error:string}|null>(null);
+export default function CompanyWorkspace({accountingControlsOnly=false,onContext,token,index,companyId,onSelect,onInspect,onNavigate,onRegulation,onHistory,onTrace,onOperations,onMapSelection,viewStateKey,initialTab,initialAccountingHandoff,onProposal,onJournalReview,onCompanyWorkflow,onWorkflow,canPropose=false,onInspectResource,onTraceResource,onJournalInspect,onJournalTrace}:{accountingControlsOnly?:boolean;onContext?:(context:CompanyNyxContext)=>void;token:string;index:CompanyIndex|null;companyId:string;onSelect:(node:Node)=>void;onInspect:(node:Node,knownAt?:string)=>void;onNavigate?:(destination:CompanyDestination)=>void;onRegulation?:(handoff:CompanyRegulationHandoff)=>void;onHistory?:(node:Node,knownAt?:string)=>void;onTrace?:(node:Node,knownAt?:string)=>void;onOperations:(state:MapWorkspaceState,selection?:MapSelection|null)=>void;onMapSelection:(selection:MapSelection|null)=>void;viewStateKey?:string;initialTab?:Tab;initialAccountingHandoff?:CompanyAccountingHandoff;onProposal?:(id:string)=>void;onJournalReview?:(reference:JournalReviewReference)=>void;onCompanyWorkflow?:(reference:CompanyWorkflowReference)=>void;onWorkflow?:(id:string)=>void;canPropose?:boolean;onJournalInspect?:(resource:Node,knownAt:string)=>void;onJournalTrace?:(resource:Node,knownAt:string)=>void}&SourceAccountNavigation) {
+ const [loaded,setLoaded]=useState<{key:string;context:Context|null;validAt:string;knownAt:string;error:string}|null>(null);
  const [refresh,setRefresh]=useState(0);
  const [restored]=useState(()=>restoreView(viewStateKey,companyId));
- const [tab,setTab]=useState<Tab>(initialTab??restored.tab);
+ const [handoff,setHandoff]=useState(()=>initialAccountingHandoff?validateAccountingHandoff(initialAccountingHandoff,companyId):null);
+ const [cutoffs,setCutoffs]=useState<CompanyCutoffs|null>(handoff?{validAt:handoff.validAt,knownAt:handoff.knownAt}:restored.cutoffs);
+ const [draftCutoffs,setDraftCutoffs]=useState<CompanyCutoffs>(cutoffs??{validAt:"",knownAt:""});
+ const [snapshotError,setSnapshotError]=useState("");
+ const [tab,setTab]=useState<Tab>(handoff?.tab??initialTab??restored.tab);
  const [search,setSearch]=useState(restored.search);
  const [choice,setChoice]=useState({companyId,ledgerId:restored.ledgerId,bookId:restored.bookId,periodId:restored.periodId});
- const [accountingDirectoryOpen,setAccountingDirectoryOpen]=useState(false);
+ const [directoryOpen,setDirectoryOpen]=useState(false);
  const [directoryPage,setDirectoryPage]=useState(0);
  const [validated,setValidated]=useState<{key:string;pins:Pins|null;error:string}|null>(null);
  const id=useId();
- const contextKey=JSON.stringify([token,companyId,refresh]);
+ const requestedValidAt=cutoffs?.validAt,requestedKnownAt=cutoffs?.knownAt;
+ const contextKey=JSON.stringify([token,companyId,refresh,requestedValidAt,requestedKnownAt]);
  const context=loaded?.key===contextKey?loaded.context:null;
+ const validAt=loaded?.key===contextKey?loaded.validAt:"";const knownAt=loaded?.key===contextKey?loaded.knownAt:"";
  const error=loaded?.key===contextKey?loaded.error:"";
  const busy=Boolean(companyId)&&loaded?.key!==contextKey;
+ useLayoutEffect(()=>{onContext?.(companyNyxContext(companyId,context?.company??null,validAt,knownAt,busy?"updating":error||!context?"unavailable":"ready"));},[onContext,companyId,context,validAt,knownAt,busy,error]);
  const selected=choice.companyId===companyId?choice:{companyId,ledgerId:"",bookId:"",periodId:""};
  const {ledgerId,bookId,periodId}=selected;
  const selectionKey=JSON.stringify([contextKey,ledgerId,bookId,periodId]);
  const selection=validated?.key===selectionKey?validated:null;
  const validating=Boolean(context&&ledgerId&&bookId&&periodId)&&!selection;
- useEffect(()=>{if(viewStateKey)try{sessionStorage.setItem(viewStateKey,JSON.stringify({companyId,tab,search,ledgerId,bookId,periodId}));}catch{/* Storage restrictions do not block company work. */}},[viewStateKey,companyId,tab,search,ledgerId,bookId,periodId]);
+ const accountingContext=useMemo(()=>selectedAccountingContext({companyId,choice:{companyId,ledgerId,bookId,periodId},context,validAt,knownAt,selectionKey,validation:validated}),[companyId,ledgerId,bookId,periodId,context,validAt,knownAt,selectionKey,validated]);
+ const accountingPins=accountingContext.state==="VALIDATED"?accountingContext.pins:null;
+ useEffect(()=>{if(viewStateKey)try{sessionStorage.setItem(viewStateKey,JSON.stringify({companyId,tab,search,ledgerId,bookId,periodId,cutoffs}));}catch{/* Storage restrictions do not block company work. */}},[viewStateKey,companyId,tab,search,ledgerId,bookId,periodId,cutoffs]);
  useEffect(()=>{
   if(!companyId)return;
   const controller=new AbortController();
-  void fetch(`/api/ontology/company-context?company_id=${encodeURIComponent(companyId)}`,{headers:{Authorization:`Bearer ${token}`},signal:controller.signal,cache:"no-store"})
-   .then(async response=>{const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:"Company context unavailable");if(!controller.signal.aborted)setLoaded({key:contextKey,context:data.context,error:""});})
-   .catch(failure=>{if(!controller.signal.aborted)setLoaded({key:contextKey,context:null,error:failure instanceof Error?failure.message:"Company context unavailable"});});
+  const requested=requestedValidAt&&requestedKnownAt?{validAt:requestedValidAt,knownAt:requestedKnownAt}:null;
+  const params=new URLSearchParams({company_id:companyId,...requested?{valid_at:requested.validAt,known_at:requested.knownAt}:{}});
+  void fetch(`/api/ontology/company-context?${params}`,{headers:{Authorization:`Bearer ${token}`},signal:controller.signal,cache:"no-store"})
+   .then(async response=>{const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:"Company context unavailable");const snapshot=accountingCompanySnapshot(data,companyId,requested,handoff);if(!controller.signal.aborted)setLoaded({key:contextKey,context:snapshot.context,validAt:snapshot.validAt,knownAt:snapshot.knownAt,error:""});})
+   .catch(failure=>{if(!controller.signal.aborted)setLoaded({key:contextKey,context:null,validAt:"",knownAt:"",error:failure instanceof Error?failure.message:"Company context unavailable"});});
   return ()=>controller.abort();
- },[token,companyId,contextKey]);
+ },[token,companyId,contextKey,requestedValidAt,requestedKnownAt,handoff]);
  useEffect(()=>{
   if(!context||!companyId||!ledgerId||!bookId||!periodId)return;
   const controller=new AbortController();
-  const params=new URLSearchParams({company_id:companyId,ledger_id:ledgerId,book_id:bookId,period_id:periodId});
+  const params=new URLSearchParams({company_id:companyId,ledger_id:ledgerId,book_id:bookId,period_id:periodId,valid_at:validAt,known_at:knownAt});
   void fetch(`/api/ontology/company-context?${params}`,{headers:{Authorization:`Bearer ${token}`},signal:controller.signal,cache:"no-store"})
-   .then(async response=>{const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:"Accounting context rejected");if(!controller.signal.aborted)setValidated({key:selectionKey,pins:data.accounting_selection,error:""});})
+   .then(async response=>{const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:"Accounting context rejected");accountingCompanySnapshot(data,companyId,{validAt,knownAt},handoff);if(!controller.signal.aborted)setValidated({key:selectionKey,pins:data.accounting_selection,error:""});})
    .catch(failure=>{if(!controller.signal.aborted)setValidated({key:selectionKey,pins:null,error:failure instanceof Error?failure.message:"Accounting context unavailable"});});
   return ()=>controller.abort();
- },[token,companyId,ledgerId,bookId,periodId,selectionKey,context]);
+ },[token,companyId,ledgerId,bookId,periodId,selectionKey,context,validAt,knownAt,handoff]);
 
  const directory=new Map<string,{node:Node;workspace:boolean;source:boolean;years:Set<number>}>();
  function add(node:Node,kind:"workspace"|"source"|"reported",year?:number){const entry=directory.get(node.resource_id)??{node,workspace:false,source:false,years:new Set<number>()};if(kind==="workspace")entry.workspace=true;if(kind==="source")entry.source=true;if(year!==undefined)entry.years.add(year);directory.set(node.resource_id,entry);}
@@ -86,7 +107,7 @@ export default function CompanyWorkspace({token,index,companyId,onSelect,onInspe
  if(context&&!directory.has(companyId))add(context.company,"source");
  const companies=[...directory.values()].filter(({node})=>`${node.display_name} ${String(node.attributes.registration_code??"")}`.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>Number(b.workspace)-Number(a.workspace)||displayName(a.node.display_name).localeCompare(displayName(b.node.display_name)));
  const company=context?.company??directory.get(companyId)?.node;
- const configurations=index?.workspaces.filter(item=>item.company.resource_id===companyId)??[];
+ const configurations=cutoffs?[]:index?.workspaces.filter(item=>item.company.resource_id===companyId)??[];
  const ledger=context?.ledgers.find(item=>item.ledger.resource_id===ledgerId);
  const missingLedger=context?!context.ledgers.length:false;
  const incompleteLedgers=context?.ledgers.filter(item=>!item.ready)??[];
@@ -98,13 +119,18 @@ export default function CompanyWorkspace({token,index,companyId,onSelect,onInspe
   ...(!context.accounting_sources.length?[{title:"Connect evidence to this company",reason:"No source accounting scope is linked to this company. Retained files alone do not establish company accounting coverage.",label:"Inspect source coverage",tab:"evidence" as Tab}]:[]),
  ]:[];
  const recent=context?[...new Map([context.company,...context.relationships.map(row=>row.record),...context.accounting_sources.flatMap(row=>[row.scope,...row.bindings]),...context.licence_evidence.map(row=>row.binding)].map(node=>[node.version_id,node])).values()].sort((a,b)=>Date.parse(b.system_from)-Date.parse(a.system_from)).slice(0,5):[];
- function pick(node:Node){setTab("overview");onSelect(node);}
- function inspect(node:Node){onInspect(node);}
- function actions(node:Node){return <span className="c360-inline-actions"><button onClick={()=>inspect(node)}>Inspect</button>{onTrace&&<button onClick={()=>onTrace(node)}>Trace</button>}{onHistory&&<button onClick={()=>onHistory(node)}>History</button>}</span>;}
- function route(destination:CompanyDestination,label:string){return onNavigate?<button className="c360-route" onClick={()=>onNavigate(destination)}>{label}<ArrowRight size={14}/></button>:null;}
+ function pick(node:Node){setTab("overview");setDirectoryOpen(false);onSelect(node);}
+ function inspect(node:Node,at=knownAt){if(at)onInspect(node,at);}
+ function trace(node:Node,at=knownAt){if(at)onTrace?.(node,at);}
+ function history(node:Node,at=knownAt){if(at)onHistory?.(node,at);}
+ function actions(node:Node){return <span className="c360-inline-actions"><button onClick={()=>inspect(node)}>Inspect</button>{onTrace&&<button onClick={()=>trace(node)}>Trace</button>}{onHistory&&<button onClick={()=>history(node)}>History</button>}</span>;}
+ function navigateCompany(destination:CompanyDestination){if(destination==="regulation"&&onRegulation){if(!context||busy||error)return;try{onRegulation(companyRegulationHandoff(context.company,validAt,knownAt));}catch(failure){setSnapshotError(failure instanceof Error?failure.message:"Regulation snapshot unavailable.");}return;}onNavigate?.(destination);}
+ function route(destination:CompanyDestination,label:string){return onNavigate?<button className="c360-route" onClick={()=>navigateCompany(destination)}>{label}<ArrowRight size={14}/></button>:null;}
  function sourceRows(){return context?.accounting_sources.length?<div className="c360-table-wrap"><table><thead><tr><th>Source scope</th><th>Observed dates</th><th>Declared use</th><th>Evidence</th></tr></thead><tbody>{context.accounting_sources.map(source=><tr key={source.scope.resource_id}><th scope="row"><button className="c360-text-button" onClick={()=>inspect(source.scope)}>{displayName(source.scope.display_name)}</button><small>{String(source.scope.attributes.worksheet??"")}</small></th><td>{String(source.scope.attributes.observed_from)}<br/>{String(source.scope.attributes.observed_through)}</td><td>{source.bindings.length?source.bindings.map(binding=><div key={binding.resource_id}><button className="c360-text-button" onClick={()=>inspect(binding)}>{readable(String(binding.attributes.source_use))}</button>{Boolean(binding.attributes.contract_version)&&<small>Interpretation version {String(binding.attributes.contract_version)}</small>}<small className={source.binding_eligibility?.[binding.version_id]?.eligible_for_accounting?"":"c360-attention-text"}>{readable(source.binding_eligibility?.[binding.version_id]?.state??"ELIGIBILITY_NOT_CHECKED")}</small>{source.binding_eligibility?.[binding.version_id]?.reason&&<small>{source.binding_eligibility[binding.version_id].reason}</small>}{source.binding_eligibility?.[binding.version_id]?.checked_at&&<small>Checked {new Date(source.binding_eligibility[binding.version_id].checked_at!).toLocaleString()}</small>}</div>):<span className="c360-attention-text">Use unresolved</span>}</td><td>{actions(source.scope)}</td></tr>)}</tbody></table></div>:<div className="c360-empty"><Database size={24}/><h4>No company-bound accounting sources</h4><p>Bind retained evidence to the accepted company before declaring its accounting use.</p>{route("data","Open Data")}</div>;}
+ function applySnapshot(){const requested=companyCutoffs(draftCutoffs);if(!requested){setSnapshotError("Enter both effective and known times with an explicit timezone, such as Z or +04:00.");return;}setSnapshotError("");setHandoff(null);setCutoffs(requested);setRefresh(value=>value+1);}
 
- const directoryCollapsed=tab==="accounting"&&Boolean(companyId)&&!accountingDirectoryOpen;
+ const directoryCollapsed=Boolean(companyId)&&!directoryOpen;
+ const descriptor=context?company360Descriptor(context,validAt,knownAt):null;
  return <div className={`c360-workbench${directoryCollapsed?" c360-directory-collapsed":""}`}>
   <aside hidden={directoryCollapsed} className="c360-directory" aria-label="Company directory"><header><Buildings size={20}/><div><strong>Companies</strong><small>{index?`${directory.size} retained contexts`:"Directory loading"}</small></div></header>
    <label className="c360-search"><MagnifyingGlass size={15}/><input value={search} onChange={event=>{setSearch(event.target.value);setDirectoryPage(0);}} placeholder="Find a company" aria-label="Find company by name or registration code"/></label>
@@ -113,23 +139,26 @@ export default function CompanyWorkspace({token,index,companyId,onSelect,onInspe
    {index&&!companies.length&&<p className="c360-directory-note">No company matches this search.</p>}
    <footer>Company identity first.<br/>Reported relationships retain their filing date.</footer>
   </aside>
-  <div className="c360-canvas">
+  <div className="c360-canvas" data-company-regulation-origin tabIndex={-1}>
    {!companyId?<div className="c360-empty c360-welcome"><Buildings size={34}/><p className="c360-eyebrow">COMPANY WORKSPACE</p><h2>Select the company behind your work</h2><p>Its accounting coverage, operating relationships and evidence will resolve from shared accepted resources.</p></div>:<>
-    <header className="c360-hero"><div><p className="c360-eyebrow">COMPANY 360</p><h2>{company?displayName(company.display_name):"Resolving company"}</h2><p>{configurations.length?configurations.map(item=>displayName(item.domain_pack.display_name)).join(" · "):"Shared legal-entity context"}</p>{Boolean(company?.attributes.registration_code)&&<span className="c360-registration">Registration {String(company?.attributes.registration_code)}</span>}</div><div className="c360-hero-actions">{tab==="accounting"&&<button aria-expanded={!directoryCollapsed} onClick={()=>setAccountingDirectoryOpen(value=>!value)}>{directoryCollapsed?"Choose company":"Hide directory"}</button>}<Badge>{context?"Accepted company context":busy?"Resolving context":"Context unavailable"}</Badge><button disabled={busy} onClick={()=>setRefresh(value=>value+1)} aria-label="Refresh company context"><ClockCounterClockwise size={15}/>Refresh</button>{context&&onHistory&&<button onClick={()=>onHistory(context.company)}>Company history</button>}</div></header>
-    <nav className="c360-tabs" aria-label="Company workspace sections">{(["overview","structure","accounting","evidence"] as Tab[]).map(value=><button key={value} aria-pressed={tab===value} onClick={()=>setTab(value)}>{value.charAt(0).toUpperCase()+value.slice(1)}</button>)}</nav>
+    <header className="c360-hero"><div><p className="c360-eyebrow">COMPANY 360</p><h2>{company?displayName(company.display_name):"Resolving company"}</h2><p>{configurations.length?configurations.map(item=>displayName(item.domain_pack.display_name)).join(" · "):"Shared legal-entity context"}</p>{Boolean(company?.attributes.registration_code)&&<span className="c360-registration">Registration {String(company?.attributes.registration_code)}</span>}</div><div className="c360-hero-actions"><button aria-expanded={!directoryCollapsed} onClick={()=>setDirectoryOpen(value=>!value)}>{directoryCollapsed?"Switch company":"Hide company navigator"}</button><Badge>{context?"Accepted company context":busy?"Resolving context":"Context unavailable"}</Badge><button disabled={busy} onClick={()=>setRefresh(value=>value+1)} aria-label="Refresh company context"><ClockCounterClockwise size={15}/>Refresh</button>{context&&onHistory&&<button onClick={()=>history(context.company)}>Company history</button>}</div></header>
+    <details className="c360-filing" onToggle={event=>{if(event.currentTarget.open&&context&&!draftCutoffs.validAt&&!draftCutoffs.knownAt)setDraftCutoffs({validAt,knownAt});}}><summary>Company snapshot · {cutoffs?"Pinned effective and known time":"Latest accepted context"}</summary><p>Company structure, source boundaries and accounting selection use this snapshot. Financial results, live eligibility checks and the operational view retain their own stated times.</p><div className="c360-accounting-select"><label>Effective at · timezone required<input maxLength={40} value={draftCutoffs.validAt} onChange={event=>setDraftCutoffs({...draftCutoffs,validAt:event.target.value})} placeholder="YYYY-MM-DDTHH:mm:ss+04:00"/></label><label>Known at · timezone required<input maxLength={40} value={draftCutoffs.knownAt} onChange={event=>setDraftCutoffs({...draftCutoffs,knownAt:event.target.value})} placeholder="YYYY-MM-DDTHH:mm:ss+04:00"/></label><div className="c360-inline-actions"><button disabled={busy} onClick={applySnapshot}>Apply & save view</button><button disabled={busy} onClick={()=>{setHandoff(null);setCutoffs(null);setDraftCutoffs({validAt:"",knownAt:""});setSnapshotError("");setRefresh(value=>value+1);}}>Latest</button></div></div>{snapshotError&&<p role="alert">{snapshotError}</p>}{context&&<p>Displayed effective {validAt} · known {knownAt}. Saved view contains references and preferences only.</p>}</details>
+    <nav className="c360-tabs" aria-label="Company workspace sections">{((accountingControlsOnly?["accounting"]:["overview","structure","accounting","evidence"]) as Tab[]).map(value=><button key={value} aria-pressed={tab===value} onClick={()=>setTab(value)}>{value==="overview"?"Company condition":value==="structure"?"Structure & relationships":value==="accounting"?"Finance & accounting":"Data & evidence"}</button>)}</nav>
     {busy&&<div className="c360-loading" role="status">Resolving accepted company relationships, source coverage and accounting context…</div>}
+    {handoff&&<p className="c360-message" role="status">Opened from Home at its exact company snapshot. Apply another snapshot or choose Latest to change this context.</p>}
+    <SelectedAccountingStrip selection={accountingContext} onInspect={inspect} onAccounting={()=>setTab("accounting")}/>
     {error&&<div className="c360-error" role="alert"><h3>Company context could not be resolved</h3><p>{error}</p></div>}
     {context&&<div className="c360-content">
-     {tab==="overview"&&<>
+     {tab==="overview"&&<>{descriptor&&<CompanyCondition token={token} viewStateKey={viewStateKey} descriptor={descriptor} onLens={setTab} onInspect={inspect} onTrace={onTrace?trace:undefined} onHistory={onHistory?history:undefined} onProposal={onProposal} onJournalReview={onJournalReview} onCompanyWorkflow={onCompanyWorkflow} onWorkflow={onWorkflow} onSelect={pick} onData={()=>onNavigate?.("data")} onRegulation={()=>navigateCompany("regulation")} onWork={()=>onNavigate?.("workflows")} onOperations={onOperations} onMapSelection={onMapSelection}/>}<details className="c360-depth"><summary>Accounting readiness & recent retained changes</summary>
       <div className="c360-overview-grid"><section className="c360-section"><header><div><p className="c360-eyebrow">PRIORITIES</p><h3>What needs attention</h3></div><span className="c360-small">From the current context</span></header>
        {attention.length?<ol className="c360-attention">{attention.map(item=><li key={item.title}><span className="c360-attention-dot"/><div><h4>{item.title}</h4><p>{item.reason}</p><button className="c360-text-button" onClick={()=>setTab(item.tab)}>{item.label}<ArrowRight size={13}/></button></div></li>)}</ol>:<div className="c360-empty"><ShieldCheck size={24}/><h4>No missing configuration identified by this view</h4><p>Source coverage and financial authority still require their own execution checks.</p></div>}
        <footer className="c360-section-foot">Configuration coverage is not financial performance or certification.</footer>
       </section><section className="c360-section"><header><div><p className="c360-eyebrow">WORKING CONTEXT</p><h3>Connected company coverage</h3></div></header><dl className="c360-coverage"><div><dt>Accounting</dt><dd>{context.ledgers.length?`${context.ledgers.length} linked ledger${context.ledgers.length===1?"":"s"}`:"Ledger not configured"}</dd></div><div><dt>Source evidence</dt><dd>{context.accounting_sources.length?`${context.accounting_sources.length} accounting scopes`:"No accounting source scope"}</dd></div><div><dt>Company structure</dt><dd>{context.relationships.length?`${context.relationships.length} effective relationships`:"No effective relationships"}</dd></div><div><dt>Analytical dimensions</dt><dd>{context.dimensions.length?`${context.dimensions.length} linked resources`:"No dimension model bound"}</dd></div><div><dt>Licence evidence</dt><dd>{context.licence_evidence.length?`${context.licence_evidence.length} retained bindings`:"No licence evidence linked"}</dd></div></dl><div className="c360-destinations">{route("data","Data & sources")}{route("ontology","Ontology")}{route("operations","Operations & maps")}{route("regulation","Regulation")}{route("workflows","Workflows & actions")}</div></section></div>
       <section className="c360-section"><header><div><p className="c360-eyebrow">WHAT CHANGED</p><h3>Latest retained versions</h3></div><span className="c360-small">Company, relationship and source records</span></header><div className="c360-table-wrap"><table><thead><tr><th>Resource</th><th>Recorded</th><th>Effective from</th><th>Evidence</th></tr></thead><tbody>{recent.map(node=><tr key={node.version_id}><th scope="row"><button className="c360-text-button" onClick={()=>inspect(node)}>{displayName(node.display_name)}</button><small>{node.object_type.replace(/([a-z])([A-Z])/g,"$1 $2")}</small></th><td>{date(node.system_from)}</td><td>{date(node.valid_from)}</td><td>{actions(node)}</td></tr>)}</tbody></table></div></section>
-     </>}
+     </details></>}
      {tab==="structure"&&<>
       {configurations.length>0&&<section className="c360-section"><header><h3>Configured workspace</h3></header>{configurations.map(item=><div className="c360-structure-row" key={item.configuration.resource_id}><Buildings size={19}/><div><strong>{displayName(item.enterprise.display_name)} → {displayName(item.company.display_name)}</strong><p>{displayName(item.domain_pack.display_name)} · attached industry semantics</p></div>{actions(item.configuration)}</div>)}<footer className="c360-section-foot">Workspace grouping is separate from corporate ownership.</footer></section>}
-      <CompanyStructureGraph context={context} onInspect={inspect} onSelect={pick} onTrace={onTrace}/>
+      <CompanyStructureGraph context={context} onInspect={inspect} onSelect={pick} onTrace={onTrace?trace:undefined}/>
       {context.structural_resources.length>0&&<section className="c360-section"><header><h3>Linked operating and structural resources</h3></header>{context.structural_resources.map(node=><div className="c360-resource-row" key={node.resource_id}><div><strong>{displayName(node.display_name)}</strong><small>{node.object_type.replace(/([a-z])([A-Z])/g,"$1 $2")}</small></div>{actions(node)}</div>)}</section>}
      </>}
      {tab==="accounting"&&<>
@@ -139,8 +168,7 @@ export default function CompanyWorkspace({token,index,companyId,onSelect,onInspe
        </div>}
        {ledger&&<div className="c360-ledger-context"><dl className="c360-coverage"><div><dt>Chart of accounts</dt><dd>{ledger.chart_id?displayName(ledger.chart_id.display_name):"Unresolved"}</dd></div><div><dt>Fiscal calendar</dt><dd>{ledger.calendar_id?displayName(ledger.calendar_id.display_name):"Unresolved"}</dd></div><div><dt>Currency context</dt><dd>{ledger.currency_id?displayName(ledger.currency_id.display_name):"Unresolved"}</dd></div></dl>{actions(ledger.ledger)}</div>}
        {validating&&<p className="c360-message" role="status">Validating the selected company, ledger, book and period…</p>}{selection?.error&&<p className="c360-error" role="alert">{selection.error}</p>}
-       {selection?.pins&&<div className="c360-message"><p><ShieldCheck size={15}/> Selected accounting context validated by the server.</p><details><summary>Exact canonical version references</summary><dl>{Object.entries(selection.pins).map(([field,pin])=><div key={field}><dt>{readable(field)}</dt><dd><code>{pin.resource_id} · {pin.version_id}</code></dd></div>)}</dl></details></div>}
-      </section>{selection?.pins&&<CompanyPeriodControl token={token} selection={selection.pins} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onInspect={onJournalInspect} onTrace={onJournalTrace}/>} {selection?.pins&&onJournalInspect&&<CompanyJournalExplorer expectedSelection={selection.pins} key={selectionKey} token={token} companyId={companyId} ledgerId={ledgerId} bookId={bookId} periodId={periodId} currency={ledger?.currency_id??null} onInspect={onJournalInspect} onTrace={onJournalTrace}/>}<CompanySourceAccountingWorkbench token={token} context={context} viewStateKey={viewStateKey} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onInspect={inspect} onTrace={onTrace} onHistory={onHistory} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>
+      </section>{accountingPins&&<CompanyPeriodControl token={token} selection={accountingPins} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onInspect={onJournalInspect} onTrace={onJournalTrace}/>} {accountingPins&&onJournalInspect&&<CompanyJournalExplorer expectedSelection={accountingPins} key={selectionKey} token={token} companyId={companyId} ledgerId={ledgerId} bookId={bookId} periodId={periodId} currency={ledger?.currency_id??null} onInspect={onJournalInspect} onTrace={onJournalTrace}/>}{!accountingControlsOnly&&<CompanySourceAccountingWorkbench token={token} context={context} viewStateKey={viewStateKey} canPropose={canPropose&&Boolean(onProposal)} onProposal={onProposal??(()=>{})} onInspect={inspect} onTrace={onTrace?trace:undefined} onHistory={onHistory?history:undefined} onInspectResource={onInspectResource} onTraceResource={onTraceResource}/>}
       <section className="c360-section"><header><h3>Analytical dimensions</h3></header>{context.dimensions.length?context.dimensions.map(node=><div className="c360-resource-row" key={node.resource_id}><div><strong>{displayName(node.display_name)}</strong>{Boolean(node.attributes.source_header)&&<small>Source label: {String(node.attributes.source_header)}</small>}</div>{actions(node)}</div>):<p className="c360-message">No source analytical dimension model is bound to this company.</p>}</section>
      </>}
      {tab==="evidence"&&<>
@@ -148,10 +176,10 @@ export default function CompanyWorkspace({token,index,companyId,onSelect,onInspe
       <section className="c360-section"><header><h3>Licence evidence</h3>{route("regulation","Open Regulation")}</header>{context.licence_evidence.length?context.licence_evidence.map(item=><div className="c360-resource-row" key={item.binding.resource_id}><div><strong>{item.licence?displayName(item.licence.display_name):"Licence dependency requires review"}</strong><small>Retained issuance evidence · current licence authority is separate</small></div>{actions(item.binding)}</div>):<p className="c360-message">No licence notice is bound to this company. This view does not determine whether a licence is required.</p>}</section>
       <section className="c360-section"><header><div><p className="c360-eyebrow">DATED SOURCE STATEMENTS</p><h3>Reported company relationships</h3></div></header><p className="c360-message">Filing relationships retain their reporting year. They do not establish current ownership, licence status or consolidation scope.</p>
        {context.disclosures.length?context.disclosures.map(disclosure=>{const observation=disclosure.observation.attributes.observation as {reported_role?:string;reported_percent?:string|null;former_indicator?:string};return <details className="c360-filing" key={disclosure.binding.resource_id}><summary>{String(disclosure.binding.attributes.reporting_year)} · {displayName(disclosure.reporter.display_name)} → {displayName(disclosure.party.display_name)}</summary><p>Reported role: {observation.reported_role?readable(observation.reported_role):"Not stated"} · {observation.reported_percent==null?"Participation not stated":`Reported ${observation.reported_percent}%`}{observation.former_indicator?` · former-party marker: ${observation.former_indicator}`:""}</p><div className="c360-inline-actions"><button onClick={()=>pick(disclosure.party)}>Open related company</button>{actions(disclosure.binding)}</div></details>;}):<p className="c360-message">No reviewed corporate disclosure bindings.</p>}
-       {index?.reported_groups?.filter(group=>group.reporter.resource_id===companyId).map(group=><details className="c360-filing" key={`${group.reporter.resource_id}:${group.reporting_year}`}><summary>{group.reporting_year} filing · {group.members.length} reported company relationships</summary><ul>{group.members.map(member=><li key={member.binding.resource_id}><button className="c360-text-button" onClick={()=>pick(member.company)}>{displayName(member.company.display_name)}</button> · {member.reported_percent===null?"participation not stated":`reported ${member.reported_percent}%`}{member.former_indicator?" · former-party marker":""} {actions(member.binding)}</li>)}</ul></details>)}
+       {!cutoffs&&index?.reported_groups?.filter(group=>group.reporter.resource_id===companyId).map(group=><details className="c360-filing" key={`${group.reporter.resource_id}:${group.reporting_year}`}><summary>{group.reporting_year} filing · {group.members.length} reported company relationships</summary><ul>{group.members.map(member=><li key={member.binding.resource_id}><button className="c360-text-button" onClick={()=>pick(member.company)}>{displayName(member.company.display_name)}</button> · {member.reported_percent===null?"participation not stated":`reported ${member.reported_percent}%`}{member.former_indicator?" · former-party marker":""} {actions(member.binding)}</li>)}</ul></details>)}
       </section>
      </>}
-     <footer className="c360-canvas-foot"><span><ShieldCheck size={14}/> Shared company context · effective resources and retained evidence</span><details><summary>Company identity & version</summary><code>{context.company.resource_id}<br/>{context.company.version_id}</code><button onClick={()=>inspect(context.company)}>Inspect company resource</button></details></footer>
+     <footer className="c360-canvas-foot"><span><ShieldCheck size={14}/> Shared company context · effective resources and retained evidence</span><details><summary>Advanced · company identity & version</summary><code>{context.company.resource_id}<br/>{context.company.version_id}</code><button onClick={()=>inspect(context.company)}>Inspect company resource</button></details></footer>
     </div>}
    </>}
   </div>

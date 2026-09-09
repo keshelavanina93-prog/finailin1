@@ -1,0 +1,22 @@
+import {loadTypeScript} from "./load-typescript.mjs";
+const homePins=await loadTypeScript(new URL("../app/company-home-pins.ts",import.meta.url));
+import test from "node:test";
+import assert from "node:assert/strict";
+const company="365aa5d9-c2ec-52e1-867a-50fe3415f486";
+const id=index=>`00000000-0000-4000-8000-${String(index).padStart(12,"0")}`;
+test("Home stores bounded unique references, separates identities and never copies financial results",async()=>{
+ const store=new Map();globalThis.localStorage={getItem:key=>store.get(key)??null,setItem:(key,value)=>store.set(key,value),removeItem:key=>store.delete(key)};
+ for(let index=1;index<=6;index++)await homePins.pinHomeAnalysis("test-user",{companyId:company,invocationId:id(index)});
+ assert.deepEqual(await homePins.homeAnalysisPins("test-user",company),[6,5,4,3,2,1].map(id));
+ await homePins.pinHomeAnalysis("test-user",{companyId:company,invocationId:id(5)});
+ assert.deepEqual(await homePins.homeAnalysisPins("test-user",company),[5,6,4,3,2,1].map(id));
+ assert.deepEqual(await homePins.homeAnalysisPins("another-user",company),[]);
+ assert.deepEqual(await homePins.homeAnalysisPins("test-user",id(99)),[]);
+ assert.ok([...store.keys()].every(key=>!key.includes("test-user")));
+ assert.deepEqual(JSON.parse([...store.values()][0]),[5,6,4,3,2,1].map(id));
+ await assert.rejects(()=>homePins.pinHomeAnalysis("test-user",{companyId:company,invocationId:"not-an-invocation"}));
+ const key=[...store.keys()][0];store.set(key,JSON.stringify([id(1),id(1)]));
+ await assert.rejects(()=>homePins.homeAnalysisPins("test-user",company),/invalid/);
+ await homePins.clearHomeAnalysisPins("test-user",company);
+ assert.deepEqual(await homePins.homeAnalysisPins("test-user",company),[]);
+});

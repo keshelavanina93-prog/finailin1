@@ -3,11 +3,14 @@
 import {useEffect,useState} from "react";
 import {ArrowRight,ClockCounterClockwise,FileText,ShieldCheck} from "@phosphor-icons/react";
 import {displayName} from "./display-name";
+import type {CompanyRegulationPage,OperatorInspection} from "@finai/contracts";
+import {assertRegulationHandoffPage,regulationRuleQuery,regulationSnapshotKey,type CompanyRegulationHandoff} from "./company-regulation-handoff";
+import {restorationInstant} from "./definition-restoration-time";
 import type {Result} from "./regulation-workspace";
 import "./regulatory-investigation.css";
 
 export type RegulatoryReference={resource_id:string;version_id:string};
-export type RegulatoryNavigation={onInspect?:(resource:RegulatoryReference)=>void;onTrace?:(resource:RegulatoryReference)=>void;onHistory?:(resource:RegulatoryReference)=>void;onWorkflow?:(workflowId:string)=>void};
+export type RegulatoryNavigation={onInspect?:(resource:RegulatoryReference,knownAt?:string)=>void;onTrace?:(resource:RegulatoryReference,knownAt?:string)=>void;onHistory?:(resource:RegulatoryReference,knownAt?:string)=>void;onWorkflow?:(workflowId:string)=>void};
 type Resource=RegulatoryReference&{display_name:string;object_type:string;system_from:string;attributes:Record<string,unknown>};
 type Observation={title:string;matsne_id:string;publication:number|null;completeness:string;advertised_publications:number[];text:string;attachments_retained:boolean;current_law_verified:boolean};
 type Publication=Resource&{attributes:{document_id:string;act_id:string;observation:Observation}};
@@ -35,10 +38,11 @@ function restoreNavigation(key?:string):NavigationState {
  }catch{return fallback;}
 }
 
-export default function RegulatoryInvestigation({token,companyId,assessment,onAssessment,viewStateKey,...navigation}:RegulatoryNavigation&{token:string;companyId:string;assessment:Result|null;onAssessment:()=>void;viewStateKey?:string}) {
+export default function RegulatoryInvestigation({token,companyId,assessment,onAssessment,viewStateKey,handoff,...navigation}:RegulatoryNavigation&{token:string;companyId:string;assessment:Result|null;onAssessment:()=>void;viewStateKey?:string;handoff?:CompanyRegulationHandoff}) {
+ const [snapshot]=useState(handoff);
  const [restored]=useState(()=>restoreNavigation(viewStateKey));
  const [publications,setPublications]=useState<Load<Publication>|null>(null);
- const [rules,setRules]=useState<Load<Rule>|null>(null);
+ const [ruleResponse,setRuleResponse]=useState<{key:string;value:Load<Rule>}|null>(null);
  const [monitors,setMonitors]=useState<Load<Monitor>|null>(null);
  const [selected,setSelected]=useState<Selection|null>(restored.selected);
  const [revision,setRevision]=useState(0);
@@ -48,25 +52,37 @@ export default function RegulatoryInvestigation({token,companyId,assessment,onAs
  const [action,setAction]=useState<{id:string;busy:boolean;error:string}|null>(null);
  const [category,setCategory]=useState<"rules"|"publications"|"monitors">(restored.category);
  const [offsets,setOffsets]=useState(restored.offsets);
+ const ruleKey=JSON.stringify([token,companyId,regulationSnapshotKey(snapshot),offsets.rules,revision]);
+ const rules=ruleResponse?.key===ruleKey?ruleResponse.value:null;
  useEffect(()=>{if(viewStateKey)try{sessionStorage.setItem(viewStateKey,JSON.stringify({selected,category,offsets}));}catch{/* Optional navigation state; authority stays on the server. */}},[viewStateKey,selected,category,offsets]);
  useEffect(()=>{
   const controller=new AbortController();
   async function load<T>(path:string,field?:string):Promise<Load<T>> {
-   const response=await fetch(`/api/ontology/${path}`,{headers:{Authorization:`Bearer ${token}`},signal:AbortSignal.any([controller.signal,AbortSignal.timeout(20000)]),cache:"no-store"});
-   if(!response.ok)throw new Error("This regulatory collection is unavailable. Retry to refresh its evidence.");
-   const data=await response.json();const rawRows=field?data[field]:data;
+   const read=async(resourcePath:string)=>{
+    const response=await fetch(`/api/ontology/${resourcePath}`,{headers:{Authorization:`Bearer ${token}`},signal:AbortSignal.any([controller.signal,AbortSignal.timeout(20000)]),cache:"no-store"});
+    if(!response.ok)throw new Error("This regulatory collection is unavailable. Retry to refresh its evidence.");
+    return response.json();
+   };
+   const companyQuery=snapshot?new URLSearchParams({version_id:snapshot.company.version_id,known_at:snapshot.knownAt}):null;
+   const [data,inspection]=await Promise.all([read(path),field==="rules"&&snapshot?read(`operator/resources/${snapshot.company.resource_id}?${companyQuery}`):Promise.resolve(null)]);
+   const rawRows=field?data[field]:data;
+   if(!Array.isArray(rawRows))throw new Error("Regulatory response did not contain a resource list.");
+   if(field==="rules"){
+    if(snapshot)assertRegulationHandoffPage(data as CompanyRegulationPage,inspection as OperatorInspection,snapshot,offsets.rules);
+    else if(data.company?.resource_id!==companyId||!restorationInstant(data.at)||!restorationInstant(data.known_at)||rawRows.some((item:Result["rules"][number])=>(item.resource.attributes as {legal_entity_id?:string}).legal_entity_id!==companyId))throw Error("Regulatory interpretations did not retain their selected company and returned times.");
+   }
    const rows=field==="rules"?rawRows.map((item:Result["rules"][number])=>({...item.resource,overview_assessment:item.assessment,overview_context:{at:data.at,known_at:data.known_at}})):rawRows;
-   if(!Array.isArray(rows))throw new Error("Regulatory response did not contain a resource list.");
    return {rows,error:"",hasMore:field?data.next_offset!==null:rows.length>=100,nextOffset:field&&typeof data.next_offset==="number"?data.next_offset:null};
   }
+  async function loadRules():Promise<Load<Rule>>{return companyId?load<Rule>(`regulation/rules?${regulationRuleQuery(companyId,offsets.rules,snapshot)}`,"rules"):{rows:[],error:"",hasMore:false,nextOffset:null};}
   function publish<T>(request:Promise<Load<T>>,set:(value:Load<T>)=>void){return request.then(value=>{if(!controller.signal.aborted)set(value);}).catch(reason=>{if(!controller.signal.aborted)set({rows:[],error:reason instanceof Error?reason.message:"Collection unavailable",hasMore:false,nextOffset:null});});}
   void Promise.allSettled([
    publish(load<Publication>(`regulation/sources?offset=${offsets.publications}`,"publications"),setPublications),
-   publish(companyId?load<Rule>(`regulation/rules?legal_entity_id=${encodeURIComponent(companyId)}&offset=${offsets.rules}`,"rules"):Promise.resolve({rows:[] as Rule[],error:"",hasMore:false,nextOffset:null}),setRules),
+   publish(loadRules(),value=>setRuleResponse({key:ruleKey,value})),
    publish(load<Monitor>("regulation/monitors"),setMonitors),
   ]);
   return()=>controller.abort();
- },[token,revision,companyId,offsets]);
+ },[token,revision,companyId,offsets,snapshot,ruleKey]);
  const companyRules=rules?.rows.filter(row=>row.attributes.legal_entity_id===companyId)??[];
  const active=selected??(category==="rules"&&companyRules[0]?{kind:"rule",id:companyRules[0].resource_id}:category==="publications"&&publications?.rows[0]?{kind:"publication",id:publications.rows[0].resource_id}:category==="monitors"&&monitors?.rows[0]?{kind:"monitor",id:monitors.rows[0].workflow_id}:null);
  const rule=active?.kind==="rule"?companyRules.find(row=>row.resource_id===active.id):undefined;
@@ -82,8 +98,8 @@ export default function RegulatoryInvestigation({token,companyId,assessment,onAs
  },[token,monitorId,revision]);
  function choose(kind:Selection["kind"],id:string){setSelected({kind,id});}
  function section(next:typeof category){setCategory(next);setSelected(null);}
- function page(kind:"rules"|"publications",offset:number){if(kind==="rules")setRules(null);else setPublications(null);setOffsets(previous=>({...previous,[kind]:offset}));setSelected(null);}
- function links(resource:RegulatoryReference){return <div className="regi-links">{navigation.onInspect&&<button onClick={()=>navigation.onInspect?.(resource)}>Inspect object</button>}{navigation.onTrace&&<button onClick={()=>navigation.onTrace?.(resource)}>Trace evidence</button>}{navigation.onHistory&&<button onClick={()=>navigation.onHistory?.(resource)}>Version history</button>}</div>;}
+ function page(kind:"rules"|"publications",offset:number){if(kind==="rules")setRuleResponse(null);else setPublications(null);setOffsets(previous=>({...previous,[kind]:offset}));setSelected(null);}
+ function links(resource:RegulatoryReference,knownAt?:string){return <div className="regi-links">{navigation.onInspect&&<button onClick={()=>navigation.onInspect?.(resource,knownAt)}>Inspect object</button>}{navigation.onTrace&&<button onClick={()=>navigation.onTrace?.(resource,knownAt)}>Trace evidence</button>}{navigation.onHistory&&<button onClick={()=>navigation.onHistory?.(resource,knownAt)}>Version history</button>}</div>;}
  async function sourceAction(documentId:string,kind:"inspect"|"impact") {
   setAction({id:documentId,busy:true,error:""});
   try {
@@ -95,11 +111,12 @@ export default function RegulatoryInvestigation({token,companyId,assessment,onAs
  }
  const documentId=publication?.attributes.document_id;
  const detail=monitorDetail?.id===monitorId?monitorDetail:null;
- const retainedAssessment=rule?assessment?.rules.find(item=>item.resource.version_id===rule.version_id):undefined;
+ const retainedAssessment=rule&&!snapshot?assessment?.rules.find(item=>item.resource.version_id===rule.version_id):undefined;
  const assessed=retainedAssessment??(rule?.overview_assessment?{assessment:rule.overview_assessment}:undefined);
  return <section className="regi" aria-label="Regulatory investigation">
   <header className="regi-header"><div><p className="regi-eyebrow">REGULATORY INTELLIGENCE</p><h2>Evidence, readiness & potential impact</h2><p>Investigate what the retained evidence establishes, and what still needs review.</p></div><button onClick={()=>setRevision(value=>value+1)}><ClockCounterClockwise size={14}/>Refresh observations</button></header>
-  <div className="regi-context"><span><ShieldCheck size={14}/>Company interpretations use the selected legal entity.</span><span>Publication and monitor lists cover the authorized workspace; applicability is separate.</span></div>
+  <div className="regi-context"><span><ShieldCheck size={14}/>Company interpretations use the selected legal entity.</span><span>Publication and monitor lists show current retained observations across the authorized workspace; they do not inherit the company rule snapshot.</span></div>
+  {snapshot&&<p className="regi-note">Company 360 rules snapshot ; effective {snapshot.validAt} ; known {snapshot.knownAt}. Company version and content are verified before any rule is shown. Applicability and compliance remain unestablished.</p>}
   <nav className="regi-tabs" aria-label="Regulatory observation collections">{(["rules","publications","monitors"] as const).map(kind=><button key={kind} aria-pressed={category===kind} onClick={()=>section(kind)}>{kind==="rules"?"Company readiness":kind==="publications"?"Legal source evidence":"Monitoring health"}</button>)}</nav>
   <div className="regi-split"><aside className="regi-queue" aria-label="Regulatory observations">
    {category==="rules"&&<>{rules?.error?<p role="alert">{rules.error}</p>:!rules?<p role="status">Loading reviewed interpretations…</p>:!companyId?<p>Select a company to inspect its reviewed interpretations.</p>:!companyRules.length?<p>No company interpretations in the loaded page. This is not evidence of no obligations.</p>:companyRules.map(row=><button key={row.version_id} aria-pressed={active?.id===row.resource_id} onClick={()=>choose("rule",row.resource_id)}><strong>{displayName(row.display_name)}</strong><span>{row.overview_assessment?.blocking_reasons?.length?row.overview_assessment.blocking_reasons.map(human).join(" · "):"Review assessment context"}</span><small>{human(row.attributes.definition.legal_status)} interpretation · {human(row.attributes.definition.activity)}</small></button>)}<div className="regi-pager"><button disabled={!rules||offsets.rules===0} onClick={()=>page("rules",Math.max(0,offsets.rules-100))}>Previous</button><span>Authorized page {Math.floor(offsets.rules/100)+1}</span><button disabled={rules?.nextOffset==null} onClick={()=>page("rules",rules!.nextOffset!)}>Next</button></div>{rules?.hasMore&&<p>Company filtering applies within each authorized rule page. Continue to see later matches.</p>}</>}
@@ -108,9 +125,9 @@ export default function RegulatoryInvestigation({token,companyId,assessment,onAs
   </aside><div className="regi-canvas">
    {(!active||(active.kind==="rule"&&rules&&!rule)||(active.kind==="publication"&&publications&&!publication)||(active.kind==="monitor"&&monitors&&!monitor))&&<div className="regi-empty"><FileText size={26}/><h3>{active?"Selected observation is not available in this loaded page":"Choose an observation to investigate"}</h3><p>Source evidence, company interpretations and monitor state remain separately inspectable.</p></div>}
    {rule&&<><header><p className="regi-eyebrow">COMPANY INTERPRETATION</p><h3>{displayName(rule.display_name)}</h3><p>{rule.attributes.definition.obligation}</p></header><dl className="regi-facts"><div><dt>Provision</dt><dd>{rule.attributes.definition.provision}</dd></div><div><dt>Declared legal status</dt><dd>{human(rule.attributes.definition.legal_status)}</dd></div><div><dt>Source completeness</dt><dd>{rule.attributes.definition.source_version_complete?"Declared complete in this interpretation":"Applicable source version incomplete"}</dd></div><div><dt>Interpreted effective dates</dt><dd>{rule.attributes.definition.effective_from} — {rule.attributes.definition.effective_to??"No end specified"}</dd></div><div><dt>Interpreted deadline</dt><dd>{rule.attributes.definition.deadline??"Not specified"}</dd></div></dl>
-    {assessed?<section className="regi-readiness"><h4>{retainedAssessment?"Retained scenario assessment":"Current readiness with incomplete context"}</h4><p>{human(assessed.assessment.legal_state)} · {human(assessed.assessment.applicability)}</p><ul>{assessed.assessment.blocking_reasons?.map(reason=><li key={reason}>{human(reason)}</li>)}</ul><p>{assessed.assessment.effective_obligation?"This scenario meets the retained interpretation's applicability checks. Compliance is not certified.":"An effective obligation is not established by this assessment."}</p>{retainedAssessment?<small>Legal date {assessment?.assessment_context?.at} · known at {assessment?.assessment_context?.known_at}. This is a retained result, not a new current-use decision.</small>:<small>No activity or customer count was supplied. Legal date {rule.overview_context?.at} · known at {rule.overview_context?.known_at}. The server identifies missing context without assuming applicability.</small>}</section>:<section className="regi-readiness"><h4>What remains to establish</h4><p>Activity, customer count, legal date and licence evidence must be evaluated by the shared assessment service. No scenario is assumed here.</p></section>}
-    <button className="regi-next" onClick={onAssessment}>Assess an explicit company scenario<ArrowRight size={14}/></button>{links(rule)}
-    <h4>Retained publications sharing this act identity</h4>{publications?.rows.filter(row=>row.attributes.act_id===rule.attributes.act_id).map(row=><button className="regi-resource" key={row.version_id} onClick={()=>{setCategory("publications");choose("publication",row.resource_id);}}>{row.attributes.observation.title}<small>{human(row.attributes.observation.completeness)} · identity association, not proof of complete applicable law</small></button>)}
+    {assessed?<section className="regi-readiness"><h4>{retainedAssessment?"Retained scenario assessment":snapshot?"Snapshot readiness with incomplete context":"Readiness at returned observation time"}</h4><p>{human(assessed.assessment.legal_state)} · {human(assessed.assessment.applicability)}</p><ul>{assessed.assessment.blocking_reasons?.map(reason=><li key={reason}>{human(reason)}</li>)}</ul><p>{assessed.assessment.effective_obligation?"This scenario meets the retained interpretation's applicability checks. Compliance is not certified.":"An effective obligation is not established by this assessment."}</p>{retainedAssessment?<small>Legal date {assessment?.assessment_context?.at} · known at {assessment?.assessment_context?.known_at}. This is a retained result, not a new current-use decision.</small>:<small>No activity or customer count was supplied. Legal date {rule.overview_context?.at} · known at {rule.overview_context?.known_at}. The server identifies missing context without assuming applicability.</small>}</section>:<section className="regi-readiness"><h4>What remains to establish</h4><p>Activity, customer count, legal date and licence evidence must be evaluated by the shared assessment service. No scenario is assumed here.</p></section>}
+    <button className="regi-next" onClick={onAssessment}>Assess an explicit company scenario<ArrowRight size={14}/></button>{links(rule,rule.overview_context?.known_at)}
+    <h4>Current retained publications sharing this act identity</h4><p>These publication observations are separate from the historical snapshot of the rule.</p>{publications?.rows.filter(row=>row.attributes.act_id===rule.attributes.act_id).map(row=><button className="regi-resource" key={row.version_id} onClick={()=>{setCategory("publications");choose("publication",row.resource_id);}}>{row.attributes.observation.title}<small>{human(row.attributes.observation.completeness)} · identity association, not proof of complete applicable law</small></button>)}
    </>}
    {publication&&documentId&&<><header><p className="regi-eyebrow">RETAINED LEGAL SOURCE</p><h3>{publication.attributes.observation.title}</h3><p>Matsne {publication.attributes.observation.matsne_id} · publication {publication.attributes.observation.publication??"unknown"}</p></header><section className="regi-readiness"><h4>{human(publication.attributes.observation.completeness)}</h4><p>Retained publication text does not establish current-law completeness or company applicability.</p><p>Attachments retained: {publication.attributes.observation.attachments_retained?"Yes":"No"} · Current law verified: {publication.attributes.observation.current_law_verified?"Yes":"No"}</p></section>{links(publication)}<div className="regi-links"><button disabled={action?.busy} onClick={()=>void sourceAction(documentId,"inspect")}>Read retained publication</button><button disabled={action?.busy} onClick={()=>void sourceAction(documentId,"impact")}>Trace potential dependency impact</button></div>
     {source?.id===documentId&&<section className="regi-original"><h4>Retained source text</h4><a href={source.source_url} target="_blank" rel="noreferrer">Open official publication</a><p className="regi-source-text">{source.observation.text}</p></section>}

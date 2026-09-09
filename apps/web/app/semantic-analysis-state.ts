@@ -1,4 +1,5 @@
-import type {AnalysisContributor,AnalysisField,AnalysisPin,AnalysisProjection,AnalysisRequest,AnalysisValue} from "@finai/contracts";
+import {journalSnapshot as exactJournalSnapshot} from "./analysis-projection-identity";
+import type {AnalysisContributor,AnalysisField,AnalysisPin,AnalysisProjection,AnalysisRequest,AnalysisRow,AnalysisValue} from "@finai/contracts";
 
 const hash=/^[a-f0-9]{64}$/;
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
@@ -47,7 +48,7 @@ function validValue(value:AnalysisValue,field:AnalysisField):boolean {
   default:return false;
  }
 }
-export type AnalysisView={version:1;request:AnalysisRequest;valid_at:string;known_at:string;receipt_hash:string;columns:string[];visual:boolean;pane:"evidence"|"trace";scroll:number;workspace?:{grid:{widths:Record<string,number>;pinned:string[];focus:{row:string;column:string}|null;left:number};dock:"right"|"bottom";collapsed:boolean;size:number}};
+export type AnalysisView={version:1;journalSnapshot?:string;request:AnalysisRequest;valid_at:string;known_at:string;receipt_hash:string;columns:string[];visual:boolean;pane:"evidence"|"trace";scroll:number;workspace?:{grid:{widths:Record<string,number>;pinned:string[];focus:{row:string;column:string}|null;left:number;search:string};dock:"right"|"bottom";collapsed:boolean;size:number}};
 export function requestKey(request:AnalysisRequest):string {
  return JSON.stringify([request.company_id,request.invocation_id,request.descriptor_sha256??null,request.filters??[],request.group_by??null,request.selected_row??null,request.contributor_index??0]);
 }
@@ -72,10 +73,12 @@ export function assertProjection(value:AnalysisProjection,request:AnalysisReques
  if(request.selected_row&&!value.selection)throw Error("The selected contributor is unavailable in this retained result.");
 }
 /** Allowlist local preferences so response values or credentials cannot be persisted. */
-export function parseView(raw:string,companyId:string):AnalysisView|null {
+export function parseView(raw:string,companyId:string,invocationId?:string,journalSnapshot?:string):AnalysisView|null {
  try {const v=JSON.parse(raw);const r=v.request;
-  if(!uuid.test(companyId)||v.version!==1||!r||r.company_id!==companyId||!uuid.test(r.invocation_id)||!hash.test(r.descriptor_sha256)||!instant(v.valid_at)||!instant(v.known_at)||!hash.test(v.receipt_hash)||!Array.isArray(r.filters)||r.filters.length>4||r.filters.some((f:{field:string;state:string;value:unknown})=>typeof f.field!=="string"||f.field.length>128||!["VALUE","NULL","MISSING"].includes(f.state)||f.value!==null&&!["string","number","boolean"].includes(typeof f.value))||r.selected_row!=null&&!rowId.test(r.selected_row)||!Number.isInteger(r.contributor_index)||r.contributor_index<0||r.contributor_index>999||r.group_by!=null&&(typeof r.group_by!=="string"||r.group_by.length>128))return null;
-  return {version:1,request:{company_id:companyId,invocation_id:r.invocation_id,descriptor_sha256:r.descriptor_sha256,filters:r.filters.map((f:{field:string;state:"VALUE"|"NULL"|"MISSING";value:string|number|boolean|null})=>({field:f.field,state:f.state,value:f.value})),group_by:r.group_by??null,selected_row:r.selected_row??null,contributor_index:r.contributor_index},valid_at:v.valid_at,known_at:v.known_at,receipt_hash:v.receipt_hash,columns:Array.isArray(v.columns)?v.columns.filter((key:unknown)=>typeof key==="string").slice(0,100):[],visual:v.visual!==false,pane:v.pane==="trace"?"trace":"evidence",workspace:parseWorkspace(v.workspace),scroll:typeof v.scroll==="number"&&Number.isFinite(v.scroll)?Math.max(0,v.scroll):0};
+  const snapshot=journalSnapshot===undefined?undefined:exactJournalSnapshot(journalSnapshot);
+  if(snapshot===undefined?"journalSnapshot" in v:!("journalSnapshot" in v)||exactJournalSnapshot(v.journalSnapshot)!==snapshot||r?.filters?.length||r?.group_by)return null;
+  if(!uuid.test(companyId)||v.version!==1||!r||r.company_id!==companyId||!uuid.test(r.invocation_id)||(invocationId!==undefined&&r.invocation_id!==invocationId)||!hash.test(r.descriptor_sha256)||!instant(v.valid_at)||!instant(v.known_at)||!hash.test(v.receipt_hash)||!Array.isArray(r.filters)||r.filters.length>4||r.filters.some((f:{field:string;state:string;value:unknown})=>typeof f.field!=="string"||f.field.length>128||!["VALUE","NULL","MISSING"].includes(f.state)||f.value!==null&&!["string","number","boolean"].includes(typeof f.value))||r.selected_row!=null&&!rowId.test(r.selected_row)||!Number.isInteger(r.contributor_index)||r.contributor_index<0||r.contributor_index>999||r.group_by!=null&&(typeof r.group_by!=="string"||r.group_by.length>128))return null;
+  return {version:1,...(snapshot===undefined?{}:{journalSnapshot:snapshot}),request:{company_id:companyId,invocation_id:r.invocation_id,descriptor_sha256:r.descriptor_sha256,filters:r.filters.map((f:{field:string;state:"VALUE"|"NULL"|"MISSING";value:string|number|boolean|null})=>({field:f.field,state:f.state,value:f.value})),group_by:r.group_by??null,selected_row:r.selected_row??null,contributor_index:r.contributor_index},valid_at:v.valid_at,known_at:v.known_at,receipt_hash:v.receipt_hash,columns:Array.isArray(v.columns)?v.columns.filter((key:unknown)=>typeof key==="string").slice(0,100):[],visual:v.visual!==false,pane:v.pane==="trace"?"trace":"evidence",workspace:parseWorkspace(v.workspace),scroll:typeof v.scroll==="number"&&Number.isFinite(v.scroll)?Math.max(0,v.scroll):0};
  }catch{return null;}
 }
 
@@ -86,7 +89,15 @@ function parseWorkspace(value:unknown):AnalysisView["workspace"] {
  const finite=(n:unknown,min:number,max:number,fallback:number)=>typeof n==="number"&&Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback;
  const widths=Object.fromEntries(Object.entries(g.widths&&typeof g.widths==="object"?g.widths:{}).filter(([key,value])=>key.length<=128&&typeof value==="number"&&Number.isFinite(value)).slice(0,100).map(([key,value])=>[key,finite(value,88,600,160)]));
  const focus=g.focus as {row?:unknown;column?:unknown}|undefined;
- return {grid:{widths,pinned:Array.isArray(g.pinned)?g.pinned.filter((key:unknown)=>typeof key==="string"&&key.length<=128).slice(0,100):[],focus:focus&&typeof focus.row==="string"&&rowId.test(focus.row)&&typeof focus.column==="string"&&focus.column.length<=128?{row:focus.row,column:focus.column}:null,left:finite(g.left,0,100000,0)},dock:v.dock==="bottom"?"bottom":"right",collapsed:v.collapsed===true,size:finite(v.size,180,700,340)};
+ return {grid:{widths,pinned:Array.isArray(g.pinned)?g.pinned.filter((key:unknown)=>typeof key==="string"&&key.length<=128).slice(0,100):[],focus:focus&&typeof focus.row==="string"&&rowId.test(focus.row)&&typeof focus.column==="string"&&focus.column.length<=128?{row:focus.row,column:focus.column}:null,left:finite(g.left,0,100000,0),search:typeof g.search==="string"?g.search.slice(0,200):""},dock:v.dock==="bottom"?"bottom":"right",collapsed:v.collapsed===true,size:finite(v.size,180,700,340)};
+}
+
+/** Presentation search of returned values only; no numeric coercion or hidden field lookup. */
+export function worksheetRowMatches(row:AnalysisRow,fields:readonly AnalysisField[],query:string):boolean {
+ const search=query.slice(0,200).trim().toLocaleLowerCase();
+ if(!search)return true;
+ const values=[row.label,...fields.map(field=>{const value=row.values[field.key];if(!value)return "";const text=value.state==="NULL"?"Recorded null":value.state==="MISSING"?"Not recorded":`${value.label??""} ${String(value.value)}`;return `${field.label}: ${text}`;})];
+ return values.some(value=>value.toLocaleLowerCase().includes(search));
 }
 
 /** Keep one keyboard entry in the rendered window without changing evidence selection. */

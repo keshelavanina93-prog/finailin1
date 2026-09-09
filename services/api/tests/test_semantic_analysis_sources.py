@@ -21,7 +21,13 @@ def source(monkeypatch):
         scope=SimpleNamespace(tenant_id=scope["tenant_id"], model_dump=lambda **_: scope)
     )
     resolver = Resolver(principal, {"function": {}, "static_dependencies": []})
-    evidence = {"object_type": "SourceEvidence", "attributes": {"sha256": source_hash}}
+    evidence = {
+        "resource_id": "retained-evidence",
+        "version_id": "retained-version",
+        "content_hash": "e" * 64,
+        "object_type": "SourceEvidence",
+        "attributes": {"sha256": source_hash},
+    }
     monkeypatch.setattr(resolver, "version", lambda _: evidence)
     state = {
         "receipt": {"receipt_id": "ir_original"},
@@ -61,7 +67,8 @@ def source(monkeypatch):
 
     monkeypatch.setattr(function_invocations, "_database", database)
     monkeypatch.setattr(accounting_source_document, "read_source", read)
-    return resolver, state
+    with resolver.read_session():
+        yield resolver, state
 
 
 def test_exact_source_cell_and_formula_cache_are_preserved(source):

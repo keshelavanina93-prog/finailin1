@@ -4,14 +4,25 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Panel } from "./g8-ui";
 import "./regulation.css";
 import RegulatorySources from "./regulatory-sources";
+import {assertRetainedRegulatoryAssessment,type RegulatoryScenario} from "./regulatory-assessment-state";
 import RegulatoryInvestigation,{type RegulatoryNavigation} from "./regulatory-investigation";
+
+import {validateRegulationHandoff,regulationSnapshotKey,type CompanyRegulationHandoff} from "./company-regulation-handoff";
 
 type Rule = {resource:{resource_id:string;version_id:string;display_name:string;attributes:{definition:{provision:string;source_version:string;effective_from:string;deadline:string|null};act_id:string;evidence_id:string;licence_id:string}};assessment:{legal_state:string;applicability:string;effective_obligation:boolean;obligation:string;days_to_deadline:number|null;blocking_reasons?:string[]}};
 type Reference = {resource_id:string;display_name:string;object_type:string};
-export type Result = {rules:Rule[];next_offset:number|null;run_id?:string;no_rules_found?:boolean;company?:{display_name:string};assessment_context?:{activity:string;at:string;known_at:string;customer_count:number|null}};
+export type Result = {rules:Rule[];next_offset:number|null;run_id?:string;no_rules_found?:boolean;company?:{resource_id:string;version_id:string;display_name:string};assessment_context?:{activity:string;at:string;known_at:string;customer_count:number|null}};
 
-export default function RegulationWorkspace({token, companyId, onProposal,viewStateKey,...navigation}: RegulatoryNavigation&{token:string;companyId:string;onProposal:(id:string)=>void;viewStateKey?:string}) {
+type Props=RegulatoryNavigation&{token:string;companyId:string;onProposal:(id:string)=>void;viewStateKey?:string;handoff?:CompanyRegulationHandoff};
+export default function RegulationWorkspace(props:Props){
+ let handoff:CompanyRegulationHandoff|undefined;
+ try{handoff=props.handoff===undefined?undefined:validateRegulationHandoff(props.handoff,props.companyId);}catch{return <p role="alert">The Company 360 regulatory reference is invalid. Reopen the displayed company snapshot; current rules have not been substituted.</p>;}
+ return <Workspace key={JSON.stringify([props.token,props.companyId,regulationSnapshotKey(handoff)])} {...props} handoff={handoff}/>;
+}
+function Workspace({token,companyId,onProposal,viewStateKey,handoff,...navigation}:Props) {
   const scenarioRef=useRef<HTMLDetailsElement>(null);
+  const assessmentRead=useRef<AbortController|null>(null);
+  useEffect(()=>()=>{const current=assessmentRead.current;assessmentRead.current=null;current?.abort();},[]);
   const [sourceToolsVisited,setSourceToolsVisited]=useState(false);
   const [proposalToolsVisited,setProposalToolsVisited]=useState(false);
   const [result,setResult]=useState<Result|null>(null);
@@ -34,17 +45,22 @@ export default function RegulationWorkspace({token, companyId, onProposal,viewSt
     void Promise.all(["RegulatoryAct","Licence","SourceEvidence"].map(load)).then(pages=>setReferences(pages.flat())).catch(e=>{if(!controller.signal.aborted)setError(String(e));});
     return ()=>controller.abort();
   },[token,proposalToolsVisited]);
-  async function request(path:string, body?:unknown) {
-    const response=await fetch(`/api/ontology/regulation/${path}`,{method:body?"POST":"GET",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined,cache:"no-store"});
+  async function request(path:string, body?:unknown,signal?:AbortSignal) {
+    const response=await fetch(`/api/ontology/regulation/${path}`,{method:body?"POST":"GET",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined,cache:"no-store",signal});
     const data=await response.json(); if(!response.ok) throw new Error(typeof data.detail==="string"?data.detail:JSON.stringify(data.detail));return data;
   }
+  async function loadAssessment(path:string,scenario?:RegulatoryScenario,runId?:string) {
+    assessmentRead.current?.abort();const controller=new AbortController();assessmentRead.current=controller;
+    setBusy(true);setError("");setResult(null);const timer=setTimeout(()=>controller.abort(),25000);
+    try{const value=await request(path,scenario,controller.signal);assertRetainedRegulatoryAssessment(value,{companyId,runId,scenario});if(assessmentRead.current===controller&&!controller.signal.aborted){setResult(value);setSavedAssessment(value.run_id);}}
+    catch(failure){if(assessmentRead.current===controller)setError(controller.signal.aborted?"Assessment retrieval timed out. No previous result is shown.":failure instanceof Error?failure.message:"Assessment unavailable.");}
+    finally{clearTimeout(timer);if(assessmentRead.current===controller){assessmentRead.current=null;setBusy(false);}}
+  }
   async function assess(event:FormEvent<HTMLFormElement>) {
-    event.preventDefault();setBusy(true);setError("");setResult(null);
-    const form=new FormData(event.currentTarget);const params=new URLSearchParams({legal_entity_id:companyId,activity:String(form.get("activity")),at:`${form.get("at")}T00:00:00Z`});
-    if(form.get("customers"))params.set("customer_count",String(form.get("customers")));
-    if(form.get("known"))params.set("known_at",`${form.get("known")}T23:59:59Z`);
-    setQuery(params.toString());
-    try{const value=await request("assessments",{legal_entity_id:companyId,activity:String(form.get("activity")),at:params.get("at"),known_at:params.get("known_at"),customer_count:form.get("customers")?Number(form.get("customers")):null});setResult(value);setSavedAssessment(value.run_id);}catch(e){setError(String(e));}finally{setBusy(false);}
+    event.preventDefault();const form=new FormData(event.currentTarget);
+    const scenario:RegulatoryScenario={legal_entity_id:companyId,activity:String(form.get("activity")),at:`${form.get("at")}T00:00:00Z`,known_at:form.get("known")?`${form.get("known")}T23:59:59Z`:null,customer_count:form.get("customers")?Number(form.get("customers")):null};
+    const params=new URLSearchParams({legal_entity_id:companyId,activity:scenario.activity,at:scenario.at});if(scenario.known_at)params.set("known_at",scenario.known_at);if(scenario.customer_count!==null)params.set("customer_count",String(scenario.customer_count));setQuery(params.toString());
+    await loadAssessment("assessments",scenario);
   }
   async function propose(event:FormEvent<HTMLFormElement>) {
     event.preventDefault();setBusy(true);setError("");const f=new FormData(event.currentTarget);
@@ -52,11 +68,12 @@ export default function RegulationWorkspace({token, companyId, onProposal,viewSt
     try{const data=await request("proposals",{name:text("name"),key:text("key"),legal_entity_id:companyId,act_id:text("act_id"),licence_id:text("licence_id"),evidence_id:text("evidence_id"),rationale:text("rationale"),definition:{legal_status:text("legal_status"),source_version:text("source_version"),source_version_complete:f.get("complete")==="on",provision:text("provision"),activity:text("rule_activity"),effective_from:text("effective_from"),effective_to:text("effective_to")||null,minimum_customers:text("minimum_customers")?Number(text("minimum_customers")):null,obligation:text("obligation"),deadline:text("deadline")||null,first_reporting_year:null}});onProposal(data.proposal.proposal_id);}catch(e){setError(String(e));}finally{setBusy(false);}
   }
   return <>
-    <RegulatoryInvestigation viewStateKey={viewStateKey} token={token} companyId={companyId} assessment={result} onAssessment={()=>{if(scenarioRef.current){scenarioRef.current.open=true;scenarioRef.current.scrollIntoView({behavior:"smooth",block:"start"});scenarioRef.current.querySelector("summary")?.focus();}}} {...navigation}/>
+    <RegulatoryInvestigation handoff={handoff} viewStateKey={viewStateKey} token={token} companyId={companyId} assessment={result} onAssessment={()=>{if(scenarioRef.current){scenarioRef.current.open=true;scenarioRef.current.scrollIntoView({behavior:"smooth",block:"start"});scenarioRef.current.querySelector("summary")?.focus();}}} {...navigation}/>
+    {handoff&&<p className="regi-note">The rules above retain the Company 360 snapshot. Explicit scenario tools and publication monitoring below use their own stated observation times.</p>}
     <details className="regi-secondary" ref={scenarioRef}><summary>Assess or reopen an explicit company scenario</summary>
     <Panel title="Regulatory obligations">
-      <label>Retained assessment ID<input value={savedAssessment} onChange={e=>setSavedAssessment(e.target.value)} placeholder="fcr_…"/></label><button disabled={busy||!/^fcr_[a-f0-9]{64}$/.test(savedAssessment)} onClick={async()=>{setBusy(true);setError("");try{setResult(await request(`assessments/${savedAssessment}`));}catch(e){setError(String(e));}finally{setBusy(false);}}}>Reopen assessment</button>
-      {result?.run_id&&<><p>Retained assessment: {result.run_id}</p><p>{result.company?.display_name} · {result.assessment_context?.activity} · legal date {result.assessment_context?.at} · known at {result.assessment_context?.known_at} · customers: {result.assessment_context?.customer_count??"Not established"}</p></>}{result?.no_rules_found&&<p>No reviewed rules were found. This is not evidence of compliance.</p>}
+      <details><summary>Advanced: reopen by retained assessment ID</summary><label>Retained assessment ID<input value={savedAssessment} onChange={e=>setSavedAssessment(e.target.value)} placeholder="fcr_…"/></label><button disabled={busy||!companyId||!/^fcr_[a-f0-9]{64}$/.test(savedAssessment)} onClick={()=>void loadAssessment(`assessments/${savedAssessment}?${new URLSearchParams({legal_entity_id:companyId})}`,undefined,savedAssessment)}>Reopen assessment</button></details>
+      {result?.run_id&&<><details><summary>Advanced: exact assessment reference</summary><dl><dt>Assessment</dt><dd>{result.run_id}</dd><dt>Company / version</dt><dd>{result.company?.resource_id} / {result.company?.version_id}</dd></dl></details><p>{result.company?.display_name} · {result.assessment_context?.activity} · legal date {result.assessment_context?.at} · known at {result.assessment_context?.known_at} · customers: {result.assessment_context?.customer_count??"Not established"}</p></>}{result?.no_rules_found&&<p>No reviewed rules were found. This is not evidence of compliance.</p>}
       <p>Assess reviewed interpretations for the selected company. Activity and customer count are scenario inputs; this assessment does not certify compliance or create accounting entries.</p>
       <form onSubmit={assess} className="g8-regulation-form">
         <label>Activity<select name="activity" required defaultValue=""><option value="" disabled>Select scenario activity</option><option>DISTRIBUTION</option><option>TRANSMISSION</option><option>SUPPLY</option></select></label>

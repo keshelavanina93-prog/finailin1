@@ -352,6 +352,11 @@ def detail(
                 404, "Journal unavailable in the selected company accounting context"
             )
         binding, _ = resolved
+        compatibility = (
+            linked(cursor, principal, journal, "source_compatibility_id", at)
+            if journal["attributes"].get("source_compatibility_id")
+            else None
+        )
         scope = linked(cursor, principal, binding, "scope_id", at)
         evidence = linked(cursor, principal, scope, "evidence_id", at)
         rows = cursor.execute(
@@ -409,8 +414,14 @@ def detail(
                 continue
             from finai_api.services.journal_dimensions import historical
 
-            lines.append({"line": line, "account": account, "source_record": record,
-                          "dimensions": historical(conn, principal, line, account, at)})
+            lines.append(
+                {
+                    "line": line,
+                    "account": account,
+                    "source_record": record,
+                    "dimensions": historical(conn, principal, line, account, at),
+                }
+            )
         integrity = check_integrity(journal, binding, lines, issues)
         try:
             validate_posting_date(
@@ -424,6 +435,7 @@ def detail(
         **envelope(selected, at),
         "journal": journal,
         "binding": binding,
+        "source_compatibility": compatibility,
         "lines": lines,
         "integrity": integrity,
         "binding_eligibility": accounting_binding_status.inspect(principal, binding),

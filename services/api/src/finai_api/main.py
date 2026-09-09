@@ -4,7 +4,10 @@ from fastapi.responses import JSONResponse
 
 from finai_api.api.account_dimension_policy_routes import router as account_dimension_policy_router
 from finai_api.api.certification_routes import router as certification_router
+from finai_api.api.company_changes_routes import router as company_changes_router
+from finai_api.api.company_condition_routes import router as company_condition_router
 from finai_api.api.company_context_routes import router as company_context_router
+from finai_api.api.company_home_routes import router as company_home_router
 from finai_api.api.company_journal_routes import router as company_journal_router
 from finai_api.api.event_time_routes import router as event_time_router
 from finai_api.api.function_routes import router as function_router
@@ -21,6 +24,7 @@ from finai_api.api.period_control_routes import router as period_control_router
 from finai_api.api.proposal_queue_routes import router as proposal_queue_router
 from finai_api.api.regulation_routes import router as regulation_router
 from finai_api.api.reporting_routes import router as reporting_router
+from finai_api.api.retained_analysis_routes import router as retained_analysis_router
 from finai_api.api.retention_routes import router as retention_router
 from finai_api.api.routes import router
 from finai_api.api.runtime_observation_routes import router as runtime_observation_router
@@ -49,6 +53,7 @@ app.include_router(ontology_definition_router)
 app.include_router(lifecycle_router)
 app.include_router(certification_router)
 app.include_router(retention_router)
+app.include_router(retained_analysis_router)
 app.include_router(function_router)
 app.include_router(ontology_import_router)
 app.include_router(runtime_observation_router)
@@ -63,6 +68,9 @@ app.include_router(proposal_queue_router)
 app.include_router(source_document_router)
 app.include_router(source_adoption_router)
 app.include_router(company_context_router)
+app.include_router(company_condition_router)
+app.include_router(company_changes_router)
+app.include_router(company_home_router)
 app.include_router(company_journal_router)
 app.include_router(period_control_router)
 app.include_router(ontology_operation_router)

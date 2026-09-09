@@ -40,6 +40,25 @@ def test_bbox_invalid_and_dateline_explicit():
         assert exc.value.status == 422
 
 
+@pytest.mark.parametrize("company", [None, UUID("731638fc-8d62-4e91-8594-fd54b21aad6b")])
+def test_empty_projection_retains_authorized_company_and_exact_times(monkeypatch, company):
+    valid = datetime(2024, 1, 1, microsecond=123456, tzinfo=UTC)
+    known = datetime(2025, 2, 1, microsecond=654321, tzinfo=UTC)
+    principal = object()
+
+    def retained_snapshot(actor, valid_at, known_at, company_id):
+        assert actor is principal
+        assert (valid_at, known_at, company_id) == (valid, known, company)
+        return [], False, valid, known
+
+    monkeypatch.setattr(maps, "snapshot", retained_snapshot)
+    result = maps.map_view(principal, valid_at=valid, known_at=known, company_id=company)
+    assert result["company_id"] == (str(company) if company else None)
+    assert result["valid_at"] == valid.isoformat()
+    assert result["known_at"] == known.isoformat()
+    assert result["features"] == [] and result["unmapped"] == []
+
+
 @pytest.fixture
 def actors():
     if os.environ.get("G8_BINDING_DB_TEST") != "1":

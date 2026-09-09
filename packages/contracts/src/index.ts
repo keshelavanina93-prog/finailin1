@@ -247,3 +247,11 @@ export interface SourcePreview {
   sha256:string; byte_length:number; integrity:"VERIFIED"; value_semantics:"SOURCE_TEXT";
 }
 export type {AnalysisScalar,AnalysisPin,AnalysisDecimalPresentation,AnalysisValue,AnalysisFilter,AnalysisRequest,AnalysisField,AnalysisRow,AnalysisContributor,AnalysisDescriptor,AnalysisProjection} from "./semantic-analysis.js";
+
+export type {CompanyHomeDescriptor} from "./company-home.js";
+export type {CompanyConditionDescriptor,CompanyConditionConnection,CompanyConditionResourceGroup,CompanyConditionWorkItem,CompanyJournalReviewItem,CompanyJournalReviews} from "./company-condition.js";
+
+export type {CompanyChangesRequest,CompanyChangesDescriptor,CompanyContextChange} from "./company-changes.js";
+export type {CompanyRegulationPage} from "./regulatory-context.js";
+
+export type {RetainedAnalysisReference,RetainedAnalysisPage} from "./retained-analyses.js";

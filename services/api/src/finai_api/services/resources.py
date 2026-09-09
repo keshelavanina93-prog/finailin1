@@ -241,7 +241,9 @@ def _check_scalar(kind: str, value: Any) -> bool:
 
 
 def _validate(
-    conn: psycopg.Connection[Any], principal: Principal, proposal: ResourceProposal,
+    conn: psycopg.Connection[Any],
+    principal: Principal,
+    proposal: ResourceProposal,
     external_proofs: dict[UUID, str] | None = None,
 ) -> dict[str, Any]:
     from finai_api.services.external_ontology_validation import validate_boundaries
@@ -321,8 +323,12 @@ def _validate(
                 and relation.startswith("EXTERNAL_ONTOLOGY_SOURCE:")
             )
             if not (
-                exact_query or exact_property or exact_function_input
-                or exact_binding_property or exact_calculated_binding or exact_external_source
+                exact_query
+                or exact_property
+                or exact_function_input
+                or exact_binding_property
+                or exact_calculated_binding
+                or exact_external_source
             ):
                 raise WorkspaceError(422, "Exact ontology dependency is not supported here")
             head = _get(conn, tenant, UUID(identifier))
@@ -368,8 +374,9 @@ def _validate(
                 resolved[identifier] = _get(conn, tenant, UUID(identifier))
             result = resolved[identifier]
             external_heads[identifier] = str(result["version_id"])
-        if (source_item.object_type == "ObjectSetDefinition"
-            and relation.startswith("TRAVERSAL_CANDIDATE:")):
+        if source_item.object_type == "ObjectSetDefinition" and relation.startswith(
+            "TRAVERSAL_CANDIDATE:"
+        ):
             # Discovery reads remain RLS-visible, temporally resolved and head-fenced.
             # Only matching endpoints are subsequently bound as DEFINITION_TYPE;
             # unrelated inspected schemas are not semantic inputs to this query.
@@ -527,8 +534,10 @@ def _validate(
 
             validate_definition(item, schema_by_name, link_by_name, target)
             if item.object_type in {
-                "ExternalOntologySource", "ExternalOntologyRelease",
-                "ExternalOntologyModule", "OntologyImportRun",
+                "ExternalOntologySource",
+                "ExternalOntologyRelease",
+                "ExternalOntologyModule",
+                "OntologyImportRun",
             }:
                 from finai_api.services.external_ontology_validation import (
                     validate as validate_external,
@@ -612,6 +621,23 @@ def _validate(
                     from finai_api.services.journal_dimensions import validate_line
 
                     validate_line(conn, principal, item, target, proposal, validation_time)
+            if item.object_type == "SourceJournalCompatibility":
+                from finai_api.services.source_journal_compatibility import (
+                    validate as validate_compatibility,
+                )
+
+                validate_compatibility(item, target)
+                from finai_api.services.accounting_promotion import validate_current_binding
+
+                validate_current_binding(
+                    conn,
+                    principal,
+                    target(
+                        item.attributes["accounting_binding_id"],
+                        identifier,
+                        "COMPATIBILITY_MATERIAL_BINDING",
+                    ),
+                )
             if item.object_type == "AccountDimensionPolicy":
                 from finai_api.services.journal_dimensions import (
                     validate_policy as validate_dimension_policy,
@@ -1113,8 +1139,11 @@ def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
     detail = proposal_detail(principal, proposal_id)
     external_proofs = {}
     preflight_error = None
-    if (detail.decision is None and "ontology_review" in principal.permissions
-            and detail.submitted_by != principal.actor_id):
+    if (
+        detail.decision is None
+        and "ontology_review" in principal.permissions
+        and detail.submitted_by != principal.actor_id
+    ):
         try:
             external_proofs = preflight(principal, detail.proposal)
         except (WorkspaceError, ValueError, KeyError) as exc:
@@ -1176,9 +1205,12 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
 
     before = proposal_detail(principal, proposal_id)
     external_proofs = {}
-    if (request.decision == "APPROVED" and before.decision is None
-            and "ontology_review" in principal.permissions
-            and before.submitted_by != principal.actor_id):
+    if (
+        request.decision == "APPROVED"
+        and before.decision is None
+        and "ontology_review" in principal.permissions
+        and before.submitted_by != principal.actor_id
+    ):
         external_proofs = preflight(principal, before.proposal)
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         tenant = principal.scope.tenant_id

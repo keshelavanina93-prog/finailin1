@@ -11,6 +11,7 @@ from finai_api.domain.semantic_analysis import (
     Row,
     Value,
 )
+from finai_api.read_budget import remaining_ms
 from finai_api.services.grouped_observations import count_observations
 from finai_api.services.semantic_analysis_support import field_label, pin, row_key, value_options
 from finai_api.services.workspace import WorkspaceError
@@ -96,8 +97,8 @@ def _contributor(resolver, obj, schema):
     )
 
 
-def build(history, plan, resolver, company_id):
-    """Only reinterpret the view; recomputation below verifies retained integrity."""
+def subject(history, plan, resolver, company_id):
+    """Verify retained observation subject and counts without reading source cells."""
     output = history["output"]
     grouping = plan.get("group_count")
     if history["status"] != "SUCCEEDED" or not grouping or not output.get("group_counts"):
@@ -128,12 +129,9 @@ def build(history, plan, resolver, company_id):
         raise WorkspaceError(409, "Retained count contributors or grouping values are inconsistent")
     if not 1 <= len(output["objects"]) <= 1000:
         raise WorkspaceError(409, "Observation company scope requires a nonempty bounded result")
-    definitions = {
-        str(pin(function).version_id): pin(function),
-        str(pin(schema).version_id): pin(schema),
-    }
-    objects, companies, evidence = {}, {}, {}
+    objects, companies = {}, {}
     for retained in output["objects"]:
+        remaining_ms()
         obj = resolver.version(retained)
         if (
             obj["attributes"] != retained["attributes"]
@@ -150,11 +148,18 @@ def build(history, plan, resolver, company_id):
             raise WorkspaceError(409, "Observation result belongs to another canonical company")
         companies[str(company["version_id"])] = company
         objects[str(obj["resource_id"])] = obj
-        evidence[str(obj["resource_id"])] = _contributor(resolver, obj, schema)
     if len(companies) != 1:
         raise WorkspaceError(409, "Observation result mixes canonical company versions")
     company = next(iter(companies.values()))
-    definitions[str(company["version_id"])] = pin(company)
+    return function, company, schema, objects
+
+
+def build(history, plan, resolver, company_id):
+    function, company, schema, objects = subject(history, plan, resolver, company_id)
+    output, grouping = history["output"], plan["group_count"]
+    definitions = {str(row["version_id"]): pin(row) for row in (function, schema, company)}
+    evidence = {identity: _contributor(resolver, obj, schema) for identity, obj in objects.items()}
+
     specs = schema["attributes"]["fields"]
     fields = []
     schema_deps = resolver.dependencies(pin(schema))
