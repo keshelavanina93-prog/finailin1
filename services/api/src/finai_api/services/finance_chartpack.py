@@ -83,10 +83,12 @@ def _row_value(row: Any, key: str, default: Any = None) -> Any:
     return getattr(row, key, default)
 
 
-def _analytic_dimension(policy: AnalyticPolicy, value: Any) -> str | None:
+def _analytic_mapping(
+    policy: AnalyticPolicy, value: Any
+) -> tuple[str | None, str, list[str]]:
     observed = _normalize_account_code(value)
     if not observed:
-        return None
+        return None, "NOT_APPLICABLE", []
     # 1C analytic labels commonly carry a human-readable suffix after the
     # account/key token (for example ``1111111 - Rustavi``).  The ChartPack
     # pattern is intentionally defined over that token, so match both the
@@ -103,8 +105,18 @@ def _analytic_dimension(policy: AnalyticPolicy, value: Any) -> str | None:
         or re.match(rule.source_pattern.removesuffix("$"), observed) is not None
     ]
     if matches:
-        return sorted(matches, key=lambda rule: (-rule.priority, rule.key))[0].dimension
-    return policy.default_dimension
+        return (
+            sorted(matches, key=lambda rule: (-rule.priority, rule.key))[0].dimension,
+            "MAPPED_CANDIDATE",
+            [],
+        )
+    return policy.default_dimension, "UNMAPPED_OBSERVED", ["UNMAPPED_SUBKONTO"]
+
+
+def _analytic_dimension(policy: AnalyticPolicy, value: Any) -> str | None:
+    """Compatibility helper returning only the proposed dimension label."""
+
+    return _analytic_mapping(policy, value)[0]
 
 
 def _account_pattern_matches(pattern: str, value: str) -> bool:
@@ -141,6 +153,9 @@ def _classification(
     raw = "" if account_code is None else str(account_code)
     normalized = _normalize_account_code(account_code)
     if not normalized:
+        observation_codes = ["UNMAPPED_ACCOUNT_CODE"]
+        if _normalize_account_code(subkonto):
+            observation_codes.append("UNMAPPED_SUBKONTO")
         return AccountClassification(
             account_code=raw,
             normalized_account_code="",
@@ -148,12 +163,17 @@ def _classification(
             additive_ok=additive_ok,
             duplicate_of=duplicate_of,
             reason="Source row has no account code; retain it as an observed row.",
+            analytic_mapping_state="UNMAPPED_OBSERVED",
+            observation_codes=observation_codes,
         )
 
     matches = [
         rule for rule in pack.rules if _account_pattern_matches(rule.account_pattern, normalized)
     ]
     if not matches:
+        observation_codes = ["UNMAPPED_ACCOUNT_CODE"]
+        if _normalize_account_code(subkonto):
+            observation_codes.append("UNMAPPED_SUBKONTO")
         return AccountClassification(
             account_code=raw,
             normalized_account_code=normalized,
@@ -161,6 +181,8 @@ def _classification(
             additive_ok=additive_ok,
             duplicate_of=duplicate_of,
             reason="No ChartPack rule matches the observed account code.",
+            analytic_mapping_state="UNMAPPED_OBSERVED",
+            observation_codes=observation_codes,
         )
 
     priority = max(rule.priority for rule in matches)
@@ -188,6 +210,18 @@ def _classification(
     policy = next(
         (item for item in pack.analytic_policies if item.key == rule.analytic_policy), None
     )
+    if policy:
+        analytic_dimension, analytic_mapping_state, observation_codes = _analytic_mapping(
+            policy, subkonto
+        )
+    elif subkonto is not None and _normalize_account_code(subkonto):
+        analytic_dimension, analytic_mapping_state, observation_codes = (
+            None,
+            "UNMAPPED_OBSERVED",
+            ["UNMAPPED_SUBKONTO"],
+        )
+    else:
+        analytic_dimension, analytic_mapping_state, observation_codes = None, "NOT_APPLICABLE", []
     return AccountClassification(
         account_code=raw,
         normalized_account_code=normalized,
@@ -198,7 +232,9 @@ def _classification(
         flow_measure=rule.flow_measure,
         balance_measure=rule.balance_measure,
         analytic_policy=rule.analytic_policy,
-        analytic_dimension=_analytic_dimension(policy, subkonto) if policy else None,
+        analytic_dimension=analytic_dimension,
+        analytic_mapping_state=analytic_mapping_state,
+        observation_codes=observation_codes,
         operating=rule.operating,
         additive_ok=additive_ok,
         duplicate_of=duplicate_of,
@@ -298,9 +334,22 @@ def classification_manifest(
         key = code or f"__ROW__:{entry['source_row']}"
         grouped[key].append(entry)
     accounts = []
+    observation_findings: list[dict[str, Any]] = []
     for code, entries in grouped.items():
         first = entries[0]
         classifications = [item["classification"] for item in entries]
+        for item in entries:
+            for observation_code in item["classification"]["observation_codes"]:
+                observation_findings.append(
+                    {
+                        "code": observation_code,
+                        "source_row": item["source_row"],
+                        "account_code": item["account_code"],
+                        "subkonto": item["subkonto"],
+                        "coordinates": item["coordinates"],
+                        "state": "OBSERVED",
+                    }
+                )
         additive_ok = all(bool(item["classification"]["additive_ok"]) for item in entries)
         accounts.append(
             {
@@ -331,6 +380,13 @@ def classification_manifest(
         "mapping_status": "proposed",
         "classification_state": "CLASSIFICATION_UNREVIEWED",
         "authority": "CANDIDATE_ONLY",
+        "observation_findings": observation_findings,
+        "unmapped_account_count": sum(
+            item["code"] == "UNMAPPED_ACCOUNT_CODE" for item in observation_findings
+        ),
+        "unmapped_subkonto_count": sum(
+            item["code"] == "UNMAPPED_SUBKONTO" for item in observation_findings
+        ),
         "accounts": accounts,
     }
 
@@ -423,6 +479,11 @@ def prepare_classification_proposal(
                     "additive_ok": entry["additive_ok"],
                     "duplicate_of": entry["duplicate_of"],
                     "classifications": entry["classifications"],
+                    "observation_findings": [
+                        finding
+                        for finding in manifest["observation_findings"]
+                        if finding["source_row"] in entry["source_rows"]
+                    ],
                     "review": {
                         "required": True,
                         "submitter_must_differ_from_reviewer": True,

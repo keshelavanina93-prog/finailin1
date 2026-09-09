@@ -57,7 +57,30 @@ def check_ready() -> None:
 
 
 def _check_retention(client: Any, bucket: str) -> None:
-    """A dedicated evidence bucket must not have automatic object deletion rules."""
+    """Require a versioned, object-lock-capable bucket without expiry rules.
+
+    A content hash and a conditional put protect one write path, but they do
+    not make the backing bucket immutable. Readiness and every preserve call
+    therefore fail closed unless the configured bucket advertises versioning
+    and Object Lock capability. Object Lock capability is deliberately not a
+    legal hold or a default retention duration; those remain governed policy.
+    """
+    try:
+        versioning = client.get_bucket_versioning(Bucket=bucket)
+    except (BotoCoreError, ClientError, OSError, KeyError) as exc:
+        raise EvidenceStoreUnavailable(
+            "Evidence bucket versioning capability is unavailable"
+        ) from exc
+    if versioning.get("Status") != "Enabled":
+        raise EvidenceStoreUnavailable("Evidence bucket versioning is not enabled")
+    try:
+        object_lock = client.get_object_lock_configuration(Bucket=bucket)
+    except (BotoCoreError, ClientError, OSError, KeyError) as exc:
+        raise EvidenceStoreUnavailable(
+            "Evidence bucket Object Lock capability is unavailable"
+        ) from exc
+    if object_lock.get("ObjectLockConfiguration", {}).get("ObjectLockEnabled") != "Enabled":
+        raise EvidenceStoreUnavailable("Evidence bucket Object Lock is not enabled")
     try:
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bucket)
     except ClientError as exc:

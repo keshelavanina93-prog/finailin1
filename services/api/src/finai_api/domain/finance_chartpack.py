@@ -116,6 +116,12 @@ class AccountClassification(ChartPackModel):
     ] | None = None
     analytic_policy: str | None = None
     analytic_dimension: str | None = None
+    analytic_mapping_state: Literal[
+        "NOT_APPLICABLE", "MAPPED_CANDIDATE", "UNMAPPED_OBSERVED"
+    ] = "NOT_APPLICABLE"
+    observation_codes: list[
+        Literal["UNMAPPED_ACCOUNT_CODE", "UNMAPPED_SUBKONTO"]
+    ] = Field(default_factory=list)
     operating: bool | None = None
     additive_ok: bool = True
     duplicate_of: int | None = None

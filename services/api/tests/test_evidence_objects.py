@@ -17,6 +17,12 @@ class ObjectClient:
         self.corrupt = False
         self.lifecycle: dict[str, Any] = {"Rules": []}
 
+    def get_bucket_versioning(self, **kwargs: Any) -> dict[str, Any]:
+        return {"Status": "Enabled"}
+
+    def get_object_lock_configuration(self, **kwargs: Any) -> dict[str, Any]:
+        return {"ObjectLockConfiguration": {"ObjectLockEnabled": "Enabled"}}
+
     def get_bucket_lifecycle_configuration(self, **kwargs: Any) -> dict[str, Any]:
         return self.lifecycle
 
@@ -111,4 +117,26 @@ def test_automatic_expiry_refuses_evidence_write(object_store, expiry):
     content = b"retained evidence"
     with pytest.raises(evidence_objects.EvidenceStoreUnavailable, match="automatic expiry"):
         evidence_objects.preserve(scope, content, sha256(content).hexdigest())
+    assert client.puts == []
+
+
+@pytest.mark.parametrize(
+    ("versioning", "lock", "message"),
+    [
+        (
+            {"Status": "Suspended"},
+            {"ObjectLockConfiguration": {"ObjectLockEnabled": "Enabled"}},
+            "versioning",
+        ),
+        ({"Status": "Enabled"}, {"ObjectLockConfiguration": {}}, "Object Lock"),
+    ],
+)
+def test_worm_capabilities_are_required_before_write(object_store, versioning, lock, message):
+    client, scope = object_store
+    client.get_bucket_versioning = lambda **kwargs: versioning
+    client.get_object_lock_configuration = lambda **kwargs: lock
+    with pytest.raises(evidence_objects.EvidenceStoreUnavailable, match=message):
+        evidence_objects.preserve(
+            scope, b"retained evidence", sha256(b"retained evidence").hexdigest()
+        )
     assert client.puts == []
