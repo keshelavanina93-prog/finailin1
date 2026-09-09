@@ -1,5 +1,6 @@
 """Durable orchestration references over existing workflow and Function evidence."""
 
+from typing import Any
 from uuid import UUID, uuid5
 
 from psycopg.types.json import Jsonb
@@ -60,7 +61,28 @@ def exceeded_budget(usage: dict, budget: dict) -> bool:
     return any(usage[key] > budget["max_" + key] for key in USAGE_KEYS)
 
 
-def retain(principal: Principal, request: TransformationRunRequest) -> str:
+def _check_preview(compiled: dict[str, Any], expected_plan_hash: str | None) -> None:
+    if expected_plan_hash is None:
+        return
+    actual = compiled.get("plan_hash")
+    if (
+        actual != expected_plan_hash
+        or function_execution._digest(
+            {key: value for key, value in compiled.items() if key != "plan_hash"}
+        )
+        != actual
+    ):
+        raise WorkspaceError(
+            409, "Transformation differs from the inspected preview; preview again"
+        )
+
+
+def retain(
+    principal: Principal,
+    request: TransformationRunRequest,
+    *,
+    expected_plan_hash: str | None = None,
+) -> str:
     require_permission(principal, "ontology_read")
     identity = "transformation:" + str(request.request_id)
     request_hash = canonical_sha256(request)
@@ -73,8 +95,10 @@ def retain(principal: Principal, request: TransformationRunRequest) -> str:
         if old:
             if old[0] != principal.actor_id or old[1].get("request_hash") != request_hash:
                 raise WorkspaceError(409, "Transformation run identity already used differently")
+            _check_preview(old[1].get("compiled_plan", {}), expected_plan_hash)
             return identity
     compiled = transformation_definitions.plan(principal, request)
+    _check_preview(compiled, expected_plan_hash)
     payload = {
         "request_hash": request_hash,
         "compiled_plan": compiled,
@@ -105,6 +129,7 @@ def retain(principal: Principal, request: TransformationRunRequest) -> str:
         ).fetchone()
         if not old or old[0] != principal.actor_id or old[1].get("request_hash") != request_hash:
             raise WorkspaceError(409, "Transformation run identity unavailable or conflicting")
+        _check_preview(old[1].get("compiled_plan", {}), expected_plan_hash)
     return identity
 
 

@@ -7,6 +7,7 @@ from finai_api.api.certification_routes import router as certification_router
 from finai_api.api.company_changes_routes import router as company_changes_router
 from finai_api.api.company_condition_routes import router as company_condition_router
 from finai_api.api.company_context_routes import router as company_context_router
+from finai_api.api.company_financial_result_routes import router as company_financial_result_router
 from finai_api.api.company_home_routes import router as company_home_router
 from finai_api.api.company_journal_routes import router as company_journal_router
 from finai_api.api.diagnostic_routes import router as diagnostic_router
@@ -35,6 +36,7 @@ from finai_api.api.runtime_observation_routes import router as runtime_observati
 from finai_api.api.semantic_analysis_routes import router as semantic_analysis_router
 from finai_api.api.source_adoption_routes import router as source_adoption_router
 from finai_api.api.source_document_routes import router as source_document_router
+from finai_api.api.source_exception_routes import router as source_exception_router
 from finai_api.api.transformation_routes import router as transformation_router
 from finai_api.api.trial_balance_package_routes import router as trial_balance_package_router
 from finai_api.api.tb_finance_contract_routes import router as tb_finance_contract_router
@@ -77,9 +79,11 @@ app.include_router(regulation_router)
 app.include_router(operator_router)
 app.include_router(proposal_queue_router)
 app.include_router(source_document_router)
+app.include_router(source_exception_router)
 app.include_router(source_adoption_router)
 app.include_router(company_context_router)
 app.include_router(company_condition_router)
+app.include_router(company_financial_result_router)
 app.include_router(company_changes_router)
 app.include_router(company_home_router)
 app.include_router(company_journal_router)

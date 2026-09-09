@@ -40,6 +40,10 @@ SEMANTICS = {
 
 # required field -> semantic kind or a canonical target type. Optional fields carry '?'.
 TYPE_FIELDS: dict[str, dict[str, str]] = {
+<<<<<<< HEAD
+=======
+    "RetainedReport": {"legal_entity_id": "@LegalEntity", "definition": "OntologyDefinition"},
+>>>>>>> origin/development/retained-reporting
     "Finding": {"legal_entity_id": "@LegalEntity", "definition": "OntologyDefinition"},
     "Investigation": {
         "legal_entity_id": "@LegalEntity", "finding_id": "@Finding",

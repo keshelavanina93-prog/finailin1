@@ -324,6 +324,10 @@ def _validate(
                 source_item.object_type == "ExternalOntologyRelease"
                 and relation.startswith("EXTERNAL_ONTOLOGY_SOURCE:")
             )
+            exact_retained_report = (
+                source_item.object_type == "RetainedReport"
+                and relation.startswith("RETAINED_REPORT:")
+            )
             if not (
                 exact_query
                 or exact_property
@@ -331,6 +335,7 @@ def _validate(
                 or exact_binding_property
                 or exact_calculated_binding
                 or exact_external_source
+                or exact_retained_report
             ):
                 raise WorkspaceError(422, "Exact ontology dependency is not supported here")
             head = _get(conn, tenant, UUID(identifier))
@@ -570,6 +575,15 @@ def _validate(
             from finai_api.services.ontology_definition_validation import validate_definition
 
             validate_definition(item, schema_by_name, link_by_name, target, principal=principal)
+<<<<<<< HEAD
+=======
+            if item.object_type == "RetainedReport":
+                from finai_api.services.retained_reports import validate as validate_report
+
+                validate_report(
+                    principal, item, target, conn, access_entity, external_proofs
+                )
+>>>>>>> origin/development/retained-reporting
             if item.object_type in {
                 "ExternalOntologySource",
                 "ExternalOntologyRelease",
@@ -1011,6 +1025,9 @@ def propose(principal: Principal, proposal: ResourceProposal) -> ProposalDetail:
     from finai_api.services.external_ontology_validation import preflight
 
     external_proofs = preflight(principal, proposal)
+    from finai_api.services.retained_reports import preflight as report_preflight
+
+    external_proofs.update(report_preflight(principal, proposal))
     with resource_connection(principal) as conn:
         conn.execute(
             "SELECT pg_advisory_xact_lock(hashtextextended(%s,0))",
@@ -1184,6 +1201,9 @@ def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
     ):
         try:
             external_proofs = preflight(principal, detail.proposal)
+            from finai_api.services.retained_reports import preflight as report_preflight
+
+            external_proofs.update(report_preflight(principal, detail.proposal))
         except (WorkspaceError, ValueError, KeyError) as exc:
             preflight_error = (
                 exc.detail if isinstance(exc, WorkspaceError) else "Invalid import replay"
@@ -1250,6 +1270,9 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
         and before.submitted_by != principal.actor_id
     ):
         external_proofs = preflight(principal, before.proposal)
+        from finai_api.services.retained_reports import preflight as report_preflight
+
+        external_proofs.update(report_preflight(principal, before.proposal))
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         tenant = principal.scope.tenant_id
         conn.execute(

@@ -1,5 +1,6 @@
 export type {ReportSectionReference,ReportComposition,ReportSectionResult,RetainedReportSnapshot,ReportPreview,SaveRetainedReport,ReportVersionReference,ReportArtifactMetadata,RetainedReport,RetainedReportListItem,RetainedReportPage} from "./retained-reports.js";
 export type { HistorySearchResult } from "./history-search.js";
+export type {CompanyFinancialResults} from "./company-financial-results.js";
 export type {
   ObjectSetFilter, FilterExpression, ObjectSetTraversal, ObjectSetQuery, ObjectSetSchemaVersion,
   ObjectSetTraversalSchemaVersion, ObjectSetResult, ObjectSetInterfacePin,
@@ -312,4 +313,8 @@ export type { MetricPin, MetricUnit, MetricSelector, MetricDefinition, MetricOut
 export type { AcceptedMovementFunctionInvocation } from "./accepted-movement-function.js";
 export type { MetricCatalogItem, MetricCatalog, MetricCatalogRequest } from "./metric-observations.js";
 export type { MetricDefinitionSnapshot } from "./metric-observations.js";
+<<<<<<< HEAD
 export type {CompanyFinancialResults} from "./company-financial-results.js";
+=======
+export type { SourceExceptionRequest, SourceExceptionObservation, RetainedSourceException, InvestigationActionRequest, InvestigationOperation, InvestigationResolutionRequest, InvestigationResolutionOperation } from "./source-exceptions.js";
+>>>>>>> origin/development/retained-reporting

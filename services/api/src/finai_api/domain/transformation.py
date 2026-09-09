@@ -178,3 +178,11 @@ class TransformationRunRequest(BaseModel):
         if value.tzinfo is None or value.utcoffset() is None:
             raise ValueError("Transformation timestamps must include a timezone")
         return value
+
+
+class PreviewedTransformationStart(BaseModel):
+    """Transport envelope; the historical run request and its hash stay unchanged."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    request: TransformationRunRequest
+    expected_plan_hash: str = Field(pattern=r"^[a-f0-9]{64}$")

@@ -151,7 +151,9 @@ def current_work(principal: Principal, company_id: UUID) -> CompanyWork:
     for row in queue["items"]:
         if (
             row.get("company_id") != str(company_id)
-            or row.get("company_binding") != "EXPLICIT_INVOCATION"
+            or row.get("company_binding") not in (
+                "EXPLICIT_INVOCATION", "EXPLICIT_RETAINED_EXCEPTION"
+            )
         ):
             raise WorkspaceError(409, "Company work contains an unbound or foreign invocation")
         if row["family"] == "ontology":
@@ -161,6 +163,11 @@ def current_work(principal: Principal, company_id: UUID) -> CompanyWork:
         operation = ontology_operations.read(principal, row["workflow_id"])  # type: ignore[no-untyped-call]
         if operation["operation_id"] != row["workflow_id"]:
             raise WorkspaceError(409, "Company work differs from its retained operation")
+        if row["company_binding"] == "EXPLICIT_RETAINED_EXCEPTION" and (
+            operation.get("definition", {}).get("kind") != "SOURCE_EXCEPTION_INVESTIGATION"
+            or operation["definition"].get("company_id") != str(company_id)
+        ):
+            raise WorkspaceError(409, "Investigation work differs from its retained company")
         proposal = operation["proposal"]
         proposal_id = operation["prepared_proposal_id"]
         if proposal and proposal["proposal"]["proposal_id"] != proposal_id:
@@ -172,8 +179,9 @@ def current_work(principal: Principal, company_id: UUID) -> CompanyWork:
                 company_id=company_id,
                 title=row["title"],
                 state=operation["state"],
+                basis=row["company_binding"],
                 created_at=row["created_at"],
-                reason=proposal["proposal"]["rationale"]
+                reason=operation.get("publication_limitation") or proposal["proposal"]["rationale"]
                 if proposal
                 else ("Company workflow retained a proposal; "
                       "submission for review is not established."),
