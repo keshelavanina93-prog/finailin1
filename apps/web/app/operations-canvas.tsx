@@ -25,7 +25,7 @@ export default function OperationsCanvas({features,state,onViewport,onSelect,onB
    highlight(instance,latest.current.selectedId);
    for(const layer of ["asset-areas","asset-lines","asset-points"]){instance.on("click",layer,e=>{const id=e.features?.[0]?.id;const feature=latest.current.features.find(f=>String(f.id)===String(id));if(feature)latest.current.onSelect(feature);});instance.on("mouseenter",layer,()=>{instance.getCanvas().style.cursor="pointer";});instance.on("mouseleave",layer,()=>{instance.getCanvas().style.cursor="";});}
   });
-  instance.on("moveend",()=>{const center=instance.getCenter();latest.current.onViewport([center.lng,center.lat],instance.getZoom());});
+  instance.on("moveend",()=>{const center=instance.getCenter().wrap();latest.current.onViewport([center.lng,center.lat],instance.getZoom());});
   instance.on("error",()=>setError("Some basemap tiles could not load. Reviewed assets and the list remain available."));
   const resize=new ResizeObserver(()=>instance.resize());resize.observe(host.current);
   return()=>{resize.disconnect();instance.remove();map.current=null;};

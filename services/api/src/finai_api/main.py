@@ -4,7 +4,10 @@ from fastapi.responses import JSONResponse
 
 from finai_api.api.account_dimension_policy_routes import router as account_dimension_policy_router
 from finai_api.api.certification_routes import router as certification_router
+from finai_api.api.company_changes_routes import router as company_changes_router
+from finai_api.api.company_condition_routes import router as company_condition_router
 from finai_api.api.company_context_routes import router as company_context_router
+from finai_api.api.company_home_routes import router as company_home_router
 from finai_api.api.company_journal_routes import router as company_journal_router
 from finai_api.api.diagnostic_routes import router as diagnostic_router
 from finai_api.api.event_time_routes import router as event_time_router
@@ -12,6 +15,7 @@ from finai_api.api.finance_ontology_routes import router as finance_ontology_rou
 from finai_api.api.function_routes import router as function_router
 from finai_api.api.history_search_routes import router as history_search_router
 from finai_api.api.lifecycle_routes import router as lifecycle_router
+from finai_api.api.metric_routes import router as metric_router
 from finai_api.api.object_set_routes import router as object_set_router
 from finai_api.api.ontology_definition_routes import router as ontology_definition_router
 from finai_api.api.ontology_import_routes import router as ontology_import_router
@@ -22,7 +26,9 @@ from finai_api.api.operator_routes import router as operator_router
 from finai_api.api.period_control_routes import router as period_control_router
 from finai_api.api.proposal_queue_routes import router as proposal_queue_router
 from finai_api.api.regulation_routes import router as regulation_router
+from finai_api.api.reporting_routes import retained_router
 from finai_api.api.reporting_routes import router as reporting_router
+from finai_api.api.retained_analysis_routes import router as retained_analysis_router
 from finai_api.api.retention_routes import router as retention_router
 from finai_api.api.routes import router
 from finai_api.api.runtime_observation_routes import router as runtime_observation_router
@@ -46,6 +52,7 @@ app = FastAPI(
 app.include_router(router)
 app.include_router(account_dimension_policy_router)
 app.include_router(reporting_router)
+app.include_router(retained_router)
 app.include_router(workspace_router)
 app.include_router(workflow_router)
 app.include_router(ontology_router)
@@ -54,7 +61,9 @@ app.include_router(ontology_definition_router)
 app.include_router(lifecycle_router)
 app.include_router(certification_router)
 app.include_router(retention_router)
+app.include_router(retained_analysis_router)
 app.include_router(function_router)
+app.include_router(metric_router)
 app.include_router(ontology_import_router)
 app.include_router(runtime_observation_router)
 app.include_router(semantic_analysis_router)
@@ -70,6 +79,9 @@ app.include_router(proposal_queue_router)
 app.include_router(source_document_router)
 app.include_router(source_adoption_router)
 app.include_router(company_context_router)
+app.include_router(company_condition_router)
+app.include_router(company_changes_router)
+app.include_router(company_home_router)
 app.include_router(company_journal_router)
 app.include_router(tb_finance_contract_router)
 app.include_router(tb_finance_router)
@@ -87,8 +99,7 @@ async def workspace_error(_request: Request, exc: WorkspaceError) -> JSONRespons
 async def database_error(_request: Request, exc: psycopg.Error) -> JSONResponse:
     if (
         isinstance(exc, psycopg.errors.RaiseException)
-        and exc.diag.message_primary
-        == "Canonical identity type and access boundary are immutable"
+        and exc.diag.message_primary == "Canonical identity type and access boundary are immutable"
     ):
         return JSONResponse(
             status_code=409,

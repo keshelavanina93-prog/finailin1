@@ -271,6 +271,7 @@ def _validate(
         raise WorkspaceError(403, "Resource policy overrides require a tenant-restricted proposal")
     resolved: dict[str, dict[str, Any]] = {}
     dependencies: dict[str, list[dict[str, str]]] = {key: [] for key in mutations}
+    co_publication_constraints: list[dict[str, str]] = []
     external_heads: dict[str, str] = {}
     schema_versions: dict[str, str | None] = {}
     impact: list[dict[str, Any]] = []
@@ -391,6 +392,35 @@ def _validate(
             raise WorkspaceError(
                 403, "A resource cannot discard a dependency's entity access boundary"
             )
+        if relation == "RESOLUTION_PAIRED_MUTATION":
+            counterpart = mutations.get(identifier)
+            pair = (source_item, counterpart)
+            contracts = {"Finding": "source-finding/2", "Investigation": "source-investigation/2"}
+            if (
+                counterpart is None
+                or {source_item.object_type, counterpart.object_type} != set(contracts)
+                or any(
+                    item is None
+                    or item.expected_version_id is None
+                    or not isinstance(item.attributes.get("definition"), dict)
+                    or item.attributes["definition"].get("contract") != contracts[item.object_type]
+                    or item.attributes["definition"].get("state") != "RESOLVED"
+                    for item in pair
+                )
+            ):
+                raise WorkspaceError(409, "Both resolution mutations must be reviewed together")
+            # The resolution validator rederives both exact mutations and prior heads.
+            # Atomic co-publication is not reciprocal causal lineage. FIELD:finding_id
+            # and every evidence/journal dependency still enter the dependency graph.
+            co_publication_constraints.append(
+                {
+                    "source_resource_id": source,
+                    "target_resource_id": identifier,
+                    "relation": relation,
+                    "expected_version_id": str(counterpart.expected_version_id),
+                }
+            )
+            return result
         dependencies[source].append(
             {
                 "resource_id": identifier,
@@ -539,7 +569,7 @@ def _validate(
                         raise WorkspaceError(422, "Money requires a canonical Currency")
             from finai_api.services.ontology_definition_validation import validate_definition
 
-            validate_definition(item, schema_by_name, link_by_name, target)
+            validate_definition(item, schema_by_name, link_by_name, target, principal=principal)
             if item.object_type in {
                 "ExternalOntologySource",
                 "ExternalOntologyRelease",
@@ -628,6 +658,23 @@ def _validate(
                     from finai_api.services.journal_dimensions import validate_line
 
                     validate_line(conn, principal, item, target, proposal, validation_time)
+            if item.object_type == "SourceJournalCompatibility":
+                from finai_api.services.source_journal_compatibility import (
+                    validate as validate_compatibility,
+                )
+
+                validate_compatibility(item, target)
+                from finai_api.services.accounting_promotion import validate_current_binding
+
+                validate_current_binding(
+                    conn,
+                    principal,
+                    target(
+                        item.attributes["accounting_binding_id"],
+                        identifier,
+                        "COMPATIBILITY_MATERIAL_BINDING",
+                    ),
+                )
             if item.object_type == "AccountDimensionPolicy":
                 from finai_api.services.journal_dimensions import (
                     validate_policy as validate_dimension_policy,
@@ -946,6 +993,7 @@ def _validate(
         "downstream_impact": downstream_impact(conn, principal, proposal, dependencies),
         "dependency_heads": external_heads,
         "dependencies": dependencies,
+        "co_publication_constraints": co_publication_constraints,
         "schema_versions": schema_versions,
         "resource_scopes": mutation_scopes,
         "compatibility": "PASS",

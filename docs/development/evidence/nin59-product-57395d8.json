@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-08T10:55:31.061267+00:00",
+  "state": "FROZEN_GREEN_CODE_REFERENCE_NOT_PRODUCT_ACCEPTED",
+  "worktree": "D:\\FinAI\\g8-nin59-route-native",
+  "branch": "development/nin59-route-native-workspace",
+  "base_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+  "code_sha": "57395d82e9a21dc6425d718f230d164d1fb47f71",
+  "tree_sha": "fae17ec5fde890f65c0308fbb28bf93471d5ca75",
+  "issues": [
+    "NIN-59",
+    "NIN-46",
+    "NIN-63"
+  ],
+  "previous_candidate": {
+    "code_sha": "1023a2f96345318464c9ffb541849ad38e5a11e7",
+    "manifest": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\docs\\development\\evidence\\nin59-product-1023a2f.json",
+      "sha256": "5610e5ea4de14f5ccbf36e2ea3077085704f1d3c17ed0bb49550b794824fa2d2"
+    },
+    "inherited_evidence": "Prior evidence retains its original code/API SHA. No fresh native or browser acceptance inferred."
+  },
+  "historical_manifest": {
+    "path": "D:\\FinAI\\g8-nin59-route-native\\docs\\development\\evidence\\nin59-viewport-candidate.json",
+    "sha256": "da00ddbff9d8101dc00a71713151cd83d508d4d7c0e74d1dbb499341410da3ad",
+    "modified": false,
+    "acceptance_reused": false
+  },
+  "implementation": [
+    "Home and Company360 discover existing company-bound retained analyses independently from device pins through a read-only authenticated API.",
+    "Discovery reuses immutable invocation, result receipt, Function and canonical company ownership checks. Initial subset is object tables and grouped source observations only; no new registry or semantic-analysis version.",
+    "At most five candidates are inspected per page, with bounded retained payload size and opt-in read deadline. Completed prefixes survive timeout; interrupted candidates resume without being skipped.",
+    "Signed pagination binds actor, permissions, exact scope, company and fixed retention cutoff. A preceding-record boundary hash detects offset shifts and requires refresh.",
+    "Source review opens only after exact company/Function pins, receipt, run, projection contract and valid/known/recorded times match retained metadata. It uses the existing revision-guarded route.",
+    "Foreign, unsupported and invalid candidates expose no result identity or title. Discovery confers no financial, current-use or business-effect authority."
+  ],
+  "candidate_ci": {
+    "run": 34216902797,
+    "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34216902797",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "web-and-contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "api",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "focused_verification": {
+    "backend_latest": "25 discovery/read-budget tests passed after final prefix and pagination drift changes. Earlier 62-test discovery/object/count adapter bundle passed; counts overlap and are not additive.",
+    "frontend": "Five focused retained page, exact open target and stale request checks passed.",
+    "types_lint": "Changed Ruff, mypy, web lint and TypeScript passed.",
+    "production_build": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\.finai\\tmp\\retained-company-discovery-build.log",
+      "sha256": "f0619ce7f8020deca915024fede08f4cf8719bf2689a279dd08dc30e6576d483"
+    },
+    "independent_review": "Bounded frontend and backend reviews found no concrete blocker. These are code/contract checks, not browser proof."
+  },
+  "native_discovery": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "performed": false,
+    "reason": "Existing isolated PostgreSQL at 127.0.0.1:55439 is unavailable. No restart or new native result claimed."
+  },
+  "browser": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "exact_candidate_mounted": false,
+    "reason": "Automatic approval review rejected isolated preview starts as blocked by policy. No retry or bypass.",
+    "viewports": [
+      {
+        "requested_width": 1920,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1440,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1280,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 820,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 768,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      }
+    ]
+  },
+  "canonical_integration": {
+    "performed": false,
+    "branch": "development/enterprise-hydration-foundation",
+    "last_rechecked_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+    "runtime_changed": false,
+    "business_data_changed": false
+  },
+  "open_gates": [
+    "Native retained discovery over authentic local state",
+    "Responsive browser operation and exact scroll/focus restoration",
+    "Independent NIN-50 acceptance and canonical integration",
+    "Full financial, live operations and intelligence authorities",
+    "Full NIN-59/46/63 and release acceptance"
+  ],
+  "changed_files_since_previous_candidate": [
+    {
+      "path": "apps/web/app/company-home.tsx",
+      "sha256_git_blob": "d918d6a6c1cd65152b396cee4a8a9a4a24e34fdceffc22c10ebfacdd9811f6a1"
+    },
+    {
+      "path": "apps/web/app/retained-company-analyses-state.ts",
+      "sha256_git_blob": "11e60f37098eda45ceb111bf35792c6993c4bf82f605dd5a183cb0c43c480a7b"
+    },
+    {
+      "path": "apps/web/app/retained-company-analyses.css",
+      "sha256_git_blob": "21bc0283bf2298f1c1f67f570d0ba6c32dba21a00b59b1dde491d2f4995f5f58"
+    },
+    {
+      "path": "apps/web/app/retained-company-analyses.tsx",
+      "sha256_git_blob": "dd6739142f1a12ad502bd4602a5623a2af0fdb30f3055cf34fc2bddacdd2a081"
+    },
+    {
+      "path": "apps/web/tests/retained-company-analyses.test.mjs",
+      "sha256_git_blob": "d175104aba8afdcc251a0d455a0db6a0e899cf7a6b8dd0ab4d0ae7dacb214833"
+    },
+    {
+      "path": "docs/development/evidence/nin59-product-1023a2f.json",
+      "sha256_git_blob": "93bcb58a7a1158ddf149c1651611ae7a9f24f9a8665c4aba838d0952cc59faab"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "sha256_git_blob": "d572e15f44bb117ea4955ea2d622078b5650e46247df4f6baf2fa1584a92894e"
+    },
+    {
+      "path": "packages/contracts/src/retained-analyses.ts",
+      "sha256_git_blob": "c77a00b6a75726b8bf4d4f5265c8eabf7e5ba49f3481de7ba3a34ba4aa172297"
+    },
+    {
+      "path": "services/api/src/finai_api/api/retained_analysis_routes.py",
+      "sha256_git_blob": "d8e0d90d8921f48e59c5916d8b2de74c42d00c2043c7ebc6b865b4f4a88784ec"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/retained_analyses.py",
+      "sha256_git_blob": "08cee71f682c85de22d692c92d031a37d5d7d0fcaf348e5155b0ac8748ed3b8f"
+    },
+    {
+      "path": "services/api/src/finai_api/main.py",
+      "sha256_git_blob": "385da3607d5a62d57e4dd1b4bcb57774312369280ed554095628e5937385f68f"
+    },
+    {
+      "path": "services/api/src/finai_api/read_budget.py",
+      "sha256_git_blob": "9b214ed43427188d9f770e40499bf2e9b46a2400945ef4f42d44955bc7deb722"
+    },
+    {
+      "path": "services/api/src/finai_api/services/retained_analyses.py",
+      "sha256_git_blob": "a68a5b8bb0daaf83c0d478d9f98c62969f22f051cceeff23bea46f3437573c3c"
+    },
+    {
+      "path": "services/api/src/finai_api/services/semantic_analysis_counts.py",
+      "sha256_git_blob": "4fee7b00ccfb809976391b21f0bc7d9e46ce5b527b094ee8fe3b00a684d0fdb9"
+    },
+    {
+      "path": "services/api/src/finai_api/services/semantic_analysis_objects.py",
+      "sha256_git_blob": "27918886f745650ccc115680f77e033d49f43c6aacf58bc49477d0054ca52d70"
+    },
+    {
+      "path": "services/api/src/finai_api/services/semantic_analysis_support.py",
+      "sha256_git_blob": "ec2f8f3c79042c4a4c4e843635dc5eb8944524cf2703034fcd46589f0cb74976"
+    },
+    {
+      "path": "services/api/src/finai_api/storage.py",
+      "sha256_git_blob": "38fa2c6fed7a2dc1d43bade64f0488c973a94127fd7b95b91797e8d6d7458218"
+    },
+    {
+      "path": "services/api/tests/test_retained_analyses.py",
+      "sha256_git_blob": "b5f33cca2c3e577a5095914228ed9a0998c33f460b68318e7cf7ce0f3e8c0f35"
+    },
+    {
+      "path": "services/api/tests/test_retained_read_budget.py",
+      "sha256_git_blob": "942106ce42b706988d8df806e0d76a12d18d553390e398517c79568488dbb271"
+    }
+  ],
+  "continuation": "Preserve exact mounted Company/Home context on Operations map drill and return, including selected resource, temporal scope, filters, scroll and focus."
+}

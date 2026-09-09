@@ -92,6 +92,7 @@ def test_same_workspace_exact_movement_selection_and_refusals(case):
     assert result.descriptor.row_noun == "objects"
     assert all(field.aggregation == "NONE" for field in result.descriptor.fields)
     assert [field.role for field in result.descriptor.fields] == [
+        "ATTRIBUTE",
         "DIMENSION",
         "ATTRIBUTE",
         "ATTRIBUTE",
@@ -116,3 +117,79 @@ def test_same_workspace_exact_movement_selection_and_refusals(case):
     history["output"]["entity_movement_review"]["movements"][0]["net_movement"] = "999"
     with pytest.raises(WorkspaceError, match="reconciliation"):
         semantic_analysis.project(None, request)
+
+
+def test_code_and_multilingual_retained_name_are_distinct_nonaggregating_columns(case):
+    history, request = case
+    _, plan, resolver = semantic_analysis.load(None, request.invocation_id)
+    account_ref = history["output"]["source_document"]["accounts"]["0012.01"]
+    account = resolver.version(account_ref)
+    account["display_name"] = "0012.01 · მიმდინარე ანგარიში / Расчётный счёт"
+    retained_history = deepcopy(history)
+    retained_plan = deepcopy(plan)
+    result = semantic_analysis.project(None, request)
+    code, name = result.descriptor.fields[:2]
+    assert (code.key, code.label, code.kind, code.role, code.aggregation) == (
+        "account_code", "Account code", "identifier", "ATTRIBUTE", "NONE"
+    )
+    assert not code.filterable and not code.groupable
+    assert (name.key, name.label, name.kind, name.role) == (
+        "account", "Account name", "reference", "DIMENSION"
+    )
+    assert result.descriptor.grain == ["account"]
+    row = next(row for row in result.rows if row.values["account_code"].value == "0012.01")
+    assert row.values["account"].label == account["display_name"]
+    assert row.values["account"].reference == pin(account)
+    assert row.values["account"].value == account_ref["resource_id"]
+    assert row.trace == pin(account)
+    selected = semantic_analysis.project(None, ProjectionRequest.model_validate({
+        **request.model_dump(),
+        "descriptor_sha256": result.descriptor_sha256,
+        "filters": [{"field": "account", "value": account_ref["resource_id"]}],
+        "selected_row": row.key,
+    }))
+    assert selected.rows == [row]
+    assert selected.selection.contributor.coordinate == "Base!S2"
+    assert row.values["debit_movement"].value == "731.97"
+    assert history == retained_history and plan == retained_plan
+
+
+@pytest.mark.parametrize("code", [None, "", "12.01", 12])
+def test_missing_or_altered_canonical_code_does_not_fall_back_to_display_name(case, code):
+    history, request = case
+    _, _, resolver = semantic_analysis.load(None, request.invocation_id)
+    account = resolver.version(history["output"]["source_document"]["accounts"]["0012.01"])
+    account["display_name"] = "0012.01 · Retained account name"
+    if code is None:
+        del account["attributes"]["account_code"]
+    else:
+        account["attributes"]["account_code"] = code
+    with pytest.raises(WorkspaceError, match="exact chart membership") as refused:
+        semantic_analysis.project(None, request)
+    assert refused.value.status == 409
+
+
+def test_old_column_descriptor_revision_is_refused_without_changing_retained_evidence(case):
+    history, request = case
+    retained = deepcopy(history)
+    current = semantic_analysis.project(None, request)
+    old_descriptor = current.descriptor.model_copy(update={
+        "fields": [
+            field.model_copy(update={"label": "Account"}) if field.key == "account" else field
+            for field in current.descriptor.fields if field.key != "account_code"
+        ]
+    })
+    old_rows = [row.model_copy(update={
+        "values": {key: value for key, value in row.values.items() if key != "account_code"}
+    }) for row in current.rows]
+    old_revision = digest({
+        "descriptor": old_descriptor.model_dump(mode="json"),
+        "rows": [row.model_dump(mode="json") for row in old_rows],
+    })
+    assert old_revision != current.descriptor_sha256
+    with pytest.raises(WorkspaceError, match="descriptor changed") as refused:
+        semantic_analysis.project(None, request.model_copy(update={
+            "descriptor_sha256": old_revision, "selected_row": current.rows[0].key,
+        }))
+    assert refused.value.status == 409
+    assert history == retained

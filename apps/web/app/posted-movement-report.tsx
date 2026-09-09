@@ -6,8 +6,9 @@ import {createOntologyClient} from "@g8/ontology-client";
 import {pairPostingGroups,displayPostedAmount,type PostingGroup} from "./posted-movement-presentation";
 import "./posted-movement-report.css";
 
-import SemanticAnalysisWorkspace from "./semantic-analysis-workspace";
+import {useSourceReview} from "./source-review-navigation";
 import {financeReportReference} from "./finance-report-reference";
+import AcceptedJournalReviewAction from "./accepted-journal-review-action";
 
 export type PostedFunction = { resource_id: string; version_id: string; display_name: string };
 type Group = PostingGroup;
@@ -26,6 +27,7 @@ export default function PostedMovementReport({ token, contextKey, functions, cur
   onInspectFunction?:(reference:{resource_id:string;version_id:string;known_at?:string})=>void;
   onTraceFunction?:(reference:{resource_id:string;version_id:string;known_at?:string})=>void;
 }) {
+  const openSourceReview=useSourceReview();
   const [saved, setSaved] = useState<{ key: string; value: RetainedReport; currency:string } | null>(null);
   const sourceTitleId=useId();
   const [inspectorOpen,setInspectorOpen]=useState(false);
@@ -106,7 +108,16 @@ export default function PostedMovementReport({ token, contextKey, functions, cur
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(()=>{if(initialInvocationId)void run(undefined,initialInvocationId);},[initialInvocationId,run]);
 
-  if(report && expectedSource) return <SemanticAnalysisWorkspace token={token} companyId={expectedSource.company_id} invocationId={report.invocation_id} onInspect={onInspectFunction}/>;
+  if(report && expectedSource) return <section className="posted-worksheet" aria-label="Retained source review">
+    <h3>Posted account movements · {saved?.currency}</h3>
+    <p>{output?.source_document.filename}</p>
+    <p>The retained calculation is ready for source review. Its account movements, supporting evidence and coverage remain tied to the reviewed company and accounting context.</p>
+    {output&&<p><strong>Partial source coverage:</strong> {output.posted_movements.coverage.included_rows} of {output.posted_movements.coverage.source_rows} rows included. Full-ledger completeness and financial-statement classification are not established.</p>}
+    {busy&&<p role="status">Checking the retained report…</p>}
+    {error&&<p role="alert">{error}</p>}
+    <button className="posted-primary" disabled={busy} onClick={()=>openSourceReview({companyId:expectedSource.company_id,invocationId:report.invocation_id})}>Open source review</button>
+    <AcceptedJournalReviewAction token={token} companyId={expectedSource.company_id} invocationId={report.invocation_id} disabled={busy}/>
+  </section>;
   return <section className="posted-worksheet" aria-label="Posted account movements">
     <h3>Posted account movements · {saved?.key===contextKey?saved.currency:currency}</h3>
     <p>Amounts as posted in Сумма. VAT is not recalculated. Amount is preserved separately and excluded from totals.</p>

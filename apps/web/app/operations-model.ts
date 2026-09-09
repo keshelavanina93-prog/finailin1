@@ -3,12 +3,13 @@ import type {Geometry,Feature,FeatureCollection} from "geojson";
 export interface MapProperties {resource:CanonicalResource;geometry_resource_id?:string;geometry_version_id?:string}
 export type MapFeature=Feature<Geometry,MapProperties>;
 export interface MapSnapshot extends FeatureCollection<Geometry,MapProperties> {
+ company_id:string|null;
  valid_at:string;known_at:string;lens:string;completeness:{snapshot_bounded:boolean;features_truncated:boolean;unmapped_truncated:boolean;scan_limit:number;limit:number};
  counts:{assets:number;mapped_in_bounds:number;outside_bounds:number;unmapped:number};
  unmapped?:Array<{resource:CanonicalResource;reason:string}>;
  warnings?:string[];
 }
-export interface MapWorkspaceState {lens:"enterprise_assets"|"gas_network";validAt:string;knownAt:string;center:[number,number];zoom:number}
+export interface MapWorkspaceState {lens:"enterprise_assets"|"gas_network";validAt:string;knownAt:string;center:[number,number];zoom:number;bbox?:string;search?:string}
 export const initialMapState:MapWorkspaceState={lens:"enterprise_assets",validAt:"",knownAt:"",center:[43.5,42.1],zoom:6};
 export interface MapSelection {resource:CanonicalResource;validAt:string;knownAt:string}
 export async function operationsRequest<T>(path:string,token:string,signal?:AbortSignal,body?:unknown):Promise<T>{

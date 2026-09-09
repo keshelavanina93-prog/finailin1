@@ -1,0 +1,167 @@
+{
+  "contract": "nin17-authentic-positive-evidence/1",
+  "code_sha": "93014f6",
+  "governing_comment": "b86825c1-647d-4573-809e-a543ca9ddf34",
+  "transport": "in-process ASGI, authentic native database, fresh process",
+  "source_sha256": "d7c7e67c093b40b6f9209b301ca8fab7e4febc85c27d735babb95fa2028a8f0a",
+  "source_rows": 596,
+  "literal_amount_rows": 595,
+  "accepted_journals": 1,
+  "unmatched_literal_rows": 594,
+  "proposal_id": "1b23895a-e339-593c-9fc8-d1c7eef7eb41",
+  "maker_denied": true,
+  "maker": "local-steward",
+  "checker": "local-steward-reviewer",
+  "compatibility": {
+    "resource_id": "85fa4313-31d8-5259-947c-7d0a5a3f004e",
+    "version_id": "f9deb7ab-563c-5340-b107-60d3ccdb6e18"
+  },
+  "reviewed_account_policy_count": 38,
+  "policy_receipt_hash": "55f03fc2834df6f241d54f49b095c0f2d6954c9cbebc00371da3a05792aa0692",
+  "amount_failures": {
+    "total": 52,
+    "scale_greater_than_six": 51,
+    "numeric_tail_also_classified": 51,
+    "zero": 1,
+    "signed_correction": 0,
+    "other": 0,
+    "rounding_authorized": false
+  },
+  "restart_same_retained_attempt": true,
+  "retry_same_receipt": true,
+  "api": {
+    "transport": "in-process ASGI, authentic native database, fresh process",
+    "http_statuses": {
+      "attempt": 200,
+      "retry": 200,
+      "reconciliation": 200,
+      "journal_detail": 200
+    },
+    "same_retry_receipt": true,
+    "journal": {
+      "resource_id": "be451fe5-4cdb-50f6-bb19-79a28fae06c6",
+      "version_id": "feec4daa-adc0-52af-8c31-7dd4b2e0c893"
+    },
+    "journal_integrity": {
+      "state": "COMPLETE_BALANCED",
+      "issues": [],
+      "declared_line_count": 2,
+      "resolved_line_count": 2,
+      "balance": {
+        "debit": "731.97",
+        "credit": "731.97",
+        "currency_id": "299a3497-aaee-5d63-bd3f-c4bd43c52aad"
+      }
+    },
+    "reconciliation": {
+      "status": "PARTIAL",
+      "matched_source_amount": "731.97",
+      "journal_debit_total": "731.97",
+      "journal_credit_total": "731.97",
+      "unmatched_source_amount": "12502235.2600000000006576",
+      "excluded_rows": [
+        {
+          "row": 288,
+          "reason": "MISSING_LITERAL_POSTED_AMOUNT",
+          "coordinate": "Base!S288"
+        }
+      ],
+      "receipt_hash": "ba84b5892e55fd32e66f92f6e77af56483f6b2f5b6aa2bf552bbd68b00251e2e"
+    },
+    "movement_trial_balance": [
+      {
+        "account": {
+          "resource_id": "aafb50fb-40b0-53a1-958c-8a202af2211e",
+          "version_id": "d4157989-ba76-572f-bca1-a1c52ef8c08c"
+        },
+        "debit": "731.97",
+        "credit": "0",
+        "net_movement": "731.97",
+        "source_coordinates": [
+          "Base!S2"
+        ],
+        "opening_balance": null,
+        "closing_balance": null
+      },
+      {
+        "account": {
+          "resource_id": "d95ead4b-97ed-5adc-a808-853a8677bd67",
+          "version_id": "7c6f483b-0383-521f-b2e4-d6466f57c60a"
+        },
+        "debit": "0",
+        "credit": "731.97",
+        "net_movement": "-731.97",
+        "source_coordinates": [
+          "Base!S2"
+        ],
+        "opening_balance": null,
+        "closing_balance": null
+      }
+    ],
+    "source_projection_present": true,
+    "source_records": [
+      {
+        "coordinate": "Base!S2",
+        "evidence_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4"
+      },
+      {
+        "coordinate": "Base!S2",
+        "evidence_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4"
+      }
+    ]
+  },
+  "projection": {
+    "snapshot_at": "2026-09-08T07:51:22.335118+00:00",
+    "descriptor_sha256": "7783a4fc435780ebe09125da320158342ac6b6dd7b786be6b0a74a8c31c800cf",
+    "row_count": 2,
+    "drilldowns": [
+      {
+        "coordinate": "Base!S2",
+        "source_sha256": "d7c7e67c093b40b6f9209b301ca8fab7e4febc85c27d735babb95fa2028a8f0a",
+        "cells": [
+          {
+            "coordinate": "Base!S2",
+            "value": "731.97",
+            "formula": null
+          },
+          {
+            "coordinate": "Base!AD2",
+            "value": "821.66000000000008",
+            "formula": null
+          }
+        ]
+      },
+      {
+        "coordinate": "Base!S2",
+        "source_sha256": "d7c7e67c093b40b6f9209b301ca8fab7e4febc85c27d735babb95fa2028a8f0a",
+        "cells": [
+          {
+            "coordinate": "Base!S2",
+            "value": "731.97",
+            "formula": null
+          },
+          {
+            "coordinate": "Base!AD2",
+            "value": "821.66000000000008",
+            "formula": null
+          }
+        ]
+      }
+    ]
+  },
+  "verification": {
+    "focused_passed": 94,
+    "focused_skipped": 3,
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "mounted_browser_verified": false,
+    "nin50_accepted": false
+  },
+  "authority_limits": [
+    "Partial accepted movement coverage only",
+    "No opening or closing balance",
+    "No financial statements or statement mapping",
+    "No certification"
+  ],
+  "receipt_hash": "2002f0d6da5de6bd176a0bf2640f27d3a64cc5d585bf48e593962340fddcd03e"
+}

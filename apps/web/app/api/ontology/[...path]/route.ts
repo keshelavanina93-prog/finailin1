@@ -14,19 +14,23 @@ async function forward(request: NextRequest, context: Context) {
   const functions = /^functions(?:\/(?:implementation|invocations(?:\/[a-fA-F0-9-]+)?))?$/.test(route);
   const runtimeObservations = request.method === "GET" && /^runtime-observations(?:\/[a-fA-F0-9-]+)?$/.test(route);
   const companyJournals = request.method === "GET" && /^company-journals(?:\/[a-fA-F0-9-]+)?$/.test(route);
-  const analysisProjection=request.method==="POST"&&route==="analysis/project";
+  const journalDispositions=request.method==="GET"&&/^company-journals\/production\/attempts\/[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}(?:\/dispositions)?$/.test(route);
+  const metricObservations=(request.method==="GET"&&route==="metrics")||(request.method==="POST"&&route==="metrics/observations")||(request.method==="GET"&&/^metrics\/observations\/fcr_[a-f0-9]{64}$/.test(route));
+  const retainedReports=(request.method==="POST"&&(route==="retained-reports"||route==="retained-reports/preview"))||(request.method==="GET"&&/^retained-reports(?:\/[a-fA-F0-9-]+(?:\/exports\/(?:xlsx|html))?)?$/.test(route));
+  const analysisProjection=request.method==="POST"&&(route==="analysis/project"||route==="company-home"||route==="company-changes"||route==="company-journals/reconciliation/projection"||route==="company-journals/reconciliation/metrics");
+  const companyCondition=request.method==="GET"&&route==="company-condition";
   const sourceAdoption=request.method==="POST"&&/^source-adoption\/(?:(?:families|transitions)\/(?:inspect|proposal)|successor)$/.test(route);
   const periodControl = (request.method === "GET" && route === "period-control") || (request.method === "POST" && route === "period-control/proposal");
   const accountDimensionPolicy = (request.method === "GET" && route === "account-dimension-policy") || (request.method === "POST" && route === "account-dimension-policy/proposal");
   const retention = /^retention\/(?:inspect|history|policies|evaluations|receipts\/[a-fA-F0-9-]+)$/.test(route);
   const model = /^model\/(?:fact-runs\/fcr_[a-f0-9]{64}(?:\/authority)?|definitions(?:\/(?:preview|contracts|[a-fA-F0-9-]+))?|proposals\/[a-fA-F0-9-]+\/decision|(?:sets|groups)\/[a-fA-F0-9-]+\/objects|bindings\/[a-fA-F0-9-]+\/proposal|facts\/[a-fA-F0-9-]+\/(?:aggregate(?:\/guarded)?|reconcile)|sources\/ir_[a-f0-9]{64}\/accounts(?:\/proposal)?|derived\/query)$/.test(route);
-  if (route !== "proposal-queue" && route !== "history-search" && !/^operator\/(?:trace|resources)\/[a-fA-F0-9-]+$/.test(route) && !/^operations(?:\/(?:licence-notices|bindings|opa_[a-f0-9]{64}(?:\/resume)?))?$/.test(route) && !documents && !/^regulation\/(monitors(?:\/rgm_[a-f0-9]{64}(?:\/control)?)?|rules|proposals|impacts(?:\/fcr_[a-f0-9]{64})|assessments(?:\/fcr_[a-f0-9]{64})?|sources(?:\/(?:capture|proposals|compare|inspect|impact))?)$/.test(route) && !model && !lifecycle && !eventTime && !certification && !retention && !functions && !transformations && !runtimeObservations && !companyJournals && !periodControl && !accountDimensionPolicy && !sourceAdoption && !analysisProjection && route !== "company-context" && route !== "object-sets/query" && !/^(catalog|context(?:\/(?:accounts|source-accounts))?|graph|aliases|reference-proposal|rollback-proposal|resources(?:\/[a-fA-F0-9-]+(?:\/graph)?)?|resolve\/[a-fA-F0-9-]+|proposals(?:\/[a-fA-F0-9-]+(?:\/(?:decision|promotion-check))?)?)$/.test(route)) {
+  if (route !== "proposal-queue" && route !== "history-search" && !/^operator\/(?:trace|resources)\/[a-fA-F0-9-]+$/.test(route) && !/^operations(?:\/(?:licence-notices|bindings|opa_[a-f0-9]{64}(?:\/resume)?))?$/.test(route) && !documents && !/^regulation\/(monitors(?:\/rgm_[a-f0-9]{64}(?:\/control)?)?|rules|proposals|impacts(?:\/fcr_[a-f0-9]{64})|assessments(?:\/fcr_[a-f0-9]{64})?|sources(?:\/(?:capture|proposals|compare|inspect|impact))?)$/.test(route) && !model && !lifecycle && !eventTime && !certification && !retention && !functions && !transformations && !runtimeObservations && !companyJournals && !journalDispositions && !periodControl && !accountDimensionPolicy && !sourceAdoption && !analysisProjection && !metricObservations && !companyCondition && route !== "company-context" && route !== "object-sets/query" && !/^(catalog|context(?:\/(?:accounts|source-accounts))?|graph|aliases|reference-proposal|rollback-proposal|resources(?:\/[a-fA-F0-9-]+(?:\/graph)?)?|resolve\/[a-fA-F0-9-]+|proposals(?:\/[a-fA-F0-9-]+(?:\/(?:decision|promotion-check))?)?)$/.test(route)) {
     return Response.json({ detail: "Ontology route not found" }, { status: 404 });
   }
   const authorization = request.headers.get("authorization");
   if (!authorization) return Response.json({ detail: "Identity required" }, { status: 401 });
   const binary = route === "source-documents";
-  const bodyLimit = binary ? 32_000_000 : route === "context/source-accounts" ? 22_000_000 : 1_000_000;
+  const bodyLimit = binary ? 32_000_000 : retainedReports ? 22_000_000 : route === "context/source-accounts" ? 22_000_000 : 1_000_000;
   let body: Uint8Array<ArrayBuffer> | undefined;
   if (request.method === "POST" && request.body) {
     const reader = request.body.getReader(); const chunks: Uint8Array[] = []; let size = 0;
@@ -47,7 +51,7 @@ async function forward(request: NextRequest, context: Context) {
       cache: "no-store", signal: AbortSignal.timeout(30_000),
     });
     const headers = new Headers({"Content-Type":result.headers.get("content-type") ?? "application/json", "Cache-Control":"no-store"});
-    for (const name of ["content-disposition", "x-source-sha256"]) { const value=result.headers.get(name); if(value)headers.set(name,value); }
+    for (const name of ["content-disposition", "x-source-sha256", "x-content-sha256", "x-report-content-hash", "x-report-proposal-id", "content-length"]) { const value=result.headers.get(name); if(value)headers.set(name,value); }
     return new Response(result.body, { status: result.status, headers });
   } catch { return Response.json({ detail: "Ontology service unavailable" }, { status: 503 }); }
 }

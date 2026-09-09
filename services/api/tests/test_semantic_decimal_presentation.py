@@ -101,7 +101,9 @@ def test_only_exact_reviewed_function_opt_in_changes_movement_display(request):
     assert after.descriptor.function.version_id != before.descriptor.function.version_id
     assert after.descriptor.contract == "semantic-analysis/2"
     assert after.descriptor.measure is None and after.descriptor.visual == "NONE"
-    for field in after.descriptor.fields[1:]:
+    code_field = next(field for field in after.descriptor.fields if field.key == "account_code")
+    assert code_field.presentation is None
+    for field in (field for field in after.descriptor.fields if field.kind == "decimal"):
         assert field.presentation.fraction_digits == 2
         assert field.presentation.currency == field.unit_reference
         assert field.role == "ATTRIBUTE" and field.aggregation == "NONE"

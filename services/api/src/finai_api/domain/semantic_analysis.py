@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, model_validator
 
-type Scalar = StrictStr | StrictInt | StrictBool | None
+Scalar = StrictStr | StrictInt | StrictBool | None
 
 
 class Model(BaseModel):
@@ -103,6 +103,7 @@ class EvidenceCell(Model):
     value: Scalar
     coordinate: str | None = None
     formula: str | None = None
+    reference: Pin | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class Contributor(Model):

@@ -54,6 +54,7 @@ def build(history, plan, resolver, company_id):
                 trace=pin(account),
                 contributor_count=len(movement["source_coordinates"]),
                 values={
+                    "account_code": Value(value=account["attributes"]["account_code"]),
                     "account": Value(
                         value=str(account["resource_id"]),
                         label=account["display_name"],
@@ -80,7 +81,15 @@ def build(history, plan, resolver, company_id):
         if digits is not None
         else None
     )
-    fields = [descriptor.fields[0].model_copy(update={"options": value_options(rows, "account")})]
+    fields = [
+        FieldDefinition(
+            key="account_code", label="Account code", kind="identifier", role="ATTRIBUTE",
+            definition=descriptor.function, aggregation="NONE",
+        ),
+        descriptor.fields[0].model_copy(update={
+            "label": "Account name", "options": value_options(rows, "account")
+        }),
+    ]
     for key, label in (
         ("debit_movement", "Debit movement"),
         ("credit_movement", "Credit movement"),

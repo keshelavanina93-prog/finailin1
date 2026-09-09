@@ -40,6 +40,11 @@ SEMANTICS = {
 
 # required field -> semantic kind or a canonical target type. Optional fields carry '?'.
 TYPE_FIELDS: dict[str, dict[str, str]] = {
+    "Finding": {"legal_entity_id": "@LegalEntity", "definition": "OntologyDefinition"},
+    "Investigation": {
+        "legal_entity_id": "@LegalEntity", "finding_id": "@Finding",
+        "definition": "OntologyDefinition",
+    },
     "ExternalOntologySource": {"definition": "OntologyDefinition"},
     "ExternalOntologyRelease": {
         "evidence_id": "@SourceEvidence", "definition": "OntologyDefinition",
@@ -154,7 +159,12 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
     "ConsolidationGroup": {"code": "Identifier"},
     "OperationalNetwork": {"code": "Identifier"},
     "AssetPortfolio": {"code": "Identifier"},
-    "DomainPack": {"code": "Identifier", "version": "Identifier"},
+    "DomainPack": {
+        "code": "Identifier",
+        "version": "Identifier",
+        "membership_group_id?": "@ObjectTypeGroup",
+        "membership_interface_id?": "@ObjectInterface",
+    },
     "Ledger": {
         "legal_entity_id": "@LegalEntity",
         "calendar_id": "@FiscalCalendar",
@@ -213,7 +223,14 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "local_account_id": "@LocalAccount",
         "group_account_id": "@GroupAccount",
     },
+    "SourceJournalCompatibility": {
+        "accounting_binding_id": "@SourceAccountingBinding", "scope_id": "@SourceAccountingScope",
+        "legal_entity_id": "@LegalEntity", "ledger_id": "@Ledger", "book_id": "@AccountingBook",
+        "period_id": "@FiscalPeriod", "currency_id": "@Currency",
+        "definition": "OntologyDefinition",
+    },
     "JournalEntry": {
+        "source_compatibility_id?": "@SourceJournalCompatibility",
         "posting_date?": "Date",
         "definition?": "OntologyDefinition",
         "accounting_binding_id?": "@SourceAccountingBinding",
@@ -223,6 +240,7 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "reference": "Identifier",
     },
     "JournalLine": {
+        "source_compatibility_id?": "@SourceJournalCompatibility",
         "dimension_policy_id?": "@AccountDimensionPolicy",
         "dimensions?": "OntologyDefinition",
         "side?": "Identifier",
@@ -244,7 +262,13 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
         "binding_review?": "OntologyDefinition",
         "execution_policy?": "OntologyDefinition",
     },
-    "MetricDefinition": {"code": "Identifier", "function_reference": "Identifier"},
+    "MetricDefinition": {
+        "code": "Identifier",
+        "function_reference": "Identifier",
+        "function_id?": "@FunctionDefinition",
+        "definition?": "OntologyDefinition",
+        "legal_entity_id?": "@LegalEntity",
+    },
     "ReportSnapshot": {
         "legal_entity_id": "@LegalEntity",
         "period_id": "@FiscalPeriod",

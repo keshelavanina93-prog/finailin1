@@ -1,0 +1,66 @@
+{
+  "code_sha": "1918e09",
+  "base_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+  "native_preview": {
+    "proof": "AUTHENTIC_READ_ONLY_IN_PROCESS_HTTP",
+    "http_status": 200,
+    "rows": 596,
+    "states": {
+      "BLOCKED": 595,
+      "EXCLUDED": 1
+    },
+    "blockers": {
+      "SOURCE_JOURNAL_SEMANTICS_UNSUPPORTED": 595,
+      "REVIEWED_SIDE_DIMENSIONS_REQUIRED": 1190,
+      "EXACT_AMOUNT_CONTRACT_UNSUPPORTED": 52,
+      "MISSING_LITERAL_POSTED_AMOUNT": 1
+    },
+    "receipt_hash": "cb8d6475d106017ce838a9cade8230743425df4295b6931adff994580a90016b",
+    "source_sha256": "d7c7e67c093b40b6f9209b301ca8fab7e4febc85c27d735babb95fa2028a8f0a",
+    "binding": {
+      "version_id": "8d08c8a1-3c38-53dc-aaf7-fd3a4c117910",
+      "resource_id": "f4cf95a5-9552-519c-8e59-96ee06bd4308",
+      "content_hash": "4eec14a6560ee033238e8d9d1df16236f9e39b86bfd6855cba8a1d42d0773a82"
+    },
+    "invocation_id": "60703b36-2243-568f-804b-c622b6365fc4",
+    "missing_literal_row": {
+      "coordinate": "Base!S288",
+      "state": "EXCLUDED",
+      "blockers": [
+        {
+          "code": "MISSING_LITERAL_POSTED_AMOUNT",
+          "detail": "A literal posted amount is absent; retain exclusion",
+          "required_authority": {
+            "object_type": "SourceRecord",
+            "evidence": {
+              "version_id": "8a981dcc-9401-525a-be80-51f9aaa5a4b9",
+              "resource_id": "f2a292a5-7f7c-533e-8caf-dd0a32b16fa4",
+              "content_hash": "22e9be2d970b0abe2e323981f0671f00ca64d18da51f7d4a0d47eab84ba9e749"
+            },
+            "coordinate": "Base!S288"
+          }
+        }
+      ]
+    }
+  },
+  "isolated_storage": {
+    "migration": 63,
+    "status": "ISOLATED_POSTGRES_STORAGE_PASS",
+    "checks": [
+      "retain",
+      "reopen",
+      "retry",
+      "tenant isolation",
+      "entity isolation",
+      "maker reuse refusal",
+      "update/delete/truncate refusal",
+      "submission phase"
+    ],
+    "server_stopped_after_test": true
+  },
+  "focused_tests_passed": 45,
+  "canonical_data_changed": false,
+  "mounted_runtime_verified": false,
+  "native_eligible_journal_publication_verified": false,
+  "independent_acceptance": false
+}

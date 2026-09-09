@@ -1,3 +1,4 @@
+export type {ReportSectionReference,ReportComposition,ReportSectionResult,RetainedReportSnapshot,ReportPreview,SaveRetainedReport,ReportVersionReference,ReportArtifactMetadata,RetainedReport,RetainedReportListItem,RetainedReportPage} from "./retained-reports.js";
 export type { HistorySearchResult } from "./history-search.js";
 export type {
   ObjectSetFilter, FilterExpression, ObjectSetTraversal, ObjectSetQuery, ObjectSetSchemaVersion,
@@ -8,6 +9,7 @@ export type {
 } from "./object-sets.js";
 export type { AccountDimensionPolicyResponse, AccountDimensionPolicyProposalRequest, AccountDimensionPolicyProposalResponse, JournalDimensionReadback, JournalDimensionProvenance } from "./account-dimension-policy.js";
 export type { CompanyJournalListResponse, CompanyJournalDetailResponse, JournalSelection, JournalPin } from "./company-journals.js";
+export type { FinancialMetricKey, FinancialMetricRequest, FinancialMetricRecipe, FinancialMetricValue, FinancialMetricNode, FinancialMetricResult } from "./company-financial-metrics.js";
 export type { PeriodControlResponse, PeriodControlProposalRequest, PeriodControlProposalResponse } from "./period-control.js";
 export type { CertificationDefinition, CertificationContract, CertificationEvaluationRequest, DefinitionConformanceReceipt } from "./certification.js";
 export type { ProposalQueuePage, ProposalQueueCursor } from "./proposal-queue.js";
@@ -247,3 +249,17 @@ export interface SourcePreview {
   sha256:string; byte_length:number; integrity:"VERIFIED"; value_semantics:"SOURCE_TEXT";
 }
 export type {AnalysisScalar,AnalysisPin,AnalysisDecimalPresentation,AnalysisValue,AnalysisFilter,AnalysisRequest,AnalysisField,AnalysisRow,AnalysisContributor,AnalysisDescriptor,AnalysisProjection} from "./semantic-analysis.js";
+export type {SourceExceptionRequest,SourceExceptionObservation,RetainedSourceException,InvestigationActionRequest,InvestigationOperation,InvestigationResolutionRequest,InvestigationResolutionOperation} from "./source-exceptions.js";
+
+export type {CompanyHomeDescriptor} from "./company-home.js";
+export type {CompanyConditionDescriptor,CompanyConditionConnection,CompanyConditionResourceGroup,CompanyConditionWorkItem,CompanyJournalReviewItem,CompanyJournalReviews} from "./company-condition.js";
+
+export type {CompanyChangesRequest,CompanyChangesDescriptor,CompanyContextChange} from "./company-changes.js";
+export type {CompanyRegulationPage} from "./regulatory-context.js";
+
+export type {RetainedAnalysisReference,RetainedAnalysisPage} from "./retained-analyses.js";
+export type { MetricPin, MetricUnit, MetricSelector, MetricDefinition, MetricOutput, MetricObservationRequest, MetricObservation } from "./metric-observations.js";
+export type { AcceptedMovementFunctionInvocation } from "./accepted-movement-function.js";
+export type { MetricCatalogItem, MetricCatalog, MetricCatalogRequest } from "./metric-observations.js";
+export type { MetricDefinitionSnapshot } from "./metric-observations.js";
+export type {CompanyFinancialResults} from "./company-financial-results.js";

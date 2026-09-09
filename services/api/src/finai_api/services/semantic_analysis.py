@@ -59,6 +59,8 @@ def project(principal, request: ProjectionRequest):
 
         if history["output"].get("entity_movement_review") is not None:
             from finai_api.services.semantic_analysis_movements import build
+    elif implementation == "finance.accepted-journal-movements/v1":
+        from finai_api.services.semantic_analysis_accepted_movements import build
     elif implementation == "ontology.object-set-derived/v1" and plan.get("group_count"):
         from finai_api.services.semantic_analysis_counts import build
     elif implementation == "ontology.object-set-derived/v1":

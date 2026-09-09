@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-08T11:58:28.167172+00:00",
+  "state": "FROZEN_GREEN_CODE_REFERENCE_NOT_PRODUCT_ACCEPTED",
+  "worktree": "D:\\FinAI\\g8-nin59-route-native",
+  "branch": "development/nin59-route-native-workspace",
+  "base_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+  "code_sha": "a16668b1ecbee06cacfbcd777883bd47e34b6568",
+  "tree_sha": "ba2d61817f375c0a07a6c82cfbd507d5c13aef48",
+  "issues": [
+    "NIN-59",
+    "NIN-46",
+    "NIN-63"
+  ],
+  "previous_candidate": {
+    "code_sha": "34eb71fda524fcfbdd4d9a3b29f468a7ab0a2a42",
+    "manifest": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\docs\\development\\evidence\\nin59-product-34eb71f.json",
+      "sha256": "4c0e561a3b496873a21bfef419162ada0bcdd7247d537d604f7e689484d65aca"
+    },
+    "inherited_evidence": "Each prior native or browser observation retains its original code/API SHA. No new integrated acceptance is inferred."
+  },
+  "historical_manifest": {
+    "path": "D:\\FinAI\\g8-nin59-route-native\\docs\\development\\evidence\\nin59-viewport-candidate.json",
+    "sha256": "da00ddbff9d8101dc00a71713151cd83d508d4d7c0e74d1dbb499341410da3ad",
+    "modified": false,
+    "acceptance_reused": false
+  },
+  "implementation": [
+    "Home financial context opens the existing accounting controls in the shared foreground navigation mechanism. Original Home stays mounted and returns with its prior financial view, disclosures, focus and scroll.",
+    "Accounting keeps a separate session/entry/company-scoped NYX readback. Original Home company version and exact valid/known cutoffs remain immutable for Return verification.",
+    "Browser Forward resumes the last validated accounting company version and exact valid/known times. Pending/unavailable requests cannot replace that accepted continuation; reference-only ledger/book/period preferences retain their original snapshot scope.",
+    "Existing ledger/book/period selection, period controls, journal explorer and exact Inspect/Trace/History remain available. Full Company360 opens explicitly at the current ready accounting snapshot for broader source work; ordinary Company360 source-review origin handling is unchanged.",
+    "No new financial calculations, accounting authority, canonical business data or NIN-62 changes.",
+    "Home and Company360 recorded changes expose a paged inline before/after comparison using only backend-declared JSON Pointers and exact retained resource versions.",
+    "Absent fields, explicit null, empty text, booleans and numeric strings remain distinct. Leading-zero and multilingual strings are not coerced. Unsafe integers and nested negative zero withhold non-faithful previews.",
+    "Technical references and structured values remain under bounded Advanced disclosures. Inspect and Trace target each exact before/after version with its own known time; no frontend financial difference or materiality is calculated.",
+    "Compact Home separates existing prepared and pending-review work from collapsed published/rejected outcomes. Exact objects, filters and callbacks are retained, with full Company360 queues unchanged.",
+    "Pending/error/unavailable and bounded queue notices remain visible. A reviewed item that moves into outcomes can reveal only its own tagged disclosure; ordinary returns restore original scroll, and a newly revealed outcome deliberately scrolls nearest to that exact item."
+  ],
+  "candidate_ci": {
+    "run": 34222473741,
+    "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34222473741",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "web-and-contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "api",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "focused_verification": {
+    "accounting": "Nine accounting handoff checks passed, including Forward continuation, immutable Home origin, scope/time mismatch refusal and pending readback handling.",
+    "shared_origin": "Twenty regulation/map/common-origin checks passed; counts overlap prior candidate verification and are not cumulative acceptance.",
+    "types_lint": "Full TypeScript and affected-file lint passed.",
+    "production_build": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\.finai\\tmp\\company-home-attention-build-final.log",
+      "sha256": "32d093aa71f232150fe289b2bc9fdbf46fa129090d1a4624b7d8b7cf4839c0ad"
+    },
+    "independent_review": "Independent bounded review found an original-cutoff reset on Forward. The correction was re-reviewed and cleared before commit. Scroll/focus checks are element-method models, not actual browser observations.",
+    "recorded_values": "Twelve focused retained-value/company-change checks, affected lint and full TypeScript passed. Independent review cleared nested negative-zero preview correction before push.",
+    "attention": "Twenty-six affected attention, journal-review, work-queue and return checks passed. Independent review cleared state partition, coverage visibility and exact moved-outcome return. Counts overlap prior origin bundles; no cumulative acceptance count.",
+    "accounting_build": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\.finai\\tmp\\company-accounting-return-build.log",
+      "sha256": "a6a6ad21a859167c20c125da7cb61718be16eeedb56a65eaf9aaf6fc7526c002"
+    },
+    "comparison_build": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\.finai\\tmp\\company-change-values-build.log",
+      "sha256": "3f4614278ec239c532f9a758e9e2f86097055178fd2a37277048730d1012f9e6"
+    },
+    "resolved_build_failure": {
+      "log": {
+        "path": "D:\\FinAI\\g8-nin59-route-native\\.finai\\tmp\\company-home-attention-build.log",
+        "sha256": "52a92e96003ecd085161ba87fb5365338d449cd9b0b49352206e522b4f531cec"
+      },
+      "reason": "Initial extraction of workflow row rendering did not retain TypeScript null narrowing inside callback. Fixed by capturing the verified descriptor; final types/lint and production build passed."
+    }
+  },
+  "native_verification": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "performed": false,
+    "reason": "Existing isolated PostgreSQL 127.0.0.1:55439 unavailable. No restart or new native accounting readback."
+  },
+  "browser": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "exact_candidate_mounted": false,
+    "reason": "Automatic approval review rejected isolated preview starts as blocked by policy. No retry or bypass.",
+    "viewports": [
+      {
+        "requested_width": 1920,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1440,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1280,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 820,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 768,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      }
+    ]
+  },
+  "canonical_integration": {
+    "performed": false,
+    "branch": "development/enterprise-hydration-foundation",
+    "last_rechecked_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+    "runtime_changed": false,
+    "business_data_changed": false
+  },
+  "open_gates": [
+    "Native integrated accounting exploration",
+    "Actual responsive browser navigation and focus/scroll restoration",
+    "NIN-50 independent acceptance and canonical integration",
+    "Full financial, live operations and intelligence authorities",
+    "Full NIN-59/46/63 and release acceptance"
+  ],
+  "changed_files_since_previous_candidate": [
+    {
+      "path": "apps/web/app/company-accounting-handoff.ts",
+      "sha256_git_blob": "66c44bbd65f5ac396e02e66ed6b0192bddad63681876c1549d14ce74b1e6bb05"
+    },
+    {
+      "path": "apps/web/app/company-change-values.ts",
+      "sha256_git_blob": "d719cfaa234dc33e61b5d6af5618099a5e3c0535e1ecf8ae00c2466ac59eb042"
+    },
+    {
+      "path": "apps/web/app/company-changes.css",
+      "sha256_git_blob": "51640184b0f7a1216e632184f5155f7618e2eb683b77585e1cb5747cddd0efb4"
+    },
+    {
+      "path": "apps/web/app/company-changes.tsx",
+      "sha256_git_blob": "f570e6915ccff7a4151aaab889a9005e503e1a3085f3c61d1c3ce0eebb6481f6"
+    },
+    {
+      "path": "apps/web/app/company-home.tsx",
+      "sha256_git_blob": "3adf8508cd4565558ca5959ee66a4b717c666cb1ffbb08d40f6d886f8f104d9c"
+    },
+    {
+      "path": "apps/web/app/company-journal-review-work.tsx",
+      "sha256_git_blob": "8a3d452a2d01c200739df286ef55520ce8c1b5ec0f492115e0b6e41301e846ec"
+    },
+    {
+      "path": "apps/web/app/company-map-handoff.ts",
+      "sha256_git_blob": "8ac2708e200c975488553e6de37e167ab96b5e4a793cbef741d7fac03af8f385"
+    },
+    {
+      "path": "apps/web/app/company-operating-workspace.css",
+      "sha256_git_blob": "10e5c84cf4cd98183a066d1413c6a84d9ad360a95c4138ad28efb184c9ab7114"
+    },
+    {
+      "path": "apps/web/app/company-operating-workspace.tsx",
+      "sha256_git_blob": "ccf3c2e920f1bd57a651be6622cd387396ee24eda88615c39e7355c9d09fbe4e"
+    },
+    {
+      "path": "apps/web/app/company-work-attention.ts",
+      "sha256_git_blob": "992e4d7fd778d297f8b39e7a88fe4956596a839ac4e32df02e9805eb27e190d1"
+    },
+    {
+      "path": "apps/web/app/company-workspace.tsx",
+      "sha256_git_blob": "7b462c7298bd85db8054d7588fb792a939efbec3aa1215e4fdba18a0fd344aeb"
+    },
+    {
+      "path": "apps/web/app/g8-workspace.tsx",
+      "sha256_git_blob": "5dbe1eaca05755a9aba79f41e1f1efed2c00ef362abf338e533c7bfa0a884fc9"
+    },
+    {
+      "path": "apps/web/app/journal-review-handoff.ts",
+      "sha256_git_blob": "502e08f4f7fb76a3e2f3fbb38a9bf9a404e594f3b914f3be53f8aab0b8f24d47"
+    },
+    {
+      "path": "apps/web/tests/company-accounting-handoff.test.mjs",
+      "sha256_git_blob": "bfe31134703b62834eb2ca7657559d5b611c2bb63460e75b9ea761e9073b7895"
+    },
+    {
+      "path": "apps/web/tests/company-change-values.test.mjs",
+      "sha256_git_blob": "71bf720fd42e35bfbdaa1fd7d4f2a76a13be9c1c84a84cfe2a67130fe9d92ca0"
+    },
+    {
+      "path": "apps/web/tests/company-work-attention.test.mjs",
+      "sha256_git_blob": "2fc6e985d17b637999c013e51b7d61c537d658c6e2e26b996ff164382dc759eb"
+    },
+    {
+      "path": "apps/web/tests/journal-review-handoff.test.mjs",
+      "sha256_git_blob": "71e84fc8b0027d1305439553129dfba5fb92bd992891eb7791c609e30815fcf8"
+    },
+    {
+      "path": "docs/development/evidence/nin59-product-34eb71f.json",
+      "sha256_git_blob": "5cc71a75628823b5aa41f3817fdd357c0a2fc5396526845757e24c251a254f9a"
+    }
+  ],
+  "continuation": "Independent NIN50 challenge of this exact candidate and recorded environment/authority dependency resolution. No additional product code was selected merely to bypass a missing authority or repeat existing verification.",
+  "superseded_checkpoints": [
+    {
+      "code_sha": "50698275dbfd7d142f2868181e3ecfc38d71adaf",
+      "ci_run": 34220974495,
+      "ci_state": "CANCELLED_BY_SUCCESSOR",
+      "web_job": "SUCCESS",
+      "api_job": "CANCELLED"
+    },
+    {
+      "code_sha": "ff7492ed7e9c7b6b7b617e0896f358c9764dd5a3",
+      "ci_run": 34221764270,
+      "ci_state": "CANCELLED_BY_SUCCESSOR",
+      "web_job": "SUCCESS",
+      "api_job": "CANCELLED"
+    }
+  ],
+  "scope_review": {
+    "state": "NO_ADDITIONAL_REQUIRED_UNBLOCKED_PRODUCT_CODE_IDENTIFIED",
+    "basis": "Bounded read-only review of requested route-native NIN59 behavior and current-authority NIN46/63 consumers. Code presence is not browser or full product acceptance.",
+    "remaining_authorities": [
+      "Accepted complete financial statements and metric results",
+      "Live operating observations and freshness authority",
+      "Shared company-bound Findings and Investigations",
+      "Compliance determination"
+    ],
+    "remaining_environment": [
+      "Existing isolated PostgreSQL unavailable for new native readback",
+      "Exact-candidate mounted responsive browser verification blocked by automatic approval review"
+    ]
+  },
+  "environment_recheck": {
+    "method": "Read-only Get-NetTCPConnection for specific isolated ports during final a166 verification",
+    "listeners": [
+      {
+        "port": 55439,
+        "listening": false
+      },
+      {
+        "port": 3074,
+        "listening": false
+      },
+      {
+        "port": 3080,
+        "listening": false
+      }
+    ],
+    "runtime_action": "NONE",
+    "authority_sources": [
+      "services/api/src/finai_api/services/company_home.py:148",
+      "services/api/src/finai_api/services/company_condition.py:198"
+    ]
+  }
+}

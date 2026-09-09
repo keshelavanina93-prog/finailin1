@@ -12,6 +12,7 @@ from finai_api import evidence_objects
 from finai_api.config import get_settings
 from finai_api.domain.authority import ExactScope
 from finai_api.domain.ingest import IngestReceipt, IngestRequest, SourceStorage
+from finai_api.read_budget import remaining_ms
 
 
 @contextmanager
@@ -21,9 +22,14 @@ def connection(
     dsn = get_settings().database_url.get_secret_value()
     if not dsn:
         raise RuntimeError("Database is not configured")
+    timeout = remaining_ms()
     with psycopg.connect(dsn, connect_timeout=3) as conn:
         if repeatable_read:
             conn.isolation_level = psycopg.IsolationLevel.REPEATABLE_READ
+        if timeout is not None:
+            timeout = remaining_ms()
+            conn.execute("SET TRANSACTION READ ONLY")
+            conn.execute("SELECT set_config('statement_timeout',%s,true)", (str(timeout),))
         conn.execute("SELECT set_config('finai.tenant_id', %s, true)", (str(scope.tenant_id),))
         yield conn
 

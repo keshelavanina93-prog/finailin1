@@ -1,0 +1,565 @@
+{
+  "contract": "g8-integration-candidate/1",
+  "recorded_at": "2026-09-08T17:01:22.129268+00:00",
+  "state": "CODE_FROZEN_CI_GREEN_NOT_PRODUCT_ACCEPTED",
+  "worktree": "D:\\FinAI\\g8-product-convergence",
+  "branch": "development/product-convergence",
+  "code_sha": "e38f43810dc602d5678315c71a6ba7a91f9e4053",
+  "tree_sha": "94178be5c07167c7e0eef4715e132201851b2567",
+  "base_sha": "98552589bca2ff7d8b3fdfb856abedfd193ff0e3",
+  "canonical_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+  "changed_files": [
+    {
+      "path": "apps/web/app/action-workbench.tsx",
+      "sha256": "2905cc87de8418e2915fc892f13e8a04411a5f2f58425ea3fbe0bc0c52aa4e1d"
+    },
+    {
+      "path": "apps/web/app/api/ontology/[...path]/route.ts",
+      "sha256": "328070ff1eb6059d6701691fa392e9eeb1ba5d2f1c5ef4ce87160c7ca4e576c2"
+    },
+    {
+      "path": "apps/web/app/company-financial-metric-state.ts",
+      "sha256": "a14e1c8ab2e0cba36ae68be2b2d6963a3e672ea476166a0cfbb7a773549bab55"
+    },
+    {
+      "path": "apps/web/app/company-financial-metrics.tsx",
+      "sha256": "06b57d7a861f3c8c1be11c77f7cf113fb26f5f372a70187fa383cb7c0b3d65cb"
+    },
+    {
+      "path": "apps/web/app/company-home.css",
+      "sha256": "490aab2936010e587d661ccab58517fd17dfcc2d62ddfa183be3ff4621de20d0"
+    },
+    {
+      "path": "apps/web/app/company-home.tsx",
+      "sha256": "f0e094897ebf17ca58acbed8528ecf2c469d9f62129ae9d60d8a49c716a2af42"
+    },
+    {
+      "path": "apps/web/app/company-operating-workspace.tsx",
+      "sha256": "db143b8031a990bcca882dcfdeb6e1c1df504034ffba494c644c4bf0b19caebf"
+    },
+    {
+      "path": "apps/web/app/g8-workspace.tsx",
+      "sha256": "8008c34c6b4a75b86adc06d4fc8d1cf58aa9eb735e245af7e833a36f26e89d18"
+    },
+    {
+      "path": "apps/web/app/home-analysis-row.ts",
+      "sha256": "ca1407c9b64fa2a66585b24dfce0000922bb103b3e1b3c1e500dcbd5ab265487"
+    },
+    {
+      "path": "apps/web/app/journal-disposition-review.css",
+      "sha256": "228dd9153ee4926d0bf3d59d25ce5e2b4b8a6ff670ac22ae6074d25b325272aa"
+    },
+    {
+      "path": "apps/web/app/journal-disposition-review.tsx",
+      "sha256": "922c06b1321e9e512476841c271a916431df4c9cd1d9036b167847fec92b428b"
+    },
+    {
+      "path": "apps/web/app/journal-disposition-state.ts",
+      "sha256": "2be54f920b1c07b777bb8e3a8bfc33e17ab0a9daa3525f7ffa619b6d29426356"
+    },
+    {
+      "path": "apps/web/app/metric-observation-review.css",
+      "sha256": "2b4cd9b402e088dfb2b5eb31abbffdfc44ec019e3b17921bf204011cc68911fa"
+    },
+    {
+      "path": "apps/web/app/metric-observation-review.tsx",
+      "sha256": "046f4fe3932f557a25ca8677b4bf4553deb0aec7aa8a739003c05f292de1a76f"
+    },
+    {
+      "path": "apps/web/app/metric-observation-state.ts",
+      "sha256": "78f28d5f40f9010a0f397c6313ed5ae66c2cf0fe01817a78085f8812bec79b4e"
+    },
+    {
+      "path": "apps/web/app/saved-analysis-workbench.tsx",
+      "sha256": "7bbae091e2fd1a4b0fd3ed7a1fcba9073fc5ea96b41ec3768ea8f7473f09e068"
+    },
+    {
+      "path": "apps/web/tests/company-financial-metric-state.test.mjs",
+      "sha256": "737c5ec2b22fbfcfa4d386dee329eef081519a5fff2f3c8a30d0dc8a6446d6da"
+    },
+    {
+      "path": "apps/web/tests/journal-disposition-proxy.test.mjs",
+      "sha256": "fc6f42e1042e4f535e69b5ec14ea1c2c75ee00a5f3aaff5015fdb8e77cb0cae9"
+    },
+    {
+      "path": "apps/web/tests/journal-disposition-state.test.mjs",
+      "sha256": "76637077871089bb7e6b934e7983c6ef502a2be91c7bc3280bff7fad5c765634"
+    },
+    {
+      "path": "apps/web/tests/journal-projection-proxy.test.mjs",
+      "sha256": "b050d1018d6555999b4812755c5b1d5edd612feb7890c65b7a8c1b205f22247b"
+    },
+    {
+      "path": "apps/web/tests/metric-observation-proxy.test.mjs",
+      "sha256": "b011877b4c05cf8b8f4416b6bcd118d8d8ca996cdf933b8130a9a688167cc200"
+    },
+    {
+      "path": "apps/web/tests/metric-observation-state.test.mjs",
+      "sha256": "3d00c30657e5ef5bb430ccea95550eec7d01d493100eb8d44950c269319d41d5"
+    },
+    {
+      "path": "packages/contracts/src/accepted-movement-function.ts",
+      "sha256": "a767596df118137b55d31e3a8f720dff4459de7011c94c76ab14995cddcffeb4"
+    },
+    {
+      "path": "packages/contracts/src/company-financial-metrics.ts",
+      "sha256": "ad3260f0c05df5a54dab403d4e38c7adf1e32d782a9a31e3df39e532df563797"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "sha256": "77ab5b1851d1f278b8560fc51ad842d04de6e832e55b350d3fe8b858f2c326e1"
+    },
+    {
+      "path": "packages/contracts/src/metric-observations.ts",
+      "sha256": "dae346b3a070c3a61ddfce8602ced7d34014b5ee344a523e54f0dbb6ddd6095e"
+    },
+    {
+      "path": "services/api/src/finai_api/api/company_journal_routes.py",
+      "sha256": "6ac76bc9ec78753ff0964de28e993b7bff7c94d2d2e97fbb1e3b9f924d9350e6"
+    },
+    {
+      "path": "services/api/src/finai_api/api/metric_routes.py",
+      "sha256": "6ae65d4497134b8ddf78a0841a8113addd5ef369e0b809f68b014632bc7e7c85"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/company_condition.py",
+      "sha256": "7fca6f79192f91ca696272323b0602e2728d32b0bdc022fa33617f09330c799f"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/company_financial_metrics.py",
+      "sha256": "1c5c7314e77c098d1de6a66dd497794d5f53796d8f6caf33a052960ef41fe5a1"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/function_execution.py",
+      "sha256": "f79b0892c8be758e57d4571751044dfd3d21b353dd76cab3d8b79b9280e97cf9"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/metric_execution.py",
+      "sha256": "70b72605d43bd4fd8503b8f6e29a7a12c7b39b7ea18f6ea11b785363655a90e2"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/ontology_catalog.py",
+      "sha256": "d1e76e00d9727980a42bbf94d96d858824d0ce5bcad833568ff4ae226d36dae6"
+    },
+    {
+      "path": "services/api/src/finai_api/main.py",
+      "sha256": "8260aa6714b66205247a1d76c25d8b73c110289a02e0d5dafc8e6128faecc3bc"
+    },
+    {
+      "path": "services/api/src/finai_api/services/accepted_movements_function.py",
+      "sha256": "7bc9d0d0637653b7dd5f1f5b63602268fcd9d5ff53fa2fac6cd66c8c041ecf93"
+    },
+    {
+      "path": "services/api/src/finai_api/services/company_financial_metrics.py",
+      "sha256": "8385f50b8f414bc02b646f287470700302b63a5766e1824395952d0d54477634"
+    },
+    {
+      "path": "services/api/src/finai_api/services/company_resource_groups.py",
+      "sha256": "dec713a4f56995b361eba58c23996476ccde174af936b95caa0a4e1877ec8f01"
+    },
+    {
+      "path": "services/api/src/finai_api/services/function_execution.py",
+      "sha256": "0884c714b4419207ced3ceb7ca9cad676bba04d10c1bdaf3cb6f771b181cb269"
+    },
+    {
+      "path": "services/api/src/finai_api/services/journal_reconciliation.py",
+      "sha256": "7f9f7dca140e0aa3808caa22618917c3b4f4b639a8f768dce3f564b6258ea874"
+    },
+    {
+      "path": "services/api/src/finai_api/services/metric_execution.py",
+      "sha256": "12041df67d4c3d58da202b12054ceff11063c0e7e5760618b96603ccc1e23c54"
+    },
+    {
+      "path": "services/api/src/finai_api/services/ontology_definition_validation.py",
+      "sha256": "9d3a44151a938218c4c158c0ae082cc0a1ad7d319af8de874b2f5e84441d555b"
+    },
+    {
+      "path": "services/api/tests/test_accepted_movements_function.py",
+      "sha256": "8b52822f02b20756806a9ffff96d9d0dc13dbd639abb2ab8a8a2308836548885"
+    },
+    {
+      "path": "services/api/tests/test_company_financial_metrics.py",
+      "sha256": "765f2245c6e4e9c517fcfb87f9ebd15e2ae59655fc3be8a148f65d1d19c96f4e"
+    },
+    {
+      "path": "services/api/tests/test_company_resource_groups.py",
+      "sha256": "4bfd7fa9d35c30ecdfc54d9fcc0c45a93614510b612a2d185e80e99eca13767c"
+    },
+    {
+      "path": "services/api/tests/test_domain_pack_membership_schema.py",
+      "sha256": "16df2269c4432535a76a621649fa419e48fe32ba32356625ad99bd3ed8b9b486"
+    },
+    {
+      "path": "services/api/tests/test_financial_metric_observation_integration.py",
+      "sha256": "1f79069e881cce58d8a046e52034caba6650b04467eb3ec3e1a20bfd31c31660"
+    },
+    {
+      "path": "services/api/tests/test_journal_reconciliation.py",
+      "sha256": "64ce9fb773213c28b465c29f50b304228c0e286d11a0c5383d8cb06fb07ce33b"
+    },
+    {
+      "path": "services/api/tests/test_metric_observations.py",
+      "sha256": "baf1e37f70b5ef79837a60faf9a465d1bfe058491a1c14f978d7dd4d3361948e"
+    }
+  ],
+  "migrations": [
+    {
+      "path": "services/api/migrations/001_hydration.sql",
+      "sha256": "87e836dab944ae40549f130092977ddc3b78f3e594346d199480b2bfa6692094"
+    },
+    {
+      "path": "services/api/migrations/002_construction_review.sql",
+      "sha256": "e7836346aa7ff5c26d92ce601420ac4a2620e76d5707b5fc8f985303f4b2ffa7"
+    },
+    {
+      "path": "services/api/migrations/003_approval_integrity.sql",
+      "sha256": "462746a02a853a5e2801d4037aac43d7966d59a7c92d613ec0333e95cb7137f3"
+    },
+    {
+      "path": "services/api/migrations/004_canonical_resource_kernel.sql",
+      "sha256": "2a13160b8de9ba282c139798f850f518783d6118b83aa3c771f4265ef214a002"
+    },
+    {
+      "path": "services/api/migrations/005_resource_acceptance_integrity.sql",
+      "sha256": "00ef1be94bbea4229fcc8a14c67ab9c18aa72eed6c20dab9f5b0840edb660279"
+    },
+    {
+      "path": "services/api/migrations/006_company_industry_capabilities.sql",
+      "sha256": "317c087d0b916ca2107da793ae5f57dd4ee422788befbce097e743af7e84d3a9"
+    },
+    {
+      "path": "services/api/migrations/007_downstream_impact_visibility.sql",
+      "sha256": "1a1f25a6a5e12f6061d40cf048b87bdcde405a5e9ff9f0710f9cb744dc5adcb2"
+    },
+    {
+      "path": "services/api/migrations/008_private_evidence_objects.sql",
+      "sha256": "b1845be9fa90035acfd9de31552a66a2e8e9c5abf0a34237455e9e5bb6a405a5"
+    },
+    {
+      "path": "services/api/migrations/009_atomic_mixed_policy_proposals.sql",
+      "sha256": "26e1f596823279b679a69f89ead7dd27fac044a186b810ce5bf16f017b697ed0"
+    },
+    {
+      "path": "services/api/migrations/010_resource_lifecycle.sql",
+      "sha256": "6354edab90ec106f0bcd4aed828cb121d47d5c35f6e7d7a38d4cdb8d1d99b8b1"
+    },
+    {
+      "path": "services/api/migrations/011_runtime_schema_readiness.sql",
+      "sha256": "f4824e0ca7196738472fe8ef94dbdc8bc456c26788956791e6e796fc40ff0b33"
+    },
+    {
+      "path": "services/api/migrations/012_lifecycle_quality_amendments.sql",
+      "sha256": "6aa5ce793349a7530f8f08fb79190476439f6b0bf683ea7957f9b32c9d4e5b0b"
+    },
+    {
+      "path": "services/api/migrations/013_workbook_source_evidence.sql",
+      "sha256": "840bbb6919bc9e9b0fa797b8e9fce90e5f94829c91a7f3412a8bf074d7d49e76"
+    },
+    {
+      "path": "services/api/migrations/014_report_source_assessments.sql",
+      "sha256": "0f758c7eae77a8a626d10828bb38dfa47501d45e8e1b24845a3144b0ba889b2d"
+    },
+    {
+      "path": "services/api/migrations/015_durable_report_workflows.sql",
+      "sha256": "666265d1aff9de75c3eb4cfd628583095fb5c7fb05ba5a3a1e4211cb410ac693"
+    },
+    {
+      "path": "services/api/migrations/016_guarded_consumption_receipts.sql",
+      "sha256": "24a9e4cdbf01c3c9f6537a32ad3eb71ec959764ef778721f7eaed6fb1d0b68b3"
+    },
+    {
+      "path": "services/api/migrations/017_consumption_state_integrity.sql",
+      "sha256": "56525b720673d26f784fc2d299f4aaeb3079f8078bdae74a732650ff957041b4"
+    },
+    {
+      "path": "services/api/migrations/018_consumption_upstream_integrity.sql",
+      "sha256": "8417c645ee1c43f6104c0b631d19844f1e4713fe0822d06f51d48e33f65543ed"
+    },
+    {
+      "path": "services/api/migrations/019_retained_event_time.sql",
+      "sha256": "af7b07a974f29387bbb3f41800b908523c41aaa54484d44284c743a8f8537104"
+    },
+    {
+      "path": "services/api/migrations/020_canonical_field_read_policy.sql",
+      "sha256": "1d256a030aabf6cba807d0f03436afb8df497a998857667ac62974cf69dec9cd"
+    },
+    {
+      "path": "services/api/migrations/021_field_policy_audit_metadata.sql",
+      "sha256": "3e5a1225e8777f4c7103bac7e71ce1843b3bdbf4e96d0179b4bf9edc640cc153"
+    },
+    {
+      "path": "services/api/migrations/022_field_policy_review_history.sql",
+      "sha256": "c9e6c3ac089b974618bff506a35a6df7517eea4201d80f6f2d5190545ff34a19"
+    },
+    {
+      "path": "services/api/migrations/023_proposal_evaluation.sql",
+      "sha256": "e5fec83ad904a3074183f05a8dda540ac2e2a3c118cc6748f3ccc39642fbba57"
+    },
+    {
+      "path": "services/api/migrations/024_proposal_read_deduplication.sql",
+      "sha256": "cfa80e211fc01dee4a0bbf59c7dcd8f428281151642bdfd14d6d63e12b1b7d94"
+    },
+    {
+      "path": "services/api/migrations/025_fact_calculation_runs.sql",
+      "sha256": "ca33893fe8d2a02944d22eefcf0109eacd46fe043577727808dacae6493ab7a4"
+    },
+    {
+      "path": "services/api/migrations/026_source_documents.sql",
+      "sha256": "81b5e7003ac5c60c0e6ab60e099ff3716bf271d21a1953630b3c0b3e06a2fb44"
+    },
+    {
+      "path": "services/api/migrations/027_dependency_pin_validation.sql",
+      "sha256": "5da4f4244c65f5caccaa35a868e93315bf4753921a17fa32a78755fa2dfccbb0"
+    },
+    {
+      "path": "services/api/migrations/028_proposal_lineage_union.sql",
+      "sha256": "2080ca7b6809e5361cec32547ca66aea83877f59bc2615b622f01235bf244984"
+    },
+    {
+      "path": "services/api/migrations/029_unrestricted_schema_read_fast_path.sql",
+      "sha256": "6d1787cae36b9e1db3bdc49ed948010f09d2a1889344c75df9f1cc84f09b0b82"
+    },
+    {
+      "path": "services/api/migrations/030_ontology_inventory_indexes.sql",
+      "sha256": "4a0f880ed966c53ca8d4b369b11b3e6a92be7d0433163f09d36b066878984ea1"
+    },
+    {
+      "path": "services/api/migrations/031_bounded_lineage_version_lookup.sql",
+      "sha256": "3a67c3354f13fe89bd00d22a69f922f66b03f158c8f709786856ee407c49c94b"
+    },
+    {
+      "path": "services/api/migrations/032_current_effective_authority.sql",
+      "sha256": "20bb6486067ae11f37ebf297f22a4bfdd713a566551bf9bdb3ed8ecb751cbbd2"
+    },
+    {
+      "path": "services/api/migrations/033_effective_event_policy.sql",
+      "sha256": "d7ad77397660d557785e94c0b72a252415dd60b48544d225ffc4e4851b29e079"
+    },
+    {
+      "path": "services/api/migrations/034_certification_receipts.sql",
+      "sha256": "c0ede0b0de2e50350ddbdc8307d6782aa79b648d1fc7c7d4254686c28a643347"
+    },
+    {
+      "path": "services/api/migrations/035_certification_lineage_integrity.sql",
+      "sha256": "977c7a4650e5004d60b11d47364c10d1eb454b6b7ee4c1615d72ac89ae1c53fa"
+    },
+    {
+      "path": "services/api/migrations/036_certification_publication_integrity.sql",
+      "sha256": "d8ebdf07b3804119498084cfe10525af72eb18296c990c4ca44e0f6d8c3ab570"
+    },
+    {
+      "path": "services/api/migrations/037_certified_lifecycle.sql",
+      "sha256": "563b719ed67c022dccf0a5df21ceb7b467bc78a6d31b44eb09d00ae8aef6c310"
+    },
+    {
+      "path": "services/api/migrations/038_certified_consumption.sql",
+      "sha256": "5d07b2cf54c2339eda7da1a54cefdb5ae6fa54be90d69401d60567e023190aa9"
+    },
+    {
+      "path": "services/api/migrations/039_artifact_retention_evaluations.sql",
+      "sha256": "fa97e72200d1c86df9b6b7ab50a32701aeef38a49d893a8d3d807f4d014a9fea"
+    },
+    {
+      "path": "services/api/migrations/040_retention_ancestor_certification_guard.sql",
+      "sha256": "9770a88cdd036c48c5ca3666a8d5ea81f392d3fc6599442952e2bbf36fe46c24"
+    },
+    {
+      "path": "services/api/migrations/041_artifact_retention_history_index.sql",
+      "sha256": "fa93755b266c0d2602c98130a9aa40c23f53d55b5944e7d12bdc446d306b499e"
+    },
+    {
+      "path": "services/api/migrations/042_function_invocations.sql",
+      "sha256": "28bd04ddde0b0e1b3cb386ceb14928fb1091cd8c7ccf1408393809be2591b822"
+    },
+    {
+      "path": "services/api/migrations/043_transformation_intents.sql",
+      "sha256": "8e6ebdfce9581f55f707b04ef1d6c5d6dc8d73dab923a5bb175f9f040a6c7989"
+    },
+    {
+      "path": "services/api/migrations/044_transformation_history_index.sql",
+      "sha256": "47786855ab7dca41562a3537892980594bdf34fbfad9e14ca1730c4a3ca910ed"
+    },
+    {
+      "path": "services/api/migrations/045_transformation_budgets.sql",
+      "sha256": "29a4786fe6a590eba1a3b3c50590824a30d9e8c319d9b0e51cd31bf06b79dd19"
+    },
+    {
+      "path": "services/api/migrations/046_retained_worksheet_functions.sql",
+      "sha256": "2187215c8f847ae6eaa3698b4f1a3d1eef950b5d6676540a0a7a272e8b16d0ce"
+    },
+    {
+      "path": "services/api/migrations/047_runtime_observations.sql",
+      "sha256": "4d9df4b86d9a9bf357be97c6713cdbc384429c7a223a0d119a667f35bdae8af7"
+    },
+    {
+      "path": "services/api/migrations/048_retained_function_inputs.sql",
+      "sha256": "f95d3eca82652b90ed822986a25bce028df28489ab7725e4cdcd74591fb5ca19"
+    },
+    {
+      "path": "services/api/migrations/049_transformation_publication_review.sql",
+      "sha256": "a199dfeb0925ea64571ddf1af64c482fcf95d86324028f151ca9a484e2cbcdc7"
+    },
+    {
+      "path": "services/api/migrations/050_grouped_observation_counts.sql",
+      "sha256": "dd9f5b4e955d16d2e91045305ef1cbe19b99fd5a7ac72b8295022788fb512d81"
+    },
+    {
+      "path": "services/api/migrations/051_grouped_observation_lookup.sql",
+      "sha256": "b86af274dfc0e4c34e671da1b7df6397370be38dcc645fbfc2c617e57fb16f66"
+    },
+    {
+      "path": "services/api/migrations/052_period_posting_control.sql",
+      "sha256": "f5eb990b188dd87738c5eb2677048d41150f9e24fc47aeae6313721c63c9304d"
+    },
+    {
+      "path": "services/api/migrations/053_effective_version_schema_resolution.sql",
+      "sha256": "f41fd1823f0372858bdaf0c2b1b8f7f01c3fa89f3ba340d81d7a99702f12076e"
+    },
+    {
+      "path": "services/api/migrations/054_account_rule_completeness.sql",
+      "sha256": "f9dbe6f28c4dbd8f30e5979dca696e70610df30075b126442e3108360a48936c"
+    },
+    {
+      "path": "services/api/migrations/055_retained_calculated_inputs.sql",
+      "sha256": "e3c70f938cca07264bb2b299cf62a356bd307d404c1690093a77c054700c94ea"
+    },
+    {
+      "path": "services/api/migrations/056_calculated_binding_promotion.sql",
+      "sha256": "9e1488fd20be51d0bec437906d276ac3f34e2ac9117ff911df3fc0a15a746064"
+    },
+    {
+      "path": "services/api/migrations/057_transformation_binding_review.sql",
+      "sha256": "c3eb1edf9b2df1c9f2daf95af1363b8145fcb5d651a5c55880c608a13201af28"
+    },
+    {
+      "path": "services/api/migrations/058_transformation_execution_policy.sql",
+      "sha256": "67f3e63afbd2c6197badadfad89211121b3cf51f60444fbf210d5f02facd2469"
+    },
+    {
+      "path": "services/api/migrations/059_temporal_observation_extent.sql",
+      "sha256": "515f4a05ac45c6741a0ec88927d6511d152c5a6ee45c22188c332756511db569"
+    },
+    {
+      "path": "services/api/migrations/060_object_set_materialization.sql",
+      "sha256": "78c3ce422b80290045164ea887d69bfda4f909d85094889c5e97eed797c500d9"
+    },
+    {
+      "path": "services/api/migrations/061_materialized_observation_counts.sql",
+      "sha256": "b191a0e0820e2fbd97e8ae44bfdd728c87f955fe05f4fbf1f9927de75c136418"
+    },
+    {
+      "path": "services/api/migrations/062_retained_posted_movements.sql",
+      "sha256": "2e494b94b672f5477f244282b35d2550b8577c83cd6a921495af5e4fb462ed4e"
+    },
+    {
+      "path": "services/api/migrations/063_journal_production_attempts.sql",
+      "sha256": "27366a46430ac8bc3b71adfb870a82720cb896439a0f6d9f1ac18793f837cb83"
+    }
+  ],
+  "migrations_changed": false,
+  "package_inputs": [
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "95ba6368af78610cd8ca28a760a2dd22a0fbbcb9a22ff1a7467855055c2d62c0"
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "f24f180910d2415aad7944067bfb7e09f4e4f7c2ef21cba1acea7b32575fc379"
+    },
+    {
+      "path": "apps/web/next.config.ts",
+      "sha256": "6e86bd8ec5d198a48a2a82cd48717812c0cda04ae57277e473c5d7dbaf26d475"
+    },
+    {
+      "path": "services/api/pyproject.toml",
+      "sha256": "59cb0bc8c6abe8d9c98301348dea71869ecfad780ca72180b0065ac46783db80"
+    }
+  ],
+  "frontend_build": {
+    "directory": "D:\\FinAI\\g8-product-convergence\\apps\\web\\.next-home",
+    "build_id": "YY1qvDSz_WmBbR4f0T7lu",
+    "standalone_entry": {
+      "path": "apps/web/.next-home/standalone/apps/web/server.js",
+      "sha256": "c25643f7037d8b9c0c540c31be202f70a3ac5f5d551e5c0947e96667889f3ee4"
+    },
+    "status": "LOCAL_BUILD_PASS_NOT_MOUNTED"
+  },
+  "ci": {
+    "run": 34253391067,
+    "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34253391067",
+    "status": "SUCCESS",
+    "jobs": {
+      "api": "success",
+      "web-and-contracts": "success"
+    }
+  },
+  "verification": {
+    "backend_focused": {
+      "passed": 28,
+      "scope": "Metric catalog, definition/source temporal guards, adapter-to-observation and mounted authorization boundaries"
+    },
+    "consumer_proxy": {
+      "passed": 42,
+      "scope": "Metric consumer exact scope/value/time/references and proxy"
+    },
+    "mypy": "PASS_207_FILES",
+    "web_types_lint": "PASS",
+    "offline_cross_wire": "Actual terminal and retention envelope through product guards and reference-only reopen; storage mocked, test source synthetic",
+    "independent": {
+      "owner_task": "01a07c7d-9a29-7d92-82ca-068bee49a02f",
+      "turn": "01a081ec-f554-7473-9925-77f5e69cebf6",
+      "passed": 36,
+      "scope": "Bounded offline count/finance/company/time/value/authority/history; synthetic retention, no native acceptance"
+    }
+  },
+  "runtime": {
+    "status": "ENVIRONMENT_BLOCKED",
+    "mounted_candidate": false,
+    "excluded": [
+      "3061",
+      "8061",
+      "associated PostgreSQL",
+      "associated MinIO/evidence stores"
+    ],
+    "identity_correction": "User identifies these as FinAI/G8 worktrees and explicitly retains exclusion. Earlier another-project classification was incorrect.",
+    "preview_3074_3080": "Historical launch denials blocked by policy; no alternate-port retry",
+    "new_function_metric_publication": false,
+    "database_or_storage_operation": false,
+    "native_browser_visual_release_acceptance": false,
+    "project_boundary": "User corrected project identity and explicitly retained exclusion in latest reply. No launch target is authorized by that correction."
+  },
+  "preserved": [
+    {
+      "path": "docs/development/evidence/nin59-viewport-candidate.json",
+      "sha256": "da00ddbff9d8101dc00a71713151cd83d508d4d7c0e74d1dbb499341410da3ad"
+    },
+    {
+      "path": "docs/development/evidence/nin59-product-a16668b.json",
+      "sha256": "979b85e25206e4192afe44ca152fec5655630951fef9ae2e1090c7af882a3516"
+    }
+  ],
+  "review": {
+    "url": "https://github.com/keshelavanina93-prog/finailin1/pull/3",
+    "base_review": "https://github.com/keshelavanina93-prog/finailin1/pull/2",
+    "canonical_review": "https://github.com/keshelavanina93-prog/finailin1/pull/1",
+    "merged": false
+  },
+  "next_code": "Separate C source exception producer and B existing canonical Action/proposal adapter; no automatic journal or Finding approval.",
+  "acceptance_gates": {
+    "CODE_PRESENT": "PASS",
+    "LOCAL_CONTRACT_PASS": "PASS_BOUNDED",
+    "LOCAL_INTEGRATED_PASS": "OFFLINE_WIRE_ONLY",
+    "AUTHENTIC_SOURCE_PASS": "HISTORICAL_FINANCE_EVIDENCE_NOT_CURRENT_NATIVE_OBSERVATION",
+    "PRODUCTION_RUNTIME_PASS": "OPEN_ENVIRONMENT_BLOCKED",
+    "GENERALIZATION_PASS": "BOUNDED_COUNT_AND_FINANCE_ONLY",
+    "SCALE_PASS": "OPEN",
+    "VISUAL_ACCEPTANCE": "OPEN_CURRENT_SCREEN_REJECTED",
+    "RELEASE_ACCEPTED": false
+  },
+  "limitations": [
+    "No reviewed executable Metric or accepted-movement Function was published by this continuation. Catalog absence or stale implementation pins remains unavailable.",
+    "Accepted company/account movements are not complete statements, opening/closing balances, financial materiality or live operations.",
+    "No authentic nonempty company DomainPack membership was established by the code-defined schema; missing accepted definitions/relationships remain unavailable.",
+    "Persistent canonical Finding/Investigation is next separate implementation, not supplied by saved Metric references."
+  ]
+}
