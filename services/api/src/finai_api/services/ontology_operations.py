@@ -217,10 +217,24 @@ def invoke_prepared(principal, request, prepare):
                     "definition": {"version": "ontology-action-intent/1"},
                 },
             )
-    return {**resume(principal, identity), "intent_id": intent_id}
+    return {
+        **resume(principal, identity),
+        "intent_id": intent_id,
+        # Preserve the caller's exact intent on replay.  The shared effect is
+        # intentionally deduplicated, but each actor/request still has its own
+        # rationale and request identity for audit and investigation replay.
+        "intent_request": invocation,
+    }
 
 
 def _retain_prepared_record(conn, principal, identity, scope, payload):
+    existing = conn.execute(
+        "SELECT payload FROM workflow_requests WHERE tenant_id=%s AND workflow_id=%s "
+        "AND exact_scope=%s",
+        (principal.scope.tenant_id, identity, Jsonb(scope)),
+    ).fetchone()
+    if existing:
+        return
     conn.execute(
         "INSERT INTO workflow_requests(tenant_id,workflow_id,exact_scope,actor_id,"
         "definition_version,payload) VALUES(%s,%s,%s,%s,%s,%s)",
