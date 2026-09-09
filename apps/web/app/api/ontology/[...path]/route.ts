@@ -13,7 +13,7 @@ async function forward(request: NextRequest, context: Context) {
   const transformations = /^transformations(?:\/runs(?:\/[a-fA-F0-9-]+(?:\/(?:control|publication-review))?)?)?$/.test(route);
   const functions = /^functions(?:\/(?:implementation|invocations(?:\/[a-fA-F0-9-]+)?))?$/.test(route);
   const runtimeObservations = request.method === "GET" && /^runtime-observations(?:\/[a-fA-F0-9-]+)?$/.test(route);
-  const finance = (request.method === "GET" && /^finance\/(?:catalog|domain|dimensions\/policies|constructions|contracts|functions|actions|runs\/fcr_[a-f0-9]{64}(?:\/export)?|tb\/(?:sources|contract|runs\/fcr_[a-f0-9]{64}|diagnostics))$/.test(route))
+  const finance = (request.method === "GET" && /^finance\/(?:catalog|domain|dimensions\/policies|constructions|contracts|functions|actions|runs\/fcr_[a-f0-9]{64}(?:\/export)?|tb\/(?:sources|reconciliation|contract|runs\/fcr_[a-f0-9]{64}|diagnostics))$/.test(route))
     || (request.method === "POST" && /^finance\/(?:catalog\/proposals|candidates\/(?:preview|proposals)|dimensions\/validate|classify|execute|journal-trial-balance|tb\/(?:draft|export|command))$/.test(route));
   const companyJournals = request.method === "GET" && /^company-journals(?:\/[a-fA-F0-9-]+)?$/.test(route);
   const journalDispositions=request.method==="GET"&&/^company-journals\/production\/attempts\/[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}(?:\/dispositions)?$/.test(route);

@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import fact_runs, tb_finance_draft
+from finai_api.services.tb_reconciliation import reconcile_retained_tb
 from finai_api.services.workspace import WorkspaceError
 
 router = APIRouter(prefix="/v1/ontology/finance/tb", tags=["TB Finance draft"])
@@ -34,6 +35,12 @@ class TBCommandRequest(TBDraftRequest):
 def sources(principal: User) -> list[dict[str, Any]]:
     require_permission(principal, "ontology_read")
     return tb_finance_draft.list_retained_tb_sources(principal)
+
+
+@router.get("/reconciliation")
+def reconciliation(principal: User) -> dict[str, Any]:
+    require_permission(principal, "ontology_read")
+    return reconcile_retained_tb(principal)
 
 
 @router.get("/contract")
