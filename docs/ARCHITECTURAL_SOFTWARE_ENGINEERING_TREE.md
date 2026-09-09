@@ -496,3 +496,14 @@ not:
 ```text
 FULLY_DEVELOPED_AND_PROVEN_FINANCIAL_AGI
 ```
+
+## 6. Verification snapshot — 2026-09-10
+
+The canonical checkout is clean at `457e14f`; the same convergence head is
+published on PR #9. The repository is not fully merged or release-accepted:
+the protected branch remains at `4261fcb`, and the latest API CI test job fails
+four tests with 83.93% coverage against the 90% threshold. Frontend
+lint/typecheck/tests/build and API Ruff/mypy pass. The worktree family and
+distributed implementation history must therefore be treated as source
+material converging into the canonical checkout, not as proof that every
+architectural dimension is complete.

@@ -813,3 +813,15 @@ The final product claim requires the dimensions to converge in one reproducible
 release candidate and pass the independent evidence gates. A green unit test,
 local service, bounded browser slice or feature worktree does not by itself prove
 authentic-source, generalization, production-runtime, scale or release acceptance.
+
+### Verification snapshot — 2026-09-10
+
+The latest implementation head is `457e14f` on PR #9. Frontend lint,
+typecheck, tests and build pass; API Ruff and mypy pass. The GitHub API test job
+does not pass yet: four tests fail (`test_finance_catalog_packaging`, the
+cross-actor investigation action test, investigation-resolution replay, and
+native object-set materialization), and the configured coverage result is
+83.93% against a 90% gate. The protected
+`development/enterprise-hydration-foundation` branch remains at `4261fcb`, so
+this head is not the canonical merged release. This is a substantial converged
+slice, not completion of the full architecture.

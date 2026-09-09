@@ -1979,3 +1979,14 @@ FULL_DIMENSIONAL_FRONTEND =
 ```
 
 Anything less is a partial frontend architecture.
+
+### Verification snapshot — 2026-09-10
+
+The current checkout contains the dimensional shell, context model, proxy
+topology and implemented finance/ontology/diagnostics/reporting surfaces. The
+latest GitHub head is `457e14f`; frontend lint, typecheck, tests and build pass,
+while the API CI test job fails four tests and the coverage gate reports 83.93%
+versus the required 90%. Therefore the UI is not certified as fully wired,
+persisted, browser-accepted or release-accepted. Planning, complete reporting,
+governed NYX reasoning, external action/readback, outcome learning, and
+source-to-action-to-export proof remain open according to the wiring register.
