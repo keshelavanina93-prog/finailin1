@@ -1,11 +1,11 @@
 "use client";
 
 import {useEffect, useState} from "react";
+import type {OperationalPromotionPreview} from "@finai/contracts";
 import {Badge, Empty} from "./g8-ui";
 import {operationsRequest} from "./operations-model";
 
-type PreviewCandidate = {object_type: string; source_row: number; identity_key: string; values: Record<string, string>; evidence: {receipt_id: string; source_record_id: string; source_hash: string; valid_at: string}};
-type Preview = {status: string; proposal_required: boolean; canonical_mutation: boolean; candidates: PreviewCandidate[]};
+type Preview = OperationalPromotionPreview;
 type Proposal = {proposal?: {proposal_id: string}; decision?: string | null};
 
 export default function OperationalPromotionPreview({token, receiptId, profile}: {token: string; receiptId: string; profile?: string}) {

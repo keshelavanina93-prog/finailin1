@@ -28,6 +28,7 @@ export interface IngestRequest {
   scope: ExactScope;
   filename: string;
   csv_text?: string;
+  json_text?: string;
   xls_base64?: string;
   xlsx_base64?: string;
   source_use?: "ACTUAL_INPUT" | "HISTORICAL_REFERENCE" | "REPORT_TEMPLATE" | "MAPPING_REFERENCE";
@@ -64,8 +65,16 @@ export interface IngestReceipt {
   } | null;
   scope: ExactScope;
   source_class: "TRIAL_BALANCE" | "UNFAMILIAR_TABULAR" | "WORKBOOK_PACKAGE";
-  source_profile?: {
+    source_profile?: {
     profile?: string;
+    grain?: string;
+    source_system?: string;
+    validation?: {
+      status: string;
+      rows: Array<{source_row: number; status: string; reasons: string[]; promotion_eligible: boolean}>;
+      promotion_eligible: false;
+      binding_status: "UNRESOLVED";
+    };
     account_catalogs?: Array<{ sheet: string; account_count: number; company_binding: string; policy: string;
       findings: Array<{ code: string; coordinates: string[] }>;
       accounts: Array<{ account_code: string; source_name: string; coordinate: string;
@@ -314,3 +323,4 @@ export type { AcceptedMovementFunctionInvocation } from "./accepted-movement-fun
 export type { MetricCatalogItem, MetricCatalog, MetricCatalogRequest } from "./metric-observations.js";
 export type { MetricDefinitionSnapshot } from "./metric-observations.js";
 export type {CompanyFinancialResults} from "./company-financial-results.js";
+export type {OperationalMeasurementGrain, OperationalValidationStage, OperationalBindingRow, OperationalBindingValidation, OperationalPromotionPreview} from "./operational-intake.js";

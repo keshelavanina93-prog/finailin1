@@ -1,11 +1,11 @@
 "use client";
 
 import {useEffect, useState} from "react";
+import type {OperationalBindingValidation} from "@finai/contracts";
 import {Badge, Empty} from "./g8-ui";
 import {operationsRequest} from "./operations-model";
 
-type BindingRow = {source_row: number; status: string; bindings: Record<string, boolean>; reasons: string[]; promotion_eligible: boolean};
-type BindingResult = {profile: string; source_system: string; grain: string; validation_stage: string; status: string; promotion_eligible: boolean; canonical_promotion: string; rows: BindingRow[]};
+type BindingResult = OperationalBindingValidation;
 
 export default function OperationalBindingReview({token, receiptId, profile}: {token: string; receiptId: string; profile?: string}) {
   const [result, setResult] = useState<BindingResult | null>(null); const [error, setError] = useState("");
