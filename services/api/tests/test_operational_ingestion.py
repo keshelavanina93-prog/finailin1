@@ -71,3 +71,19 @@ def test_scada_profile_flags_non_monotonic_meter_series_for_review():
     )
     assert result.source_profile["validation"]["rows"][1]["status"] == "REVIEW_REQUIRED"
     assert "NON_MONOTONIC_SERIES" in result.source_profile["validation"]["rows"][1]["reasons"]
+
+
+def test_retail_cash_register_profile_retains_shift_close_as_review_candidate():
+    result = compile_source(
+        request(
+            "RETAIL_CASH_REGISTER",
+            "store_id,cash_register_id,shift_id,operator_id,event_time,currency,gross_amount,net_amount,payment_method,source_record_id,source_hash\n"
+            "STORE-1,TILL-2,SHIFT-9,OP-4,2026-08-12T22:00:00+04:00,GEL,1200.00,1180.00,CARD,Z-ROW-1,"
+            + "a" * 64
+            + "\n",
+        )
+    )
+    assert result.source_profile["profile"] == "retail-cash-register-shift-close/1"
+    assert result.source_profile["grain"] == "ONE_CASH_REGISTER_SHIFT_CLOSE"
+    assert result.source_profile["validation"]["promotion_eligible"] is False
+    assert result.candidates[0].values["operational_grain"] == "ONE_CASH_REGISTER_SHIFT_CLOSE"

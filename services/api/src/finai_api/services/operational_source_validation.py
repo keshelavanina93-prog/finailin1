@@ -14,6 +14,7 @@ from typing import Any
 
 ORPAK_PROFILE = "orpak-forecourt-sale-line/1"
 GAS_PROFILE = "gas-telemetry-measurement/1"
+RETAIL_PROFILE = "retail-cash-register-shift-close/1"
 ORPAK_REQUIRED = frozenset(
     {
         "station_id",
@@ -49,6 +50,21 @@ GAS_REQUIRED = frozenset(
         "source_hash",
     }
 )
+RETAIL_REQUIRED = frozenset(
+    {
+        "store_id",
+        "cash_register_id",
+        "shift_id",
+        "operator_id",
+        "event_time",
+        "currency",
+        "gross_amount",
+        "net_amount",
+        "payment_method",
+        "source_record_id",
+        "source_hash",
+    }
+)
 UNITS = frozenset({"L", "LITER", "LITERS", "M3", "KG", "TONNE", "TONNES"})
 HASH = re.compile(r"^[a-fA-F0-9]{64}$")
 
@@ -66,6 +82,12 @@ def profile_for(source_system: str | None) -> dict[str, Any] | None:
             "profile": GAS_PROFILE,
             "grain": "ONE_METER_MEASUREMENT_AT_ONE_TIME",
             "required": GAS_REQUIRED,
+        }
+    if key in {"RETAIL_CASH_REGISTER", "CASH_REGISTER", "RETAIL_POS"}:
+        return {
+            "profile": RETAIL_PROFILE,
+            "grain": "ONE_CASH_REGISTER_SHIFT_CLOSE",
+            "required": RETAIL_REQUIRED,
         }
     return None
 
@@ -103,22 +125,41 @@ def validate_row(source_system: str, row: dict[str, str], seen: set[str]) -> dic
     if not missing:
         if not HASH.fullmatch(row["source_hash"]):
             reasons.append("INVALID_SOURCE_HASH")
-        if row["unit"].upper() not in UNITS:
+        if "unit" in row and row["unit"].upper() not in UNITS:
             reasons.append("UNKNOWN_UNIT")
         if not row["source_record_id"].strip():
             reasons.append("MISSING_SOURCE_ID")
-        identity_fields = (
-            (row["transaction_id"], row["station_id"], row["nozzle_id"], row["event_time"])
-            if source_system.upper() == "ORPAK"
-            else (row["meter_id"], row["measurement_timestamp"], row["measurement_type"])
-        )
+        identity_fields: tuple[str, ...]
+        if source_system.upper() == "ORPAK":
+            identity_fields = (
+                row["transaction_id"],
+                row["station_id"],
+                row["nozzle_id"],
+                row["event_time"],
+            )
+        elif source_system.upper() in {"SCADA", "GAS_TELEMETRY"}:
+            identity_fields = (
+                row["meter_id"],
+                row["measurement_timestamp"],
+                row["measurement_type"],
+            )
+        else:
+            identity_fields = (
+                row["store_id"],
+                row["cash_register_id"],
+                row["shift_id"],
+                row["event_time"],
+            )
         identity = sha256("|".join(identity_fields).encode()).hexdigest()
         if identity in seen:
             reasons.append("DUPLICATE_EVENT")
         seen.add(identity)
         _time(
             row,
-            "event_time" if source_system.upper() == "ORPAK" else "measurement_timestamp",
+            "event_time"
+            if source_system.upper()
+            in {"ORPAK", "RETAIL_CASH_REGISTER", "CASH_REGISTER", "RETAIL_POS"}
+            else "measurement_timestamp",
             reasons,
         )
         if source_system.upper() == "ORPAK":
@@ -127,10 +168,15 @@ def validate_row(source_system: str, row: dict[str, str], seen: set[str]) -> dic
             _decimal(row, "gross_amount", reasons)
             if not re.fullmatch(r"[A-Z]{3}", row["currency"]):
                 reasons.append("INVALID_CURRENCY")
-        else:
+        elif source_system.upper() in {"SCADA", "GAS_TELEMETRY"}:
             _decimal(row, "value", reasons)
             if not row["pressure_basis"].strip() or not row["temperature_basis"].strip():
                 reasons.append("MISSING_MEASUREMENT_BASIS")
+        else:
+            _decimal(row, "gross_amount", reasons)
+            _decimal(row, "net_amount", reasons)
+            if not re.fullmatch(r"[A-Z]{3}", row["currency"]):
+                reasons.append("INVALID_CURRENCY")
     return {
         "status": "REJECTED" if reasons else "REVIEW_REQUIRED",
         "reasons": sorted(set(reasons)),
