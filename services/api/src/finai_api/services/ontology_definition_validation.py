@@ -29,6 +29,18 @@ def validate_definition(
     links: dict[str, str],
     target: Callable[..., dict[str, Any]],
 ) -> None:
+    if item.object_type == "MetricDefinition":
+        from finai_api.services.metric_execution import validate_publication
+
+        validate_publication(item, target)
+        return
+    if item.object_type == "DomainPack":
+        # Normal resource validation captures typed, exact FIELD dependency pins.
+        # A pack chooses one executable membership basis; it cannot union two
+        # independently governed definitions by implication.
+        if {"membership_group_id", "membership_interface_id"}.issubset(item.attributes):
+            raise WorkspaceError(422, "DomainPack membership requires at most one definition")
+        return
     model = DEFINITION_MODELS.get(item.object_type)
     if model is None:
         return

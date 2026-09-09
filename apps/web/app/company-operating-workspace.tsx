@@ -13,16 +13,17 @@ import CompanyJournalReviewWork from "./company-journal-review-work";
 import "./company-operating-workspace.css";
 
 type ResourceAction=(resource:CanonicalResource,knownAt:string)=>void;
-export type CompanyOperatingProps={token:string;viewStateKey?:string;companyId:string;snapshot:{validAt:string;knownAt:string};compact?:boolean;onInspect:ResourceAction;onTrace?:ResourceAction;onHistory?:ResourceAction;onProposal?:(id:string)=>void;onJournalReview?:(reference:JournalReviewReference)=>void;onCompanyWorkflow?:(reference:CompanyWorkflowReference)=>void;onWorkflow?:(id:string)=>void};
+export type CompanyOperatingProps={token:string;viewStateKey?:string;companyId:string;snapshot:{validAt:string;knownAt:string};compact?:boolean;onJournalSources?:(value:CompanyConditionDescriptorV2["journal_reviews"]|null)=>void;onInspect:ResourceAction;onTrace?:ResourceAction;onHistory?:ResourceAction;onProposal?:(id:string)=>void;onJournalReview?:(reference:JournalReviewReference)=>void;onCompanyWorkflow?:(reference:CompanyWorkflowReference)=>void;onWorkflow?:(id:string)=>void};
 const human=(value:string)=>value.replace(/([a-z])([A-Z])/g,"$1 $2").replaceAll("_"," ").toLowerCase();
 const stamp=(value:string)=>new Date(value).toLocaleString();
 
 export default function CompanyOperatingWorkspace(props:CompanyOperatingProps){return <OperatingWorkspace key={`${props.token}:${props.companyId}:${props.snapshot.validAt}:${props.snapshot.knownAt}`} {...props}/>;}
-function OperatingWorkspace({token,viewStateKey,companyId,snapshot,compact=false,onInspect,onTrace,onHistory,onProposal,onJournalReview,onCompanyWorkflow,onWorkflow}:CompanyOperatingProps){
+function OperatingWorkspace({token,viewStateKey,companyId,snapshot,compact=false,onJournalSources,onInspect,onTrace,onHistory,onProposal,onJournalReview,onCompanyWorkflow,onWorkflow}:CompanyOperatingProps){
  const {validAt,knownAt}=snapshot;
  const storageKey=!compact&&viewStateKey?`${viewStateKey}:operating-v1:${companyId}`:null;
  const [restored]=useState(()=>{if(!storageKey)return null;try{return parseOperatingView(sessionStorage.getItem(storageKey)??"",{companyId,validAt,knownAt});}catch{return null;}});
  const [result,setResult]=useState<CompanyConditionDescriptorV2|null>(null),[error,setError]=useState("");const [revision,setRevision]=useState(0);const [settledRevision,setSettledRevision]=useState<number|null>(null);
+ useEffect(()=>{onJournalSources?.(settledRevision===revision&&!error?result?.journal_reviews??null:null);},[result,error,settledRevision,revision,onJournalSources]);
  const [openedWorkflow,setOpenedWorkflow]=useState("");
  const [workFilter,setWorkFilter]=useState<"ALL"|CompanyConditionWorkItem["state"]>(restored?.workFilter??"ALL"),[workSearch,setWorkSearch]=useState(restored?.workSearch??"");
  const [group,setGroup]=useState<OperatingView["group"]>(restored?.group??null),[search,setSearch]=useState(restored?.search??"");

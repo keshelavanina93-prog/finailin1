@@ -1,4 +1,5 @@
 "use client";
+import JournalDispositionReview,{type JournalDispositionContext} from "./journal-disposition-review";
 import type {CompanyWorkflowReference} from "./journal-review-handoff";
 import {companyWorkflowQueueItem,assertCompanyWorkflowRun} from "./company-workflow-review";
 import {useCallback,useEffect,useRef,useState} from "react";
@@ -14,7 +15,9 @@ import {Value} from "./operator-history";
 const label=(s:string)=>s.toLowerCase().replaceAll("_"," ");
 const commandLabel=(s:string)=>({complete:"Acknowledge source review",resume:"Resume",pause:"Pause",retry:"Retry processing",cancel:"Cancel process"}[s]??s);
 type Queue={items:ActionItem[];truncated:boolean};
-export default function ActionWorkbench({token,principal,companyId,onInspect,initialWorkflowId,companyWorkflow,onReturnFromWorkflow,onOpenBuild,initialProposalId,onReturnFromProposal,onProposalDecision}:{token:string;principal:Principal;companyId:string;initialWorkflowId?:string;companyWorkflow?:CompanyWorkflowReference;onReturnFromWorkflow?:()=>void;initialProposalId?:string;onReturnFromProposal?:()=>void;onProposalDecision?:()=>void;onOpenBuild?:(requestId:string,transformation:{resource_id:string;version_id:string})=>void;onInspect:(id:string)=>void}){
+export default function ActionWorkbench({token,principal,companyId,onInspect,initialWorkflowId,companyWorkflow,onReturnFromWorkflow,onOpenBuild,initialProposalId,onReturnFromProposal,onProposalDecision,journalDisposition}:{token:string;principal:Principal;companyId:string;initialWorkflowId?:string;companyWorkflow?:CompanyWorkflowReference;onReturnFromWorkflow?:()=>void;initialProposalId?:string;journalDisposition?:JournalDispositionContext;onReturnFromProposal?:()=>void;onProposalDecision?:()=>void;onOpenBuild?:(requestId:string,transformation:{resource_id:string;version_id:string})=>void;onInspect:(id:string)=>void}){
+ const [dispositionProposal,setDispositionProposal]=useState<string|null>(null);
+ const reviewedProposalId=journalDisposition?dispositionProposal??initialProposalId:initialProposalId;
  const commandPanel=useRef<HTMLElement>(null);
  const lifecycle=useRef({active:true});
  useEffect(()=>{const visit={active:true};lifecycle.current=visit;return()=>{visit.active=false;};},[token,companyId,companyWorkflow,initialWorkflowId,initialProposalId]);
@@ -59,8 +62,9 @@ export default function ActionWorkbench({token,principal,companyId,onInspect,ini
  if(initialProposalId)return <section className="g8-actions" aria-label="Business change review">
    <header><h2>Review proposed business changes</h2><p>This is the retained proposal selected from your workspace. The company remains your navigation context; the server checks the proposal scope and review authority.</p></header>
    {onReturnFromProposal&&<button type="button" onClick={onReturnFromProposal}>Return to previous workspace</button>}
-   <PromotionReadiness key={initialProposalId} token={token} proposalId={initialProposalId} onDecision={()=>onProposalDecision?.()}/>
-   <details><summary>Exact proposal reference</summary><p>{initialProposalId}</p></details>
+   {journalDisposition&&<JournalDispositionReview token={token} context={journalDisposition} revision={revision} onProposal={setDispositionProposal}/>}
+   <PromotionReadiness key={reviewedProposalId} token={token} proposalId={reviewedProposalId!} onDecision={()=>{setRevision(value=>value+1);onProposalDecision?.();}}/>
+   <details><summary>Advanced · exact proposal reference</summary><p>{reviewedProposalId}</p></details>
  </section>;
  return <section className="g8-actions" aria-label="Governed workbench">{onReturnFromWorkflow&&<button type="button" onClick={onReturnFromWorkflow}>Return to previous workspace</button>}<div className="g8-actions-toolbar"><label>Find work<input maxLength={128} value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Name or process family"/></label>{companyId&&!companyWorkflow&&<label className="g8-actions-check"><input type="checkbox" disabled={busy||!!pending} checked={unbound} onChange={e=>{setUnbound(e.target.checked);choose("");}}/>Include work without company binding</label>}<button disabled={busy} onClick={()=>setRevision(r=>r+1)}>Refresh work</button></div>
  <p>Source checks, regulatory monitoring and reviewed business changes share retained requests and receipts. This workbench does not execute external financial postings.</p>

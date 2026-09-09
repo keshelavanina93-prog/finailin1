@@ -8,6 +8,7 @@ export type {
 } from "./object-sets.js";
 export type { AccountDimensionPolicyResponse, AccountDimensionPolicyProposalRequest, AccountDimensionPolicyProposalResponse, JournalDimensionReadback, JournalDimensionProvenance } from "./account-dimension-policy.js";
 export type { CompanyJournalListResponse, CompanyJournalDetailResponse, JournalSelection, JournalPin } from "./company-journals.js";
+export type { FinancialMetricKey, FinancialMetricRequest, FinancialMetricRecipe, FinancialMetricValue, FinancialMetricNode, FinancialMetricResult } from "./company-financial-metrics.js";
 export type { PeriodControlResponse, PeriodControlProposalRequest, PeriodControlProposalResponse } from "./period-control.js";
 export type { CertificationDefinition, CertificationContract, CertificationEvaluationRequest, DefinitionConformanceReceipt } from "./certification.js";
 export type { ProposalQueuePage, ProposalQueueCursor } from "./proposal-queue.js";
@@ -255,3 +256,7 @@ export type {CompanyChangesRequest,CompanyChangesDescriptor,CompanyContextChange
 export type {CompanyRegulationPage} from "./regulatory-context.js";
 
 export type {RetainedAnalysisReference,RetainedAnalysisPage} from "./retained-analyses.js";
+export type { MetricPin, MetricUnit, MetricSelector, MetricDefinition, MetricOutput, MetricObservationRequest, MetricObservation } from "./metric-observations.js";
+export type { AcceptedMovementFunctionInvocation } from "./accepted-movement-function.js";
+export type { MetricCatalogItem, MetricCatalog, MetricCatalogRequest } from "./metric-observations.js";
+export type { MetricDefinitionSnapshot } from "./metric-observations.js";

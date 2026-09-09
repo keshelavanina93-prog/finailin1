@@ -1,11 +1,13 @@
 import type {AnalysisProjection} from "@finai/contracts";
 import {assertProjection,parseView} from "./semantic-analysis-state";
-import {assertHomeRevision,homeAnalysisRequest,type HomeAnalysisReference} from "./company-home-revision";
+import {assertHomeRevision,type HomeAnalysisReference} from "./company-home-revision";
 import {displayedAnalysisView,type SourceReviewTarget} from "./source-review-route";
 
 /** Request evidence for an existing displayed row; the destination rechecks its contributor. */
 export function homeAnalysisRowTarget(projection:AnalysisProjection,reference:HomeAnalysisReference,companyId:string,rowKey:string,contributorIndex=0):SourceReviewTarget|null {
- assertProjection(projection,homeAnalysisRequest(reference,companyId));
+ // A first read learns its revision from the response. Validate its original
+ // request echo, then require the learned exact revision before constructing a drill.
+ assertProjection(projection,{...projection.request,company_id:companyId,invocation_id:reference.invocationId});
  assertHomeRevision(projection,reference);
  const displayed=displayedAnalysisView(projection,companyId,reference.journalSnapshot);
  const row=projection.rows.find(item=>item.key===rowKey);
