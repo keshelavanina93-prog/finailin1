@@ -816,7 +816,7 @@ authentic-source, generalization, production-runtime, scale or release acceptanc
 
 ### Verification snapshot — 2026-09-10
 
-The latest implementation head is `9f44764` on PR #9. Frontend lint,
+The latest implementation head is `90aec7c` on PR #9. Frontend lint,
 typecheck, tests and build pass; API Ruff and mypy pass. The GitHub API test job
 previously failed four tests. The packaging, cross-actor investigation action,
 and investigation-resolution replay failures are fixed locally in `1e1ed74`;
@@ -828,7 +828,10 @@ calculation, scenario authoring, liquidity projection and outcome measurement
 are wired as bounded canonical projections. A read-only petroleum conservation
 bridge is now mounted at `/v1/operations/petroleum/reconciliation`, with
 bounded accepted-resource lineage at `/v1/operations/petroleum/lineage/{resource_id}`;
-retained ORPAK/SCADA intake and operational telemetry remain open.
+ORPAK forecourt sale-line and SCADA/gas measurement-grain validation now run
+at hydration intake with explicit evidence, duplicate, timestamp, unit and
+binding states; retained connector readback, canonical object promotion and
+live operational telemetry remain open.
 A citation-first NYX refusal/explanation boundary is now wired at
 `/v1/ontology/nyx/reason`; model-backed reasoning, multi-citation packets and
 proposal handoff execution remain open. The previous configured coverage result was 83.93% against
