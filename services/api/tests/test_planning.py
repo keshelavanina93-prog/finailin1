@@ -105,14 +105,30 @@ def test_forecast_aggregates_accepted_scenario_cells(monkeypatch):
             node(scenario, "ScenarioVersion", {"code": "FCST", "kind": "FORECAST"})
         ],
         "PlanningCellFact": [
-            node(uuid4(), "PlanningCellFact", {
-                "legal_entity_id": "company-a", "scenario_version_id": str(scenario),
-                "period_id": "2025-01", "measure": "cash", "currency_id": "GEL", "amount": "1.10",
-            }),
-            node(uuid4(), "PlanningCellFact", {
-                "legal_entity_id": "company-a", "scenario_version_id": str(scenario),
-                "period_id": "2025-01", "measure": "cash", "currency_id": "GEL", "amount": "2.15",
-            }),
+            node(
+                uuid4(),
+                "PlanningCellFact",
+                {
+                    "legal_entity_id": "company-a",
+                    "scenario_version_id": str(scenario),
+                    "period_id": "2025-01",
+                    "measure": "cash",
+                    "currency_id": "GEL",
+                    "amount": "1.10",
+                },
+            ),
+            node(
+                uuid4(),
+                "PlanningCellFact",
+                {
+                    "legal_entity_id": "company-a",
+                    "scenario_version_id": str(scenario),
+                    "period_id": "2025-01",
+                    "measure": "cash",
+                    "currency_id": "GEL",
+                    "amount": "2.15",
+                },
+            ),
         ],
     }
     monkeypatch.setattr(
@@ -124,3 +140,49 @@ def test_forecast_aggregates_accepted_scenario_cells(monkeypatch):
     assert result["contract"] == "forecast-projection/1"
     assert result["rows"][0]["amount"] == "3.25"
     assert result["model_backed"] is False
+
+
+def test_liquidity_partitions_signed_cash_flows(monkeypatch):
+    scenario = uuid4()
+    rows = {
+        "ScenarioVersion": [node(scenario, "ScenarioVersion", {"code": "PLAN", "kind": "PLAN"})],
+        "PlanningCellFact": [
+            node(
+                uuid4(),
+                "PlanningCellFact",
+                {
+                    "legal_entity_id": "company-a",
+                    "scenario_version_id": str(scenario),
+                    "period_id": "2025-01",
+                    "measure": "cash",
+                    "currency_id": "GEL",
+                    "direction": "INFLOW",
+                    "amount": "10.00",
+                },
+            ),
+            node(
+                uuid4(),
+                "PlanningCellFact",
+                {
+                    "legal_entity_id": "company-a",
+                    "scenario_version_id": str(scenario),
+                    "period_id": "2025-01",
+                    "measure": "cash",
+                    "currency_id": "GEL",
+                    "direction": "OUTFLOW",
+                    "amount": "3.25",
+                },
+            ),
+        ],
+    }
+    monkeypatch.setattr(
+        planning.resources,
+        "list_resources",
+        lambda _principal, object_type, _search, _offset, **_kwargs: rows[object_type],
+    )
+    result = planning.liquidity(principal(), scenario)
+    assert result["contract"] == "liquidity-projection/1"
+    assert result["rows"][0]["inflow"] == "10.00"
+    assert result["rows"][0]["outflow"] == "3.25"
+    assert result["rows"][0]["net"] == "6.75"
+    assert result["treasury_authority"] is False

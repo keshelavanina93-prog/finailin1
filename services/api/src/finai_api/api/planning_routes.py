@@ -26,3 +26,8 @@ def compare(principal: User, scenario_a: UUID, scenario_b: UUID) -> dict[str, An
 @router.get("/forecast")
 def forecast(principal: User, scenario_id: UUID) -> dict[str, Any]:
     return planning.forecast(principal, scenario_id)
+
+
+@router.get("/liquidity")
+def liquidity(principal: User, scenario_id: UUID) -> dict[str, Any]:
+    return planning.liquidity(principal, scenario_id)

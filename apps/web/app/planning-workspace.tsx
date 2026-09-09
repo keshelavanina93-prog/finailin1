@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import OutcomeMeasurementPanel from "./outcome-measurement-panel";
+import LiquidityProjectionPanel from "./liquidity-projection-panel";
 
 type Node = { resource_id: string; version_id: string; display_name: string; authority_state: string; evidence_class: string; attributes: Record<string, unknown> };
 type Catalog = { contract: "planning-catalog/1"; scenarios: Node[]; cells: Node[]; authority: string; forecast_calculation_available: false };
@@ -48,5 +49,6 @@ export default function PlanningWorkspace({ token, companyName }: { token: strin
     </>}
     {comparison && <><h3>Scenario comparison</h3><p>{comparison.coverage} · deterministic Decimal delta · forecast calculation available: {String(comparison.forecast_calculation_available)}</p>{comparison.rows.length ? <div className="g8-table-scroll"><table><thead><tr><th>Dimension</th><th>Scenario A</th><th>Scenario B</th><th>Delta</th></tr></thead><tbody>{comparison.rows.map(row => <tr key={JSON.stringify(row.dimension)}><td>{Object.entries(row.dimension).filter(([, value]) => value).map(([key, value]) => `${key}: ${value}`).join(" · ")}</td><td>{row.scenario_a}</td><td>{row.scenario_b}</td><td>{row.delta}</td></tr>)}</tbody></table></div> : <p>No common planning dimensions were found.</p>}</>}
     <OutcomeMeasurementPanel token={token} planScenarioId={a} actualScenarioId={b} />
+    <LiquidityProjectionPanel token={token} scenarioId={a} />
   </section>;
 }

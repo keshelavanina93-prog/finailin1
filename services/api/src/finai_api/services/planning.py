@@ -85,9 +85,9 @@ def compare(principal, scenario_a: UUID, scenario_b: UUID) -> dict[str, Any]:
             )
         )
         bucket = grouped.setdefault(key, {})
-        bucket[str(attrs["scenario_version_id"])] = bucket.get(
-            str(attrs["scenario_version_id"]), Decimal(0)
-        ) + amount
+        bucket[str(attrs["scenario_version_id"])] = (
+            bucket.get(str(attrs["scenario_version_id"]), Decimal(0)) + amount
+        )
     rows = []
     for key, values in sorted(grouped.items()):
         a = values.get(str(scenario_a), Decimal(0))
@@ -150,10 +150,9 @@ def forecast(principal, scenario_id: UUID) -> dict[str, Any]:
     buckets: dict[tuple[str, ...], Decimal] = {}
     for row in _resources(principal, "PlanningCellFact"):
         attrs = row["attributes"]
-        if (
-            str(attrs.get("legal_entity_id")) != company_id
-            or str(attrs.get("scenario_version_id")) != str(scenario_id)
-        ):
+        if str(attrs.get("legal_entity_id")) != company_id or str(
+            attrs.get("scenario_version_id")
+        ) != str(scenario_id):
             continue
         try:
             amount = Decimal(str(attrs["amount"]))
@@ -178,5 +177,65 @@ def forecast(principal, scenario_id: UUID) -> dict[str, Any]:
         "calculation": "DETERMINISTIC_DECIMAL_AGGREGATION",
         "model_backed": False,
         "current_use_authorized": False,
+        "business_effect_authorized": False,
+    }
+
+
+def liquidity(principal, scenario_id: UUID) -> dict[str, Any]:
+    """Build a currency-partitioned cash projection from accepted planning facts."""
+    require_permission(principal, "ontology_read")
+    company_id = str(principal.scope.legal_entity_id)
+    scenarios = {
+        str(row["resource_id"]): row
+        for row in _resources(principal, "ScenarioVersion")
+        if not row["attributes"].get("legal_entity_id")
+        or str(row["attributes"].get("legal_entity_id")) == company_id
+    }
+    selected = scenarios.get(str(scenario_id))
+    if selected is None:
+        raise WorkspaceError(404, "Scenario is unavailable in the authorized company scope")
+    buckets: dict[tuple[str, str], dict[str, Decimal]] = {}
+    for row in _resources(principal, "PlanningCellFact"):
+        attrs = row["attributes"]
+        if str(attrs.get("legal_entity_id")) != company_id or str(
+            attrs.get("scenario_version_id")
+        ) != str(scenario_id):
+            continue
+        if str(attrs.get("measure", "")).lower() not in {"cash", "cash_flow", "liquidity"}:
+            continue
+        try:
+            amount = Decimal(str(attrs["amount"]))
+        except (InvalidOperation, KeyError) as exc:
+            raise WorkspaceError(409, "Accepted liquidity cell contains an invalid amount") from exc
+        direction = str(attrs.get("direction", attrs.get("cash_flow_direction", "NET"))).upper()
+        signed = (
+            -abs(amount)
+            if direction in {"OUTFLOW", "OUT", "PAYMENT"}
+            else abs(amount)
+            if direction in {"INFLOW", "IN"}
+            else amount
+        )
+        bucket = buckets.setdefault(
+            (str(attrs.get("period_id", "")), str(attrs.get("currency_id", ""))),
+            {"inflow": Decimal(0), "outflow": Decimal(0), "net": Decimal(0)},
+        )
+        bucket["inflow"] += signed if signed > 0 else Decimal(0)
+        bucket["outflow"] += abs(signed) if signed < 0 else Decimal(0)
+        bucket["net"] += signed
+    rows = [
+        {
+            "period_id": key[0],
+            "currency_id": key[1],
+            **{name: format(value, "f") for name, value in values.items()},
+        }
+        for key, values in sorted(buckets.items())
+    ]
+    return {
+        "contract": "liquidity-projection/1",
+        "scenario": selected,
+        "rows": rows,
+        "coverage": "ACCEPTED_CASH_PLANNING_CELL_FACTS",
+        "calculation": "DETERMINISTIC_SIGNED_DECIMAL_AGGREGATION",
+        "treasury_authority": False,
         "business_effect_authorized": False,
     }
