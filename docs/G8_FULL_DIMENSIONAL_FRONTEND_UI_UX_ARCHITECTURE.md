@@ -1984,7 +1984,7 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest GitHub head is `0fe6668`; frontend lint, typecheck, tests and build pass.
+latest GitHub head is `f17a369`; frontend lint, typecheck, tests and build pass.
 The previous API CI job failed four tests; three are fixed locally in this head,
 while the database-backed object-set materialization path is still under CI
 verification. Planning now has a real catalog/comparison UI and allowlisted
