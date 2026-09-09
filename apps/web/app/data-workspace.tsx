@@ -49,7 +49,7 @@ function SourceFamilyMatrix({companyName}:{companyName:string}) {
    return <article key={item.id} className={`source-family-card ${sourceFamilyClassName(state)}`}>
     <div><strong>{item.label}</strong><span>{item.systems.join(", ")}</span></div>
     <mark>{sourceFamilyLabel(state)}</mark>
-    <dl><dt>Scope</dt><dd>{item.requiredScopeDimensions.join(", ")}</dd><dt>Evidence</dt><dd>{item.requiredEvidence.join(", ")}</dd><dt>Routes</dt><dd>{routes}</dd><dt>Missing</dt><dd>{missing.length?missing.join(", "):"No missing frontend intake dimensions declared"}</dd><dt>Destination</dt><dd>{destination}</dd></dl>
+    <dl><dt>Measurement grain</dt><dd><code>{item.measurementGrain}</code></dd><dt>Scope</dt><dd>{item.requiredScopeDimensions.join(", ")}</dd><dt>Evidence</dt><dd>{item.requiredEvidence.join(", ")}</dd><dt>Routes</dt><dd>{routes}</dd><dt>Missing</dt><dd>{missing.length?missing.join(", "):"No missing frontend intake dimensions declared"}</dd><dt>Destination</dt><dd>{destination}</dd></dl>
    </article>;
   })}</div>
   <p className="source-family-note">Target means the product architecture requires this dimension, but this checkout does not yet prove a complete frontend/backend/browser-wired journey for it.</p>

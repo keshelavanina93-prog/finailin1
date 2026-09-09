@@ -69,6 +69,7 @@ export type SourceFamilyIntakePlan = {
   id: string;
   label: string;
   systems: readonly string[];
+  measurementGrain: string;
   requiredScopeDimensions: readonly RequiredScopeDimension[];
   implementedScopeDimensions: readonly RequiredScopeDimension[];
   requiredEvidence: readonly EvidenceRequirement[];
@@ -93,6 +94,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     id: "1c_trial_balance",
     label: "1C trial balance",
     systems: ["1C", "Excel trial balance export", "retained workbook"],
+    measurementGrain: "ONE_ACCOUNT_PERIOD_BALANCE_ROW",
     requiredScopeDimensions: ["tenant", "legal_entity", "account", "subaccount", "currency", "period", "document", "lineage"],
     implementedScopeDimensions: ["tenant", "legal_entity", "account", "currency", "period", "document", "lineage"],
     requiredEvidence: [
@@ -117,6 +119,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     id: "1c_journal_movements",
     label: "1C journal and movements",
     systems: ["1C", "posting journal", "movement registers"],
+    measurementGrain: "ONE_JOURNAL_LINE_OR_MOVEMENT_DOCUMENT_LINE",
     requiredScopeDimensions: [
       "tenant",
       "legal_entity",
@@ -152,6 +155,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     id: "seg_procurement_expense",
     label: "SEG procurement and expense",
     systems: ["SEG procurement", "expense workbooks", "vendor evidence"],
+    measurementGrain: "ONE_PROCUREMENT_OR_EXPENSE_DOCUMENT_LINE",
     requiredScopeDimensions: [
       "tenant",
       "legal_entity",
@@ -189,6 +193,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     id: "socar_sgp_seg_multi_entity",
     label: "SOCAR, SGP and SEG multi-entity structures",
     systems: ["SOCAR", "SGP", "SEG", "corporate registry", "group structure evidence"],
+    measurementGrain: "ONE_ENTITY_RELATIONSHIP_ASSERTION",
     requiredScopeDimensions: ["tenant", "legal_entity", "business_unit", "site", "counterparty", "currency", "period", "document", "lineage"],
     implementedScopeDimensions: ["tenant", "legal_entity", "business_unit", "period", "document", "lineage"],
     requiredEvidence: [
@@ -212,6 +217,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     id: "orpak_forecourt_pos",
     label: "ORPAK forecourt POS",
     systems: ["ORPAK", "forecourt POS", "station controller"],
+    measurementGrain: "ONE_FORECOURT_SALE_LINE",
     requiredScopeDimensions: [
       "tenant",
       "legal_entity",
@@ -258,6 +264,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     id: "gas_telemetry",
     label: "Gas telemetry",
     systems: ["gas telemetry", "metering gateway", "SCADA export"],
+    measurementGrain: "ONE_METER_MEASUREMENT_AT_ONE_TIME",
     requiredScopeDimensions: ["tenant", "legal_entity", "site", "meter", "asset", "tank", "measurement_basis", "quality", "period", "document", "lineage"],
     implementedScopeDimensions: ["tenant", "legal_entity", "site", "meter", "asset", "tank", "fuel_grade", "measurement_basis", "quality", "period", "document", "lineage"],
     requiredEvidence: ["source_file_hash", "schema_hash", "row_count", "tank_level_reading", "external_reference", "lineage_receipt"],
@@ -288,6 +295,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     id: "retail_cash_registers",
     label: "Retail cash registers",
     systems: ["cash register exports", "retail POS", "fiscal Z reports"],
+    measurementGrain: "ONE_CASH_REGISTER_SHIFT_CLOSE",
     requiredScopeDimensions: [
       "tenant",
       "legal_entity",
@@ -325,6 +333,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     id: "regulatory_external_evidence",
     label: "Regulatory and external evidence",
     systems: ["regulatory filings", "public registry", "external market/reference sources"],
+    measurementGrain: "ONE_RETAINED_EXTERNAL_EVIDENCE_ASSERTION",
     requiredScopeDimensions: ["tenant", "legal_entity", "counterparty", "currency", "period", "document", "lineage"],
     implementedScopeDimensions: ["tenant", "legal_entity", "period", "document", "lineage"],
     requiredEvidence: ["source_file_hash", "schema_hash", "regulatory_filing", "external_reference", "lineage_receipt"],
