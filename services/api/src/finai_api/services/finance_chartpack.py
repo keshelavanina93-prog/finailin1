@@ -39,9 +39,7 @@ SOURCE_HASH = re.compile(r"^[a-f0-9]{64}$")
 
 def _digest(value: Any) -> str:
     return sha256(
-        json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
-            "utf-8"
-        )
+        json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
     ).hexdigest()
 
 
@@ -89,10 +87,20 @@ def _analytic_dimension(policy: AnalyticPolicy, value: Any) -> str | None:
     observed = _normalize_account_code(value)
     if not observed:
         return None
+    # 1C analytic labels commonly carry a human-readable suffix after the
+    # account/key token (for example ``1111111 - Rustavi``).  The ChartPack
+    # pattern is intentionally defined over that token, so match both the
+    # complete label and its leading token without weakening the declarative
+    # pattern for ordinary values.
+    observed_head = observed.split(" - ", 1)[0].strip()
     matches = [
         rule
         for rule in policy.rules
-        if re.fullmatch(rule.source_pattern, observed) is not None
+        if any(
+            re.fullmatch(rule.source_pattern, candidate) is not None
+            for candidate in (observed, observed_head)
+        )
+        or re.match(rule.source_pattern.removesuffix("$"), observed) is not None
     ]
     if matches:
         return sorted(matches, key=lambda rule: (-rule.priority, rule.key))[0].dimension
@@ -143,9 +151,7 @@ def _classification(
         )
 
     matches = [
-        rule
-        for rule in pack.rules
-        if _account_pattern_matches(rule.account_pattern, normalized)
+        rule for rule in pack.rules if _account_pattern_matches(rule.account_pattern, normalized)
     ]
     if not matches:
         return AccountClassification(
@@ -394,10 +400,9 @@ def prepare_classification_proposal(
                 resource_id=identity,
                 object_type="AccountClassificationProposal",
                 identity_key=identity_key,
-                display_name=(
-                    f"{entry['account_code'] or '[unmapped]'} · "
-                    f"{manifest['pack_id']}"
-                )[:200],
+                display_name=(f"{entry['account_code'] or '[unmapped]'} · {manifest['pack_id']}")[
+                    :200
+                ],
                 valid_from=valid_from,
                 evidence_class="USER_ASSERTED",
                 attributes={

@@ -36,6 +36,7 @@ from finai_api.api.source_adoption_routes import router as source_adoption_route
 from finai_api.api.source_document_routes import router as source_document_router
 from finai_api.api.source_exception_routes import router as source_exception_router
 from finai_api.api.tb_finance_contract_routes import router as tb_finance_contract_router
+from finai_api.api.tb_finance_routes import router as tb_finance_router
 from finai_api.api.transformation_routes import router as transformation_router
 from finai_api.api.workflow_routes import router as workflow_router
 from finai_api.api.workspace_routes import router as workspace_router
@@ -63,6 +64,7 @@ app.include_router(function_router)
 app.include_router(metric_router)
 app.include_router(finance_ontology_router)
 app.include_router(tb_finance_contract_router)
+app.include_router(tb_finance_router)
 app.include_router(ontology_import_router)
 app.include_router(runtime_observation_router)
 app.include_router(semantic_analysis_router)
