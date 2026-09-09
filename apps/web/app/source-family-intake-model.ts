@@ -142,7 +142,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
       "proxy-only",
     ),
     currentImplementationStatus: "partially-implemented",
-    blockedOrMissingContracts: ["Movement-register grain and physical candidate intake are wired; movement-to-journal-line reconciliation and authentic connector readback remain open."],
+    blockedOrMissingContracts: ["Movement-register grain, movement-to-journal-line reconciliation, and governed proposal submission are wired; independent promotion and authentic connector readback remain open."],
   },
   {
     id: "seg_procurement_expense",
@@ -234,7 +234,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     presentEvidence: ["source_file_hash", "schema_hash", "station_master", "fuel_grade_mapping", "lineage_receipt"],
     routes: intakeRoutes(["/api/hydration", "/api/operations/petroleum/intake/{receipt_id}/validation"], ["/v1/hydration/ingest", "/v1/operations/petroleum/intake/{receipt_id}/validation"], "wired"),
     currentImplementationStatus: "partially-implemented",
-    blockedOrMissingContracts: ["ORPAK sale-line and semantic binding validation are wired; canonical RetailSale promotion and authentic connector readback remain governed review work."],
+    blockedOrMissingContracts: ["ORPAK sale-line, semantic binding, and governed proposal submission are wired; independent promotion and authentic connector readback remain open."],
   },
   {
     id: "gas_telemetry",
@@ -269,7 +269,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     presentEvidence: ["source_file_hash", "schema_hash", "pos_shift_close", "cash_register_z_report"],
     routes: intakeRoutes(["/api/hydration", "/api/operations/petroleum/intake/{receipt_id}/validation"], ["/v1/hydration/ingest", "/v1/operations/petroleum/intake/{receipt_id}/validation"], "wired"),
     currentImplementationStatus: "partially-implemented",
-    blockedOrMissingContracts: ["Canonical RetailSale promotion and authentic register connector readback remain governed review work."],
+    blockedOrMissingContracts: ["Governed RetailSale proposal submission is wired; independent promotion and authentic register connector readback remain open."],
   },
   {
     id: "regulatory_external_evidence",

@@ -153,6 +153,7 @@ def promotion_preview(principal: Principal, receipt_id: str) -> dict[str, Any]:
                     "resource_id": str(match.resource_id),
                     "version_id": str(match.version_id),
                 }
+        canonical_values: dict[str, Any]
         if source_system == "ORPAK":
             object_type = "RetailSale"
             canonical_values = {
@@ -211,6 +212,16 @@ def promotion_preview(principal: Principal, receipt_id: str) -> dict[str, Any]:
                 "temperature_basis": values["temperature_basis"],
                 "quality_status": values["quality_status"],
             }
+        canonical_values = {
+            "legal_entity_id": str(receipt.scope.legal_entity_id),
+            **canonical_values,
+            "source_details": {
+                "receipt_id": receipt.receipt_id,
+                "source_record_id": values["source_record_id"],
+                "source_hash": receipt.source_sha256,
+                "source_row": candidate.source_row,
+            },
+        }
         candidates.append(
             {
                 "object_type": object_type,
@@ -263,13 +274,7 @@ def submit_governed_proposal(principal: Principal, receipt_id: str) -> ProposalD
                 object_type=candidate["object_type"],
                 identity_key=candidate["identity_key"],
                 display_name=f"{candidate['object_type']} · {source_record_id}",
-                attributes={
-                    **values,
-                    "source_record_id": source_record_id,
-                    "source_hash": candidate["evidence"]["source_hash"],
-                    "source_receipt_id": receipt.receipt_id,
-                    "source_row": candidate["source_row"],
-                },
+                attributes=values,
                 valid_from=effective,
                 evidence_class="SOURCE_BOUND",
             )

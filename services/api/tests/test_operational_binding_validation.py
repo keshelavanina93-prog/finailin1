@@ -186,4 +186,4 @@ def test_submit_governed_proposal_persists_review_packet_without_promotion(monke
     assert result is proposal
     assert proposal.mutations[0].object_type == "RetailSale"
     assert proposal.mutations[0].evidence_class == "SOURCE_BOUND"
-    assert proposal.mutations[0].attributes["source_record_id"] == "ROW-1"
+    assert proposal.mutations[0].attributes["source_details"]["source_record_id"] == "ROW-1"
