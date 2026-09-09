@@ -323,3 +323,4 @@ export function createOntologyClient(options: OntologyClientOptions) {
 }
 
 export * from './external-ontology.js';
+export * from './finance.js';

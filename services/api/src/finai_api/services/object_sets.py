@@ -14,6 +14,7 @@ from finai_api.domain.object_sets import (
     ObjectSetResult,
     TraversalSchemaVersion,
 )
+from finai_api.domain.resource_metadata import metadata_spec
 from finai_api.domain.review import Principal
 from finai_api.services.object_filter_contract import (
     RANGE_OPERATORS,
@@ -40,6 +41,25 @@ def _schema_compat_sql(alias, schema_cte, field, args):
 def _filter_sql(filters, alias, schema_cte, args, exact_schema=False):
     predicate = ""
     for condition in filters:
+        metadata = metadata_spec(condition.field)
+        if metadata is not None:
+            column = condition.field.removeprefix("meta:")
+            value_sql = f"{alias}.{column}"
+            if condition.operator in {"eq", "in", "not_in"}:
+                if condition.operator == "eq":
+                    predicate += f" AND {value_sql}::text=%s"
+                    args.append(str(condition.value))
+                else:
+                    comparison = "= ANY" if condition.operator == "in" else "<> ALL"
+                    predicate += f" AND {value_sql}::text {comparison}(%s::text[])"
+                    args.append([str(value) for value in condition.value])
+            elif metadata["kind"] == "datetime":
+                operator = {"lt": "<", "lte": "<=", "gt": ">", "gte": ">="}[condition.operator]
+                predicate += f" AND {value_sql} {operator} %s::timestamptz"
+                args.append(condition.value)
+            else:
+                raise WorkspaceError(422, "Metadata range filters require a time field")
+            continue
         if exact_schema or condition.operator in {"in", "not_in"}:
             predicate += " AND " + _schema_compat_sql(alias, schema_cte, condition.field, args)
         if condition.operator == "eq":

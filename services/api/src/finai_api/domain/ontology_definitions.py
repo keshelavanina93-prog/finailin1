@@ -5,6 +5,9 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from finai_api.domain.finance_classification import FinanceClassificationPolicy
+from finai_api.domain.finance_execution import FinanceProjectionDefinition
+from finai_api.domain.finance_ontology import FinanceCapabilityDefinition
 from finai_api.domain.object_sets import ObjectSetQuery
 from finai_api.domain.regulation import RegulatoryDefinition
 
@@ -75,24 +78,42 @@ class InterfaceField(Definition):
         "datetime",
         "money",
         "quantity",
+        "definition",
     ]
     required: bool = True
     semantic_id: UUID | None = None
     target_type: TypeName | None = None
+    constraints: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def reference_target(self) -> "InterfaceField":
+        from finai_api.domain.field_constraints import validate_constraints
+
+        validate_constraints(self.constraints)
         if self.target_type is not None and self.kind != "reference":
             raise ValueError("Only reference properties can declare an endpoint type")
         return self
 
 
 class InterfaceDefinition(Definition):
-    fields: dict[Name, InterfaceField] = Field(min_length=1, max_length=100)
+    fields: dict[Name, InterfaceField] = Field(max_length=100)
 
 
 class ImplementationDefinition(Definition):
-    fields: dict[Name, Name] = Field(min_length=1, max_length=100)
+    fields: dict[Name, str] = Field(max_length=100)
+
+    @model_validator(mode="after")
+    def mapped_fields(self) -> "ImplementationDefinition":
+        import re
+
+        from finai_api.domain.resource_metadata import metadata_spec
+
+        for value in self.fields.values():
+            if metadata_spec(value) is None and not re.fullmatch(
+                r"[a-zA-Z][a-zA-Z0-9_]{0,127}", value
+            ):
+                raise ValueError("Interface mapping must name a stored field or supported metadata")
+        return self
 
 
 class TypeGroupDefinition(Definition):
@@ -222,6 +243,9 @@ DEFINITION_MODELS: dict[str, type[BaseModel]] = {
     "FactContract": FactContract,
     "FactReconciliation": FactReconciliation,
     "RegulatoryRule": RegulatoryDefinition,
+    "FinanceCapabilityDefinition": FinanceCapabilityDefinition,
+    "FinanceProjectionDefinition": FinanceProjectionDefinition,
+    "FinanceClassificationPolicy": FinanceClassificationPolicy,
 }
 
 
@@ -230,6 +254,9 @@ class DefinitionWrite(Definition):
     expected_version_id: UUID | None = None
     kind: Literal[
         "ObjectSetDefinition",
+        "FinanceCapabilityDefinition",
+        "FinanceProjectionDefinition",
+        "FinanceClassificationPolicy",
         "ObjectInterface",
         "ObjectTypeImplementation",
         "ObjectTypeGroup",

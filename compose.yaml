@@ -18,7 +18,9 @@ services:
       retries: 10
 
   api:
-    build: ./services/api
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
     environment:
       FINAI_ENVIRONMENT: local
       FINAI_DATABASE_URL: ${FINAI_DATABASE_URL:?Set a restricted PostgreSQL runtime DSN}

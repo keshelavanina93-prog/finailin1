@@ -89,6 +89,9 @@ TYPE_FIELDS: dict[str, dict[str, str]] = {
     },
     "SourceAccountDefinition": {
         "account_code": "AccountCode", "source_record_id": "@SourceRecord",
+        # The reviewed source row carries the selected chart pin. This is a
+        # binding input, not authority for the chart itself.
+        "chart_id?": "@LocalChartOfAccounts",
         "source_name": "Text", "definition": "OntologyDefinition",
     },
     "FactContract": {"schema_id": "@SchemaDefinition", "definition": "OntologyDefinition"},
