@@ -97,3 +97,118 @@ def validate(principal: Principal, receipt_id: str) -> dict[str, Any]:
         "accounting_authorized": False,
         "business_effect_authorized": False,
     }
+
+
+def promotion_preview(principal: Principal, receipt_id: str) -> dict[str, Any]:
+    """Compile eligible retained rows into a proposal-only canonical payload preview."""
+    report = validate(principal, receipt_id)
+    receipt = retrieve(principal.scope, receipt_id)
+    assert receipt is not None
+    profile = str(report["profile"])
+    source_system = (
+        "ORPAK"
+        if profile.startswith("orpak-")
+        else "GAS_TELEMETRY"
+        if profile.startswith("gas-telemetry-")
+        else "SCADA"
+        if profile.startswith("scada-")
+        else "RETAIL_CASH_REGISTER"
+        if profile.startswith("retail-cash-register-")
+        else ""
+    )
+    lookup = LOOKUPS[source_system]
+    accepted: dict[str, list[Any]] = {
+        object_type: resources.list_resources(principal, object_type, "", 0, limit=1000)
+        for object_type in set(lookup.values())
+    }
+    rows_by_source = {int(row["source_row"]): row for row in report["rows"]}
+    candidates: list[dict[str, Any]] = []
+    for candidate in receipt.candidates:
+        if candidate.object_type != "SourceRecord":
+            continue
+        row_report = rows_by_source.get(candidate.source_row)
+        if not row_report or not row_report["promotion_eligible"]:
+            continue
+        values = candidate.values
+        refs: dict[str, dict[str, str]] = {}
+        for field, object_type in lookup.items():
+            match = next(
+                (item for item in accepted[object_type] if _matches(item, str(values[field]))),
+                None,
+            )
+            if match is not None:
+                refs[field] = {
+                    "resource_id": str(match.resource_id),
+                    "version_id": str(match.version_id),
+                }
+        if source_system == "ORPAK":
+            object_type = "RetailSale"
+            canonical_values = {
+                "transaction_id": values["transaction_id"],
+                "station_id": refs["station_id"]["resource_id"],
+                "product_id": refs["product_code"]["resource_id"],
+                "dispenser_id": refs["dispenser_id"]["resource_id"],
+                "nozzle_id": refs["nozzle_id"]["resource_id"],
+                "event_time": values["event_time"],
+                "quantity": values["quantity"],
+                "unit": values["unit"],
+                "unit_price": values["unit_price"],
+                "gross_amount": values["gross_amount"],
+                "payment_method": values["payment_method"],
+                "currency": values["currency"],
+            }
+        elif source_system == "RETAIL_CASH_REGISTER":
+            object_type = "CashRegisterShiftClose"
+            canonical_values = {
+                "store_id": refs["store_id"]["resource_id"],
+                "cash_register_id": refs["cash_register_id"]["resource_id"],
+                "shift_id": values["shift_id"],
+                "operator_id": values["operator_id"],
+                "event_time": values["event_time"],
+                "z_report_id": values["z_report_id"],
+                "fiscal_close_status": values["fiscal_close_status"],
+                "currency": values["currency"],
+                "gross_amount": values["gross_amount"],
+                "net_amount": values["net_amount"],
+                "payment_method": values["payment_method"],
+            }
+        else:
+            object_type = "PhysicalMeasurement"
+            canonical_values = {
+                "meter_id": refs["meter_id"]["resource_id"],
+                "asset_id": refs["asset_id"]["resource_id"],
+                "location_id": refs["location_id"]["resource_id"],
+                "measurement_type": values["measurement_type"],
+                "measurement_timestamp": values["measurement_timestamp"],
+                "value": values["value"],
+                "unit": values["unit"],
+                "pressure_basis": values["pressure_basis"],
+                "temperature_basis": values["temperature_basis"],
+                "quality_status": values["quality_status"],
+            }
+        candidates.append(
+            {
+                "object_type": object_type,
+                "identity_key": f"{object_type}:{values['source_record_id']}",
+                "source_row": candidate.source_row,
+                "values": canonical_values,
+                "bindings": refs,
+                "evidence": {
+                    "receipt_id": receipt.receipt_id,
+                    "source_record_id": values["source_record_id"],
+                    "source_hash": receipt.source_sha256,
+                    "valid_at": str(receipt.scope.period),
+                },
+            }
+        )
+    return {
+        "contract": "operational-promotion-preview/1",
+        "receipt_id": receipt.receipt_id,
+        "profile": profile,
+        "status": "READY_FOR_GOVERNED_PROPOSAL" if candidates else "NO_ELIGIBLE_ROWS",
+        "proposal_required": True,
+        "canonical_mutation": False,
+        "accounting_authorized": False,
+        "business_effect_authorized": False,
+        "candidates": candidates,
+    }

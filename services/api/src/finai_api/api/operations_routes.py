@@ -66,6 +66,11 @@ def petroleum_intake_validation(principal: User, receipt_id: str) -> dict[str, A
     return operational_binding_validation.validate(principal, receipt_id)
 
 
+@router.get("/petroleum/intake/{receipt_id}/promotion-preview")
+def petroleum_intake_promotion_preview(principal: User, receipt_id: str) -> dict[str, Any]:
+    return operational_binding_validation.promotion_preview(principal, receipt_id)
+
+
 @router.post("/import-proposal", response_model=ProposalDetail)
 def import_proposal(principal: User, request: SpatialImportRequest) -> ProposalDetail:
     require_permission(principal, "ontology_propose")

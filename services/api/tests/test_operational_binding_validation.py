@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from finai_api.domain.authority import ExactScope
 from finai_api.domain.review import Principal
@@ -24,12 +24,18 @@ def receipt(
 ) -> SimpleNamespace:
     candidate = SimpleNamespace(object_type="SourceRecord", source_row=2, values=values)
     return SimpleNamespace(
-        receipt_id="receipt-1", source_profile={"profile": profile}, candidates=(candidate,)
+        receipt_id="receipt-1",
+        source_sha256="b" * 64,
+        scope=SCOPE,
+        source_profile={"profile": profile},
+        candidates=(candidate,),
     )
 
 
 def resource(object_type: str, value: str) -> SimpleNamespace:
-    return SimpleNamespace(object_type=object_type, attributes={"code": value})
+    return SimpleNamespace(
+        object_type=object_type, resource_id=uuid4(), version_id=uuid4(), attributes={"code": value}
+    )
 
 
 def valid_orpak_values() -> dict[str, str]:
@@ -123,3 +129,27 @@ def test_binding_validation_resolves_retail_store_and_cash_register(monkeypatch)
 
     assert result["status"] == "VALIDATED"
     assert result["promotion_eligible"] is True
+
+
+def test_promotion_preview_is_proposal_only_and_preserves_evidence(monkeypatch):
+    values = valid_orpak_values()
+    monkeypatch.setattr(
+        operational_binding_validation, "retrieve", lambda scope, receipt_id: receipt(values)
+    )
+    monkeypatch.setattr(
+        operational_binding_validation.resources,
+        "list_resources",
+        lambda principal, object_type, query, offset, limit: [
+            resource(object_type, values[field])
+            for field, mapped_type in operational_binding_validation.LOOKUPS["ORPAK"].items()
+            if mapped_type == object_type
+        ],
+    )
+
+    result = operational_binding_validation.promotion_preview(PRINCIPAL, "receipt-1")
+
+    assert result["status"] == "READY_FOR_GOVERNED_PROPOSAL"
+    assert result["proposal_required"] is True
+    assert result["canonical_mutation"] is False
+    assert result["candidates"][0]["object_type"] == "RetailSale"
+    assert result["candidates"][0]["evidence"]["source_record_id"] == "ROW-1"
