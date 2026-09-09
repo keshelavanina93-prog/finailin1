@@ -22,7 +22,10 @@ from finai_api.services import finance_ontology, resources
 from finai_api.services.schema_compatibility import schema_compatibility
 from finai_api.services.workspace import WorkspaceError
 
-BATCH_LIMIT = 75
+# The review validator bounds downstream dependency impact as well as mutation
+# count.  A fixed page can still exceed that bound when a schema phase has many
+# dependants, so installation also bisects a page on that specific refusal.
+BATCH_LIMIT = 25
 LEGACY_PHASE = "LegacyPlatformContracts"
 LEGACY_SCHEMA_KEYS = {
     "Artifact",
@@ -151,15 +154,32 @@ def install(author: Principal, reviewer: Principal) -> dict[str, Any]:
                 )
             )
         # Finish each dependency phase before publishing resources that refer to it.
-        for offset in range(0, len(mutations), BATCH_LIMIT):
-            page = mutations[offset : offset + BATCH_LIMIT]
+        # Keep the proposal immutable and split only before proposal creation when
+        # the validator says this page's dependency impact is too broad.
+        pages = [
+            mutations[offset : offset + BATCH_LIMIT]
+            for offset in range(0, len(mutations), BATCH_LIMIT)
+        ]
+        while pages:
+            page = pages.pop(0)
             proposal = ResourceProposal(
                 title="Install executable ontology definitions: " + phase,
                 rationale="Publish typed platform definitions while preserving accepted versions and company facts",
                 access_entity="__PLATFORM__",
                 mutations=page,
             )
-            resources.propose(author, proposal)
+            try:
+                resources.propose(author, proposal)
+            except WorkspaceError as exc:
+                if (
+                    exc.status == 409
+                    and "Dependency impact exceeds the resource bound" in exc.detail
+                    and len(page) > 1
+                ):
+                    midpoint = len(page) // 2
+                    pages[0:0] = [page[:midpoint], page[midpoint:]]
+                    continue
+                raise
             resources.review(
                 reviewer,
                 proposal.proposal_id,

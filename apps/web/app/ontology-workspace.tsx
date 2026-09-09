@@ -10,9 +10,10 @@ import ProposalImpact, { SchemaChangeDetails } from "./proposal-impact";
 const metadata = new Set(["SchemaDefinition", "SemanticContract", "LinkType"]);
 const label = (value: string) => value.replaceAll("_", " ").replace(/([a-z])([A-Z])/g, "$1 $2");
 const message = (error: unknown) => error instanceof Error ? error.message : "Request failed";
+const sourceKeys = new Set(["source_row", "source_row_key", "source_sheet", "source_coordinate", "source_document_id", "source_record_id", "source_sha256"]);
 type Draft = { type: string; current?: CanonicalResource; attributes: Record<string, unknown>; name: string };
 
-export default function OntologyWorkspace({ token, principal, initialProposalId }: { token: string; principal: Principal; initialProposalId?: string }) {
+export default function OntologyWorkspace({ token, principal, initialProposalId, onOpenObjectWorkspace }: { token: string; principal: Principal; initialProposalId?: string; onOpenObjectWorkspace?: () => void }) {
   const [catalog, setCatalog] = useState<CanonicalResource[]>([]);
   const [nodes, setNodes] = useState<CanonicalResource[]>([]);
   const [queue, setQueue] = useState<ProposalSummary[]>([]);
@@ -20,9 +21,11 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
   const [detail, setDetail] = useState<CanonicalDetail | null>(null);
   const [proposal, setProposal] = useState<ResourceProposalDetail | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
+  const [pinnedVersionId, setPinnedVersionId] = useState<string | null>(null);
   const [kind, setKind] = useState("");
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
+  const [queueError, setQueueError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(true);
   const [effectiveFrom] = useState(() => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
@@ -42,9 +45,25 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
   useEffect(() => {
     let cancelled = false;
     const selectionRef = selection;
-    Promise.all([api<CanonicalResource[]>("catalog"), api<{ resources: CanonicalResource[]; bounded: boolean }>("graph"), api<ProposalSummary[]>("proposals")])
-      .then(([definitions, graph, proposals]) => { if (!cancelled) { setCatalog(definitions); setNodes(graph.resources); setBounded(graph.bounded); setQueue(proposals); } })
-      .catch(error => { if (!cancelled) setError(message(error)); }).finally(() => { if (!cancelled) setBusy(false); });
+    Promise.allSettled([
+      api<CanonicalResource[]>("catalog"),
+      api<{ resources: CanonicalResource[]; bounded: boolean }>("graph"),
+      api<{ proposals: ProposalSummary[] }>("proposal-queue?limit=25"),
+    ]).then(results => {
+      if (cancelled) return;
+      const [catalogResult, graphResult, queueResult] = results;
+      if (catalogResult.status === "fulfilled") setCatalog(catalogResult.value);
+      else setError(message(catalogResult.reason));
+      if (graphResult.status === "fulfilled") {
+        setNodes(graphResult.value.resources);
+        setBounded(graphResult.value.bounded);
+      } else setError(message(graphResult.reason));
+      if (queueResult.status === "fulfilled") {
+        setQueue(queueResult.value.proposals);
+        setQueueError("");
+      }
+      else setQueueError(message(queueResult.reason));
+    }).finally(() => { if (!cancelled) setBusy(false); });
     return () => { cancelled = true; selectionRef.current++; };
   }, [api, revision]);
   useEffect(() => {
@@ -65,12 +84,12 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
 
   async function inspect(id: string) {
     const request = ++selection.current; setError("");
-    try { const result = await api<CanonicalDetail>(`resources/${id}`); if (selection.current === request) { setDetail(result); setDraft(null); setProposal(null); } }
+    try { const result = await api<CanonicalDetail>(`resources/${id}`); if (selection.current === request) { setDetail(result); setPinnedVersionId(null); setDraft(null); setProposal(null); } }
     catch (error) { if (selection.current === request) setError(message(error)); }
   }
   async function openProposal(id: string) {
     const request = ++selection.current; setError("");
-    try { const result = await api<ResourceProposalDetail>(`proposals/${id}`); if (selection.current === request) { setProposal(result); setDetail(null); setDraft(null); } }
+    try { const result = await api<ResourceProposalDetail>(`proposals/${id}`); if (selection.current === request) { setProposal(result); setDetail(null); setPinnedVersionId(null); setDraft(null); } }
     catch (error) { if (selection.current === request) setError(message(error)); }
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -118,15 +137,21 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
   function edit(resource: CanonicalResource, attributes = resource.attributes) {
     setDraft({ type: resource.object_type, current: resource, name: resource.display_name, attributes }); setDetail(null); setProposal(null);
   }
+  const inspectedVersion = detail ? (pinnedVersionId ? detail.versions.find(version => version.version_id === pinnedVersionId) ?? detail.resource : detail.resource) : null;
+  const sourceEntries = inspectedVersion ? Object.entries(inspectedVersion.attributes).filter(([key, value]) => sourceKeys.has(key) && value !== null && value !== undefined && value !== "") : [];
+  const sourceRowValues = inspectedVersion?.attributes.source_row_values;
+  const sourceRowObject = sourceRowValues && typeof sourceRowValues === "object" ? sourceRowValues : null;
   function renderValue(value: unknown): string {
     if (typeof value === "string") return names.get(value) ?? value;
     return JSON.stringify(value);
   }
 
   return <section className="ontology-workspace">
-    <div className="section-heading"><div><p className="overline">SHARED ENTERPRISE RESOURCES</p><h1>Enterprise & ontology</h1><p className="muted">Explore typed relationships, govern identity and review changes to shared business meaning.</p></div><button className="quiet" disabled={busy} onClick={() => setRevision(value => value + 1)}>Refresh</button></div>
-    <div className="ontology-tabs">{(["graph", "object_sets", "resources", "review", "registry"] as const).map(id => <button className={tab === id ? "active" : "quiet"} key={id} onClick={() => { setTab(id); setKind(""); }}>{id === "graph" ? "Enterprise graph" : id === "review" ? `Change review (${queue.filter(row => row.decision === "PENDING").length})` : label(id)}</button>)}</div>
+    <div className="section-heading"><div><p className="overline">SHARED ENTERPRISE RESOURCES</p><h1>Enterprise & ontology</h1><p className="muted">Explore typed relationships, govern identity and review changes to shared business meaning.</p></div><div className="heading-actions">{onOpenObjectWorkspace && <button className="quiet" onClick={onOpenObjectWorkspace}>Open object workspace</button>}<button className="quiet" disabled={busy} onClick={() => setRevision(value => value + 1)}>Refresh</button></div></div>
+    <div className="ontology-runtime-strip"><div><p className="overline">LIVE OBJECT CONTRACTS</p><p className="muted">Accepted objects resolve by type and version. The object workspace exposes type filters, current or pinned construction versions, source rows and receipt-backed approve/reject review.</p></div>{onOpenObjectWorkspace && <button className="quiet" onClick={onOpenObjectWorkspace}>Inspect accepted objects</button>}</div>
+    <div className="ontology-tabs">{(["graph", "object_sets", "resources", "review", "registry"] as const).map(id => <button className={tab === id ? "active" : "quiet"} key={id} onClick={() => { setTab(id); setKind(""); }}>{id === "graph" ? "Enterprise graph" : id === "review" ? `Change review${queueError ? " (unavailable)" : ` (${queue.filter(row => row.decision === "PENDING").length})`}` : label(id)}</button>)}</div>
     {error && <p className="error-banner" role="alert">{error}</p>}{notice && <p className="success-banner" role="status">{notice}</p>}
+    {queueError && <p className="error-banner" role="status">Review queue is temporarily unavailable: {queueError}. Catalog, graph, typed sets and resource inspection remain available; use Refresh to retry the queue.</p>}
     {bounded && <p className="error-banner">This graph is limited to 1,000 visible resources. It is not a complete enterprise inventory.</p>}
     <div className="ontology-layout"><div>
       {tab === "object_sets" && <ObjectSets token={token} catalog={catalog} />}
@@ -139,14 +164,15 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
       </section>}
       {(tab === "resources" || tab === "registry") && <section className="data-panel"><div className="toolbar"><input aria-label="Find resource" placeholder="Find a resource" value={search} onChange={event => setSearch(event.target.value)} /><select aria-label="Resource type" value={kind} onChange={event => setKind(event.target.value)}><option value="">All types</option>{(tab === "registry" ? [...metadata] : schemas.map(schema => schema.identity_key)).map(type => <option key={type}>{type}</option>)}</select></div>
         <div className="data-scroll"><table><thead><tr><th>Resource</th><th>Type</th><th>Evidence</th></tr></thead><tbody>{visible.map(node => <tr key={node.resource_id}><td><button className="text-link" onClick={() => void inspect(node.resource_id)}>{node.display_name}</button></td><td>{label(node.object_type)}</td><td>{label(node.evidence_class)}</td></tr>)}</tbody></table>{!visible.length && <p className="empty-state">No resources match this view.</p>}</div></section>}
-      {tab === "review" && <section className="data-panel"><div className="toolbar"><h2>Immutable change proposals</h2></div><div className="data-scroll"><table><thead><tr><th>Proposal</th><th>Author</th><th>Decision</th></tr></thead><tbody>{queue.map(row => <tr key={row.proposal_id}><td><button className="text-link" onClick={() => void openProposal(row.proposal_id)}>{row.title}</button></td><td>{row.submitted_by}</td><td><span className={`status ${row.decision.toLowerCase()}`}>{row.decision}</span></td></tr>)}</tbody></table>{!queue.length && <p className="empty-state">No change proposals yet.</p>}</div></section>}
+      {tab === "review" && <section className="data-panel"><div className="toolbar"><h2>Immutable change proposals</h2></div>{queueError ? <div className="empty-state"><h3>Review queue unavailable</h3><p>The registry remains readable while the bounded queue is retried. No proposal is approved or rejected by this screen until a retained review request is loaded.</p></div> : <div className="data-scroll"><table><thead><tr><th>Proposal</th><th>Author</th><th>Decision</th></tr></thead><tbody>{queue.map(row => <tr key={row.proposal_id}><td><button className="text-link" onClick={() => void openProposal(row.proposal_id)}>{row.title}</button></td><td>{row.submitted_by}</td><td><span className={`status ${row.decision.toLowerCase()}`}>{row.decision}</span></td></tr>)}</tbody></table>{!queue.length && <p className="empty-state">No change proposals yet.</p>}</div>}</section>}
       {canPropose && <div className="upload-strip"><div><h3>Create a governed resource</h3><p>Typed fields and references are validated before review.</p></div><select aria-label="New resource type" defaultValue="" onChange={event => { if (event.target.value) { setDraft({ type: event.target.value, attributes: {}, name: "" }); setDetail(null); setProposal(null); event.target.value = ""; } }}><option value="">Choose a type…</option>{schemas.map(schema => <option key={schema.resource_id} value={schema.identity_key}>{label(schema.identity_key)}</option>)}</select></div>}
     </div>
-    {(detail || proposal || draft) && <aside className="ontology-inspector data-panel"><button className="quiet close-inspector" onClick={() => { selection.current++; setDetail(null); setProposal(null); setDraft(null); }}>Close</button>
-      {detail && <><p className="overline">{label(detail.resource.object_type)}</p><h2>{detail.resource.display_name}</h2><span className="status observed">{label(detail.resource.evidence_class)}</span><dl className="resource-fields">{Object.entries(detail.resource.attributes).map(([key, value]) => <div key={key}><dt>{label(key)}</dt><dd>{typeof value === "string" && names.has(value) ? <button className="text-link" onClick={() => void inspect(value)}>{names.get(value)}</button> : renderValue(value)}</dd></div>)}</dl>
+    {(detail || proposal || draft) && <aside className="ontology-inspector data-panel"><button className="quiet close-inspector" onClick={() => { selection.current++; setDetail(null); setProposal(null); setPinnedVersionId(null); setDraft(null); }}>Close</button>
+      {detail && inspectedVersion && <><p className="overline">{label(inspectedVersion.object_type)}</p><h2>{inspectedVersion.display_name}</h2><div className="version-compare" aria-label="Current and pinned ontology versions"><div><span>Current accepted version</span><code>{detail.resource.version_id}</code></div><div><span>Pinned inspection version</span><code>{inspectedVersion.version_id}</code></div>{pinnedVersionId && pinnedVersionId !== detail.resource.version_id && <button type="button" className="quiet" onClick={() => setPinnedVersionId(null)}>Return to current</button>}</div><span className="status observed">{label(inspectedVersion.evidence_class)}</span><dl className="resource-fields">{Object.entries(inspectedVersion.attributes).map(([key, value]) => <div key={key}><dt>{label(key)}</dt><dd>{typeof value === "string" && names.has(value) ? <button className="text-link" onClick={() => void inspect(value)}>{names.get(value)}</button> : renderValue(value)}</dd></div>)}</dl>
+        <section className="source-row-panel" aria-label="Source row evidence"><h3>Source row evidence</h3>{sourceEntries.length ? <dl className="resource-fields">{sourceEntries.map(([key, value]) => <div key={key}><dt>{label(key)}</dt><dd>{renderValue(value)}</dd></div>)}</dl> : <p className="muted">No source-row receipt is attached to this exact version.</p>}{sourceRowObject && <details><summary>Retained source-row values</summary><pre>{String(JSON.stringify(sourceRowObject, null, 2))}</pre></details>}</section>
         <IdentityHistory key={detail.resource.resource_id} resourceId={detail.resource.resource_id} token={token} />
         {canPropose && (!metadata.has(detail.resource.object_type) || admin) && <button onClick={() => edit(detail.resource)}>Propose a new version</button>}
-        <h3>Version history</h3>{detail.versions.map(version => <details key={version.version_id}><summary>{new Date(version.system_from).toLocaleString()} · {version.authority_state}</summary><p>Effective {new Date(version.valid_from).toLocaleString()}</p><pre>{JSON.stringify(version.attributes, null, 2)}</pre>{canPropose && (!metadata.has(detail.resource.object_type) || admin) && <button className="quiet" onClick={() => edit(detail.resource, version.attributes)}>Propose restoring these values</button>}</details>)}
+        <h3>Version history</h3>{detail.versions.map(version => <details key={version.version_id}><summary>{new Date(version.system_from).toLocaleString()} · {version.version_id === detail.resource.version_id ? "CURRENT · " : ""}{version.authority_state}</summary><p>Effective {new Date(version.valid_from).toLocaleString()}</p><p><button type="button" className="text-link" onClick={() => setPinnedVersionId(version.version_id)}>{version.version_id === inspectedVersion.version_id ? "Pinned for inspection" : "Inspect this exact version"}</button></p><pre>{JSON.stringify(version.attributes, null, 2)}</pre>{canPropose && (!metadata.has(detail.resource.object_type) || admin) && <button className="quiet" onClick={() => edit(detail.resource, version.attributes)}>Propose restoring these values</button>}</details>)}
         <h3>Dependent versions</h3>{detail.dependents.length ? detail.dependents.map((row, i) => <p key={`${row.version_id}:${row.relation}:${i}`}><button className="text-link" onClick={() => void inspect(row.resource_id)}>{row.display_name}</button><small> · {row.relation}</small></p>) : <p className="muted">No recorded dependent versions.</p>}
         <details><summary>Identity & provenance</summary><p>Identity {detail.resource.resource_id}</p><p>Version {detail.resource.version_id}</p><p>Hash {detail.resource.content_hash}</p><p>Access: {detail.resource.access_entity}</p></details></>}
       {draft && <form key={draft.current?.resource_id ?? draft.type} className="resource-form" onSubmit={submit}><p className="overline">{draft.current ? "PROPOSE VERSION" : "NEW RESOURCE"}</p><h2>{label(draft.type)}</h2><label>Display name<input name="display_name" defaultValue={draft.name} required maxLength={200} /></label>
@@ -154,7 +180,7 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
         {fields ? Object.entries(fields).filter(([name]) => !(draft.type === "ContextBinding" && name === "source_scope_key")).map(([name, spec]) => <label key={name}>{label(name)}{spec.required ? " *" : ""}{spec.kind === "reference" ? <select name={name} required={spec.required} defaultValue={String(draft.attributes[name] ?? "")}><option value="">Choose a resource…</option>{[...catalog, ...nodes.filter(node => !metadata.has(node.object_type))].filter(node => !spec.target_type || spec.target_type === "*" || node.object_type === spec.target_type).map(node => <option key={node.resource_id} value={node.resource_id}>{node.display_name} · {label(node.object_type)}</option>)}</select> : spec.kind === "boolean" ? <select name={name} defaultValue={String(draft.attributes[name] ?? false)}><option value="false">No</option><option value="true">Yes</option></select> : <input name={name} required={spec.required} type={spec.kind === "date" ? "date" : spec.kind === "integer" ? "number" : "text"} defaultValue={draft.attributes[name] === undefined ? "" : typeof draft.attributes[name] === "object" ? JSON.stringify(draft.attributes[name]) : String(draft.attributes[name])} placeholder={spec.kind === "datetime" ? "2026-09-05T00:00:00Z" : spec.kind === "money" ? '{"amount":"0.00","currency_id":"…"}' : spec.kind === "quantity" ? '{"amount":"0","unit":"…"}' : label(spec.kind)} />}</label>) : <label>Registry definition<textarea name="attributes" rows={16} defaultValue={JSON.stringify(draft.attributes, null, 2)} required /></label>}
         <label>Effective from<input type="datetime-local" name="valid_from" required defaultValue={effectiveFrom} /></label><label>Reason and evidence<textarea name="rationale" required minLength={10} maxLength={2000} rows={3} /></label><button disabled={busy}>{busy ? "Validating…" : "Validate & submit for review"}</button></form>}
       {proposal && <><p className="overline">CHANGE REVIEW</p><h2>{proposal.proposal.title}</h2><p>{proposal.proposal.rationale}</p><p>Submitted by {proposal.submitted_by}</p><span className="status observed">{proposal.decision ?? "PENDING"}</span><h3>Validated impact</h3>{proposal.validation.impact.map(item => <div className="impact-item" key={item.resource_id}><strong>{item.name}</strong><small>{item.operation} · {item.fields_changed.map(label).join(", ")}</small><SchemaChangeDetails item={item} /></div>)}<PromotionReadiness key={`${proposal.proposal.proposal_id}:${proposal.decision}`} token={token} proposalId={proposal.proposal.proposal_id} /><ProposalImpact key={proposal.proposal.proposal_id} validation={proposal.validation} /><details><summary>Proposed values</summary><pre>{JSON.stringify(proposal.proposal.mutations, null, 2)}</pre></details>
-        {proposal.decision ? <p>Reviewed by {proposal.reviewed_by}: {proposal.review_rationale}</p> : canReview && proposal.submitted_by !== principal.actor_id ? <form className="resource-form" onSubmit={review}><label>Decision<select name="decision" defaultValue={proposal.validation.downstream_impact?.status === "COMPLETE" ? "APPROVED" : "REJECTED"}><option value="APPROVED" disabled={proposal.validation.downstream_impact?.status !== "COMPLETE"}>Approve</option><option value="REJECTED">Reject</option></select></label><label>Review rationale<textarea name="rationale" minLength={10} maxLength={2000} required /></label><button disabled={busy}>Record review</button></form> : <p className="muted">An independent reviewer identity is required.</p>}</>}
+        {proposal.decision ? <p>Reviewed by {proposal.reviewed_by}: {proposal.review_rationale}</p> : canReview && proposal.submitted_by !== principal.actor_id ? <form className="resource-form" onSubmit={review}><label>Review rationale<textarea name="rationale" minLength={10} maxLength={2000} required /></label><div className="review-actions"><button type="submit" name="decision" value="APPROVED" disabled={busy || proposal.validation.downstream_impact?.status !== "COMPLETE"}>Approve</button><button type="submit" name="decision" value="REJECTED" className="quiet" disabled={busy}>Reject</button></div><p className="muted">Approval is enabled only when the retained validation is complete. The server still enforces submitter/reviewer separation and immutable decisions.</p></form> : <p className="muted">An independent reviewer identity is required.</p>}</>}
     </aside>}
     </div>
   </section>;
