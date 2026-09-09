@@ -6,7 +6,9 @@ from finai_api.api.account_dimension_policy_routes import router as account_dime
 from finai_api.api.certification_routes import router as certification_router
 from finai_api.api.company_context_routes import router as company_context_router
 from finai_api.api.company_journal_routes import router as company_journal_router
+from finai_api.api.diagnostic_routes import router as diagnostic_router
 from finai_api.api.event_time_routes import router as event_time_router
+from finai_api.api.finance_ontology_routes import router as finance_ontology_router
 from finai_api.api.function_routes import router as function_router
 from finai_api.api.history_search_routes import router as history_search_router
 from finai_api.api.lifecycle_routes import router as lifecycle_router
@@ -25,6 +27,9 @@ from finai_api.api.routes import router
 from finai_api.api.runtime_observation_routes import router as runtime_observation_router
 from finai_api.api.source_document_routes import router as source_document_router
 from finai_api.api.transformation_routes import router as transformation_router
+from finai_api.api.trial_balance_package_routes import router as trial_balance_package_router
+from finai_api.api.tb_finance_contract_routes import router as tb_finance_contract_router
+from finai_api.api.tb_finance_routes import router as tb_finance_router
 from finai_api.api.workflow_routes import router as workflow_router
 from finai_api.api.workspace_routes import router as workspace_router
 from finai_api.evidence_objects import EvidenceStoreUnavailable
@@ -49,7 +54,9 @@ app.include_router(retention_router)
 app.include_router(function_router)
 app.include_router(runtime_observation_router)
 app.include_router(transformation_router)
+app.include_router(trial_balance_package_router)
 app.include_router(event_time_router)
+app.include_router(finance_ontology_router)
 app.include_router(history_search_router)
 app.include_router(operations_router)
 app.include_router(regulation_router)
@@ -58,6 +65,9 @@ app.include_router(proposal_queue_router)
 app.include_router(source_document_router)
 app.include_router(company_context_router)
 app.include_router(company_journal_router)
+app.include_router(tb_finance_contract_router)
+app.include_router(tb_finance_router)
+app.include_router(diagnostic_router)
 app.include_router(period_control_router)
 app.include_router(ontology_operation_router)
 

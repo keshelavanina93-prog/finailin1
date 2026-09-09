@@ -13,6 +13,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.authority import canonical_sha256
+from finai_api.domain.field_constraints import matches_constraints
 from finai_api.domain.resources import (
     CanonicalResource,
     ProposalDetail,
@@ -241,10 +242,15 @@ def _check_scalar(kind: str, value: Any) -> bool:
 
 
 def _validate(
-    conn: psycopg.Connection[Any], principal: Principal, proposal: ResourceProposal
+    conn: psycopg.Connection[Any],
+    principal: Principal,
+    proposal: ResourceProposal,
+    external_proofs: dict[UUID, str] | None = None,
 ) -> dict[str, Any]:
+    from finai_api.services.external_ontology_validation import validate_boundaries
     from finai_api.services.resource_rollback import validate_restoration
 
+    validate_boundaries(proposal)
     validate_restoration(conn, principal, proposal)
     tenant = principal.scope.tenant_id
     if (
@@ -253,6 +259,8 @@ def _validate(
     ) and "ontology_admin" not in principal.permissions:
         raise WorkspaceError(403, "Tenant-wide ontology administration permission required")
     mutations = {str(item.resource_id): item for item in proposal.mutations}
+    if sum(item.object_type == "SourceSnapshotAdoption" for item in proposal.mutations) > 1:
+        raise WorkspaceError(422, "Review one recurring-source transition per change set")
     mutation_scopes = {
         identifier: item.access_entity or proposal.access_entity
         for identifier, item in mutations.items()
@@ -311,9 +319,17 @@ def _validate(
                 source_item.resource_id in proposal.calculated_bindings
                 and relation.startswith("CALCULATED_BINDING:")
             )
+            exact_external_source = (
+                source_item.object_type == "ExternalOntologyRelease"
+                and relation.startswith("EXTERNAL_ONTOLOGY_SOURCE:")
+            )
             if not (
-                exact_query or exact_property or exact_function_input
-                or exact_binding_property or exact_calculated_binding
+                exact_query
+                or exact_property
+                or exact_function_input
+                or exact_binding_property
+                or exact_calculated_binding
+                or exact_external_source
             ):
                 raise WorkspaceError(422, "Exact ontology dependency is not supported here")
             head = _get(conn, tenant, UUID(identifier))
@@ -359,8 +375,9 @@ def _validate(
                 resolved[identifier] = _get(conn, tenant, UUID(identifier))
             result = resolved[identifier]
             external_heads[identifier] = str(result["version_id"])
-        if (source_item.object_type == "ObjectSetDefinition"
-            and relation.startswith("TRAVERSAL_CANDIDATE:")):
+        if source_item.object_type == "ObjectSetDefinition" and relation.startswith(
+            "TRAVERSAL_CANDIDATE:"
+        ):
             # Discovery reads remain RLS-visible, temporally resolved and head-fenced.
             # Only matching endpoints are subsequently bound as DEFINITION_TYPE;
             # unrelated inspected schemas are not semantic inputs to this query.
@@ -502,7 +519,13 @@ def _validate(
                         raise WorkspaceError(422, f"{item.display_name}: missing {name}")
                     continue
                 value = item.attributes[name]
-                if not _check_scalar(spec["kind"], value):
+                array = (
+                    spec["kind"] == "definition"
+                    and spec.get("constraints", {}).get("type") == "array"
+                )
+                if (
+                    not array and not _check_scalar(spec["kind"], value)
+                ) or not matches_constraints(value, spec.get("constraints", {})):
                     raise WorkspaceError(
                         422, f"{item.display_name}: invalid {name} ({spec['kind']})"
                     )
@@ -517,6 +540,19 @@ def _validate(
             from finai_api.services.ontology_definition_validation import validate_definition
 
             validate_definition(item, schema_by_name, link_by_name, target)
+            if item.object_type in {
+                "ExternalOntologySource",
+                "ExternalOntologyRelease",
+                "ExternalOntologyModule",
+                "OntologyImportRun",
+            }:
+                from finai_api.services.external_ontology_validation import (
+                    validate as validate_external,
+                )
+
+                validate_external(
+                    principal, item, target, previous, access_entity, conn, external_proofs
+                )
             if item.object_type == "FunctionDefinition":
                 from finai_api.services.function_execution import validate_function
 
@@ -566,6 +602,10 @@ def _validate(
                 from finai_api.services.source_accounting_context import validate_context
 
                 validate_context(principal, item, target)
+            if item.object_type in {"SourceFamily", "SourceSnapshotAdoption"}:
+                from finai_api.services.source_adoption import validate as validate_adoption
+
+                validate_adoption(conn, principal, item, target, previous, access_entity)
             if (
                 item.object_type == "Alias"
                 and item.attributes.get("source_system") == "RETAINED_ACCOUNTING_COMPANY"
@@ -589,9 +629,11 @@ def _validate(
 
                     validate_line(conn, principal, item, target, proposal, validation_time)
             if item.object_type == "AccountDimensionPolicy":
-                from finai_api.services.journal_dimensions import validate_policy
+                from finai_api.services.journal_dimensions import (
+                    validate_policy as validate_dimension_policy,
+                )
 
-                validate_policy(conn, principal, item, target, proposal, validation_time)
+                validate_dimension_policy(conn, principal, item, target, proposal, validation_time)
             if item.object_type == "PeriodControl":
                 from finai_api.services.period_control import validate as validate_period_control
 
@@ -796,7 +838,9 @@ def _validate(
             validate_requirement_coverage(
                 requirements,
                 [
-                    VersionReference(resource_id=pin["resource_id"], version_id=pin["version_id"])
+                    VersionReference(
+                        resource_id=UUID(pin["resource_id"]), version_id=UUID(pin["version_id"])
+                    )
                     for pin in dependencies[identifier]
                 ],
                 schema_versions.get(identifier),
@@ -916,6 +960,9 @@ def propose(principal: Principal, proposal: ResourceProposal) -> ProposalDetail:
         "ontology_propose",
     }.issubset(principal.permissions):
         raise WorkspaceError(403, "Tenant proposals require an authorized ontology administrator")
+    from finai_api.services.external_ontology_validation import preflight
+
+    external_proofs = preflight(principal, proposal)
     with resource_connection(principal) as conn:
         conn.execute(
             "SELECT pg_advisory_xact_lock(hashtextextended(%s,0))",
@@ -930,7 +977,7 @@ def propose(principal: Principal, proposal: ResourceProposal) -> ProposalDetail:
             raise WorkspaceError(409, "Proposal ID was reused for different content")
         if row:
             return proposal_detail(principal, proposal.proposal_id)
-        validation = _validate(conn, principal, proposal)
+        validation = _validate(conn, principal, proposal, external_proofs)
         snapshot = validation["downstream_impact"]
         restricted = snapshot["requires_tenant_steward"]
         fingerprint = impact_fingerprint(snapshot)
@@ -1048,10 +1095,11 @@ def _promotion_validation(
     principal: Principal,
     proposal: ResourceProposal,
     retained: dict[str, Any],
+    external_proofs: dict[UUID, str] | None = None,
 ) -> dict[str, Any]:
     """The read check and atomic promotion must use the same eligibility rules."""
     require_evaluation(proposal, retained)
-    validation = _validate(conn, principal, proposal)
+    validation = _validate(conn, principal, proposal, external_proofs)
     if validation["dependency_heads"] != retained["dependency_heads"]:
         raise WorkspaceError(409, "A reviewed dependency changed; submit a refreshed proposal")
 
@@ -1076,6 +1124,22 @@ def _promotion_validation(
 
 def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
     """Read-only advisory check. Review rechecks everything under its own transaction."""
+    from finai_api.services.external_ontology_validation import preflight
+
+    detail = proposal_detail(principal, proposal_id)
+    external_proofs = {}
+    preflight_error = None
+    if (
+        detail.decision is None
+        and "ontology_review" in principal.permissions
+        and detail.submitted_by != principal.actor_id
+    ):
+        try:
+            external_proofs = preflight(principal, detail.proposal)
+        except (WorkspaceError, ValueError, KeyError) as exc:
+            preflight_error = (
+                exc.detail if isinstance(exc, WorkspaceError) else "Invalid import replay"
+            )
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         tenant = principal.scope.tenant_id
         conn.execute(
@@ -1090,6 +1154,8 @@ def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
         if not row:
             raise WorkspaceError(404, "Resource proposal not found in authorized context")
         blockers: list[str] = []
+        if preflight_error:
+            blockers.append(preflight_error)
         if row["decision"]:
             blockers.append("This proposal already has an immutable decision.")
         if "ontology_review" not in principal.permissions:
@@ -1107,6 +1173,7 @@ def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
                     principal,
                     ResourceProposal.model_validate(row["payload"]["request"]),
                     row["payload"]["validation"],
+                    external_proofs,
                 )
             except WorkspaceError as error:
                 blockers.append(error.detail)
@@ -1124,6 +1191,17 @@ def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
 
 
 def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> ProposalDetail:
+    from finai_api.services.external_ontology_validation import preflight
+
+    before = proposal_detail(principal, proposal_id)
+    external_proofs = {}
+    if (
+        request.decision == "APPROVED"
+        and before.decision is None
+        and "ontology_review" in principal.permissions
+        and before.submitted_by != principal.actor_id
+    ):
+        external_proofs = preflight(principal, before.proposal)
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         tenant = principal.scope.tenant_id
         conn.execute(
@@ -1159,7 +1237,7 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
             proposal = ResourceProposal.model_validate(row["payload"]["request"])
             if request.decision == "APPROVED":
                 validation = _promotion_validation(
-                    conn, principal, proposal, row["payload"]["validation"]
+                    conn, principal, proposal, row["payload"]["validation"], external_proofs
                 )
             conn.execute(
                 (

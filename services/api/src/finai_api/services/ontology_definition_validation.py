@@ -17,6 +17,7 @@ from finai_api.domain.ontology_definitions import (
     InterfaceDefinition,
 )
 from finai_api.domain.regulation import RegulatoryDefinition
+from finai_api.domain.resource_metadata import metadata_spec
 from finai_api.domain.resources import ResourceMutation
 from finai_api.services.object_filter_contract import validate_filters
 from finai_api.services.temporal_definition_dependency import TemporalDependencyUnavailable
@@ -37,6 +38,21 @@ def validate_definition(
     except (ValidationError, KeyError) as exc:
         raise WorkspaceError(422, f"Invalid {item.object_type} definition: {exc}") from exc
     source = str(item.resource_id)
+
+    if item.object_type == "FinanceClassificationPolicy":
+        from finai_api.services.finance_classification import validate_policy
+
+        validate_policy(item, target)
+        return
+
+    if item.object_type == "FinanceProjectionDefinition":
+        from finai_api.services.finance_execution import validate_projection
+
+        validate_projection(item, target)
+        return
+
+    if item.object_type == "FinanceCapabilityDefinition":
+        return
 
     if item.object_type == "RegulatoryRule":
         assert isinstance(definition, RegulatoryDefinition)
@@ -238,7 +254,7 @@ def validate_definition(
         if set(mapping) != set(required):
             raise WorkspaceError(422, "Implementation must map every declared interface property")
         for name, field in mapping.items():
-            spec = fields.get(field)
+            spec = metadata_spec(field) or fields.get(field)
             if not spec or spec["kind"] != required[name]["kind"]:
                 raise WorkspaceError(422, f"Interface property {name} has an incompatible mapping")
             if required[name]["required"] and not spec["required"]:

@@ -5,6 +5,8 @@ from typing import Any
 from unicodedata import category
 from uuid import UUID
 
+from finai_api.domain.field_constraints import validate_constraints
+
 
 class SchemaCompatibilityError(ValueError):
     def __init__(self, status: int, detail: str) -> None:
@@ -76,6 +78,11 @@ def validate_schema(name: str, attributes: dict[str, Any]) -> dict[str, dict[str
         if identifier in identifiers:
             raise SchemaCompatibilityError(422, "Field identities must be unique within a schema")
         identifiers.add(identifier)
+        if "constraints" in spec:
+            try:
+                validate_constraints(spec["constraints"])
+            except ValueError as exc:
+                raise SchemaCompatibilityError(422, str(exc)) from exc
         permissions = spec.get("read_permissions", [])
         if (
             not isinstance(permissions, list)
@@ -157,6 +164,15 @@ def schema_compatibility(
                 before.get("deprecated", False),
                 after.get("deprecated", False),
             )
+        if before.get("constraints", {}) != after.get("constraints", {}):
+            change(
+                field_name,
+                before["field_id"],
+                "VALUE_CONSTRAINT_CHANGED",
+                before.get("constraints", {}),
+                after.get("constraints", {}),
+            )
+            breaking.add(field_name + " (value constraint change)")
         old_permissions = before.get("read_permissions", [])
         new_permissions = after.get("read_permissions", [])
         if old_permissions != new_permissions:
