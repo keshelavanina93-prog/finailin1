@@ -26,7 +26,7 @@ async function forward(request: NextRequest, context: Context) {
   const companyCondition=request.method==="GET"&&route==="company-condition";
   const sourceExceptions=(request.method==="POST"&&route==="source-exceptions")||(request.method==="GET"&&/^source-exceptions\/fcr_[a-f0-9]{64}$/.test(route));
   const investigationActions=request.method==="POST"&&(route==="operations/investigations"||route==="operations/investigation-resolutions");
-  const petroleumReconciliation=request.method==="GET"&&route==="operations/petroleum/reconciliation";
+  const petroleumReconciliation=request.method==="GET"&&/^operations\/petroleum\/(?:reconciliation|lineage\/[a-fA-F0-9-]+)$/.test(route);
   const sourceJournalReconciliation=request.method==="GET"&&/^company-journals\/reconciliation\/source\/[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$/.test(route);
   const sourceAdoption=request.method==="POST"&&/^source-adoption\/(?:(?:families|transitions)\/(?:inspect|proposal)|successor)$/.test(route);
   const periodControl = (request.method === "GET" && route === "period-control") || (request.method === "POST" && route === "period-control/proposal");

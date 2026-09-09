@@ -50,6 +50,13 @@ def petroleum_reconciliation_view(
     return petroleum_reconciliation.reconcile(principal, company_id)
 
 
+@router.get("/petroleum/lineage/{resource_id}")
+def petroleum_lineage_view(
+    principal: User, resource_id: UUID, company_id: UUID | None = None
+) -> dict[str, Any]:
+    return petroleum_reconciliation.lineage(principal, resource_id, company_id)
+
+
 @router.post("/import-proposal", response_model=ProposalDetail)
 def import_proposal(principal: User, request: SpatialImportRequest) -> ProposalDetail:
     require_permission(principal, "ontology_propose")

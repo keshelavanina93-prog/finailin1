@@ -45,7 +45,7 @@ def _quantity(attrs: dict[str, Any], names: tuple[str, ...]) -> Decimal:
 def reconcile(principal: Principal, company_id: UUID | None = None) -> dict[str, Any]:
     require_permission(principal, "ontology_read")
     company = str(company_id) if company_id else None
-    grouped: dict[tuple[str, ...], dict[str, Decimal]] = {}
+    grouped: dict[tuple[str, ...], dict[str, Any]] = {}
     counts = {kind: 0 for kind in SOURCE_TYPES}
     for object_type in SOURCE_TYPES:
         for resource in resources.list_resources(principal, object_type, "", 0, limit=1000):
@@ -63,6 +63,7 @@ def reconcile(principal: Principal, company_id: UUID | None = None) -> dict[str,
                     for name in ("opening", "receipts", "dispatches", "losses", "closing", "sales")
                 },
             )
+            bucket.setdefault("source_resource_ids", []).append(str(resource.resource_id))
             if object_type == "InventoryBalance":
                 bucket["opening"] += _quantity(attrs, ("opening_quantity", "opening"))
                 bucket["receipts"] += _quantity(
@@ -82,17 +83,22 @@ def reconcile(principal: Principal, company_id: UUID | None = None) -> dict[str,
                 bucket["sales"] += _quantity(attrs, ("quantity", "volume", "sold_quantity"))
             else:
                 bucket["closing"] += _quantity(attrs, ("quantity", "volume", "measured_quantity"))
-    rows = []
+    rows: list[dict[str, Any]] = []
     for key, values in sorted(grouped.items()):
         expected = values["opening"] + values["receipts"] - values["dispatches"] - values["losses"]
         variance = values["closing"] - expected
         rows.append(
             {
                 "dimensions": dict(zip(DIMENSIONS, key, strict=True)),
-                **{name: format(value, "f") for name, value in values.items()},
+                **{
+                    name: format(value, "f")
+                    for name, value in values.items()
+                    if name != "source_resource_ids"
+                },
                 "expected_closing": format(expected, "f"),
                 "variance": format(variance, "f"),
                 "status": "RECONCILED" if variance == 0 else "REVIEW_REQUIRED",
+                "source_resource_ids": values.get("source_resource_ids", []),
             }
         )
     return {
@@ -106,4 +112,65 @@ def reconcile(principal: Principal, company_id: UUID | None = None) -> dict[str,
         "business_effect_authorized": False,
         "telemetry_connected": bool(sum(counts.values())),
         "warning": "Physical measurements and booked accounting remain separate authorities.",
+    }
+
+
+def lineage(
+    principal: Principal, resource_id: UUID, company_id: UUID | None = None
+) -> dict[str, Any]:
+    """Return a bounded directed lineage path over accepted physical resources."""
+    require_permission(principal, "ontology_read")
+    company = str(company_id) if company_id else None
+    nodes: dict[str, Any] = {}
+    for object_type in SOURCE_TYPES:
+        for resource in resources.list_resources(principal, object_type, "", 0, limit=1000):
+            attrs = resource.attributes
+            if company is not None and not any(
+                str(attrs.get(key)) == company for key in ("legal_entity_id", "company_id")
+            ):
+                continue
+            nodes[str(resource.resource_id)] = resource
+    root = str(resource_id)
+    if root not in nodes:
+        raise WorkspaceError(404, "Petroleum resource unavailable in authorized scope")
+    edges: list[dict[str, str]] = []
+    reference_fields = (
+        "source_resource_id",
+        "source_id",
+        "origin_id",
+        "destination_id",
+        "destination_asset_id",
+        "shipment_id",
+        "waybill_id",
+        "tank_id",
+        "station_id",
+        "movement_id",
+        "sale_id",
+    )
+    for source_id, resource in nodes.items():
+        for field in reference_fields:
+            target_id = str(resource.attributes.get(field, ""))
+            if target_id in nodes and target_id != source_id:
+                edges.append({"source_id": source_id, "target_id": target_id, "field": field})
+    seen = {root}
+    queue = [root]
+    selected_edges: list[dict[str, str]] = []
+    while queue and len(seen) < 250:
+        current = queue.pop(0)
+        for edge in edges:
+            if edge["source_id"] != current:
+                continue
+            selected_edges.append(edge)
+            if edge["target_id"] not in seen:
+                seen.add(edge["target_id"])
+                queue.append(edge["target_id"])
+    return {
+        "contract": "petroleum-lineage/1",
+        "root_resource_id": root,
+        "resources": [nodes[node].model_dump(mode="json") for node in sorted(seen)],
+        "edges": selected_edges,
+        "bounded": len(seen) >= 250,
+        "authority": "ACCEPTED_CANONICAL_RESOURCE_LINEAGE",
+        "accounting_authorized": False,
+        "business_effect_authorized": False,
     }
