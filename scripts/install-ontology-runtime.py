@@ -88,6 +88,10 @@ def install(author: Principal, reviewer: Principal) -> dict[str, Any]:
         raise ValueError(
             "Ontology installation requires a distinct reviewer in the same tenant"
         )
+    # A reviewed steward grant is an install-scoped derived capability.  It does
+    # not mutate FINAI_ACCESS_TOKENS or turn a rejected dependency check into a
+    # success by omission.
+    author = ontology_install.effective_install_principal(author)
     compiled = finance_ontology.compilation(author.scope.tenant_id)
     specs = list(compiled.definitions)
     legacy = platform_definitions(author.scope.tenant_id)
@@ -212,6 +216,24 @@ def main() -> None:
         action="store_true",
         help="Print the read-only install preflight without creating proposals",
     )
+    parser.add_argument(
+        "--request-steward-grant",
+        action="store_true",
+        help="Retain the immutable restricted-read grant request; do not install",
+    )
+    parser.add_argument(
+        "--review-steward-grant",
+        action="store_true",
+        help="Approve the retained steward grant as the distinct reviewer",
+    )
+    parser.add_argument(
+        "--grant-rationale",
+        default=(
+            "Authorize restricted-read dependency impact inspection for the governed "
+            "platform catalog installation"
+        ),
+        help="Rationale retained with a steward grant request or decision",
+    )
     args = parser.parse_args([] if "pytest" in sys.modules else None)
     principals = [
         Principal.model_validate(value)
@@ -229,6 +251,23 @@ def main() -> None:
         and p.scope.tenant_id == author.scope.tenant_id
         and {"ontology_admin", "ontology_review"}.issubset(p.permissions)
     )
+    if args.request_steward_grant:
+        result = ontology_install.request_steward_grant(
+            author,
+            ontology_install.StewardGrantRequest(rationale=args.grant_rationale),
+        )
+        print(json.dumps(result, sort_keys=True))
+        return
+    if args.review_steward_grant:
+        result = ontology_install.review_steward_grant(
+            reviewer,
+            ontology_install._grant_id(reviewer.scope.tenant_id),
+            ontology_install.StewardGrantDecision(
+                decision="APPROVED", rationale=args.grant_rationale
+            ),
+        )
+        print(json.dumps(result, sort_keys=True))
+        return
     if args.dry_run:
         print(json.dumps(ontology_install.preflight(author), sort_keys=True))
         return
