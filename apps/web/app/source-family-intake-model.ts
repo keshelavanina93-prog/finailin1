@@ -232,9 +232,9 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
       "lineage_receipt",
     ],
     presentEvidence: ["source_file_hash", "schema_hash", "station_master", "fuel_grade_mapping", "lineage_receipt"],
-    routes: intakeRoutes(["/api/hydration"], ["/v1/hydration/ingest"], "wired"),
+    routes: intakeRoutes(["/api/hydration", "/api/operations/petroleum/intake/{receipt_id}/validation"], ["/v1/hydration/ingest", "/v1/operations/petroleum/intake/{receipt_id}/validation"], "wired"),
     currentImplementationStatus: "partially-implemented",
-    blockedOrMissingContracts: ["ORPAK sale-line validation is wired; accepted Station/Product/Dispenser/Nozzle bindings and canonical RetailSale promotion remain governed review work."],
+    blockedOrMissingContracts: ["ORPAK sale-line and semantic binding validation are wired; canonical RetailSale promotion and authentic connector readback remain governed review work."],
   },
   {
     id: "gas_telemetry",
@@ -244,9 +244,9 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     implementedScopeDimensions: ["tenant", "legal_entity", "site", "tank", "fuel_grade", "period", "document", "lineage"],
     requiredEvidence: ["source_file_hash", "schema_hash", "row_count", "tank_level_reading", "external_reference", "lineage_receipt"],
     presentEvidence: ["source_file_hash", "schema_hash", "row_count", "tank_level_reading", "lineage_receipt"],
-    routes: intakeRoutes(["/api/hydration", "/api/operations/petroleum/reconciliation"], ["/v1/hydration/ingest", "/v1/operations/petroleum/reconciliation"], "wired"),
+    routes: intakeRoutes(["/api/hydration", "/api/operations/petroleum/intake/{receipt_id}/validation", "/api/operations/petroleum/reconciliation"], ["/v1/hydration/ingest", "/v1/operations/petroleum/intake/{receipt_id}/validation", "/v1/operations/petroleum/reconciliation"], "wired"),
     currentImplementationStatus: "partially-implemented",
-    blockedOrMissingContracts: ["Telemetry validation is wired; accepted Meter/Asset/Location bindings, monotonic series checks and live connector readback remain governed review work."],
+    blockedOrMissingContracts: ["Telemetry and semantic binding validation are wired; monotonic series checks and live connector readback remain governed review work."],
   },
   {
     id: "retail_cash_registers",
