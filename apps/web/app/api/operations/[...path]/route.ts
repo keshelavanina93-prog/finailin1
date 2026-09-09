@@ -3,7 +3,7 @@ import { backendBaseUrl } from "../../backend";
 type Context = {params: Promise<{path: string[]}>};
 async function forward(request:NextRequest,context:Context) {
  const {path}=await context.params; const route=path.join("/");
- if(!/^(map(?:\/[a-fA-F0-9-]+\/connections)?|import-proposal|petroleum\/(?:reconciliation|lineage\/[a-fA-F0-9-]+|intake\/[a-zA-Z0-9_-]{1,128}\/validation|intake\/[a-zA-Z0-9_-]{1,128}\/promotion-preview))$/.test(route)) return Response.json({detail:"Operations route not found"},{status:404});
+ if(!/^(map(?:\/[a-fA-F0-9-]+\/connections)?|import-proposal|petroleum\/(?:reconciliation|margin|lineage\/[a-fA-F0-9-]+|intake\/[a-zA-Z0-9_-]{1,128}\/validation|intake\/[a-zA-Z0-9_-]{1,128}\/promotion-preview))$/.test(route)) return Response.json({detail:"Operations route not found"},{status:404});
  const authorization=request.headers.get("authorization");
  if(!authorization)return Response.json({detail:"Identity required"},{status:401});
  const body=request.method==="POST"?await request.text():undefined;

@@ -54,6 +54,11 @@ def petroleum_reconciliation_view(
     return petroleum_reconciliation.reconcile(principal, company_id)
 
 
+@router.get("/petroleum/margin")
+def petroleum_margin_view(principal: User, company_id: UUID | None = None) -> dict[str, Any]:
+    return petroleum_reconciliation.margin(principal, company_id)
+
+
 @router.get("/petroleum/lineage/{resource_id}")
 def petroleum_lineage_view(
     principal: User, resource_id: UUID, company_id: UUID | None = None

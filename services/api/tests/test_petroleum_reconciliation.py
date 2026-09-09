@@ -93,3 +93,48 @@ def test_lineage_returns_only_referenced_accepted_resources(monkeypatch):
     assert result["contract"] == "petroleum-lineage/1"
     assert len(result["resources"]) == 2
     assert result["edges"][0]["field"] == "destination_id"
+
+
+def test_margin_bridge_keeps_revenue_volume_and_cogs_dimensionally_separate(monkeypatch):
+    rows = {
+        "RetailSale": [
+            FakeResource(
+                UUID("50000000-0000-0000-0000-000000000001"),
+                {
+                    "legal_entity_id": str(_principal().scope.legal_entity_id),
+                    "station_id": "station-1",
+                    "product_id": "diesel",
+                    "period_id": "2025-01",
+                    "currency": "GEL",
+                    "quantity": "100",
+                    "net_amount": "350",
+                },
+            )
+        ],
+        "ProductCost": [
+            FakeResource(
+                UUID("60000000-0000-0000-0000-000000000001"),
+                {
+                    "legal_entity_id": str(_principal().scope.legal_entity_id),
+                    "station_id": "station-1",
+                    "product_id": "diesel",
+                    "period_id": "2025-01",
+                    "currency": "GEL",
+                    "cost_amount": "280",
+                },
+            )
+        ],
+    }
+    monkeypatch.setattr(
+        petroleum_reconciliation.resources,
+        "list_resources",
+        lambda _p, kind, _s, _o, limit=1000: rows[kind],
+    )
+    result = petroleum_reconciliation.margin(_principal())
+    row = result["rows"][0]
+    assert row["volume"] == "100"
+    assert row["revenue"] == "350"
+    assert row["cogs"] == "280"
+    assert row["gross_margin"] == "70"
+    assert row["status"] == "COMPLETE"
+    assert result["accounting_authorized"] is False

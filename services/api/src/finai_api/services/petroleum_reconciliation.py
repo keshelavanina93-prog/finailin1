@@ -14,6 +14,7 @@ from finai_api.services import resources
 from finai_api.services.workspace import WorkspaceError
 
 SOURCE_TYPES = ("InventoryBalance", "PhysicalMovement", "PhysicalMeasurement", "RetailSale")
+MARGIN_SOURCE_TYPES = ("RetailSale", "ProductCost")
 DIMENSIONS = (
     "legal_entity_id",
     "facility_id",
@@ -112,6 +113,73 @@ def reconcile(principal: Principal, company_id: UUID | None = None) -> dict[str,
         "business_effect_authorized": False,
         "telemetry_connected": bool(sum(counts.values())),
         "warning": "Physical measurements and booked accounting remain separate authorities.",
+    }
+
+
+def margin(principal: Principal, company_id: UUID | None = None) -> dict[str, Any]:
+    """Project sales volume, revenue and available product cost by exact dimensions."""
+    require_permission(principal, "ontology_read")
+    company = str(company_id) if company_id else None
+    grouped: dict[tuple[str, ...], dict[str, Any]] = {}
+    counts = {kind: 0 for kind in MARGIN_SOURCE_TYPES}
+    dimensions = ("legal_entity_id", "station_id", "product_id", "period_id", "currency")
+    for object_type in MARGIN_SOURCE_TYPES:
+        for resource in resources.list_resources(principal, object_type, "", 0, limit=1000):
+            attrs = resource.attributes
+            if company is not None and not any(
+                str(attrs.get(key)) == company for key in ("legal_entity_id", "company_id")
+            ):
+                continue
+            counts[object_type] += 1
+            key = tuple(str(attrs.get(field, "")) for field in dimensions)
+            bucket = grouped.setdefault(
+                key,
+                {
+                    "volume": Decimal(0),
+                    "revenue": Decimal(0),
+                    "cogs": Decimal(0),
+                    "cost_count": 0,
+                    "source_resource_ids": [],
+                },
+            )
+            bucket["source_resource_ids"].append(str(resource.resource_id))
+            if object_type == "RetailSale":
+                bucket["volume"] += _quantity(attrs, ("quantity", "volume", "sold_quantity"))
+                bucket["revenue"] += _quantity(
+                    attrs, ("net_amount", "revenue_amount", "gross_amount")
+                )
+            else:
+                bucket["cogs"] += _quantity(
+                    attrs, ("cogs_amount", "cost_amount", "valuation_amount")
+                )
+                bucket["cost_count"] += 1
+    rows: list[dict[str, Any]] = []
+    for key, values in sorted(grouped.items()):
+        revenue, cogs = values["revenue"], values["cogs"]
+        cost_available = values["cost_count"] > 0
+        rows.append(
+            {
+                "dimensions": dict(zip(dimensions, key, strict=True)),
+                "volume": format(values["volume"], "f"),
+                "revenue": format(revenue, "f"),
+                "cogs": format(cogs, "f") if cost_available else None,
+                "gross_margin": format(revenue - cogs, "f") if cost_available else None,
+                "status": "COMPLETE" if cost_available else "COGS_UNAVAILABLE",
+                "source_resource_ids": values["source_resource_ids"],
+            }
+        )
+    return {
+        "contract": "petroleum-margin-bridge/1",
+        "company_id": company,
+        "coverage": "APPROVED_CANONICAL_RESOURCES",
+        "counts": counts,
+        "rows": rows,
+        "accounting_authorized": False,
+        "business_effect_authorized": False,
+        "warning": (
+            "Revenue and physical volume are projections; COGS is shown only when "
+            "an accepted ProductCost source exists."
+        ),
     }
 
 
