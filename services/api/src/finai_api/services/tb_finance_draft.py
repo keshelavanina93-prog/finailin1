@@ -17,6 +17,7 @@ from typing import Any
 
 from openpyxl import Workbook
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 from finai_api.domain.review import Principal
 from finai_api.services import fact_runs
@@ -92,7 +93,7 @@ def _receipt_rows(principal: Principal, receipt_ids: Sequence[str]) -> list[dict
             "SELECT receipt_id, request, receipt, exact_scope, source_storage, source_sha256 "
             "FROM hydration_runs WHERE tenant_id=%s AND exact_scope=%s "
             "AND receipt_id=ANY(%s::text[])",
-            (principal.scope.tenant_id, scope, list(receipt_ids)),
+            (principal.scope.tenant_id, Jsonb(scope), list(receipt_ids)),
         ).fetchall()
     found = {str(row["receipt_id"]): row for row in rows}
     missing = sorted(set(receipt_ids) - set(found))
@@ -164,7 +165,7 @@ def list_retained_tb_sources(principal: Principal) -> list[dict[str, Any]]:
             "FROM hydration_runs WHERE tenant_id=%s AND exact_scope=%s "
             "AND receipt->>'source_class'='TRIAL_BALANCE' ORDER BY ingested_at, receipt_id "
             "LIMIT 100",
-            (principal.scope.tenant_id, scope),
+            (principal.scope.tenant_id, Jsonb(scope)),
         ).fetchall()
     result = []
     for row in rows:

@@ -7,6 +7,7 @@ from collections.abc import Iterable, Mapping
 from typing import Any
 
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 from finai_api.domain.review import Principal
 from finai_api.storage import connection
@@ -88,7 +89,7 @@ def reconcile_retained_tb(principal: Principal) -> dict[str, Any]:
             "FROM hydration_runs WHERE tenant_id=%s AND exact_scope=%s "
             "AND receipt->>'source_class'='TRIAL_BALANCE' "
             "ORDER BY ingested_at, receipt_id LIMIT 100",
-            (principal.scope.tenant_id, scope),
+            (principal.scope.tenant_id, Jsonb(scope)),
         ).fetchall()
     result = summarize_receipts(rows)
     result["tenant_id"] = str(principal.scope.tenant_id)
