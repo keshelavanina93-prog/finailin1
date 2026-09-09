@@ -1984,7 +1984,7 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest implementation head is `9b3d6b1`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation, petroleum conservation/lineage, and source-family operational validation represented in the unified workspaces.
+latest implementation head is `831a7a7`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation, petroleum conservation/lineage, and source-family operational validation represented in the unified workspaces.
 The previous API CI job failed four tests; three are fixed locally in this head,
 while the database-backed object-set materialization path is still under CI
 verification. Planning now has real catalog/comparison, forecast, liquidity,
@@ -1994,7 +1994,7 @@ accepted physical resources, and hydration validates ORPAK and gas telemetry
 grains before promotion. The retained-source review now reads the semantic
 binding result through the authenticated operations proxy and displays row
 bindings, explicit reasons, non-monotonic series findings and the distinction
-between governed-promotion eligibility and disabled canonical promotion. Retail cash-register shift-close intake is represented as a wired, partially implemented source family with Z-report identity and fiscal-close review evidence. Accepted Store/CashRegister semantic binding remains open. Retained source
+between governed-promotion eligibility and disabled canonical promotion. Retail cash-register shift-close intake is represented as a wired, partially implemented source family with Z-report identity, fiscal-close review evidence and Store/CashRegister semantic-binding readback. Canonical RetailSale promotion remains open. Retained source
 connectors, canonical operational promotion and live telemetry remain open.
 The previous coverage result was
 83.93% versus the required 90%. NYX now calls a citation-first governed
