@@ -1990,7 +1990,7 @@ while the database-backed object-set materialization path is still under CI
 verification. Planning now has real catalog/comparison, forecast, liquidity,
 authoring, outcome-measurement and shadow-evaluation UI over accepted canonical
 facts. Operations now includes a petroleum conservation/lineage bridge over
-accepted physical resources, and hydration validates ORPAK and gas telemetry
+accepted physical resources, and the unified intake UI now accepts CSV or bounded structured JSON while hydration validates ORPAK and gas telemetry
 grains before promotion. The retained-source review now reads the semantic
 binding result through the authenticated operations proxy and displays row
 bindings, explicit reasons, non-monotonic series findings and the distinction

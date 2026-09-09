@@ -1,6 +1,7 @@
 import csv
 import io
 import json
+from collections.abc import Sequence
 from decimal import Decimal, InvalidOperation, localcontext
 from hashlib import sha256
 from typing import Any
@@ -28,11 +29,22 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
         from finai_api.services.xls_source import compile_xls
 
         return compile_xls(request)
-    assert request.csv_text is not None
-    reader = csv.DictReader(
-        io.StringIO(request.csv_text.removeprefix("\ufeff"), newline=""), strict=True
-    )
-    columns = reader.fieldnames
+    columns: Sequence[str] | None
+    if request.json_text is not None:
+        parsed = json.loads(request.json_text)
+        json_rows = [
+            {key: "" if value is None else str(value) for key, value in row.items()}
+            for row in parsed
+        ]
+        columns = list(json_rows[0]) if json_rows else None
+        source_rows = [(index + 2, row) for index, row in enumerate(json_rows)]
+    else:
+        assert request.csv_text is not None
+        reader = csv.DictReader(
+            io.StringIO(request.csv_text.removeprefix("\ufeff"), newline=""), strict=True
+        )
+        columns = reader.fieldnames
+        source_rows = list(enumerate(reader, 2))
     if (
         not columns
         or any(not name.strip() for name in columns)
@@ -68,7 +80,7 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
     seen_operational: set[str] = set()
     with localcontext() as context:
         context.prec = 50
-        for row_number, row in enumerate(reader, 2):
+        for row_number, row in source_rows:
             if row_number > 10001:
                 raise ValueError("CSV exceeds 10000 rows")
             if None in row or any(value is None for value in row.values()):
@@ -171,7 +183,7 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
     return IngestReceipt(
         receipt_id=f"ir_{request_hash}",
         request_sha256=request_hash,
-        source_sha256=sha256(request.csv_text.encode("utf-8")).hexdigest(),
+        source_sha256=sha256(request.source_bytes()).hexdigest(),
         scope=request.scope,
         source_class="TRIAL_BALANCE" if tb else "UNFAMILIAR_TABULAR",
         source_profile=(

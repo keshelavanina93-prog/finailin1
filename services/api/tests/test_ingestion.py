@@ -1,3 +1,5 @@
+import json
+from hashlib import sha256
 from uuid import uuid4
 
 import pytest
@@ -49,12 +51,59 @@ def test_analytical_rows_preserve_grain_and_reject_duplicates() -> None:
 
 
 def test_bom_is_retained_in_source_hash_but_not_column_binding() -> None:
-    from hashlib import sha256
-
     request = source("\ufeffaccount_code,debit,credit\r\n001,1,1\r\n")
     receipt = compile_source(request)
     assert receipt.source_class == "TRIAL_BALANCE"
     assert receipt.source_sha256 == sha256(request.csv_text.encode()).hexdigest()
+
+
+def test_structured_json_operational_source_uses_same_grain_validation() -> None:
+    values = {
+        "station_id": "ST-1",
+        "dispenser_id": "D-2",
+        "nozzle_id": "N-1",
+        "product_code": "DIESEL",
+        "transaction_id": "TX-1",
+        "event_time": "2026-08-12T10:00:00+04:00",
+        "quantity": "1250.50",
+        "unit": "L",
+        "unit_price": "3.20",
+        "gross_amount": "4001.60",
+        "payment_method": "CARD",
+        "currency": "GEL",
+        "source_record_id": "ROW-1",
+        "source_hash": "a" * 64,
+    }
+    request = IngestRequest(
+        scope=ExactScope(tenant_id=uuid4(), legal_entity_id="a", period="2026-08", currency="GEL"),
+        filename="orpak.json",
+        json_text=json.dumps([values]),
+        source_system="ORPAK",
+    )
+    receipt = compile_source(request)
+    assert receipt.source_sha256 == sha256(request.json_text.encode()).hexdigest()
+    assert receipt.candidates[0].values["station_id"] == "ST-1"
+    assert receipt.candidates[0].values["operational_grain"] == "ONE_FORECOURT_SALE_LINE"
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        "{}",
+        "[]",
+        '[{"station_id":"ST-1"},{"station_id":"ST-1","extra":"x"}]',
+        '[{"station_id":{"nested":true}}]',
+    ],
+)
+def test_structured_json_source_requires_bounded_uniform_scalar_records(payload: str) -> None:
+    with pytest.raises(ValueError):
+        IngestRequest(
+            scope=ExactScope(
+                tenant_id=uuid4(), legal_entity_id="a", period="2026-08", currency="GEL"
+            ),
+            filename="source.json",
+            json_text=payload,
+        )
 
 
 @pytest.mark.parametrize("object_type", ["Invoice", "JournalDocument", "InventoryMovement"])

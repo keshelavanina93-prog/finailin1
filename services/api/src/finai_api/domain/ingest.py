@@ -1,5 +1,6 @@
 import base64
 import binascii
+import json
 from typing import Any, Literal, Self
 from uuid import UUID
 
@@ -21,6 +22,7 @@ class IngestRequest(BaseModel):
     scope: ExactScope
     filename: str = Field(min_length=1, max_length=256)
     csv_text: str | None = Field(default=None, min_length=1, max_length=1_000_000)
+    json_text: str | None = Field(default=None, min_length=1, max_length=2_000_000)
     xls_base64: str | None = Field(default=None, min_length=1, max_length=5_333_336)
     xlsx_base64: str | None = Field(default=None, min_length=1, max_length=21_333_336)
     source_use: Literal[
@@ -43,8 +45,32 @@ class IngestRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_source(self) -> Self:
-        if sum(x is not None for x in (self.csv_text, self.xls_base64, self.xlsx_base64)) != 1:
-            raise ValueError("Provide exactly one CSV, XLS or XLSX source")
+        if (
+            sum(
+                x is not None
+                for x in (self.csv_text, self.json_text, self.xls_base64, self.xlsx_base64)
+            )
+            != 1
+        ):
+            raise ValueError("Provide exactly one CSV, JSON, XLS or XLSX source")
+        if self.json_text is not None:
+            try:
+                parsed = json.loads(self.json_text)
+            except json.JSONDecodeError as exc:
+                raise ValueError("Invalid JSON source") from exc
+            if not isinstance(parsed, list) or not parsed or len(parsed) > 10000:
+                raise ValueError("JSON source must be a nonempty array of at most 10000 records")
+            if any(
+                not isinstance(row, dict)
+                or not row
+                or any(not isinstance(key, str) or not key.strip() for key in row)
+                or any(isinstance(value, (dict, list)) for value in row.values())
+                for row in parsed
+            ):
+                raise ValueError("JSON source records must contain nonempty scalar fields")
+            columns = set(parsed[0])
+            if any(set(row) != columns for row in parsed):
+                raise ValueError("JSON source records must have an identical field shape")
         if self.xlsx_base64 is not None:
             try:
                 content = base64.b64decode(self.xlsx_base64, validate=True)
@@ -64,6 +90,8 @@ class IngestRequest(BaseModel):
         return self
 
     def source_bytes(self) -> bytes:
+        if self.json_text is not None:
+            return self.json_text.encode("utf-8")
         if self.xlsx_base64 is not None:
             return base64.b64decode(self.xlsx_base64, validate=True)
         if self.xls_base64 is not None:
@@ -76,6 +104,8 @@ class IngestRequest(BaseModel):
         result: dict[str, Any] = handler(self)
         if self.csv_text is not None:
             result.pop("inspection_version", None)
+        if self.json_text is None:
+            result.pop("json_text", None)
         if self.xlsx_base64 is None:
             result.pop("xlsx_base64", None)
         if self.source_use == "ACTUAL_INPUT":

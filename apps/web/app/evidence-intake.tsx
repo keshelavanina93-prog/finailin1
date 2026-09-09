@@ -7,7 +7,7 @@ import SgpTrialBalancePackage from "./sgp-trial-balance-package";
 
 type DimensionRule = { rule_version_id: string; dimension_code: string; required: boolean; members: Array<{ code: string; version_id: string }> };
 type Account = { resource_id: string; version_id: string; display_name: string; account_code: string; dimension_rules: DimensionRule[] };
-type Prepared = { filename: string; csv_text?: string; xls_base64?: string; xlsx_base64?: string; context_version_id: string | null; codes: string[]; accounts: Account[]; observations: Record<string, string>; dimensionValues: Record<string, string[]>; rejects: string[]; warnings: string[] };
+type Prepared = { filename: string; csv_text?: string; json_text?: string; xls_base64?: string; xlsx_base64?: string; context_version_id: string | null; codes: string[]; accounts: Account[]; observations: Record<string, string>; dimensionValues: Record<string, string[]>; rejects: string[]; warnings: string[] };
 type PackageItem = Prepared & { status: "queued" | "preparing" | "ready" | "retaining" | "retained" | "failed"; error?: string };
 const SGP_FILE_PATTERN = /^SGP\s+(?:[1-9]|1[0-2])\.xls$/;
 const PACKAGE_TARGET = 12;
@@ -49,12 +49,15 @@ export default function EvidenceIntake({ token, principal, onRetained }: {
   async function prepareFile(file: File): Promise<Prepared> {
     const isXls = file.name.toLowerCase().endsWith(".xls");
     const isXlsx = file.name.toLowerCase().endsWith(".xlsx");
+    const isJson = file.name.toLowerCase().endsWith(".json");
     const isWorkbook = isXls || isXlsx;
-    if (!file.size || file.size > (isXlsx ? 16_000_000 : isXls ? 4_000_000 : 1_000_000)) throw new Error("Choose a CSV up to 1 MB, XLS up to 4 MB or XLSX up to 16 MB.");
+    if (!file.size || file.size > (isXlsx ? 16_000_000 : isXls ? 4_000_000 : isJson ? 2_000_000 : 1_000_000)) throw new Error("Choose a CSV up to 1 MB, JSON up to 2 MB, XLS up to 4 MB or XLSX up to 16 MB.");
     const bytes = new Uint8Array(await file.arrayBuffer());
     let binary = "";
     if (isWorkbook) for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
-    const payload = isXlsx ? { xlsx_base64: btoa(binary) } : isXls ? { xls_base64: btoa(binary) } : {
+    const payload = isXlsx ? { xlsx_base64: btoa(binary) } : isXls ? { xls_base64: btoa(binary) } : isJson ? {
+      json_text: new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes),
+    } : {
       csv_text: new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes),
     };
     const context = await request<{ binding: { version_id: string } | null }>("/api/ontology/context");
@@ -123,7 +126,7 @@ export default function EvidenceIntake({ token, principal, onRetained }: {
 
   async function retainPrepared(item: Prepared, selectedBindings: Record<string, string> = bindings) {
     return request<IngestReceipt>("/api/hydration", {
-      scope: principal.scope, filename: item.filename, csv_text: item.csv_text,
+      scope: principal.scope, filename: item.filename, csv_text: item.csv_text, json_text: item.json_text,
       xls_base64: item.xls_base64,
       xlsx_base64: item.xlsx_base64, source_use: item.xls_base64 || item.xlsx_base64 ? "HISTORICAL_REFERENCE" : sourceUse,
       context_version_id: item.context_version_id,
@@ -172,7 +175,7 @@ export default function EvidenceIntake({ token, principal, onRetained }: {
     <form ref={fileForm} className="upload-strip" onSubmit={prepare}>
       <div><p className="overline">HISTORICAL SOURCE PACKAGE</p><h2>2025 Trial Balance Intake</h2><p>SOCAR Georgia Petroleum · SGP 1.xls — SGP 12.xls</p>
         <p>Monthly 1C workbooks are retained against their 2025 valid periods. The active operational scope ({principal.scope.period}) is kept separate.</p></div>
-      <label>Source workbook(s)<input type="file" accept=".csv,.xls,.xlsx" name="source" multiple required disabled={busy} onChange={() => { setPrepared(null); setPackagePrepared([]); setPackageReport(null); setError(""); }} /><small>Select exactly 12 SGP XLS workbooks for an asynchronous package intake.</small></label>
+      <label>Source file(s)<input type="file" accept=".csv,.json,.xls,.xlsx" name="source" multiple required disabled={busy} onChange={() => { setPrepared(null); setPackagePrepared([]); setPackageReport(null); setError(""); }} /><small>Select ORPAK/telemetry JSON, CSV, or the 12 SGP XLS workbooks for package intake.</small></label>
       <label>Intended use<select value={sourceUse} disabled={busy} onChange={event => { setSourceUse(event.target.value); setPrepared(null); }}><option value="ACTUAL_INPUT">Facts for selected period</option><option value="HISTORICAL_REFERENCE">Historical source example</option><option value="REPORT_TEMPLATE">Reporting requirement example</option><option value="MAPPING_REFERENCE">Mapping reference</option></select></label>
       <button disabled={busy}>{busy ? "Preparing…" : "Prepare intake"}</button>
       <label className="source-only-choice"><input type="checkbox" checked={sourceOnly} disabled={busy} onChange={event => { setSourceOnly(event.target.checked); setPrepared(null); }} /> Retain as source evidence without canonical binding</label>

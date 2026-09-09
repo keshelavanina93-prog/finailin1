@@ -99,12 +99,12 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
   ),
   routeFamily(
     "hydration",
-    "Evidence and trial balance package hydration",
+    "Evidence, structured operational JSON, and trial balance package hydration",
     "/api/hydration",
     "/v1/hydration",
     "strongly_wired",
     [
-      "/api/hydration -> /v1/hydration/ingest",
+      "/api/hydration -> /v1/hydration/ingest (CSV/JSON/XLS/XLSX)",
       "/api/hydration/package -> /v1/hydration/trial-balance-package",
       "/api/hydration/package/diagnostics -> /v1/hydration/trial-balance-package/diagnostics",
     ],

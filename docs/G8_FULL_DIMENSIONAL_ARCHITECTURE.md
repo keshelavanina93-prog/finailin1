@@ -829,7 +829,7 @@ are wired as bounded canonical projections. A read-only petroleum conservation
 bridge is now mounted at `/v1/operations/petroleum/reconciliation`, with
 bounded accepted-resource lineage at `/v1/operations/petroleum/lineage/{resource_id}`;
 ORPAK forecourt sale-line and SCADA/gas measurement-grain validation now run
-at hydration intake with explicit evidence, duplicate, timestamp and unit
+at CSV or structured JSON hydration intake with explicit evidence, duplicate, timestamp and unit
 states. Retained receipts now also expose semantic binding validation at
 `/v1/operations/petroleum/intake/{receipt_id}/validation`, resolving accepted
 Station/Product/Dispenser/Nozzle and Meter/Asset/Location identifiers without
