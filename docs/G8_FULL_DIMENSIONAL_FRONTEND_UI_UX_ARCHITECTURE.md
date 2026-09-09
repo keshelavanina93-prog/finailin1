@@ -1984,12 +1984,14 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest implementation head is `48f689e`; frontend lint and typecheck pass for the changed surfaces, with the learning-evaluation action wired to the outcome panel.
+latest implementation head is `86a93a3`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and the petroleum conservation bridge wired into the unified planning and operations workspaces.
 The previous API CI job failed four tests; three are fixed locally in this head,
 while the database-backed object-set materialization path is still under CI
-verification. Planning now has a real catalog/comparison UI and allowlisted
-backend route over accepted canonical facts; authoring, forecast execution,
-liquidity and outcome wiring remain open. The previous coverage result was
+verification. Planning now has real catalog/comparison, forecast, liquidity,
+authoring, outcome-measurement and shadow-evaluation UI over accepted canonical
+facts. Operations now includes a petroleum conservation bridge over accepted
+physical resources; source-specific telemetry intake and movement lineage
+remain open. The previous coverage result was
 83.93% versus the required 90%. NYX now calls a citation-first governed
 reasoning boundary for exact selected resources; model-backed reasoning and
 proposal/action handoff remain open.

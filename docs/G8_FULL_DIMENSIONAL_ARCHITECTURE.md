@@ -816,7 +816,7 @@ authentic-source, generalization, production-runtime, scale or release acceptanc
 
 ### Verification snapshot — 2026-09-10
 
-The latest implementation head is `48f689e` on PR #9. Frontend lint,
+The latest implementation head is `86a93a3` on PR #9. Frontend lint,
 typecheck, tests and build pass; API Ruff and mypy pass. The GitHub API test job
 previously failed four tests. The packaging, cross-actor investigation action,
 and investigation-resolution replay failures are fixed locally in `1e1ed74`;
@@ -825,7 +825,10 @@ current GitHub run. The accepted ScenarioVersion/PlanningCellFact catalog and
 deterministic exact-scope scenario comparison are now wired through
 `/v1/ontology/planning` and the frontend Planning workspace; forecast
 calculation, scenario authoring, liquidity projection and outcome measurement
-remain open. A citation-first NYX refusal/explanation boundary is now wired at
+are wired as bounded canonical projections. A read-only petroleum conservation
+bridge is now mounted at `/v1/operations/petroleum/reconciliation`; retained
+ORPAK/SCADA intake, full movement lineage and operational telemetry remain open.
+A citation-first NYX refusal/explanation boundary is now wired at
 `/v1/ontology/nyx/reason`; model-backed reasoning, multi-citation packets and
 proposal handoff execution remain open. The previous configured coverage result was 83.93% against
 a 90% gate. The protected
