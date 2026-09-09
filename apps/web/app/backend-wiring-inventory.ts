@@ -142,11 +142,11 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
   routeFamily(
     "outcomes_learning",
     "Outcomes and governed learning",
-    "/api/ontology/outcomes/actual-vs-plan",
-    "/v1/ontology/outcomes/actual-vs-plan",
+    "/api/ontology/outcomes/actual-vs-plan, /api/ontology/outcomes/learning-evaluation",
+    "/v1/ontology/outcomes/actual-vs-plan, /v1/ontology/outcomes/learning-evaluation",
     "partial",
     ["services/api/src/finai_api/services/outcomes.py"],
-    ["learning candidate evaluation/promotion and outcome timeline UI"],
+    ["learning candidate promotion/rollback and outcome timeline UI"],
   ),
   routeFamily(
     "petroleum_telemetry_bridge",

@@ -18,3 +18,13 @@ def actual_vs_plan(
     principal: User, plan_scenario_id: UUID, actual_scenario_id: UUID
 ) -> dict[str, Any]:
     return outcomes.actual_vs_plan(principal, plan_scenario_id, actual_scenario_id)
+
+
+@router.get("/learning-evaluation")
+def learning_evaluation(
+    principal: User,
+    plan_scenario_id: UUID,
+    actual_scenario_id: UUID,
+    tolerance: str = "0",
+) -> dict[str, Any]:
+    return outcomes.evaluate_learning(principal, plan_scenario_id, actual_scenario_id, tolerance)

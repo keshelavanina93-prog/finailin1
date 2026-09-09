@@ -1,6 +1,8 @@
 """Deterministic, evidence-bound outcome measurement over accepted plan facts."""
 
+import json
 from decimal import Decimal, InvalidOperation
+from hashlib import sha256
 from typing import Any
 from uuid import UUID
 
@@ -81,5 +83,49 @@ def actual_vs_plan(principal, plan_scenario_id: UUID, actual_scenario_id: UUID) 
         "measurement_authorized": True,
         "learning_candidate_created": False,
         "policy_or_model_changed": False,
+        "business_effect_authorized": False,
+    }
+
+
+def evaluate_learning(
+    principal, plan_scenario_id: UUID, actual_scenario_id: UUID, tolerance: str
+) -> dict[str, Any]:
+    """Evaluate a measured outcome in shadow mode without promoting learning."""
+    try:
+        threshold = Decimal(tolerance)
+    except InvalidOperation as exc:
+        raise WorkspaceError(422, "Learning tolerance must be a finite decimal") from exc
+    if not threshold.is_finite() or threshold < 0:
+        raise WorkspaceError(422, "Learning tolerance must be a non-negative finite decimal")
+    measurement = actual_vs_plan(principal, plan_scenario_id, actual_scenario_id)
+    rows = []
+    within_tolerance = True
+    for row in measurement["rows"]:
+        variance = Decimal(row["variance"])
+        absolute = abs(variance)
+        accepted = absolute <= threshold
+        within_tolerance = within_tolerance and accepted
+        rows.append(
+            {**row, "absolute_variance": format(absolute, "f"), "within_tolerance": accepted}
+        )
+    candidate_material = {
+        "measurement_contract": measurement["contract"],
+        "plan_scenario_id": str(plan_scenario_id),
+        "actual_scenario_id": str(actual_scenario_id),
+        "tolerance": format(threshold, "f"),
+        "rows": rows,
+    }
+    candidate_id = (
+        "lc_" + sha256(json.dumps(candidate_material, sort_keys=True).encode()).hexdigest()
+    )
+    return {
+        "contract": "learning-evaluation/1",
+        "candidate_id": candidate_id,
+        "measurement": {**measurement, "rows": rows},
+        "status": "SHADOW_PASS" if within_tolerance else "SHADOW_REVIEW_REQUIRED",
+        "tolerance": format(threshold, "f"),
+        "promotion_required": True,
+        "production_policy_changed": False,
+        "production_model_changed": False,
         "business_effect_authorized": False,
     }
