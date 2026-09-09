@@ -4,12 +4,20 @@ import type { WirePropertyFilter } from './ontology-wire.js';
 /** Portable queries over canonical resources; scalar values keep their declared type. */
 export type ObjectSetFilter = WirePropertyFilter;
 
+/** Two to twenty conditions, at most three group levels; all query leaves share one budget. */
+export interface FilterExpression {
+  op: 'all' | 'any';
+  conditions: Array<ObjectSetFilter | FilterExpression>;
+}
+
 export interface ObjectSetTraversal {
   kind: 'reference' | 'link';
   name: string;
   direction: 'outgoing' | 'incoming';
   /** Applied to reached objects before the next relationship step. Omit when empty. */
   filters?: ObjectSetFilter[];
+  /** Combined with the reached-object filters using AND. */
+  filter_expression?: FilterExpression;
 }
 
 export interface ObjectSetInterfacePin { resource_id: string; version_id: string; }
@@ -63,6 +71,8 @@ export interface ObjectSetQuery {
   resource_ids?: string[] | null;
   search: string;
   filters: ObjectSetFilter[];
+  /** Combined with root filters using AND; omitted for legacy definitions. */
+  filter_expression?: FilterExpression;
   traversal: ObjectSetTraversal[];
   offset: number;
   limit: number;
