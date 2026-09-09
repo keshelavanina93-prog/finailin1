@@ -816,7 +816,7 @@ authentic-source, generalization, production-runtime, scale or release acceptanc
 
 ### Verification snapshot — 2026-09-10
 
-The latest implementation head is `1bead38` on PR #9. Frontend lint,
+The latest implementation head is `2118166` on PR #9. Frontend lint,
 typecheck, tests and build pass; API Ruff and mypy pass. The GitHub API test job
 previously failed four tests. The packaging, cross-actor investigation action,
 and investigation-resolution replay failures are fixed locally in `1e1ed74`;
@@ -834,7 +834,8 @@ states. Retained receipts now also expose semantic binding validation at
 `/v1/operations/petroleum/intake/{receipt_id}/validation`, resolving accepted
 Station/Product/Dispenser/Nozzle and Meter/Asset/Location identifiers without
 mutating canonical truth; gas series also flag non-monotonic meter timestamps
-for review. Retained connector readback, canonical operational
+for review. Fully bound rows are eligible for a governed mapping/promotion
+proposal, but canonical operational mutation remains disabled. Retained connector readback, canonical operational
 promotion and live operational telemetry remain open.
 A citation-first NYX refusal/explanation boundary is now wired at
 `/v1/ontology/nyx/reason`; model-backed reasoning, multi-citation packets and

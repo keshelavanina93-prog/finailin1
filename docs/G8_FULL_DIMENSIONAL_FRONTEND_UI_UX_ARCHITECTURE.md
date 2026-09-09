@@ -1984,7 +1984,7 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest implementation head is `1bead38`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation, petroleum conservation/lineage, and source-family operational validation represented in the unified workspaces.
+latest implementation head is `2118166`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation, petroleum conservation/lineage, and source-family operational validation represented in the unified workspaces.
 The previous API CI job failed four tests; three are fixed locally in this head,
 while the database-backed object-set materialization path is still under CI
 verification. Planning now has real catalog/comparison, forecast, liquidity,
@@ -1993,7 +1993,8 @@ facts. Operations now includes a petroleum conservation/lineage bridge over
 accepted physical resources, and hydration validates ORPAK and gas telemetry
 grains before promotion. The retained-source review now reads the semantic
 binding result through the authenticated operations proxy and displays row
-bindings, explicit reasons, non-monotonic series findings and the disabled promotion state. Retained source
+bindings, explicit reasons, non-monotonic series findings and the distinction
+between governed-promotion eligibility and disabled canonical promotion. Retained source
 connectors, canonical operational promotion and live telemetry remain open.
 The previous coverage result was
 83.93% versus the required 90%. NYX now calls a citation-first governed
