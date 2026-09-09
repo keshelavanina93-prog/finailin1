@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from finai_api.services.independent_tb_reader import read_tb_path
-from finai_api.services.tb_source_family import bind_source_family
+from finai_api.services.tb_source_family import bind_source_family, family_reuse_report
 
 
 @pytest.fixture(scope="module")
@@ -40,3 +40,17 @@ def test_family_identity_is_deterministic(family):
     assert family.family_id.startswith("sf_")
     assert family.family_key == "source-family:" + family.family_id.removeprefix("sf_")
     assert len({snapshot.snapshot_id for snapshot in family.snapshots}) == 12
+
+
+def test_reuse_applies_the_pack_once_and_surfaces_review_deltas(family):
+    root = Path(r"D:\download c\TB")
+    months = tuple(read_tb_path(root / f"SGP {month}.xls") for month in range(1, 13))
+    report = family_reuse_report(months)
+    assert report["pack_applied_once"] is True
+    assert report["baseline_period"] == "2025-01"
+    assert report["classification_reused_for"][-2:] == ["2025-11", "2025-12"]
+    assert "2025-09" in report["review_required_periods"]
+    assert "2025-10" in report["review_required_periods"]
+    sep_oct = next(item for item in report["deltas"] if item["to_period"] == "2025-10")
+    assert sep_oct["classification_reuse"] is True
+    assert sep_oct["review_required"] is True

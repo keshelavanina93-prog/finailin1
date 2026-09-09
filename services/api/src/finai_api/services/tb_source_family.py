@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from hashlib import sha256
 from typing import Any
 
-from finai_api.services.independent_tb_reader import TBMonth
+from finai_api.services.independent_tb_reader import TBMonth, family_deltas
 
 SOURCE_CLASS = "1C_TURNOVER_TRIAL_BALANCE"
 CONTRACT_VERSION = "1c_turnover_trial_balance@v1"
@@ -83,6 +83,40 @@ class SourceFamily:
             "snapshots": [snapshot.as_dict() for snapshot in self.snapshots],
             "status": self.status,
         }
+
+
+def family_reuse_report(months: Sequence[TBMonth]) -> dict[str, Any]:
+    """Describe pack reuse and review-only deltas across a recurring family."""
+
+    ordered = tuple(sorted(months, key=lambda item: item.period))
+    if not ordered:
+        raise ValueError("At least one observed TB snapshot is required")
+    deltas = family_deltas(ordered)
+    return {
+        "contract": "source-family-reuse/1",
+        "pack_applied_once": True,
+        "baseline_period": ordered[0].period,
+        "classification_reused_for": [month.period for month in ordered[1:]],
+        "review_required_periods": [
+            delta.to_period for delta in deltas if delta.requires_review
+        ],
+        "deltas": [
+            {
+                "from_period": delta.from_period,
+                "to_period": delta.to_period,
+                "new_account_codes": list(delta.new_account_codes),
+                "removed_account_codes": list(delta.removed_account_codes),
+                "new_outline_levels": list(delta.new_outline_levels),
+                "removed_outline_levels": list(delta.removed_outline_levels),
+                "outline_shape_changed": delta.outline_shape_changed,
+                "measure_columns_changed": delta.measure_columns_changed,
+                "heading_language_changed": delta.heading_language_changed,
+                "classification_reuse": delta.auto_reuse_existing_classification,
+                "review_required": delta.requires_review,
+            }
+            for delta in deltas
+        ],
+    }
 
 
 def _digest(value: Any) -> str:
