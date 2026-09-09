@@ -816,7 +816,7 @@ authentic-source, generalization, production-runtime, scale or release acceptanc
 
 ### Verification snapshot — 2026-09-10
 
-The latest implementation head is `3923eeb` on PR #9. Frontend lint,
+The latest implementation head is `6270452` on PR #9. Frontend lint,
 typecheck, tests and build pass; API Ruff and mypy pass. The GitHub API test job
 previously failed four tests. The packaging, cross-actor investigation action,
 and investigation-resolution replay failures are fixed locally in `1e1ed74`;
@@ -836,7 +836,7 @@ Station/Product/Dispenser/Nozzle and Meter/Asset/Location identifiers without
 mutating canonical truth; gas series also flag non-monotonic meter timestamps
 for review. Fully bound rows are eligible for a governed mapping/promotion
 proposal, but canonical operational mutation remains disabled. Retail cash-register shift-close rows now have a typed retained-review contract including Z-report identity and fiscal-close state; reopened or unconfirmed closes remain review-required. Accepted Store/CashRegister semantic binding validation is now wired; canonical RetailSale promotion and retained connector readback remain open. Canonical operational
-promotion previews now compile evidence-linked RetailSale, CashRegisterShiftClose, and PhysicalMeasurement candidates without persisting them.
+promotion previews now compile evidence-linked RetailSale, CashRegisterShiftClose, and PhysicalMeasurement candidates without persisting them. A read-only revenue/volume/COGS/margin bridge is now exposed by exact operating dimensions; missing ProductCost remains explicitly unavailable.
 promotion and live operational telemetry remain open.
 A citation-first NYX refusal/explanation boundary is now wired at
 `/v1/ontology/nyx/reason`; model-backed reasoning, multi-citation packets and
