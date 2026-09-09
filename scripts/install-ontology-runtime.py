@@ -10,8 +10,9 @@ import os
 import sys
 from copy import deepcopy
 from datetime import UTC, datetime
+from hashlib import sha256
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid5
 
 from finai_api.domain.ontology_catalog import canonical_id, platform_definitions
 from finai_api.domain.resources import (
@@ -28,6 +29,9 @@ from finai_api.services.workspace import WorkspaceError
 # count.  A fixed page can still exceed that bound when a schema phase has many
 # dependants, so installation also bisects a page on that specific refusal.
 BATCH_LIMIT = 25
+# Platform definitions are timeless registry contracts.  A fixed effective
+# instant keeps a retried proposal byte-identical after a process crash.
+INSTALL_VALID_FROM = datetime(1970, 1, 1, tzinfo=UTC)
 LEGACY_PHASE = "LegacyPlatformContracts"
 LEGACY_SCHEMA_KEYS = {
     "Artifact",
@@ -56,6 +60,17 @@ LEGACY_SCHEMA_KEYS = {
     "SourceLicenceNotice",
     "LicenceNoticeBinding",
 }
+
+
+def deterministic_proposal_id(author: Principal, phase: str, page: list[ResourceMutation]) -> UUID:
+    effect = {
+        "phase": phase,
+        "mutations": [item.model_dump(mode="json") for item in page],
+    }
+    digest = sha256(
+        json.dumps(effect, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    return uuid5(author.scope.tenant_id, f"ontology-install/{phase}/{digest}")
 
 
 def compatible_attributes(
@@ -154,7 +169,7 @@ def install(author: Principal, reviewer: Principal) -> dict[str, Any]:
                 ResourceMutation(
                     resource_id=identity,
                     expected_version_id=expected,
-                    valid_from=datetime.now(UTC),
+                    valid_from=INSTALL_VALID_FROM,
                     evidence_class="REFERENCE_TEMPLATE",
                     **spec,
                 )
@@ -169,6 +184,7 @@ def install(author: Principal, reviewer: Principal) -> dict[str, Any]:
         while pages:
             page = pages.pop(0)
             proposal = ResourceProposal(
+                proposal_id=deterministic_proposal_id(author, phase, page),
                 title="Install executable ontology definitions: " + phase,
                 rationale="Publish typed platform definitions while preserving accepted versions and company facts",
                 access_entity="__PLATFORM__",
@@ -179,7 +195,7 @@ def install(author: Principal, reviewer: Principal) -> dict[str, Any]:
             except WorkspaceError as exc:
                 if (
                     exc.status == 409
-                    and "Dependency impact exceeds the resource bound" in exc.detail
+                    and exc.detail.startswith("Dependency impact exceeds the ")
                     and len(page) > 1
                 ):
                     midpoint = len(page) // 2
