@@ -19,6 +19,7 @@ from finai_api.api.object_set_routes import router as object_set_router
 from finai_api.api.ontology_definition_routes import router as ontology_definition_router
 from finai_api.api.ontology_import_routes import router as ontology_import_router
 from finai_api.api.ontology_operation_routes import router as ontology_operation_router
+from finai_api.api.ontology_install_routes import router as ontology_install_router
 from finai_api.api.ontology_routes import router as ontology_router
 from finai_api.api.operations_routes import router as operations_router
 from finai_api.api.operator_routes import router as operator_router
@@ -80,6 +81,7 @@ app.include_router(company_home_router)
 app.include_router(company_journal_router)
 app.include_router(period_control_router)
 app.include_router(ontology_operation_router)
+app.include_router(ontology_install_router)
 
 
 @app.exception_handler(WorkspaceError)

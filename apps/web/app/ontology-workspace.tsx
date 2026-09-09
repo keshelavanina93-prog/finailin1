@@ -12,11 +12,32 @@ const label = (value: string) => value.replaceAll("_", " ").replace(/([a-z])([A-
 const message = (error: unknown) => error instanceof Error ? error.message : "Request failed";
 const sourceKeys = new Set(["source_row", "source_row_key", "source_sheet", "source_coordinate", "source_document_id", "source_record_id", "source_sha256"]);
 type Draft = { type: string; current?: CanonicalResource; attributes: Record<string, unknown>; name: string };
+type InstallPreflight = {
+  catalog_id: string;
+  catalog_sha256: string;
+  tenant_id: string;
+  author: { actor_id: string | null; display_name: string | null; permissions: string[] };
+  reviewer: { actor_id: string | null; display_name: string | null; permissions: string[] };
+  steward: { actor_id: string | null; display_name: string | null; permissions: string[] };
+  required_permissions: Record<string, string[]>;
+  present_permissions: Record<string, string[]>;
+  missing_permissions: Record<string, string[]>;
+  hidden_dependents: Array<{ object_type: string | null; identity_key: string | null; display_name: string | null }>;
+  phase_counts: Array<{ phase: string; compiled: number; installed: number; pending: number }>;
+  would_publish: { count: number; identities: Array<{ phase: string; identity_key: string; status: string }> };
+  would_preserve: { count: number; identities: Array<{ phase: string; identity_key: string; status: string }> };
+  company_instances_published: number;
+  company_facts_published: boolean;
+  blocked_reason: string[];
+  can_install: boolean;
+  mutation_performed: boolean;
+};
 
 export default function OntologyWorkspace({ token, principal, initialProposalId, onOpenObjectWorkspace }: { token: string; principal: Principal; initialProposalId?: string; onOpenObjectWorkspace?: () => void }) {
   const [catalog, setCatalog] = useState<CanonicalResource[]>([]);
   const [nodes, setNodes] = useState<CanonicalResource[]>([]);
   const [queue, setQueue] = useState<ProposalSummary[]>([]);
+  const [preflight, setPreflight] = useState<InstallPreflight | null>(null);
   const [tab, setTab] = useState<"graph" | "resources" | "review" | "registry" | "object_sets">("graph");
   const [detail, setDetail] = useState<CanonicalDetail | null>(null);
   const [proposal, setProposal] = useState<ResourceProposalDetail | null>(null);
@@ -26,6 +47,7 @@ export default function OntologyWorkspace({ token, principal, initialProposalId,
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
   const [queueError, setQueueError] = useState("");
+  const [preflightError, setPreflightError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(true);
   const [effectiveFrom] = useState(() => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
@@ -49,9 +71,10 @@ export default function OntologyWorkspace({ token, principal, initialProposalId,
       api<CanonicalResource[]>("catalog"),
       api<{ resources: CanonicalResource[]; bounded: boolean }>("graph"),
       api<{ proposals: ProposalSummary[] }>("proposal-queue?limit=25"),
+      api<InstallPreflight>("install/preflight"),
     ]).then(results => {
       if (cancelled) return;
-      const [catalogResult, graphResult, queueResult] = results;
+      const [catalogResult, graphResult, queueResult, preflightResult] = results;
       if (catalogResult.status === "fulfilled") setCatalog(catalogResult.value);
       else setError(message(catalogResult.reason));
       if (graphResult.status === "fulfilled") {
@@ -63,6 +86,10 @@ export default function OntologyWorkspace({ token, principal, initialProposalId,
         setQueueError("");
       }
       else setQueueError(message(queueResult.reason));
+      if (preflightResult.status === "fulfilled") {
+        setPreflight(preflightResult.value);
+        setPreflightError("");
+      } else setPreflightError(message(preflightResult.reason));
     }).finally(() => { if (!cancelled) setBusy(false); });
     return () => { cancelled = true; selectionRef.current++; };
   }, [api, revision]);
@@ -149,6 +176,8 @@ export default function OntologyWorkspace({ token, principal, initialProposalId,
   return <section className="ontology-workspace">
     <div className="section-heading"><div><p className="overline">SHARED ENTERPRISE RESOURCES</p><h1>Enterprise & ontology</h1><p className="muted">Explore typed relationships, govern identity and review changes to shared business meaning.</p></div><div className="heading-actions">{onOpenObjectWorkspace && <button className="quiet" onClick={onOpenObjectWorkspace}>Open object workspace</button>}<button className="quiet" disabled={busy} onClick={() => setRevision(value => value + 1)}>Refresh</button></div></div>
     <div className="ontology-runtime-strip"><div><p className="overline">LIVE OBJECT CONTRACTS</p><p className="muted">Accepted objects resolve by type and version. The object workspace exposes type filters, current or pinned construction versions, source rows and receipt-backed approve/reject review.</p></div>{onOpenObjectWorkspace && <button className="quiet" onClick={onOpenObjectWorkspace}>Inspect accepted objects</button>}</div>
+    {preflightError && <p className="error-banner" role="status">Platform catalog preflight unavailable: {preflightError}. No installation mutation was attempted.</p>}
+    {preflight && <section className="ontology-install-panel data-panel" aria-label="Platform catalog installation preflight"><div className="toolbar"><div><p className="overline">INSTALL PREFLIGHT · READ ONLY</p><h2>Platform catalog installation</h2><p className="muted">Compiled is not accepted. This panel exposes the exact steward and dependency gate before any proposal is created.</p></div><span className={`status ${preflight.can_install ? "approved" : "rejected"}`}>{preflight.can_install ? "READY" : "BLOCKED"}</span></div><div className="install-facts"><div><span>Catalog</span><strong>{preflight.catalog_id}</strong><small>{preflight.catalog_sha256.slice(0, 16)}…</small></div><div><span>Author</span><strong>{preflight.author.actor_id ?? "Unavailable"}</strong><small>{preflight.present_permissions.author.join(", ") || "No permissions"}</small></div><div><span>Reviewer</span><strong>{preflight.reviewer.actor_id ?? "Unavailable"}</strong><small>{preflight.present_permissions.reviewer.join(", ") || "No permissions"}</small></div><div><span>Tenant steward</span><strong>{preflight.steward.actor_id ?? "Unavailable"}</strong><small>{preflight.present_permissions.steward.join(", ") || "Missing restricted read"}</small></div></div>{preflight.blocked_reason.map(reason => <p className="error-banner" key={reason}>{reason}</p>)}{preflight.hidden_dependents.length > 0 && <details><summary>Hidden dependents blocking complete impact ({preflight.hidden_dependents.length})</summary><ul>{preflight.hidden_dependents.map(item => <li key={`${item.object_type}:${item.identity_key}`}>{item.identity_key ?? item.object_type} · {item.display_name ?? "restricted identity"}</li>)}</ul></details>}<div className="install-phase-grid">{preflight.phase_counts.map(phase => <div key={phase.phase}><span>{phase.phase}</span><strong>{phase.installed}/{phase.compiled} installed</strong><small>{phase.pending} pending</small></div>)}</div><p className="muted">Would publish {preflight.would_publish.count} platform identities; preserve {preflight.would_preserve.count}; company instances published {preflight.company_instances_published}; company facts published {String(preflight.company_facts_published)}. Mutation performed: {String(preflight.mutation_performed)}.</p></section>}
     <div className="ontology-tabs">{(["graph", "object_sets", "resources", "review", "registry"] as const).map(id => <button className={tab === id ? "active" : "quiet"} key={id} onClick={() => { setTab(id); setKind(""); }}>{id === "graph" ? "Enterprise graph" : id === "review" ? `Change review${queueError ? " (unavailable)" : ` (${queue.filter(row => row.decision === "PENDING").length})`}` : label(id)}</button>)}</div>
     {error && <p className="error-banner" role="alert">{error}</p>}{notice && <p className="success-banner" role="status">{notice}</p>}
     {queueError && <p className="error-banner" role="status">Review queue is temporarily unavailable: {queueError}. Catalog, graph, typed sets and resource inspection remain available; use Refresh to retry the queue.</p>}

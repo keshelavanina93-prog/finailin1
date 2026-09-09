@@ -4,8 +4,10 @@ Company constructions are never installed here. Existing accepted fields retain 
 identities and constraints; only compatible missing fields and new definitions are added.
 """
 
+import argparse
 import json
 import os
+import sys
 from copy import deepcopy
 from datetime import UTC, datetime
 from typing import Any
@@ -18,7 +20,7 @@ from finai_api.domain.resources import (
     ResourceReview,
 )
 from finai_api.domain.review import Principal
-from finai_api.services import finance_ontology, resources
+from finai_api.services import finance_ontology, ontology_install, resources
 from finai_api.services.schema_compatibility import schema_compatibility
 from finai_api.services.workspace import WorkspaceError
 
@@ -204,6 +206,13 @@ def install(author: Principal, reviewer: Principal) -> dict[str, Any]:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print the read-only install preflight without creating proposals",
+    )
+    args = parser.parse_args([] if "pytest" in sys.modules else None)
     principals = [
         Principal.model_validate(value)
         for value in json.loads(os.environ["FINAI_ACCESS_TOKENS"]).values()
@@ -220,6 +229,9 @@ def main() -> None:
         and p.scope.tenant_id == author.scope.tenant_id
         and {"ontology_admin", "ontology_review"}.issubset(p.permissions)
     )
+    if args.dry_run:
+        print(json.dumps(ontology_install.preflight(author), sort_keys=True))
+        return
     result = install(author, reviewer)
     print(json.dumps(result, sort_keys=True))
 
