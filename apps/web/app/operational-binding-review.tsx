@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {Badge, Empty} from "./g8-ui";
 import {operationsRequest} from "./operations-model";
 
-type BindingRow = {source_row: number; status: string; bindings: Record<string, boolean>; reasons: string[]};
+type BindingRow = {source_row: number; status: string; bindings: Record<string, boolean>; reasons: string[]; promotion_eligible: boolean};
 type BindingResult = {profile: string; status: string; promotion_eligible: boolean; canonical_promotion: string; rows: BindingRow[]};
 
 export default function OperationalBindingReview({token, receiptId, profile}: {token: string; receiptId: string; profile?: string}) {

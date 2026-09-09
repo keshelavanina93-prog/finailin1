@@ -77,8 +77,10 @@ def validate(principal: Principal, receipt_id: str) -> dict[str, Any]:
                 "status": "VALIDATED" if not reasons else "REVIEW_REQUIRED",
                 "bindings": bindings,
                 "reasons": sorted(set(reasons)),
+                "promotion_eligible": not reasons,
             }
         )
+    promotion_eligible = bool(rows) and all(row["promotion_eligible"] for row in rows)
     return {
         "contract": "operational-binding-validation/1",
         "receipt_id": receipt.receipt_id,
@@ -87,7 +89,7 @@ def validate(principal: Principal, receipt_id: str) -> dict[str, Any]:
         "status": "VALIDATED"
         if rows and all(row["status"] == "VALIDATED" for row in rows)
         else "REVIEW_REQUIRED",
-        "promotion_eligible": False,
+        "promotion_eligible": promotion_eligible,
         "canonical_promotion": "GOVERNED_REVIEW_REQUIRED",
         "accounting_authorized": False,
         "business_effect_authorized": False,

@@ -70,7 +70,8 @@ def test_binding_validation_resolves_accepted_orpak_dimensions(monkeypatch):
     result = operational_binding_validation.validate(PRINCIPAL, "receipt-1")
 
     assert result["status"] == "VALIDATED"
-    assert result["promotion_eligible"] is False
+    assert result["promotion_eligible"] is True
+    assert result["canonical_promotion"] == "GOVERNED_REVIEW_REQUIRED"
     assert all(result["rows"][0]["bindings"].values())
 
 
