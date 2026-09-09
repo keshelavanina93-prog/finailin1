@@ -30,7 +30,7 @@ async function forward(request: NextRequest, context: Context) {
   const sourceAdoption=request.method==="POST"&&/^source-adoption\/(?:(?:families|transitions)\/(?:inspect|proposal)|successor)$/.test(route);
   const periodControl = (request.method === "GET" && route === "period-control") || (request.method === "POST" && route === "period-control/proposal");
   const accountDimensionPolicy = (request.method === "GET" && route === "account-dimension-policy") || (request.method === "POST" && route === "account-dimension-policy/proposal");
-  const planning = request.method === "GET" && /^planning\/(?:catalog|compare|forecast|liquidity)$/.test(route);
+  const planning = (request.method === "GET" && /^planning\/(?:catalog|compare|forecast|liquidity)$/.test(route)) || (request.method === "POST" && route === "planning/proposals");
   const nyxReasoning = request.method === "POST" && route === "nyx/reason";
   const retention = /^retention\/(?:inspect|history|policies|evaluations|receipts\/[a-fA-F0-9-]+)$/.test(route);
   const model = /^model\/(?:fact-runs\/fcr_[a-f0-9]{64}(?:\/authority)?|definitions(?:\/(?:preview|contracts|[a-fA-F0-9-]+))?|proposals\/[a-fA-F0-9-]+\/decision|(?:sets|groups)\/[a-fA-F0-9-]+\/objects|bindings\/[a-fA-F0-9-]+\/proposal|facts\/[a-fA-F0-9-]+\/(?:aggregate(?:\/guarded)?|reconcile)|sources\/ir_[a-f0-9]{64}\/accounts(?:\/proposal)?|derived\/query)$/.test(route);
