@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.finai.local/fact-envelope.schema.json",
+  "title": "G8 Fact Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "grain", "epistemic", "authority_state", "legal_entity_id", "period_id", "scenario_version_id", "source_record_ids"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "grain": {
+      "enum": ["TRANSACTION", "JOURNAL_LINE", "ACCOUNT_PERIOD", "FS_ITEM_PERIOD", "REPORT_LINE_PERIOD", "PLANNING_CELL"]
+    },
+    "epistemic": { "enum": ["OBSERVED", "DERIVED", "INFERRED", "UNAVAILABLE"] },
+    "authority_state": { "enum": ["CANDIDATE", "REVIEWED", "ACCEPTED", "REJECTED", "SUPERSEDED", "WITHDRAWN"] },
+    "legal_entity_id": { "type": "string", "minLength": 1 },
+    "ledger_id": { "type": ["string", "null"] },
+    "period_id": { "type": "string", "minLength": 1 },
+    "scenario_version_id": { "type": "string", "minLength": 1 },
+    "mapping_version_id": { "type": ["string", "null"] },
+    "currency_id": { "type": ["string", "null"] },
+    "amount": { "type": ["string", "null"] },
+    "scale": { "type": ["integer", "null"] },
+    "unit_id": { "type": ["string", "null"] },
+    "quantity": { "type": ["string", "null"] },
+    "source_record_ids": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "unknown_slots": { "type": "array", "items": { "type": "string" } }
+  }
+}
