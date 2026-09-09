@@ -132,11 +132,18 @@ def compatible(previous, observation):
     old = FindingDefinition.model_validate(previous["attributes"]["definition"]).evidence
     if (
         old.binding != observation.binding
+        or old.company != observation.company
+        or old.source_function != observation.source_function
+        or old.source != observation.source
+        or old.source_valid_at != observation.source_valid_at
+        or old.source_known_at != observation.source_known_at
         or old.selection != observation.selection
         or evidence_context(old) != evidence_context(observation)
     ):
         raise WorkspaceError(
-            409, "Changed binding or accounting context requires explicit compatibility"
+            409,
+            "Changed binding, source interpretation or accounting context "
+            "requires explicit compatibility",
         )
 
 
@@ -209,6 +216,16 @@ def invoke(principal, request: InvestigationAction):
 
 
 def validate_publication(item, target, principal):
+    if item.attributes.get("definition", {}).get("contract") in (
+        "source-finding/2",
+        "source-investigation/2",
+    ):
+        from finai_api.services.investigation_resolution import (
+            validate_publication as validate_resolution,
+        )
+
+        validate_resolution(item, target, principal)
+        return
     if principal is None:
         raise WorkspaceError(422, "Retained exception publication requires scoped validation")
     model = FindingDefinition if item.object_type == "Finding" else InvestigationDefinition

@@ -79,3 +79,17 @@ export type InvestigationOperation = {
   current_use_authorized: false;
   business_effect_authorized: false;
 };
+
+/** Explicit reviewed resolution; exact canonical heads and matched evidence only. */
+export type InvestigationResolutionRequest = {
+  request_id: string;
+  finding: AnalysisPin;
+  investigation: AnalysisPin;
+  matched_exception_run_id: string;
+  rationale: string;
+};
+
+/** Resolution uses the same governed operation and exact publication boundary. */
+export type InvestigationResolutionOperation = Omit<InvestigationOperation, "intent_request"> & {
+  intent_request: InvestigationResolutionRequest | null;
+};

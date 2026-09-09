@@ -37,6 +37,27 @@ def company_binding(payload: dict[str, Any]) -> tuple[str | None, str]:
         finding = next(m for m in mutations if m["object_type"] == "Finding")
         if finding["attributes"]["definition"]["evidence"]["company"]["resource_id"] != company:
             raise ValueError("Company differs from retained exception evidence")
+        if definition.get("operation") == "RESOLVE":
+            proofs = [m["attributes"]["definition"]["resolution"] for m in mutations]
+            proof = proofs[0]
+            if (
+                proofs[1] != proof
+                or proof["unmatched_exception_run_id"] != definition["exception_run_id"]
+                or proof["matched_exception_run_id"] != definition["matched_exception_run_id"]
+                or proof["unmatched_evidence"]["company"]["resource_id"] != company
+                or proof["matched_evidence"]["company"]["resource_id"] != company
+                or any(m["attributes"]["definition"]["state"] != "RESOLVED" for m in mutations)
+            ):
+                raise ValueError("Resolution proof differs from retained company work")
+            for mutation in mutations:
+                prior_key = "prior_" + mutation["object_type"].lower()
+                prior = proof[prior_key]
+                if (
+                    prior != definition[prior_key]
+                    or prior["resource_id"] != mutation["resource_id"]
+                    or prior["version_id"] != mutation["expected_version_id"]
+                ):
+                    raise ValueError("Resolution differs from its prior canonical pair")
     except (KeyError, TypeError, ValueError, AttributeError) as exc:
         raise WorkspaceError(409, "Retained investigation company binding is invalid") from exc
     return company, "EXPLICIT_RETAINED_EXCEPTION"
