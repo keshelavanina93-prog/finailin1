@@ -4,10 +4,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 RUN groupadd --system finai && useradd --system --gid finai finai
-WORKDIR /app
+WORKDIR /app/services/api
 
-COPY pyproject.toml ./
-COPY src ./src
+COPY services/api/pyproject.toml ./
+COPY services/api/src ./src
+COPY services/api/migrations ./migrations
+COPY packages/contracts/catalog /app/packages/contracts/catalog
+COPY constructions/candidate /app/constructions/candidate
 RUN pip install --no-cache-dir .
 
 USER finai

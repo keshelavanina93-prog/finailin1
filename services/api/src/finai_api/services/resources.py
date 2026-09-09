@@ -13,6 +13,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.authority import canonical_sha256
+from finai_api.domain.field_constraints import matches_constraints
 from finai_api.domain.resources import (
     CanonicalResource,
     ProposalDetail,
@@ -518,7 +519,13 @@ def _validate(
                         raise WorkspaceError(422, f"{item.display_name}: missing {name}")
                     continue
                 value = item.attributes[name]
-                if not _check_scalar(spec["kind"], value):
+                array = (
+                    spec["kind"] == "definition"
+                    and spec.get("constraints", {}).get("type") == "array"
+                )
+                if (
+                    not array and not _check_scalar(spec["kind"], value)
+                ) or not matches_constraints(value, spec.get("constraints", {})):
                     raise WorkspaceError(
                         422, f"{item.display_name}: invalid {name} ({spec['kind']})"
                     )

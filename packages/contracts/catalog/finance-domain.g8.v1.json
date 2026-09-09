@@ -1,0 +1,575 @@
+{
+  "domain_id": "g8.finance.domain.v1",
+  "version": 1,
+  "identity_policy": "EXISTING_CANONICAL_RESOURCE_IDENTITIES",
+  "capabilities": [
+    {
+      "code": "BALANCE_SHEET",
+      "name": "Balance sheet",
+      "purpose": "Interpret scoped closing positions with reconciled account and statement mappings.",
+      "required_evidence": [
+        "closing balances",
+        "chart",
+        "statement mapping",
+        "coverage"
+      ],
+      "dimensions": [
+        "legal_entity",
+        "ledger",
+        "account",
+        "currency"
+      ],
+      "process_types": [
+        "close_period",
+        "classify_position"
+      ],
+      "fact_grains": [
+        "ACCOUNT_PERIOD",
+        "FS_ITEM_PERIOD"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "INCOME_STATEMENT",
+      "name": "Income statement",
+      "purpose": "Project recognized revenue and expense movements into separately versioned reporting lines.",
+      "required_evidence": [
+        "journal or period movements",
+        "recognition policy",
+        "report mapping"
+      ],
+      "dimensions": [
+        "legal_entity",
+        "account",
+        "department",
+        "cost_article",
+        "product"
+      ],
+      "process_types": [
+        "recognize_revenue",
+        "recognize_expense"
+      ],
+      "fact_grains": [
+        "JOURNAL_LINE",
+        "REPORT_LINE_PERIOD"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "CASH_FLOW",
+      "name": "Cash flow",
+      "purpose": "Classify actual cash movements using evidenced cash-account and cash-flow policies.",
+      "required_evidence": [
+        "cash movements",
+        "cash account mapping",
+        "cash-flow mapping"
+      ],
+      "dimensions": [
+        "legal_entity",
+        "cash_account",
+        "counterparty",
+        "cash_flow_article"
+      ],
+      "process_types": [
+        "receive_cash",
+        "pay_cash"
+      ],
+      "fact_grains": [
+        "JOURNAL_LINE",
+        "REPORT_LINE_PERIOD"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "DOUBLE_ENTRY",
+      "name": "Journal and posting controls",
+      "purpose": "Validate scoped debit and credit movements and trace each accepted posting to its source.",
+      "required_evidence": [
+        "posting lines",
+        "entry identity",
+        "source document",
+        "currency context"
+      ],
+      "dimensions": [
+        "legal_entity",
+        "ledger",
+        "book",
+        "account",
+        "currency"
+      ],
+      "process_types": [
+        "post_entry",
+        "reverse_entry"
+      ],
+      "fact_grains": [
+        "JOURNAL_LINE"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "INVENTORY",
+      "name": "Inventory and valuation",
+      "purpose": "Track source-supported quantities and costs using explicitly reviewed valuation policies.",
+      "required_evidence": [
+        "inventory movements",
+        "lots",
+        "unit conversion",
+        "valuation policy"
+      ],
+      "dimensions": [
+        "product",
+        "warehouse",
+        "lot",
+        "unit",
+        "legal_entity"
+      ],
+      "process_types": [
+        "receive_inventory",
+        "transfer_inventory",
+        "issue_inventory"
+      ],
+      "fact_grains": [
+        "TRANSACTION",
+        "JOURNAL_LINE"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "FOREIGN_EXCHANGE",
+      "name": "Foreign currency",
+      "purpose": "Keep transaction and functional currency contexts distinct with pinned conversion policies.",
+      "required_evidence": [
+        "currency roles",
+        "rate set",
+        "rate type",
+        "valuation dates"
+      ],
+      "dimensions": [
+        "currency",
+        "legal_entity",
+        "account"
+      ],
+      "process_types": [
+        "translate_amount",
+        "remeasure_position"
+      ],
+      "fact_grains": [
+        "JOURNAL_LINE",
+        "ACCOUNT_PERIOD"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "TAX",
+      "name": "Tax accounting",
+      "purpose": "Apply only evidenced tax classifications and recoverability policies to source-supported tax facts.",
+      "required_evidence": [
+        "tax registers",
+        "applicable rules",
+        "recoverability decisions"
+      ],
+      "dimensions": [
+        "tax_kind",
+        "jurisdiction",
+        "legal_entity",
+        "account"
+      ],
+      "process_types": [
+        "recognize_tax",
+        "settle_tax"
+      ],
+      "fact_grains": [
+        "JOURNAL_LINE",
+        "FS_ITEM_PERIOD"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "DEPRECIATION",
+      "name": "Depreciation and amortization",
+      "purpose": "Calculate source-supported depreciation from approved basis, method, dates and useful life.",
+      "required_evidence": [
+        "asset register",
+        "basis",
+        "useful life",
+        "method",
+        "in-service date"
+      ],
+      "dimensions": [
+        "asset",
+        "department",
+        "legal_entity"
+      ],
+      "process_types": [
+        "depreciate_asset",
+        "amortize_asset"
+      ],
+      "fact_grains": [
+        "ACCOUNT_PERIOD",
+        "JOURNAL_LINE"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "BUDGET_CONTROL",
+      "name": "Budget and actual",
+      "purpose": "Compare compatible actual and planning grains under pinned budget-article mappings.",
+      "required_evidence": [
+        "budget version",
+        "actual movements",
+        "budget mapping",
+        "period coverage"
+      ],
+      "dimensions": [
+        "budget_article",
+        "department",
+        "scenario",
+        "legal_entity"
+      ],
+      "process_types": [
+        "plan_budget",
+        "compare_actual"
+      ],
+      "fact_grains": [
+        "PLANNING_CELL",
+        "REPORT_LINE_PERIOD"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "CONSOLIDATION",
+      "name": "Consolidation",
+      "purpose": "Reconcile group reporting and separately governed elimination and translation policies.",
+      "required_evidence": [
+        "group perimeter",
+        "ownership evidence",
+        "intercompany matches",
+        "translation policy"
+      ],
+      "dimensions": [
+        "legal_entity",
+        "intercompany_partner",
+        "currency"
+      ],
+      "process_types": [
+        "translate_entity",
+        "eliminate_intercompany"
+      ],
+      "fact_grains": [
+        "JOURNAL_LINE",
+        "FS_ITEM_PERIOD"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "PAYROLL",
+      "name": "Payroll and personnel",
+      "purpose": "Interpret evidenced payroll accruals and payments using separately reviewed local policies.",
+      "required_evidence": [
+        "payroll registers",
+        "approved pay rules",
+        "deductions",
+        "settlements"
+      ],
+      "dimensions": [
+        "employee",
+        "department",
+        "legal_entity",
+        "pay_component"
+      ],
+      "process_types": [
+        "accrue_payroll",
+        "settle_payroll"
+      ],
+      "fact_grains": [
+        "JOURNAL_LINE",
+        "ACCOUNT_PERIOD"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "ASSET_LIFECYCLE",
+      "name": "Fixed asset lifecycle",
+      "purpose": "Preserve capitalization, commissioning, transfer and disposal evidence across asset versions.",
+      "required_evidence": [
+        "asset documents",
+        "capitalization policy",
+        "construction costs",
+        "disposal records"
+      ],
+      "dimensions": [
+        "asset",
+        "project",
+        "location",
+        "legal_entity"
+      ],
+      "process_types": [
+        "capitalize_cost",
+        "commission_asset",
+        "dispose_asset"
+      ],
+      "fact_grains": [
+        "TRANSACTION",
+        "JOURNAL_LINE"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "TREASURY",
+      "name": "Treasury and risk",
+      "purpose": "Model source-supported funding, settlements and financial instruments with approved valuation rules.",
+      "required_evidence": [
+        "bank and debt records",
+        "instrument terms",
+        "valuation policies"
+      ],
+      "dimensions": [
+        "instrument",
+        "bank_account",
+        "currency",
+        "legal_entity"
+      ],
+      "process_types": [
+        "borrow",
+        "repay",
+        "hedge"
+      ],
+      "fact_grains": [
+        "TRANSACTION",
+        "JOURNAL_LINE"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "MANAGEMENT_COST",
+      "name": "Management and cost accounting",
+      "purpose": "Apply reviewed allocation drivers and versioned management projections without duplicating source authority.",
+      "required_evidence": [
+        "cost pools",
+        "allocation drivers",
+        "management mapping"
+      ],
+      "dimensions": [
+        "cost_center",
+        "profit_center",
+        "activity",
+        "product",
+        "segment"
+      ],
+      "process_types": [
+        "allocate_cost",
+        "analyze_margin"
+      ],
+      "fact_grains": [
+        "ACCOUNT_PERIOD",
+        "REPORT_LINE_PERIOD"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "code": "AUDIT",
+      "name": "Audit and reconciliation",
+      "purpose": "Retain evidence, reconcile controls, review exceptions and reconstruct historical decisions.",
+      "required_evidence": [
+        "source lineage",
+        "definition versions",
+        "review receipts",
+        "control expectations"
+      ],
+      "dimensions": [
+        "legal_entity",
+        "period",
+        "source_family"
+      ],
+      "process_types": [
+        "reconcile",
+        "review_exception",
+        "reconstruct_history"
+      ],
+      "fact_grains": [
+        "JOURNAL_LINE",
+        "ACCOUNT_PERIOD",
+        "REPORT_LINE_PERIOD"
+      ],
+      "calculation_policy_required": true,
+      "source_module_identity": "SOURCE_EVIDENCE_REQUIRED"
+    }
+  ],
+  "modules": [
+    {
+      "code": "M1",
+      "capability": "DOUBLE_ENTRY",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M2",
+      "capability": "INVENTORY",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M3",
+      "capability": "FOREIGN_EXCHANGE",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M4",
+      "capability": "TAX",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M5",
+      "capability": "DEPRECIATION",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M6",
+      "capability": "BUDGET_CONTROL",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M7",
+      "capability": "CONSOLIDATION",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M8",
+      "capability": "PAYROLL",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M9",
+      "capability": "ASSET_LIFECYCLE",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M10",
+      "capability": "TREASURY",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M11",
+      "capability": "MANAGEMENT_COST",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M12",
+      "capability": "AUDIT",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M13",
+      "capability": "BALANCE_SHEET",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M14",
+      "capability": "INCOME_STATEMENT",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    },
+    {
+      "code": "M15",
+      "capability": "CASH_FLOW",
+      "source_of_truth": "SOURCE_EVIDENCE_REQUIRED",
+      "journal_effect": "CANDIDATE_UNLESS_REVIEWED"
+    }
+  ],
+  "account_dimension_policies": [
+    {
+      "account_family_pattern": "^7310(?:\\.|$)",
+      "required_dimensions": [
+        "cost_article",
+        "department"
+      ],
+      "observed_slot_order": [
+        "cost_article",
+        "department"
+      ],
+      "evidence_state": "OBSERVED_LABEL_ONLY",
+      "slot_note": "Base sheet positions are observed only; posting order becomes binding only when RULE_EVIDENCED."
+    },
+    {
+      "account_family_pattern": "^7410(?:\\.|$)",
+      "required_dimensions": [
+        "department",
+        "cost_article"
+      ],
+      "observed_slot_order": [
+        "department",
+        "cost_article"
+      ],
+      "evidence_state": "OBSERVED_LABEL_ONLY",
+      "slot_note": "7410 preserves the opposite Base column order observed for 73/82 families."
+    },
+    {
+      "account_family_pattern": "^3110(?:\\.|$)",
+      "required_dimensions": [
+        "counterparty",
+        "contract"
+      ],
+      "observed_slot_order": [
+        "counterparty",
+        "contract"
+      ],
+      "evidence_state": "OBSERVED_LABEL_ONLY",
+      "slot_note": "Counterparty and contract are required only after a reviewed rule receipt."
+    },
+    {
+      "account_family_pattern": "^1610(?:\\.|$)",
+      "required_dimensions": [
+        "product",
+        "warehouse"
+      ],
+      "observed_slot_order": [
+        "product",
+        "warehouse"
+      ],
+      "evidence_state": "OBSERVED_LABEL_ONLY",
+      "slot_note": "Nomenclature/product and warehouse labels do not become universal subkonto slots."
+    }
+  ],
+  "traceability": {
+    "path": [
+      "SourceEvidence",
+      "SourceRecord",
+      "SourceDocument",
+      "CanonicalJournalEntry",
+      "CanonicalJournalLine",
+      "AccountDimensionPolicy",
+      "BudgetArticle",
+      "ReportingLine"
+    ],
+    "cash_flow_condition": "CashFlowArticle is required only when an evidenced cash movement exists.",
+    "unknown_state": "UNKNOWN",
+    "tb_boundary": "Trial balance alone cannot authorize cash flow or a full statement.",
+    "projection_boundary": "CORPORATE_MR and PETROLEUM_OPERATING_PL are separate versioned projections over the same identities.",
+    "grain_boundary": "No transaction drill may be invented from ACCOUNT_PERIOD."
+  }
+}
