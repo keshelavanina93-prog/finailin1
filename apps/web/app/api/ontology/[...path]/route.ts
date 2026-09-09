@@ -19,6 +19,7 @@ async function forward(request: NextRequest, context: Context) {
   const retainedReports=(request.method==="POST"&&(route==="retained-reports"||route==="retained-reports/preview"))||(request.method==="GET"&&/^retained-reports(?:\/[a-fA-F0-9-]+(?:\/exports\/(?:xlsx|html))?)?$/.test(route));
   const analysisProjection=request.method==="POST"&&(route==="analysis/project"||route==="company-home"||route==="company-changes"||route==="company-journals/reconciliation/projection"||route==="company-journals/reconciliation/metrics");
   const companyFinancialResults=request.method==="GET"&&route==="company-financial-results";
+  const outcomes = request.method === "GET" && route === "outcomes/actual-vs-plan";
   const requestedRoute = route;
   if (retainedReports || outcomes) route = "proposal-queue";
   const transformationPreview=request.method==="POST"&&["transformations/preview","transformations/previewed-runs"].includes(route);
@@ -30,7 +31,6 @@ async function forward(request: NextRequest, context: Context) {
   const periodControl = (request.method === "GET" && route === "period-control") || (request.method === "POST" && route === "period-control/proposal");
   const accountDimensionPolicy = (request.method === "GET" && route === "account-dimension-policy") || (request.method === "POST" && route === "account-dimension-policy/proposal");
   const planning = request.method === "GET" && /^planning\/(?:catalog|compare)$/.test(route);
-  const outcomes = request.method === "GET" && route === "outcomes/actual-vs-plan";
   const nyxReasoning = request.method === "POST" && route === "nyx/reason";
   const retention = /^retention\/(?:inspect|history|policies|evaluations|receipts\/[a-fA-F0-9-]+)$/.test(route);
   const model = /^model\/(?:fact-runs\/fcr_[a-f0-9]{64}(?:\/authority)?|definitions(?:\/(?:preview|contracts|[a-fA-F0-9-]+))?|proposals\/[a-fA-F0-9-]+\/decision|(?:sets|groups)\/[a-fA-F0-9-]+\/objects|bindings\/[a-fA-F0-9-]+\/proposal|facts\/[a-fA-F0-9-]+\/(?:aggregate(?:\/guarded)?|reconcile)|sources\/ir_[a-f0-9]{64}\/accounts(?:\/proposal)?|derived\/query)$/.test(route);

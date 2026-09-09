@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import OutcomeMeasurementPanel from "./outcome-measurement-panel";
 
 type Node = { resource_id: string; version_id: string; display_name: string; authority_state: string; evidence_class: string; attributes: Record<string, unknown> };
 type Catalog = { contract: "planning-catalog/1"; scenarios: Node[]; cells: Node[]; authority: string; forecast_calculation_available: false };
@@ -9,10 +10,43 @@ type Comparison = { contract: "planning-comparison/1"; rows: Array<{ dimension: 
 export default function PlanningWorkspace({ token, companyName }: { token: string; companyName: string }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [comparison, setComparison] = useState<Comparison | null>(null);
-  const [a, setA] = useState(""); const [b, setB] = useState("");
-  const [busy, setBusy] = useState(true); const [error, setError] = useState("");
-  useEffect(() => { const controller = new AbortController(); void fetch("/api/ontology/planning/catalog", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store", signal: controller.signal }).then(async response => { const data = await response.json() as Catalog & { detail?: string }; if (!response.ok) throw new Error(data.detail ?? "Planning catalog unavailable"); return data; }).then(data => { setCatalog(data); setA(data.scenarios[0]?.resource_id ?? ""); setB(data.scenarios[1]?.resource_id ?? ""); }).catch(failure => { if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : "Planning catalog unavailable"); }).finally(() => { if (!controller.signal.aborted) setBusy(false); }); return () => controller.abort(); }, [token]);
+  const [a, setA] = useState("");
+  const [b, setB] = useState("");
+  const [busy, setBusy] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/ontology/planning/catalog", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store", signal: controller.signal })
+      .then(async response => { const data = await response.json() as Catalog & { detail?: string }; if (!response.ok) throw new Error(data.detail ?? "Planning catalog unavailable"); return data; })
+      .then(data => { setCatalog(data); setA(data.scenarios[0]?.resource_id ?? ""); setB(data.scenarios[1]?.resource_id ?? ""); })
+      .catch(failure => { if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : "Planning catalog unavailable"); })
+      .finally(() => { if (!controller.signal.aborted) setBusy(false); });
+    return () => controller.abort();
+  }, [token]);
+
   const selectedCells = useMemo(() => catalog?.cells.slice(0, 100) ?? [], [catalog]);
-  async function compare() { if (!a || !b || a === b) { setError("Select two different accepted scenarios."); return; } setBusy(true); setError(""); try { const response = await fetch(`/api/ontology/planning/compare?scenario_a=${encodeURIComponent(a)}&scenario_b=${encodeURIComponent(b)}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }); const data = await response.json() as Comparison & { detail?: string }; if (!response.ok) throw new Error(data.detail ?? "Scenario comparison unavailable"); setComparison(data); } catch (failure) { setError(failure instanceof Error ? failure.message : "Scenario comparison unavailable"); } finally { setBusy(false); } }
-  return <section className="g8-panel" aria-label="Planning and scenario workspace"><div className="g8-panel-heading"><div><p className="overline">PLANNING · ACCEPTED CANONICAL FACTS</p><h2>{companyName} planning</h2><p>Compare reviewed scenario versions and planning cells in the selected company scope. No forecast is invented and no accounting truth is changed here.</p></div><span className="g8-badge">{catalog?.authority ?? "Loading"}</span></div>{busy && !catalog && <p role="status">Loading accepted planning resources…</p>}{error && <p className="g8-inline-error" role="alert">{error}</p>}{catalog && <><div className="g8-actionbar"><label>Scenario A<select value={a} onChange={event => setA(event.target.value)}><option value="">Select scenario</option>{catalog.scenarios.map(item => <option key={item.resource_id} value={item.resource_id}>{String(item.attributes.code ?? item.display_name)} · {String(item.attributes.kind ?? "unknown")}</option>)}</select></label><label>Scenario B<select value={b} onChange={event => setB(event.target.value)}><option value="">Select scenario</option>{catalog.scenarios.map(item => <option key={item.resource_id} value={item.resource_id}>{String(item.attributes.code ?? item.display_name)} · {String(item.attributes.kind ?? "unknown")}</option>)}</select></label><button onClick={() => void compare()} disabled={busy || !a || !b || a === b}>Compare exact scenarios</button></div><h3>Accepted planning cells</h3>{selectedCells.length ? <div className="g8-table-scroll"><table><thead><tr><th>Article</th><th>Period</th><th>Department</th><th>Measure</th><th>Amount</th><th>Authority</th></tr></thead><tbody>{selectedCells.map(item => <tr key={item.version_id}><td>{String(item.attributes.budget_article_id)}</td><td>{String(item.attributes.period_starts_on)} — {String(item.attributes.period_ends_on)}</td><td>{String(item.attributes.department_id)}</td><td>{String(item.attributes.measure ?? "—")}</td><td>{String(item.attributes.amount)}</td><td>{item.authority_state}</td></tr>)}</tbody></table></div> : <p>No accepted PlanningCellFact resources are available for this company scope.</p>}</>}{comparison && <><h3>Scenario comparison</h3><p>{comparison.coverage} · deterministic Decimal delta · forecast calculation available: {String(comparison.forecast_calculation_available)}</p>{comparison.rows.length ? <div className="g8-table-scroll"><table><thead><tr><th>Dimension</th><th>Scenario A</th><th>Scenario B</th><th>Delta</th></tr></thead><tbody>{comparison.rows.map(row => <tr key={JSON.stringify(row.dimension)}><td>{Object.entries(row.dimension).filter(([, value]) => value).map(([key, value]) => `${key}: ${value}`).join(" · ")}</td><td>{row.scenario_a}</td><td>{row.scenario_b}</td><td>{row.delta}</td></tr>)}</tbody></table></div> : <p>No common planning dimensions were found.</p>}</>}</section>;
+  async function compare() {
+    if (!a || !b || a === b) { setError("Select two different accepted scenarios."); return; }
+    setBusy(true); setError("");
+    try {
+      const response = await fetch(`/api/ontology/planning/compare?scenario_a=${encodeURIComponent(a)}&scenario_b=${encodeURIComponent(b)}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+      const data = await response.json() as Comparison & { detail?: string };
+      if (!response.ok) throw new Error(data.detail ?? "Scenario comparison unavailable");
+      setComparison(data);
+    } catch (failure) { setError(failure instanceof Error ? failure.message : "Scenario comparison unavailable"); }
+    finally { setBusy(false); }
+  }
+
+  return <section className="g8-panel" aria-label="Planning and scenario workspace">
+    <div className="g8-panel-heading"><div><p className="overline">PLANNING · ACCEPTED CANONICAL FACTS</p><h2>{companyName} planning</h2><p>Compare reviewed scenario versions and planning cells in the selected company scope. No forecast is invented and no accounting truth is changed here.</p></div><span className="g8-badge">{catalog?.authority ?? "Loading"}</span></div>
+    {busy && !catalog && <p role="status">Loading accepted planning resources…</p>}
+    {error && <p className="g8-inline-error" role="alert">{error}</p>}
+    {catalog && <>
+      <div className="g8-actionbar"><label>Scenario A<select value={a} onChange={event => setA(event.target.value)}><option value="">Select scenario</option>{catalog.scenarios.map(item => <option key={item.resource_id} value={item.resource_id}>{String(item.attributes.code ?? item.display_name)} · {String(item.attributes.kind ?? "unknown")}</option>)}</select></label><label>Scenario B<select value={b} onChange={event => setB(event.target.value)}><option value="">Select scenario</option>{catalog.scenarios.map(item => <option key={item.resource_id} value={item.resource_id}>{String(item.attributes.code ?? item.display_name)} · {String(item.attributes.kind ?? "unknown")}</option>)}</select></label><button onClick={() => void compare()} disabled={busy || !a || !b || a === b}>Compare exact scenarios</button></div>
+      <h3>Accepted planning cells</h3>{selectedCells.length ? <div className="g8-table-scroll"><table><thead><tr><th>Article</th><th>Period</th><th>Department</th><th>Measure</th><th>Amount</th><th>Authority</th></tr></thead><tbody>{selectedCells.map(item => <tr key={item.version_id}><td>{String(item.attributes.budget_article_id)}</td><td>{String(item.attributes.period_starts_on)} — {String(item.attributes.period_ends_on)}</td><td>{String(item.attributes.department_id)}</td><td>{String(item.attributes.measure ?? "—")}</td><td>{String(item.attributes.amount)}</td><td>{item.authority_state}</td></tr>)}</tbody></table></div> : <p>No accepted PlanningCellFact resources are available for this company scope.</p>}
+    </>}
+    {comparison && <><h3>Scenario comparison</h3><p>{comparison.coverage} · deterministic Decimal delta · forecast calculation available: {String(comparison.forecast_calculation_available)}</p>{comparison.rows.length ? <div className="g8-table-scroll"><table><thead><tr><th>Dimension</th><th>Scenario A</th><th>Scenario B</th><th>Delta</th></tr></thead><tbody>{comparison.rows.map(row => <tr key={JSON.stringify(row.dimension)}><td>{Object.entries(row.dimension).filter(([, value]) => value).map(([key, value]) => `${key}: ${value}`).join(" · ")}</td><td>{row.scenario_a}</td><td>{row.scenario_b}</td><td>{row.delta}</td></tr>)}</tbody></table></div> : <p>No common planning dimensions were found.</p>}</>}
+    <OutcomeMeasurementPanel token={token} planScenarioId={a} actualScenarioId={b} />
+  </section>;
 }
