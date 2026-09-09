@@ -21,6 +21,7 @@ from finai_api.domain.resources import (
     ResourceReview,
 )
 from finai_api.domain.review import Principal
+from finai_api.services import dependency_impact
 from finai_api.services.dependency_impact import downstream_impact, impact_fingerprint
 from finai_api.services.proposal_evaluation import record_evaluation, require_evaluation
 from finai_api.services.schema_compatibility import SchemaCompatibilityError, schema_compatibility
@@ -988,9 +989,20 @@ def _validate(
                 raise WorkspaceError(409, "Identity merge would introduce a cycle")
             visited.add(current)
             current = redirects[current]
+    impact_limit = dependency_impact.MAX_RESOURCES
+    if proposal.access_entity == "__PLATFORM__" and "restricted_read" in principal.permissions:
+        # A reviewed steward grant permits a complete, still-bounded platform
+        # impact walk. The normal tenant proposal bound remains unchanged.
+        impact_limit = dependency_impact.PLATFORM_MAX_RESOURCES
     return {
         "impact": impact,
-        "downstream_impact": downstream_impact(conn, principal, proposal, dependencies),
+        "downstream_impact": downstream_impact(
+            conn,
+            principal,
+            proposal,
+            dependencies,
+            max_resources=impact_limit,
+        ),
         "dependency_heads": external_heads,
         "dependencies": dependencies,
         "co_publication_constraints": co_publication_constraints,

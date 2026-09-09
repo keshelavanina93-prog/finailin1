@@ -107,6 +107,7 @@ def install(author: Principal, reviewer: Principal) -> dict[str, Any]:
     # not mutate FINAI_ACCESS_TOKENS or turn a rejected dependency check into a
     # success by omission.
     author = ontology_install.effective_install_principal(author)
+    reviewer = ontology_install.effective_install_principal(reviewer)
     compiled = finance_ontology.compilation(author.scope.tenant_id)
     specs = list(compiled.definitions)
     legacy = platform_definitions(author.scope.tenant_id)

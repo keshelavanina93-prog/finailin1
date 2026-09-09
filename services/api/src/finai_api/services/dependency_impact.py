@@ -15,6 +15,10 @@ from finai_api.services.workspace import WorkspaceError
 
 MAX_DEPTH = 16
 MAX_RESOURCES = 1000
+# A reviewed tenant steward may need to inspect the complete platform graph
+# already present in a live registry. This remains bounded and is selected only
+# for platform proposals made with the existing restricted-read capability.
+PLATFORM_MAX_RESOURCES = 20_000
 
 
 def impact_fingerprint(snapshot: dict[str, Any]) -> str:
@@ -26,6 +30,8 @@ def downstream_impact(
     principal: Principal,
     proposal: ResourceProposal,
     dependencies: dict[str, list[dict[str, str]]],
+    *,
+    max_resources: int = MAX_RESOURCES,
 ) -> dict[str, Any]:
     mutations = {str(item.resource_id): item for item in proposal.mutations}
     proposed_versions = {str(uuid5(proposal.proposal_id, key)) for key in mutations}
@@ -57,6 +63,7 @@ def downstream_impact(
         },
         proposed_reverse,
         proposal.access_entity,
+        max_resources=max_resources,
     )
 
 
@@ -89,6 +96,8 @@ def _traverse(
     expected_roots: dict[str, bool],
     proposed_reverse: dict[str, list[dict[str, Any]]],
     access_entity: str,
+    *,
+    max_resources: int = MAX_RESOURCES,
 ) -> dict[str, Any]:
     neighbors: dict[str, list[dict[str, Any]]] = {}
     unique_resources: set[str] = set(expected_roots)
@@ -133,9 +142,9 @@ def _traverse(
                     "GROUP BY v.resource_id,v.version_id,v.object_type,"
                     "v.display_name,v.access_entity "
                     "ORDER BY v.resource_id,v.version_id LIMIT %s",
-                    (principal.scope.tenant_id, UUID(identifier), MAX_RESOURCES + 1),
+                    (principal.scope.tenant_id, UUID(identifier), max_resources + 1),
                 ).fetchall()
-        if len(rows) > MAX_RESOURCES:
+        if len(rows) > max_resources:
             raise WorkspaceError(
                 409, "Dependency impact exceeds the resource bound; narrow the change"
             )
@@ -156,7 +165,7 @@ def _traverse(
         ]
         result.extend(proposed_reverse.get(identifier, []))
         unique_resources.update(row["resource_id"] for row in result)
-        if len(unique_resources) > MAX_RESOURCES:
+        if len(unique_resources) > max_resources:
             raise WorkspaceError(
                 409, "Dependency impact exceeds the resource bound; narrow the change"
             )
@@ -178,7 +187,7 @@ def _traverse(
                         **{key: value for key, value in child.items() if key != "cycle_dependency"},
                         "depth": depth + 1,
                     }
-                if len(affected) > MAX_RESOURCES:
+                if len(affected) > max_resources:
                     raise WorkspaceError(
                         409, "Dependency impact exceeds the snapshot bound; narrow the change"
                     )
@@ -216,6 +225,6 @@ def _traverse(
         "requires_tenant_steward": restricted,
         "selection": "CURRENT_ACCEPTED_HEADS_AND_PROPOSED",
         "max_depth": MAX_DEPTH,
-        "max_resources": MAX_RESOURCES,
+        "max_resources": max_resources,
         "affected": [affected[key] for key in sorted(affected)],
     }
