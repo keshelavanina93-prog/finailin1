@@ -9,8 +9,8 @@ export interface CompanyConditionResourceGroup {
 }
 export interface CompanyConditionWorkItem {
  workflow_id:string;proposal_id:string|null;company_id:string;title:string;
- state:"PREPARED"|"PENDING_REVIEW"|"PUBLISHED"|"REJECTED";
- created_at:string;reason:string;basis:"EXPLICIT_INVOCATION";
+ state:"PREPARED"|"PENDING_REVIEW"|"PUBLISHED"|"REJECTED"|"PUBLICATION_UNAVAILABLE";
+ created_at:string;reason:string;basis:"EXPLICIT_INVOCATION"|"EXPLICIT_RETAINED_EXCEPTION";
 }
 export interface CompanyConditionDescriptor {
  contract:"g8-company-condition/1";company:CanonicalResource;valid_at:string;known_at:string;
