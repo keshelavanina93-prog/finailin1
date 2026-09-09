@@ -34,6 +34,11 @@ def digest(value):
     return sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def proposal_effect(proposal: ResourceProposal):
+    """Return the semantic proposal effect, excluding request metadata and prose."""
+    return proposal.model_dump(mode="json", exclude={"proposal_id", "title", "rationale"})
+
+
 def recent(principal, document_id: str | None = None, binding_id: UUID | None = None):
     require_permission(principal, "ontology_read")
     if bool(document_id) == bool(binding_id):

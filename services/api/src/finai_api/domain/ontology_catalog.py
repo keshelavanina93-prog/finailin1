@@ -33,6 +33,11 @@ SEMANTICS = {
 
 # required field -> semantic kind or a canonical target type. Optional fields carry '?'.
 TYPE_FIELDS: dict[str, dict[str, str]] = {
+    "Finding": {"legal_entity_id": "@LegalEntity", "definition": "OntologyDefinition"},
+    "Investigation": {
+        "legal_entity_id": "@LegalEntity", "finding_id": "@Finding",
+        "definition": "OntologyDefinition",
+    },
     "ExternalOntologySource": {"definition": "OntologyDefinition"},
     "ExternalOntologyRelease": {
         "evidence_id": "@SourceEvidence", "definition": "OntologyDefinition",

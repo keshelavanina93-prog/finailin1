@@ -9,7 +9,6 @@ from finai_api.api.company_condition_routes import router as company_condition_r
 from finai_api.api.company_context_routes import router as company_context_router
 from finai_api.api.company_home_routes import router as company_home_router
 from finai_api.api.company_journal_routes import router as company_journal_router
-from finai_api.api.diagnostic_routes import router as diagnostic_router
 from finai_api.api.event_time_routes import router as event_time_router
 from finai_api.api.finance_ontology_routes import router as finance_ontology_router
 from finai_api.api.function_routes import router as function_router
@@ -85,7 +84,6 @@ app.include_router(company_home_router)
 app.include_router(company_journal_router)
 app.include_router(tb_finance_contract_router)
 app.include_router(tb_finance_router)
-app.include_router(diagnostic_router)
 app.include_router(period_control_router)
 app.include_router(ontology_operation_router)
 

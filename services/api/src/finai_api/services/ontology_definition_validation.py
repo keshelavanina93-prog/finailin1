@@ -29,7 +29,14 @@ def validate_definition(
     schemas: dict[str, str],
     links: dict[str, str],
     target: Callable[..., dict[str, Any]],
+    *,
+    principal=None,
 ) -> None:
+    if item.object_type in ("Finding", "Investigation"):
+        from finai_api.services.investigation_actions import validate_publication
+
+        validate_publication(item, target, principal)
+        return
     if item.object_type == "MetricDefinition":
         from finai_api.services.metric_execution import validate_publication
 

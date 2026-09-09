@@ -569,7 +569,7 @@ def _validate(
                         raise WorkspaceError(422, "Money requires a canonical Currency")
             from finai_api.services.ontology_definition_validation import validate_definition
 
-            validate_definition(item, schema_by_name, link_by_name, target)
+            validate_definition(item, schema_by_name, link_by_name, target, principal=principal)
             if item.object_type in {
                 "ExternalOntologySource",
                 "ExternalOntologyRelease",

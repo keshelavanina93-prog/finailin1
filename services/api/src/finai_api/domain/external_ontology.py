@@ -15,9 +15,9 @@ from pydantic import (
 
 from finai_api.domain.semantic_analysis import Pin
 
-type Digest = Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
-type Iri = Annotated[str, StringConstraints(min_length=1, max_length=2048)]
-type Syntax = Literal["TURTLE", "RDF_XML"]
+Digest = Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
+Iri = Annotated[str, StringConstraints(min_length=1, max_length=2048)]
+Syntax = Literal["TURTLE", "RDF_XML"]
 
 
 def absolute_iri(value: str) -> str:
