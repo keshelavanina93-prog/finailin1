@@ -61,8 +61,20 @@ def intake(
 
 
 @router.get("/constructions/{receipt_id}", response_model=ReceiptDetail)
-def construction(receipt_id: str, principal: User) -> ReceiptDetail:
-    return workspace.detail(principal, receipt_id)
+def construction(
+    receipt_id: str,
+    principal: User,
+    period: Annotated[str | None, Query(pattern=r"^2025-(0[1-9]|1[0-2])$")] = None,
+) -> ReceiptDetail:
+    if period is None:
+        return workspace.detail(principal, receipt_id)
+    # Historical SGP receipts are retained under their observed month.  Read
+    # access may cross the signed-in operational month only for the explicit
+    # 2025 source package and keeps tenant/entity/currency unchanged.
+    historical = principal.model_copy(
+        update={"scope": principal.scope.model_copy(update={"period": period})}
+    )
+    return workspace.detail(historical, receipt_id)
 
 
 @router.post("/constructions/{receipt_id}/decision", response_model=ReviewDecision)

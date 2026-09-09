@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import G8Workspace from "./g8-workspace";
 import "./styles.css";
 import "./trial-balance-review.css";
+import "./ontology-connections.css";
 
 export const metadata: Metadata = {
   title: "G8 by NYXCore",

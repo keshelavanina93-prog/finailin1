@@ -25,6 +25,24 @@
 .dataws-panel>.g8-history-explorer { margin:0; }
 .dataws-panel>.source-browser { margin:0; }
 .dataws-foot { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px 20px; padding:11px 24px; border-top:1px solid var(--g8-border); font-size:9px; color:var(--g8-muted); line-height:1.6; }
+.source-family-matrix { display:grid; gap:16px; }
+.source-family-matrix>header { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; padding:18px; border:1px solid var(--g8-border); border-radius:var(--g8-radius); background:var(--g8-raised); }
+.source-family-matrix h3 { margin:0 0 6px; font-size:18px; font-weight:600; }
+.source-family-matrix p { margin:0; color:var(--g8-muted); font-size:11px; line-height:1.6; }
+.source-family-matrix>header>span { flex:none; max-width:280px; color:var(--g8-cyan); font-size:10px; text-align:right; overflow-wrap:anywhere; }
+.source-family-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.source-family-card { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; padding:15px; border:1px solid var(--g8-border); border-radius:var(--g8-radius); background:rgba(255,255,255,.02); }
+.source-family-card strong { display:block; font-size:13px; margin-bottom:4px; }
+.source-family-card div>span { display:block; color:var(--g8-muted); font-size:10px; line-height:1.5; }
+.source-family-card mark { align-self:start; border-radius:999px; padding:5px 8px; background:transparent; border:1px solid var(--g8-border); color:var(--g8-muted); font-size:9px; text-transform:uppercase; letter-spacing:.06em; }
+.source-family-card.wired mark { border-color:rgba(130,220,185,.45); color:var(--g8-accent); }
+.source-family-card.partial mark { border-color:rgba(230,190,110,.5); color:#e3c071; }
+.source-family-card.target mark { border-color:rgba(150,165,180,.35); color:#aab7c1; }
+.source-family-card dl { grid-column:1/-1; display:grid; grid-template-columns:82px minmax(0,1fr); gap:7px 10px; margin:0; padding-top:12px; border-top:1px solid var(--g8-border); font-size:10px; line-height:1.5; }
+.source-family-card dt { color:var(--g8-muted); }
+.source-family-card dd { margin:0; overflow-wrap:anywhere; }
+.source-family-note { padding:12px 14px; border:1px solid var(--g8-border); border-radius:var(--g8-radius); background:rgba(230,190,110,.06); }
 @container (max-width:700px) { .dataws-header { padding:18px; flex-wrap:wrap; gap:14px; } .dataws-context { padding:12px 18px; } .dataws-observed { text-align:left; } .dataws-tabs { padding:0 18px; gap:18px; } .dataws-guidance { padding:11px 18px; } .dataws-guidance>span:last-child { display:none; } .dataws-panel { padding:12px; } .dataws-foot { padding:10px 18px; } }
 @media(max-height:650px) { .dataws-panel { min-height:280px; max-height:65dvh; } }
-@media(max-width:600px) { .dataws-tabs { gap:16px; } .dataws-tabs button { font-size:10px; } .dataws-panel { min-height:340px; max-height:75dvh; } }
+@media(max-width:800px) { .source-family-grid { grid-template-columns:1fr; } .source-family-matrix>header { display:block; } .source-family-matrix>header>span { display:block; margin-top:10px; text-align:left; } }
+@media(max-width:600px) { .dataws-tabs { gap:16px; } .dataws-tabs button { font-size:10px; } .dataws-panel { min-height:340px; max-height:75dvh; } .source-family-card { grid-template-columns:1fr; } .source-family-card mark { justify-self:start; } }

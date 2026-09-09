@@ -96,6 +96,56 @@ export interface IngestReceipt {
   functions_executed: string[];
 }
 
+export interface TrialBalancePackageMonth {
+  filename: string;
+  period: string;
+  source_sha256: string;
+  row_count: number;
+  selected_root_rows: number;
+  source_total_rows: number[];
+  totals: Record<string, string>;
+  pair_deltas: Record<string, string>;
+  hierarchy_check_count: number;
+  hierarchy_breaks: number;
+  equality: Record<string, "PASS" | "BREAK">;
+  equality_state: "PASS" | "BREAK";
+  mapping_state: "REQUIRED" | "APPROVED";
+  receipt_id: string | null;
+}
+
+export interface TrialBalancePackageReport {
+  package_id: string;
+  entity_label: string;
+  year: 2025;
+  currency: string;
+  workbook_count: number;
+  row_count: number;
+  expected_row_count: number;
+  row_count_state: "PASS" | "BREAK";
+  periods: string[];
+  months: TrialBalancePackageMonth[];
+  carryforward: Array<{
+    from_period: string | null;
+    to_period: string;
+    opening_debit: string | null;
+    prior_closing_debit: string | null;
+    debit_delta: string | null;
+    opening_credit: string | null;
+    prior_closing_credit: string | null;
+    credit_delta: string | null;
+    state: "NOT_APPLICABLE" | "PASS" | "BREAK";
+  }>;
+  carryforward_breaks: number;
+  hierarchy_breaks: number;
+  package_evidence_state: "SOURCE_PROOF_PASSED" | "SOURCE_REVIEW_REQUIRED";
+  mapping_state: "REQUIRED" | "APPROVED";
+  finance_locked: boolean;
+  planning_locked: boolean;
+  reporting_locked: boolean;
+  historical_scope_guard: Record<string, string | boolean>;
+  account_codes: string[];
+}
+
 export interface Principal {
   actor_id: string;
   display_name: string;
