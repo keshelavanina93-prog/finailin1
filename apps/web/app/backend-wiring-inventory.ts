@@ -78,6 +78,7 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
       "/api/operations/petroleum/reconciliation -> /v1/operations/petroleum/reconciliation",
       "/api/operations/petroleum/margin -> /v1/operations/petroleum/margin",
       "/api/operations/petroleum/movement-journal-reconciliation -> /v1/operations/petroleum/movement-journal-reconciliation",
+      "/api/operations/petroleum/telemetry -> /v1/operations/petroleum/telemetry",
       "/api/operations/petroleum/lineage/{resource_id} -> /v1/operations/petroleum/lineage/{resource_id}",
       "/api/operations/petroleum/intake/{receipt_id}/validation -> /v1/operations/petroleum/intake/{receipt_id}/validation",
       "/api/operations/petroleum/intake/{receipt_id}/promotion-preview -> /v1/operations/petroleum/intake/{receipt_id}/promotion-preview",
@@ -158,11 +159,11 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
   routeFamily(
     "petroleum_telemetry_bridge",
     "Full petroleum telemetry bridge",
-    null,
-    null,
-    "target_only",
-    [],
-    ["full petroleum telemetry bridge"],
+    "/api/operations/petroleum/telemetry",
+    "/v1/operations/petroleum/telemetry",
+    "partial",
+    ["/api/operations/petroleum/telemetry -> /v1/operations/petroleum/telemetry"],
+    ["live connector/readback and continuous alerting remain open"],
   ),
 ];
 

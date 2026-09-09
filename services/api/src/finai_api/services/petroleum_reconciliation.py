@@ -4,7 +4,9 @@ This is a read-only bridge over approved canonical resource versions. It never
 turns a physical variance into an accounting posting or an external action.
 """
 
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
+from itertools import pairwise
 from typing import Any
 from uuid import UUID
 
@@ -285,6 +287,97 @@ def movement_journal_reconciliation(
         "warning": (
             "Reference coverage is not posting authority; movement promotion remains "
             "governed review."
+        ),
+    }
+
+
+def telemetry(principal: Principal, company_id: UUID | None = None) -> dict[str, Any]:
+    """Project accepted physical measurements into deterministic meter series."""
+    require_permission(principal, "ontology_read")
+    company = str(company_id) if company_id else None
+    measurements = resources.list_resources(principal, "PhysicalMeasurement", "", 0, limit=5000)
+    if company is not None:
+        measurements = [
+            item
+            for item in measurements
+            if any(
+                str(item.attributes.get(key)) == company
+                for key in ("legal_entity_id", "company_id")
+            )
+        ]
+    grouped: dict[tuple[str, ...], list[Any]] = {}
+    dimensions = (
+        "legal_entity_id",
+        "meter_id",
+        "asset_id",
+        "location_id",
+        "measurement_type",
+        "unit",
+        "pressure_basis",
+        "temperature_basis",
+    )
+    for item in measurements:
+        key = tuple(str(item.attributes.get(field, "")) for field in dimensions)
+        grouped.setdefault(key, []).append(item)
+    rows: list[dict[str, Any]] = []
+    for key, items in sorted(grouped.items()):
+        readings: list[tuple[datetime, Decimal, Any]] = []
+        invalid = 0
+        for item in items:
+            attrs = item.attributes
+            try:
+                timestamp = datetime.fromisoformat(str(attrs.get("measurement_timestamp", "")))
+                value = _decimal(attrs.get("value"), "value")
+                if timestamp.tzinfo is None:
+                    raise ValueError
+                readings.append((timestamp, value, item))
+            except (ValueError, TypeError, WorkspaceError):
+                invalid += 1
+        readings.sort(key=lambda entry: (entry[0], str(entry[2].resource_id)))
+        intervals = [
+            (right[0] - left[0]).total_seconds()
+            for left, right in pairwise(readings)
+            if right[0] >= left[0]
+        ]
+        median = sorted(intervals)[(len(intervals) - 1) // 2] if intervals else None
+        gap_count = sum(1 for interval in intervals if median and interval > max(2 * median, 3600))
+        basis_complete = bool(key[6] and key[7] and key[5])
+        if invalid:
+            status = "INVALID_READING_REVIEW"
+        elif not basis_complete:
+            status = "MEASUREMENT_BASIS_REVIEW"
+        elif gap_count:
+            status = "GAP_REVIEW_REQUIRED"
+        else:
+            status = "SERIES_ORDERED"
+        rows.append(
+            {
+                "dimensions": dict(zip(dimensions, key, strict=True)),
+                "reading_count": len(readings),
+                "invalid_readings": invalid,
+                "first_timestamp": readings[0][0].isoformat() if readings else None,
+                "last_timestamp": readings[-1][0].isoformat() if readings else None,
+                "minimum_value": format(min((row[1] for row in readings), default=Decimal(0)), "f"),
+                "maximum_value": format(max((row[1] for row in readings), default=Decimal(0)), "f"),
+                "median_interval_seconds": median,
+                "gap_count": gap_count,
+                "basis_state": "COMPLETE" if basis_complete else "INCOMPLETE",
+                "status": status,
+                "source_resource_ids": [str(row[2].resource_id) for row in readings],
+            }
+        )
+    return {
+        "contract": "petroleum-telemetry-bridge/1",
+        "company_id": company,
+        "coverage": "ACCEPTED_PHYSICAL_MEASUREMENTS",
+        "rows": rows,
+        "measurement_count": len(measurements),
+        "live_connector": False,
+        "accounting_authorized": False,
+        "business_effect_authorized": False,
+        "warning": (
+            "This is an accepted measurement snapshot; it is not a live connector or "
+            "booked financial truth."
         ),
     }
 

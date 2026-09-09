@@ -1995,7 +1995,7 @@ grains before promotion. The retained-source review now reads the semantic
 binding result through the authenticated operations proxy and displays row
 bindings, explicit reasons, non-monotonic series findings and the distinction
 between governed-promotion eligibility and disabled canonical promotion. Retail cash-register shift-close intake is represented as a wired, partially implemented source family with Z-report identity, fiscal-close review evidence, Store/CashRegister semantic-binding readback and a proposal preview with an independent-review submission action. Operations also presents the accepted-resource revenue/volume/COGS/margin bridge with explicit COGS gaps and a movement-to-journal coverage panel with matched and unresolved states. 1C movement-register intake is represented with physical movement grain and evidence-linked proposal preview plus governed proposal submission. Canonical operational object schemas are now included in the platform seed so the handoff is validated by the same ontology schema/dependency gate as other proposals. Canonical publication remains behind independent review. Retained source
-connectors, canonical operational promotion and live telemetry remain open.
+connectors, canonical operational promotion and live telemetry remain open. The Operations surface now includes accepted measurement-series windows, basis completeness, invalid readings and inferred gap review states.
 The previous coverage result was
 83.93% versus the required 90%. NYX now calls a citation-first governed
 reasoning boundary for exact selected resources; model-backed reasoning and

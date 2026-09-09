@@ -66,6 +66,11 @@ def movement_journal_reconciliation_view(
     return petroleum_reconciliation.movement_journal_reconciliation(principal, company_id)
 
 
+@router.get("/petroleum/telemetry")
+def petroleum_telemetry_view(principal: User, company_id: UUID | None = None) -> dict[str, Any]:
+    return petroleum_reconciliation.telemetry(principal, company_id)
+
+
 @router.get("/petroleum/lineage/{resource_id}")
 def petroleum_lineage_view(
     principal: User, resource_id: UUID, company_id: UUID | None = None

@@ -203,3 +203,67 @@ def test_movement_journal_reconciliation_exposes_missing_journal(monkeypatch):
     )
     result = petroleum_reconciliation.movement_journal_reconciliation(_principal())
     assert result["rows"][0]["status"] == "MISSING_JOURNAL"
+
+
+def test_telemetry_bridge_reports_basis_and_series_gaps(monkeypatch):
+    entity = str(_principal().scope.legal_entity_id)
+    rows = {
+        "PhysicalMeasurement": [
+            FakeResource(
+                UUID("90000000-0000-0000-0000-000000000001"),
+                {
+                    "legal_entity_id": entity,
+                    "meter_id": "meter-1",
+                    "asset_id": "asset-1",
+                    "location_id": "location-1",
+                    "measurement_type": "FLOW",
+                    "unit": "M3",
+                    "pressure_basis": "ABS",
+                    "temperature_basis": "15C",
+                    "measurement_timestamp": "2025-01-01T00:00:00+00:00",
+                    "value": "10",
+                },
+            ),
+            FakeResource(
+                UUID("90000000-0000-0000-0000-000000000002"),
+                {
+                    "legal_entity_id": entity,
+                    "meter_id": "meter-1",
+                    "asset_id": "asset-1",
+                    "location_id": "location-1",
+                    "measurement_type": "FLOW",
+                    "unit": "M3",
+                    "pressure_basis": "ABS",
+                    "temperature_basis": "15C",
+                    "measurement_timestamp": "2025-01-01T01:00:00+00:00",
+                    "value": "12",
+                },
+            ),
+            FakeResource(
+                UUID("90000000-0000-0000-0000-000000000003"),
+                {
+                    "legal_entity_id": entity,
+                    "meter_id": "meter-1",
+                    "asset_id": "asset-1",
+                    "location_id": "location-1",
+                    "measurement_type": "FLOW",
+                    "unit": "M3",
+                    "pressure_basis": "ABS",
+                    "temperature_basis": "15C",
+                    "measurement_timestamp": "2025-01-01T05:00:00+00:00",
+                    "value": "18",
+                },
+            ),
+        ]
+    }
+    monkeypatch.setattr(
+        petroleum_reconciliation.resources,
+        "list_resources",
+        lambda _p, kind, _s, _o, limit=5000: rows[kind],
+    )
+    result = petroleum_reconciliation.telemetry(_principal())
+    assert result["contract"] == "petroleum-telemetry-bridge/1"
+    assert result["rows"][0]["status"] == "GAP_REVIEW_REQUIRED"
+    assert result["rows"][0]["gap_count"] == 1
+    assert result["rows"][0]["basis_state"] == "COMPLETE"
+    assert result["live_connector"] is False
