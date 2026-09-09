@@ -143,10 +143,10 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
   const [navigationCompanyId,setCompanyId] = useState(savedContext.companyId);const companyId=routeTarget?.companyId??navigationCompanyId;
   const workspaceMapSession=token;
   const mapStateScope=JSON.stringify([token,companyId]);
-  const [storedMapState,setStoredMapState]=useState<{scope:string;state:MapWorkspaceState}|null>(()=>{try{const value=JSON.parse(sessionStorage.getItem("g8-map-state")??"null");return value&&typeof value.scope==="string"&&value.state?value:null;}catch{return null;}});
+  const storedMapState=(()=>{try{const value=JSON.parse(sessionStorage.getItem("g8-map-state")??"null");return value&&typeof value.scope==="string"&&value.state?value as {scope:string;state:MapWorkspaceState}:null;}catch{return null;}})();
+  const setStoredMapState=(value:{scope:string;state:MapWorkspaceState})=>sessionStorage.setItem("g8-map-state",JSON.stringify(value));
   const [mapState,setMapState]=useState<MapWorkspaceState>(()=>storedMapState?.scope===mapStateScope?storedMapState.state:initialMapState);
   const [search,setSearch] = useState(""); const [workFilter,setWorkFilter] = useState("pending");
-  useEffect(()=>{const value=sessionStorage.getItem("g8-map-state");try{const parsed=value?JSON.parse(value):null;setStoredMapState(parsed&&typeof parsed.scope==="string"&&parsed.state?parsed:null);}catch{setStoredMapState(null);}},[mapStateScope]);
   const [journalReviewEntry,setJournalReviewEntry]=useState<CompanyForegroundEntry|null>(null);
   const [journalReviewMode,setJournalReviewMode]=useState<"review"|"refused"|null>(()=>journalReviewHistoryMode(window.history.state,null)==="refused"?"refused":null);
   const journalEntry=journalReviewEntryForSession(journalReviewEntry,token,companyId,view);
@@ -172,7 +172,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
     const key=JSON.stringify([token,accountingEntryId]);
     try{const handoff=accountingContinuation(context,companyId);setAccountingReadback({key,context});if(handoff)setJournalReviewEntry(current=>current?.entryId===accountingEntryId&&current.token===token&&isCompanyAccountingOrigin(current.reference)&&current.reference.company.resource_id===companyId&&JSON.stringify(current.accountingHandoff)!==JSON.stringify(handoff)?{...current,accountingHandoff:handoff}:current);}
     catch{setAccountingReadback({key,context:{companyId,status:"unavailable"}});}
-  },[token,accountingEntryId,companyId]);
+  },[token,accountingEntryId,companyId,setAccountingReadback,setJournalReviewEntry]);
   const foregroundAccountingContext=accountingForegroundContext(accountingReadback,accountingReadbackKey,companyId);
   const companyContext=journalForeground&&!journalOriginVerified?null:companyAccounting&&journalForeground?foregroundAccountingContext:displayedCompanyContext;
   const [rawTrace,setTrace]=useState<TraceSelection|null>(savedContext.trace);const trace=rawTrace?.company_id===companyId?rawTrace:null;
@@ -219,7 +219,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
     const read=resourceRead.current;resourceRead.current=null;setResourceInspectionEntry(null);cancelAnimationFrame(resourceFocusFrame.current);
     if(!read)return;const cancelled=cancelResourceInspectionRead(read,detailRequest.current);detailRequest.current=cancelled.requestId;
     if(cancelled.clearReadback){setSelected(null);setDetailError("");setDetailBusy(false);}
-  },[]);
+  },[setResourceInspectionEntry,setSelected,setDetailError,setDetailBusy]);
   useLayoutEffect(()=>()=>cancelResourceInspection(),[companySurfaceKey,cancelResourceInspection]);
   const clearSelection = useCallback(() => {cancelResourceInspection();setDetailScope(companyId);setHistory(null);setTrace(null);setMapSelection(null);detailRequest.current++;setSelected(null);setWork(null);setReceipt(null);setProposal(null);setDetailError("");setDetailBusy(false);},[cancelResourceInspection,companyId,setHistory,setTrace,setMapSelection,setWork,setProposal,setSelected,setReceipt,setDetailScope,setDetailError,setDetailBusy]);
   const [engineering,setEngineering] = useState<{view:EngineeringView;receiptId?:string;proposalId?:string}>({view:"intake"});
@@ -487,11 +487,10 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
     try {if(item.kind === "evidence") {const value=await get<ReceiptDetail>(`workspace/constructions/${item.id}`,token);if(request===detailRequest.current)setReceipt(value);}else {const value=await get<ResourceProposalDetail>(`ontology/proposals/${item.id}`,token);if(request===detailRequest.current)setProposal(value);}}
     catch(error){if(request===detailRequest.current)setDetailError(error instanceof Error ? error.message : "Could not inspect work");}
     finally {if(request===detailRequest.current)setDetailBusy(false);}
-  },[token,companyId,setBuildTarget,setWork,setProposal,setRail,setNyxFolded,cancelResourceInspection]);
+  },[token,companyId,setBuildTarget,setSourceSelectionKey,setWork,setProposal,setRail,setNyxFolded,cancelResourceInspection]);
   const inspectSource = useCallback((source:IntakeItem) => {void inspectWork(workItems([source],[])[0],false);},[inspectWork]);
   const selectMap = (selection:MapSelection|null) => {clearSelection();setMapSelection(selection);if(selection){setNyxTab("context");setNyxFolded(false);setRail(true);}};
   useEffect(()=>{const state=mapState;if(mapScope==="company"||mapScope==="workspace")setStoredMapState({scope:mapStateScope,state});},[mapScope,mapState,mapStateScope]);
-  useEffect(()=>{if(storedMapState?.scope===mapStateScope)sessionStorage.setItem("g8-map-state",JSON.stringify(storedMapState));},[storedMapState,mapStateScope]);
   const mapProps={token,selection:mapSelection,companyId:companyId||undefined,canPropose:principal.permissions.includes("ontology_propose"),state:mapState,onState:setMapState,onSelect:selectMap,onReview:(id:string)=>openEngineering("ontology",undefined,id)};
   function focusWorkQueue(){const panel=workRef.current?.closest("details");if(panel)panel.open=true;requestAnimationFrame(()=>{const queue=workRef.current;if(queue){queue.focus({preventScroll:true});queue.scrollIntoView({behavior:"smooth"});}});}
   const workTable = <>{queueAnchor!==null&&<p className="g8-subtle">Browsing older changes. Refresh workspace to return to the latest queue.</p>}<WorkQueue onLoadMoreProposals={()=>void loadOlderProposals()} proposalsHaveMore={paging?.page?.has_more??false} proposalsLoadingMore={paging?.loadingMore??false} proposalsPageError={paging?.page?paging.error:""} items={items} filter={workFilter} onFilter={setWorkFilter} onInspect={item=>{void inspectWork(item);setNyxTab("context");}} onHistory={()=>openEngineering("history")} loading={queuesLoading} errors={[snapshot.evidence.error?`Evidence queue unavailable: ${snapshot.evidence.error}`:"",snapshot.proposals.error?`Change queue unavailable: ${snapshot.proposals.error}`:""].filter(Boolean)} scope={companyMismatch?"Company exploration; unbound source evidence excluded":"Current authorized scope"}/></>;
