@@ -67,7 +67,7 @@ def preview(principal: Principal, composition: ReportComposition) -> dict[str, A
             {key: company[key] for key in ("resource_id", "version_id", "content_hash")}
         ),
         company_label=company["display_name"],
-        sections=resolve(principal, composition.company_id, composition.sections),
+        sections=resolve(principal, composition.company_id, composition.sections),  # type: ignore[arg-type]
     )
     return ReportPreview(
         snapshot=snapshot, snapshot_sha256=digest(snapshot.model_dump(mode="json"))
@@ -134,7 +134,7 @@ def save(principal: Principal, request: SaveRetainedReport) -> dict[str, Any]:
     try:
         prior = _read_detail(principal, request.request_id, request.composition.company_id)
     except WorkspaceError as exc:
-        if exc.status_code != 404:
+        if exc.status != 404:
             raise
     else:
         definition = prior[2]
@@ -277,7 +277,7 @@ def validate(
         if row["content_hash"] != pin.content_hash:
             raise WorkspaceError(409, "Report dependency content changed")
         upstream_authority(
-            conn, principal, pin.resource_id, pin.version_id, allow_historical_provenance=True
+            conn, principal.scope.tenant_id, pin.version_id, allow_historical_provenance=True
         )
 
 
@@ -290,7 +290,7 @@ def export(
     if format not in {"xlsx", "html"}:
         raise WorkspaceError(404, "Report export format is unavailable")
     detail, item, definition = _read_detail(principal, proposal_id, company_id)
-    artifact = definition.exports[format].model_dump(mode="json")
+    artifact = definition.exports[format].model_dump(mode="json")  # type: ignore[index]
     content = validate_artifact_bytes(artifact)
     return content, {
         "Content-Type": artifact["media_type"],

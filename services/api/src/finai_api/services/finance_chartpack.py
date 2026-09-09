@@ -441,7 +441,7 @@ def prepare_classification_proposal(
         ),
         access_entity=principal.scope.legal_entity_id,
         mutations=mutations,
-        source_versions=dict(source_versions or {}),
+        source_versions={key: dict(value) for key, value in (source_versions or {}).items()},
     )
 
 

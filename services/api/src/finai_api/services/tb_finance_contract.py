@@ -136,11 +136,11 @@ class TbFinanceContractRequest(BaseModel):
 class TbFinanceContractDecision(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    contract_id: Literal[CONTRACT_ID] = CONTRACT_ID
-    profile: Literal[PROFILE] = PROFILE
-    source_class: Literal[SOURCE_CLASS] = SOURCE_CLASS
-    source_family: Literal[SOURCE_FAMILY] = SOURCE_FAMILY
-    input_grain: Literal[INPUT_GRAIN] = INPUT_GRAIN
+    contract_id: Literal["1c_turnover_trial_balance@v1"] = CONTRACT_ID
+    profile: Literal["account_period_tb_finance"] = PROFILE
+    source_class: Literal["1C_TURNOVER_TRIAL_BALANCE"] = SOURCE_CLASS
+    source_family: Literal["1C_ACCOUNT_PERIOD"] = SOURCE_FAMILY
+    input_grain: Literal["ACCOUNT_PERIOD"] = INPUT_GRAIN
     operation: str
     requested_objects: tuple[str, ...]
     requested_outputs: tuple[str, ...]

@@ -427,7 +427,7 @@ def _draft_sections(months: Sequence[TBMonth], pack, continuity: dict[str, Any])
                 for key, local_class in pnl_classes.items()
             }
         )
-    totals = defaultdict(Decimal)
+    totals: defaultdict[str, Decimal] = defaultdict(Decimal)
     ytd = []
     for item, natural in zip(pnl_monthly, natural_closing, strict=True):
         for key, value in item.items():
@@ -469,7 +469,7 @@ def _draft_sections(months: Sequence[TBMonth], pack, continuity: dict[str, Any])
             "cash_end": pulse["cash_end"],
             "monthly_net_change": _decimal(
                 Decimal(pulse["cash_end"])
-                - (Decimal(previous["cash_end"]) if index else Decimal(0))
+                - (Decimal(pulses[index - 1]["cash_end"]) if index else Decimal(0))
             ),
             "label": "CASH_BRIDGE_FROM_TB",
             "certification": "NOT_CERTIFIED",

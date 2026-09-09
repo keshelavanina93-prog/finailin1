@@ -8,7 +8,8 @@ import json
 from collections.abc import Iterable
 from decimal import Decimal, InvalidOperation, localcontext
 from hashlib import sha256
-from typing import Any
+from typing import Any, Literal, cast
+from uuid import UUID
 
 from finai_api.domain.authority import ExactScope
 from finai_api.domain.ingest import IngestReceipt, IngestRequest
@@ -51,7 +52,9 @@ def _decimal(value: str | None) -> Decimal:
     return parsed
 
 
-def _equality(frontier: dict[str, Any]) -> tuple[dict[str, str], dict[str, str], str]:
+def _equality(
+    frontier: dict[str, Any],
+) -> tuple[dict[str, str], dict[str, Literal["PASS", "BREAK"]], Literal["PASS", "BREAK"]]:
     totals = frontier.get("account_totals") or {}
     residuals = frontier.get("source_total_residuals") or {}
     pair_deltas = {
@@ -68,8 +71,10 @@ def _equality(frontier: dict[str, Any]) -> tuple[dict[str, str], dict[str, str],
                 if pair_pass and measure in residuals and _decimal(residuals[measure]) == 0
                 else "BREAK"
             )
-    state = "PASS" if equality and all(value == "PASS" for value in equality.values()) else "BREAK"
-    return pair_deltas, equality, state
+    state: Literal["PASS", "BREAK"] = (
+        "PASS" if equality and all(value == "PASS" for value in equality.values()) else "BREAK"
+    )
+    return pair_deltas, cast(dict[str, Literal["PASS", "BREAK"]], equality), state
 
 
 def _carryforward(
@@ -93,7 +98,7 @@ def _carryforward(
     prior_credit = _decimal(previous.totals.get("closing_credit"))
     debit_delta = opening_debit - prior_debit
     credit_delta = opening_credit - prior_credit
-    state = "PASS" if debit_delta == 0 and credit_delta == 0 else "BREAK"
+    state: Literal["PASS", "BREAK"] = "PASS" if debit_delta == 0 and credit_delta == 0 else "BREAK"
     return TrialBalanceCarryforward(
         from_period=previous.period,
         to_period=current.period,
@@ -187,13 +192,16 @@ def build_package_report(
         "legal_entity_id": legal_entity_id,
         "sources": [(month.filename, month.source_sha256) for month in months],
     }
-    package_id = "tbp_" + sha256(
-        json.dumps(package_key, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
+    package_id = (
+        "tbp_"
+        + sha256(
+            json.dumps(package_key, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+    )
     equality_pass = all(month.equality_state == "PASS" for month in months)
     return TrialBalancePackageReport(
         package_id=package_id,
-        tenant_id=tenant_id,
+        tenant_id=cast(UUID | None, tenant_id),
         legal_entity_id=legal_entity_id,
         entity_label=entity_label,
         currency=currency,
@@ -247,17 +255,18 @@ def diagnose_package(
         "legal_entity_id": report.legal_entity_id,
         "sources": [(month.filename, month.source_sha256) for month in report.months],
     }
-    expected_package_id = "tbp_" + sha256(
-        json.dumps(package_key, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
+    expected_package_id = (
+        "tbp_"
+        + sha256(
+            json.dumps(package_key, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+    )
     if report.package_id != expected_package_id:
         raise TrialBalancePackageError("Package identity hash does not match its source manifest")
 
     expected_periods = tuple(f"2025-{month:02d}" for month in range(1, 13))
     guard = report.historical_scope_guard
-    evaluated_under_active_runtime_period = bool(
-        guard.get("evaluated_under_active_runtime_period")
-    )
+    evaluated_under_active_runtime_period = bool(guard.get("evaluated_under_active_runtime_period"))
     guard_isolated = (
         report.year == 2025
         and report.periods == expected_periods
@@ -345,8 +354,7 @@ def diagnose_package(
                 severity="INFO",
                 state="PASS",
                 message=(
-                    "Every month-to-month opening balance matches the prior month "
-                    "closing balance."
+                    "Every month-to-month opening balance matches the prior month closing balance."
                 ),
                 periods=expected_periods[1:],
             )
@@ -410,7 +418,7 @@ def diagnose_package(
         )
 
     if any(item.severity == "ERROR" for item in findings):
-        overall_state = "BLOCKED"
+        overall_state: Literal["PASS", "REVIEW_REQUIRED", "BLOCKED"] = "BLOCKED"
     elif (
         report.mapping_state != "APPROVED"
         or carryforward_breaks
