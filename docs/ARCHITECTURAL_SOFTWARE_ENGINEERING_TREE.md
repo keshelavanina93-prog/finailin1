@@ -499,7 +499,7 @@ FULLY_DEVELOPED_AND_PROVEN_FINANCIAL_AGI
 
 ## 6. Verification snapshot — 2026-09-10
 
-The canonical checkout is clean at `90aec7c`; the same convergence head is
+The canonical checkout is clean at `36f13df`; the same convergence head is
 published on PR #9. The repository is not fully merged or release-accepted:
 the protected branch remains at `4261fcb`, and the latest API CI test job fails
 previously failed four tests; three are fixed in `1e1ed74`, while the
@@ -508,7 +508,8 @@ still under verification. Frontend
 lint/typecheck/tests/build and API Ruff/mypy pass. The planning catalog,
 scenario comparison, forecast, liquidity, scenario authoring, outcome
 measurement, petroleum conservation and petroleum lineage projections plus
-ORPAK/SCADA source-grain validation are now implemented as bounded governed
+ORPAK/SCADA source-grain and retained semantic-binding validation are now
+implemented as bounded governed
 projections; canonical operational promotion and the remaining decision/action planes
 are not. The NYX citation/refusal boundary is implemented, but it is not
 model-backed reasoning or consequential action execution. The worktree family and
