@@ -1984,7 +1984,7 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest implementation head is `86a93a3`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and the petroleum conservation bridge wired into the unified planning and operations workspaces.
+latest implementation head is `9f44764`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and the petroleum conservation/lineage bridge wired into the unified planning and operations workspaces.
 The previous API CI job failed four tests; three are fixed locally in this head,
 while the database-backed object-set materialization path is still under CI
 verification. Planning now has real catalog/comparison, forecast, liquidity,
