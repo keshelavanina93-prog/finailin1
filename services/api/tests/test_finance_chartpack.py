@@ -34,6 +34,18 @@ def test_chartpack_is_data_and_maps_1c_group_codes():
         classify_account("141X", subkonto="Acme", pack=pack).analytic_dimension
         == "counterparty_analytic"
     )
+    assert (
+        classify_account("141X", subkonto="Acme", pack=pack).analytic_mapping_state
+        == "UNMAPPED_OBSERVED"
+    )
+
+
+def test_unknown_codes_and_subkonto_are_observations_in_a_candidate_manifest():
+    pack = load_chartpack()
+    row = classify_account("9999", subkonto="unconfigured analytic", pack=pack)
+    assert row.state == "UNMAPPED"
+    assert row.analytic_mapping_state == "UNMAPPED_OBSERVED"
+    assert row.observation_codes == ["UNMAPPED_ACCOUNT_CODE", "UNMAPPED_SUBKONTO"]
 
 
 def test_january_7410_classification_retains_non_additive_duplicates(january):

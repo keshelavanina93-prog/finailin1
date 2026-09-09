@@ -36,7 +36,7 @@ try {
     $configuration = Get-Content -Raw -LiteralPath $configurationPath | ConvertFrom-Json -AsHashtable
     $policyPath = Join-Path $env:FINAI_RUNTIME_ROOT 'tools\minio\evidence-policy.json'
         @{ Version = '2012-10-17'; Statement = @(
-            @{ Effect = 'Allow'; Action = @('s3:GetBucketLocation', 's3:GetBucketVersioning', 's3:GetLifecycleConfiguration', 's3:ListBucket'); Resource = @('arn:aws:s3:::g8-evidence') },
+            @{ Effect = 'Allow'; Action = @('s3:GetBucketLocation', 's3:GetBucketVersioning', 's3:GetLifecycleConfiguration', 's3:GetBucketObjectLockConfiguration', 's3:ListBucket'); Resource = @('arn:aws:s3:::g8-evidence') },
             @{ Effect = 'Allow'; Action = @('s3:GetObject', 's3:GetObjectVersion', 's3:PutObject'); Resource = @('arn:aws:s3:::g8-evidence/*') }
         ) } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $policyPath -Encoding utf8
     if (-not $configuration.FINAI_S3_ACCESS_KEY) {

@@ -30,6 +30,9 @@ def test_family_uses_heading_period_and_retains_all_snapshots(family):
     ]
     assert all(snapshot.construction_state == "OBSERVED" for snapshot in family.snapshots)
     assert all(snapshot.evidence_class == "SOURCE_BOUND" for snapshot in family.snapshots)
+    assert family.snapshots[0].valid_at == "2025-01-31"
+    assert family.snapshots[-1].valid_at == "2025-12-31"
+    assert all(snapshot.known_at is None for snapshot in family.snapshots)
     assert all(
         "OBSERVED_PERIOD_DIFFERS_FROM_WORKING_SCOPE:2026-08" in snapshot.findings
         for snapshot in family.snapshots

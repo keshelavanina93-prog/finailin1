@@ -13,7 +13,7 @@ const label = (value: string) => value.replaceAll("_", " ").replace(/([a-z])([A-
 const message = (error: unknown) => error instanceof Error ? error.message : "Request failed";
 type Draft = { type: string; current?: CanonicalResource; attributes: Record<string, unknown>; name: string };
 
-export default function OntologyWorkspace({ token, principal, initialProposalId }: { token: string; principal: Principal; initialProposalId?: string }) {
+export default function OntologyWorkspace({ token, principal, initialProposalId, onOpenObjectWorkspace }: { token: string; principal: Principal; initialProposalId?: string; onOpenObjectWorkspace?: () => void }) {
   const [catalog, setCatalog] = useState<CanonicalResource[]>([]);
   const [nodes, setNodes] = useState<CanonicalResource[]>([]);
   const [edges, setEdges] = useState<OntologyConnection[]>([]);
@@ -140,7 +140,7 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
 
   return <section className="ontology-workspace">
     <div className="section-heading"><div><p className="overline">SHARED ENTERPRISE RESOURCES</p><h1>Enterprise & ontology</h1><p className="muted">Explore typed relationships, govern identity and review changes to shared business meaning.</p></div><button className="quiet" disabled={busy} onClick={() => setRevision(value => value + 1)}>Refresh</button></div>
-    <div className="ontology-tabs">{(["graph", "object_sets", "resources", "review", "registry"] as const).map(id => <button className={tab === id ? "active" : "quiet"} key={id} onClick={() => { setTab(id); setKind(""); }}>{id === "graph" ? "Enterprise graph" : id === "review" ? `Change review (${queue.filter(row => row.decision === "PENDING").length})` : label(id)}</button>)}</div>
+    <div className="ontology-tabs">{(["graph", "object_sets", "resources", "review", "registry"] as const).map(id => <button className={tab === id ? "active" : "quiet"} key={id} onClick={() => { setTab(id); setKind(""); }}>{id === "graph" ? "Enterprise graph" : id === "review" ? `Change review (${queue.filter(row => row.decision === "PENDING").length})` : label(id)}</button>)}{onOpenObjectWorkspace && <button className="quiet" onClick={onOpenObjectWorkspace}>Open object workspace</button>}</div>
     {error && <p className="error-banner" role="alert">{error}</p>}{notice && <p className="success-banner" role="status">{notice}</p>}
     {bounded && <p className="error-banner">This graph is limited to 1,000 visible resources. It is not a complete enterprise inventory.</p>}
     <div className="ontology-layout"><div>

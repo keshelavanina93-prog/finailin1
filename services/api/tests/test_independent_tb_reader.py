@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import replace
 from decimal import Decimal
@@ -34,6 +35,15 @@ EXPECTED = {
 }
 
 
+def _control_manifest() -> dict:
+    path = Path(__file__).parent / "fixtures" / "sgp-2025-control-table.json"
+    value = json.loads(path.read_text(encoding="utf-8"))
+    assert value["contract"] == "tb-audit-control/1"
+    assert value["fixture_id"] == "SGP-2025"
+    assert len(value["months"]) == 12
+    return value
+
+
 def _fixture_dir() -> Path:
     return Path(
         os.environ.get(
@@ -44,19 +54,30 @@ def _fixture_dir() -> Path:
 
 
 def _expectations() -> dict[str, TBAuditExpectation]:
+    manifest = _control_manifest()
+    committed = {item["month"]: item for item in manifest["months"]}
+    assert set(committed) == set(EXPECTED)
     return {
-        f"2025-{month:02d}": TBAuditExpectation(
-            filename=f"SGP {month}.xls",
-            period=f"2025-{month:02d}",
-            nonblank_rows=values[0],
-            root_rows=values[1],
-            opening=Decimal(values[2]),
-            turnover=Decimal(values[3]),
-            closing=Decimal(values[4]),
-            control_row=values[5],
+        item["period"]: TBAuditExpectation(
+            filename=item["filename"],
+            period=item["period"],
+            nonblank_rows=item["nonblank_rows"],
+            root_rows=item["root_rows"],
+            opening=Decimal(item["opening"]),
+            turnover=Decimal(item["turnover"]),
+            closing=Decimal(item["closing"]),
+            control_row=item["control_row"],
         )
-        for month, values in EXPECTED.items()
+        for item in manifest["months"]
     }
+
+
+def test_committed_sgp_control_manifest_is_complete_and_deterministic():
+    manifest = _control_manifest()
+    periods = [item["period"] for item in manifest["months"]]
+    assert periods == [f"2025-{month:02d}" for month in range(1, 13)]
+    assert len({item["filename"] for item in manifest["months"]}) == 12
+    assert manifest["total_turnover"] == "7935295969.09"
 
 
 @pytest.fixture(scope="module")

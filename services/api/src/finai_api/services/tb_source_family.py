@@ -8,7 +8,7 @@ company, currency, journal, or published financial fact.
 from __future__ import annotations
 
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from hashlib import sha256
 from typing import Any
@@ -38,6 +38,12 @@ class SourcePeriodSnapshot:
     chart_fingerprint: str
     working_period: str | None
     findings: tuple[str, ...]
+    # Bi-temporal source coordinates.  ``valid_at`` is the source heading's
+    # period end; ``known_at`` is the immutable intake timestamp.  Keeping
+    # these on each snapshot prevents consumers from silently substituting a
+    # credential/session date for business time.
+    valid_at: str
+    known_at: str | None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -58,6 +64,8 @@ class SourcePeriodSnapshot:
             "chart_fingerprint": self.chart_fingerprint,
             "working_period": self.working_period,
             "findings": list(self.findings),
+            "valid_at": self.valid_at,
+            "known_at": self.known_at,
         }
 
 
@@ -130,6 +138,7 @@ def bind_source_family(
     *,
     receipt_ids: Sequence[str | None] | None = None,
     working_period: str | None = None,
+    known_at_by_receipt: Mapping[str, str | None] | None = None,
 ) -> SourceFamily:
     """Bind ordered observed snapshots into one recurring source family.
 
@@ -180,10 +189,11 @@ def bind_source_family(
                 "source_sha256": month.source_sha256,
             }
         )
+        receipt_id = ids[index]
         snapshots.append(
             SourcePeriodSnapshot(
                 snapshot_id="sps_" + snapshot_key,
-                receipt_id=ids[index],
+                receipt_id=receipt_id,
                 filename=month.filename,
                 source_sha256=month.source_sha256,
                 observed_period=month.period,
@@ -199,6 +209,12 @@ def bind_source_family(
                 chart_fingerprint=month.fingerprint.digest,
                 working_period=working_period,
                 findings=tuple(findings),
+                valid_at=month.period_end.isoformat(),
+                known_at=(
+                    known_at_by_receipt.get(receipt_id)
+                    if known_at_by_receipt and receipt_id is not None
+                    else None
+                ),
             )
         )
     return SourceFamily(

@@ -63,6 +63,12 @@ def test_draft_uses_heading_period_and_retains_mismatch_finding(fixture_payload)
     assert result["function"] == "tb_statement_draft@v1"
     assert result["period_authority"]["accounting_period"] == "SOURCE_INTERNAL_HEADER"
     assert result["period_authority"]["current_date_used_for_accounting_period"] is False
+    assert result["period_authority"]["valid_time_fields"] == [
+        "valid_at",
+        "period_start",
+        "period_end",
+    ]
+    assert result["period_authority"]["known_time_field"] == "hydration_runs.ingested_at"
     assert [row["period"] for row in result["year_pulse"]] == [
         f"2025-{month:02d}" for month in range(1, 13)
     ]
@@ -80,16 +86,23 @@ def test_draft_is_source_linked_and_finance_only(fixture_payload):
 
     assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) < 16_000_000
     assert result["year_pulse"][0]["revenue_month"] == "48832047.44"
-    assert result["year_pulse"][0]["cogs_month"] == "0"
+    assert result["year_pulse"][0]["cogs_month"] == "37685779.61"
     assert result["receivables_by_analytic"][0]["analytics"] == {
         "site_analytic": 110,
         "counterparty_analytic": 2050,
     }
     assert len(result["account_period_facts"]) == 408
     assert len(result["account_period_analytic_facts"]) == 28410
-    assert result["fact_columns"][-2:] == ["source_index", "source_row"]
+    assert result["fact_columns"][10:12] == ["source_index", "source_row"]
+    assert result["fact_columns"][-2:] == ["valid_at", "known_at"]
     assert result["account_period_facts"][0]["lineage"]["source_sha256"]
+    assert result["account_period_facts"][0]["valid_at"] == "2025-01-31"
+    assert result["account_period_facts"][0]["known_at"] == "2026-09-09T00:00:00Z"
     assert result["account_period_analytic_facts"][0][10] == 0
+    assert result["account_period_analytic_facts"][0][-2:] == [
+        "2025-01-31",
+        "2026-09-09T00:00:00Z",
+    ]
     assert result["exceptions"]["unsupported"] == [
         "canonical_journals",
         "invoices",

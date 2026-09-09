@@ -56,7 +56,10 @@ def test_period_conflict_and_forbidden_accounting_requests_fail_closed():
     changed = request.model_copy(
         update={"scope": request.scope.model_copy(update={"period": "2026-01"})}
     )
-    assert compile_source(changed).rejects
+    period_observation = compile_source(changed)
+    assert not period_observation.rejects
+    assert period_observation.observed_bindings["period"] == "2025-01"
+    assert any("observed heading wins" in warning for warning in period_observation.warnings)
     for kind in ("Invoice", "JournalEntry", "InventoryMovement", "PeriodBalance", "Account"):
         with pytest.raises(SourceAuthorityDenied):
             compile_source(request.model_copy(update={"requested_objects": (kind,)}))

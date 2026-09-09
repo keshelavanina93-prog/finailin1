@@ -14,11 +14,17 @@ from finai_api.domain.finance_execution import (
     CanonicalJournalTrialBalanceRequest,
     FinanceExecutionRequest,
 )
+from finai_api.domain.finance_mapping_registry import MappingRegistryProposalRequest
 from finai_api.domain.finance_ontology import CatalogProposalRequest
 from finai_api.domain.ontology_definitions import DEFINITION_MODELS
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal, require_permission
-from finai_api.services import finance_candidates, finance_classification, finance_execution
+from finai_api.services import (
+    finance_candidates,
+    finance_classification,
+    finance_execution,
+    finance_mapping_registry,
+)
 from finai_api.services import finance_ontology as finance
 from finai_api.services.fact_runs import read_run
 
@@ -81,6 +87,21 @@ def propose_candidates(principal: User, request: CandidateIntakeRequest) -> Any:
     return finance_candidates.submit(principal, request)
 
 
+@router.post("/mapping-registry/proposals")
+def propose_mapping_registry(principal: User, request: MappingRegistryProposalRequest) -> Any:
+    proposal = finance_mapping_registry.prepare_mapping_registry_proposal(
+        principal,
+        registry_id=request.registry_id,
+        registry_version=request.registry_version,
+        source_family=request.source_family,
+        source_hashes=request.source_hashes,
+        entries=request.entries,
+        rationale=request.rationale,
+        valid_from=request.valid_from,
+    )
+    return finance_mapping_registry.submit_mapping_registry_proposal(principal, proposal)
+
+
 @router.post("/classify")
 def classify(principal: User, request: ClassificationRequest) -> dict[str, Any]:
     return finance_classification.classify(principal, request)
@@ -122,6 +143,7 @@ def contracts(principal: User) -> dict[str, Any]:
     models: dict[str, type[BaseModel]] = {
         "CatalogProposalRequest": CatalogProposalRequest,
         "CandidateIntakeRequest": CandidateIntakeRequest,
+        "MappingRegistryProposalRequest": MappingRegistryProposalRequest,
         "ClassificationRequest": ClassificationRequest,
         "FinanceExecutionRequest": FinanceExecutionRequest,
         "CanonicalJournalTrialBalanceRequest": CanonicalJournalTrialBalanceRequest,

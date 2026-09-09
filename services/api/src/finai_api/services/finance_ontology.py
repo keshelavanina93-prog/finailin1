@@ -18,6 +18,7 @@ from finai_api.domain.resources import ResourceMutation, ResourceProposal
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
 from finai_api.services import resources
+from finai_api.services.schema_compatibility import SchemaCompatibilityError, schema_compatibility
 from finai_api.services.workspace import WorkspaceError
 
 PHASES = (
@@ -242,6 +243,23 @@ def _heads(principal: Principal, definitions: list[dict[str, Any]]) -> dict[UUID
     return {row["resource_id"]: row for row in rows}
 
 
+def accepted_definition_matches(spec: dict[str, Any], current: dict[str, Any] | None) -> bool:
+    """Treat an accepted, semantically compatible schema superset as installed."""
+    if not current or current["authority_state"] != "APPROVED":
+        return False
+    if current["attributes"] == spec["attributes"]:
+        return True
+    if spec["object_type"] != "SchemaDefinition":
+        return False
+    try:
+        schema_compatibility(
+            spec["identity_key"], current["attributes"], spec["attributes"]
+        )
+    except SchemaCompatibilityError:
+        return False
+    return True
+
+
 def catalog(principal: Principal) -> dict[str, Any]:
     require_permission(principal, "ontology_read")
     compiled = compilation(principal.scope.tenant_id)
@@ -253,11 +271,7 @@ def catalog(principal: Principal) -> dict[str, Any]:
             principal.scope.tenant_id, spec["object_type"], spec["identity_key"]
         )
         current = heads.get(identity)
-        matches = bool(
-            current
-            and current["authority_state"] == "APPROVED"
-            and current["attributes"] == spec["attributes"]
-        )
+        matches = accepted_definition_matches(spec, current)
         entries.append(
             {
                 "resource_id": str(identity),

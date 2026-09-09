@@ -156,13 +156,68 @@ def compile_xls(request: IngestRequest) -> IngestReceipt:
     source = inspect_xls(content)
     from finai_api.services.tb_frontier import analyze
     frontier = analyze(source["rows"])
-    rejects = (
-        ()
-        if source["period"] == request.scope.period or request.source_use != "ACTUAL_INPUT"
-        else (
-            f"Source period {source['period']} differs from selected period {request.scope.period}",
+    # The workbook heading establishes the observed fiscal period.  A login or
+    # working-scope period is a context finding, never a reason to discard a
+    # retained historical snapshot.  Financial consumers must bind the
+    # observed period and carry this mismatch forward as review evidence.
+    period_mismatch = source["period"] != request.scope.period
+    period_warning = (
+        (
+            f"Observed period {source['period']} differs from working period "
+            f"{request.scope.period}; the observed heading wins for this snapshot.",
         )
+        if period_mismatch
+        else ()
     )
+    findings = [
+        {
+            "code": "SOURCE_TOTAL_FRONTIER",
+            "sheet": source["sheet"],
+            "message": (
+                f"{frontier['state']}: {len(frontier['selected_rows'])} root summaries. "
+                "Only these rows are used for the source-total proof. "
+                "Account/detail rows remain non-additive; account reporting depth "
+                "requires a separate approved mapping and netting policy."
+            ),
+            "coordinates": [str(r) for r in frontier["selected_rows"]],
+            "severity": "REVIEW_REQUIRED",
+        },
+        {
+            "code": "REPEATED_ACCOUNT_SUMMARIES",
+            "sheet": source["sheet"],
+            "message": (
+                "Repeated codes and parent/detail rows are non-additive; "
+                "choose a reviewed aggregation frontier."
+            ),
+            "coordinates": source["duplicate_codes"],
+            "occurrences": len(source["duplicate_codes"]),
+            "severity": "REVIEW_REQUIRED",
+        },
+        {
+            "code": "NESTED_ANALYTIC_HIERARCHY",
+            "sheet": source["sheet"],
+            "message": (
+                "Source outline levels and parent row coordinates are retained. "
+                "Subconto identities and completeness still require binding."
+            ),
+            "coordinates": [],
+            "severity": "REVIEW_REQUIRED",
+        },
+    ]
+    if period_mismatch:
+        findings.append(
+            {
+                "code": "OBSERVED_PERIOD_WORKING_SCOPE_MISMATCH",
+                "sheet": source["sheet"],
+                "message": (
+                    f"Observed heading period {source['period']} differs from working "
+                    f"scope {request.scope.period}; observed period is authoritative "
+                    "for this retained snapshot."
+                ),
+                "coordinates": [f"{source['sheet']}!C3"],
+                "severity": "REVIEW_REQUIRED",
+            }
+        )
     request_hash = canonical_sha256(request)
     return IngestReceipt(
         receipt_id=f"ir_{request_hash}",
@@ -176,41 +231,7 @@ def compile_xls(request: IngestRequest) -> IngestReceipt:
             "source_use": request.source_use,
             "observed_period": source["period"],
             "observed_company_label": source["company_label"],
-            "findings": [
-                {
-                    "code": "SOURCE_TOTAL_FRONTIER",
-                    "sheet": source["sheet"],
-                    "message": (
-                        f"{frontier['state']}: {len(frontier['selected_rows'])} root summaries. "
-                        "Only these rows are used for the source-total proof. "
-                        "Account/detail rows remain non-additive; account reporting depth "
-                        "requires a separate approved mapping and netting policy."
-                    ),
-                    "coordinates": [str(r) for r in frontier["selected_rows"]],
-                    "severity": "REVIEW_REQUIRED",
-                },
-                {
-                    "code": "REPEATED_ACCOUNT_SUMMARIES",
-                    "sheet": source["sheet"],
-                    "message": (
-                        "Repeated codes and parent/detail rows are non-additive; "
-                        "choose a reviewed aggregation frontier."
-                    ),
-                    "coordinates": source["duplicate_codes"],
-                    "occurrences": len(source["duplicate_codes"]),
-                    "severity": "REVIEW_REQUIRED",
-                },
-                {
-                    "code": "NESTED_ANALYTIC_HIERARCHY",
-                    "sheet": source["sheet"],
-                    "message": (
-                        "Source outline levels and parent row coordinates are retained. "
-                        "Subconto identities and completeness still require binding."
-                    ),
-                    "coordinates": [],
-                    "severity": "REVIEW_REQUIRED",
-                },
-            ],
+            "findings": findings,
             "financial_promotion": "UNAVAILABLE",
         },
         classifier_version="1c-biff-tb-layout/1",
@@ -240,13 +261,14 @@ def compile_xls(request: IngestRequest) -> IngestReceipt:
             )
             for row in source["rows"]
         ),
-        rejects=rejects,
         warnings=(
             "Source observations only; company, currency and account hierarchy need review.",
             "Cached XLS cell values are not recalculated or certified.",
             "Account summaries and analytical rows are non-additive; no journal created.",
             "Repeated source codes: " + ", ".join(source["duplicate_codes"]),
+            *period_warning,
         ),
+        rejects=(),
         reconciliation={"status": "REVIEW_REQUIRED", "aggregation": "NOT_PERFORMED"},
         functions_executed=("source.1c-biff-tb-inspection/1",),
     )

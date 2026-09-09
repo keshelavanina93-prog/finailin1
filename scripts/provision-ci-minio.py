@@ -110,7 +110,7 @@ def main() -> None:
         policy = {
             "Version": "2012-10-17", "Statement": [
                 {"Effect": "Allow", "Action": ["s3:GetBucketLocation", "s3:GetBucketVersioning",
-                 "s3:GetLifecycleConfiguration", "s3:ListBucket"],
+                 "s3:GetLifecycleConfiguration", "s3:GetBucketObjectLockConfiguration", "s3:ListBucket"],
                  "Resource": [f"arn:aws:s3:::{bucket}"]},
                 {"Effect": "Allow", "Action": ["s3:GetObject", "s3:GetObjectVersion",
                  "s3:PutObject"], "Resource": [f"arn:aws:s3:::{bucket}/*"]},

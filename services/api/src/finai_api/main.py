@@ -11,6 +11,7 @@ from finai_api.api.company_financial_result_routes import router as company_fina
 from finai_api.api.company_home_routes import router as company_home_router
 from finai_api.api.company_journal_routes import router as company_journal_router
 from finai_api.api.diagnostic_routes import router as diagnostic_router
+from finai_api.api.enterprise_diagnostics_routes import router as enterprise_diagnostics_router
 from finai_api.api.event_time_routes import router as event_time_router
 from finai_api.api.finance_ontology_routes import router as finance_ontology_router
 from finai_api.api.function_routes import router as function_router
@@ -20,6 +21,7 @@ from finai_api.api.metric_routes import router as metric_router
 from finai_api.api.object_set_routes import router as object_set_router
 from finai_api.api.ontology_definition_routes import router as ontology_definition_router
 from finai_api.api.ontology_import_routes import router as ontology_import_router
+from finai_api.api.ontology_install_routes import router as ontology_install_router
 from finai_api.api.ontology_operation_routes import router as ontology_operation_router
 from finai_api.api.ontology_routes import router as ontology_router
 from finai_api.api.operations_routes import router as operations_router
@@ -73,6 +75,8 @@ app.include_router(transformation_router)
 app.include_router(trial_balance_package_router)
 app.include_router(event_time_router)
 app.include_router(finance_ontology_router)
+app.include_router(enterprise_diagnostics_router)
+app.include_router(ontology_install_router)
 app.include_router(history_search_router)
 app.include_router(operations_router)
 app.include_router(regulation_router)

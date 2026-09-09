@@ -1,0 +1,21 @@
+{
+  "contract": "tb-audit-control/1",
+  "fixture_id": "SGP-2025",
+  "source_family": "1C_ACCOUNT_PERIOD",
+  "source_artifacts": "PRIVATE_EXTERNAL_XLS",
+  "months": [
+    {"month": 1, "filename": "SGP 1.xls", "period": "2025-01", "nonblank_rows": 2912, "root_rows": 33, "opening": "453974719.53", "turnover": "511929505.16", "closing": "481653693.79", "control_row": 2917},
+    {"month": 2, "filename": "SGP 2.xls", "period": "2025-02", "nonblank_rows": 2951, "root_rows": 33, "opening": "481670361.67", "turnover": "529353044.21", "closing": "516857773.88", "control_row": 2956},
+    {"month": 3, "filename": "SGP 3.xls", "period": "2025-03", "nonblank_rows": 3101, "root_rows": 33, "opening": "512119387.75", "turnover": "386324334.74", "closing": "531707610.86", "control_row": 3106},
+    {"month": 4, "filename": "SGP 4.xls", "period": "2025-04", "nonblank_rows": 3056, "root_rows": 33, "opening": "529869670.03", "turnover": "549386091.95", "closing": "534637509.11", "control_row": 3061},
+    {"month": 5, "filename": "SGP 5.xls", "period": "2025-05", "nonblank_rows": 3126, "root_rows": 34, "opening": "534637625.87", "turnover": "482739137.06", "closing": "555868698.53", "control_row": 3131},
+    {"month": 6, "filename": "SGP 6.xls", "period": "2025-06", "nonblank_rows": 3294, "root_rows": 34, "opening": "556035372.27", "turnover": "548423357.54", "closing": "557305161.90", "control_row": 3299},
+    {"month": 7, "filename": "SGP 7.xls", "period": "2025-07", "nonblank_rows": 3283, "root_rows": 33, "opening": "557297798.23", "turnover": "749795757.17", "closing": "561034569.01", "control_row": 3288},
+    {"month": 8, "filename": "SGP 8.xls", "period": "2025-08", "nonblank_rows": 3193, "root_rows": 33, "opening": "561034547.02", "turnover": "746422914.81", "closing": "563509486.17", "control_row": 3198},
+    {"month": 9, "filename": "SGP 9.xls", "period": "2025-09", "nonblank_rows": 3386, "root_rows": 34, "opening": "562987188.09", "turnover": "807658317.03", "closing": "597291834.68", "control_row": 3391},
+    {"month": 10, "filename": "SGP 10.xls", "period": "2025-10", "nonblank_rows": 3308, "root_rows": 36, "opening": "455744466.09", "turnover": "1006567423.42", "closing": "460199164.54", "control_row": 3313},
+    {"month": 11, "filename": "SGP 11.xls", "period": "2025-11", "nonblank_rows": 3236, "root_rows": 36, "opening": "459949738.70", "turnover": "721513449.05", "closing": "480297003.74", "control_row": 3241},
+    {"month": 12, "filename": "SGP 12.xls", "period": "2025-12", "nonblank_rows": 3291, "root_rows": 36, "opening": "480149772.71", "turnover": "895182636.95", "closing": "502654668.80", "control_row": 3296}
+  ],
+  "total_turnover": "7935295969.09"
+}
