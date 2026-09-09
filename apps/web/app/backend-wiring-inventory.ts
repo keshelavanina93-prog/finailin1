@@ -122,7 +122,15 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
     ["forecast calculation, scenario proposal editor, liquidity projection, actual-vs-plan outcome"],
   ),
   routeFamily("top_level_reporting", "Top-level reporting", null, null, "target_only", [], ["top-level reporting"]),
-  routeFamily("nyx_reasoning", "NYX reasoning", null, null, "target_only", [], ["NYX reasoning"]),
+  routeFamily(
+    "nyx_reasoning",
+    "NYX reasoning",
+    "/api/ontology/nyx/reason",
+    "/v1/ontology/nyx/reason",
+    "partial",
+    ["apps/web/app/nyx-interaction.tsx"],
+    ["model-backed reasoning, multi-citation packets, proposal handoff execution"],
+  ),
   routeFamily("outcomes_learning", "Outcomes and governed learning", null, null, "target_only", [], ["outcomes/learning"]),
   routeFamily(
     "petroleum_telemetry_bridge",
