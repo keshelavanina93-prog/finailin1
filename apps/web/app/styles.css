@@ -358,6 +358,16 @@ button.g8-signal:hover {background:#132936;}
 @container(max-width:690px){.g8-workbench{grid-template-columns:1fr}.g8-actionbar{flex-wrap:wrap}.g8-actionbar button{flex-basis:42%}.source-explorer{grid-template-columns:1fr}.source-list{display:flex;max-height:145px}.source-list>button{min-width:150px;max-width:220px}.source-browser>footer{display:none}.company-setup-intro{flex-wrap:wrap}}
 @media(max-width:1000px){.fold-navigation{display:none}.g8-analyst{width:min(var(--nyx-width,340px),calc(100vw - 12px))}.nyx-resize{left:0}.g8-analyst>header{gap:7px}.g8-analyst .source-pagination{flex-wrap:wrap}.g8-analyst .source-pagination>span{width:100%}}
 @media(prefers-reduced-motion:reduce){.g8-app button{transition:none}}
+
+/* Company identity stays explicit in the Home header: the name alone is not a usable context. */
+.g8-company-hero-copy{min-width:0}
+.g8-company-hero-meta{display:flex;gap:7px;flex-wrap:wrap;margin:-3px 0 10px}
+.g8-company-hero-meta span{padding:3px 7px;border:1px solid #355766;background:#0b202cbb;border-radius:3px;color:#c8dce5;font-size:9px;letter-spacing:.15px}
+.g8-hero-status>strong{overflow-wrap:anywhere}
+.g8-hero-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0}
+.g8-hero-facts span{display:grid;gap:2px;padding-top:7px;border-top:1px solid #294654;color:#829eaf;font-size:9px}
+.g8-hero-facts small{color:#d2e2e8;font-size:10px;overflow-wrap:anywhere}
+@media(max-width:760px){.g8-hero-facts{grid-template-columns:1fr 1fr}}
 @media(min-width:761px) and (max-width:1000px){.fold-navigation{display:inline-flex}.g8-app.nav-folded{grid-template-columns:64px minmax(0,1fr)}.nav-folded .g8-sidebar{padding:17px 6px}.nav-folded .g8-nav-brand{flex-direction:column;gap:12px;margin-bottom:18px}.nav-folded .fold-navigation{position:static}.nav-folded .g8-brand>div,.nav-folded .g8-tagline,.nav-folded .g8-sidebar nav button>span,.nav-folded .g8-system>span,.nav-folded .g8-system>svg:last-child,.nav-folded .g8-platform>span{display:none}.nav-folded .g8-sidebar nav button,.nav-folded .g8-system{padding:13px;justify-content:center}.nav-folded .g8-platform{padding:10px;justify-content:center}}
 .source-tabs{flex-wrap:wrap;gap:4px}.g8-analyst [hidden]{display:none}
 /* Approved reference composition: company hero, financial/operational canvas, work below. */
