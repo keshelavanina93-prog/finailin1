@@ -80,7 +80,7 @@ def test_draft_is_source_linked_and_finance_only(fixture_payload):
 
     assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) < 16_000_000
     assert result["year_pulse"][0]["revenue_month"] == "48832047.44"
-    assert result["year_pulse"][0]["cogs_month"] == "0"
+    assert result["year_pulse"][0]["cogs_month"] == "37685779.61"
     assert result["receivables_by_analytic"][0]["analytics"] == {
         "site_analytic": 110,
         "counterparty_analytic": 2050,

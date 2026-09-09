@@ -202,6 +202,58 @@ def _classify_root(row: TBRow, pack) -> Any:
     )
 
 
+def _statement_rows(month: TBMonth, pack) -> tuple[tuple[TBRow, Any], ...]:
+    """Return one non-overlapping row frontier for statement calculations.
+
+    A report may put classified accounts below a broad aggregate such as
+    ``6XXX``.  If that aggregate contains more than one proposed class, use
+    the shallowest mapped descendant per class; otherwise the root total is
+    the canonical frontier.  Descendants are never added to a selected
+    ancestor, and rows already marked non-additive remain excluded.
+    """
+
+    selected: list[tuple[TBRow, Any]] = []
+    for root in month.root_rows:
+        root_classification = _classify_root(root, pack)
+        descendants: list[tuple[TBRow, Any]] = []
+        for row in month.rows:
+            if row is root or not row.account_code or not row.account_path:
+                continue
+            if row.account_path[0] != root.account_code or not row.additive_ok:
+                continue
+            classification = _classify_root(row, pack)
+            if classification.local_account_class:
+                descendants.append((row, classification))
+
+        descendant_classes = {item[1].local_account_class for item in descendants}
+        aggregate_conflict = bool(
+            root.account_code
+            and "X" in root.account_code.upper()
+            and root_classification.local_account_class
+            and descendant_classes - {root_classification.local_account_class}
+        )
+        if root_classification.local_account_class and not aggregate_conflict:
+            selected.append((root, root_classification))
+            continue
+
+        by_class: dict[str, list[tuple[TBRow, Any]]] = defaultdict(list)
+        for item in descendants:
+            by_class[item[1].local_account_class].append(item)
+        for candidates in by_class.values():
+            candidates.sort(key=lambda item: (len(item[0].account_path), item[0].source_row))
+            chosen: list[TBRow] = []
+            for row, classification in candidates:
+                if any(
+                    len(parent.account_path) <= len(row.account_path)
+                    and row.account_path[: len(parent.account_path)] == parent.account_path
+                    for parent in chosen
+                ):
+                    continue
+                selected.append((row, classification))
+                chosen.append(row)
+    return tuple(selected)
+
+
 def _sum_class(rows: Iterable[tuple[TBRow, Any]], local_class: str, measure: str) -> Decimal:
     return sum(
         (
@@ -233,7 +285,7 @@ def _analytic_rows(month: TBMonth) -> list[TBRow]:
 
 
 def _pulse(month: TBMonth, pack, boundary_status: str) -> dict[str, Any]:
-    roots = tuple((row, _classify_root(row, pack)) for row in month.root_rows)
+    roots = _statement_rows(month, pack)
     revenue = _sum_class(roots, "revenue", "turnover_credit")
     cogs = _sum_class(roots, "cost_of_goods_sold", "turnover_debit")
     selling = _sum_class(roots, "selling_expense", "turnover_debit")
@@ -407,7 +459,7 @@ def _draft_sections(months: Sequence[TBMonth], pack, continuity: dict[str, Any])
     pnl_monthly = []
     natural_closing = []
     for month, pulse in zip(months, pulses, strict=True):
-        roots = tuple((row, _classify_root(row, pack)) for row in month.root_rows)
+        roots = _statement_rows(month, pack)
         pnl_monthly.append(
             {
                 "period": pulse["period"],
@@ -480,7 +532,7 @@ def _draft_sections(months: Sequence[TBMonth], pack, continuity: dict[str, Any])
     ar = []
     ap_debt = []
     for month, pulse in zip(months, pulses, strict=True):
-        roots = tuple((row, _classify_root(row, pack)) for row in month.root_rows)
+        roots = _statement_rows(month, pack)
         inventory_classes = {"goods_in_transit", "merchandise_inventory"}
         goods_open = sum(
             (
