@@ -121,7 +121,15 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
     ["apps/web/app/planning-workspace.tsx"],
     ["forecast calculation, scenario proposal editor, liquidity projection, actual-vs-plan outcome"],
   ),
-  routeFamily("top_level_reporting", "Top-level reporting", null, null, "target_only", [], ["top-level reporting"]),
+  routeFamily(
+    "top_level_reporting",
+    "Top-level reporting",
+    "/api/ontology/retained-reports/preview, /api/ontology/retained-reports, /api/ontology/retained-reports/{proposal_id}, /api/ontology/retained-reports/{proposal_id}/exports/{format}",
+    "/v1/ontology/retained-reports/preview, /v1/ontology/retained-reports, /v1/ontology/retained-reports/{proposal_id}, /v1/ontology/retained-reports/{proposal_id}/exports/{format}",
+    "partial",
+    ["apps/web/app/reporting-workspace.tsx"],
+    ["certification/release gate and broader report families remain open"],
+  ),
   routeFamily(
     "nyx_reasoning",
     "NYX reasoning",
