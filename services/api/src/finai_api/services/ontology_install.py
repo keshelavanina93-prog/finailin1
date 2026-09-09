@@ -135,19 +135,35 @@ def _hidden_dependents(principal: Principal, root_ids: list) -> list[dict[str, A
     with resources.resource_connection(principal) as conn, conn.cursor(
         row_factory=dict_row
     ) as cursor:
+        has_batch_function = cursor.execute(
+            "SELECT to_regprocedure("
+            "'public.g8_hidden_current_dependents_for_roots(uuid[])'"
+            ") AS function_name"
+        ).fetchone()["function_name"] is not None
         has_detail_function = cursor.execute(
             "SELECT to_regprocedure('public.g8_hidden_current_dependents(uuid)') AS function_name"
         ).fetchone()["function_name"] is not None
-        for root_id in root_ids:
-            if has_detail_function:
-                values = cursor.execute(
-                    "SELECT * FROM public.g8_hidden_current_dependents(%s)", (root_id,)
-                ).fetchall()
-            else:  # pragma: no cover - compatibility with pre-A1 DBs
+        if has_batch_function:
+            values = cursor.execute(
+                "SELECT * FROM public.g8_hidden_current_dependents_for_roots(%s::uuid[])",
+                (root_ids,),
+            ).fetchall()
+            values = [dict(value) for value in values]
+        else:
+            values = []
+            for root_id in root_ids:
+                if has_detail_function:
+                    values.extend(
+                        cursor.execute(
+                            "SELECT * FROM public.g8_hidden_current_dependents(%s)",
+                            (root_id,),
+                        ).fetchall()
+                    )
+                    continue
                 hidden = cursor.execute(
                     "SELECT public.g8_has_hidden_current_dependents(%s) AS hidden", (root_id,)
                 ).fetchone()["hidden"]
-                values = (
+                values.extend(
                     [
                         {
                             "resource_id": None,
@@ -161,22 +177,25 @@ def _hidden_dependents(principal: Principal, root_ids: list) -> list[dict[str, A
                     if hidden
                     else []
                 )
-            for value in values:
-                rows.append(
-                    {
-                        "root_resource_id": str(root_id),
-                        "resource_id": str(value["resource_id"])
-                        if value.get("resource_id")
-                        else None,
-                        "version_id": str(value["version_id"])
-                        if value.get("version_id")
-                        else None,
-                        "object_type": value.get("object_type"),
-                        "identity_key": value.get("identity_key"),
-                        "display_name": value.get("display_name"),
-                        "access_entity": value.get("access_entity"),
-                    }
-                )
+        for value in values:
+            root_id = value.get("root_resource_id") or value.get("root_id")
+            if root_id is None and len(root_ids) == 1:
+                root_id = root_ids[0]
+            rows.append(
+                {
+                    "root_resource_id": str(root_id) if root_id else None,
+                    "resource_id": str(value["resource_id"])
+                    if value.get("resource_id")
+                    else None,
+                    "version_id": str(value["version_id"])
+                    if value.get("version_id")
+                    else None,
+                    "object_type": value.get("object_type"),
+                    "identity_key": value.get("identity_key"),
+                    "display_name": value.get("display_name"),
+                    "access_entity": value.get("access_entity"),
+                }
+            )
     return sorted(rows, key=lambda item: (item["object_type"] or "", item["identity_key"] or ""))
 
 
