@@ -267,9 +267,9 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     implementedScopeDimensions: ["tenant", "legal_entity", "store", "cash_register", "shift", "operator", "currency", "period", "document", "lineage"],
     requiredEvidence: ["source_file_hash", "schema_hash", "pos_shift_close", "cash_register_z_report", "row_count", "lineage_receipt"],
     presentEvidence: ["source_file_hash", "schema_hash", "pos_shift_close", "cash_register_z_report"],
-    routes: intakeRoutes(["/api/hydration"], ["/v1/hydration/ingest"], "wired"),
+    routes: intakeRoutes(["/api/hydration", "/api/operations/petroleum/intake/{receipt_id}/validation"], ["/v1/hydration/ingest", "/v1/operations/petroleum/intake/{receipt_id}/validation"], "wired"),
     currentImplementationStatus: "partially-implemented",
-    blockedOrMissingContracts: ["Fiscal Z-report evidence and accepted Store/CashRegister semantic bindings are not yet typed."],
+    blockedOrMissingContracts: ["Canonical RetailSale promotion and authentic register connector readback remain governed review work."],
   },
   {
     id: "regulatory_external_evidence",

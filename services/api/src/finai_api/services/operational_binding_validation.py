@@ -18,6 +18,7 @@ LOOKUPS = {
     },
     "SCADA": {"meter_id": "Meter", "asset_id": "Asset", "location_id": "Location"},
     "GAS_TELEMETRY": {"meter_id": "Meter", "asset_id": "Asset", "location_id": "Location"},
+    "RETAIL_CASH_REGISTER": {"store_id": "Store", "cash_register_id": "CashRegister"},
 }
 
 
@@ -42,6 +43,8 @@ def validate(principal: Principal, receipt_id: str) -> dict[str, Any]:
         if profile.startswith("gas-telemetry-")
         else "SCADA"
         if profile.startswith("scada-")
+        else "RETAIL_CASH_REGISTER"
+        if profile.startswith("retail-cash-register-")
         else source_system.upper()
     )
     lookup = LOOKUPS.get(source_system)

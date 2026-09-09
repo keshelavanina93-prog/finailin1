@@ -96,3 +96,30 @@ def test_binding_validation_requires_gas_meter_bindings(monkeypatch):
     assert result["profile"] == "gas-telemetry-measurement/1"
     assert result["status"] == "REVIEW_REQUIRED"
     assert "UNBOUND_METER_ID" in result["rows"][0]["reasons"]
+
+
+def test_binding_validation_resolves_retail_store_and_cash_register(monkeypatch):
+    values = {
+        "store_id": "STORE-1",
+        "cash_register_id": "TILL-2",
+        "operational_validation": '{"reasons": []}',
+    }
+    monkeypatch.setattr(
+        operational_binding_validation,
+        "retrieve",
+        lambda scope, receipt_id: receipt(values, "retail-cash-register-shift-close/1"),
+    )
+    monkeypatch.setattr(
+        operational_binding_validation.resources,
+        "list_resources",
+        lambda principal, object_type, query, offset, limit: [
+            resource(
+                object_type, values["store_id" if object_type == "Store" else "cash_register_id"]
+            )
+        ],
+    )
+
+    result = operational_binding_validation.validate(PRINCIPAL, "receipt-1")
+
+    assert result["status"] == "VALIDATED"
+    assert result["promotion_eligible"] is True

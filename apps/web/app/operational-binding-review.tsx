@@ -9,7 +9,7 @@ type BindingResult = {profile: string; status: string; promotion_eligible: boole
 
 export default function OperationalBindingReview({token, receiptId, profile}: {token: string; receiptId: string; profile?: string}) {
   const [result, setResult] = useState<BindingResult | null>(null); const [error, setError] = useState("");
-  const operational = Boolean(profile?.startsWith("orpak-") || profile?.startsWith("scada-") || profile?.startsWith("gas-telemetry-"));
+  const operational = Boolean(profile?.startsWith("orpak-") || profile?.startsWith("scada-") || profile?.startsWith("gas-telemetry-") || profile?.startsWith("retail-cash-register-"));
   useEffect(() => { if (!operational) return; const controller = new AbortController();
     void operationsRequest<BindingResult>(`petroleum/intake/${encodeURIComponent(receiptId)}/validation`, token, controller.signal).then(setResult).catch(reason => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "Binding validation unavailable"); });
     return () => controller.abort();
