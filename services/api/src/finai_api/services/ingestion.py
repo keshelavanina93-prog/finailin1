@@ -7,7 +7,11 @@ from typing import Any
 
 from finai_api.domain.authority import canonical_sha256
 from finai_api.domain.ingest import Candidate, IngestReceipt, IngestRequest
-from finai_api.services.operational_source_validation import profile_for, validate_row
+from finai_api.services.operational_source_validation import (
+    profile_for,
+    validate_row,
+    validate_series,
+)
 
 
 class SourceAuthorityDenied(ValueError):
@@ -60,6 +64,7 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
     accounts: set[str] = set()
     grains: set[tuple[str, ...]] = set()
     operational_rows: list[dict[str, Any]] = []
+    operational_source_rows: list[dict[str, str]] = []
     seen_operational: set[str] = set()
     with localcontext() as context:
         context.prec = 50
@@ -78,6 +83,7 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
                 if validation:
                     validation["source_row"] = row_number
                     operational_rows.append(validation)
+                    operational_source_rows.append(row)
                     if validation["status"] == "REJECTED":
                         rejects.append(f"row {row_number}: {', '.join(validation['reasons'])}")
                         continue
@@ -150,6 +156,8 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
                 ]
             )
         imbalance = str(debit_total - credit_total)
+    if operational:
+        validate_series(request.source_system or "", operational_source_rows, operational_rows)
     if not candidates:
         warnings.append("No usable candidate rows")
     if operational:

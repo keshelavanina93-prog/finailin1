@@ -833,7 +833,8 @@ at hydration intake with explicit evidence, duplicate, timestamp and unit
 states. Retained receipts now also expose semantic binding validation at
 `/v1/operations/petroleum/intake/{receipt_id}/validation`, resolving accepted
 Station/Product/Dispenser/Nozzle and Meter/Asset/Location identifiers without
-mutating canonical truth. Retained connector readback, canonical operational
+mutating canonical truth; gas series also flag non-monotonic meter timestamps
+for review. Retained connector readback, canonical operational
 promotion and live operational telemetry remain open.
 A citation-first NYX refusal/explanation boundary is now wired at
 `/v1/ontology/nyx/reason`; model-backed reasoning, multi-citation packets and

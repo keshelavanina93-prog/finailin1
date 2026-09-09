@@ -53,3 +53,21 @@ def test_scada_profile_rejects_missing_source_record_identity():
                 + "\n",
             )
         )
+
+
+def test_scada_profile_flags_non_monotonic_meter_series_for_review():
+    result = compile_source(
+        request(
+            "SCADA",
+            "meter_id,asset_id,location_id,measurement_type,measurement_timestamp,value,unit,pressure_basis,temperature_basis,quality_status,source_system,source_record_id,source_hash\n"
+            "M-1,A-1,L-1,LEVEL,2026-08-12T10:00:00+04:00,10,M3,ABSOLUTE,AMBIENT,GOOD,SCADA,ROW-1,"
+            + "a"
+            * 64
+            + "\n"
+            "M-1,A-1,L-1,LEVEL,2026-08-12T09:00:00+04:00,9,M3,ABSOLUTE,AMBIENT,GOOD,SCADA,ROW-2,"
+            + "b" * 64
+            + "\n",
+        )
+    )
+    assert result.source_profile["validation"]["rows"][1]["status"] == "REVIEW_REQUIRED"
+    assert "NON_MONOTONIC_SERIES" in result.source_profile["validation"]["rows"][1]["reasons"]

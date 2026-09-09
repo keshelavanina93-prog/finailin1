@@ -246,7 +246,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
     presentEvidence: ["source_file_hash", "schema_hash", "row_count", "tank_level_reading", "lineage_receipt"],
     routes: intakeRoutes(["/api/hydration", "/api/operations/petroleum/intake/{receipt_id}/validation", "/api/operations/petroleum/reconciliation"], ["/v1/hydration/ingest", "/v1/operations/petroleum/intake/{receipt_id}/validation", "/v1/operations/petroleum/reconciliation"], "wired"),
     currentImplementationStatus: "partially-implemented",
-    blockedOrMissingContracts: ["Telemetry and semantic binding validation are wired; monotonic series checks and live connector readback remain governed review work."],
+    blockedOrMissingContracts: ["Telemetry, semantic binding and retained-series monotonicity checks are wired; live connector readback remains governed review work."],
   },
   {
     id: "retail_cash_registers",

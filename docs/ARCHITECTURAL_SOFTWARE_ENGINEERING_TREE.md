@@ -508,7 +508,8 @@ still under verification. Frontend
 lint/typecheck/tests/build and API Ruff/mypy pass. The planning catalog,
 scenario comparison, forecast, liquidity, scenario authoring, outcome
 measurement, petroleum conservation and petroleum lineage projections plus
-ORPAK/SCADA source-grain and retained semantic-binding validation are now
+ORPAK/SCADA source-grain, semantic-binding and retained-series monotonicity
+validation are now
 implemented as bounded governed
 projections; canonical operational promotion and the remaining decision/action planes
 are not. The NYX citation/refusal boundary is implemented, but it is not

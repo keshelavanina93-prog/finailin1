@@ -141,3 +141,24 @@ def validate_row(source_system: str, row: dict[str, str], seen: set[str]) -> dic
             json.dumps(row, sort_keys=True, separators=(",", ":")).encode()
         ).hexdigest(),
     }
+
+
+def validate_series(
+    source_system: str, rows: list[dict[str, str]], validations: list[dict[str, Any]]
+) -> None:
+    """Apply checks that require the complete measurement series, not one row."""
+    if source_system.upper() not in {"SCADA", "GAS_TELEMETRY"}:
+        return
+    previous: dict[str, datetime] = {}
+    for row, validation in zip(rows, validations, strict=True):
+        if validation["status"] == "REJECTED":
+            continue
+        try:
+            timestamp = datetime.fromisoformat(row["measurement_timestamp"])
+        except ValueError:
+            continue
+        meter = row["meter_id"].strip()
+        if meter in previous and timestamp < previous[meter]:
+            validation["reasons"] = sorted(set(validation["reasons"]) | {"NON_MONOTONIC_SERIES"})
+            validation["status"] = "REVIEW_REQUIRED"
+        previous[meter] = timestamp

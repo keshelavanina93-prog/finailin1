@@ -1993,7 +1993,7 @@ facts. Operations now includes a petroleum conservation/lineage bridge over
 accepted physical resources, and hydration validates ORPAK and gas telemetry
 grains before promotion. The retained-source review now reads the semantic
 binding result through the authenticated operations proxy and displays row
-bindings, explicit reasons and the disabled promotion state. Retained source
+bindings, explicit reasons, non-monotonic series findings and the disabled promotion state. Retained source
 connectors, canonical operational promotion and live telemetry remain open.
 The previous coverage result was
 83.93% versus the required 90%. NYX now calls a citation-first governed
