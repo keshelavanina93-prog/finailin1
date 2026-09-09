@@ -1,0 +1,1060 @@
+{
+  "contract": "g8-integration-candidate/1",
+  "recorded_at": "2026-09-08T20:44:02.261224+00:00",
+  "state": "CODE_FROZEN_CI_GREEN_NOT_PRODUCT_ACCEPTED",
+  "worktree": "D:\\FinAI\\g8-accepted-financial-workspace",
+  "branch": "development/accepted-financial-worksheet",
+  "code_sha": "9c84ce1f88ffa2b92c0316ca59957c6d44a4d245",
+  "tree_sha": "010d9614de9fe66f317e23b9430c06cd40acdda0",
+  "base_sha": "e2aabdd73eb43aa289e7dd35f7892ceb05f5eb90",
+  "canonical_sha": "4261fcb88778552f3e986f1bdfd6043081bd6692",
+  "canonical_reconciliation": {
+    "review": "https://github.com/keshelavanina93-prog/finailin1/pull/6",
+    "included_in_candidate": false,
+    "note": "Separate catalog/candidate delivery advanced canonical. No overlapping changed paths; no duplicate replay or merge by this correction."
+  },
+  "changed_files": [
+    {
+      "path": "apps/web/app/analysis-workspace-owner.ts",
+      "sha256": "6e7adb6ecc256819e39e8623d496b7290eb0bd9bbd02be454515f58944a68bf6"
+    },
+    {
+      "path": "apps/web/app/api/ontology/[...path]/route.ts",
+      "sha256": "1035576da6dbddaaf38e67a4c7f1a312e4935bc0026b947e69f50a5240432e5d"
+    },
+    {
+      "path": "apps/web/app/builds-workbench.tsx",
+      "sha256": "03746a5b57d6be3249675a25e027bee7c229ae15d6f9b17621120cfa844283de"
+    },
+    {
+      "path": "apps/web/app/company-directory.ts",
+      "sha256": "563ed9e2c3974da6c392684eef9e5725674fc31f0f49165c7254a4db79f744ce"
+    },
+    {
+      "path": "apps/web/app/company-map-scope.ts",
+      "sha256": "cd1a607dd19133e6ef36004f7d06bdaac6cff50dba6199169b0341ee7e7e94e6"
+    },
+    {
+      "path": "apps/web/app/company-picker.tsx",
+      "sha256": "90d87ef9b821dc2487f42e7878e4223c8f567d66a4911346a0ff11404e5b0216"
+    },
+    {
+      "path": "apps/web/app/company-workspace.css",
+      "sha256": "cf800ed2794c14624ef6def47f4bb1e7cc5f9897ee86422a5b6f77bda573e7d9"
+    },
+    {
+      "path": "apps/web/app/company-workspace.tsx",
+      "sha256": "2d8cc11d5a89fccb6bc37d8641104dd7899042b48aee180ba326c2aa8a79f8a9"
+    },
+    {
+      "path": "apps/web/app/finance-discovery-state.ts",
+      "sha256": "5129f2fb656343175cf65f0c349ecc50eceaba27adf4938e01eb0e865d9f37d0"
+    },
+    {
+      "path": "apps/web/app/finance-workspace.css",
+      "sha256": "661ffb7f946f8fec5b06cd9b6e80a95cb99fb88d5825605415675065053a5b2d"
+    },
+    {
+      "path": "apps/web/app/finance-workspace.tsx",
+      "sha256": "8c254ca0b98d35ab6dc3c121baff2ed9a2de95101ee2dd0e7a9bae47f2ecea72"
+    },
+    {
+      "path": "apps/web/app/g8-workspace.tsx",
+      "sha256": "9019b037ada15970c3c177e7bc038e6ea3680b73e2cfc50877fdb1ad6716bf77"
+    },
+    {
+      "path": "apps/web/app/posted-movement-report.tsx",
+      "sha256": "e6467d780bb72b9e382bcb9ff5f3137937dcabed6cc0b82eac0281964ac97bad"
+    },
+    {
+      "path": "apps/web/app/regulatory-investigation.tsx",
+      "sha256": "cbf90eaa71b4c1cba5134c202fe2e9bf285f2d9cf8bdec2c095ebebfab327ad1"
+    },
+    {
+      "path": "apps/web/app/semantic-analysis-state.ts",
+      "sha256": "ff5a1b4cadce2f500b98708bc88654b073bc4f3059087a3c7c44372cdcc92337"
+    },
+    {
+      "path": "apps/web/app/semantic-analysis-workspace.css",
+      "sha256": "2ff83167965bd947003aa0b441a06e22926795ac46a2cc508b84c5c6196af576"
+    },
+    {
+      "path": "apps/web/app/semantic-analysis-workspace.tsx",
+      "sha256": "b0f2a626a31926396731f1c808a9d9f260536ef9ac43032241714748c48ed714"
+    },
+    {
+      "path": "apps/web/app/source-documents.tsx",
+      "sha256": "075bc719ccc5c7992c316e5629bff882d05254c5cadbb88ba08a07e24ee9354f"
+    },
+    {
+      "path": "apps/web/app/transformation-preview.ts",
+      "sha256": "4d32494695453ed5d111b656832f694d6123f9fa19a15005aa092611eb204936"
+    },
+    {
+      "path": "apps/web/tests/analysis-workspace-owner.test.mjs",
+      "sha256": "75c7000fd29c84e2e7e87716cef5972cd6824eb6d8dc26efac500a976eb01fde"
+    },
+    {
+      "path": "apps/web/tests/company-directory.test.mjs",
+      "sha256": "2c48b1134b0e9b0949f82fa8783bd9072dff1d83cd15acccb25213e5f5815684"
+    },
+    {
+      "path": "apps/web/tests/company-map-scope.test.mjs",
+      "sha256": "ec93442c7b0ca4c0985952dc93f92e879cc48de52894f842818245b4c6ffef0c"
+    },
+    {
+      "path": "apps/web/tests/finance-discovery-state.test.mjs",
+      "sha256": "7b48712989aa5798bc1b6353a10da3a92e8c06d03c0e2766ef3822bf71d81686"
+    },
+    {
+      "path": "apps/web/tests/finance-workspace-render.test.mjs",
+      "sha256": "4ebac48dc30ce0cb81f8dfa97805eab244948911553642f02be06b3f542dd091"
+    },
+    {
+      "path": "apps/web/tests/fixtures/company-financial-results-synthetic.json",
+      "sha256": "5fe3443b29e8ed6518a21313a0a773eb45366617cf79265a0a64127c185d47ba"
+    },
+    {
+      "path": "apps/web/tests/product-discovery-proxy.test.mjs",
+      "sha256": "97cc6073cc2932cbafa8373be3be9befbc239e5821711172462fe781b43cc959"
+    },
+    {
+      "path": "apps/web/tests/semantic-analysis-state.test.mjs",
+      "sha256": "da6918637d96b72d2b3622e01118e40107e3562736588ede6b28c4131cd8d014"
+    },
+    {
+      "path": "apps/web/tests/semantic-evidence-presentation.test.mjs",
+      "sha256": "d58bbc0e4f2526c7d55bda31f0e7d0ca843c6052dbe415eb0e48be2f375bb378"
+    },
+    {
+      "path": "apps/web/tests/transformation-preview.test.mjs",
+      "sha256": "f67995374fa8b5087d78cc1fb71d6540528bb92e75f78a661f109fc5897a7654"
+    },
+    {
+      "path": "packages/contracts/src/company-financial-results.ts",
+      "sha256": "425a4bc94035a2a753fbba193e40ac5e8b23e9396016d338d439d38fa8b6d1ca"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "sha256": "51353e3ad069697c3503d3c7dd3a9769e1ea957ca5829cfdab74ba7fc6d19293"
+    },
+    {
+      "path": "packages/contracts/src/semantic-analysis.ts",
+      "sha256": "3c3406a3f782fd4c481ea4f731dfe6096a9dbbc66b923f45ea0435071d619659"
+    },
+    {
+      "path": "services/api/src/finai_api/api/company_financial_result_routes.py",
+      "sha256": "e391dbbf0d03f251bba668bc692959d24e4b8d02cf29f1e847dc238f6f36d8db"
+    },
+    {
+      "path": "services/api/src/finai_api/api/transformation_routes.py",
+      "sha256": "b167eba5d7cc9cc24ac485a6240447b20b8b65ffdfe280d7c516f2ae546834bb"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/semantic_analysis.py",
+      "sha256": "a464a0f2dc87385e6c8ecd7128e5853a08a737adfc28fd0929fe6c1f66bbbcbd"
+    },
+    {
+      "path": "services/api/src/finai_api/domain/transformation.py",
+      "sha256": "e16dd07f3a69423bd243bd25a1ae5e11e931e76d7d154e9b0b807f19e1496a5d"
+    },
+    {
+      "path": "services/api/src/finai_api/main.py",
+      "sha256": "27c1ca5b178f2f75254fcd39d07f3d0c53a536c8df13350b2a188557597e1374"
+    },
+    {
+      "path": "services/api/src/finai_api/services/company_context.py",
+      "sha256": "39a264dcfbad9752e21840e987383a16f87743f80165524e9bb46ba22e6c967f"
+    },
+    {
+      "path": "services/api/src/finai_api/services/company_directory.py",
+      "sha256": "4636e3479680ebff78420695c5048fcf8794f8907fe81d62b44a8c2a2beb1293"
+    },
+    {
+      "path": "services/api/src/finai_api/services/company_financial_results.py",
+      "sha256": "d9a4aaa345cfa8dbdebd92dc165541ec22b1b054d3a23d8c986998d8f68ff297"
+    },
+    {
+      "path": "services/api/src/finai_api/services/company_source.py",
+      "sha256": "ea9d2dd3327ff9f9174b5e020ba11876285e0168910bb7ef695d28cb0bddeb27"
+    },
+    {
+      "path": "services/api/src/finai_api/services/semantic_analysis.py",
+      "sha256": "5377a106563b663186e091e29f7669b9f9b71cc9cd736121c9438ac572926d43"
+    },
+    {
+      "path": "services/api/src/finai_api/services/semantic_analysis_accepted_movements.py",
+      "sha256": "944d1a28960f56fb8c4f99ab9e97869ae5d83f60a36ff10842dfd21f3a44e95d"
+    },
+    {
+      "path": "services/api/src/finai_api/services/transformation_preview.py",
+      "sha256": "cd35972c5894f1be3add02e7362ab3d7dbfc73573f115c59a3bbfa1ada216cbe"
+    },
+    {
+      "path": "services/api/src/finai_api/services/transformation_runs.py",
+      "sha256": "efa605ed80778091e4cc97e17c32c77267f5364522ae6cd8d825e310de362fa8"
+    },
+    {
+      "path": "services/api/tests/test_accepted_worksheet_dispatch.py",
+      "sha256": "38447b65593dc074076d81c146bfb23c6f4c01ec76656a1397f4e47e21d4f19c"
+    },
+    {
+      "path": "services/api/tests/test_company_directory.py",
+      "sha256": "f7d16e526e6ac85d10fa5a474d3a29bb2ad9bc8d495b77716987899e87736b05"
+    },
+    {
+      "path": "services/api/tests/test_company_financial_results.py",
+      "sha256": "181d7b0069dd1c31f4c387989ee31b4c2b389e073a05e704436f5ff7801cf99a"
+    },
+    {
+      "path": "services/api/tests/test_product_discovery_routes.py",
+      "sha256": "7b9e34159e6f1ad7a7f69491d2dea7e86622069cca0866b832ed8befa8dcb8ea"
+    },
+    {
+      "path": "services/api/tests/test_semantic_analysis_accepted_movements.py",
+      "sha256": "1d61ef02b087dc9d0f043863c69cc71e0e73b5d76b1f5fabfa60db3e9bb88689"
+    },
+    {
+      "path": "services/api/tests/test_source_company_identity_boundary.py",
+      "sha256": "dfd292e266d48f34028f2575a8af3a8dcc8c51302bf3f4cb30132203d9372285"
+    },
+    {
+      "path": "services/api/tests/test_transformation_preview.py",
+      "sha256": "36a5a2b592ba75935e72e2a19d769d02213c6eac20c8fe56c76e19a7a74aef9d"
+    }
+  ],
+  "migrations": {
+    "unchanged_from_base": true,
+    "files": [
+      {
+        "path": "services/api/migrations/001_hydration.sql",
+        "sha256": "87e836dab944ae40549f130092977ddc3b78f3e594346d199480b2bfa6692094"
+      },
+      {
+        "path": "services/api/migrations/002_construction_review.sql",
+        "sha256": "e7836346aa7ff5c26d92ce601420ac4a2620e76d5707b5fc8f985303f4b2ffa7"
+      },
+      {
+        "path": "services/api/migrations/003_approval_integrity.sql",
+        "sha256": "462746a02a853a5e2801d4037aac43d7966d59a7c92d613ec0333e95cb7137f3"
+      },
+      {
+        "path": "services/api/migrations/004_canonical_resource_kernel.sql",
+        "sha256": "2a13160b8de9ba282c139798f850f518783d6118b83aa3c771f4265ef214a002"
+      },
+      {
+        "path": "services/api/migrations/005_resource_acceptance_integrity.sql",
+        "sha256": "00ef1be94bbea4229fcc8a14c67ab9c18aa72eed6c20dab9f5b0840edb660279"
+      },
+      {
+        "path": "services/api/migrations/006_company_industry_capabilities.sql",
+        "sha256": "317c087d0b916ca2107da793ae5f57dd4ee422788befbce097e743af7e84d3a9"
+      },
+      {
+        "path": "services/api/migrations/007_downstream_impact_visibility.sql",
+        "sha256": "1a1f25a6a5e12f6061d40cf048b87bdcde405a5e9ff9f0710f9cb744dc5adcb2"
+      },
+      {
+        "path": "services/api/migrations/008_private_evidence_objects.sql",
+        "sha256": "b1845be9fa90035acfd9de31552a66a2e8e9c5abf0a34237455e9e5bb6a405a5"
+      },
+      {
+        "path": "services/api/migrations/009_atomic_mixed_policy_proposals.sql",
+        "sha256": "26e1f596823279b679a69f89ead7dd27fac044a186b810ce5bf16f017b697ed0"
+      },
+      {
+        "path": "services/api/migrations/010_resource_lifecycle.sql",
+        "sha256": "6354edab90ec106f0bcd4aed828cb121d47d5c35f6e7d7a38d4cdb8d1d99b8b1"
+      },
+      {
+        "path": "services/api/migrations/011_runtime_schema_readiness.sql",
+        "sha256": "f4824e0ca7196738472fe8ef94dbdc8bc456c26788956791e6e796fc40ff0b33"
+      },
+      {
+        "path": "services/api/migrations/012_lifecycle_quality_amendments.sql",
+        "sha256": "6aa5ce793349a7530f8f08fb79190476439f6b0bf683ea7957f9b32c9d4e5b0b"
+      },
+      {
+        "path": "services/api/migrations/013_workbook_source_evidence.sql",
+        "sha256": "840bbb6919bc9e9b0fa797b8e9fce90e5f94829c91a7f3412a8bf074d7d49e76"
+      },
+      {
+        "path": "services/api/migrations/014_report_source_assessments.sql",
+        "sha256": "0f758c7eae77a8a626d10828bb38dfa47501d45e8e1b24845a3144b0ba889b2d"
+      },
+      {
+        "path": "services/api/migrations/015_durable_report_workflows.sql",
+        "sha256": "666265d1aff9de75c3eb4cfd628583095fb5c7fb05ba5a3a1e4211cb410ac693"
+      },
+      {
+        "path": "services/api/migrations/016_guarded_consumption_receipts.sql",
+        "sha256": "24a9e4cdbf01c3c9f6537a32ad3eb71ec959764ef778721f7eaed6fb1d0b68b3"
+      },
+      {
+        "path": "services/api/migrations/017_consumption_state_integrity.sql",
+        "sha256": "56525b720673d26f784fc2d299f4aaeb3079f8078bdae74a732650ff957041b4"
+      },
+      {
+        "path": "services/api/migrations/018_consumption_upstream_integrity.sql",
+        "sha256": "8417c645ee1c43f6104c0b631d19844f1e4713fe0822d06f51d48e33f65543ed"
+      },
+      {
+        "path": "services/api/migrations/019_retained_event_time.sql",
+        "sha256": "af7b07a974f29387bbb3f41800b908523c41aaa54484d44284c743a8f8537104"
+      },
+      {
+        "path": "services/api/migrations/020_canonical_field_read_policy.sql",
+        "sha256": "1d256a030aabf6cba807d0f03436afb8df497a998857667ac62974cf69dec9cd"
+      },
+      {
+        "path": "services/api/migrations/021_field_policy_audit_metadata.sql",
+        "sha256": "3e5a1225e8777f4c7103bac7e71ce1843b3bdbf4e96d0179b4bf9edc640cc153"
+      },
+      {
+        "path": "services/api/migrations/022_field_policy_review_history.sql",
+        "sha256": "c9e6c3ac089b974618bff506a35a6df7517eea4201d80f6f2d5190545ff34a19"
+      },
+      {
+        "path": "services/api/migrations/023_proposal_evaluation.sql",
+        "sha256": "e5fec83ad904a3074183f05a8dda540ac2e2a3c118cc6748f3ccc39642fbba57"
+      },
+      {
+        "path": "services/api/migrations/024_proposal_read_deduplication.sql",
+        "sha256": "cfa80e211fc01dee4a0bbf59c7dcd8f428281151642bdfd14d6d63e12b1b7d94"
+      },
+      {
+        "path": "services/api/migrations/025_fact_calculation_runs.sql",
+        "sha256": "ca33893fe8d2a02944d22eefcf0109eacd46fe043577727808dacae6493ab7a4"
+      },
+      {
+        "path": "services/api/migrations/026_source_documents.sql",
+        "sha256": "81b5e7003ac5c60c0e6ab60e099ff3716bf271d21a1953630b3c0b3e06a2fb44"
+      },
+      {
+        "path": "services/api/migrations/027_dependency_pin_validation.sql",
+        "sha256": "5da4f4244c65f5caccaa35a868e93315bf4753921a17fa32a78755fa2dfccbb0"
+      },
+      {
+        "path": "services/api/migrations/028_proposal_lineage_union.sql",
+        "sha256": "2080ca7b6809e5361cec32547ca66aea83877f59bc2615b622f01235bf244984"
+      },
+      {
+        "path": "services/api/migrations/029_unrestricted_schema_read_fast_path.sql",
+        "sha256": "6d1787cae36b9e1db3bdc49ed948010f09d2a1889344c75df9f1cc84f09b0b82"
+      },
+      {
+        "path": "services/api/migrations/030_ontology_inventory_indexes.sql",
+        "sha256": "4a0f880ed966c53ca8d4b369b11b3e6a92be7d0433163f09d36b066878984ea1"
+      },
+      {
+        "path": "services/api/migrations/031_bounded_lineage_version_lookup.sql",
+        "sha256": "3a67c3354f13fe89bd00d22a69f922f66b03f158c8f709786856ee407c49c94b"
+      },
+      {
+        "path": "services/api/migrations/032_current_effective_authority.sql",
+        "sha256": "20bb6486067ae11f37ebf297f22a4bfdd713a566551bf9bdb3ed8ecb751cbbd2"
+      },
+      {
+        "path": "services/api/migrations/033_effective_event_policy.sql",
+        "sha256": "d7ad77397660d557785e94c0b72a252415dd60b48544d225ffc4e4851b29e079"
+      },
+      {
+        "path": "services/api/migrations/034_certification_receipts.sql",
+        "sha256": "c0ede0b0de2e50350ddbdc8307d6782aa79b648d1fc7c7d4254686c28a643347"
+      },
+      {
+        "path": "services/api/migrations/035_certification_lineage_integrity.sql",
+        "sha256": "977c7a4650e5004d60b11d47364c10d1eb454b6b7ee4c1615d72ac89ae1c53fa"
+      },
+      {
+        "path": "services/api/migrations/036_certification_publication_integrity.sql",
+        "sha256": "d8ebdf07b3804119498084cfe10525af72eb18296c990c4ca44e0f6d8c3ab570"
+      },
+      {
+        "path": "services/api/migrations/037_certified_lifecycle.sql",
+        "sha256": "563b719ed67c022dccf0a5df21ceb7b467bc78a6d31b44eb09d00ae8aef6c310"
+      },
+      {
+        "path": "services/api/migrations/038_certified_consumption.sql",
+        "sha256": "5d07b2cf54c2339eda7da1a54cefdb5ae6fa54be90d69401d60567e023190aa9"
+      },
+      {
+        "path": "services/api/migrations/039_artifact_retention_evaluations.sql",
+        "sha256": "fa97e72200d1c86df9b6b7ab50a32701aeef38a49d893a8d3d807f4d014a9fea"
+      },
+      {
+        "path": "services/api/migrations/040_retention_ancestor_certification_guard.sql",
+        "sha256": "9770a88cdd036c48c5ca3666a8d5ea81f392d3fc6599442952e2bbf36fe46c24"
+      },
+      {
+        "path": "services/api/migrations/041_artifact_retention_history_index.sql",
+        "sha256": "fa93755b266c0d2602c98130a9aa40c23f53d55b5944e7d12bdc446d306b499e"
+      },
+      {
+        "path": "services/api/migrations/042_function_invocations.sql",
+        "sha256": "28bd04ddde0b0e1b3cb386ceb14928fb1091cd8c7ccf1408393809be2591b822"
+      },
+      {
+        "path": "services/api/migrations/043_transformation_intents.sql",
+        "sha256": "8e6ebdfce9581f55f707b04ef1d6c5d6dc8d73dab923a5bb175f9f040a6c7989"
+      },
+      {
+        "path": "services/api/migrations/044_transformation_history_index.sql",
+        "sha256": "47786855ab7dca41562a3537892980594bdf34fbfad9e14ca1730c4a3ca910ed"
+      },
+      {
+        "path": "services/api/migrations/045_transformation_budgets.sql",
+        "sha256": "29a4786fe6a590eba1a3b3c50590824a30d9e8c319d9b0e51cd31bf06b79dd19"
+      },
+      {
+        "path": "services/api/migrations/046_retained_worksheet_functions.sql",
+        "sha256": "2187215c8f847ae6eaa3698b4f1a3d1eef950b5d6676540a0a7a272e8b16d0ce"
+      },
+      {
+        "path": "services/api/migrations/047_runtime_observations.sql",
+        "sha256": "4d9df4b86d9a9bf357be97c6713cdbc384429c7a223a0d119a667f35bdae8af7"
+      },
+      {
+        "path": "services/api/migrations/048_retained_function_inputs.sql",
+        "sha256": "f95d3eca82652b90ed822986a25bce028df28489ab7725e4cdcd74591fb5ca19"
+      },
+      {
+        "path": "services/api/migrations/049_transformation_publication_review.sql",
+        "sha256": "a199dfeb0925ea64571ddf1af64c482fcf95d86324028f151ca9a484e2cbcdc7"
+      },
+      {
+        "path": "services/api/migrations/050_grouped_observation_counts.sql",
+        "sha256": "dd9f5b4e955d16d2e91045305ef1cbe19b99fd5a7ac72b8295022788fb512d81"
+      },
+      {
+        "path": "services/api/migrations/051_grouped_observation_lookup.sql",
+        "sha256": "b86af274dfc0e4c34e671da1b7df6397370be38dcc645fbfc2c617e57fb16f66"
+      },
+      {
+        "path": "services/api/migrations/052_period_posting_control.sql",
+        "sha256": "f5eb990b188dd87738c5eb2677048d41150f9e24fc47aeae6313721c63c9304d"
+      },
+      {
+        "path": "services/api/migrations/053_effective_version_schema_resolution.sql",
+        "sha256": "f41fd1823f0372858bdaf0c2b1b8f7f01c3fa89f3ba340d81d7a99702f12076e"
+      },
+      {
+        "path": "services/api/migrations/054_account_rule_completeness.sql",
+        "sha256": "f9dbe6f28c4dbd8f30e5979dca696e70610df30075b126442e3108360a48936c"
+      },
+      {
+        "path": "services/api/migrations/055_retained_calculated_inputs.sql",
+        "sha256": "e3c70f938cca07264bb2b299cf62a356bd307d404c1690093a77c054700c94ea"
+      },
+      {
+        "path": "services/api/migrations/056_calculated_binding_promotion.sql",
+        "sha256": "9e1488fd20be51d0bec437906d276ac3f34e2ac9117ff911df3fc0a15a746064"
+      },
+      {
+        "path": "services/api/migrations/057_transformation_binding_review.sql",
+        "sha256": "c3eb1edf9b2df1c9f2daf95af1363b8145fcb5d651a5c55880c608a13201af28"
+      },
+      {
+        "path": "services/api/migrations/058_transformation_execution_policy.sql",
+        "sha256": "67f3e63afbd2c6197badadfad89211121b3cf51f60444fbf210d5f02facd2469"
+      },
+      {
+        "path": "services/api/migrations/059_temporal_observation_extent.sql",
+        "sha256": "515f4a05ac45c6741a0ec88927d6511d152c5a6ee45c22188c332756511db569"
+      },
+      {
+        "path": "services/api/migrations/060_object_set_materialization.sql",
+        "sha256": "78c3ce422b80290045164ea887d69bfda4f909d85094889c5e97eed797c500d9"
+      },
+      {
+        "path": "services/api/migrations/061_materialized_observation_counts.sql",
+        "sha256": "b191a0e0820e2fbd97e8ae44bfdd728c87f955fe05f4fbf1f9927de75c136418"
+      },
+      {
+        "path": "services/api/migrations/062_retained_posted_movements.sql",
+        "sha256": "2e494b94b672f5477f244282b35d2550b8577c83cd6a921495af5e4fb462ed4e"
+      },
+      {
+        "path": "services/api/migrations/063_journal_production_attempts.sql",
+        "sha256": "27366a46430ac8bc3b71adfb870a82720cb896439a0f6d9f1ac18793f837cb83"
+      }
+    ]
+  },
+  "preserved": [
+    {
+      "path": "docs/development/evidence/nin59-viewport-candidate.json",
+      "sha256": "da00ddbff9d8101dc00a71713151cd83d508d4d7c0e74d1dbb499341410da3ad"
+    },
+    {
+      "path": "docs/development/evidence/nin59-product-a16668b.json",
+      "sha256": "979b85e25206e4192afe44ca152fec5655630951fef9ae2e1090c7af882a3516"
+    }
+  ],
+  "implementation": [
+    "Source organization labels cannot propose LegalEntity identities; endpoint refuses before source access. Existing records are not rewritten.",
+    "Shared company-directory/1 admits explicit approved declarations or exact configured workspaces; observations and filing parties remain review-only. Full-width searchable directory replaces floating chooser.",
+    "Root company, Finance, Regulation and map guards preserve exact scope. Unresolved company never becomes global scope; global geography/legal library requires explicit choice.",
+    "Canonical financial discovery and exact retained posted/accepted movement results use the shared worksheet. Historical reopening remains independent of current discovery availability.",
+    "Accepted worksheet displays retained account values and original source/journal evidence without recalculation or company-total double counting. Typed reference details require Advanced; scalar business facts stay visible.",
+    "Read-only transformation plan preview binds Start inspected plan to the reviewed request/hash before retention and execution; metadata preview is not transformed-row output."
+  ],
+  "artifacts": {
+    "source": {
+      "archive_sha256": "076db896a1fbf1fe7df6489cf0ac1944d10cb06f389e271caeb25b941b9ef9cb",
+      "commit": "9c84ce1f88ffa2b92c0316ca59957c6d44a4d245",
+      "tree": "010d9614de9fe66f317e23b9430c06cd40acdda0",
+      "files": 1252,
+      "kind": "SOURCE_ARTIFACT",
+      "archive": "D:\\FinAI\\g8-accepted-financial-workspace\\.finai\\artifacts\\source\\076db896a1fbf1fe7df6489cf0ac1944d10cb06f389e271caeb25b941b9ef9cb\\source.zip",
+      "manifest": "D:\\FinAI\\g8-accepted-financial-workspace\\.finai\\artifacts\\source\\076db896a1fbf1fe7df6489cf0ac1944d10cb06f389e271caeb25b941b9ef9cb\\manifest.json"
+    },
+    "api": {
+      "contract": "g8-api-build-artifact/1",
+      "kind": "API_WHEEL_BUILD",
+      "archive_sha256": "076db896a1fbf1fe7df6489cf0ac1944d10cb06f389e271caeb25b941b9ef9cb",
+      "commit": "9c84ce1f88ffa2b92c0316ca59957c6d44a4d245",
+      "tree": "010d9614de9fe66f317e23b9430c06cd40acdda0",
+      "source_directory": "D:\\FinAI\\g8-accepted-financial-workspace\\.finai\\artifacts\\build-inputs\\source-pe_6fmbq\\source",
+      "source_unchanged_after_build": true,
+      "pyproject_sha256": "59cb0bc8c6abe8d9c98301348dea71869ecfad780ca72180b0065ac46783db80",
+      "dependency_lock_sha256": "a250964b212a6fff5b3f08845e1953287dd218ea71ecce9d6971730bfa4a971a",
+      "build_tool_versions": {
+        "pip": "26.2.1",
+        "hatchling": "1.27.0",
+        "packaging": "26.3",
+        "pathspec": "1.1.1",
+        "pluggy": "1.6.0",
+        "trove-classifiers": "2025.1.15.22",
+        "editables": "0.5"
+      },
+      "build_script_sha256": "4718e49e9303db59622eb80bb3cfb185c64d1d0cda41f8835d0e3f1d35020880",
+      "source_verifier_sha256": "0c4a7da5397516d3b3a6302074724cb0b212e3997a51af389e667fd5945d9aff",
+      "python_executable": "D:\\FinAI\\g8-investigation-resolution-product\\.finai\\build-venv\\Scripts\\python.exe",
+      "target": "CPython3.13.14-Windows-AMD64",
+      "wheel": "D:\\FinAI\\g8-accepted-financial-workspace\\.finai\\artifacts\\api-builds\\build-fp5udphp\\wheels\\finai_api-0.1.0-py3-none-any.whl",
+      "wheel_sha256": "d0301393d852f05d770fa871db4e29c8cc6e067620933c4057b6b3539e8ee79d",
+      "canonical_sql_files": 63,
+      "migration_sha256": {
+        "001_hydration.sql": "87e836dab944ae40549f130092977ddc3b78f3e594346d199480b2bfa6692094",
+        "002_construction_review.sql": "e7836346aa7ff5c26d92ce601420ac4a2620e76d5707b5fc8f985303f4b2ffa7",
+        "003_approval_integrity.sql": "462746a02a853a5e2801d4037aac43d7966d59a7c92d613ec0333e95cb7137f3",
+        "004_canonical_resource_kernel.sql": "2a13160b8de9ba282c139798f850f518783d6118b83aa3c771f4265ef214a002",
+        "005_resource_acceptance_integrity.sql": "00ef1be94bbea4229fcc8a14c67ab9c18aa72eed6c20dab9f5b0840edb660279",
+        "006_company_industry_capabilities.sql": "317c087d0b916ca2107da793ae5f57dd4ee422788befbce097e743af7e84d3a9",
+        "007_downstream_impact_visibility.sql": "1a1f25a6a5e12f6061d40cf048b87bdcde405a5e9ff9f0710f9cb744dc5adcb2",
+        "008_private_evidence_objects.sql": "b1845be9fa90035acfd9de31552a66a2e8e9c5abf0a34237455e9e5bb6a405a5",
+        "009_atomic_mixed_policy_proposals.sql": "26e1f596823279b679a69f89ead7dd27fac044a186b810ce5bf16f017b697ed0",
+        "010_resource_lifecycle.sql": "6354edab90ec106f0bcd4aed828cb121d47d5c35f6e7d7a38d4cdb8d1d99b8b1",
+        "011_runtime_schema_readiness.sql": "f4824e0ca7196738472fe8ef94dbdc8bc456c26788956791e6e796fc40ff0b33",
+        "012_lifecycle_quality_amendments.sql": "6aa5ce793349a7530f8f08fb79190476439f6b0bf683ea7957f9b32c9d4e5b0b",
+        "013_workbook_source_evidence.sql": "840bbb6919bc9e9b0fa797b8e9fce90e5f94829c91a7f3412a8bf074d7d49e76",
+        "014_report_source_assessments.sql": "0f758c7eae77a8a626d10828bb38dfa47501d45e8e1b24845a3144b0ba889b2d",
+        "015_durable_report_workflows.sql": "666265d1aff9de75c3eb4cfd628583095fb5c7fb05ba5a3a1e4211cb410ac693",
+        "016_guarded_consumption_receipts.sql": "24a9e4cdbf01c3c9f6537a32ad3eb71ec959764ef778721f7eaed6fb1d0b68b3",
+        "017_consumption_state_integrity.sql": "56525b720673d26f784fc2d299f4aaeb3079f8078bdae74a732650ff957041b4",
+        "018_consumption_upstream_integrity.sql": "8417c645ee1c43f6104c0b631d19844f1e4713fe0822d06f51d48e33f65543ed",
+        "019_retained_event_time.sql": "af7b07a974f29387bbb3f41800b908523c41aaa54484d44284c743a8f8537104",
+        "020_canonical_field_read_policy.sql": "1d256a030aabf6cba807d0f03436afb8df497a998857667ac62974cf69dec9cd",
+        "021_field_policy_audit_metadata.sql": "3e5a1225e8777f4c7103bac7e71ce1843b3bdbf4e96d0179b4bf9edc640cc153",
+        "022_field_policy_review_history.sql": "c9e6c3ac089b974618bff506a35a6df7517eea4201d80f6f2d5190545ff34a19",
+        "023_proposal_evaluation.sql": "e5fec83ad904a3074183f05a8dda540ac2e2a3c118cc6748f3ccc39642fbba57",
+        "024_proposal_read_deduplication.sql": "cfa80e211fc01dee4a0bbf59c7dcd8f428281151642bdfd14d6d63e12b1b7d94",
+        "025_fact_calculation_runs.sql": "ca33893fe8d2a02944d22eefcf0109eacd46fe043577727808dacae6493ab7a4",
+        "026_source_documents.sql": "81b5e7003ac5c60c0e6ab60e099ff3716bf271d21a1953630b3c0b3e06a2fb44",
+        "027_dependency_pin_validation.sql": "5da4f4244c65f5caccaa35a868e93315bf4753921a17fa32a78755fa2dfccbb0",
+        "028_proposal_lineage_union.sql": "2080ca7b6809e5361cec32547ca66aea83877f59bc2615b622f01235bf244984",
+        "029_unrestricted_schema_read_fast_path.sql": "6d1787cae36b9e1db3bdc49ed948010f09d2a1889344c75df9f1cc84f09b0b82",
+        "030_ontology_inventory_indexes.sql": "4a0f880ed966c53ca8d4b369b11b3e6a92be7d0433163f09d36b066878984ea1",
+        "031_bounded_lineage_version_lookup.sql": "3a67c3354f13fe89bd00d22a69f922f66b03f158c8f709786856ee407c49c94b",
+        "032_current_effective_authority.sql": "20bb6486067ae11f37ebf297f22a4bfdd713a566551bf9bdb3ed8ecb751cbbd2",
+        "033_effective_event_policy.sql": "d7ad77397660d557785e94c0b72a252415dd60b48544d225ffc4e4851b29e079",
+        "034_certification_receipts.sql": "c0ede0b0de2e50350ddbdc8307d6782aa79b648d1fc7c7d4254686c28a643347",
+        "035_certification_lineage_integrity.sql": "977c7a4650e5004d60b11d47364c10d1eb454b6b7ee4c1615d72ac89ae1c53fa",
+        "036_certification_publication_integrity.sql": "d8ebdf07b3804119498084cfe10525af72eb18296c990c4ca44e0f6d8c3ab570",
+        "037_certified_lifecycle.sql": "563b719ed67c022dccf0a5df21ceb7b467bc78a6d31b44eb09d00ae8aef6c310",
+        "038_certified_consumption.sql": "5d07b2cf54c2339eda7da1a54cefdb5ae6fa54be90d69401d60567e023190aa9",
+        "039_artifact_retention_evaluations.sql": "fa97e72200d1c86df9b6b7ab50a32701aeef38a49d893a8d3d807f4d014a9fea",
+        "040_retention_ancestor_certification_guard.sql": "9770a88cdd036c48c5ca3666a8d5ea81f392d3fc6599442952e2bbf36fe46c24",
+        "041_artifact_retention_history_index.sql": "fa93755b266c0d2602c98130a9aa40c23f53d55b5944e7d12bdc446d306b499e",
+        "042_function_invocations.sql": "28bd04ddde0b0e1b3cb386ceb14928fb1091cd8c7ccf1408393809be2591b822",
+        "043_transformation_intents.sql": "8e6ebdfce9581f55f707b04ef1d6c5d6dc8d73dab923a5bb175f9f040a6c7989",
+        "044_transformation_history_index.sql": "47786855ab7dca41562a3537892980594bdf34fbfad9e14ca1730c4a3ca910ed",
+        "045_transformation_budgets.sql": "29a4786fe6a590eba1a3b3c50590824a30d9e8c319d9b0e51cd31bf06b79dd19",
+        "046_retained_worksheet_functions.sql": "2187215c8f847ae6eaa3698b4f1a3d1eef950b5d6676540a0a7a272e8b16d0ce",
+        "047_runtime_observations.sql": "4d9df4b86d9a9bf357be97c6713cdbc384429c7a223a0d119a667f35bdae8af7",
+        "048_retained_function_inputs.sql": "f95d3eca82652b90ed822986a25bce028df28489ab7725e4cdcd74591fb5ca19",
+        "049_transformation_publication_review.sql": "a199dfeb0925ea64571ddf1af64c482fcf95d86324028f151ca9a484e2cbcdc7",
+        "050_grouped_observation_counts.sql": "dd9f5b4e955d16d2e91045305ef1cbe19b99fd5a7ac72b8295022788fb512d81",
+        "051_grouped_observation_lookup.sql": "b86af274dfc0e4c34e671da1b7df6397370be38dcc645fbfc2c617e57fb16f66",
+        "052_period_posting_control.sql": "f5eb990b188dd87738c5eb2677048d41150f9e24fc47aeae6313721c63c9304d",
+        "053_effective_version_schema_resolution.sql": "f41fd1823f0372858bdaf0c2b1b8f7f01c3fa89f3ba340d81d7a99702f12076e",
+        "054_account_rule_completeness.sql": "f9dbe6f28c4dbd8f30e5979dca696e70610df30075b126442e3108360a48936c",
+        "055_retained_calculated_inputs.sql": "e3c70f938cca07264bb2b299cf62a356bd307d404c1690093a77c054700c94ea",
+        "056_calculated_binding_promotion.sql": "9e1488fd20be51d0bec437906d276ac3f34e2ac9117ff911df3fc0a15a746064",
+        "057_transformation_binding_review.sql": "c3eb1edf9b2df1c9f2daf95af1363b8145fcb5d651a5c55880c608a13201af28",
+        "058_transformation_execution_policy.sql": "67f3e63afbd2c6197badadfad89211121b3cf51f60444fbf210d5f02facd2469",
+        "059_temporal_observation_extent.sql": "515f4a05ac45c6741a0ec88927d6511d152c5a6ee45c22188c332756511db569",
+        "060_object_set_materialization.sql": "78c3ce422b80290045164ea887d69bfda4f909d85094889c5e97eed797c500d9",
+        "061_materialized_observation_counts.sql": "b191a0e0820e2fbd97e8ae44bfdd728c87f955fe05f4fbf1f9927de75c136418",
+        "062_retained_posted_movements.sql": "2e494b94b672f5477f244282b35d2550b8577c83cd6a921495af5e4fb462ed4e",
+        "063_journal_production_attempts.sql": "27366a46430ac8bc3b71adfb870a82720cb896439a0f6d9f1ac18793f837cb83"
+      },
+      "python_source_matches_archive": true,
+      "package_inventory_and_bytes_match_archive": true,
+      "metadata_checks": [
+        "NAME",
+        "VERSION",
+        "REQUIRES_PYTHON",
+        "WHEEL_TAG",
+        "RECORD"
+      ],
+      "requires_dist_metadata_verified": false,
+      "dependency_downloads_disabled": true,
+      "network_isolation": false,
+      "runtime_verified": false,
+      "release_accepted": false,
+      "sbom_complete": false
+    },
+    "web": {
+      "artifact_directory": "D:\\FinAI\\g8-accepted-financial-workspace\\.finai\\artifacts\\web-builds\\web-artifact-mpheyh4p",
+      "archive_sha256": "4d996bfa569dc3d62deb0ba28810ea266e7a1160e4e0970ce2ce788d05dffde6",
+      "files": 1325,
+      "bytes": 26804720,
+      "source_commit": "9c84ce1f88ffa2b92c0316ca59957c6d44a4d245",
+      "status": "VERIFIED_INPUTS_STANDALONE_COLLECTED"
+    },
+    "web_extraction": {
+      "code_sha": "9c84ce1f88ffa2b92c0316ca59957c6d44a4d245",
+      "archive_sha256": "4d996bfa569dc3d62deb0ba28810ea266e7a1160e4e0970ce2ce788d05dffde6",
+      "entrypoint": "D:\\FinAI\\g8-accepted-financial-workspace\\.finai\\artifacts\\extraction-812ywzq4\\web\\apps\\web\\server.js",
+      "files_verified": 1325,
+      "internal_links_verified": 26,
+      "network_disabled_during_extraction": true,
+      "service_started": false,
+      "runtime_acceptance": false
+    },
+    "checkout_byte_reconciliation": {
+      "kind": "CHECKOUT_LINE_ENDINGS_ONLY",
+      "code_sha": "9c84ce1f88ffa2b92c0316ca59957c6d44a4d245",
+      "files": [
+        "scripts/assert-d-drive.ps1",
+        "scripts/bootstrap-local.ps1",
+        "scripts/copy-workspace-key.ps1",
+        "scripts/g8-browser.ps1",
+        "scripts/g8-built-worker.ps1",
+        "scripts/g8-runtime.ps1",
+        "scripts/g8-system.ps1",
+        "scripts/g8-workflows.ps1",
+        "scripts/install-local-minio.ps1",
+        "scripts/install-local-temporal.ps1",
+        "scripts/install-packaged-python.ps1",
+        "scripts/load-local.ps1",
+        "scripts/lock-local-python.ps1",
+        "scripts/provision-local-minio.ps1",
+        "scripts/run-workspace.ps1",
+        "scripts/start-local-postgres.ps1",
+        "scripts/test-built-worker-ownership.ps1",
+        "scripts/test-d-drive.ps1",
+        "scripts/test-runtime.ps1",
+        "scripts/verify-local.ps1",
+        "services/api/src/finai_api/services/company_financial_results.py",
+        "services/api/src/finai_api/services/semantic_analysis.py",
+        "services/api/tests/test_company_financial_results.py"
+      ],
+      "web_build_input_changed": false
+    }
+  },
+  "ci": {
+    "conclusion": "success",
+    "headSha": "9c84ce1f88ffa2b92c0316ca59957c6d44a4d245",
+    "jobs": [
+      {
+        "completedAt": "2026-09-08T20:33:15Z",
+        "conclusion": "success",
+        "databaseId": 102226653906,
+        "name": "web-and-contracts",
+        "startedAt": "2026-09-08T20:31:21Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-09-08T20:31:24Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-09-08T20:31:22Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:31:26Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-09-08T20:31:24Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:31:27Z",
+            "conclusion": "success",
+            "name": "Run pnpm/action-setup@v4",
+            "number": 3,
+            "startedAt": "2026-09-08T20:31:26Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:31:36Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-node@v4",
+            "number": 4,
+            "startedAt": "2026-09-08T20:31:27Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:31:38Z",
+            "conclusion": "success",
+            "name": "Run pnpm install --frozen-lockfile",
+            "number": 5,
+            "startedAt": "2026-09-08T20:31:36Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:08Z",
+            "conclusion": "success",
+            "name": "Run pnpm lint",
+            "number": 6,
+            "startedAt": "2026-09-08T20:31:38Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:28Z",
+            "conclusion": "success",
+            "name": "Run pnpm typecheck",
+            "number": 7,
+            "startedAt": "2026-09-08T20:32:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:47Z",
+            "conclusion": "success",
+            "name": "Run pnpm test",
+            "number": 8,
+            "startedAt": "2026-09-08T20:32:28Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:33:11Z",
+            "conclusion": "success",
+            "name": "Run pnpm build",
+            "number": 9,
+            "startedAt": "2026-09-08T20:32:47Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:33:11Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@v4",
+            "number": 16,
+            "startedAt": "2026-09-08T20:33:11Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:33:11Z",
+            "conclusion": "success",
+            "name": "Post Run pnpm/action-setup@v4",
+            "number": 17,
+            "startedAt": "2026-09-08T20:33:11Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:33:11Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 18,
+            "startedAt": "2026-09-08T20:33:11Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:33:11Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 19,
+            "startedAt": "2026-09-08T20:33:11Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34275137157/job/102226653906"
+      },
+      {
+        "completedAt": "2026-09-08T20:42:34Z",
+        "conclusion": "success",
+        "databaseId": 102226654359,
+        "name": "api",
+        "startedAt": "2026-09-08T20:31:21Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-09-08T20:31:23Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-09-08T20:31:22Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:31:35Z",
+            "conclusion": "success",
+            "name": "Initialize containers",
+            "number": 2,
+            "startedAt": "2026-09-08T20:31:23Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:31:36Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 3,
+            "startedAt": "2026-09-08T20:31:35Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:31:39Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 4,
+            "startedAt": "2026-09-08T20:31:36Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:31:54Z",
+            "conclusion": "success",
+            "name": "Run python -m pip install -e \"services/api[dev]\"",
+            "number": 5,
+            "startedAt": "2026-09-08T20:31:39Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:31:58Z",
+            "conclusion": "success",
+            "name": "Verify capped RDF index before service setup",
+            "number": 6,
+            "startedAt": "2026-09-08T20:31:54Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:00Z",
+            "conclusion": "success",
+            "name": "Check native packaging paths before service setup",
+            "number": 7,
+            "startedAt": "2026-09-08T20:31:58Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:08Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-go@v5",
+            "number": 8,
+            "startedAt": "2026-09-08T20:32:00Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:09Z",
+            "conclusion": "success",
+            "name": "Restore pinned official MinIO binaries",
+            "number": 9,
+            "startedAt": "2026-09-08T20:32:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:09Z",
+            "conclusion": "skipped",
+            "name": "Build pinned official MinIO server and client",
+            "number": 10,
+            "startedAt": "2026-09-08T20:32:09Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:09Z",
+            "conclusion": "success",
+            "name": "Verify cached MinIO binary hashes",
+            "number": 11,
+            "startedAt": "2026-09-08T20:32:09Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:10Z",
+            "conclusion": "success",
+            "name": "Provision restricted PostgreSQL runtime",
+            "number": 12,
+            "startedAt": "2026-09-08T20:32:09Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:11Z",
+            "conclusion": "success",
+            "name": "Provision private versioned evidence storage",
+            "number": 13,
+            "startedAt": "2026-09-08T20:32:10Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:11Z",
+            "conclusion": "success",
+            "name": "Load disposable runtime configuration",
+            "number": 14,
+            "startedAt": "2026-09-08T20:32:11Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:12Z",
+            "conclusion": "success",
+            "name": "Install canonical platform definitions for native authority checks",
+            "number": 15,
+            "startedAt": "2026-09-08T20:32:11Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:12Z",
+            "conclusion": "success",
+            "name": "Run python -m ruff check services/api",
+            "number": 16,
+            "startedAt": "2026-09-08T20:32:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:32:22Z",
+            "conclusion": "success",
+            "name": "Run python -m mypy services/api/src",
+            "number": 17,
+            "startedAt": "2026-09-08T20:32:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:42:31Z",
+            "conclusion": "success",
+            "name": "Run python -m pytest services/api/tests",
+            "number": 18,
+            "startedAt": "2026-09-08T20:32:22Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:42:31Z",
+            "conclusion": "success",
+            "name": "Stop disposable evidence service",
+            "number": 19,
+            "startedAt": "2026-09-08T20:42:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:42:31Z",
+            "conclusion": "success",
+            "name": "Post Restore pinned official MinIO binaries",
+            "number": 34,
+            "startedAt": "2026-09-08T20:42:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:42:31Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-go@v5",
+            "number": 35,
+            "startedAt": "2026-09-08T20:42:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:42:32Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 36,
+            "startedAt": "2026-09-08T20:42:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:42:32Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 37,
+            "startedAt": "2026-09-08T20:42:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:42:32Z",
+            "conclusion": "success",
+            "name": "Stop containers",
+            "number": 38,
+            "startedAt": "2026-09-08T20:42:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-08T20:42:32Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 39,
+            "startedAt": "2026-09-08T20:42:32Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34275137157/job/102226654359"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34275137157"
+  },
+  "focused_verification": {
+    "api_adapter_dispatch": "17 passed",
+    "consumer_and_actual_render": "29 passed",
+    "actual_wire": {
+      "path": "D:\\FinAI\\g8-finance-evidence-references\\.finai\\tmp\\accepted-invocation-wire.json",
+      "sha256": "ab9b2f1d6f6a36227c5b72f237d0bdd0ce1113fe3c908c7d3432c99721ec3901",
+      "consumer_checks": 97,
+      "scope": "Actual execute/retain/history/load/reconciliation/project and four contributor drills over synthetic memory storage; frozen test Function definitions, not full catalog publication or native runtime."
+    },
+    "independent": {
+      "task": "01a07c7d-9a29-7d92-82ca-068bee49a02f",
+      "adapter": "14 bounded checks, no defect at1e15ed3",
+      "typed_reference": "10 bounded checks, no defect at822c615",
+      "consumer": "Bounded source review passed at9c84ce1: closed Advanced references, visible ordinary facts, selected/excluded pin guards, unchanged panes/NYX/authority. Turn01a082b7-3fdc-76c3-880d-3818bda55505 completed; no browser/native acceptance."
+    }
+  },
+  "runtime": {
+    "status": "ENVIRONMENT_BLOCKED",
+    "mounted_candidate": false,
+    "excluded": [
+      "3061",
+      "8061",
+      "associated PostgreSQL and MinIO/evidence stores"
+    ],
+    "changes_to_existing_services_or_stores": false,
+    "preview_3074_3080": "Historical automatic approval review denial: blocked by policy; not bypassed",
+    "pending": "Single previously prepared isolated target/export authorization remains unanswered. This manifest grants no runtime permission."
+  },
+  "review": {
+    "url": "https://github.com/keshelavanina93-prog/finailin1/pull/7",
+    "base": "e2aabdd73eb43aa289e7dd35f7892ceb05f5eb90",
+    "merged": false
+  },
+  "acceptance_gates": {
+    "CODE_PRESENT": "PASS",
+    "LOCAL_CONTRACT_PASS": "PASS_BOUNDED",
+    "LOCAL_INTEGRATED_PASS": "SYNTHETIC_OFFLINE_WIRE_ONLY",
+    "AUTHENTIC_SOURCE_PASS": "OPEN_CURRENT_CANDIDATE",
+    "PRODUCTION_RUNTIME_PASS": "OPEN_ENVIRONMENT_BLOCKED",
+    "VISUAL_ACCEPTANCE": "OPEN_CURRENT_SCREEN_REJECTED",
+    "GENERALIZATION_PASS": "BOUNDED_INSTALLED_ADAPTERS_ONLY",
+    "SCALE_PASS": "OPEN",
+    "RELEASE_ACCEPTED": false
+  },
+  "limitations": [
+    "Company declarations still depend on their recorded authority; no name-based region reclassification or live-record cleanup was performed.",
+    "No complete financial statements, close, consolidation, live operations, financial materiality, scenario engine or authentic second subject is established by this correction.",
+    "Full Home, Company360, premium dark/light design, NYX AI, Pipeline Studio and reporting/export requirements remain open.",
+    "NIN22 remains REFERENCE_ONLY, January2026 withdrawn, NIN62 expansion frozen, accepted journals preserved, f003399 not replayed."
+  ],
+  "ci_summary": {
+    "run_id": 34275137157,
+    "api": "SUCCESS",
+    "web_and_contracts": "SUCCESS",
+    "api_passed": 1849,
+    "api_skipped": 18,
+    "api_coverage_percent": 90.64,
+    "required_coverage_percent": 90
+  }
+}

@@ -14,12 +14,13 @@ from temporalio.exceptions import WorkflowAlreadyStartedError
 from finai_api.api.workflow_routes import client
 from finai_api.config import get_settings
 from finai_api.domain.review import Principal
-from finai_api.domain.transformation import TransformationRunRequest
+from finai_api.domain.transformation import PreviewedTransformationStart, TransformationRunRequest
 from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import (
     function_catalog,
     report_workflows,
     transformation_history,
+    transformation_preview,
     transformation_runs,
 )
 from finai_api.services.workspace import WorkspaceError
@@ -41,6 +42,31 @@ async def start(principal: User, request: TransformationRunRequest) -> dict[str,
     require_permission(principal, "ontology_read")
     require_permission(principal, "ingest")
     identity = await asyncio.to_thread(transformation_runs.retain, principal, request)
+    return await _start_retained(principal, request, identity)
+
+
+@router.post("/preview")
+def preview(principal: User, request: TransformationRunRequest) -> dict[str, Any]:
+    require_permission(principal, "ontology_read")
+    return transformation_preview.preview(principal, request)
+
+
+@router.post("/previewed-runs")
+async def start_previewed(principal: User, request: PreviewedTransformationStart) -> dict[str, Any]:
+    require_permission(principal, "ontology_read")
+    require_permission(principal, "ingest")
+    identity = await asyncio.to_thread(
+        transformation_runs.retain,
+        principal,
+        request.request,
+        expected_plan_hash=request.expected_plan_hash,
+    )
+    return await _start_retained(principal, request.request, identity)
+
+
+async def _start_retained(
+    principal: Principal, request: TransformationRunRequest, identity: str
+) -> dict[str, Any]:
     runtime = await client()
     with suppress(WorkflowAlreadyStartedError):
         await runtime.start_workflow(

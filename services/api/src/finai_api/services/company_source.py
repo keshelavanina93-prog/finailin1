@@ -1,14 +1,9 @@
 """Source-column company observations, without inferred registration or ownership."""
 
-from datetime import UTC, datetime
-from uuid import uuid5
 
 import xlrd
 
-from finai_api.domain.ontology_catalog import canonical_id
-from finai_api.domain.resources import ResourceMutation, ResourceProposal
 from finai_api.domain.review import Principal
-from finai_api.services import resources
 from finai_api.services.source_documents import document_bytes
 from finai_api.services.workspace import WorkspaceError
 
@@ -138,92 +133,10 @@ def propose_companies(
     column: int,
     mode: str = "company_column",
 ):
-    observed = inspect_companies(principal, document_id, sheet, header_row, column, mode)
-    if not observed["companies"] or observed["unassigned_row_count"]:
-        raise WorkspaceError(
-            422, "Resolve empty or unassigned company observations before publication"
-        )
-    evidence = canonical_id(principal.scope.tenant_id, "SourceEvidence", observed["sha256"])
-    now = datetime.now(UTC)
-    mutations = []
-    specs = [
-        (
-            evidence,
-            "SourceEvidence",
-            observed["sha256"],
-            "Retained company source",
-            {"sha256": observed["sha256"], "source_system": "RETAINED_DOCUMENT"},
-        )
-    ]
-    for company in observed["companies"]:
-        coordinate = company["first_coordinate"]
-        record = uuid5(evidence, coordinate)
-        identity = uuid5(evidence, "company:" + company["source_label"])
-        specs.extend(
-            [
-                (
-                    record,
-                    "SourceRecord",
-                    observed["sha256"] + ":" + coordinate,
-                    coordinate,
-                    {"evidence_id": str(evidence), "coordinate": coordinate},
-                ),
-                (
-                    identity,
-                    "LegalEntity",
-                    "observed-company:" + str(identity),
-                    company["source_label"],
-                    {"evidence_id": str(evidence)},
-                ),
-                (
-                    uuid5(identity, "source-record"),
-                    "Relationship",
-                    "company-source:" + str(identity),
-                    "Company observed in " + coordinate,
-                    {
-                        "relation_id": str(
-                            canonical_id(principal.scope.tenant_id, "LinkType", "DERIVED_FROM")
-                        ),
-                        "source_id": str(identity),
-                        "target_id": str(record),
-                        "evidence_id": str(evidence),
-                    },
-                ),
-            ]
-        )
-    for identity, kind, key, name, attributes in specs:
-        try:
-            prior = resources.get_resource(principal, identity)["resource"]
-            if prior["attributes"] != attributes or prior["object_type"] != kind:
-                raise WorkspaceError(
-                    409, "An existing source identity conflicts with this observation"
-                )
-            continue
-        except WorkspaceError as exc:
-            if exc.status != 404:
-                raise
-        mutations.append(
-            ResourceMutation(
-                resource_id=identity,
-                object_type=kind,
-                identity_key=key,
-                display_name=name,
-                attributes=attributes,
-                valid_from=now,
-                evidence_class="SOURCE_BOUND",
-            )
-        )
-    if not mutations:
-        raise WorkspaceError(409, "These source company observations are already published")
-    return resources.propose(
-        principal,
-        ResourceProposal(
-            title="Publish observed company identities from retained source",
-            rationale=(
-                "Preserve source company names and exact cells; registration, "
-                "group membership, licences and chart applicability remain unestablished."
-            ),
-            access_entity=principal.scope.legal_entity_id,
-            mutations=mutations,
-        ),
+    # A source column can contain a region, branch or reporting label. Its text
+    # alone cannot establish a legal company, even after generic proposal review.
+    raise WorkspaceError(
+        410,
+        "Source labels cannot create legal entities. Review an explicit company identity "
+        "and match the retained label through the existing source-company Alias workflow.",
     )
