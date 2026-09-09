@@ -499,13 +499,16 @@ FULLY_DEVELOPED_AND_PROVEN_FINANCIAL_AGI
 
 ## 6. Verification snapshot — 2026-09-10
 
-The canonical checkout is clean at `1e1ed74`; the same convergence head is
+The canonical checkout is clean at `c175765`; the same convergence head is
 published on PR #9. The repository is not fully merged or release-accepted:
 the protected branch remains at `4261fcb`, and the latest API CI test job fails
 previously failed four tests; three are fixed in `1e1ed74`, while the
 database-backed object-set materialization path and the coverage threshold are
 still under verification. Frontend
-lint/typecheck/tests/build and API Ruff/mypy pass. The worktree family and
+lint/typecheck/tests/build and API Ruff/mypy pass. The planning catalog and
+deterministic scenario comparison are now implemented as a bounded canonical
+resource projection; forecast calculation and the remaining decision/outcome
+planes are not. The worktree family and
 distributed implementation history must therefore be treated as source
 material converging into the canonical checkout, not as proof that every
 architectural dimension is complete.

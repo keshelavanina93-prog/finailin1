@@ -816,12 +816,16 @@ authentic-source, generalization, production-runtime, scale or release acceptanc
 
 ### Verification snapshot — 2026-09-10
 
-The latest implementation head is `1e1ed74` on PR #9. Frontend lint,
+The latest implementation head is `c175765` on PR #9. Frontend lint,
 typecheck, tests and build pass; API Ruff and mypy pass. The GitHub API test job
 previously failed four tests. The packaging, cross-actor investigation action,
 and investigation-resolution replay failures are fixed locally in `1e1ed74`;
 the native object-set materialization path is still being verified by the
-current GitHub run. The previous configured coverage result was 83.93% against
+current GitHub run. The accepted ScenarioVersion/PlanningCellFact catalog and
+deterministic exact-scope scenario comparison are now wired through
+`/v1/ontology/planning` and the frontend Planning workspace; forecast
+calculation, scenario authoring, liquidity projection and outcome measurement
+remain open. The previous configured coverage result was 83.93% against
 a 90% gate. The protected
 `development/enterprise-hydration-foundation` branch remains at `4261fcb`, so
 this head is not the canonical merged release. This is a substantial converged

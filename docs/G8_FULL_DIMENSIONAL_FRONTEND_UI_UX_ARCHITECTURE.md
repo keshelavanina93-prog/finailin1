@@ -1984,10 +1984,13 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest GitHub head is `1e1ed74`; frontend lint, typecheck, tests and build pass.
+latest GitHub head is `c175765`; frontend lint, typecheck, tests and build pass.
 The previous API CI job failed four tests; three are fixed locally in this head,
 while the database-backed object-set materialization path is still under CI
-verification. The previous coverage result was 83.93% versus the required 90%.
+verification. Planning now has a real catalog/comparison UI and allowlisted
+backend route over accepted canonical facts; authoring, forecast execution,
+liquidity and outcome wiring remain open. The previous coverage result was
+83.93% versus the required 90%.
 Therefore the UI is not certified as fully wired,
 persisted, browser-accepted or release-accepted. Planning, complete reporting,
 governed NYX reasoning, external action/readback, outcome learning, and
