@@ -7,6 +7,7 @@ from finai_api.api.certification_routes import router as certification_router
 from finai_api.api.company_context_routes import router as company_context_router
 from finai_api.api.company_journal_routes import router as company_journal_router
 from finai_api.api.event_time_routes import router as event_time_router
+from finai_api.api.finance_ontology_routes import router as finance_ontology_router
 from finai_api.api.function_routes import router as function_router
 from finai_api.api.history_search_routes import router as history_search_router
 from finai_api.api.lifecycle_routes import router as lifecycle_router
@@ -50,6 +51,7 @@ app.include_router(lifecycle_router)
 app.include_router(certification_router)
 app.include_router(retention_router)
 app.include_router(function_router)
+app.include_router(finance_ontology_router)
 app.include_router(ontology_import_router)
 app.include_router(runtime_observation_router)
 app.include_router(semantic_analysis_router)
@@ -77,8 +79,7 @@ async def workspace_error(_request: Request, exc: WorkspaceError) -> JSONRespons
 async def database_error(_request: Request, exc: psycopg.Error) -> JSONResponse:
     if (
         isinstance(exc, psycopg.errors.RaiseException)
-        and exc.diag.message_primary
-        == "Canonical identity type and access boundary are immutable"
+        and exc.diag.message_primary == "Canonical identity type and access boundary are immutable"
     ):
         return JSONResponse(
             status_code=409,
