@@ -18,6 +18,7 @@ from finai_api.api.function_routes import router as function_router
 from finai_api.api.history_search_routes import router as history_search_router
 from finai_api.api.lifecycle_routes import router as lifecycle_router
 from finai_api.api.metric_routes import router as metric_router
+from finai_api.api.nyx_reasoning_routes import router as nyx_reasoning_router
 from finai_api.api.object_set_routes import router as object_set_router
 from finai_api.api.ontology_definition_routes import router as ontology_definition_router
 from finai_api.api.ontology_import_routes import router as ontology_import_router
@@ -98,6 +99,7 @@ app.include_router(diagnostic_router)
 app.include_router(period_control_router)
 app.include_router(planning_router)
 app.include_router(ontology_operation_router)
+app.include_router(nyx_reasoning_router)
 
 
 @app.exception_handler(WorkspaceError)
