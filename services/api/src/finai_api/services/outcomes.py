@@ -7,9 +7,12 @@ from hashlib import sha256
 from typing import Any
 from uuid import UUID
 
+from psycopg.types.json import Jsonb
+
 from finai_api.security import require_permission
 from finai_api.services import planning
 from finai_api.services.workspace import WorkspaceError
+from finai_api.storage import connection
 
 DIMENSIONS = (
     "budget_article_id",
@@ -141,4 +144,85 @@ def evaluate_learning(
         "production_policy_changed": False,
         "production_model_changed": False,
         "business_effect_authorized": False,
+    }
+
+
+def retain_measurement(principal, measurement: dict[str, Any]) -> dict[str, Any]:
+    """Retain an exact deterministic measurement without promoting learning."""
+    require_permission(principal, "ontology_propose")
+    expected_scope = {"legal_entity_id": str(principal.scope.legal_entity_id)}
+    if (
+        measurement.get("contract") != "outcome-measurement/1"
+        or measurement.get("scope") != expected_scope
+    ):
+        raise WorkspaceError(422, "Outcome measurement does not match the authorized company scope")
+    measurement_id = str(measurement.get("measurement_id", ""))
+    if not measurement_id.startswith("om_") or len(measurement_id) != 67:
+        raise WorkspaceError(422, "Outcome measurement identity is invalid")
+    content_hash = sha256(
+        json.dumps(measurement, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    scope = principal.scope.model_dump(mode="json")
+    with connection(principal.scope) as conn:
+        conn.execute("SELECT set_config('finai.exact_scope',%s,true)", (json.dumps(scope),))
+        conn.execute(
+            "INSERT INTO outcome_measurements "
+            "(tenant_id,measurement_id,exact_scope,payload,content_hash,actor_id) "
+            "VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (tenant_id,measurement_id) DO NOTHING",
+            (
+                principal.scope.tenant_id,
+                measurement_id,
+                Jsonb(scope),
+                Jsonb(measurement),
+                content_hash,
+                principal.actor_id,
+            ),
+        )
+        row = conn.execute(
+            "SELECT payload,content_hash,recorded_at FROM outcome_measurements "
+            "WHERE tenant_id=%s AND measurement_id=%s AND exact_scope=%s",
+            (principal.scope.tenant_id, measurement_id, Jsonb(scope)),
+        ).fetchone()
+    if row is None or row[1] != content_hash:
+        raise WorkspaceError(409, "Outcome measurement retention integrity check failed")
+    return {
+        "measurement": dict(row[0]),
+        "content_hash": row[1],
+        "recorded_at": row[2].isoformat(),
+        "retained": True,
+    }
+
+
+def measurement_timeline(principal, limit: int = 50) -> dict[str, Any]:
+    """Read retained outcome measurements in the caller's exact company scope."""
+    require_permission(principal, "ontology_read")
+    bounded = max(1, min(limit, 100))
+    scope = principal.scope.model_dump(mode="json")
+    with connection(principal.scope, repeatable_read=True) as conn:
+        conn.execute("SELECT set_config('finai.exact_scope',%s,true)", (json.dumps(scope),))
+        rows = conn.execute(
+            "SELECT payload,content_hash,recorded_at FROM outcome_measurements "
+            "WHERE tenant_id=%s AND exact_scope=%s "
+            "ORDER BY recorded_at DESC,measurement_id DESC LIMIT %s",
+            (principal.scope.tenant_id, Jsonb(scope), bounded),
+        ).fetchall()
+    items = []
+    for payload, content_hash, recorded_at in rows:
+        if (
+            sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+            != content_hash
+        ):
+            raise WorkspaceError(409, "Outcome measurement timeline integrity failed")
+        items.append(
+            {
+                "measurement": dict(payload),
+                "content_hash": content_hash,
+                "recorded_at": recorded_at.isoformat(),
+            }
+        )
+    return {
+        "contract": "outcome-measurement-timeline/1",
+        "scope": {"legal_entity_id": str(principal.scope.legal_entity_id)},
+        "items": items,
+        "limit": bounded,
     }

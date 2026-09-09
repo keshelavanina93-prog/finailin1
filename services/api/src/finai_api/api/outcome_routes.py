@@ -3,7 +3,7 @@
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal
@@ -28,3 +28,15 @@ def learning_evaluation(
     tolerance: str = "0",
 ) -> dict[str, Any]:
     return outcomes.evaluate_learning(principal, plan_scenario_id, actual_scenario_id, tolerance)
+
+
+@router.post("/measurements")
+def retain_measurement(measurement: dict[str, Any], principal: User) -> dict[str, Any]:
+    return outcomes.retain_measurement(principal, measurement)
+
+
+@router.get("/measurements")
+def measurement_timeline(
+    principal: User, limit: int = Query(default=50, ge=1, le=100)
+) -> dict[str, Any]:
+    return outcomes.measurement_timeline(principal, limit)

@@ -33,3 +33,16 @@ export type LearningEvaluation = {
   production_model_changed: false;
   business_effect_authorized: false;
 };
+
+export type RetainedOutcomeMeasurement = {
+  measurement: OutcomeMeasurement;
+  content_hash: string;
+  recorded_at: string;
+};
+
+export type OutcomeMeasurementTimeline = {
+  contract: "outcome-measurement-timeline/1";
+  scope: {legal_entity_id: string};
+  items: RetainedOutcomeMeasurement[];
+  limit: number;
+};

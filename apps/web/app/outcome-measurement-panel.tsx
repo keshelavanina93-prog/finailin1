@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type {LearningEvaluation, OutcomeMeasurement} from "@finai/contracts";
+import type {LearningEvaluation, OutcomeMeasurement, OutcomeMeasurementTimeline} from "@finai/contracts";
 
 type Outcome = OutcomeMeasurement;
 type Learning = LearningEvaluation;
@@ -11,15 +11,27 @@ export default function OutcomeMeasurementPanel({ token, planScenarioId, actualS
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [learning, setLearning] = useState<Learning | null>(null);
+  const [timeline, setTimeline] = useState<OutcomeMeasurementTimeline | null>(null);
   async function measure() {
     setBusy(true); setError("");
     try {
       const response = await fetch(`/api/ontology/outcomes/actual-vs-plan?plan_scenario_id=${encodeURIComponent(planScenarioId)}&actual_scenario_id=${encodeURIComponent(actualScenarioId)}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
       const data = await response.json() as Outcome & { detail?: string };
       if (!response.ok) throw new Error(data.detail ?? "Outcome measurement unavailable");
-      setResult(data);
+      setResult(data); await retain(data); await loadTimeline();
     } catch (failure) { setError(failure instanceof Error ? failure.message : "Outcome measurement unavailable"); }
     finally { setBusy(false); }
+  }
+  async function retain(data: Outcome) {
+    const response = await fetch("/api/ontology/outcomes/measurements", { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(data), cache: "no-store" });
+    const value = await response.json() as { detail?: string };
+    if (!response.ok) throw new Error(value.detail ?? "Outcome retention unavailable");
+  }
+  async function loadTimeline() {
+    const response = await fetch("/api/ontology/outcomes/measurements?limit=20", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+    const data = await response.json() as OutcomeMeasurementTimeline & { detail?: string };
+    if (!response.ok) throw new Error(data.detail ?? "Outcome timeline unavailable");
+    setTimeline(data);
   }
   async function evaluateLearning() {
     setBusy(true); setError("");
@@ -31,5 +43,5 @@ export default function OutcomeMeasurementPanel({ token, planScenarioId, actualS
     } catch (failure) { setError(failure instanceof Error ? failure.message : "Learning evaluation unavailable"); }
     finally { setBusy(false); }
   }
-  return <section className="g8-panel" aria-label="Actual versus plan outcome measurement"><div className="g8-panel-heading"><div><p className="overline">OUTCOME · ACCEPTED FACTS</p><h3>Measure actual versus plan</h3><p>Reads accepted PlanningCellFact values in the selected company scope. It creates no learning candidate and changes no policy or model.</p></div><div><button onClick={() => void measure()} disabled={busy || !planScenarioId || !actualScenarioId}>{busy ? "Measuring…" : "Measure outcome"}</button><button onClick={() => void evaluateLearning()} disabled={busy || !planScenarioId || !actualScenarioId}>Evaluate in shadow</button></div></div>{error && <p className="g8-inline-error" role="alert">{error}</p>}{result && <><p role="status">{result.coverage} · measurement authorized: {String(result.measurement_authorized)} · learning candidate created: {String(result.learning_candidate_created)}</p><details><summary>Exact outcome readback</summary><dl><dt>Measurement ID</dt><dd><code>{result.measurement_id}</code></dd><dt>Observed at</dt><dd>{new Date(result.observed_at).toLocaleString()}</dd><dt>Legal entity</dt><dd>{result.scope.legal_entity_id}</dd><dt>Scenario pair</dt><dd>{String(result.plan_scenario.resource_id)} → {String(result.actual_scenario.resource_id)}</dd></dl></details>{result.rows.length ? <div className="g8-table-scroll"><table><thead><tr><th>Dimension</th><th>Planned</th><th>Actual</th><th>Variance</th></tr></thead><tbody>{result.rows.map(row => <tr key={JSON.stringify(row.dimension)}><td>{Object.entries(row.dimension).filter(([, value]) => value).map(([key, value]) => `${key}: ${value}`).join(" · ")}</td><td>{row.planned}</td><td>{row.actual}</td><td>{row.variance}</td></tr>)}</tbody></table></div> : <p>No accepted plan/actual cells were found for the selected dimensions.</p>}</>}{learning && <p role="status">Shadow evaluation {learning.status}; candidate {learning.candidate_id}. Promotion required: {String(learning.promotion_required)}. Production policy/model changed: {String(learning.production_policy_changed)}/{String(learning.production_model_changed)}.</p>}</section>;
+  return <section className="g8-panel" aria-label="Actual versus plan outcome measurement"><div className="g8-panel-heading"><div><p className="overline">OUTCOME · ACCEPTED FACTS</p><h3>Measure actual versus plan</h3><p>Reads accepted PlanningCellFact values in the selected company scope. Retained measurements are immutable evidence; learning remains shadow-only.</p></div><div><button onClick={() => void measure()} disabled={busy || !planScenarioId || !actualScenarioId}>{busy ? "Measuring…" : "Measure and retain"}</button><button onClick={() => void evaluateLearning()} disabled={busy || !planScenarioId || !actualScenarioId}>Evaluate in shadow</button></div></div>{error && <p className="g8-inline-error" role="alert">{error}</p>}{result && <><p role="status">{result.coverage} · measurement authorized: {String(result.measurement_authorized)} · retained: {timeline?.items.some(item => item.measurement.measurement_id === result.measurement_id) ? "yes" : "pending"}</p><details><summary>Exact outcome readback</summary><dl><dt>Measurement ID</dt><dd><code>{result.measurement_id}</code></dd><dt>Observed at</dt><dd>{new Date(result.observed_at).toLocaleString()}</dd><dt>Legal entity</dt><dd>{result.scope.legal_entity_id}</dd><dt>Scenario pair</dt><dd>{String(result.plan_scenario.resource_id)} → {String(result.actual_scenario.resource_id)}</dd></dl></details>{result.rows.length ? <div className="g8-table-scroll"><table><thead><tr><th>Dimension</th><th>Planned</th><th>Actual</th><th>Variance</th></tr></thead><tbody>{result.rows.map(row => <tr key={JSON.stringify(row.dimension)}><td>{Object.entries(row.dimension).filter(([, value]) => value).map(([key, value]) => `${key}: ${value}`).join(" · ")}</td><td>{row.planned}</td><td>{row.actual}</td><td>{row.variance}</td></tr>)}</tbody></table></div> : <p>No accepted plan/actual cells were found for the selected dimensions.</p>}</>}{timeline && <details><summary>Retained outcome timeline · {timeline.items.length}</summary><ol>{timeline.items.map(item => <li key={item.measurement.measurement_id}><code>{item.measurement.measurement_id}</code> · {new Date(item.recorded_at).toLocaleString()} · <code>{item.content_hash}</code></li>)}</ol></details>}{learning && <p role="status">Shadow evaluation {learning.status}; candidate {learning.candidate_id}. Promotion required: {String(learning.promotion_required)}. Production policy/model changed: {String(learning.production_policy_changed)}/{String(learning.production_model_changed)}.</p>}</section>;
 }
