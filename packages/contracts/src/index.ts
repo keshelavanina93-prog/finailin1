@@ -324,3 +324,4 @@ export type { MetricCatalogItem, MetricCatalog, MetricCatalogRequest } from "./m
 export type { MetricDefinitionSnapshot } from "./metric-observations.js";
 export type {CompanyFinancialResults} from "./company-financial-results.js";
 export type {OperationalMeasurementGrain, OperationalValidationStage, OperationalBindingRow, OperationalBindingValidation, OperationalPromotionPreview} from "./operational-intake.js";
+export type {OutcomeDimensionRow, OutcomeMeasurement, LearningEvaluation} from "./outcomes.js";

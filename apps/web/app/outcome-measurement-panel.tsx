@@ -1,15 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import type {LearningEvaluation, OutcomeMeasurement} from "@finai/contracts";
 
-type Outcome = {
-  contract: "outcome-measurement/1";
-  rows: Array<{ dimension: Record<string, string>; planned: string; actual: string; variance: string }>;
-  coverage: string;
-  measurement_authorized: boolean;
-  learning_candidate_created: boolean;
-};
-type Learning = { contract: "learning-evaluation/1"; candidate_id: string; status: string; tolerance: string; promotion_required: boolean; production_policy_changed: false; production_model_changed: false };
+type Outcome = OutcomeMeasurement;
+type Learning = LearningEvaluation;
 
 export default function OutcomeMeasurementPanel({ token, planScenarioId, actualScenarioId }: { token: string; planScenarioId: string; actualScenarioId: string }) {
   const [result, setResult] = useState<Outcome | null>(null);
