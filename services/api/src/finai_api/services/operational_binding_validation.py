@@ -19,6 +19,11 @@ LOOKUPS = {
     "SCADA": {"meter_id": "Meter", "asset_id": "Asset", "location_id": "Location"},
     "GAS_TELEMETRY": {"meter_id": "Meter", "asset_id": "Asset", "location_id": "Location"},
     "RETAIL_CASH_REGISTER": {"store_id": "Store", "cash_register_id": "CashRegister"},
+    "MOVEMENT_REGISTER": {
+        "source_location_id": "Location",
+        "destination_location_id": "Location",
+        "product_code": "Product",
+    },
 }
 
 
@@ -45,6 +50,8 @@ def validate(principal: Principal, receipt_id: str) -> dict[str, Any]:
         if profile.startswith("scada-")
         else "RETAIL_CASH_REGISTER"
         if profile.startswith("retail-cash-register-")
+        else "MOVEMENT_REGISTER"
+        if profile.startswith("1c-movement-register-")
         else source_system.upper()
     )
     lookup = LOOKUPS.get(source_system)
@@ -114,6 +121,8 @@ def promotion_preview(principal: Principal, receipt_id: str) -> dict[str, Any]:
         if profile.startswith("scada-")
         else "RETAIL_CASH_REGISTER"
         if profile.startswith("retail-cash-register-")
+        else "MOVEMENT_REGISTER"
+        if profile.startswith("1c-movement-register-")
         else ""
     )
     lookup = LOOKUPS[source_system]
@@ -171,6 +180,19 @@ def promotion_preview(principal: Principal, receipt_id: str) -> dict[str, Any]:
                 "gross_amount": values["gross_amount"],
                 "net_amount": values["net_amount"],
                 "payment_method": values["payment_method"],
+            }
+        elif source_system == "MOVEMENT_REGISTER":
+            object_type = "PhysicalMovement"
+            canonical_values = {
+                "movement_id": values["movement_id"],
+                "movement_type": values["movement_type"],
+                "source_location_id": refs["source_location_id"]["resource_id"],
+                "destination_location_id": refs["destination_location_id"]["resource_id"],
+                "product_id": refs["product_code"]["resource_id"],
+                "event_time": values["event_time"],
+                "quantity": values["quantity"],
+                "unit": values["unit"],
+                "document_id": values["document_id"],
             }
         else:
             object_type = "PhysicalMeasurement"

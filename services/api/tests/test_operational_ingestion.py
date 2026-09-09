@@ -87,3 +87,18 @@ def test_retail_cash_register_profile_retains_shift_close_as_review_candidate():
     assert result.source_profile["grain"] == "ONE_CASH_REGISTER_SHIFT_CLOSE"
     assert result.source_profile["validation"]["promotion_eligible"] is False
     assert result.candidates[0].values["operational_grain"] == "ONE_CASH_REGISTER_SHIFT_CLOSE"
+
+
+def test_1c_movement_register_profile_retains_physical_movement_grain():
+    result = compile_source(
+        request(
+            "1C_MOVEMENT_REGISTER",
+            "movement_id,movement_type,source_location_id,destination_location_id,product_code,event_time,quantity,unit,document_id,source_record_id,source_hash\n"
+            "MOVE-1,TRANSFER,TANK-1,STATION-2,DIESEL,2026-08-12T10:00:00+04:00,500,L,DOC-1,ROW-1,"
+            + "a" * 64
+            + "\n",
+        )
+    )
+    assert result.source_profile["profile"] == "1c-movement-register/1"
+    assert result.source_profile["grain"] == "ONE_PHYSICAL_MOVEMENT_DOCUMENT_LINE"
+    assert result.candidates[0].values["operational_grain"] == "ONE_PHYSICAL_MOVEMENT_DOCUMENT_LINE"

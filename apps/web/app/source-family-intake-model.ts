@@ -142,7 +142,7 @@ export const SOURCE_FAMILY_INTAKE_PLANS: readonly SourceFamilyIntakePlan[] = [
       "proxy-only",
     ),
     currentImplementationStatus: "partially-implemented",
-    blockedOrMissingContracts: ["Movement-register to journal-line reconciliation contract is missing."],
+    blockedOrMissingContracts: ["Movement-register grain and physical candidate intake are wired; movement-to-journal-line reconciliation and authentic connector readback remain open."],
   },
   {
     id: "seg_procurement_expense",

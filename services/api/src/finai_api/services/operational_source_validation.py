@@ -15,6 +15,7 @@ from typing import Any
 ORPAK_PROFILE = "orpak-forecourt-sale-line/1"
 GAS_PROFILE = "gas-telemetry-measurement/1"
 RETAIL_PROFILE = "retail-cash-register-shift-close/1"
+MOVEMENT_PROFILE = "1c-movement-register/1"
 ORPAK_REQUIRED = frozenset(
     {
         "station_id",
@@ -67,6 +68,21 @@ RETAIL_REQUIRED = frozenset(
         "source_hash",
     }
 )
+MOVEMENT_REQUIRED = frozenset(
+    {
+        "movement_id",
+        "movement_type",
+        "source_location_id",
+        "destination_location_id",
+        "product_code",
+        "event_time",
+        "quantity",
+        "unit",
+        "document_id",
+        "source_record_id",
+        "source_hash",
+    }
+)
 UNITS = frozenset({"L", "LITER", "LITERS", "M3", "KG", "TONNE", "TONNES"})
 HASH = re.compile(r"^[a-fA-F0-9]{64}$")
 
@@ -90,6 +106,12 @@ def profile_for(source_system: str | None) -> dict[str, Any] | None:
             "profile": RETAIL_PROFILE,
             "grain": "ONE_CASH_REGISTER_SHIFT_CLOSE",
             "required": RETAIL_REQUIRED,
+        }
+    if key in {"1C_MOVEMENT_REGISTER", "1C_MOVEMENTS", "MOVEMENT_REGISTER"}:
+        return {
+            "profile": MOVEMENT_PROFILE,
+            "grain": "ONE_PHYSICAL_MOVEMENT_DOCUMENT_LINE",
+            "required": MOVEMENT_REQUIRED,
         }
     return None
 
@@ -145,11 +167,18 @@ def validate_row(source_system: str, row: dict[str, str], seen: set[str]) -> dic
                 row["measurement_timestamp"],
                 row["measurement_type"],
             )
-        else:
+        elif source_system.upper() in {"RETAIL_CASH_REGISTER", "CASH_REGISTER", "RETAIL_POS"}:
             identity_fields = (
                 row["store_id"],
                 row["cash_register_id"],
                 row["shift_id"],
+                row["event_time"],
+            )
+        else:
+            identity_fields = (
+                row["movement_id"],
+                row["source_location_id"],
+                row["destination_location_id"],
                 row["event_time"],
             )
         identity = sha256("|".join(identity_fields).encode()).hexdigest()
@@ -160,7 +189,15 @@ def validate_row(source_system: str, row: dict[str, str], seen: set[str]) -> dic
             row,
             "event_time"
             if source_system.upper()
-            in {"ORPAK", "RETAIL_CASH_REGISTER", "CASH_REGISTER", "RETAIL_POS"}
+            in {
+                "ORPAK",
+                "RETAIL_CASH_REGISTER",
+                "CASH_REGISTER",
+                "RETAIL_POS",
+                "1C_MOVEMENT_REGISTER",
+                "1C_MOVEMENTS",
+                "MOVEMENT_REGISTER",
+            }
             else "measurement_timestamp",
             reasons,
         )
@@ -174,7 +211,7 @@ def validate_row(source_system: str, row: dict[str, str], seen: set[str]) -> dic
             _decimal(row, "value", reasons)
             if not row["pressure_basis"].strip() or not row["temperature_basis"].strip():
                 reasons.append("MISSING_MEASUREMENT_BASIS")
-        else:
+        elif source_system.upper() in {"RETAIL_CASH_REGISTER", "CASH_REGISTER", "RETAIL_POS"}:
             _decimal(row, "gross_amount", reasons)
             _decimal(row, "net_amount", reasons)
             if not re.fullmatch(r"[A-Z]{3}", row["currency"]):
@@ -184,6 +221,8 @@ def validate_row(source_system: str, row: dict[str, str], seen: set[str]) -> dic
                 reasons.append("FISCAL_CLOSE_NOT_CONFIRMED")
             elif fiscal_status == "REOPENED":
                 reasons.append("FISCAL_CLOSE_REOPENED")
+        else:
+            _decimal(row, "quantity", reasons)
     return {
         "status": "REJECTED" if reasons else "REVIEW_REQUIRED",
         "reasons": sorted(set(reasons)),
