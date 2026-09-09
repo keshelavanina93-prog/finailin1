@@ -103,6 +103,7 @@ class EvidenceCell(Model):
     value: Scalar
     coordinate: str | None = None
     formula: str | None = None
+    reference: Pin | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class Contributor(Model):
