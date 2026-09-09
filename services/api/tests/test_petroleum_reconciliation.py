@@ -138,3 +138,68 @@ def test_margin_bridge_keeps_revenue_volume_and_cogs_dimensionally_separate(monk
     assert row["gross_margin"] == "70"
     assert row["status"] == "COMPLETE"
     assert result["accounting_authorized"] is False
+
+
+def test_movement_journal_reconciliation_reports_reference_and_quantity_state(monkeypatch):
+    movement_id = UUID("70000000-0000-0000-0000-000000000001")
+    line_id = UUID("80000000-0000-0000-0000-000000000001")
+    rows = {
+        "PhysicalMovement": [
+            FakeResource(
+                movement_id,
+                {
+                    "legal_entity_id": str(_principal().scope.legal_entity_id),
+                    "movement_id": "move-1",
+                    "document_id": "doc-1",
+                    "product_id": "diesel",
+                    "unit": "L",
+                    "period_id": "2025-01",
+                    "quantity": "100",
+                },
+            ),
+        ],
+        "JournalLine": [
+            FakeResource(
+                line_id,
+                {
+                    "legal_entity_id": str(_principal().scope.legal_entity_id),
+                    "source_document_id": "doc-1",
+                    "quantity": "100",
+                },
+            ),
+        ],
+    }
+    monkeypatch.setattr(
+        petroleum_reconciliation.resources,
+        "list_resources",
+        lambda _p, kind, _s, _o, limit=1000: rows[kind],
+    )
+    result = petroleum_reconciliation.movement_journal_reconciliation(_principal())
+    assert result["contract"] == "movement-journal-reconciliation/1"
+    assert result["rows"][0]["status"] == "MATCHED"
+    assert result["rows"][0]["journal_line_resource_id"] == str(line_id)
+    assert result["accounting_authorized"] is False
+
+
+def test_movement_journal_reconciliation_exposes_missing_journal(monkeypatch):
+    rows = {
+        "PhysicalMovement": [
+            FakeResource(
+                UUID("70000000-0000-0000-0000-000000000002"),
+                {
+                    "legal_entity_id": str(_principal().scope.legal_entity_id),
+                    "movement_id": "move-2",
+                    "quantity": "10",
+                    "unit": "L",
+                },
+            )
+        ],
+        "JournalLine": [],
+    }
+    monkeypatch.setattr(
+        petroleum_reconciliation.resources,
+        "list_resources",
+        lambda _p, kind, _s, _o, limit=1000: rows[kind],
+    )
+    result = petroleum_reconciliation.movement_journal_reconciliation(_principal())
+    assert result["rows"][0]["status"] == "MISSING_JOURNAL"

@@ -9,6 +9,7 @@ import "./operations.css";
 import OperationsConnections from "./operations-connections";
 import PetroleumReconciliationPanel from "./petroleum-reconciliation-panel";
 import PetroleumMarginPanel from "./petroleum-margin-panel";
+import MovementJournalReconciliationPanel from "./movement-journal-reconciliation-panel";
 import {assertMapSnapshot,mapSelectionInSnapshot} from "./operations-snapshot-state";
 const Canvas=dynamic(()=>import("./operations-canvas"),{ssr:false,loading:()=> <p role="status">Opening geographic canvas…</p>});
 interface Props {token:string;companyId?:string;canPropose:boolean;state:MapWorkspaceState;onState:(state:MapWorkspaceState)=>void;onSelect:(selection:MapSelection|null)=>void;onReview:(id:string)=>void;selection?:MapSelection|null;compact?:boolean;onOpen?:()=>void}
@@ -38,7 +39,7 @@ function OperationsMapCanvas({token,companyId,canPropose,state,onState,onSelect,
  <footer className="ops-footer"><span>Position does not establish connectivity or operating condition.</span>{snapshot&&<small>Effective {new Date(snapshot.valid_at).toLocaleString()} · Known {new Date(snapshot.known_at).toLocaleString()}</small>}</footer></section>;
 }
 export default function OperationsMap(props: Props) {
-  return <><OperationsMapCanvas {...props}/>{!props.compact&&<><PetroleumReconciliationPanel token={props.token} companyId={props.companyId}/><PetroleumMarginPanel token={props.token} companyId={props.companyId}/></>}</>;
+  return <><OperationsMapCanvas {...props}/>{!props.compact&&<><PetroleumReconciliationPanel token={props.token} companyId={props.companyId}/><PetroleumMarginPanel token={props.token} companyId={props.companyId}/><MovementJournalReconciliationPanel token={props.token} companyId={props.companyId}/></>}</>;
 }
 
 function SpatialImport({token,companyId,onReview}:{token:string;companyId:string;onReview:(id:string)=>void}){

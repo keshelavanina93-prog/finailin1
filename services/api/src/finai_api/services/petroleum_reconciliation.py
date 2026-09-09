@@ -15,6 +15,7 @@ from finai_api.services.workspace import WorkspaceError
 
 SOURCE_TYPES = ("InventoryBalance", "PhysicalMovement", "PhysicalMeasurement", "RetailSale")
 MARGIN_SOURCE_TYPES = ("RetailSale", "ProductCost")
+JOURNAL_RECONCILIATION_TYPES = ("PhysicalMovement", "JournalLine")
 DIMENSIONS = (
     "legal_entity_id",
     "facility_id",
@@ -179,6 +180,111 @@ def margin(principal: Principal, company_id: UUID | None = None) -> dict[str, An
         "warning": (
             "Revenue and physical volume are projections; COGS is shown only when "
             "an accepted ProductCost source exists."
+        ),
+    }
+
+
+def movement_journal_reconciliation(
+    principal: Principal, company_id: UUID | None = None
+) -> dict[str, Any]:
+    """Reconcile accepted physical movements to booked journal-line references.
+
+    This read-only bridge proves evidence coverage only; it never posts or
+    promotes a movement into accounting authority.
+    """
+    require_permission(principal, "ontology_read")
+    company = str(company_id) if company_id else None
+
+    def in_company(attrs: dict[str, Any]) -> bool:
+        return company is None or any(
+            str(attrs.get(key)) == company for key in ("legal_entity_id", "company_id")
+        )
+
+    movements = [
+        resource
+        for resource in resources.list_resources(principal, "PhysicalMovement", "", 0, limit=1000)
+        if in_company(resource.attributes)
+    ]
+    lines = [
+        resource
+        for resource in resources.list_resources(principal, "JournalLine", "", 0, limit=1000)
+        if in_company(resource.attributes)
+    ]
+
+    def refs(attrs: dict[str, Any]) -> set[str]:
+        return {
+            str(attrs[key])
+            for key in (
+                "source_record_id",
+                "movement_id",
+                "document_id",
+                "source_document_id",
+                "reference",
+            )
+            if attrs.get(key) not in (None, "")
+        }
+
+    def quantity(attrs: dict[str, Any]) -> Decimal | None:
+        for name in ("quantity", "volume", "moved_quantity", "source_quantity"):
+            if attrs.get(name) not in (None, ""):
+                return _decimal(attrs[name], name)
+        return None
+
+    rows: list[dict[str, Any]] = []
+    for movement in movements:
+        movement_refs = refs(movement.attributes)
+        candidates = [line for line in lines if movement_refs & refs(line.attributes)]
+        line = candidates[0] if candidates else None
+        movement_quantity = quantity(movement.attributes)
+        journal_quantity = quantity(line.attributes) if line else None
+        if line is None:
+            status = "MISSING_JOURNAL"
+            reason = "No accepted JournalLine shares the movement evidence or document identity."
+        elif movement_quantity is None or journal_quantity is None:
+            status = "QUANTITY_UNAVAILABLE"
+            reason = "Reference coverage exists, but both sides lack a comparable quantity."
+        elif movement_quantity != journal_quantity:
+            status = "QUANTITY_MISMATCH"
+            reason = (
+                "Movement and journal quantities differ; review source and accounting dimensions."
+            )
+        else:
+            status = "MATCHED"
+            reason = (
+                "Movement evidence is referenced by an accepted journal line with equal quantity."
+            )
+        rows.append(
+            {
+                "movement_resource_id": str(movement.resource_id),
+                "movement_identity": next(iter(sorted(movement_refs)), ""),
+                "journal_line_resource_id": str(line.resource_id) if line else None,
+                "dimensions": {
+                    key: str(movement.attributes.get(key, ""))
+                    for key in ("legal_entity_id", "product_id", "unit", "period_id", "currency")
+                },
+                "movement_quantity": format(movement_quantity, "f")
+                if movement_quantity is not None
+                else None,
+                "journal_quantity": format(journal_quantity, "f")
+                if journal_quantity is not None
+                else None,
+                "status": status,
+                "reason": reason,
+                "accounting_authorized": False,
+                "business_effect_authorized": False,
+            }
+        )
+    return {
+        "contract": "movement-journal-reconciliation/1",
+        "company_id": company,
+        "coverage": "ACCEPTED_PHYSICAL_MOVEMENTS_AND_JOURNAL_LINES",
+        "counts": {"PhysicalMovement": len(movements), "JournalLine": len(lines)},
+        "rows": rows,
+        "accounting_authorized": False,
+        "business_effect_authorized": False,
+        "warning": (
+            "Reference coverage is not posting authority; movement promotion remains "
+            "governed review."
         ),
     }
 
