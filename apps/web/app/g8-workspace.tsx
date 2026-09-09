@@ -39,6 +39,7 @@ import NyxInteraction from "./nyx-interaction";
 import WorkQueue,{WorkspaceHealth} from "./work-queue";
 import OperationsMap from "./operations-map";
 import {initialMapState,type MapWorkspaceState,type MapSelection} from "./operations-model";
+import {companyMapScope} from "./company-map-scope";
 import ExecutiveOverview from "./executive-overview";
 import CompanyHome from "./company-home";
 import {companyNyxCaption,companyNyxForSurface,type CompanyNyxContext,type CompanyNyxReadback} from "./company-nyx-context";
@@ -129,7 +130,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
     }catch{return empty;}
   });
   const [buildTarget,setBuildTarget]=useState<{requestId:string;transformation:{resource_id:string;version_id:string};companyId:string;selection:number}|null>(null);
-  const [mapState,setMapState]=useState<MapWorkspaceState>(initialMapState);const [rawMapSelection,setMapSelection]=useState<MapSelection|null>(null);
+  const [rawMapSelection,setMapSelection]=useState<MapSelection|null>(null);
   const [resolvedCompany,setResolvedCompany]=useState<ResolvedCompanyContext|null>(null);
   const [companyContextError,setCompanyContextError]=useState("");
   const [companyIndex,setCompanyIndex] = useState<CompanyIndex|null>(null);
@@ -139,7 +140,13 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
   const [companyAccountingEntry,setCompanyAccountingEntry]=useState<CompanyAccountingEntry|null>(null);
   const [view,setView] = useState<View>(savedContext.view); const [snapshot,setSnapshot] = useState<Snapshot>(emptySnapshot);
   const [loading,setLoading] = useState(true); const [revision,setRevision] = useState(0); const [updated,setUpdated] = useState("");
-  const [navigationCompanyId,setCompanyId] = useState(savedContext.companyId);const companyId=routeTarget?.companyId??navigationCompanyId; const [search,setSearch] = useState(""); const [workFilter,setWorkFilter] = useState("pending");
+  const [navigationCompanyId,setCompanyId] = useState(savedContext.companyId);const companyId=routeTarget?.companyId??navigationCompanyId;
+  const workspaceMapSession=token;
+  const mapStateScope=JSON.stringify([token,companyId]);
+  const [storedMapState,setStoredMapState]=useState<{scope:string;state:MapWorkspaceState}|null>(()=>{try{const value=JSON.parse(sessionStorage.getItem("g8-map-state")??"null");return value&&typeof value.scope==="string"&&value.state?value:null;}catch{return null;}});
+  const [mapState,setMapState]=useState<MapWorkspaceState>(()=>storedMapState?.scope===mapStateScope?storedMapState.state:initialMapState);
+  const [search,setSearch] = useState(""); const [workFilter,setWorkFilter] = useState("pending");
+  useEffect(()=>{const value=sessionStorage.getItem("g8-map-state");try{const parsed=value?JSON.parse(value):null;setStoredMapState(parsed&&typeof parsed.scope==="string"&&parsed.state?parsed:null);}catch{setStoredMapState(null);}},[mapStateScope]);
   const [journalReviewEntry,setJournalReviewEntry]=useState<CompanyForegroundEntry|null>(null);
   const [journalReviewMode,setJournalReviewMode]=useState<"review"|"refused"|null>(()=>journalReviewHistoryMode(window.history.state,null)==="refused"?"refused":null);
   const journalEntry=journalReviewEntryForSession(journalReviewEntry,token,companyId,view);
@@ -378,6 +385,7 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
   const company = companies.find(item => item.resource_id === companyId);
   const contextCompanyId = snapshot.context.data?.canonical_references.legal_entity_id?.resource_id;
   const currentCompany = company;
+  const mapScope=companyMapScope(companyId,currentCompany?.resource_id,companyDirectory.data!==null,workspaceMapSession===token);
   const selectedCompanyId=companyId;
   useEffect(()=>{
     const controller=new AbortController();
@@ -482,7 +490,9 @@ function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal
   },[token,companyId,setBuildTarget,setWork,setProposal,setRail,setNyxFolded,cancelResourceInspection]);
   const inspectSource = useCallback((source:IntakeItem) => {void inspectWork(workItems([source],[])[0],false);},[inspectWork]);
   const selectMap = (selection:MapSelection|null) => {clearSelection();setMapSelection(selection);if(selection){setNyxTab("context");setNyxFolded(false);setRail(true);}};
-  const mapProps={token,selection:mapSelection,companyId:currentCompany?.resource_id,canPropose:principal.permissions.includes("ontology_propose"),state:mapState,onState:setMapState,onSelect:selectMap,onReview:(id:string)=>openEngineering("ontology",undefined,id)};
+  useEffect(()=>{const state=mapState;if(mapScope==="company"||mapScope==="workspace")setStoredMapState({scope:mapStateScope,state});},[mapScope,mapState,mapStateScope]);
+  useEffect(()=>{if(storedMapState?.scope===mapStateScope)sessionStorage.setItem("g8-map-state",JSON.stringify(storedMapState));},[storedMapState,mapStateScope]);
+  const mapProps={token,selection:mapSelection,companyId:companyId||undefined,canPropose:principal.permissions.includes("ontology_propose"),state:mapState,onState:setMapState,onSelect:selectMap,onReview:(id:string)=>openEngineering("ontology",undefined,id)};
   function focusWorkQueue(){const panel=workRef.current?.closest("details");if(panel)panel.open=true;requestAnimationFrame(()=>{const queue=workRef.current;if(queue){queue.focus({preventScroll:true});queue.scrollIntoView({behavior:"smooth"});}});}
   const workTable = <>{queueAnchor!==null&&<p className="g8-subtle">Browsing older changes. Refresh workspace to return to the latest queue.</p>}<WorkQueue onLoadMoreProposals={()=>void loadOlderProposals()} proposalsHaveMore={paging?.page?.has_more??false} proposalsLoadingMore={paging?.loadingMore??false} proposalsPageError={paging?.page?paging.error:""} items={items} filter={workFilter} onFilter={setWorkFilter} onInspect={item=>{void inspectWork(item);setNyxTab("context");}} onHistory={()=>openEngineering("history")} loading={queuesLoading} errors={[snapshot.evidence.error?`Evidence queue unavailable: ${snapshot.evidence.error}`:"",snapshot.proposals.error?`Change queue unavailable: ${snapshot.proposals.error}`:""].filter(Boolean)} scope={companyMismatch?"Company exploration; unbound source evidence excluded":"Current authorized scope"}/></>;
   function openSourceReview(target:SourceReviewTarget){

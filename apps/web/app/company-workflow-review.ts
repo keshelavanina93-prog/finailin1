@@ -4,7 +4,7 @@ import type {CompanyWorkflowReference} from "./journal-review-handoff";
 export function companyWorkflowQueueItem(items:ActionItem[],reference:CompanyWorkflowReference):ActionItem {
  const matches=items.filter(item=>item.workflow_id===reference.workflowId);
  const item=matches[0];
- if(matches.length!==1||item.company_id!==reference.company.resource_id||item.company_binding!=="EXPLICIT_INVOCATION"||item.family!=="ontology")throw Error("The selected workflow is unavailable in this company's current explicitly bound queue. No other work has been substituted.");
+ if(matches.length!==1||item.company_id!==reference.company.resource_id||!(["EXPLICIT_INVOCATION","EXPLICIT_RETAINED_EXCEPTION"] as const).includes(item.company_binding as "EXPLICIT_INVOCATION"|"EXPLICIT_RETAINED_EXCEPTION")||item.family!=="ontology")throw Error("The selected workflow is unavailable in this company's current explicitly bound queue. No other work has been substituted.");
  return item;
 }
 export function assertCompanyWorkflowRun(run:WorkRun&{prepared_proposal_id?:string},reference:CompanyWorkflowReference):void {

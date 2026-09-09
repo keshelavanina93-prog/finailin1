@@ -17,7 +17,6 @@ from finai_api.services import trial_balance_package as package_service
 from finai_api.services.trial_balance_package import TrialBalancePackageError, build_package_report
 from finai_api.services.xls_source import inspect_xls
 
-
 MEASURES = (
     "opening_debit",
     "opening_credit",
@@ -97,7 +96,7 @@ def test_package_report_is_month_bound_and_exposes_carryforward_breaks():
 
 def test_package_report_detects_a_real_carryforward_break():
     sources = [_source(month, str(100 + month - 1), str(100 + month)) for month in range(1, 13)]
-    filename, content, source, receipt = sources[4]
+    _, _, source, _ = sources[4]
     source["rows"][0]["values"]["opening_debit"] = "999"
     source["rows"][0]["values"]["opening_credit"] = "999"
     report = build_package_report(
@@ -115,7 +114,9 @@ def test_package_report_rejects_a_non_sgp_company_label():
     for _, _, source, _ in sources:
         source["company_label"] = "Unrelated Company"
     with pytest.raises(TrialBalancePackageError, match="SOCAR Petroleum"):
-        build_package_report(sources, currency="GEL", active_runtime_period="2026-08", expected_row_count=24)
+        build_package_report(
+            sources, currency="GEL", active_runtime_period="2026-08", expected_row_count=24
+        )
 
 
 def test_package_report_rejects_a_month_without_a_source_total_footer():
@@ -142,7 +143,7 @@ def test_package_request_requires_the_exact_twelve_source_names():
     assert len(request.files) == 12
     with pytest.raises(ValueError):
         TrialBalancePackageRequest(
-            files=tuple(payload[:-1] + [{"filename": "SGP 13.xls", "xls_base64": "eA=="}])
+            files=(*payload[:-1], {"filename": "SGP 13.xls", "xls_base64": "eA=="})
         )
 
 

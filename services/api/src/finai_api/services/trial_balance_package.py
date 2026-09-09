@@ -5,9 +5,10 @@ from __future__ import annotations
 import base64
 import binascii
 import json
+from collections.abc import Iterable
 from decimal import Decimal, InvalidOperation, localcontext
 from hashlib import sha256
-from typing import Any, Iterable
+from typing import Any
 
 from finai_api.domain.authority import ExactScope
 from finai_api.domain.ingest import IngestReceipt, IngestRequest
@@ -479,7 +480,7 @@ def compile_package(
         )
         prepared.append((item.filename, content, source, compile_source(ingest_request)))
 
-    report = build_package_report(
+    _report = build_package_report(
         [
             (filename, content, source, receipt.receipt_id)
             for filename, content, source, receipt in prepared

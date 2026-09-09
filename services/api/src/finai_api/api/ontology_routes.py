@@ -15,11 +15,11 @@ from finai_api.domain.resources import (
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import resources
-from finai_api.services.ontology_connections import connections, source_connections
 from finai_api.services.enterprise_reference import socar_reference
 from finai_api.services.historical_graph import historical_graph
 from finai_api.services.ingest_binding import context_accounts
 from finai_api.services.ingestion import SourceAuthorityDenied, compile_source
+from finai_api.services.ontology_connections import connections, source_connections
 from finai_api.services.resource_rollback import RollbackRequest, rollback_draft
 from finai_api.services.workspace import WorkspaceError
 
