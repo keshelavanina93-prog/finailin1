@@ -19,7 +19,6 @@ async function forward(request: NextRequest, context: Context) {
   const retainedReports=(request.method==="POST"&&(route==="retained-reports"||route==="retained-reports/preview"))||(request.method==="GET"&&/^retained-reports(?:\/[a-fA-F0-9-]+(?:\/exports\/(?:xlsx|html))?)?$/.test(route));
   const analysisProjection=request.method==="POST"&&(route==="analysis/project"||route==="company-home"||route==="company-changes"||route==="company-journals/reconciliation/projection"||route==="company-journals/reconciliation/metrics");
   const companyFinancialResults=request.method==="GET"&&route==="company-financial-results";
-  const retainedReports = (request.method === "POST" && (route === "retained-reports" || route === "retained-reports/preview")) || (request.method === "GET" && /^retained-reports(?:\/[a-fA-F0-9-]+(?:\/exports\/(?:xlsx|html))?)?$/.test(route));
   const requestedRoute = route;
   if (retainedReports) route = "proposal-queue";
   const transformationPreview=request.method==="POST"&&["transformations/preview","transformations/previewed-runs"].includes(route);
