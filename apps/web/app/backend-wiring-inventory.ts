@@ -75,8 +75,9 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
       "/api/operations/map -> /v1/operations/map",
       "/api/operations/map/*/connections -> /v1/operations/map/*/connections",
       "/api/operations/import-proposal -> /v1/operations/import-proposal",
+      "/api/operations/petroleum/reconciliation -> /v1/operations/petroleum/reconciliation",
     ],
-    ["full petroleum telemetry bridge"],
+    ["ORPAK/SCADA retained measurement intake and movement lineage"],
   ),
   routeFamily(
     "diagnostics",

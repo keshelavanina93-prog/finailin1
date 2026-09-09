@@ -7,10 +7,11 @@ import {Badge} from "./g8-ui";
 import {readable} from "./g8-model";
 import "./operations.css";
 import OperationsConnections from "./operations-connections";
+import PetroleumReconciliationPanel from "./petroleum-reconciliation-panel";
 import {assertMapSnapshot,mapSelectionInSnapshot} from "./operations-snapshot-state";
 const Canvas=dynamic(()=>import("./operations-canvas"),{ssr:false,loading:()=> <p role="status">Opening geographic canvas…</p>});
 interface Props {token:string;companyId?:string;canPropose:boolean;state:MapWorkspaceState;onState:(state:MapWorkspaceState)=>void;onSelect:(selection:MapSelection|null)=>void;onReview:(id:string)=>void;selection?:MapSelection|null;compact?:boolean;onOpen?:()=>void}
-export default function OperationsMap({token,companyId,canPropose,state,onState,onSelect,onReview,selection,compact=false,onOpen}:Props){
+function OperationsMapCanvas({token,companyId,canPropose,state,onState,onSelect,onReview,selection,compact=false,onOpen}:Props){
  const [response,setResponse]=useState<{key:string;data:MapSnapshot|null;error:string}|null>(null);
  const bbox=state.bbox??"",search=state.search??"";const [revision,setRevision]=useState(0);const [importing,setImporting]=useState(false);
  const requestKey=JSON.stringify([token,companyId??null,state.lens,state.validAt,state.knownAt,bbox,revision]);
@@ -35,6 +36,10 @@ export default function OperationsMap({token,companyId,canPropose,state,onState,
  {!compact&&<>{selection&&!verifiedSelection&&<p className="ops-empty">The retained asset selection is not verified in this exact returned map snapshot. It may be outside this bounded area or use another version or time. Its reference is preserved; highlighting and connection drill are withheld.</p>}<div className="ops-list-heading"><h3>Assets & geography</h3><input aria-label="Filter loaded map assets" placeholder="Filter loaded assets…" value={search} maxLength={200} onChange={e=>onState({...state,search:e.target.value.slice(0,200)})}/><small>{snapshot?.counts.outside_bounds??0} outside area</small></div><div className="g8-table-scroll"><table><thead><tr><th>Asset</th><th>Type</th><th>Geography</th><th>Evidence</th></tr></thead><tbody>{rows.map(({resource,reason})=><tr key={resource.resource_id} aria-selected={selected?.resource_id===resource.resource_id}><td><button className="g8-link" onClick={()=>select(resource)}>{resource.display_name}</button></td><td>{readable(resource.object_type)}</td><td>{reason}</td><td>{readable(resource.evidence_class)}</td></tr>)}</tbody></table>{!rows.length&&<p className="ops-empty">{loading?"Loading assets…":error?"Asset inventory unavailable.":"No matching assets in this bounded snapshot."}</p>}</div>{verifiedSelection&&<OperationsConnections token={token} selection={verifiedSelection} companyId={companyId} onSelect={onSelect}/>}</>}
  <footer className="ops-footer"><span>Position does not establish connectivity or operating condition.</span>{snapshot&&<small>Effective {new Date(snapshot.valid_at).toLocaleString()} · Known {new Date(snapshot.known_at).toLocaleString()}</small>}</footer></section>;
 }
+export default function OperationsMap(props: Props) {
+  return <><OperationsMapCanvas {...props}/>{!props.compact&&<PetroleumReconciliationPanel token={props.token} companyId={props.companyId}/>}</>;
+}
+
 function SpatialImport({token,companyId,onReview}:{token:string;companyId:string;onReview:(id:string)=>void}){
  const [busy,setBusy]=useState(false);const [error,setError]=useState("");const [saved,setSaved]=useState<ResourceProposalDetail|null>(null);
  async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();const values=new FormData(e.currentTarget);const file=values.get("file");setError("");setBusy(true);try{if(!(file instanceof File)||!file.size||file.size>1_800_000)throw new Error("Choose a GeoJSON file smaller than 1.8 MB.");const geojson=JSON.parse(await file.text());const effective=String(values.get("valid"));const proposal=await operationsRequest<ResourceProposalDetail>("import-proposal",token,undefined,{company_id:companyId,title:String(values.get("title")),rationale:String(values.get("rationale")),valid_from:new Date(effective).toISOString(),geojson});setSaved(proposal);}catch(err){setError(err instanceof Error?err.message:"Import unavailable");}finally{setBusy(false);}}

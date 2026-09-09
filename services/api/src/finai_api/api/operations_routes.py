@@ -7,7 +7,7 @@ from fastapi import APIRouter, Query, Response
 from finai_api.api.ontology_routes import User
 from finai_api.domain.resources import ProposalDetail
 from finai_api.security import require_permission
-from finai_api.services import operations_map
+from finai_api.services import operations_map, petroleum_reconciliation
 from finai_api.services.spatial_import import SpatialImportRequest
 from finai_api.services.spatial_import import import_proposal as create_import
 
@@ -41,6 +41,13 @@ def connections(
 ) -> dict[str, Any]:
     response.headers["Cache-Control"] = "no-store"
     return operations_map.connections(principal, resource_id, depth, valid_at, known_at, company_id)
+
+
+@router.get("/petroleum/reconciliation")
+def petroleum_reconciliation_view(
+    principal: User, company_id: UUID | None = None
+) -> dict[str, Any]:
+    return petroleum_reconciliation.reconcile(principal, company_id)
 
 
 @router.post("/import-proposal", response_model=ProposalDetail)
