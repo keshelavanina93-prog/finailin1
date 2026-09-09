@@ -96,3 +96,31 @@ def test_compare_is_exact_scope_and_decimal_deterministic(monkeypatch):
     assert result["rows"][0]["scenario_a"] == "100.10"
     assert result["rows"][0]["scenario_b"] == "125.25"
     assert result["rows"][0]["delta"] == "25.15"
+
+
+def test_forecast_aggregates_accepted_scenario_cells(monkeypatch):
+    scenario = uuid4()
+    rows = {
+        "ScenarioVersion": [
+            node(scenario, "ScenarioVersion", {"code": "FCST", "kind": "FORECAST"})
+        ],
+        "PlanningCellFact": [
+            node(uuid4(), "PlanningCellFact", {
+                "legal_entity_id": "company-a", "scenario_version_id": str(scenario),
+                "period_id": "2025-01", "measure": "cash", "currency_id": "GEL", "amount": "1.10",
+            }),
+            node(uuid4(), "PlanningCellFact", {
+                "legal_entity_id": "company-a", "scenario_version_id": str(scenario),
+                "period_id": "2025-01", "measure": "cash", "currency_id": "GEL", "amount": "2.15",
+            }),
+        ],
+    }
+    monkeypatch.setattr(
+        planning.resources,
+        "list_resources",
+        lambda _principal, object_type, _search, _offset, **_kwargs: rows[object_type],
+    )
+    result = planning.forecast(principal(), scenario)
+    assert result["contract"] == "forecast-projection/1"
+    assert result["rows"][0]["amount"] == "3.25"
+    assert result["model_backed"] is False

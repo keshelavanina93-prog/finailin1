@@ -125,3 +125,58 @@ def compare(principal, scenario_a: UUID, scenario_b: UUID) -> dict[str, Any]:
         "current_use_authorized": False,
         "business_effect_authorized": False,
     }
+
+
+def forecast(principal, scenario_id: UUID) -> dict[str, Any]:
+    """Project accepted scenario cells into a deterministic period forecast.
+
+    This is a governed arithmetic projection, not model inference. It never
+    creates facts, changes the ledger, or promotes a planning scenario.
+    """
+    require_permission(principal, "ontology_read")
+    company_id = str(principal.scope.legal_entity_id)
+    scenarios = {
+        str(row["resource_id"]): row
+        for row in _resources(principal, "ScenarioVersion")
+        if not row["attributes"].get("legal_entity_id")
+        or str(row["attributes"].get("legal_entity_id")) == company_id
+    }
+    selected = scenarios.get(str(scenario_id))
+    if selected is None:
+        raise WorkspaceError(404, "Scenario is unavailable in the authorized company scope")
+    kind = str(selected["attributes"].get("kind", "")).upper()
+    if kind not in {"PLAN", "FORECAST"}:
+        raise WorkspaceError(409, "Forecast projection requires a PLAN or FORECAST scenario")
+    buckets: dict[tuple[str, ...], Decimal] = {}
+    for row in _resources(principal, "PlanningCellFact"):
+        attrs = row["attributes"]
+        if (
+            str(attrs.get("legal_entity_id")) != company_id
+            or str(attrs.get("scenario_version_id")) != str(scenario_id)
+        ):
+            continue
+        try:
+            amount = Decimal(str(attrs["amount"]))
+        except (InvalidOperation, KeyError) as exc:
+            raise WorkspaceError(409, "Accepted planning cell contains an invalid amount") from exc
+        key = tuple(str(attrs.get(name, "")) for name in ("period_id", "measure", "currency_id"))
+        buckets[key] = buckets.get(key, Decimal(0)) + amount
+    rows = [
+        {
+            "period_id": key[0],
+            "measure": key[1],
+            "currency_id": key[2],
+            "amount": format(value, "f"),
+        }
+        for key, value in sorted(buckets.items())
+    ]
+    return {
+        "contract": "forecast-projection/1",
+        "scenario": selected,
+        "rows": rows,
+        "coverage": "ACCEPTED_PLANNING_CELL_FACTS",
+        "calculation": "DETERMINISTIC_DECIMAL_AGGREGATION",
+        "model_backed": False,
+        "current_use_authorized": False,
+        "business_effect_authorized": False,
+    }

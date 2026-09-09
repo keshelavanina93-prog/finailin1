@@ -21,3 +21,8 @@ def catalog(principal: User) -> dict[str, Any]:
 @router.get("/compare")
 def compare(principal: User, scenario_a: UUID, scenario_b: UUID) -> dict[str, Any]:
     return planning.compare(principal, scenario_a, scenario_b)
+
+
+@router.get("/forecast")
+def forecast(principal: User, scenario_id: UUID) -> dict[str, Any]:
+    return planning.forecast(principal, scenario_id)

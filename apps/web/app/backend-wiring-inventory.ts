@@ -115,11 +115,11 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
   routeFamily(
     "planning",
     "Planning",
-    "/api/ontology/planning/catalog, /api/ontology/planning/compare",
-    "/v1/ontology/planning/catalog, /v1/ontology/planning/compare",
+    "/api/ontology/planning/catalog, /api/ontology/planning/compare, /api/ontology/planning/forecast",
+    "/v1/ontology/planning/catalog, /v1/ontology/planning/compare, /v1/ontology/planning/forecast",
     "partial",
     ["apps/web/app/planning-workspace.tsx"],
-    ["forecast calculation, scenario proposal editor, and liquidity projection"],
+    ["scenario proposal editor and liquidity projection"],
   ),
   routeFamily(
     "top_level_reporting",
