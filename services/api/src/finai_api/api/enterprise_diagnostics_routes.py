@@ -1,6 +1,7 @@
 """Read-only enterprise target diagnosis over the caller's authorized resource graph."""
 
 from typing import Annotated, Any
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel, ConfigDict
@@ -25,7 +26,8 @@ from finai_api.domain.workspace_projections import (
     projection_catalog,
 )
 from finai_api.security import authenticated_principal, require_permission
-from finai_api.services import enterprise_diagnostics, executable_function_registry
+from finai_api.services import enterprise_diagnostics, executable_function_registry, planning
+from finai_api.services.workspace import WorkspaceError
 
 
 class CalculationCompileRequest(BaseModel):
@@ -37,6 +39,13 @@ class CalculationCompileRequest(BaseModel):
     intersections: tuple[IntersectionSet, ...] = ()
     changed_nodes: tuple[str, ...] = ()
     changed_coordinates: tuple[Coordinate, ...] = ()
+
+
+class ProjectionDataRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    projection_id: str
+    selection: WorkspaceSelection
 
 
 router = APIRouter(prefix="/v1/workspace", tags=["enterprise diagnostics"])
@@ -142,6 +151,75 @@ def project_selection(
         "selection": selection.model_dump(mode="json"),
         "scope_state": "EXACT_CONTEXT_REQUIRED",
         "eligible_projections": eligible_projections(selection),
+        "authority_effect": "NONE",
+    }
+
+
+@router.post("/projections/data")
+def projection_data(
+    request: ProjectionDataRequest, principal: ReadUser, response: Response
+) -> dict[str, object]:
+    """Read a real governed projection using the validated exact selection."""
+
+    response.headers["Cache-Control"] = "no-store"
+    eligible = {item["projection_id"]: item for item in eligible_projections(request.selection)}
+    projection = eligible.get(request.projection_id)
+    if projection is None:
+        raise WorkspaceError(
+            409, "Projection is unavailable for the selected workspace and exact context"
+        )
+
+    if request.projection_id in {"planning-grid", "formatted-table", "executive-kpi"}:
+        catalog = planning.catalog(principal)
+        company_id = str(principal.scope.legal_entity_id)
+        rows = []
+        for item in catalog["cells"]:
+            attrs = item["attributes"]
+            if request.selection.scenario_id and str(
+                attrs.get("scenario_version_id")
+            ) != request.selection.scenario_id:
+                continue
+            if request.selection.period and str(attrs.get("period_id")) != (
+                request.selection.period
+            ):
+                continue
+            rows.append(item)
+        return {
+            "contract": "workspace-projection-data/1",
+            "projection": projection,
+            "selection": request.selection.model_dump(mode="json"),
+            "data_state": "ACCEPTED_CANONICAL",
+            "rows": rows,
+            "scope": {"company_id": company_id},
+            "authority_effect": "NONE",
+        }
+
+    if request.selection.scenario_id and request.selection.comparison_baseline:
+        try:
+            comparison = planning.compare(
+                principal,
+                UUID(request.selection.scenario_id),
+                UUID(request.selection.comparison_baseline),
+            )
+        except ValueError as exc:
+            raise WorkspaceError(
+                422, "Scenario and comparison baseline must be valid identifiers"
+            ) from exc
+        return {
+            "contract": "workspace-projection-data/1",
+            "projection": projection,
+            "selection": request.selection.model_dump(mode="json"),
+            "data_state": "ACCEPTED_DETERMINISTIC_COMPARISON",
+            "rows": comparison["rows"],
+            "coverage": comparison["coverage"],
+            "authority_effect": "NONE",
+        }
+    return {
+        "contract": "workspace-projection-data/1",
+        "projection": projection,
+        "selection": request.selection.model_dump(mode="json"),
+        "data_state": "UNAVAILABLE_REQUIRED_COMPARISON_CONTEXT",
+        "rows": [],
         "authority_effect": "NONE",
     }
 
