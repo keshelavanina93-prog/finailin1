@@ -26,7 +26,12 @@ from finai_api.domain.workspace_projections import (
     projection_catalog,
 )
 from finai_api.security import authenticated_principal, require_permission
-from finai_api.services import enterprise_diagnostics, executable_function_registry, planning
+from finai_api.services import (
+    enterprise_diagnostics,
+    executable_function_registry,
+    operations_map,
+    planning,
+)
 from finai_api.services.workspace import WorkspaceError
 
 
@@ -191,6 +196,66 @@ def projection_data(
             "data_state": "ACCEPTED_CANONICAL",
             "rows": rows,
             "scope": {"company_id": company_id},
+            "authority_effect": "NONE",
+        }
+
+    if request.projection_id == "operations-map":
+        try:
+            map_result = operations_map.map_view(
+                principal,
+                "enterprise_assets",
+                None,
+                None,
+                None,
+                500,
+                UUID(request.selection.company_id),
+            )
+        except ValueError as exc:
+            raise WorkspaceError(
+                422, "Company scope must be a valid identifier for map data"
+            ) from exc
+        return {
+            "contract": "workspace-projection-data/1",
+            "projection": projection,
+            "selection": request.selection.model_dump(mode="json"),
+            "data_state": "ACCEPTED_CANONICAL",
+            "rows": map_result.get("features", []),
+            "coverage": map_result.get("contract", "operations-map/1"),
+            "scope": {"company_id": request.selection.company_id},
+            "authority_effect": "NONE",
+        }
+
+    if request.projection_id in {"movement-network", "hierarchy-drilldown"}:
+        if not request.selection.selected_object_id:
+            return {
+                "contract": "workspace-projection-data/1",
+                "projection": projection,
+                "selection": request.selection.model_dump(mode="json"),
+                "data_state": "UNAVAILABLE_REQUIRED_COMPARISON_CONTEXT",
+                "rows": [],
+                "authority_effect": "NONE",
+            }
+        try:
+            network_result = operations_map.connections(
+                principal,
+                UUID(request.selection.selected_object_id),
+                2,
+                None,
+                None,
+                UUID(request.selection.company_id),
+            )
+        except ValueError as exc:
+            raise WorkspaceError(
+                422, "Selected object and company scope must be valid identifiers"
+            ) from exc
+        return {
+            "contract": "workspace-projection-data/1",
+            "projection": projection,
+            "selection": request.selection.model_dump(mode="json"),
+            "data_state": "ACCEPTED_CANONICAL",
+            "rows": network_result.get("connections", []),
+            "coverage": network_result.get("contract", "operations-connections/1"),
+            "scope": {"company_id": request.selection.company_id},
             "authority_effect": "NONE",
         }
 
