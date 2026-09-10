@@ -4,11 +4,11 @@
 import { useEffect, useState } from "react";
 import type { ProjectionSelectionEvent, WorkspaceProjectionData, WorkspaceSelection } from "@finai/contracts";
 
-type Point = { label: string; value: number; row_id?: string };
+type Point = { label: string; value: number; row_id?: string; secondary_value?: number };
 
 type Edge = { source_id: string; target_id: string; relation?: string };
 
-type Feature = { geometry?: { type?: string; coordinates?: unknown }; properties?: { resource?: { display_name?: string; object_type?: string } } };
+type Feature = { row_id?: string; resource_id?: string; geometry?: { type?: string; coordinates?: unknown }; properties?: { resource?: { display_name?: string; object_type?: string; resource_id?: string } } };
 
 const selectionDimensions = ["facility_id", "tank_id", "product_id", "station_id", "period", "scenario_id", "version_id", "comparison_baseline", "replay_as_of"] as const;
 
@@ -36,7 +36,9 @@ function points(data: WorkspaceProjectionData): Point[] {
     const attributes = typeof row.attributes === "object" && row.attributes !== null ? row.attributes as Record<string, unknown> : {};
     const candidate = row.delta ?? row.amount ?? row.scenario_b ?? row.value ?? attributes.amount;
     const value = typeof candidate === "number" ? candidate : Number(candidate);
-    return Number.isFinite(value) ? [{ label: String(row.label ?? row.period_id ?? attributes.period_id ?? row.dimension ?? `Row ${index + 1}`), value, row_id: typeof row.row_id === "string" ? row.row_id : undefined }] : [];
+    const secondaryCandidate = row.scenario_b ?? attributes.scenario_b;
+    const secondary = Number(secondaryCandidate);
+    return Number.isFinite(value) ? [{ label: String(row.label ?? row.period_id ?? attributes.period_id ?? row.dimension ?? `Row ${index + 1}`), value, row_id: typeof row.row_id === "string" ? row.row_id : undefined, secondary_value: Number.isFinite(secondary) ? secondary : undefined }] : [];
   }).slice(0, 24);
 }
 
@@ -45,7 +47,7 @@ function edges(data: WorkspaceProjectionData): Edge[] {
 }
 
 function features(data: WorkspaceProjectionData): Feature[] {
-  return data.rows.filter((row): row is Feature => typeof row.geometry === "object" && row.geometry !== null).slice(0, 100);
+  return data.rows.filter((row): row is Feature => typeof row.geometry === "object" && row.geometry !== null).map(row => ({ ...row, row_id: typeof row.row_id === "string" ? row.row_id : typeof row.resource_id === "string" ? row.resource_id : row.properties?.resource?.resource_id })).slice(0, 100);
 }
 
 function NumericTable({ data, values }: { data: WorkspaceProjectionData; values: Point[] }) {
@@ -71,7 +73,7 @@ function ChartFigure({ data, values }: { data: WorkspaceProjectionData; values: 
     return <svg viewBox="0 0 720 260" preserveAspectRatio="none" aria-label="Waterfall projection"><line x1="16" y1="220" x2="704" y2="220" stroke="currentColor" opacity=".35" />{values.map((point, index) => { const previous = index ? cumulative[index - 1] : 0; const next = cumulative[index]; const scale = 180 / extent; const y = 220 - Math.max(previous, next) * scale; const height = Math.max(2, Math.abs(point.value) * scale); const x = 20 + index * (680 / values.length); return <g key={`${point.label}:${index}`} onClick={() => publishProjectionSelection(data, { selected_object_id: point.row_id ?? null })}><rect x={x} y={y} width={Math.max(8, 680 / values.length - 6)} height={height} rx="3" data-delta={point.value} /><line x1={x + Math.max(8, 680 / values.length - 6)} y1={220 - next * scale} x2={x + 680 / values.length + 2} y2={220 - next * scale} stroke="currentColor" opacity=".35" /><title>{point.label}: change {point.value}; cumulative {next}</title></g>; })}<text x="18" y="250" fontSize="10">Sequential governed changes · cumulative total {cumulative.at(-1) ?? 0}</text></svg>;
   }
   if (chartType === "COMBINATION") {
-    const secondary = values.map((_, index) => { const row = data.normalized_rows?.[index]; const raw = row?.measures.scenario_b ?? data.rows[index]?.scenario_b; const value = Number(raw); return Number.isFinite(value) ? value : null; });
+    const secondary = values.map(point => point.secondary_value ?? null);
     const secondaryValues = secondary.filter((value): value is number => value !== null);
     if (!secondaryValues.length) return <div role="status">Combination projection requires a second governed numeric series; the primary series remains below.</div>;
     const secondaryMaximum = Math.max(...secondaryValues.map(value => Math.abs(value)), 1);
@@ -111,13 +113,13 @@ export default function ProjectionDataRenderer({ data, token }: { data: Workspac
   const graph = edges(data);
   const mapFeatures = features(data);
   if (data.projection.kind === "MAP" && mapFeatures.length) {
-    const pointsForMap = mapFeatures.flatMap(feature => {
-      const coordinates = feature.geometry?.coordinates;
-      return feature.geometry?.type === "Point" && Array.isArray(coordinates) && typeof coordinates[0] === "number" && typeof coordinates[1] === "number" ? [{ x: coordinates[0], y: coordinates[1], label: feature.properties?.resource?.display_name ?? "Accepted asset" }] : [];
+      const pointsForMap = mapFeatures.flatMap(feature => {
+        const coordinates = feature.geometry?.coordinates;
+        return feature.geometry?.type === "Point" && Array.isArray(coordinates) && typeof coordinates[0] === "number" && typeof coordinates[1] === "number" ? [{ x: coordinates[0], y: coordinates[1], label: feature.properties?.resource?.display_name ?? "Accepted asset", row_id: feature.row_id }] : [];
     });
     if (pointsForMap.length) {
       const xs = pointsForMap.map(point => point.x), ys = pointsForMap.map(point => point.y), minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-      return <div className="g8-projection-result"><h4>{data.projection.label} · {data.data_state}</h4><p>Accepted geometry only · authority effect: {data.authority_effect}.</p><div className="g8-projection-chart" role="img" aria-label="Accepted operational assets for the exact selected context"><svg viewBox="0 0 720 280" preserveAspectRatio="none">{pointsForMap.map((point, index) => { const x = 30 + ((point.x - minX) / (maxX - minX || 1)) * 660; const y = 250 - ((point.y - minY) / (maxY - minY || 1)) * 220; return <g key={`${point.label}:${index}`} onClick={() => publishProjectionSelection(data, { selected_object_id: (data.normalized_rows ?? [])[index]?.row_id ?? null })}><circle cx={x} cy={y} r="5" /><title>{point.label}</title></g>; })}</svg></div><p>{pointsForMap.length} accepted point geometries returned. Non-point and unmapped assets remain in the operations map&apos;s governed evidence view.</p></div>;
+      return <div className="g8-projection-result"><h4>{data.projection.label} · {data.data_state}</h4><p>Accepted geometry only · authority effect: {data.authority_effect}.</p><div className="g8-projection-chart" role="img" aria-label="Accepted operational assets for the exact selected context"><svg viewBox="0 0 720 280" preserveAspectRatio="none">{pointsForMap.map((point, index) => { const x = 30 + ((point.x - minX) / (maxX - minX || 1)) * 660; const y = 250 - ((point.y - minY) / (maxY - minY || 1)) * 220; return <g key={`${point.label}:${index}`} onClick={() => point.row_id && publishProjectionSelection(data, { selected_object_id: point.row_id })}><circle cx={x} cy={y} r="5" /><title>{point.label}</title></g>; })}</svg></div><p>{pointsForMap.length} accepted point geometries returned. Non-point and unmapped assets remain in the operations map&apos;s governed evidence view.</p></div>;
     }
   }
   if (data.projection.kind === "ACTION" && ["CONTEXT_ONLY", "ACCEPTED_CANONICAL"].includes(data.data_state)) {
