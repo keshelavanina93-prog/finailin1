@@ -1984,7 +1984,7 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest implementation head is `f75df17`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, and retained outcome timeline represented in the unified workspaces.
+latest implementation head is `e0e7a3e`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, and retained outcome timeline represented in the unified workspaces.
 The previous API CI job failed four tests; three are fixed locally in this head,
 while the database-backed object-set materialization path is still under CI
 verification. Planning now has real catalog/comparison, forecast, liquidity,
