@@ -1,7 +1,10 @@
+from hashlib import sha256
+
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
+from finai_api.api import enterprise_diagnostics_routes
 from finai_api.domain.workspace_projections import (
     WorkspaceSelection,
     eligible_projections,
@@ -142,6 +145,62 @@ def test_nyx_projection_refuses_without_valid_exact_resource_ids() -> None:
     assert body["data_state"] == "UNAVAILABLE_REQUIRED_CONTEXT"
     assert body["authority_effect"] == "NONE"
     assert body["rows"] == []
+
+
+def test_image_projection_returns_hash_bound_retained_media(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    content = b"\x89PNG\r\n\x1a\nretained-image"
+    monkeypatch.setattr(
+        enterprise_diagnostics_routes.accounting_source_document,
+        "read_source",
+        lambda _principal, _identity: (
+            {"filename": "tank-dip.png", "source_sha256": sha256(content).hexdigest()},
+            content,
+        ),
+    )
+    selection = WorkspaceSelection(
+        company_id="sgp",
+        selected_object_id="doc_" + "a" * 64,
+        replay_as_of="2026-09-10T12:00:00Z",
+    )
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post(
+            "/v1/workspace/projections/data",
+            json={"projection_id": "image-evidence", "selection": selection.model_dump()},
+        )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data_state"] == "ACCEPTED_CANONICAL"
+    assert body["coverage"] == "retained-image/1"
+    assert body["media"]["media_type"] == "image/png"
+    assert body["media"]["data_url"].startswith("data:image/png;base64,")
+    assert body["media"]["sha256"] == sha256(content).hexdigest()
+
+
+def test_image_projection_refuses_non_image_retained_evidence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        enterprise_diagnostics_routes.accounting_source_document,
+        "read_source",
+        lambda _principal, _identity: (
+            {"filename": "source.xls", "source_sha256": "a" * 64},
+            b"not-an-image",
+        ),
+    )
+    selection = WorkspaceSelection(
+        company_id="sgp",
+        selected_object_id="doc_" + "b" * 64,
+        replay_as_of="2026-09-10T12:00:00Z",
+    )
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post(
+            "/v1/workspace/projections/data",
+            json={"projection_id": "image-evidence", "selection": selection.model_dump()},
+        )
+    assert response.status_code == 200
+    assert response.json()["data_state"] == "UNAVAILABLE_AUTHORITY_PAYLOAD"
 
 
 def test_projection_rows_expose_typed_coordinate_measure_and_evidence_envelope() -> None:
