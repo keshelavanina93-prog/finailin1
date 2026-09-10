@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 from finai_api.domain.calculation_graph import CalculationGraph, CalculationNode
 from finai_api.domain.multidimensional_runtime import (
+    AggregationPolicy,
     CalculationBlock,
     Coordinate,
     DimensionalSignature,
@@ -15,6 +16,7 @@ from finai_api.domain.multidimensional_runtime import (
     RuntimeState,
     TransformDefinition,
     TransformType,
+    aggregate_by_hierarchy,
     aggregate_sparse_values,
     compile_sparse_plan,
     execute_sparse_decimal_plan,
@@ -145,6 +147,68 @@ def test_mapping_and_sum_aggregation_are_explicit_and_deterministic() -> None:
     assert aggregated[Coordinate(values=(("region", "TBILISI"),))] == Decimal("14.15")
 
 
+def test_financial_aggregation_and_time_conversion_are_explicit() -> None:
+    cells = {
+        Coordinate(values=(("product", "DIESEL"), ("period", "2026-09"))): Decimal("10"),
+        Coordinate(values=(("product", "DIESEL"), ("period", "2026-10"))): Decimal("12"),
+    }
+    last = aggregate_sparse_values(
+        cells,
+        frozenset({"product"}),
+        policy=AggregationPolicy.LAST_VALID,
+    )
+    assert last[Coordinate(values=(("product", "DIESEL"),))] == Decimal("12")
+    shifted = execute_transform(
+        TransformDefinition(
+            transform_id="lag-volume",
+            transform_type=TransformType.LAG,
+            source_signature_id="product-period",
+            target_signature_id="product-period",
+            implementation_id="trusted.time.lag.v1",
+        ),
+        cells,
+    )
+    assert Coordinate(values=(("period", "2026-08"), ("product", "DIESEL"))) in shifted
+
+
+def test_hierarchy_aggregation_uses_replay_membership() -> None:
+    hierarchy = HierarchyDefinition(
+        hierarchy_id="station-region",
+        version="2",
+        child_dimension="station",
+        parent_dimension="region",
+        valid_from="2026-01-01T00:00:00+00:00",
+        known_at="2026-01-01T00:00:00+00:00",
+    )
+    memberships = (
+        HierarchyMembership(
+            hierarchy_id="station-region",
+            child_value="024",
+            parent_value="OLD",
+            valid_from="2026-01-01T00:00:00+00:00",
+            valid_to="2026-09-01T00:00:00+00:00",
+            known_at="2026-01-01T00:00:00+00:00",
+        ),
+        HierarchyMembership(
+            hierarchy_id="station-region",
+            child_value="024",
+            parent_value="NEW",
+            valid_from="2026-09-01T00:00:00+00:00",
+            known_at="2026-09-02T00:00:00+00:00",
+        ),
+    )
+    result = aggregate_by_hierarchy(
+        {coordinate("024"): Decimal("7")},
+        hierarchy,
+        memberships,
+        valid_at="2026-08-31T00:00:00+00:00",
+        replay_as_of="2026-09-01T00:00:00+00:00",
+    )
+    assert result[
+        Coordinate(values=(("company", "SGP"), ("period", "2026-09"), ("region", "OLD")))
+    ] == Decimal("7")
+
+
 def test_transform_dispatch_refuses_unregistered_execution_and_supports_mapping() -> None:
     source = {Coordinate(values=(("station", "024"),)): Decimal("10")}
     transform = TransformDefinition(
@@ -169,7 +233,7 @@ def test_transform_dispatch_refuses_unregistered_execution_and_supports_mapping(
         ),
     )
     assert result == {Coordinate(values=(("region", "TBILISI"),)): Decimal("10")}
-    unsupported = transform.model_copy(update={"transform_type": TransformType.LAG})
+    unsupported = transform.model_copy(update={"transform_type": TransformType.RECONCILE})
     try:
         execute_transform(unsupported, source)
     except ValueError as error:

@@ -558,9 +558,12 @@ SparseCalculationResult
 ```
 
 The implementation validates signature/intersection compatibility, preserves
-explicit dimension/value mappings, aggregates only to a declared target grain,
-groups independent nodes into deterministic stages, and intersects changed
-coordinates with populated intersections. It returns separate runtime
+explicit dimension/value mappings, executes direct/map/lookup/aggregate,
+unit/currency conversion and lag/lead/cohort time transforms only with
+explicit inputs, supports SUM/LAST_VALID/weighted aggregation, and resolves
+versioned hierarchy memberships using both economic time and replay knowledge
+cutoffs. It groups independent nodes into deterministic stages and intersects
+changed coordinates with populated intersections. It returns separate runtime
 freshness (`CALCULATION_FRESH`, `DIRTY`, `BLOCKED`) and authority fields; every
 successful result is a `DERIVED_CANDIDATE` with accounting and business-effect
 authority set to false. Results carry graph plan hashes, input pins,

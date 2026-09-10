@@ -189,6 +189,7 @@ class TransformDefinition(BaseModel):
     aggregation_policy: AggregationPolicy | None = None
     allocation_driver: str | None = None
     time_operator: TimeOperator | None = None
+    time_offset: int = Field(default=1, ge=1, le=120)
     null_behavior: str = "BLOCK"
     missing_behavior: str = "BLOCK"
     implementation_id: str = Field(min_length=1)
@@ -414,16 +415,46 @@ def map_coordinate(coordinate: Coordinate, mapping: DimensionMapping) -> Coordin
 def aggregate_sparse_values(
     cells: Mapping[Coordinate, Decimal],
     target_dimensions: frozenset[str],
+    *,
+    policy: AggregationPolicy = AggregationPolicy.SUM,
+    weights: Mapping[Coordinate, Decimal] | None = None,
 ) -> dict[Coordinate, Decimal]:
-    """Perform deterministic SUM aggregation at a declared common grain."""
+    """Aggregate at a declared grain using financial, not visual, semantics."""
 
-    grouped: defaultdict[tuple[tuple[str, str], ...], Decimal] = defaultdict(Decimal)
+    grouped: defaultdict[tuple[tuple[str, str], ...], list[tuple[Coordinate, Decimal]]] = (
+        defaultdict(list)
+    )
     for coordinate, value in cells.items():
         target = tuple(
             sorted((name, item) for name, item in coordinate.values if name in target_dimensions)
         )
-        grouped[target] += value
-    return {Coordinate(values=key): value for key, value in sorted(grouped.items())}
+        grouped[target].append((coordinate, value))
+    result: dict[Coordinate, Decimal] = {}
+    for key, items in sorted(grouped.items()):
+        if policy is AggregationPolicy.SUM:
+            result[Coordinate(values=key)] = sum((value for _, value in items), Decimal(0))
+        elif policy is AggregationPolicy.LAST_VALID:
+            result[Coordinate(values=key)] = max(items, key=lambda item: item[0].values)[1]
+        elif policy is AggregationPolicy.WEIGHTED_AVERAGE:
+            if weights is None:
+                raise ValueError("Weights are required for weighted average")
+            denominator = sum(
+                (weights.get(coordinate, Decimal(0)) for coordinate, _ in items), Decimal(0)
+            )
+            if denominator == 0:
+                raise ValueError("Weighted average has a zero denominator")
+            result[Coordinate(values=key)] = (
+                sum(
+                    (value * weights.get(coordinate, Decimal(0)) for coordinate, value in items),
+                    Decimal(0),
+                )
+                / denominator
+            )
+        else:
+            raise ValueError(
+                "RATIO aggregation requires an explicit numerator/denominator contract"
+            )
+    return result
 
 
 def execute_transform(
@@ -432,6 +463,8 @@ def execute_transform(
     *,
     mapping: DimensionMapping | None = None,
     target_dimensions: frozenset[str] | None = None,
+    conversion_factors: Mapping[Coordinate, Decimal] | None = None,
+    weights: Mapping[Coordinate, Decimal] | None = None,
 ) -> dict[Coordinate, Decimal]:
     """Execute safe transforms with explicit refusal for unregistered operators."""
 
@@ -444,7 +477,32 @@ def execute_transform(
     if transform.transform_type is TransformType.AGGREGATE:
         if target_dimensions is None:
             raise ValueError("Target dimensions are required for aggregation")
-        return aggregate_sparse_values(cells, target_dimensions)
+        return aggregate_sparse_values(
+            cells,
+            target_dimensions,
+            policy=transform.aggregation_policy or AggregationPolicy.SUM,
+            weights=weights,
+        )
+    if transform.transform_type in {TransformType.CONVERT_UNIT, TransformType.CONVERT_CURRENCY}:
+        if conversion_factors is None:
+            raise ValueError("Conversion factors are required for this transform")
+        converted: dict[Coordinate, Decimal] = {}
+        for coordinate, value in cells.items():
+            factor = conversion_factors.get(coordinate)
+            if factor is None or not factor.is_finite():
+                raise ValueError("Conversion factor is missing or non-finite")
+            converted[coordinate] = value * factor
+        return converted
+    if transform.transform_type in {
+        TransformType.LAG,
+        TransformType.LEAD,
+        TransformType.COHORT_SHIFT,
+    }:
+        direction = -1 if transform.transform_type is TransformType.LAG else 1
+        return {
+            _shift_period(coordinate, direction * transform.time_offset): value
+            for coordinate, value in cells.items()
+        }
     raise ValueError(
         f"Transform implementation is not registered: {transform.transform_type.value}"
     )
@@ -481,11 +539,54 @@ def resolve_hierarchy_parent(
     return next(iter(parents))
 
 
+def aggregate_by_hierarchy(
+    cells: Mapping[Coordinate, Decimal],
+    hierarchy: HierarchyDefinition,
+    memberships: tuple[HierarchyMembership, ...],
+    *,
+    valid_at: str,
+    replay_as_of: str,
+) -> dict[Coordinate, Decimal]:
+    """Aggregate through a versioned hierarchy without using current membership."""
+
+    result: dict[Coordinate, Decimal] = {}
+    for coordinate, value in cells.items():
+        values = coordinate.mapping
+        child_value = values.get(hierarchy.child_dimension)
+        if child_value is None:
+            raise ValueError("Hierarchy child dimension is missing from coordinate")
+        values[hierarchy.parent_dimension] = resolve_hierarchy_parent(
+            hierarchy,
+            memberships,
+            child_value,
+            valid_at=valid_at,
+            replay_as_of=replay_as_of,
+        )
+        values.pop(hierarchy.child_dimension, None)
+        target = Coordinate(values=tuple(sorted(values.items())))
+        result[target] = result.get(target, Decimal(0)) + value
+    return result
+
+
 def _parse_time(value: str) -> datetime:
     try:
         return datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError as exc:
         raise ValueError("Temporal runtime values must be ISO timestamps") from exc
+
+
+def _shift_period(coordinate: Coordinate, months: int) -> Coordinate:
+    values = coordinate.mapping
+    period = values.get("period")
+    if period is None or len(period) != 7 or period[4] != "-":
+        raise ValueError("Time transforms require a YYYY-MM period coordinate")
+    try:
+        year, month = int(period[:4]), int(period[5:])
+        absolute = year * 12 + month - 1 + months
+        values["period"] = f"{absolute // 12:04d}-{absolute % 12 + 1:02d}"
+    except ValueError as exc:
+        raise ValueError("Time transforms require a valid YYYY-MM period") from exc
+    return Coordinate(values=tuple(sorted(values.items())))
 
 
 def _graph_plan(graph: CalculationGraph, changed_nodes: tuple[str, ...]) -> tuple[str, ...] | None:
@@ -672,6 +773,7 @@ __all__: Final = [
     "TimeOperator",
     "TransformDefinition",
     "TransformType",
+    "aggregate_by_hierarchy",
     "aggregate_sparse_values",
     "compile_sparse_plan",
     "execute_sparse_decimal_plan",
