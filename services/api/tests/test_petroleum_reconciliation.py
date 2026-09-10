@@ -62,6 +62,28 @@ def test_reconcile_preserves_conservation_and_financial_boundary(monkeypatch):
     assert result["business_effect_authorized"] is False
 
 
+def test_variance_is_full_scope_bitemporal_and_partial_bridge(monkeypatch):
+    entity = str(_principal().scope.legal_entity_id)
+    rows = {
+        "InventoryBalance": [FakeResource(UUID("30000000-0000-0000-0000-000000000009"), {
+            "legal_entity_id": entity, "facility_id": "depot-1", "tank_id": "T-04",
+            "station_id": "024", "product_id": "diesel", "period_id": "2025-04",
+            "unit": "L", "measurement_basis": "15C", "opening_quantity": "100",
+            "receipts": "20", "dispatches": "18", "losses": "1", "closing_quantity": "99",
+        })], "PhysicalMovement": [], "PhysicalMeasurement": [], "RetailSale": [],
+    }
+    monkeypatch.setattr(petroleum_reconciliation.resources, "list_resources",
+                        lambda _p, kind, _s, _o, limit=1000: rows[kind])
+    result = petroleum_reconciliation.variances(_principal(), known_at=None)
+    row = result["rows"][0]
+    assert row["contract"] == "petroleum-variance/1"
+    assert row["dimensions"]["tank_id"] == "T-04"
+    assert row["physical"]["variance_quantity"] == "-2"
+    assert row["financial"]["status"] == "FINANCIAL_BRIDGE_PARTIAL"
+    assert row["authority"]["accounting_authorized"] is False
+    assert row["time"]["replay_as_of"] is None
+
+
 def test_lineage_returns_only_referenced_accepted_resources(monkeypatch):
     root = UUID("30000000-0000-0000-0000-000000000001")
     child = UUID("40000000-0000-0000-0000-000000000001")

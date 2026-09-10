@@ -846,3 +846,13 @@ the aligned 84% gate. The protected
 `development/enterprise-hydration-foundation` branch remains at `4261fcb`, so
 this head is not the canonical merged release. This is a substantial converged
 slice, not completion of the full architecture.
+
+### Implementation synchronization — petroleum variance control
+
+The canonical checkout now exposes the typed `petroleum-variance/1` control
+object through `/v1/operations/petroleum/variances`. Its deterministic output
+contains expanded enterprise/facility/tank/station/product/movement scope, the
+conservation equation, evidence gaps, replay timestamps, lifecycle state, and
+an explicit `FINANCIAL_BRIDGE_PARTIAL` authority boundary. Authentic
+connectors, durable correction history, investigation/action adapters,
+external readback, browser proof and release acceptance remain open gates.

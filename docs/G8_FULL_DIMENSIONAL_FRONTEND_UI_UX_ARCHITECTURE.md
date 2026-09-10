@@ -2004,3 +2004,10 @@ Therefore the UI is not certified as fully wired,
 persisted, browser-accepted or release-accepted. Planning, complete reporting,
 governed NYX reasoning, external action/readback, outcome learning, and
 source-to-action-to-export proof remain open according to the wiring register.
+
+Operations now consumes `/api/operations/petroleum/variances` and renders each
+control object as a scoped conservation record with evidence gaps, review
+lifecycle, bitemporal replay fields and `FINANCIAL_BRIDGE_PARTIAL`. The map is
+only one projection of the object. Evidence/lineage inspection,
+investigation/approval/action/readback screens, restart persistence,
+authenticated browser proof and independent acceptance remain required.

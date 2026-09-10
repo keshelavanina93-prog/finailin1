@@ -54,6 +54,16 @@ def petroleum_reconciliation_view(
     return petroleum_reconciliation.reconcile(principal, company_id)
 
 
+@router.get("/petroleum/variances")
+def petroleum_variances_view(
+    principal: User,
+    company_id: UUID | None = None,
+    valid_at: datetime | None = None,
+    known_at: datetime | None = None,
+) -> dict[str, Any]:
+    return petroleum_reconciliation.variances(principal, company_id, valid_at, known_at)
+
+
 @router.get("/petroleum/margin")
 def petroleum_margin_view(principal: User, company_id: UUID | None = None) -> dict[str, Any]:
     return petroleum_reconciliation.margin(principal, company_id)

@@ -76,6 +76,7 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
       "/api/operations/map/*/connections -> /v1/operations/map/*/connections",
       "/api/operations/import-proposal -> /v1/operations/import-proposal",
       "/api/operations/petroleum/reconciliation -> /v1/operations/petroleum/reconciliation",
+      "/api/operations/petroleum/variances -> /v1/operations/petroleum/variances",
       "/api/operations/petroleum/margin -> /v1/operations/petroleum/margin",
       "/api/operations/petroleum/movement-journal-reconciliation -> /v1/operations/petroleum/movement-journal-reconciliation",
       "/api/operations/petroleum/telemetry -> /v1/operations/petroleum/telemetry",
@@ -84,7 +85,7 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
       "/api/operations/petroleum/intake/{receipt_id}/promotion-preview -> /v1/operations/petroleum/intake/{receipt_id}/promotion-preview",
       "/api/operations/petroleum/intake/{receipt_id}/promotion-proposal -> /v1/operations/petroleum/intake/{receipt_id}/promotion-proposal",
     ],
-    ["ORPAK/SCADA retained measurement intake and movement lineage"],
+    ["authentic ORPAK/SCADA connectors, canonical promotion, investigation/action/readback adapters"],
   ),
   routeFamily(
     "diagnostics",

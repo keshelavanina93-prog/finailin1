@@ -523,3 +523,12 @@ model-backed reasoning or consequential action execution. The worktree family an
 distributed implementation history must therefore be treated as source
 material converging into the canonical checkout, not as proof that every
 architectural dimension is complete.
+
+### Current convergence addition
+
+`services/api/.../petroleum_reconciliation.py::variances` and
+`/v1/operations/petroleum/variances` now form the deterministic Petroleum
+Variance contract. The frontend Operations panel consumes the typed collection
+through the Next proxy. This is a real backend-to-frontend wiring step, not a
+release-complete claim: authentic connectors, durable investigation/action
+readback and independent browser/restart evidence remain open.

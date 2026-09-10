@@ -19,13 +19,27 @@ SOURCE_TYPES = ("InventoryBalance", "PhysicalMovement", "PhysicalMeasurement", "
 MARGIN_SOURCE_TYPES = ("RetailSale", "ProductCost")
 JOURNAL_RECONCILIATION_TYPES = ("PhysicalMovement", "JournalLine")
 DIMENSIONS = (
+    "tenant_id",
+    "enterprise_id",
     "legal_entity_id",
     "facility_id",
+    "warehouse_id",
     "tank_id",
     "station_id",
     "product_id",
+    "batch_id",
+    "movement_id",
+    "route_id",
+    "carrier_id",
     "period_id",
     "unit",
+    "measurement_basis",
+)
+
+VARIANCE_STATES = (
+    "RECONCILED", "WITHIN_TOLERANCE", "REVIEW_REQUIRED", "EVIDENCE_MISSING",
+    "INVESTIGATION_OPEN", "EXPLANATION_ACCEPTED", "ADJUSTMENT_PROPOSED",
+    "APPROVAL_REQUIRED", "RESOLVED",
 )
 
 
@@ -117,6 +131,77 @@ def reconcile(principal: Principal, company_id: UUID | None = None) -> dict[str,
         "telemetry_connected": bool(sum(counts.values())),
         "warning": "Physical measurements and booked accounting remain separate authorities.",
     }
+
+
+def variances(
+    principal: Principal,
+    company_id: UUID | None = None,
+    valid_at: datetime | None = None,
+    known_at: datetime | None = None,
+) -> dict[str, Any]:
+    """Return first-class, fully scoped petroleum control objects.
+
+    This is deliberately a deterministic projection.  It records the physical
+    control and its evidence/authority boundaries, but never creates a GL
+    adjustment or executes an operational action.
+    """
+    result = reconcile(principal, company_id)
+    rows: list[dict[str, Any]] = []
+    for index, row in enumerate(result["rows"]):
+        dimensions = row["dimensions"]
+        source_ids = list(row.get("source_resource_ids", []))
+        missing: list[str] = []
+        if not dimensions.get("unit"):
+            missing.append("UNKNOWN_UNIT")
+        if not dimensions.get("facility_id"):
+            missing.append("UNKNOWN_FACILITY")
+        if not dimensions.get("tank_id") and not dimensions.get("station_id"):
+            missing.append("UNKNOWN_STORAGE_OR_STATION")
+        if row["receipts"] != "0" and not source_ids:
+            missing.append("MISSING_MOVEMENT_EVIDENCE")
+        if row["closing"] == "0" and row["opening"] != "0":
+            missing.append("MISSING_CLOSING_MEASUREMENT")
+        physical_status = "EVIDENCE_MISSING" if missing else row["status"]
+        if physical_status == "RECONCILED":
+            lifecycle = "CONSERVATION_CHECKED"
+        else:
+            lifecycle = "VARIANCE_FLAGGED"
+        rows.append({
+            "variance_id": f"petroleum-variance:{index}:{'|'.join(dimensions.values())}",
+            "contract": "petroleum-variance/1",
+            "dimensions": dimensions,
+            "physical": {
+                "opening": row["opening"], "receipts": row["receipts"],
+                "dispatches": row["dispatches"], "losses": row["losses"],
+                "expected_closing": row["expected_closing"], "measured_closing": row["closing"],
+                "variance_quantity": row["variance"],
+                "variance_pct": format(
+                    (Decimal(row["variance"]) / Decimal(row["expected_closing"]) * 100)
+                    if Decimal(row["expected_closing"]) else Decimal(0), ".6f"
+                ),
+                "equation": "opening + receipts - dispatches - losses = expected_closing",
+            },
+            "evidence": {"source_resource_ids": source_ids, "gaps": missing},
+            "time": {
+                "valid_at": valid_at.isoformat()
+                if valid_at
+                else dimensions.get("period_id") or None,
+                     "known_at": known_at.isoformat() if known_at else None,
+                     "recorded_at": known_at.isoformat() if known_at else None,
+                     "approved_at": None, "corrected_at": None,
+                     "replay_as_of": known_at.isoformat() if known_at else None},
+            "review": {"status": physical_status, "lifecycle": lifecycle,
+                       "investigation": "NOT_OPEN", "action": "NOT_PROPOSED",
+                       "readback": "NOT_APPLICABLE"},
+            "financial": {"status": "FINANCIAL_BRIDGE_PARTIAL",
+                          "estimated_value": None, "valuation_basis": None,
+                          "cogs_effect_candidate": None, "margin_effect_candidate": None},
+            "authority": {"observed": True, "validated": not bool(missing),
+                          "accounting_authorized": False, "business_effect_authorized": False,
+                          "canonical_adjustment_created": False},
+        })
+    return {**result, "contract": "petroleum-variance-collection/1", "rows": rows,
+            "bitemporal": True, "action_execution": "GOVERNED_ADAPTER_REQUIRED"}
 
 
 def margin(principal: Principal, company_id: UUID | None = None) -> dict[str, Any]:
