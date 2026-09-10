@@ -43,6 +43,26 @@ def test_projection_catalog_is_server_owned_and_read_only() -> None:
     assert statuses["image-evidence"] == "IMPLEMENTED"
 
 
+def test_projection_catalog_covers_every_declared_card_and_chart_variant() -> None:
+    catalog = projection_catalog()
+    projection_ids = {item["projection_id"] for item in catalog}
+    assert projection_ids >= {
+        "executive-kpi", "planning-grid", "formatted-table", "variance-waterfall",
+        "hierarchy-drilldown", "movement-network", "operations-map", "evidence-table",
+        "nyx-context", "field-input", "image-evidence", "action-control",
+        "chart-area", "chart-bar", "chart-column", "chart-combination", "chart-dot",
+        "chart-gantt", "chart-line", "chart-pie", "chart-scatter", "chart-bubble",
+    }
+    assert {item["kind"] for item in catalog} == {
+        "ACTION", "CHART", "FIELD", "GRID", "HIERARCHY", "IMAGE", "KPI",
+        "MAP", "NETWORK", "TABLE", "TEXT", "WATERFALL",
+    }
+    assert {item["chart_type"] for item in catalog if item["chart_type"]} == {
+        "AREA", "BAR", "COLUMN", "COMBINATION", "DOT", "GANTT", "LINE",
+        "PIE", "SCATTER", "BUBBLE", "WATERFALL",
+    }
+
+
 def test_selection_preserves_exact_cross_projection_dimensions() -> None:
     selection = WorkspaceSelection(
         company_id="sgp",
@@ -60,6 +80,34 @@ def test_selection_preserves_exact_cross_projection_dimensions() -> None:
     assert selection.model_dump()["facility_id"] == "tbilisi-depot"
     assert selection.model_dump()["tank_id"] == "T-04"
     assert selection.model_dump()["replay_as_of"] == "2026-09-10T12:00:00Z"
+
+
+def test_selection_endpoint_round_trips_full_context_for_synchronization() -> None:
+    selection = WorkspaceSelection(
+        selected_object_id="variance-1",
+        company_id="sgp",
+        facility_id="tbilisi-depot",
+        tank_id="T-04",
+        product_id="diesel-en590",
+        station_id="024",
+        period="2026-09",
+        scenario_id="forecast-v3",
+        version_id="v3",
+        comparison_baseline="budget-2026",
+        replay_as_of="2026-09-10T12:00:00Z",
+        workspace="REPORT",
+    )
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post(
+            "/v1/workspace/projections/selection", json=selection.model_dump()
+        )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["contract"] == "workspace-selection/1"
+    assert body["authority_effect"] == "NONE"
+    assert body["selection"] == selection.model_dump()
+    eligible_ids = {item["projection_id"] for item in body["eligible_projections"]}
+    assert {"formatted-table", "chart-line", "image-evidence"} <= eligible_ids
 
 
 def test_selection_rejects_empty_company_scope() -> None:
