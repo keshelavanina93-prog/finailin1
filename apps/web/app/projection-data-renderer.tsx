@@ -8,13 +8,22 @@ type Edge = { source_id: string; target_id: string; relation?: string };
 
 type Feature = { geometry?: { type?: string; coordinates?: unknown }; properties?: { resource?: { display_name?: string; object_type?: string } } };
 
+const selectionDimensions = ["product_id", "station_id", "period", "scenario_id", "version_id", "comparison_baseline", "replay_as_of"] as const;
+
 function publishProjectionSelection(data: WorkspaceProjectionData, patch: Partial<WorkspaceSelection>) {
+  const sourceRow = data.normalized_rows?.find(row => row.row_id === patch.selected_object_id);
+  const rowSelection = sourceRow ? Object.fromEntries(
+    selectionDimensions.flatMap(dimension => {
+      const value = sourceRow.coordinates[dimension];
+      return value ? [[dimension, value]] : [];
+    }),
+  ) as Partial<WorkspaceSelection> : {};
   window.dispatchEvent(new CustomEvent<ProjectionSelectionEvent>("g8-workspace-selection", {
     detail: {
       contract: "workspace-selection-event/1",
       source_projection_id: data.projection.projection_id,
       source_row_id: patch.selected_object_id,
-      selection: { ...patch, company_id: data.selection.company_id },
+      selection: { ...rowSelection, ...patch, company_id: data.selection.company_id },
     },
   }));
 }

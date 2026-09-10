@@ -2050,7 +2050,8 @@ Every card family and workspace projection must inherit one exact
 `WorkspaceSelection`: company, product, station, period, scenario, version,
 comparison baseline, selected object, and `replay_as_of`. The current checkout
 implements the server-owned projection registry and exact-selection validation
-at `/api/workspace/projections/catalog` and `/api/workspace/projections/selection`.
+at `/api/workspace/projections/catalog` and `/api/workspace/projections/selection`,
+with the backend forwarding these through `/v1/workspace/projections/*`.
 Projection rows use the typed normalized envelope, and rendered projection
 interactions emit `workspace-selection-event/1` with source projection and row
 identity before the receiving surface revalidates scope.
