@@ -1,5 +1,6 @@
 """Read-only enterprise target diagnosis over the caller's authorized resource graph."""
 
+from collections.abc import Callable
 from decimal import Decimal
 from typing import Annotated, Any
 from uuid import UUID
@@ -423,7 +424,7 @@ def _decimal_divide(left: Decimal, right: Decimal) -> Decimal:
     return left / right
 
 
-_SAFE_DECIMAL_EVALUATORS = {
+_SAFE_DECIMAL_EVALUATORS: dict[str, Callable[..., Decimal]] = {
     "add": _decimal_add,
     "subtract": _decimal_subtract,
     "multiply": _decimal_multiply,
