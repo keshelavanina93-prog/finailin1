@@ -237,8 +237,9 @@ export const DIMENSIONAL_SURFACES: readonly DimensionalSurface[] = [
       "state_machine",
       "authority_visible",
       "evidence_or_lineage",
+      "typed_contract",
     ],
-    ["typed_contract", "approval_boundary", "negative_authority_test", "browser_proof", "restart_readback"],
+    ["approval_boundary", "negative_authority_test", "browser_proof", "restart_readback"],
     ["operational_scope"],
   ),
   surface(
