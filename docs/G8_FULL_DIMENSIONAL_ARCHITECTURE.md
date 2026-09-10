@@ -826,7 +826,7 @@ partial or registered projections cannot be mistaken for release completion.
 
 ### Verification snapshot — 2026-09-10
 
-The latest implementation head at the time of this snapshot was `b35fe70` on the converged implementation
+The latest implementation head at the time of this snapshot was `3c39b08` on the converged implementation
 branches. Frontend lint,
 typecheck, tests and build pass; API Ruff and mypy pass. The GitHub API test job
 previously failed four tests. The packaging, cross-actor investigation action,
@@ -854,7 +854,7 @@ A citation-first NYX refusal/explanation boundary is now wired at
 NYX model-backed reasoning and proposal/action handoff execution remain open. The latest API coverage result was 83.73% against
 the aligned 84% gate. The protected
 `development/enterprise-hydration-foundation` branch remains separate from the
-pushed review head `b35fe70`, so this head is not the canonical merged release.
+pushed review head `3c39b08`, so this head is not the canonical merged release.
 This is a substantial converged
 slice, not completion of the full architecture.
 

@@ -24,6 +24,7 @@ from finai_api.domain.workspace_projections import (
     WorkspaceSelection,
     eligible_projections,
     projection_catalog,
+    replay_timestamp,
 )
 from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import (
@@ -173,6 +174,10 @@ def projection_data(
         raise WorkspaceError(
             409, "Projection is unavailable for the selected workspace and exact context"
         )
+    try:
+        replay_as_of = replay_timestamp(request.selection)
+    except ValueError as exc:
+        raise WorkspaceError(422, str(exc)) from exc
 
     if request.projection_id in {"planning-grid", "formatted-table", "executive-kpi"}:
         catalog = planning.catalog(principal)
@@ -203,12 +208,11 @@ def projection_data(
         try:
             map_result = operations_map.map_view(
                 principal,
-                "enterprise_assets",
-                None,
-                None,
-                None,
-                500,
-                UUID(request.selection.company_id),
+                lens="enterprise_assets",
+                valid_at=None,
+                known_at=replay_as_of,
+                limit=500,
+                company_id=UUID(request.selection.company_id),
             )
         except ValueError as exc:
             raise WorkspaceError(
@@ -241,7 +245,7 @@ def projection_data(
                 UUID(request.selection.selected_object_id),
                 2,
                 None,
-                None,
+                replay_as_of,
                 UUID(request.selection.company_id),
             )
         except ValueError as exc:

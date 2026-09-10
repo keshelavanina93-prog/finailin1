@@ -507,7 +507,7 @@ FULLY_DEVELOPED_AND_PROVEN_FINANCIAL_AGI
 
 ## 6. Verification snapshot — 2026-09-10
 
-The canonical checkout snapshot was clean at `b35fe70`; that implementation
+The canonical checkout snapshot was clean at `3c39b08`; that implementation
 head is published on the pushed review branch. The repository is not
 fully merged or release-accepted:
 the protected branch remains separate from the pushed review head, and the

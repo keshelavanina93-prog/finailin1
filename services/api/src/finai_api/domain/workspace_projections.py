@@ -1,5 +1,6 @@
 """Server-owned projection taxonomy and exact cross-canvas selection contract."""
 
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -50,6 +51,19 @@ class WorkspaceSelection(Model):
     comparison_baseline: str | None = Field(default=None, min_length=1, max_length=256)
     replay_as_of: str | None = Field(default=None, min_length=1, max_length=128)
     workspace: WorkspaceKind | None = None
+
+
+def replay_timestamp(selection: WorkspaceSelection) -> datetime | None:
+    """Parse the caller's replay pin for bitemporal read-only projection reads."""
+    if selection.replay_as_of is None:
+        return None
+    value = selection.replay_as_of.strip()
+    if not value:
+        raise ValueError("replay_as_of must not be blank")
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("replay_as_of must be an ISO-8601 timestamp") from exc
 
 
 class ProjectionDefinition(Model):

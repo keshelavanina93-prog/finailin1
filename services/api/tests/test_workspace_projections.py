@@ -5,6 +5,7 @@ from finai_api.domain.workspace_projections import (
     WorkspaceSelection,
     eligible_projections,
     projection_catalog,
+    replay_timestamp,
 )
 
 
@@ -55,3 +56,16 @@ def test_projection_eligibility_does_not_invent_missing_context() -> None:
     assert "variance-waterfall" not in eligible
     assert "executive-kpi" not in eligible
     assert "action-control" not in eligible
+
+
+def test_replay_timestamp_is_parsed_for_bitemporal_projection_reads() -> None:
+    selection = WorkspaceSelection(company_id="company", replay_as_of="2026-09-10T08:30:00Z")
+    parsed = replay_timestamp(selection)
+    assert parsed is not None
+    assert parsed.isoformat() == "2026-09-10T08:30:00+00:00"
+
+
+def test_invalid_replay_timestamp_is_refused() -> None:
+    selection = WorkspaceSelection(company_id="company", replay_as_of="not-a-time")
+    with pytest.raises(ValueError, match="ISO-8601"):
+        replay_timestamp(selection)
