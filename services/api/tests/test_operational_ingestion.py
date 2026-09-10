@@ -73,6 +73,21 @@ def test_scada_profile_flags_non_monotonic_meter_series_for_review():
     assert "NON_MONOTONIC_SERIES" in result.source_profile["validation"]["rows"][1]["reasons"]
 
 
+def test_operational_receipt_reports_rejected_rows_at_receipt_level():
+    result = compile_source(
+        request(
+            "ORPAK",
+            "station_id,dispenser_id,nozzle_id,product_code,transaction_id,event_time,quantity,unit,unit_price,gross_amount,payment_method,currency,source_record_id,source_hash\n"
+            "ST-1,D-2,N-1,DIESEL,TX-1,2026-08-12T10:00:00,-1,L,3.20,4001.60,CARD,GEL,ROW-1,"
+            + "a" * 64
+            + "\n",
+        )
+    )
+    assert result.source_profile["validation"]["status"] == "REJECTED"
+    assert result.source_profile["validation"]["promotion_eligible"] is False
+    assert result.candidates == ()
+
+
 def test_retail_cash_register_profile_retains_shift_close_as_review_candidate():
     result = compile_source(
         request(
