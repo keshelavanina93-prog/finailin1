@@ -126,6 +126,41 @@ def test_action_projection_exposes_boundary_without_execution() -> None:
     assert values["execution"] == "NOT_PERMITTED_FROM_PROJECTION"
 
 
+def test_action_projection_reads_exact_company_workbench_without_execution(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    company_id = "11111111-1111-4111-8111-111111111111"
+    monkeypatch.setattr(
+        enterprise_diagnostics_routes.operator_workbench,
+        "listing",
+        lambda _principal, _company_id, include_unbound: {
+            "items": [
+                {
+                    "workflow_id": "workflow-1",
+                    "title": "Review retained source exception",
+                    "family": "source",
+                    "company_id": company_id,
+                    "created_at": "2026-09-10T12:00:00+00:00",
+                }
+            ],
+            "truncated": False,
+        },
+    )
+    selection = WorkspaceSelection(company_id=company_id)
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post(
+            "/v1/workspace/projections/data",
+            json={"projection_id": "action-control", "selection": selection.model_dump()},
+        )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data_state"] == "ACCEPTED_CANONICAL"
+    assert body["coverage"] == "workflow/workbench/1"
+    assert any(row.get("workflow_id") == "workflow-1" for row in body["rows"])
+    values = {row["field"]: row["value"] for row in body["rows"] if "value" in row}
+    assert values["execution"] == "NOT_PERMITTED_FROM_PROJECTION"
+
+
 def test_nyx_projection_refuses_without_valid_exact_resource_ids() -> None:
     selection = WorkspaceSelection(
         company_id="sgp",

@@ -41,6 +41,7 @@ from finai_api.services import (
     executable_function_registry,
     nyx_reasoning,
     operations_map,
+    operator_workbench,
     planning,
 )
 from finai_api.services.workspace import WorkspaceError
@@ -302,16 +303,43 @@ def projection_data(
                 "authority_state": "ACTION_CONTEXT",
             },
         ]
+        workflow_rows: list[dict[str, object]] = []
+        try:
+            company_id = UUID(request.selection.company_id)
+        except ValueError:
+            company_id = None
+        if company_id is not None:
+            workbench = operator_workbench.listing(principal, company_id, include_unbound=False)
+            items = workbench.get("items", [])
+            if request.selection.selected_object_id:
+                items = [
+                    item for item in items
+                    if item.get("workflow_id") == request.selection.selected_object_id
+                ]
+            for item in items[:100]:
+                workflow_rows.append(
+                    {
+                        "row_id": f"action:{item['workflow_id']}",
+                        "label": str(item.get("title") or "Retained workflow"),
+                        "field": "workflow",
+                        "workflow_id": item["workflow_id"],
+                        "family": item.get("family", "unsupported"),
+                        "company_id": item.get("company_id"),
+                        "created_at": item.get("created_at"),
+                        "authority_state": "RETAINED_WORKFLOW",
+                    }
+                )
+        action_rows.extend(workflow_rows)
         return {
             "contract": "workspace-projection-data/1",
             "projection": projection,
             "selection": request.selection.model_dump(mode="json"),
-            "data_state": "CONTEXT_ONLY",
+            "data_state": "ACCEPTED_CANONICAL" if workflow_rows else "CONTEXT_ONLY",
             "rows": action_rows,
             "normalized_rows": [
                 item.model_dump(mode="json") for item in normalize_projection_rows(action_rows)
             ],
-            "coverage": "workflow/control",
+            "coverage": "workflow/workbench/1" if workflow_rows else "workflow/control",
             "scope": {"company_id": request.selection.company_id},
             "authority_effect": "NONE",
         }
