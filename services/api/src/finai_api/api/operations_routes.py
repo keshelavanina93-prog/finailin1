@@ -102,6 +102,11 @@ def petroleum_action_execute(principal: User, control_id: str) -> dict[str, Any]
     return petroleum_control.execute(principal, control_id)
 
 
+@router.post("/petroleum/variances/investigations/{control_id}/outcome/measure")
+def petroleum_outcome_measure(principal: User, control_id: str) -> dict[str, Any]:
+    return petroleum_control.measure_outcome(principal, control_id)
+
+
 @router.get("/petroleum/margin")
 def petroleum_margin_view(principal: User, company_id: UUID | None = None) -> dict[str, Any]:
     return petroleum_reconciliation.margin(principal, company_id)

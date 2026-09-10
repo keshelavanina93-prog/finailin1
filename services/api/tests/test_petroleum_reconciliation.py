@@ -236,6 +236,62 @@ def test_petroleum_local_adapter_persists_typed_readback(monkeypatch):
     assert events[0][3]["readback"]["status"] == "VERIFIED"
 
 
+def test_petroleum_outcome_measurement_recomputes_fresh_accepted_variance(monkeypatch):
+    principal = _principal()
+    principal.actor_id = "checker"
+    principal.permissions = ["ontology_read"]
+    baseline = {
+        "variance_id": "petroleum-variance:outcome",
+        "dimensions": {"legal_entity_id": str(principal.scope.legal_entity_id), "tank_id": "T-04"},
+        "physical": {"variance_quantity": "-10"},
+        "review": {"status": "REVIEW_REQUIRED"},
+        "evidence": {"source_hashes": ["a" * 64]},
+        "time": {
+            "valid_at": "2025-04", "known_at": "2025-05", "recorded_at": "2025-05",
+            "approved_at": None, "corrected_at": None, "replay_as_of": None,
+        },
+    }
+    current = {
+        **baseline,
+        "physical": {"variance_quantity": "0"},
+        "review": {"status": "WITHIN_TOLERANCE"},
+        "evidence": {"source_hashes": ["b" * 64]},
+    }
+    control = {
+        "state": "READBACK_VERIFIED", "variance": baseline,
+        "readback": {"readback_id": "local-readback-1"},
+    }
+    events = []
+    def read_control(*_args):
+        return {**control, "outcome": events[-1][3]["outcome"]} if events else control
+
+    monkeypatch.setattr(petroleum_control, "read", read_control)
+    monkeypatch.setattr(petroleum_control, "_find", lambda *_: current)
+    monkeypatch.setattr(
+        petroleum_control.report_workflows, "event", lambda *args: events.append(args)
+    )
+
+    result = petroleum_control.measure_outcome(principal, "pvc_outcome")
+
+    assert result["outcome"]["status"] == "MEASURED_RESOLVED"
+    assert result["outcome"]["baseline"]["variance_quantity"] == "-10"
+    assert result["outcome"]["current"]["variance_quantity"] == "0"
+    assert result["outcome"]["authority"]["accounting_authorized"] is False
+    assert events[0][2].startswith("outcome-measured:")
+
+
+def test_petroleum_outcome_measurement_requires_verified_readback(monkeypatch):
+    principal = _principal()
+    principal.permissions = ["ontology_read"]
+    monkeypatch.setattr(
+        petroleum_control, "read", lambda *_: {"state": "APPROVED", "readback": None}
+    )
+    from finai_api.services.workspace import WorkspaceError
+
+    with pytest.raises(WorkspaceError, match="verified action readback"):
+        petroleum_control.measure_outcome(principal, "pvc_without_readback")
+
+
 def test_variance_valuation_is_candidate_only_when_product_cost_is_accepted(monkeypatch):
     entity = str(_principal().scope.legal_entity_id)
     rows = {

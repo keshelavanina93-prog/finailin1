@@ -150,6 +150,7 @@ def read(principal: Principal, control_id: str) -> dict[str, Any]:
     state = request.get("state", "INVESTIGATION_OPEN")
     execution = "REFUSED_NO_EXTERNAL_ADAPTER"
     readback: dict[str, Any] | None = None
+    outcome: dict[str, Any] | None = None
     for event in events:
         if event.get("state") in {
             "EXPLANATION_ACCEPTED", "EXPLANATION_REJECTED", "ACTION_PROPOSED",
@@ -160,11 +161,69 @@ def read(principal: Principal, control_id: str) -> dict[str, Any]:
             execution = str(event["execution"])
         if event.get("readback"):
             readback = event["readback"]
+        if event.get("outcome"):
+            outcome = event["outcome"]
     return {"contract": "petroleum-control/1", "control_id": control_id,
             "variance": request["variance"], "state": state, "events": events,
             "initiator_actor_id": request["initiator_actor_id"],
-            "execution": execution, "readback": readback,
+            "execution": execution, "readback": readback, "outcome": outcome,
             "accounting_authorized": False, "business_effect_authorized": False}
+
+
+def measure_outcome(principal: Principal, control_id: str) -> dict[str, Any]:
+    """Measure fresh accepted physical evidence after verified action readback."""
+    require_permission(principal, "ontology_read")
+    control = read(principal, control_id)
+    if control["state"] != "READBACK_VERIFIED" or not control.get("readback"):
+        raise WorkspaceError(409, "Outcome measurement requires a verified action readback")
+    try:
+        current = _find(principal, control["variance"]["variance_id"])
+    except WorkspaceError as exc:
+        if exc.status == 404:
+            raise WorkspaceError(
+                409,
+                "Outcome measurement is unavailable because current accepted evidence is missing",
+            ) from exc
+        raise
+    baseline = control["variance"]
+    current_status = str(current["review"]["status"])
+    resolved = current_status in {"RECONCILED", "WITHIN_TOLERANCE", "RESOLVED"}
+    outcome = {
+        "contract": "petroleum-outcome-measurement/1",
+        "status": "MEASURED_RESOLVED" if resolved else "MEASURED_UNRESOLVED",
+        "control_id": control_id,
+        "variance_id": baseline["variance_id"],
+        "scope": baseline["dimensions"],
+        "baseline": {
+            "variance_quantity": baseline["physical"]["variance_quantity"],
+            "review_status": baseline["review"]["status"],
+            "source_hashes": baseline["evidence"]["source_hashes"],
+            "time": baseline["time"],
+        },
+        "current": {
+            "variance_quantity": current["physical"]["variance_quantity"],
+            "review_status": current_status,
+            "source_hashes": current["evidence"]["source_hashes"],
+            "time": current["time"],
+        },
+        "readback_id": control["readback"]["readback_id"],
+        "authority": {
+            "physical_outcome_measured": True,
+            "accounting_authorized": False,
+            "business_effect_authorized": False,
+        },
+    }
+    measurement_hash = sha256(
+        json.dumps(outcome, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    outcome["measurement_hash"] = measurement_hash
+    report_workflows.event(
+        principal,
+        control_id,
+        "outcome-measured:" + measurement_hash,
+        {"outcome": outcome, "actor_id": principal.actor_id},
+    )
+    return read(principal, control_id)
 
 
 def decide(
