@@ -82,6 +82,8 @@ def compare(principal, scenario_a: UUID, scenario_b: UUID) -> dict[str, Any]:
                 "warehouse_id",
                 "unit_id",
                 "currency_id",
+                "period_starts_on",
+                "period_ends_on",
             )
         )
         bucket = grouped.setdefault(key, {})
@@ -105,6 +107,8 @@ def compare(principal, scenario_a: UUID, scenario_b: UUID) -> dict[str, Any]:
                             "warehouse_id",
                             "unit_id",
                             "currency_id",
+                            "period_starts_on",
+                            "period_ends_on",
                         ),
                         key,
                         strict=True,

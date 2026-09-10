@@ -98,6 +98,36 @@ def test_compare_is_exact_scope_and_decimal_deterministic(monkeypatch):
     assert result["rows"][0]["delta"] == "25.15"
 
 
+def test_compare_preserves_governed_period_intervals(monkeypatch):
+    scenario_a, scenario_b = uuid4(), uuid4()
+    rows = {
+        "ScenarioVersion": [
+            node(scenario_a, "ScenarioVersion", {"kind": "BUDGET"}),
+            node(scenario_b, "ScenarioVersion", {"kind": "FORECAST"}),
+        ],
+        "PlanningCellFact": [
+            node(uuid4(), "PlanningCellFact", {
+                "legal_entity_id": "company-a", "scenario_version_id": str(scenario_a),
+                "period_id": "2025-01", "period_starts_on": "2025-01-01",
+                "period_ends_on": "2025-01-31", "amount": "10",
+            }),
+            node(uuid4(), "PlanningCellFact", {
+                "legal_entity_id": "company-a", "scenario_version_id": str(scenario_b),
+                "period_id": "2025-01", "period_starts_on": "2025-01-01",
+                "period_ends_on": "2025-01-31", "amount": "12",
+            }),
+        ],
+    }
+    monkeypatch.setattr(
+        planning.resources,
+        "list_resources",
+        lambda _principal, object_type, _search, _offset, **_kwargs: rows[object_type],
+    )
+    result = planning.compare(principal(), scenario_a, scenario_b)
+    assert result["rows"][0]["dimension"]["period_starts_on"] == "2025-01-01"
+    assert result["rows"][0]["dimension"]["period_ends_on"] == "2025-01-31"
+
+
 def test_forecast_aggregates_accepted_scenario_cells(monkeypatch):
     scenario = uuid4()
     rows = {
