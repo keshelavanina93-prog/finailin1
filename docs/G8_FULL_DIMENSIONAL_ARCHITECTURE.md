@@ -823,6 +823,11 @@ through `WorkspaceSelection`; the selection endpoint has no authority effect.
 This is the cross-canvas seam for table, grid, KPI, map, network, hierarchy,
 waterfall, evidence, and NYX projections. Registry status remains explicit so
 partial or registered projections cannot be mistaken for release completion.
+Projection payloads also expose a typed normalized row envelope containing
+coordinates, measures, labels, authority state, evidence references, and
+valid/known timestamps. Projection interactions publish the typed
+`workspace-selection-event/1` contract so chart, timeline, map, network, table,
+and grid selections can update the same company-scoped context.
 
 ### Verification snapshot — 2026-09-10
 

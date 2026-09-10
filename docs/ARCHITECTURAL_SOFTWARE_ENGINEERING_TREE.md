@@ -586,3 +586,7 @@ registry for card families and workspace projections. The exact
 context without granting authority and deliberately reports each projection as
 implemented, partial, or registered until its real data, lineage, browser,
 restart, and release gates are proven.
+The projection renderer consumes normalized coordinates/measures and emits the
+typed `workspace-selection-event/1` contract from chart points, timeline bars,
+map points, network nodes, and table rows; replay pins are passed into the
+Operations snapshot as `known_at`.
