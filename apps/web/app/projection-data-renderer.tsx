@@ -6,6 +6,8 @@ type Point = { label: string; value: number };
 
 type Edge = { source_id: string; target_id: string; relation?: string };
 
+type Feature = { geometry?: { type?: string; coordinates?: unknown }; properties?: { resource?: { display_name?: string; object_type?: string } } };
+
 function points(data: WorkspaceProjectionData): Point[] {
   return data.rows.flatMap((row, index) => {
     const candidate = row.delta ?? row.amount ?? row.scenario_b ?? row.value;
@@ -18,6 +20,10 @@ function edges(data: WorkspaceProjectionData): Edge[] {
   return data.rows.filter((row): row is Record<string, unknown> & Edge => typeof row.source_id === "string" && typeof row.target_id === "string").map(row => ({ source_id: row.source_id, target_id: row.target_id, relation: typeof row.relation === "string" ? row.relation : undefined })).slice(0, 120);
 }
 
+function features(data: WorkspaceProjectionData): Feature[] {
+  return data.rows.filter((row): row is Feature => typeof row.geometry === "object" && row.geometry !== null).slice(0, 100);
+}
+
 function NumericTable({ values }: { values: Point[] }) {
   return <div className="g8-table-scroll"><table><caption>Governed values used by this projection</caption><thead><tr><th>Coordinate</th><th>Value</th></tr></thead><tbody>{values.map(point => <tr key={`${point.label}:${point.value}`}><th>{point.label}</th><td>{point.value}</td></tr>)}</tbody></table></div>;
 }
@@ -25,6 +31,23 @@ function NumericTable({ values }: { values: Point[] }) {
 export default function ProjectionDataRenderer({ data }: { data: WorkspaceProjectionData }) {
   const values = points(data);
   const graph = edges(data);
+  const mapFeatures = features(data);
+  if (data.projection.kind === "MAP" && mapFeatures.length) {
+    const pointsForMap = mapFeatures.flatMap(feature => {
+      const coordinates = feature.geometry?.coordinates;
+      return feature.geometry?.type === "Point" && Array.isArray(coordinates) && typeof coordinates[0] === "number" && typeof coordinates[1] === "number" ? [{ x: coordinates[0], y: coordinates[1], label: feature.properties?.resource?.display_name ?? "Accepted asset" }] : [];
+    });
+    if (pointsForMap.length) {
+      const xs = pointsForMap.map(point => point.x), ys = pointsForMap.map(point => point.y), minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+      return <div className="g8-projection-result"><h4>{data.projection.label} · {data.data_state}</h4><p>Accepted geometry only · authority effect: {data.authority_effect}.</p><div className="g8-projection-chart" role="img" aria-label="Accepted operational assets for the exact selected context"><svg viewBox="0 0 720 280" preserveAspectRatio="none">{pointsForMap.map((point, index) => { const x = 30 + ((point.x - minX) / (maxX - minX || 1)) * 660; const y = 250 - ((point.y - minY) / (maxY - minY || 1)) * 220; return <g key={`${point.label}:${index}`}><circle cx={x} cy={y} r="5" /><title>{point.label}</title></g>; })}</svg></div><p>{pointsForMap.length} accepted point geometries returned. Non-point and unmapped assets remain in the operations map&apos;s governed evidence view.</p></div>;
+    }
+  }
+  if (["FIELD", "IMAGE", "ACTION"].includes(data.projection.kind)) {
+    return <div className="g8-projection-result"><h4>{data.projection.label}</h4><p role="status">This projection is registered for the exact context, but its authoritative payload is not available in this read-only data contract. No input mutation, image substitution, or business action was performed.</p><strong>{data.data_state}</strong></div>;
+  }
+  if (data.projection.kind === "TEXT") {
+    return <div className="g8-projection-result"><h4>{data.projection.label}</h4><p>Governed narrative projection for the selected company and object.</p><dl><dt>Data state</dt><dd>{data.data_state}</dd><dt>Authority effect</dt><dd>{data.authority_effect}</dd><dt>Synchronization</dt><dd>{data.projection.synchronization_group}</dd></dl><p>NYX narrative generation remains citation-bound to the returned evidence and is not inferred by this renderer.</p></div>;
+  }
   if ((data.projection.kind === "NETWORK" || data.projection.kind === "HIERARCHY") && graph.length) {
     const nodes = [...new Set(graph.flatMap(edge => [edge.source_id, edge.target_id]))].slice(0, 40);
     return <div className="g8-projection-result"><h4>{data.projection.label} · {data.data_state}</h4><p>Explicit directed connectivity only · authority effect: {data.authority_effect}.</p><div className="g8-projection-chart" role="img" aria-label={`${data.projection.label} for the exact selected context`}><svg viewBox="0 0 720 280" preserveAspectRatio="none">{graph.map((edge, index) => { const source = nodes.indexOf(edge.source_id); const target = nodes.indexOf(edge.target_id); const x1 = 30 + (source % 8) * 90; const y1 = 30 + Math.floor(source / 8) * 48; const x2 = 30 + (target % 8) * 90; const y2 = 30 + Math.floor(target / 8) * 48; return <line key={`${edge.source_id}:${edge.target_id}:${index}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" opacity=".5" />; })}{nodes.map((node, index) => <g key={node}><circle cx={30 + (index % 8) * 90} cy={30 + Math.floor(index / 8) * 48} r="8" /><text x={42 + (index % 8) * 90} y={34 + Math.floor(index / 8) * 48} fontSize="9">{node.slice(0, 12)}</text></g>)}</svg></div><div className="g8-table-scroll"><table><caption>Explicit edges returned by the governed connection service</caption><thead><tr><th>Source</th><th>Relation</th><th>Target</th></tr></thead><tbody>{graph.map((edge, index) => <tr key={`${edge.source_id}:${edge.target_id}:${index}`}><td>{edge.source_id}</td><td>{edge.relation ?? "—"}</td><td>{edge.target_id}</td></tr>)}</tbody></table></div></div>;
