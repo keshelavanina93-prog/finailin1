@@ -25,7 +25,7 @@ function publishProjectionSelection(data: WorkspaceProjectionData, patch: Partia
       contract: "workspace-selection-event/1",
       source_projection_id: data.projection.projection_id,
       source_row_id: patch.selected_object_id,
-      selection: { ...rowSelection, ...patch, company_id: data.selection.company_id },
+      selection: { ...data.selection, ...rowSelection, ...patch, company_id: data.selection.company_id },
     },
   }));
 }
@@ -51,7 +51,7 @@ function features(data: WorkspaceProjectionData): Feature[] {
 }
 
 function NumericTable({ data, values }: { data: WorkspaceProjectionData; values: Point[] }) {
-  return <div className="g8-table-scroll"><table><caption>Governed values used by this projection</caption><thead><tr><th>Coordinate</th><th>Value</th></tr></thead><tbody>{values.map(point => <tr key={`${point.label}:${point.value}`} onClick={() => point.row_id && publishProjectionSelection(data, { selected_object_id: point.row_id })}><th>{point.label}</th><td>{point.value}</td></tr>)}</tbody></table></div>;
+  return <div className="g8-table-scroll"><table><caption>Governed values used by this projection</caption><thead><tr><th>Coordinate</th><th>Value</th></tr></thead><tbody>{values.map((point, index) => <tr key={point.row_id ?? `${point.label}:${point.value}:${index}`} onClick={() => point.row_id && publishProjectionSelection(data, { selected_object_id: point.row_id })}><th>{point.label}</th><td>{point.value}</td></tr>)}</tbody></table></div>;
 }
 
 function ChartFigure({ data, values }: { data: WorkspaceProjectionData; values: Point[] }) {

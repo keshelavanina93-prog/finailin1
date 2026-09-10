@@ -599,8 +599,9 @@ implemented, partial, or registered until its real data, lineage, browser,
 restart, and release gates are proven.
 The projection renderer consumes normalized coordinates/measures and emits the
 typed `workspace-selection-event/1` contract from chart points, timeline bars,
-map points, network nodes, and table rows; replay pins are passed into the
-Operations snapshot as `known_at`.
+map points, network nodes, and table rows. Each event preserves the complete
+current `WorkspaceSelection`; replay pins are passed into the Operations
+snapshot as `known_at`.
 The Image card now follows the retained-source path for exact `doc_`/`ir_`
 identities, with MIME/size refusal and client-side SHA-256 verification before
 display. This is a retained evidence projection, not an authority-bearing

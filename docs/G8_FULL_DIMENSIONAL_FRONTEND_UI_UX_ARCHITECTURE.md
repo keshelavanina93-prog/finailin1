@@ -1990,7 +1990,7 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest implementation head at the time of this snapshot was `882df05`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, known telemetry quality/basis states and inferred series-gap review, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, retained outcome timeline, and governed cross-projection card/chart rendering represented in the unified workspaces. The projection contract suite now proves every declared card family, chart variant, full selection round-trip, and runtime dispatch branch (16 focused tests); stable row identity is preserved for chart, timeline, map, and combination interactions. The canonical local supervisor also converges the pinned services after exact interrupted-process adoption, and the managed web build now preserves the fixed local-login surface; automated credential-entry proof remains open.
+latest implementation head at the time of this snapshot was `320fe74`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, known telemetry quality/basis states and inferred series-gap review, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, retained outcome timeline, and governed cross-projection card/chart rendering represented in the unified workspaces. The projection contract suite now proves every declared card family, chart variant, full selection round-trip, and runtime dispatch branch (16 focused tests); stable row identity is preserved for chart, timeline, map, and combination interactions, and selection events preserve the complete current context. The canonical local supervisor also converges the pinned services after exact interrupted-process adoption, and the managed web build now preserves the fixed local-login surface; automated credential-entry proof remains open.
 The GitHub CI runs for this head are in progress on both pushed review branches. Planning now has real catalog/comparison, forecast, liquidity,
 authoring, outcome-measurement and shadow-evaluation UI over accepted canonical
 facts. Operations now includes a petroleum conservation/lineage bridge over
@@ -2052,7 +2052,9 @@ at `/api/workspace/projections/catalog` and `/api/workspace/projections/selectio
 with the backend forwarding these through `/v1/workspace/projections/*`.
 Projection rows use the typed normalized envelope, and rendered projection
 interactions emit `workspace-selection-event/1` with source projection and row
-identity before the receiving surface revalidates scope.
+identity before the receiving surface revalidates scope. The event carries the
+complete current `WorkspaceSelection`, so selecting a row cannot silently drop
+facility, tank, product, scenario, version, baseline, or replay context.
 The mounted Planning surface shows the registry and validation result. It is a
 real wiring seam, not a claim that all card families are complete; each
 projection remains explicitly `IMPLEMENTED`, `PARTIAL`, or `REGISTERED` until

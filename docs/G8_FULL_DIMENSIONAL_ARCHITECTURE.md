@@ -834,7 +834,9 @@ Projection payloads also expose a typed normalized row envelope containing
 coordinates, measures, labels, authority state, evidence references, and
 valid/known timestamps. Projection interactions publish the typed
 `workspace-selection-event/1` contract so chart, timeline, map, network, table,
-and grid selections can update the same company-scoped context.
+and grid selections can update the same company-scoped context. The event
+contains the complete current selection, not only the clicked row fields, so
+contextual dimensions cannot be lost during synchronization.
 The retained-evidence Image projection follows the same selection fabric. It
 accepts only exact retained `doc_`/`ir_` identities, requires an image MIME type
 and bounded payload, carries source SHA-256, and renders only after browser-side
