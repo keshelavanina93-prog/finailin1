@@ -181,6 +181,11 @@ def test_submit_governed_proposal_persists_review_packet_without_promotion(monke
             if mapped_type == object_type
         ],
     )
+    monkeypatch.setattr(
+        operational_binding_validation.resources,
+        "current_resources",
+        lambda *args, **kwargs: {},
+    )
     captured = {}
     monkeypatch.setattr(
         operational_binding_validation.resources,
@@ -190,6 +195,9 @@ def test_submit_governed_proposal_persists_review_packet_without_promotion(monke
     result = operational_binding_validation.submit_governed_proposal(principal, "receipt-1")
     proposal = captured["proposal"]
     assert result is proposal
-    assert proposal.mutations[0].object_type == "RetailSale"
-    assert proposal.mutations[0].evidence_class == "SOURCE_BOUND"
-    assert proposal.mutations[0].attributes["source_details"]["source_record_id"] == "ROW-1"
+    assert proposal.mutations[0].object_type == "SourceEvidence"
+    sale = proposal.mutations[1]
+    assert sale.object_type == "RetailSale"
+    assert sale.evidence_class == "SOURCE_BOUND"
+    assert sale.attributes["evidence_id"] == str(proposal.mutations[0].resource_id)
+    assert sale.attributes["source_details"]["source_record_id"] == "ROW-1"

@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import NAMESPACE_URL, uuid5
 
+from finai_api.domain.ontology_catalog import canonical_id
 from finai_api.domain.resources import ProposalDetail, ResourceMutation, ResourceProposal
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
@@ -220,6 +221,13 @@ def promotion_preview(principal: Principal, receipt_id: str) -> dict[str, Any]:
             }
         canonical_values = {
             "legal_entity_id": str(receipt.scope.legal_entity_id),
+            "evidence_id": str(
+                canonical_id(
+                    receipt.scope.tenant_id,
+                    "SourceEvidence",
+                    receipt.source_sha256,
+                )
+            ),
             **canonical_values,
             "source_details": {
                 "receipt_id": receipt.receipt_id,
@@ -266,7 +274,39 @@ def submit_governed_proposal(principal: Principal, receipt_id: str) -> ProposalD
         raise WorkspaceError(409, "Operational intake has no eligible rows for proposal submission")
     receipt = retrieve(principal.scope, receipt_id)
     assert receipt is not None
+    evidence_id = canonical_id(
+        principal.scope.tenant_id,
+        "SourceEvidence",
+        receipt.source_sha256,
+    )
     mutations: list[ResourceMutation] = []
+    existing_evidence = resources.current_resources(principal, [evidence_id]).get(str(evidence_id))
+    if existing_evidence is None:
+        period_start = datetime.fromisoformat(f"{receipt.scope.period}-01T00:00:00+00:00")
+        mutations.append(
+            ResourceMutation(
+                resource_id=evidence_id,
+                object_type="SourceEvidence",
+                identity_key=receipt.source_sha256,
+                display_name=f"Retained {preview['source_system']} operational evidence",
+                attributes={
+                    "sha256": receipt.source_sha256,
+                    "source_system": preview["source_system"],
+                },
+                valid_from=period_start,
+                evidence_class="SOURCE_BOUND",
+            )
+        )
+    elif (
+        existing_evidence.get("object_type") != "SourceEvidence"
+        or existing_evidence.get("authority_state") != "APPROVED"
+        or existing_evidence.get("evidence_class") != "SOURCE_BOUND"
+        or existing_evidence.get("attributes", {}).get("sha256") != receipt.source_sha256
+    ):
+        raise WorkspaceError(
+            409,
+            "Retained operational evidence identity is unavailable or incompatible",
+        )
     for candidate in preview["candidates"]:
         values = candidate["values"]
         raw_time = values.get("event_time") or values.get("measurement_timestamp")
