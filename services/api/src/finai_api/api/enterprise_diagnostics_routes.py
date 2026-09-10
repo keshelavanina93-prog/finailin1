@@ -253,7 +253,7 @@ def projection_data(
             "projection": projection,
             "selection": request.selection.model_dump(mode="json"),
             "data_state": "ACCEPTED_CANONICAL",
-            "rows": network_result.get("connections", []),
+            "rows": network_result.get("edges", []),
             "coverage": network_result.get("contract", "operations-connections/1"),
             "scope": {"company_id": request.selection.company_id},
             "authority_effect": "NONE",
