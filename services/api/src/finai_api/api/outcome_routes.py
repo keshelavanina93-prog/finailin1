@@ -21,6 +21,15 @@ def actual_vs_plan(
     return outcomes.actual_vs_plan(principal, plan_scenario_id, actual_scenario_id)
 
 
+@router.get("/multi-baseline")
+def multi_baseline(
+    principal: User,
+    actual_scenario_id: UUID,
+    baseline_scenario_id: Annotated[list[UUID], Query(min_length=1, max_length=12)],
+) -> dict[str, Any]:
+    return outcomes.multi_baseline(principal, actual_scenario_id, tuple(baseline_scenario_id))
+
+
 @router.get("/learning-evaluation")
 def learning_evaluation(
     principal: User,

@@ -20,6 +20,21 @@ export type OutcomeMeasurement = {
   business_effect_authorized: false;
 };
 
+export type MultiBaselineOutcome = {
+  contract: "outcome-multi-baseline/1";
+  measurement_id: string;
+  scope: {legal_entity_id: string};
+  actual_scenario: Record<string, unknown>;
+  comparisons: Array<{
+    baseline: Record<string, unknown>;
+    alignment: "EXACT" | "AGGREGATED" | "APPROVED_ALLOCATION" | "PARTIAL" | "INCOMPARABLE";
+    rows: Array<{dimension: Record<string, string>; baseline: string; actual: string; variance: string}>;
+  }>;
+  coverage: "ACCEPTED_PLANNING_CELL_FACTS";
+  comparison_authorized: true;
+  business_effect_authorized: false;
+};
+
 export type LearningEvaluation = {
   contract: "learning-evaluation/1";
   candidate_id: string;

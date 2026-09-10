@@ -119,6 +119,61 @@ def test_actual_vs_plan_returns_decimal_variance(monkeypatch):
     assert result["learning_candidate_created"] is False
 
 
+def test_multi_baseline_preserves_each_versioned_comparison(monkeypatch):
+    principal = _principal()
+    baseline_a = UUID("10000000-0000-0000-0000-000000000001")
+    baseline_b = UUID("10000000-0000-0000-0000-000000000002")
+    actual = UUID("20000000-0000-0000-0000-000000000001")
+    base = {
+        "legal_entity_id": str(principal.scope.legal_entity_id),
+        "period_id": "2025-01",
+        "measure": "amount",
+    }
+    scenarios = [
+        {"resource_id": baseline_a, "attributes": {**base, "kind": "BUDGET"}},
+        {"resource_id": baseline_b, "attributes": {**base, "kind": "FORECAST"}},
+        {"resource_id": actual, "attributes": {**base, "kind": "ACTUAL"}},
+    ]
+    cells = [
+        {
+            "resource_id": "pa",
+            "attributes": {
+                **base,
+                "scenario_version_id": str(baseline_a),
+                "amount": "10.10",
+            },
+        },
+        {
+            "resource_id": "pb",
+            "attributes": {
+                **base,
+                "scenario_version_id": str(baseline_b),
+                "amount": "11.10",
+            },
+        },
+        {
+            "resource_id": "a",
+            "attributes": {
+                **base,
+                "scenario_version_id": str(actual),
+                "amount": "12.35",
+            },
+        },
+    ]
+    monkeypatch.setattr(
+        outcomes.planning,
+        "_resources",
+        lambda _p, kind: scenarios if kind == "ScenarioVersion" else cells,
+    )
+    result = outcomes.multi_baseline(principal, actual, (baseline_a, baseline_b))
+    assert result["contract"] == "outcome-multi-baseline/1"
+    assert len(result["comparisons"]) == 2
+    assert result["comparisons"][0]["baseline"]["resource_id"] == baseline_a
+    assert result["comparisons"][0]["rows"][0]["variance"] == "2.25"
+    assert result["comparisons"][1]["rows"][0]["variance"] == "1.25"
+    assert result["business_effect_authorized"] is False
+
+
 def test_learning_evaluation_is_deterministic_shadow_only(monkeypatch):
     principal = _principal()
     plan = UUID("10000000-0000-0000-0000-000000000001")

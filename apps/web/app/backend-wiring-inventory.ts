@@ -158,8 +158,8 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
   routeFamily(
     "outcomes_learning",
     "Outcomes and governed learning",
-    "/api/ontology/outcomes/actual-vs-plan, /api/ontology/outcomes/learning-evaluation, /api/ontology/outcomes/measurements, /api/ontology/outcomes/learning-candidates",
-    "/v1/ontology/outcomes/actual-vs-plan, /v1/ontology/outcomes/learning-evaluation, /v1/ontology/outcomes/measurements, /v1/ontology/outcomes/learning-candidates",
+    "/api/ontology/outcomes/actual-vs-plan, /api/ontology/outcomes/multi-baseline, /api/ontology/outcomes/learning-evaluation, /api/ontology/outcomes/measurements, /api/ontology/outcomes/learning-candidates",
+    "/v1/ontology/outcomes/actual-vs-plan, /v1/ontology/outcomes/multi-baseline, /v1/ontology/outcomes/learning-evaluation, /v1/ontology/outcomes/measurements, /v1/ontology/outcomes/learning-candidates",
     "partial",
     ["services/api/src/finai_api/services/outcomes.py"],
     ["production deployment executor and policy/model mutation"],

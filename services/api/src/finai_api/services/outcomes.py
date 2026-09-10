@@ -103,6 +103,56 @@ def actual_vs_plan(principal, plan_scenario_id: UUID, actual_scenario_id: UUID) 
     }
 
 
+def multi_baseline(
+    principal, actual_scenario_id: UUID, baseline_scenario_ids: tuple[UUID, ...]
+) -> dict[str, Any]:
+    """Compare one validated Actual snapshot with several immutable baselines."""
+
+    require_permission(principal, "ontology_read")
+    if not baseline_scenario_ids or len(baseline_scenario_ids) > 12:
+        raise WorkspaceError(422, "Provide between 1 and 12 baseline snapshots")
+    if actual_scenario_id in baseline_scenario_ids or len(set(baseline_scenario_ids)) != len(
+        baseline_scenario_ids
+    ):
+        raise WorkspaceError(422, "Actual and baseline snapshots must be distinct")
+    comparisons = []
+    for baseline_id in baseline_scenario_ids:
+        measurement = actual_vs_plan(principal, baseline_id, actual_scenario_id)
+        comparisons.append(
+            {
+                "baseline": measurement["plan_scenario"],
+                "alignment": "EXACT",
+                "rows": [
+                    {
+                        "dimension": row["dimension"],
+                        "baseline": row["planned"],
+                        "actual": row["actual"],
+                        "variance": row["variance"],
+                    }
+                    for row in measurement["rows"]
+                ],
+            }
+        )
+    identity_material = {
+        "contract": "outcome-multi-baseline/1",
+        "actual_scenario_id": str(actual_scenario_id),
+        "baseline_scenario_ids": [str(item) for item in baseline_scenario_ids],
+        "comparisons": comparisons,
+        "legal_entity_id": str(principal.scope.legal_entity_id),
+    }
+    return {
+        "contract": "outcome-multi-baseline/1",
+        "measurement_id": "omb_"
+        + sha256(json.dumps(identity_material, sort_keys=True, default=str).encode()).hexdigest(),
+        "scope": {"legal_entity_id": str(principal.scope.legal_entity_id)},
+        "actual_scenario": measurement["actual_scenario"],
+        "comparisons": comparisons,
+        "coverage": "ACCEPTED_PLANNING_CELL_FACTS",
+        "comparison_authorized": True,
+        "business_effect_authorized": False,
+    }
+
+
 def evaluate_learning(
     principal, plan_scenario_id: UUID, actual_scenario_id: UUID, tolerance: str
 ) -> dict[str, Any]:
