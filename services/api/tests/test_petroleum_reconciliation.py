@@ -158,6 +158,22 @@ def test_petroleum_control_requires_independent_checker(monkeypatch):
         raise AssertionError("maker must not approve its own petroleum action")
 
 
+def test_petroleum_control_finds_variance_for_named_legal_entity(monkeypatch):
+    principal = _principal()
+    principal.scope.legal_entity_id = "SOCAR_PETROLEUM_GEORGIA"
+    target = {"variance_id": "petroleum-variance:named-company"}
+    calls = []
+
+    def variances(actor):
+        calls.append(actor)
+        return {"rows": [target]}
+
+    monkeypatch.setattr(petroleum_control.petroleum_reconciliation, "variances", variances)
+
+    assert petroleum_control._find(principal, target["variance_id"]) == target
+    assert calls == [principal]
+
+
 def test_variance_valuation_is_candidate_only_when_product_cost_is_accepted(monkeypatch):
     entity = str(_principal().scope.legal_entity_id)
     rows = {
