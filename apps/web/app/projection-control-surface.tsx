@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import type { ProjectionCatalog, WorkspaceProjectionData, WorkspaceSelection, WorkspaceSelectionResponse } from "@finai/contracts";
 import ProjectionDataRenderer from "./projection-data-renderer";
 
-export default function ProjectionControlSurface({ token, companyId }: { token: string; companyId: string }) {
+export default function ProjectionControlSurface({ token, companyId, initialWorkspace }: { token: string; companyId: string; initialWorkspace?: WorkspaceSelection["workspace"] }) {
   const [catalog, setCatalog] = useState<ProjectionCatalog | null>(null);
-  const [selection, setSelection] = useState<WorkspaceSelection>({ company_id: companyId, workspace: "BRIDGE_FIRST" });
+  const [selection, setSelection] = useState<WorkspaceSelection>({ company_id: companyId, workspace: initialWorkspace ?? "BRIDGE_FIRST" });
   const [validated, setValidated] = useState<WorkspaceSelectionResponse | null>(null);
   const [error, setError] = useState("");
   const [data, setData] = useState<WorkspaceProjectionData | null>(null);
