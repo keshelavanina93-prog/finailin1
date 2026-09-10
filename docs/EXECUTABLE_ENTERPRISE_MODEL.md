@@ -501,6 +501,42 @@ Layer 3  citation-grounded NYX explanation or hypothesis
 NYX receives the retained resolution/result packet and may explain it. It may
 not replace layer 1 or layer 2 with narrative.
 
+### Calculation-graph runtime foundation (implemented)
+
+The first executable runtime foundation is implemented in
+`services/api/src/finai_api/domain/calculation_graph.py`. It is deliberately
+smaller than a spreadsheet engine and safer for governed enterprise facts:
+
+```text
+CalculationNode
+  node_id + function_id + declared dependency node ids + fact coordinate
+        ↓
+CalculationGraph(versioned)
+        ↓
+deterministic topological plan
+        ↓
+dirty downstream closure after changed inputs
+        ↓
+explicit owner-registered Decimal evaluator
+        ↓
+CalculationResult with refusal state and reproducible values
+```
+
+The planner refuses duplicate identities, unknown dependencies, unknown
+changed inputs, and cycles. Incremental planning selects only the changed
+inputs and their downstream dependents, while preserving a deterministic
+topological order. Evaluation accepts callable implementations supplied by a
+trusted domain service; formulas are never deserialized or executed from
+user-provided strings. Existing source values are retained as inputs rather
+than re-evaluated, and computed outputs must be finite `Decimal` values.
+
+This is an executable kernel seam, not a completion claim for the full
+enterprise calculation fabric. It still requires domain function registration,
+durable graph/version persistence, invalidation events, grain/time/authority
+eligibility integration, and production-scale execution before the related
+capability can be marked release-accepted. Focused regression coverage lives
+in `services/api/tests/test_calculation_graph.py`.
+
 ## 10. Persistence and invalidation
 
 The current PostgreSQL resource/version and dependency tables remain the
