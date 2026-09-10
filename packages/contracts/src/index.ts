@@ -70,7 +70,8 @@ export interface IngestReceipt {
     grain?: string;
     source_system?: string;
     validation?: {
-      status: string;
+      status: "VALID" | "REVIEW_REQUIRED" | "REJECTED";
+      grain?: string;
       rows: Array<{source_row: number; status: string; reasons: string[]; promotion_eligible: boolean}>;
       promotion_eligible: false;
       binding_status: "UNRESOLVED";

@@ -191,9 +191,14 @@ def compile_source(request: IngestRequest) -> IngestReceipt:
                 "profile": operational["profile"],
                 "grain": operational["grain"],
                 "validation": {
-                    "status": "REVIEW_REQUIRED"
-                    if any(item["status"] == "REVIEW_REQUIRED" for item in operational_rows)
-                    else "VALID",
+                    "status": (
+                        "REJECTED"
+                        if any(item["status"] == "REJECTED" for item in operational_rows)
+                        else "REVIEW_REQUIRED"
+                        if any(item["status"] == "REVIEW_REQUIRED" for item in operational_rows)
+                        else "VALID"
+                    ),
+                    "grain": operational["grain"],
                     "rows": operational_rows,
                     "promotion_eligible": False,
                     "binding_status": "UNRESOLVED",
