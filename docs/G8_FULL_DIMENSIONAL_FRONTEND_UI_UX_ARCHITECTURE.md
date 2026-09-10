@@ -1990,10 +1990,8 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest implementation head at the time of this snapshot was `d61e74e`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, known telemetry quality/basis states and inferred series-gap review, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, retained outcome timeline, and governed cross-projection card/chart rendering represented in the unified workspaces.
-The previous API CI job failed four tests; three are fixed locally in this head,
-while the database-backed object-set materialization path is still under CI
-verification. Planning now has real catalog/comparison, forecast, liquidity,
+latest implementation head at the time of this snapshot was `7a2e1a5`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, known telemetry quality/basis states and inferred series-gap review, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, retained outcome timeline, and governed cross-projection card/chart rendering represented in the unified workspaces. The projection contract suite now proves every declared card family, chart variant, and full selection round-trip; stable row identity is preserved for chart, timeline, map, and combination interactions.
+The latest GitHub CI runs for this head are pending. Planning now has real catalog/comparison, forecast, liquidity,
 authoring, outcome-measurement and shadow-evaluation UI over accepted canonical
 facts. Operations now includes a petroleum conservation/lineage bridge over
 accepted physical resources, and the unified intake UI now accepts CSV or bounded structured JSON while hydration validates ORPAK and gas telemetry
