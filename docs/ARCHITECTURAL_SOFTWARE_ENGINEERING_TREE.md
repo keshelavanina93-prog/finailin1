@@ -538,3 +538,7 @@ The next backend branch is the durable `petroleum-control/1` workflow in
 request/event store and exposed by the Operations proxy. It records
 investigation, checker decisions and adapter refusal without mutating accounting
 truth.
+
+The reconciliation projection now enforces those replay cutoffs before grouping
+resources, so corrected evidence can be compared without changing the original
+accepted snapshot.

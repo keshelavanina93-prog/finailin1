@@ -861,3 +861,7 @@ The durable petroleum control workflow is now also wired through
 `/v1/operations/petroleum/variances/investigations`: it retains the exact
 variance snapshot, records investigation and independent decisions, and
 refuses execution when no external adapter can provide readback.
+
+Replay requests apply the supplied `valid_at` and `known_at` cutoffs while
+selecting accepted evidence, and control identity is derived from governed
+scope rather than row position.

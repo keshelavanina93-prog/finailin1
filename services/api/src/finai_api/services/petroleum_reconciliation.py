@@ -6,6 +6,7 @@ turns a physical variance into an accounting posting or an external action.
 
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
+from hashlib import sha256
 from itertools import pairwise
 from typing import Any
 from uuid import UUID
@@ -60,7 +61,12 @@ def _quantity(attrs: dict[str, Any], names: tuple[str, ...]) -> Decimal:
     return Decimal(0)
 
 
-def reconcile(principal: Principal, company_id: UUID | None = None) -> dict[str, Any]:
+def reconcile(
+    principal: Principal,
+    company_id: UUID | None = None,
+    valid_at: datetime | None = None,
+    known_at: datetime | None = None,
+) -> dict[str, Any]:
     require_permission(principal, "ontology_read")
     company = str(company_id) if company_id else None
     grouped: dict[tuple[str, ...], dict[str, Any]] = {}
@@ -68,6 +74,8 @@ def reconcile(principal: Principal, company_id: UUID | None = None) -> dict[str,
     for object_type in SOURCE_TYPES:
         for resource in resources.list_resources(principal, object_type, "", 0, limit=1000):
             attrs = resource.attributes
+            if not _in_snapshot(attrs, valid_at, known_at):
+                continue
             if company is not None and not any(
                 str(attrs.get(key)) == company for key in ("legal_entity_id", "company_id")
             ):
@@ -133,6 +141,29 @@ def reconcile(principal: Principal, company_id: UUID | None = None) -> dict[str,
     }
 
 
+def _in_snapshot(
+    attrs: dict[str, Any], valid_at: datetime | None, known_at: datetime | None
+) -> bool:
+    """Exclude evidence first known after the requested replay instant."""
+    if valid_at is not None:
+        raw_valid = attrs.get("valid_at", attrs.get("valid_from"))
+        if raw_valid:
+            try:
+                if datetime.fromisoformat(str(raw_valid)) > valid_at:
+                    return False
+            except (TypeError, ValueError):
+                return False
+    if known_at is not None:
+        raw_known = attrs.get("known_at", attrs.get("recorded_at", attrs.get("system_from")))
+        if raw_known:
+            try:
+                if datetime.fromisoformat(str(raw_known)) > known_at:
+                    return False
+            except (TypeError, ValueError):
+                return False
+    return True
+
+
 def variances(
     principal: Principal,
     company_id: UUID | None = None,
@@ -145,9 +176,9 @@ def variances(
     control and its evidence/authority boundaries, but never creates a GL
     adjustment or executes an operational action.
     """
-    result = reconcile(principal, company_id)
+    result = reconcile(principal, company_id, valid_at, known_at)
     rows: list[dict[str, Any]] = []
-    for index, row in enumerate(result["rows"]):
+    for row in result["rows"]:
         dimensions = row["dimensions"]
         source_ids = list(row.get("source_resource_ids", []))
         missing: list[str] = []
@@ -167,7 +198,9 @@ def variances(
         else:
             lifecycle = "VARIANCE_FLAGGED"
         rows.append({
-            "variance_id": f"petroleum-variance:{index}:{'|'.join(dimensions.values())}",
+            "variance_id": "petroleum-variance:" + sha256(
+                "|".join(f"{key}={value}" for key, value in dimensions.items()).encode()
+            ).hexdigest(),
             "contract": "petroleum-variance/1",
             "dimensions": dimensions,
             "physical": {

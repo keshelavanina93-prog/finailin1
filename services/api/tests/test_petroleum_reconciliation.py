@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from uuid import UUID
 
 from finai_api.services import petroleum_control, petroleum_reconciliation
@@ -82,6 +83,26 @@ def test_variance_is_full_scope_bitemporal_and_partial_bridge(monkeypatch):
     assert row["financial"]["status"] == "FINANCIAL_BRIDGE_PARTIAL"
     assert row["authority"]["accounting_authorized"] is False
     assert row["time"]["replay_as_of"] is None
+
+
+def test_reconcile_replay_excludes_evidence_known_after_cutoff(monkeypatch):
+    entity = str(_principal().scope.legal_entity_id)
+    rows = {
+        "InventoryBalance": [
+            FakeResource(UUID("30000000-0000-0000-0000-000000000010"), {
+                "legal_entity_id": entity, "facility_id": "depot-1", "tank_id": "T-04",
+                "product_id": "diesel", "period_id": "2025-04", "unit": "L",
+                "opening_quantity": "100", "closing_quantity": "100",
+                "known_at": "2025-05-01T00:00:00+00:00",
+            })
+        ], "PhysicalMovement": [], "PhysicalMeasurement": [], "RetailSale": [],
+    }
+    monkeypatch.setattr(petroleum_reconciliation.resources, "list_resources",
+                        lambda _p, kind, _s, _o, limit=1000: rows[kind])
+    result = petroleum_reconciliation.reconcile(
+        _principal(), known_at=datetime(2025, 4, 30, tzinfo=UTC)
+    )
+    assert result["rows"] == []
 
 
 def test_petroleum_control_requires_independent_checker(monkeypatch):
