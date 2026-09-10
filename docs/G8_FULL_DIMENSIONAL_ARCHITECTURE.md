@@ -842,12 +842,12 @@ integrity verification; it has no authority effect.
 
 ### Verification snapshot — 2026-09-10
 
-The latest implementation head at the time of this snapshot was `f6b8e3f` on the converged implementation
+The latest implementation head at the time of this snapshot was `882df05` on the converged implementation
 branches. Frontend lint,
 typecheck, tests and build pass; API Ruff and mypy pass. The focused projection
 suite has 15 passing tests, including complete card-family/chart-variant and
 full-selection round-trip coverage. The latest GitHub CI runs for this head are
-in progress for both pushed review branches. The canonical local supervisor now successfully converges PostgreSQL, MinIO, API, web, Temporal and worker services at the pinned local ports after adopting exact interrupted-process identities. The projection dispatch suite now exercises every registered card family/chart variant (16 focused tests), including the exact retained-image path when comparison context is also present. The accepted ScenarioVersion/PlanningCellFact catalog and
+in progress for both pushed review branches. The canonical local supervisor now successfully converges PostgreSQL, MinIO, API, web, Temporal and worker services at the pinned local ports after adopting exact interrupted-process identities. The local build marker and managed web environment now preserve the fixed local-login surface; the real managed browser renders that login and the proxy accepts the configured credentials, while automated credential-entry proof remains tooling-limited. The projection dispatch suite now exercises every registered card family/chart variant (16 focused tests), including the exact retained-image path when comparison context is also present. The accepted ScenarioVersion/PlanningCellFact catalog and
 deterministic exact-scope scenario comparison are now wired through
 `/v1/ontology/planning` and the frontend Planning workspace; forecast
 calculation, scenario authoring, liquidity projection and outcome measurement
@@ -869,7 +869,7 @@ A citation-first NYX refusal/explanation boundary is now wired at
 NYX model-backed reasoning and proposal/action handoff execution remain open. The latest API coverage result was 83.73% against
 the aligned 84% gate. The protected
 `development/enterprise-hydration-foundation` branch remains separate from the
-pushed review head `f6b8e3f`, so this head is not the canonical merged release.
+pushed review head `882df05`, so this head is not the canonical merged release.
 This is a substantial converged
 slice, not completion of the full architecture.
 
