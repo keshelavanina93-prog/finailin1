@@ -7,6 +7,7 @@ Meter, Tank and company resources.
 
 import json
 import re
+from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
@@ -84,6 +85,8 @@ MOVEMENT_REQUIRED = frozenset(
     }
 )
 UNITS = frozenset({"L", "LITER", "LITERS", "M3", "KG", "TONNE", "TONNES"})
+TELEMETRY_QUALITY = frozenset({"OBSERVED", "CORRECTED", "ESTIMATED", "GOOD", "BAD"})
+UNKNOWN_BASIS = frozenset({"", "UNKNOWN", "UNSPECIFIED", "N/A", "NA"})
 HASH = re.compile(r"^[a-fA-F0-9]{64}$")
 
 
@@ -209,8 +212,13 @@ def validate_row(source_system: str, row: dict[str, str], seen: set[str]) -> dic
                 reasons.append("INVALID_CURRENCY")
         elif source_system.upper() in {"SCADA", "GAS_TELEMETRY"}:
             _decimal(row, "value", reasons)
-            if not row["pressure_basis"].strip() or not row["temperature_basis"].strip():
+            if (
+                row["pressure_basis"].strip().upper() in UNKNOWN_BASIS
+                or row["temperature_basis"].strip().upper() in UNKNOWN_BASIS
+            ):
                 reasons.append("MISSING_MEASUREMENT_BASIS")
+            if row["quality_status"].strip().upper() not in TELEMETRY_QUALITY:
+                reasons.append("UNKNOWN_QUALITY_STATUS")
         elif source_system.upper() in {"RETAIL_CASH_REGISTER", "CASH_REGISTER", "RETAIL_POS"}:
             _decimal(row, "gross_amount", reasons)
             _decimal(row, "net_amount", reasons)
@@ -242,6 +250,7 @@ def validate_series(
     if source_system.upper() not in {"SCADA", "GAS_TELEMETRY"}:
         return
     previous: dict[str, datetime] = {}
+    series: defaultdict[str, list[tuple[datetime, dict[str, Any]]]] = defaultdict(list)
     for row, validation in zip(rows, validations, strict=True):
         if validation["status"] == "REJECTED":
             continue
@@ -254,3 +263,20 @@ def validate_series(
             validation["reasons"] = sorted(set(validation["reasons"]) | {"NON_MONOTONIC_SERIES"})
             validation["status"] = "REVIEW_REQUIRED"
         previous[meter] = timestamp
+        series[meter].append((timestamp, validation))
+    for readings in series.values():
+        ordered = sorted(readings, key=lambda item: item[0])
+        intervals = [
+            (ordered[index][0] - ordered[index - 1][0]).total_seconds()
+            for index in range(1, len(ordered))
+        ]
+        if len(intervals) < 2:
+            continue
+        baseline = sorted(intervals)[len(intervals) // 2]
+        if baseline <= 0:
+            continue
+        for index, interval in enumerate(intervals, start=1):
+            if interval > baseline * 2:
+                target = ordered[index][1]
+                target["reasons"] = sorted(set(target["reasons"]) | {"MEASUREMENT_GAP"})
+                target["status"] = "REVIEW_REQUIRED"

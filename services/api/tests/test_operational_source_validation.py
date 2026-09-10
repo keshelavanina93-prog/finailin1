@@ -98,7 +98,7 @@ def test_duplicate_identity_is_detected_even_when_rows_are_well_formed():
     assert "DUPLICATE_EVENT" in second["reasons"]
 
 
-def test_gas_validation_requires_basis_and_detects_series_order():
+def test_gas_validation_requires_basis_quality_and_detects_series_findings():
     first = _gas()
     second = _gas() | {
         "source_record_id": "READ-2",
@@ -111,6 +111,23 @@ def test_gas_validation_requires_basis_and_detects_series_order():
     validate_series("SCADA", [first, second], validations)
     assert validations[1]["status"] == "REVIEW_REQUIRED"
     assert "NON_MONOTONIC_SERIES" in validations[1]["reasons"]
+    unknown = _gas() | {"quality_status": "INFERRED"}
+    assert "UNKNOWN_QUALITY_STATUS" in validate_row("SCADA", unknown, set())["reasons"]
+
+
+def test_gas_series_marks_inferred_gap_for_review():
+    rows = [
+        _gas(),
+        _gas()
+        | {"source_record_id": "READ-2", "measurement_timestamp": "2026-08-12T10:01:00+04:00"},
+        _gas()
+        | {"source_record_id": "READ-3", "measurement_timestamp": "2026-08-12T10:02:00+04:00"},
+        _gas()
+        | {"source_record_id": "READ-4", "measurement_timestamp": "2026-08-12T10:05:00+04:00"},
+    ]
+    validations = [validate_row("SCADA", row, set()) for row in rows]
+    validate_series("SCADA", rows, validations)
+    assert "MEASUREMENT_GAP" in validations[3]["reasons"]
 
 
 def test_retail_and_movement_profiles_apply_domain_checks():
