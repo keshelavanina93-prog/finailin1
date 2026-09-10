@@ -110,6 +110,101 @@ def test_selection_endpoint_round_trips_full_context_for_synchronization() -> No
     assert {"formatted-table", "chart-line", "image-evidence"} <= eligible_ids
 
 
+def test_every_registered_projection_has_a_typed_read_path(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The catalog must not contain a card family with no API dispatch branch."""
+
+    company_id = "11111111-1111-4111-8111-111111111111"
+    selected_id = "22222222-2222-4222-8222-222222222222"
+    scenario_id = "33333333-3333-4333-8333-333333333333"
+    baseline_id = "44444444-4444-4444-8444-444444444444"
+    version_id = "55555555-5555-4555-8555-555555555555"
+    monkeypatch.setattr(
+        enterprise_diagnostics_routes.planning,
+        "catalog",
+        lambda *_args: {"cells": [{
+            "row_id": "planning:1",
+            "label": "Revenue",
+            "amount": "100.00",
+            "period_id": "2026-09",
+            "attributes": {"scenario_version_id": scenario_id},
+        }]},
+    )
+    monkeypatch.setattr(
+        enterprise_diagnostics_routes.planning,
+        "compare",
+        lambda *_args: {
+            "rows": [{
+                "row_id": "comparison:1",
+                "label": "Revenue variance",
+                "delta": "10.00",
+                "scenario_a": "100.00",
+                "scenario_b": "90.00",
+            }],
+            "coverage": "planning-comparison/1",
+        },
+    )
+    monkeypatch.setattr(
+        enterprise_diagnostics_routes.operations_map,
+        "map_view",
+        lambda *_args, **_kwargs: {"features": [], "contract": "operations-map/1"},
+    )
+    monkeypatch.setattr(
+        enterprise_diagnostics_routes.operations_map,
+        "connections",
+        lambda *_args, **_kwargs: {"edges": [], "contract": "operations-connections/1"},
+    )
+    monkeypatch.setattr(
+        enterprise_diagnostics_routes.nyx_reasoning,
+        "reason",
+        lambda *_args, **_kwargs: {
+            "answer": "The selected evidence is retained and read-only.",
+            "state": "EXPLANATION",
+            "contract": "nyx-reason/1",
+        },
+    )
+    monkeypatch.setattr(
+        enterprise_diagnostics_routes.operator_workbench,
+        "listing",
+        lambda *_args, **_kwargs: {"items": [], "truncated": False},
+    )
+    selection = WorkspaceSelection(
+        selected_object_id=selected_id,
+        company_id=company_id,
+        facility_id="tbilisi-depot",
+        tank_id="T-04",
+        product_id="diesel-en590",
+        station_id="024",
+        period="2026-09",
+        scenario_id=scenario_id,
+        version_id=version_id,
+        comparison_baseline=baseline_id,
+        replay_as_of="2026-09-10T12:00:00Z",
+    )
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        catalog = client.get("/v1/workspace/projections/catalog").json()
+        response_by_id = {}
+        for definition in catalog["projections"]:
+            response = client.post(
+                "/v1/workspace/projections/data",
+                json={
+                    "projection_id": definition["projection_id"],
+                    "selection": selection.model_dump(),
+                },
+            )
+            assert response.status_code == 200, definition["projection_id"]
+            body = response.json()
+            assert body["contract"] == "workspace-projection-data/1"
+            assert body["projection"]["projection_id"] == definition["projection_id"]
+            assert body["authority_effect"] == "NONE"
+            response_by_id[definition["projection_id"]] = body
+    assert set(response_by_id) == {item["projection_id"] for item in catalog["projections"]}
+    assert response_by_id["nyx-context"]["data_state"] == "CONTEXT_ONLY"
+    assert response_by_id["image-evidence"]["data_state"] == "UNAVAILABLE_REQUIRED_CONTEXT"
+    assert response_by_id["action-control"]["data_state"] == "CONTEXT_ONLY"
+
+
 def test_selection_rejects_empty_company_scope() -> None:
     with pytest.raises(ValidationError):
         WorkspaceSelection(company_id="")

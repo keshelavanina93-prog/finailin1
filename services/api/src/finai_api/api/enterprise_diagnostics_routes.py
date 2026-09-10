@@ -486,7 +486,11 @@ def projection_data(
             "authority_effect": "NONE",
         }
 
-    if request.selection.scenario_id and request.selection.comparison_baseline:
+    if (
+        request.projection_id != "image-evidence"
+        and request.selection.scenario_id
+        and request.selection.comparison_baseline
+    ):
         try:
             comparison = planning.compare(
                 principal,
