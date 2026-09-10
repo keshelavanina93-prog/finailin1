@@ -1,3 +1,7 @@
+import os
+import subprocess
+from pathlib import Path
+
 import psycopg
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -54,59 +58,75 @@ from finai_api.services.workspace import WorkspaceError
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8061
+REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
 
-app = FastAPI(
-    title="G8 by NYXCore API",
-    summary="Evidence-native enterprise operating platform",
-    version="0.1.0",
+# Keep the API surface explicit.  This is the single composition registry for
+# every mounted G8 domain; the local supervisor starts the other runtime
+# processes (web, storage, Temporal and worker) around this application.
+API_ROUTERS = (
+    router,
+    account_dimension_policy_router,
+    reporting_router,
+    retained_router,
+    workspace_router,
+    workflow_router,
+    ontology_router,
+    object_set_router,
+    ontology_definition_router,
+    lifecycle_router,
+    local_auth_router,
+    certification_router,
+    retention_router,
+    retained_analysis_router,
+    function_router,
+    metric_router,
+    ontology_import_router,
+    runtime_observation_router,
+    semantic_analysis_router,
+    transformation_router,
+    trial_balance_package_router,
+    event_time_router,
+    finance_ontology_router,
+    enterprise_diagnostics_router,
+    ontology_install_router,
+    history_search_router,
+    operations_router,
+    regulation_router,
+    operator_router,
+    proposal_queue_router,
+    source_document_router,
+    source_exception_router,
+    source_adoption_router,
+    company_context_router,
+    company_condition_router,
+    company_financial_result_router,
+    company_changes_router,
+    company_home_router,
+    company_journal_router,
+    tb_finance_contract_router,
+    tb_finance_router,
+    diagnostic_router,
+    period_control_router,
+    planning_router,
+    outcome_router,
+    ontology_operation_router,
+    nyx_reasoning_router,
 )
-app.include_router(router)
-app.include_router(account_dimension_policy_router)
-app.include_router(reporting_router)
-app.include_router(retained_router)
-app.include_router(workspace_router)
-app.include_router(workflow_router)
-app.include_router(ontology_router)
-app.include_router(object_set_router)
-app.include_router(ontology_definition_router)
-app.include_router(lifecycle_router)
-app.include_router(local_auth_router)
-app.include_router(certification_router)
-app.include_router(retention_router)
-app.include_router(retained_analysis_router)
-app.include_router(function_router)
-app.include_router(metric_router)
-app.include_router(ontology_import_router)
-app.include_router(runtime_observation_router)
-app.include_router(semantic_analysis_router)
-app.include_router(transformation_router)
-app.include_router(trial_balance_package_router)
-app.include_router(event_time_router)
-app.include_router(finance_ontology_router)
-app.include_router(enterprise_diagnostics_router)
-app.include_router(ontology_install_router)
-app.include_router(history_search_router)
-app.include_router(operations_router)
-app.include_router(regulation_router)
-app.include_router(operator_router)
-app.include_router(proposal_queue_router)
-app.include_router(source_document_router)
-app.include_router(source_exception_router)
-app.include_router(source_adoption_router)
-app.include_router(company_context_router)
-app.include_router(company_condition_router)
-app.include_router(company_financial_result_router)
-app.include_router(company_changes_router)
-app.include_router(company_home_router)
-app.include_router(company_journal_router)
-app.include_router(tb_finance_contract_router)
-app.include_router(tb_finance_router)
-app.include_router(diagnostic_router)
-app.include_router(period_control_router)
-app.include_router(planning_router)
-app.include_router(outcome_router)
-app.include_router(ontology_operation_router)
-app.include_router(nyx_reasoning_router)
+
+
+def create_app() -> FastAPI:
+    """Build the complete G8 API application from one router registry."""
+
+    application = FastAPI(
+        title="G8 by NYXCore API",
+        summary="Evidence-native enterprise operating platform",
+        version="0.1.0",
+    )
+    for mounted_router in API_ROUTERS:
+        application.include_router(mounted_router)
+    return application
+
+app = create_app()
 
 
 @app.exception_handler(WorkspaceError)
@@ -144,6 +164,36 @@ async def evidence_store_error(_request: Request, _exc: EvidenceStoreUnavailable
     )
 
 
+def run_local_stack(api_port: int, web_port: int, postgres_bin: str) -> None:
+    """Start the complete local G8 runtime through the canonical supervisor.
+
+    ``main.py`` remains safe for the API supervisor because only the explicit
+    ``--stack`` mode delegates to PowerShell.  The supervisor then launches
+    this module again without ``--stack`` for the API process.
+    """
+
+    if os.name != "nt":
+        raise SystemExit("The local full-stack launcher requires Windows PowerShell 7.")
+    launcher = REPOSITORY_ROOT / "scripts" / "start-nyxcore-local.ps1"
+    if not launcher.is_file():
+        raise SystemExit(f"Local stack launcher is missing: {launcher}")
+    command = [
+        "pwsh",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        str(launcher),
+        "-ApiPort",
+        str(api_port),
+        "-WebPort",
+        str(web_port),
+        "-PostgresBin",
+        postgres_bin,
+    ]
+    subprocess.run(command, cwd=REPOSITORY_ROOT, check=True)
+
+
 def run() -> None:
     """Run this API composition root as a standalone local process.
 
@@ -152,20 +202,36 @@ def run() -> None:
     direct local development, so those paths all execute the same app object.
     """
     import argparse
-    import os
 
     import uvicorn
 
     parser = argparse.ArgumentParser(description="Run the G8 by NYXCore API")
+    parser.add_argument(
+        "--stack",
+        action="store_true",
+        help="Start the complete local G8 stack: PostgreSQL, MinIO, Temporal, worker, API and web",
+    )
     parser.add_argument("--host", default=os.environ.get("FINAI_API_HOST", DEFAULT_HOST))
     parser.add_argument(
         "--port", type=int, default=int(os.environ.get("FINAI_API_PORT", DEFAULT_PORT))
     )
+    parser.add_argument(
+        "--web-port", type=int, default=int(os.environ.get("FINAI_WEB_PORT", 3061))
+    )
+    parser.add_argument(
+        "--postgres-bin",
+        default=os.environ.get("FINAI_POSTGRES_BIN", r"D:\PG18\pgsql\bin"),
+        help="PostgreSQL bin directory used by --stack",
+    )
     args = parser.parse_args()
+    for name, value in (("FINAI_API_PORT", args.port), ("FINAI_WEB_PORT", args.web_port)):
+        if not 1024 <= value <= 65535:
+            raise SystemExit(f"{name} must be between 1024 and 65535, got {value}")
+    if args.stack:
+        run_local_stack(args.port, args.web_port, args.postgres_bin)
+        return
     host = args.host
     port = args.port
-    if not 1024 <= port <= 65535:
-        raise SystemExit(f"FINAI_API_PORT must be between 1024 and 65535, got {port}")
     uvicorn.run(app, host=host, port=port)
 
 

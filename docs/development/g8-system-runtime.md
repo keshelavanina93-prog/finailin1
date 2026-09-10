@@ -8,6 +8,18 @@ From `D:\FinAI\finailinear1`, use PowerShell 7:
 .\scripts\g8-system.ps1 -Action stop -ApiPort 8062 -WebPort 3062
 ```
 
+The Python API composition root exposes the same complete local-development
+entrypoint when a single command is preferred:
+
+```powershell
+.\.venv\Scripts\python.exe -m finai_api.main --stack
+```
+
+Without `--stack`, `python -m finai_api.main` starts only the FastAPI process.
+That API-only mode is intentional: it is the child process launched by this
+supervisor and by the container image. The explicit stack mode prevents the API
+child from recursively starting another copy of the system.
+
 The entry point composes the existing supervisors. It starts the retained native
 PostgreSQL cluster, MinIO, Temporal, API, workflow worker and built web application
 in that order. A running PostgreSQL cluster is reused without provisioning it

@@ -165,6 +165,18 @@ run can also create the desktop shortcut with
 the ignored `.finai\local.json`; they are only accepted when the API runs in
 the local environment.
 
+The same complete stack is also available from the Python composition root:
+
+```powershell
+.\.venv\Scripts\python.exe -m finai_api.main --stack
+```
+
+`python -m finai_api.main` without `--stack` remains the API-only mode used by
+the supervisor and container image. `--stack` is the explicit local-development
+mode; it delegates to the canonical D:-resident supervisor so the web shell,
+worker, Temporal, MinIO and PostgreSQL are started with the same ownership and
+health checks.
+
 The local PostgreSQL cluster binds to `127.0.0.1:55439`, uses SCRAM credentials,
 and stores all data beneath `.finai/data/postgres-native`. Configuration and the
 generated exact-scope access token are in ignored `.finai/local.json`. Use its

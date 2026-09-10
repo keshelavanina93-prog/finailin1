@@ -19,6 +19,10 @@ if ([IO.Path]::GetPathRoot([IO.Path]::GetFullPath($PostgresBin)) -ne 'D:\') {
 function Test-Postgres {
     if (-not (Test-Path -LiteralPath "$PostgresBin\pg_ctl.exe")) { return $false }
     $PSNativeCommandUseErrorActionPreference = $false
+    if (Test-Path -LiteralPath "$PostgresBin\pg_isready.exe") {
+        & "$PostgresBin\pg_isready.exe" -h 127.0.0.1 -p 55439 -t 2 2>$null | Out-Null
+        if ($LASTEXITCODE -eq 0) { return $true }
+    }
     & "$PostgresBin\pg_ctl.exe" status -D $cluster 2>$null | Out-Null
     return $LASTEXITCODE -eq 0
 }
