@@ -1,0 +1,45 @@
+import {restorationInstant} from "./definition-restoration-time";
+
+export type DispositionPin={resource_id:string;version_id:string;content_hash:string};
+export type DispositionScope={companyId:string;requestId:string;invocationId:string;proposalId:string};
+type Blocker={code:string;detail?:string;required_authority?:unknown};
+type Mutation={resource_id:string;object_type:string;attributes:Record<string,unknown>};
+type AttemptRow={coordinate:string;state:string;blockers?:Blocker[];proposal?:{proposal_id:string;mutations:Mutation[]}};
+export type JournalAttempt={contract:"source-journal-production/1";receipt_hash:string;source_sha256:string;source_receipt_hash:string;binding:DispositionPin;request:{request_id:string;company_id:string;invocation_id:string;coordinates:string[]};rows:AttemptRow[]};
+export const dispositionLabels={PUBLISHED:"Published",PENDING_REVIEW:"Awaiting review",REJECTED:"Rejected",BLOCKED:"Blocked",EXCLUDED:"Excluded",UNAVAILABLE:"Unavailable",NOT_SUBMITTED:"Not submitted"} as const;
+export type DispositionItem={coordinate:string;state:keyof typeof dispositionLabels;prepared_state:string;prepared_blockers:Blocker[];blockers:Blocker[];proposal_id:string|null;review:{decision:"APPROVED"|"REJECTED"|null;submitted_by:string|null;reviewed_by:string|null;rationale:string|null;recorded_at:string|null}|null;publication:{journal:DispositionPin;lines:DispositionPin[]}|null};
+export type JournalDispositions={contract:"journal-production-dispositions/1";request_id:string;company_id:string;invocation_id:string;attempt_receipt_hash:string;source_sha256:string;binding:DispositionPin;source_exclusions:Array<{coordinate:string;blockers:Blocker[]}>;selection_count:number;items:DispositionItem[];counts:Partial<Record<DispositionItem["state"],number>>;financial_totals:null;current_use_authorized:false;business_effect_authorized:false;observation_started_at:string;observed_at:string;consistency:"PER_ITEM_READ_OBSERVATION";receipt_hash:string};
+const uuid=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i,hash=/^[a-f0-9]{64}$/;
+const id=(v:unknown):v is string=>typeof v==="string"&&uuid.test(v);
+const digest=(v:unknown):v is string=>typeof v==="string"&&hash.test(v);
+const coordinate=(v:unknown):v is string=>typeof v==="string"&&v.length>0&&v.length<=512;
+const pin=(v:DispositionPin)=>Boolean(v&&id(v.resource_id)&&id(v.version_id)&&digest(v.content_hash));
+export const sameDispositionPin=(a:DispositionPin,b:DispositionPin)=>Boolean(a&&b&&a.resource_id===b.resource_id&&a.version_id===b.version_id&&a.content_hash===b.content_hash);
+const blockers=(v:Blocker[])=>Array.isArray(v)&&v.every(b=>b&&typeof b.code==="string"&&b.code.length>0&&(b.detail===undefined||b.detail===null||typeof b.detail==="string"));
+const fail=(message:string):never=>{throw Error(message);};
+export function assertJournalAttempt(value:unknown,scope:DispositionScope,previous?:JournalAttempt):asserts value is JournalAttempt {
+ const v=value as JournalAttempt;
+ if(!Object.values(scope).every(id)||!v||v.contract!=="source-journal-production/1"||v.request?.request_id!==scope.requestId||v.request.company_id!==scope.companyId||v.request.invocation_id!==scope.invocationId||!digest(v.receipt_hash)||!digest(v.source_sha256)||!digest(v.source_receipt_hash)||!pin(v.binding))fail("Journal attempt does not match the original company, request and source result.");
+ if(!Array.isArray(v.request.coordinates)||v.request.coordinates.length>20||!v.request.coordinates.every(coordinate)||new Set(v.request.coordinates).size!==v.request.coordinates.length||!Array.isArray(v.rows)||v.rows.some(r=>!r||!coordinate(r.coordinate)||typeof r.state!=="string"||!blockers(r.blockers??[]))||new Set(v.rows.map(r=>r.coordinate)).size!==v.rows.length||v.request.coordinates.some(c=>!v.rows.some(r=>r.coordinate===c)))fail("The original source selection is incomplete or ambiguous.");
+ if(!v.rows.some(r=>v.request.coordinates.includes(r.coordinate)&&r.proposal?.proposal_id===scope.proposalId))fail("The selected proposal is not part of this immutable journal request.");
+ for(const row of v.rows){if(!row.proposal)continue;const p=row.proposal;if(!id(p.proposal_id)||!Array.isArray(p.mutations)||p.mutations.some(m=>!m||!id(m.resource_id)||!m.attributes)||new Set(p.mutations.map(m=>m.resource_id)).size!==p.mutations.length)fail("The original proposal references are malformed.");const journals=p.mutations.filter(m=>m.object_type==="JournalEntry"),lines=p.mutations.filter(m=>m.object_type==="JournalLine");if(journals.length!==1||lines.length!==2||journals[0].attributes.legal_entity_id!==scope.companyId||journals[0].attributes.accounting_binding_id!==v.binding.resource_id||lines.some(m=>m.attributes.journal_id!==journals[0].resource_id))fail("The original proposed journal does not retain its company and line membership.");}
+ if(previous&&(previous.receipt_hash!==v.receipt_hash||previous.source_sha256!==v.source_sha256||previous.source_receipt_hash!==v.source_receipt_hash||!sameDispositionPin(previous.binding,v.binding)||JSON.stringify(previous.request.coordinates)!==JSON.stringify(v.request.coordinates)))fail("The immutable attempt or original source selection changed. Reopen the original review explicitly.");
+}
+export function assertJournalDispositions(value:unknown,attempt:JournalAttempt):asserts value is JournalDispositions {
+ const v=value as JournalDispositions,r=attempt.request;
+ if(!v||v.contract!=="journal-production-dispositions/1"||v.company_id!==r.company_id||v.request_id!==r.request_id||v.invocation_id!==r.invocation_id||v.attempt_receipt_hash!==attempt.receipt_hash||v.source_sha256!==attempt.source_sha256||!sameDispositionPin(v.binding,attempt.binding)||!digest(v.receipt_hash)||v.financial_totals!==null||v.current_use_authorized!==false||v.business_effect_authorized!==false||v.consistency!=="PER_ITEM_READ_OBSERVATION")fail("Journal outcomes do not match the immutable request and source evidence.");
+ const start=restorationInstant(v.observation_started_at),end=restorationInstant(v.observed_at);
+ if(!start||!end||start>end)fail("The per-item read observation interval is invalid.");
+ if(!Array.isArray(v.items)||v.selection_count!==r.coordinates.length||v.items.length!==r.coordinates.length||v.items.some((item,index)=>!item||item.coordinate!==r.coordinates[index])||new Set(v.items.map(i=>i.coordinate)).size!==v.items.length)fail("Journal outcomes do not conserve the original coordinate selection.");
+ for(const item of v.items){const row=attempt.rows.find(row=>row.coordinate===item.coordinate)!;if(!Object.hasOwn(dispositionLabels,item.state)||item.prepared_state!==row.state||!blockers(item.blockers)||JSON.stringify(item.prepared_blockers)!==JSON.stringify(row.blockers??[])||item.proposal_id!==(row.proposal?.proposal_id??null))fail("An item outcome lost its original intent or proposal identity.");
+  if(!row.proposal&&(!["BLOCKED","EXCLUDED"].includes(item.state)||item.review!==null))fail("An unproposed source row cannot claim review or publication.");
+  const review=item.review;if(review&&(review.decision!==null&&review.decision!=="APPROVED"&&review.decision!=="REJECTED"||review.recorded_at!==null&&!restorationInstant(review.recorded_at)))fail("The retained review observation is invalid.");
+  if(item.state==="PUBLISHED") {const publication=item.publication,p=row.proposal;if(review?.decision!=="APPROVED"||!publication||!pin(publication.journal)||!p||publication.journal.resource_id!==p.mutations.find(m=>m.object_type==="JournalEntry")?.resource_id||!Array.isArray(publication.lines)||publication.lines.length!==2||publication.lines.some(l=>!pin(l)||!p.mutations.some(m=>m.object_type==="JournalLine"&&m.resource_id===l.resource_id))||new Set(publication.lines.map(l=>l.resource_id)).size!==2)fail("Published status requires the exact approved journal and both published line versions.");}
+  else if(item.publication!==null||review?.decision==="APPROVED"&&item.state!=="UNAVAILABLE")fail("Approval without exact publication must remain unavailable.");
+  if(review?.decision==="REJECTED"&&item.state!=="REJECTED"||review?.decision===null&&item.state!=="PENDING_REVIEW")fail("The observed review decision contradicts the item disposition.");
+  if(item.state==="PENDING_REVIEW"&&(!review||review.decision!==null)||item.state==="REJECTED"&&review?.decision!=="REJECTED"||item.state==="EXCLUDED"&&row.state!=="EXCLUDED")fail("The disposition contradicts its retained review or exclusion.");
+ }
+ const exclusions=attempt.rows.filter(row=>row.state==="EXCLUDED").map(row=>({coordinate:row.coordinate,blockers:row.blockers??[]}));
+ if(JSON.stringify(v.source_exclusions)!==JSON.stringify(exclusions))fail("Original source exclusions changed during the outcome read.");
+ if(!v.counts||Array.isArray(v.counts)||Object.entries(v.counts).some(([state,count])=>!Object.hasOwn(dispositionLabels,state)||!Number.isInteger(count)||count!==v.items.filter(i=>i.state===state).length)||v.items.some(i=>!Object.hasOwn(v.counts,i.state)))fail("Reported state counts do not match the observed items.");
+}

@@ -1,51 +1,78 @@
 "use client";
 
 import {useEffect,useState} from "react";
-import type {CanonicalResource} from "@finai/contracts";
+import type {CompanyFinancialResults} from "@finai/contracts";
 import type {Context} from "./company-workspace";
-import PostedMovementReport,{type PostedFunction} from "./posted-movement-report";
+import PostedMovementReport from "./posted-movement-report";
+import SemanticAnalysisWorkspace from "./semantic-analysis-workspace";
+import {useSourceReview} from "./source-review-navigation";
+import {assertFinanceDiscovery,financeLinkedSelection,type FinanceSelection} from "./finance-discovery-state";
+import {sameMetricPin} from "./metric-observation-state";
 import {Badge,Empty} from "./g8-ui";
+import type {FinanceReportReference} from "./finance-report-reference";
 import "./finance-workspace.css";
 
-import type {FinanceReportReference} from "./finance-report-reference";
+const recorded=(value:string)=>new Intl.DateTimeFormat(undefined,{dateStyle:"medium",timeStyle:"short"}).format(new Date(value));
 
-type ReviewedContext={scope:CanonicalResource|null;binding:CanonicalResource|null;observed:Record<string,string>;posted_movement_functions?:PostedFunction[];candidates:Record<string,CanonicalResource[]>;accounting_eligibility?:{eligible_for_accounting:boolean;reason:string};company_binding?:{accepted:boolean;company:{resource_id:string}|null}};
 type Reference={resource_id:string;version_id:string;known_at?:string};
-export default function FinanceWorkspace({onClearReport,initialReport,token,companyId,context,contextError,onContext,onInspect,onTrace}:{onClearReport:()=>void;initialReport:FinanceReportReference|null;token:string;companyId:string;context:Context|null;contextError:string;onContext:()=>void;onInspect:(reference:Reference)=>void;onTrace:(reference:Reference)=>void}){
-  const sources=context?.company.resource_id===companyId?context.accounting_sources.filter(item=>item.scope.attributes.source_profile==="seg_expense_base"):[];
-  const [choice,setChoice]=useState("");const [loaded,setLoaded]=useState<{key:string;context:ReviewedContext}|null>(null);
-  const [error,setError]=useState("");const [revision,setRevision]=useState(0);
-  const source=sources.find(item=>item.scope.resource_id===(choice||(initialReport?.companyId===companyId?initialReport.scopeId:"")))??(sources.length===1?sources[0]:null);
-  const key=JSON.stringify([companyId,source?.scope.resource_id,source?.scope.version_id,revision]);
-  const accounting=loaded?.key===key?loaded.context:null;
-  useEffect(()=>{
-    if(!source)return;
-    const controller=new AbortController();const scope=source.scope;
-    void fetch(`/api/ontology/source-documents/${encodeURIComponent(String(scope.attributes.document_id))}/accounting-context/inspect`,{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({company_id:companyId,sheet:scope.attributes.worksheet,profile:scope.attributes.source_profile}),signal:controller.signal}).then(async response=>{
-      const data=await response.json();if(!response.ok)throw Error(typeof data.detail==="string"?data.detail:`Reviewed accounting context unavailable (${response.status}).`);
-      if(data.scope?.resource_id!==scope.resource_id||data.scope?.attributes.legal_entity_id!==companyId||data.company_binding?.accepted!==true||data.company_binding?.company?.resource_id!==companyId)throw Error("The reviewed source does not match the selected company. Refresh its accounting context.");
-      if(!controller.signal.aborted){setLoaded({key,context:data});setError("");}
-    }).catch(cause=>{if(!controller.signal.aborted)setError(String(cause));});
-    return()=>controller.abort();
-  },[token,companyId,key,source]);
-  if(!companyId)return <Empty title="Choose a company">Select the company whose reviewed financial sources you want to analyse.</Empty>;
-  if(contextError)return <p role="alert">{contextError}<button onClick={onContext}>Review company context</button></p>;
-  if(!context)return <p role="status">Loading the company’s reviewed reporting context…</p>;
-  if(initialReport&&initialReport.companyId!==companyId)return <Empty title="This report belongs to another company" action="Return to this company’s reports" onAction={onClearReport}>Select its original company to open the retained report. No report values have been shown in this company context.</Empty>;
-  if(!sources.length)return <Empty title="No reviewed account-movement source is connected" action="Review company accounting context" onAction={onContext}>This company has no supported retained source for this report. No substitute company or financial values have been selected.</Empty>;
-  const name=(field:string,type:string)=>accounting?.candidates[type]?.find(item=>item.resource_id===accounting.binding?.attributes[field])?.display_name??"Not established";
-  const binding=accounting?.binding;
-  return <section className="finance-workspace" aria-label="Company finance reports">
-    <header><div><h2>Account movements</h2><p>Reviewed source postings, account breakdown and original evidence.</p></div><button onClick={onContext}>Review accounting context</button></header>
-    <label>Source and observed period<select value={source?.scope.resource_id??""} onChange={event=>{setChoice(event.target.value);onClearReport();setError("");}}><option value="">Choose a retained source</option>{sources.map(item=><option key={item.scope.version_id} value={item.scope.resource_id}>{item.scope.display_name} · {String(item.scope.attributes.worksheet)} · {String(item.scope.attributes.observed_from)}–{String(item.scope.attributes.observed_through)}</option>)}</select></label>
-    {source&&!accounting&&!error&&<p role="status">Checking the source’s reviewed accounting interpretation…</p>}
-    {error&&<p role="alert">{error}<button onClick={()=>{setError("");setRevision(value=>value+1);}}>Retry source context</button></p>}
-    {accounting&&binding&&<>
-      <dl className="finance-report-context"><div><dt>Ledger</dt><dd>{name("ledger_id","Ledger")}</dd></div><div><dt>Book</dt><dd>{name("book_id","AccountingBook")}</dd></div><div><dt>Period</dt><dd>{name("period_id","FiscalPeriod")}</dd></div><div><dt>Currency</dt><dd>{name("currency_id","Currency")}</dd></div></dl>
-      <p><Badge tone={accounting.accounting_eligibility?.eligible_for_accounting?"good":"warning"}>{accounting.accounting_eligibility?.eligible_for_accounting?"Reviewed for guarded use":"Accounting use unavailable"}</Badge> {accounting.accounting_eligibility?.reason}</p>
-      <PostedMovementReport key={`${key}:${binding.version_id}`} initialInvocationId={initialReport?.scopeId===source?.scope.resource_id?initialReport?.invocationId:undefined} token={token} contextKey={`${key}:${binding.version_id}`} currency={name("currency_id","Currency")} functions={accounting.posted_movement_functions??[]} eligible={accounting.accounting_eligibility?.eligible_for_accounting===true} expectedSource={{company_id:companyId,ledger_id:String(binding.attributes.ledger_id),book_id:String(binding.attributes.book_id),period_id:String(binding.attributes.period_id),currency_id:String(binding.attributes.currency_id),document_id:String(source!.scope.attributes.document_id),scope_id:source!.scope.resource_id,binding_id:binding.resource_id,binding_version_id:binding.version_id}} onInspectFunction={onInspect} onTraceFunction={onTrace}/>
-      <details><summary>Reviewed source interpretation</summary><p>{String(binding.attributes.rationale??"No rationale retained")}</p><button onClick={()=>onTrace(binding)}>Show accounting context trace</button></details>
-    </>}
-    {accounting&&!binding&&<p role="status">A reviewed accounting-use decision is required before this source can produce a financial result.</p>}
-  </section>;
+type Page={valid_at?:string;known_at?:string;after_function_id?:string;after_invocation_id?:string;revision:number};
+export default function FinanceWorkspace({active=false,onClearReport,initialReport,token,companyId,context,onContext,onInspect,onTrace}:{active?:boolean;onClearReport:()=>void;initialReport:FinanceReportReference|null;token:string;companyId:string;context:Context|null;contextError:string;onContext:()=>void;onInspect:(reference:Reference)=>void;onTrace:(reference:Reference)=>void}){
+ const openSourceReview=useSourceReview();
+ const [page,setPage]=useState<Page>({revision:0});
+ const [response,setResponse]=useState<{key:string;data:CompanyFinancialResults|null;error:string}|null>(null);
+ const [selection,setSelection]=useState<FinanceSelection|null>(null);
+ const [selectionError,setSelectionError]=useState("");
+ const [capabilityId,setCapabilityId]=useState("");
+ const key=JSON.stringify([companyId,page]);
+ const data=response?.key===key?response.data:null,error=response?.key===key?response.error:"";
+ useEffect(()=>{
+  if(!active||!companyId)return;
+  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),25000);
+  const params=new URLSearchParams({company_id:companyId});
+  for(const field of ["valid_at","known_at","after_function_id","after_invocation_id"] as const){const value=page[field];if(value)params.set(field,value);}
+  void fetch(`/api/ontology/company-financial-results?${params}`,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",signal:controller.signal}).then(async result=>{
+   const value=await result.json();if(!result.ok)throw Error(result.status===401||result.status===403||result.status===404?"Financial results are unavailable in this company and access scope.":typeof value.detail==="string"?value.detail:`Financial discovery unavailable (${result.status}).`);
+   assertFinanceDiscovery(value,companyId,page.valid_at&&page.known_at?{valid_at:page.valid_at,known_at:page.known_at}:undefined);
+   if(!controller.signal.aborted)setResponse({key,data:value,error:""});
+  }).catch(cause=>{if(!controller.signal.aborted)setResponse({key,data:null,error:String(cause)});else if(controller.signal.reason!=="inactive")setResponse({key,data:null,error:"Financial discovery timed out. Retry this company."});}).finally(()=>clearTimeout(timer));
+  return()=>{clearTimeout(timer);controller.abort("inactive");};
+ },[active,token,companyId,key,page]);
+ useEffect(()=>{
+  if(!active)return;let disposed=false;
+  const restore=()=>{if(location.pathname!=="/")return;try{setSelection(financeLinkedSelection(new URL(location.href),companyId,initialReport));setSelectionError("");setCapabilityId(new URL(location.href).searchParams.get("finance_function")??"");}catch(cause){setSelection(null);setSelectionError(String(cause));}};
+  queueMicrotask(()=>{if(!disposed)restore();});window.addEventListener("popstate",restore);
+  return()=>{disposed=true;window.removeEventListener("popstate",restore);};
+ },[active,companyId,initialReport]);
+ function choose(invocationId:string,functionVersion=""){
+  if(!active)return;window.dispatchEvent(new Event("g8:capture-source-review"));
+  const result=data?.results.find(item=>item.invocation_id===invocationId);
+  const url=new URL(location.href);url.searchParams.delete("finance_analysis_view");url.searchParams.delete("finance_result");url.searchParams.delete("finance_function");
+  if(result)url.searchParams.set("finance_result",JSON.stringify({companyId,invocationId,receiptHash:result.receipt_hash}));
+  if(functionVersion)url.searchParams.set("finance_function",functionVersion);
+  history.pushState(history.state,"",url);
+  setSelection(result?{invocationId,receiptHash:result.receipt_hash}:null);setSelectionError("");setCapabilityId(functionVersion);onClearReport();
+ }
+ const retained=data?.results.find(item=>item.invocation_id===selection?.invocationId);
+ const capability=data?.capabilities.find(item=>item.function.version_id===capabilityId);
+ const source=capability?.source_scope?data?.sources.find(item=>sameMetricPin(item.scope,capability.source_scope)):null;
+ const binding=source?.bindings.find(item=>sameMetricPin(item,capability?.accounting_binding));
+ if(!companyId)return <Empty title="Choose a company">Select a company to review its available financial results.</Empty>;
+ if(selectionError)return <Empty title="Retained result reference unavailable" action="Clear invalid result reference" onAction={()=>choose("")}>{selectionError}</Empty>;
+ const name=(id:unknown)=>context?.company.resource_id===companyId?context.ledgers.find(item=>item.currency_id?.resource_id===id)?.currency_id?.display_name??"Declared currency":"Declared currency";
+ return <section className="finance-workspace" aria-label="Company financial results">
+  {error&&<p role="alert">Current financial discovery is unavailable. {error} <button onClick={()=>setPage(p=>({...p,revision:p.revision+1}))}>Retry financial discovery</button><button onClick={onContext}>Review company context</button></p>}
+  {!data&&!error&&<p role="status">Loading current financial results and available calculations...</p>}
+  <header><label>Retained result<select disabled={!data} value={selection?.invocationId??""} onChange={event=>choose(event.target.value)}><option value="">Choose a retained result</option>{selection&&!retained&&<option value={selection.invocationId}>Linked retained result · original context</option>}{data?.results.map(result=><option key={result.invocation_id} value={result.invocation_id}>{result.reopen==="SEMANTIC_ANALYSIS"?"Source movements":"Accepted journal movements"} · {result.source.sheet??"Retained evidence"} · {recorded(result.recorded_at)}</option>)}</select></label><button onClick={onContext}>Accounting context</button></header>
+  {data&&(data.next_function_cursor||data.next_invocation_cursor)&&<div className="finance-pagination"><span>More discovery entries are available. This page is not complete company coverage.</span>{data.next_invocation_cursor&&<button onClick={()=>setPage(p=>({...p,valid_at:data.valid_at,known_at:data.known_at,after_invocation_id:data.next_invocation_cursor!}))}>More retained results</button>}{data.next_function_cursor&&<button onClick={()=>setPage(p=>({...p,valid_at:data.valid_at,known_at:data.known_at,after_function_id:data.next_function_cursor!}))}>More available calculations</button>}</div>}
+  {data&&<details className="finance-capabilities"><summary>Available calculations ({data.capabilities.length}) · reviewed source context</summary>
+   <p>New calculations recheck their exact dependencies. Opening a retained result above never runs a calculation again.</p>
+   {data.capabilities.map(item=><div key={item.function.version_id}><strong>{item.display_name}</strong> <Badge tone={item.state==="DISCOVERED"?"neutral":"warning"}>{item.state==="DISCOVERED"?"Available for guarded review":"Accounting binding blocked"}</Badge><p>{item.reason??(item.required_input==="EXACT_ACCEPTED_MOVEMENTS_INPUT"?"Select exact accepted journal movements in accounting context before running this calculation.":"Uses the reviewed source and accounting binding returned by the canonical catalog.")}</p>{item.required_input==="REVIEWED_SOURCE_CONTEXT"&&<button disabled={item.state!=="DISCOVERED"} onClick={()=>{choose("",item.function.version_id);}}>Review new calculation</button>}{item.required_input==="EXACT_ACCEPTED_MOVEMENTS_INPUT"&&<button onClick={onContext}>Review accepted journal input</button>}<details><summary>Advanced capability reference</summary><pre>{JSON.stringify(item,null,2)}</pre><button onClick={()=>onInspect(item.function)}>Inspect Function definition</button></details></div>)}
+   {!data.capabilities.length&&<p>No supported calculation was found in this catalog page.</p>}
+   {data.unavailable_capabilities.map((item,index)=><p key={index} role="status">Calculation unavailable: {item.reason}</p>)}
+  </details>}
+  {selection&&(retained?.reopen!=="FUNCTION_HISTORY")&&<div className="finance-retained-result"><SemanticAnalysisWorkspace key={selection.invocationId} owner="finance" active={active} expectedReceiptHash={selection.receiptHash} token={token} companyId={companyId} invocationId={selection.invocationId} onInspect={onInspect} onOpenSourceReview={openSourceReview}/></div>}
+  {selection&&retained?.reopen==="FUNCTION_HISTORY"&&<section><h3>Retained accepted journal calculation</h3><p>This calculation has no supported worksheet projection yet. Its original receipt and cutoffs remain available below; no replacement source calculation has been run.</p><details><summary>Advanced · retained calculation reference</summary><pre>{JSON.stringify(retained,null,2)}</pre><button onClick={()=>onInspect({...retained.function,known_at:retained.known_at})}>Inspect retained Function definition</button></details></section>}
+  {!selection&&capability&&source&&binding&&<PostedMovementReport active={active} key={capability.function.version_id} token={token} contextKey={capability.function.version_id} functions={[{...capability.function,display_name:capability.display_name}]} currency={name(binding.attributes.currency_id)} eligible={capability.state==="DISCOVERED"} expectedSource={{company_id:companyId,document_id:capability.document_id!,scope_id:source.scope.resource_id,binding_id:binding.resource_id,binding_version_id:binding.version_id,ledger_id:String(binding.attributes.ledger_id),book_id:String(binding.attributes.book_id),period_id:String(binding.attributes.period_id),currency_id:String(binding.attributes.currency_id)}} onInspectFunction={onInspect} onTraceFunction={onTrace}/>}
+  {data&&!selection&&!capability&&<Empty title={data.results.length?"Choose a retained financial result":"No retained financial result in this page"}>{data.results.length?"Open its worksheet to review rows, filters and original evidence.":"Review the available calculations or connect a supported financial source. No financial values have been substituted."}</Empty>}
+ </section>;
 }

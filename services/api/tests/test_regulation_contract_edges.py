@@ -667,7 +667,7 @@ def test_rule_assessment_distinguishes_temporal_interpretation_and_holder_author
         },
     )
     other = SimpleNamespace(attributes={"legal_entity_id": str(uuid4())})
-    monkeypatch.setattr(routes.resources, "get_resource", lambda *_: {"resource": entity})
+    monkeypatch.setattr(routes, "_company_at", lambda *_: entity)
     listing = Mock(return_value=[matching, other])
     monkeypatch.setattr(routes.resources, "list_resources", listing)
     monkeypatch.setattr(routes.resources, "version_references", lambda *_: refs)
@@ -706,8 +706,8 @@ def test_rule_assessment_distinguishes_temporal_interpretation_and_holder_author
 
 
 def test_rule_assessment_refuses_naive_time_and_noncompany(monkeypatch, operator):
-    read = Mock(return_value={"resource": {"object_type": "Industry"}})
-    monkeypatch.setattr(routes.resources, "get_resource", read)
+    read = Mock(return_value={"object_type": "Industry"})
+    monkeypatch.setattr(routes, "_company_at", read)
     with pytest.raises(WorkspaceError, match="timezone"):
         routes.rules(operator, uuid4(), at=datetime(2026, 9, 8), known_at=NOW)
     read.assert_not_called()

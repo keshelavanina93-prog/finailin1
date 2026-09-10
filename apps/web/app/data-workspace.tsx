@@ -1,11 +1,19 @@
 "use client";
 
 import {useEffect,useId,useRef,useState,type KeyboardEvent,type ReactNode} from "react";
-import {Archive,ClockCounterClockwise,Files,Plus,Function as FunctionIcon,FlowArrow} from "@phosphor-icons/react";
+import {Archive,ClockCounterClockwise,Files,Plus,Function as FunctionIcon,FlowArrow,Database} from "@phosphor-icons/react";
+import {
+ SOURCE_FAMILY_INTAKE_PLANS,
+ classifySourceFamily,
+ missingDimensionsForAnalyst,
+ sourceFamilyIntakeSummary,
+ type SourceFamilyClassification,
+} from "./source-family-intake-model";
 import "./data-workspace.css";
 
-type Section = "history"|"sources"|"documents"|"analyses"|"builds";
+type Section = "families"|"history"|"sources"|"documents"|"analyses"|"builds";
 const sections = [
+ {id:"families",label:"Source families",icon:Database,description:"See which enterprise source families are accepted, partially wired or still blocked."},
  {id:"builds",label:"Builds",icon:FlowArrow,description:"Follow durable evidence builds through node completion and retained named outputs."},
  {id:"analyses",label:"Saved analyses",icon:FunctionIcon,description:"Run a reviewed evidence analysis with exact definitions, source versions and time cutoffs."},
  {id:"history",label:"Resources & history",icon:ClockCounterClockwise,description:"Find recorded company resources, then inspect their exact version, dependencies and evidence."},
@@ -16,9 +24,36 @@ const sections = [
 function restoredSection(key:string):Section {
  try {
   const saved=sessionStorage.getItem(key);
-  if(saved==="history"||saved==="sources"||saved==="documents"||saved==="analyses"||saved==="builds")return saved;
+  if(saved==="families"||saved==="history"||saved==="sources"||saved==="documents"||saved==="analyses"||saved==="builds")return saved;
  } catch {/* Navigation works when session storage is unavailable. */}
- return "history";
+ return "families";
+}
+
+function sourceFamilyClassName(state: SourceFamilyClassification) {
+ return state === "anchored" ? "wired" : state === "partial" ? "partial" : "target";
+}
+
+function sourceFamilyLabel(state: SourceFamilyClassification) {
+ return state === "anchored" ? "Anchored" : state === "partial" ? "Partial" : "Target";
+}
+
+function SourceFamilyMatrix({companyName}:{companyName:string}) {
+ const summary=sourceFamilyIntakeSummary();
+ return <section className="source-family-matrix" aria-label="Source family intake matrix">
+  <header><div><p className="dataws-eyebrow">MASSIVE MULTI-ENTITY INTAKE</p><h3>Source family matrix</h3><p>Read-only convergence map for 1C, ORPAK/POS, gas networks, cash registers and multi-company evidence.</p></div><span>{companyName||"All authorized contexts"} · {summary.families} families · {summary.anchored} anchored · {summary.partial} partial · {summary.targetOnly} target</span></header>
+  <div className="source-family-grid">{SOURCE_FAMILY_INTAKE_PLANS.map(item=>{
+   const state=classifySourceFamily(item);
+   const missing=missingDimensionsForAnalyst(item.id);
+   const destination=item.routes.backendRoutes.length?item.routes.backendRoutes.join(" -> "):"No backend route declared";
+   const routes=item.routes.proxyRoutes.length?item.routes.proxyRoutes.join(" -> "):"No frontend proxy route proved yet";
+   return <article key={item.id} className={`source-family-card ${sourceFamilyClassName(state)}`}>
+    <div><strong>{item.label}</strong><span>{item.systems.join(", ")}</span></div>
+    <mark>{sourceFamilyLabel(state)}</mark>
+    <dl><dt>Measurement grain</dt><dd><code>{item.measurementGrain}</code></dd><dt>Scope</dt><dd>{item.requiredScopeDimensions.join(", ")}</dd><dt>Evidence</dt><dd>{item.requiredEvidence.join(", ")}</dd><dt>Routes</dt><dd>{routes}</dd><dt>Missing</dt><dd>{missing.length?missing.join(", "):"No missing frontend intake dimensions declared"}</dd><dt>Destination</dt><dd>{destination}</dd></dl>
+   </article>;
+  })}</div>
+  <p className="source-family-note">Target means the product architecture requires this dimension, but this checkout does not yet prove a complete frontend/backend/browser-wired journey for it.</p>
+ </section>;
 }
 
 /** Parent keys this workbench by identity and company context. Only a section name is persisted. */
@@ -53,7 +88,7 @@ export default function DataWorkspace({companyName,viewStateKey,history,sources,
   event.preventDefault();select(sections[target].id);tabs.current[target]?.focus();
  }
  const active=sections.find(item=>item.id===section)!;
- const panels={history,sources,documents,analyses:savedAnalyses,builds};
+ const panels={families:<SourceFamilyMatrix companyName={companyName}/>,history,sources,documents,analyses:savedAnalyses,builds};
  const count=typeof observedSourceCount==="number"&&Number.isSafeInteger(observedSourceCount)&&observedSourceCount>=0?observedSourceCount:null;
  return <section className="dataws" aria-label="Data workspace">
   <header className="dataws-header"><div><p className="dataws-eyebrow">DATA WORKSPACE</p><h2>Resources, history & evidence</h2><p>Follow a business resource to the evidence behind it.</p></div><button className="dataws-intake" onClick={onIntake}><Plus size={14} aria-hidden="true"/>Retain a source</button></header>

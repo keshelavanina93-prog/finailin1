@@ -7,7 +7,7 @@ async function forward(request: NextRequest, context: Context) {
   const { path } = await context.params;
   // Fixed upstream host and explicitly allowed routes: never turn this into an arbitrary proxy.
   const route = path.join("/");
-  if (!/^(session|summary|intake|workflows(?:\/[a-zA-Z0-9_-]+(?:\/control)?)?|report-inputs|report-calculations(?:\/[a-zA-Z0-9_-]+(?:\/export)?)?|objects(?:\/[a-zA-Z0-9_:.-]+)?|constructions\/[a-zA-Z0-9_-]+(?:\/(decision|source|export|preview))?)$/.test(route)) {
+  if (!/^(session|summary|intake|workflows(?:\/[a-zA-Z0-9_-]+(?:\/control)?)?|report-inputs|report-calculations(?:\/[a-zA-Z0-9_-]+(?:\/export)?)?|objects(?:\/[a-zA-Z0-9_:.-]+)?|constructions\/[a-zA-Z0-9_-]+(?:\/(decision|source|export|preview))?|diagnostic-targets|diagnostics|executable-preflight|executable-functions|calculation\/compile|projections\/(catalog|selection|data))$/.test(route)) {
     return Response.json({ detail: "Workspace route not found" }, { status: 404 });
   }
   const authorization = request.headers.get("authorization");

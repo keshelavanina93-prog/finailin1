@@ -1,0 +1,381 @@
+{
+  "mode": "SYNTHETIC_STORAGE_REAL_EXECUTE_RETAIN_HISTORY_LOAD_JOURNAL_RECONCILIATION_PROJECTION",
+  "source_sha256": "ab9b2f1d6f6a36227c5b72f237d0bdd0ce1113fe3c908c7d3432c99721ec3901",
+  "projection": {
+    "descriptor": {
+      "contract": "semantic-analysis/2",
+      "invocation_id": "fd118671-96d1-43b5-822e-093d485f22d2",
+      "receipt_hash": "623b0411e249d31bb65c03b0719dde11ab2c738a8214ffdffc7811b70a0b87f7",
+      "run_id": "fcr_adb66eba08cadc170276b275083f135ac9a90fafbb230f1d29bac601184c06fe",
+      "function": {
+        "resource_id": "82182c16-40bd-4753-acdf-44806d560d16",
+        "version_id": "84d67ad1-5aca-4d89-a7ac-dc357be157dc",
+        "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+      },
+      "company": {
+        "resource_id": "270c02ff-e4ae-481e-875e-8c93bc1e2d63",
+        "version_id": "8f3e1e3f-16a6-47ac-b381-906d6ce23a15",
+        "content_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+      },
+      "company_label": "LegalEntity",
+      "title": "Accepted journal movements",
+      "row_noun": "objects",
+      "grain": [
+        "account"
+      ],
+      "partition_keys": [],
+      "fields": [
+        {
+          "key": "account_code",
+          "label": "Account code",
+          "kind": "identifier",
+          "role": "ATTRIBUTE",
+          "unit": null,
+          "unit_reference": null,
+          "definition": {
+            "resource_id": "82182c16-40bd-4753-acdf-44806d560d16",
+            "version_id": "84d67ad1-5aca-4d89-a7ac-dc357be157dc",
+            "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+          },
+          "field_id": null,
+          "semantic_id": null,
+          "filterable": false,
+          "groupable": false,
+          "aggregation": "NONE",
+          "options": []
+        },
+        {
+          "key": "account",
+          "label": "Account",
+          "kind": "reference",
+          "role": "DIMENSION",
+          "unit": null,
+          "unit_reference": null,
+          "definition": {
+            "resource_id": "82182c16-40bd-4753-acdf-44806d560d16",
+            "version_id": "84d67ad1-5aca-4d89-a7ac-dc357be157dc",
+            "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+          },
+          "field_id": null,
+          "semantic_id": null,
+          "filterable": true,
+          "groupable": true,
+          "aggregation": "NONE",
+          "options": [
+            {
+              "state": "VALUE",
+              "value": "2ab74d26-f7cb-47dc-8abf-8b20da84a496",
+              "label": "LocalAccount",
+              "reference": {
+                "resource_id": "2ab74d26-f7cb-47dc-8abf-8b20da84a496",
+                "version_id": "d7d20075-13f1-4240-a246-50603277c6a3",
+                "content_hash": "79c344d3c15a72a8fd9b338fe70287478685d65c37dc4029728870e923288f8e"
+              }
+            },
+            {
+              "state": "VALUE",
+              "value": "a3f44ac6-6147-454d-87b2-2de9576fe3cf",
+              "label": "LocalAccount",
+              "reference": {
+                "resource_id": "a3f44ac6-6147-454d-87b2-2de9576fe3cf",
+                "version_id": "408e6a68-87aa-4ef2-96ea-0aa8c419b7ec",
+                "content_hash": "21c8d514c802cf5e8a41c36b90f84775510da3be326bc09d4d4f892f53cc8a6c"
+              }
+            }
+          ]
+        },
+        {
+          "key": "debit_movement",
+          "label": "Accepted debit movement",
+          "kind": "decimal",
+          "role": "ATTRIBUTE",
+          "unit": "GEL",
+          "unit_reference": {
+            "resource_id": "e3b3be66-ac3d-4573-8623-9d4d5df268b4",
+            "version_id": "6eea1d1c-2d0d-41ac-a25e-874395401d8c",
+            "content_hash": "9875b9ced1e15d8e9f2881aee1c5937d490d4024fb061a57fdc90de517f468d2"
+          },
+          "definition": {
+            "resource_id": "82182c16-40bd-4753-acdf-44806d560d16",
+            "version_id": "84d67ad1-5aca-4d89-a7ac-dc357be157dc",
+            "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+          },
+          "field_id": null,
+          "semantic_id": null,
+          "filterable": false,
+          "groupable": false,
+          "aggregation": "NONE",
+          "options": []
+        },
+        {
+          "key": "credit_movement",
+          "label": "Accepted credit movement",
+          "kind": "decimal",
+          "role": "ATTRIBUTE",
+          "unit": "GEL",
+          "unit_reference": {
+            "resource_id": "e3b3be66-ac3d-4573-8623-9d4d5df268b4",
+            "version_id": "6eea1d1c-2d0d-41ac-a25e-874395401d8c",
+            "content_hash": "9875b9ced1e15d8e9f2881aee1c5937d490d4024fb061a57fdc90de517f468d2"
+          },
+          "definition": {
+            "resource_id": "82182c16-40bd-4753-acdf-44806d560d16",
+            "version_id": "84d67ad1-5aca-4d89-a7ac-dc357be157dc",
+            "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+          },
+          "field_id": null,
+          "semantic_id": null,
+          "filterable": false,
+          "groupable": false,
+          "aggregation": "NONE",
+          "options": []
+        },
+        {
+          "key": "net_movement",
+          "label": "Accepted net movement",
+          "kind": "decimal",
+          "role": "ATTRIBUTE",
+          "unit": "GEL",
+          "unit_reference": {
+            "resource_id": "e3b3be66-ac3d-4573-8623-9d4d5df268b4",
+            "version_id": "6eea1d1c-2d0d-41ac-a25e-874395401d8c",
+            "content_hash": "9875b9ced1e15d8e9f2881aee1c5937d490d4024fb061a57fdc90de517f468d2"
+          },
+          "definition": {
+            "resource_id": "82182c16-40bd-4753-acdf-44806d560d16",
+            "version_id": "84d67ad1-5aca-4d89-a7ac-dc357be157dc",
+            "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+          },
+          "field_id": null,
+          "semantic_id": null,
+          "filterable": false,
+          "groupable": false,
+          "aggregation": "NONE",
+          "options": []
+        }
+      ],
+      "measure": null,
+      "visual": "NONE",
+      "filtering": "RETAINED_GROUP_SELECTION",
+      "grouping": "RETAINED_ROWS_WITHOUT_AGGREGATION",
+      "authority": "Retained accepted journal movements; no current-use authority",
+      "coverage": [
+        {
+          "label": "Matched source coverage",
+          "value": "RECONCILED"
+        },
+        {
+          "label": "Accepted journals",
+          "value": "1"
+        },
+        {
+          "label": "Unmatched source rows",
+          "value": "0"
+        },
+        {
+          "label": "Excluded source rows",
+          "value": "0"
+        },
+        {
+          "label": "Ledger completeness",
+          "value": "UNESTABLISHED"
+        }
+      ],
+      "context": [
+        {
+          "label": "Ledger",
+          "value": "Currency"
+        },
+        {
+          "label": "Book",
+          "value": "Currency"
+        },
+        {
+          "label": "Period",
+          "value": "FiscalPeriod"
+        },
+        {
+          "label": "Currency",
+          "value": "Currency"
+        },
+        {
+          "label": "Journal observed at",
+          "value": "2026-09-08T00:00:00+00:00"
+        }
+      ],
+      "valid_at": "2026-09-08T00:00:00+00:00",
+      "known_at": "2026-09-08T00:00:00+00:00",
+      "recorded_at": "2026-09-08T00:00:00+00:00",
+      "definitions": [
+        {
+          "resource_id": "82182c16-40bd-4753-acdf-44806d560d16",
+          "version_id": "84d67ad1-5aca-4d89-a7ac-dc357be157dc",
+          "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+        },
+        {
+          "resource_id": "e3b3be66-ac3d-4573-8623-9d4d5df268b4",
+          "version_id": "6eea1d1c-2d0d-41ac-a25e-874395401d8c",
+          "content_hash": "9875b9ced1e15d8e9f2881aee1c5937d490d4024fb061a57fdc90de517f468d2"
+        },
+        {
+          "resource_id": "5c84e59f-0d70-41e3-8e71-931154f663c7",
+          "version_id": "af5e486b-0dff-4e83-b3f8-e3c3e94cc934",
+          "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+        },
+        {
+          "resource_id": "06449539-5ee3-4992-85b0-c357ccc840fd",
+          "version_id": "21fb8903-5612-439b-9667-2fd64c720ad8",
+          "content_hash": "175dfbed053790a2ed8e0a13d61f9075430cdf2b117b4eea7a6bf789d284d95f"
+        },
+        {
+          "resource_id": "70163dba-b178-4cf3-b9cb-0710b0ac8794",
+          "version_id": "8a61c11e-0c65-47e8-b573-3127c69e03a9",
+          "content_hash": "a6935ac11329c868f55a0f4811b054379bb90f5441fbcba3df2585b143dc5762"
+        },
+        {
+          "resource_id": "d26bd3bd-6d34-49bd-ae14-21bf3db75882",
+          "version_id": "7209eda7-783a-464f-aadc-3c06b310ab11",
+          "content_hash": "f556876e9c0e5e41a8e533653f3a216fb854485f4bfc725e8482b679493b9afe"
+        },
+        {
+          "resource_id": "18c35a16-a601-4d4c-a637-25c87ded6aaa",
+          "version_id": "a582870b-a600-4a47-90fb-1b818db08132",
+          "content_hash": "91a548545294be78437979fed88af4b151d8f6647dfb38d3f69d3b7a04f13600"
+        },
+        {
+          "resource_id": "95c06a56-b9de-41d4-847f-b1eadfd4cfe2",
+          "version_id": "9c4c340b-9712-4bac-bf1a-3fb6d39ee2b7",
+          "content_hash": "653c901e2a3dc49d21c3927e86d8ab0da36888a9606f3e7ea99b1fee58fdecd7"
+        },
+        {
+          "resource_id": "de4c3e25-b4ce-470a-adcc-af3f2eb3c8ad",
+          "version_id": "c6215058-63c5-4eea-9762-edc023e0cb4c",
+          "content_hash": "cc9c1a1d1f00af8b4acac8873ccd2162a9972d50d710030dee49799df0c1e2d8"
+        }
+      ],
+      "unavailable_operations": [
+        "Values are retained account movements; do not sum company and account hierarchy.",
+        "Opening balances, closing balances, financial statements and certification are unavailable.",
+        "Source and journal observation times are independent; reopening does not refresh either."
+      ],
+      "excluded_evidence": [],
+      "current_use_authorized": false,
+      "business_effect_authorized": false
+    },
+    "descriptor_sha256": "5a5597f27157d3390c838380f8dac96db9b6fbcebfe2e03cd578ec5c4d291538",
+    "rows": [
+      {
+        "key": "row_1b7c587b7f90a259bb5051929cb0cf9603f1af41c0599d8d22d60ec017407c4d",
+        "label": "LocalAccount",
+        "values": {
+          "account_code": {
+            "state": "VALUE",
+            "value": "3110",
+            "label": null,
+            "reference": null
+          },
+          "account": {
+            "state": "VALUE",
+            "value": "2ab74d26-f7cb-47dc-8abf-8b20da84a496",
+            "label": "LocalAccount",
+            "reference": {
+              "resource_id": "2ab74d26-f7cb-47dc-8abf-8b20da84a496",
+              "version_id": "d7d20075-13f1-4240-a246-50603277c6a3",
+              "content_hash": "79c344d3c15a72a8fd9b338fe70287478685d65c37dc4029728870e923288f8e"
+            }
+          },
+          "debit_movement": {
+            "state": "VALUE",
+            "value": "0",
+            "label": null,
+            "reference": null
+          },
+          "credit_movement": {
+            "state": "VALUE",
+            "value": "731.97",
+            "label": null,
+            "reference": null
+          },
+          "net_movement": {
+            "state": "VALUE",
+            "value": "-731.97",
+            "label": null,
+            "reference": null
+          }
+        },
+        "contributor_count": 2,
+        "trace": {
+          "resource_id": "2ab74d26-f7cb-47dc-8abf-8b20da84a496",
+          "version_id": "d7d20075-13f1-4240-a246-50603277c6a3",
+          "content_hash": "79c344d3c15a72a8fd9b338fe70287478685d65c37dc4029728870e923288f8e"
+        }
+      },
+      {
+        "key": "row_fd4acbec45f860ca7a201a6e5a21e94de52d82e4a664eac0ede8173bbae8fdd1",
+        "label": "LocalAccount",
+        "values": {
+          "account_code": {
+            "state": "VALUE",
+            "value": "0012.01",
+            "label": null,
+            "reference": null
+          },
+          "account": {
+            "state": "VALUE",
+            "value": "a3f44ac6-6147-454d-87b2-2de9576fe3cf",
+            "label": "LocalAccount",
+            "reference": {
+              "resource_id": "a3f44ac6-6147-454d-87b2-2de9576fe3cf",
+              "version_id": "408e6a68-87aa-4ef2-96ea-0aa8c419b7ec",
+              "content_hash": "21c8d514c802cf5e8a41c36b90f84775510da3be326bc09d4d4f892f53cc8a6c"
+            }
+          },
+          "debit_movement": {
+            "state": "VALUE",
+            "value": "731.97",
+            "label": null,
+            "reference": null
+          },
+          "credit_movement": {
+            "state": "VALUE",
+            "value": "0",
+            "label": null,
+            "reference": null
+          },
+          "net_movement": {
+            "state": "VALUE",
+            "value": "731.97",
+            "label": null,
+            "reference": null
+          }
+        },
+        "contributor_count": 2,
+        "trace": {
+          "resource_id": "a3f44ac6-6147-454d-87b2-2de9576fe3cf",
+          "version_id": "408e6a68-87aa-4ef2-96ea-0aa8c419b7ec",
+          "content_hash": "21c8d514c802cf5e8a41c36b90f84775510da3be326bc09d4d4f892f53cc8a6c"
+        }
+      }
+    ],
+    "total_rows": 2,
+    "sections": [
+      {
+        "label": "Accepted journal movements",
+        "row_keys": [
+          "row_1b7c587b7f90a259bb5051929cb0cf9603f1af41c0599d8d22d60ec017407c4d",
+          "row_fd4acbec45f860ca7a201a6e5a21e94de52d82e4a664eac0ede8173bbae8fdd1"
+        ]
+      }
+    ],
+    "selection": null,
+    "request": {
+      "invocation_id": "fd118671-96d1-43b5-822e-093d485f22d2",
+      "company_id": "270c02ff-e4ae-481e-875e-8c93bc1e2d63",
+      "descriptor_sha256": null,
+      "filters": [],
+      "group_by": null,
+      "selected_row": null,
+      "contributor_index": 0
+    }
+  }
+}

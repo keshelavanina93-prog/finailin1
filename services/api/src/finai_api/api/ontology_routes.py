@@ -19,6 +19,7 @@ from finai_api.services.enterprise_reference import socar_reference
 from finai_api.services.historical_graph import historical_graph
 from finai_api.services.ingest_binding import context_accounts
 from finai_api.services.ingestion import SourceAuthorityDenied, compile_source
+from finai_api.services.ontology_connections import connections, source_connections
 from finai_api.services.resource_rollback import RollbackRequest, rollback_draft
 from finai_api.services.workspace import WorkspaceError
 
@@ -49,7 +50,13 @@ def reference_proposal(principal: User) -> ProposalDetail:
 @router.get("/graph")
 def graph(principal: User) -> dict[str, Any]:
     nodes = resources.list_resources(principal, None, "", 0, limit=1000)
-    return {"resources": nodes, "bounded": len(nodes) == 1000, "limit": 1000}
+    return {
+        "resources": nodes,
+        "connections": connections(principal, nodes),
+        "source_connections": source_connections(principal),
+        "bounded": len(nodes) == 1000,
+        "limit": 1000,
+    }
 
 
 @router.get("/catalog", response_model=list[CanonicalResource])

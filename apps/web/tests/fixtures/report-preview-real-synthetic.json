@@ -1,0 +1,1001 @@
+{
+  "contract": "retained-report-preview/1",
+  "snapshot": {
+    "contract": "retained-report-snapshot/1",
+    "composition": {
+      "company_id": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+      "valid_at": "2026-09-08T00:00:00Z",
+      "known_at": "2026-09-08T00:00:00Z",
+      "title": "Synthetic retained financial report",
+      "commentary": "Offline storage-only proof; no financial statements or native acceptance.",
+      "sections": [
+        {
+          "section_id": "be10754a-b6ba-455b-a306-6da801916549",
+          "title": "Accepted journal movements",
+          "invocation_id": "2039ab74-765f-4de6-b302-d59a217772a7",
+          "receipt_hash": "319186610b52fd3ee8685f5925e23367a9d1110c2f52fd1cdcdcde08cc900df2",
+          "descriptor_sha256": "a515ee54430916cb09698fe27b31f4cc43d5ff044c13b146d0464ad4d76572e8",
+          "columns": [
+            "account",
+            "debit_movement",
+            "credit_movement",
+            "net_movement"
+          ],
+          "filters": [],
+          "group_by": null
+        }
+      ]
+    },
+    "company": {
+      "resource_id": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+      "version_id": "63fccfb1-1f65-4af3-a575-4869acedd880",
+      "content_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    "company_label": "LegalEntity",
+    "sections": [
+      {
+        "reference": {
+          "section_id": "be10754a-b6ba-455b-a306-6da801916549",
+          "title": "Accepted journal movements",
+          "invocation_id": "2039ab74-765f-4de6-b302-d59a217772a7",
+          "receipt_hash": "319186610b52fd3ee8685f5925e23367a9d1110c2f52fd1cdcdcde08cc900df2",
+          "descriptor_sha256": "a515ee54430916cb09698fe27b31f4cc43d5ff044c13b146d0464ad4d76572e8",
+          "columns": [
+            "account",
+            "debit_movement",
+            "credit_movement",
+            "net_movement"
+          ],
+          "filters": [],
+          "group_by": null
+        },
+        "projection": {
+          "descriptor": {
+            "contract": "semantic-analysis/2",
+            "invocation_id": "2039ab74-765f-4de6-b302-d59a217772a7",
+            "receipt_hash": "319186610b52fd3ee8685f5925e23367a9d1110c2f52fd1cdcdcde08cc900df2",
+            "run_id": "fcr_3edb28fd5018c17aef6b327b5adf3dee45d6de5c7e1023af8b79eda4b125cb83",
+            "function": {
+              "resource_id": "239c004f-88e3-413e-806c-e4b50bdb4d1a",
+              "version_id": "c3bec2c6-ba35-48ac-a075-ea55751d93bb",
+              "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+            },
+            "company": {
+              "resource_id": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "version_id": "63fccfb1-1f65-4af3-a575-4869acedd880",
+              "content_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+            },
+            "company_label": "LegalEntity",
+            "title": "Accepted journal movements",
+            "row_noun": "objects",
+            "grain": [
+              "account"
+            ],
+            "partition_keys": [],
+            "fields": [
+              {
+                "key": "account_code",
+                "label": "Account code",
+                "kind": "identifier",
+                "role": "ATTRIBUTE",
+                "unit": null,
+                "unit_reference": null,
+                "definition": {
+                  "resource_id": "239c004f-88e3-413e-806c-e4b50bdb4d1a",
+                  "version_id": "c3bec2c6-ba35-48ac-a075-ea55751d93bb",
+                  "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+                },
+                "field_id": null,
+                "semantic_id": null,
+                "filterable": false,
+                "groupable": false,
+                "aggregation": "NONE",
+                "options": []
+              },
+              {
+                "key": "account",
+                "label": "Account",
+                "kind": "reference",
+                "role": "DIMENSION",
+                "unit": null,
+                "unit_reference": null,
+                "definition": {
+                  "resource_id": "239c004f-88e3-413e-806c-e4b50bdb4d1a",
+                  "version_id": "c3bec2c6-ba35-48ac-a075-ea55751d93bb",
+                  "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+                },
+                "field_id": null,
+                "semantic_id": null,
+                "filterable": true,
+                "groupable": true,
+                "aggregation": "NONE",
+                "options": [
+                  {
+                    "state": "VALUE",
+                    "value": "80cfca18-0452-4572-942a-e1c5c34faeaf",
+                    "label": "LocalAccount",
+                    "reference": {
+                      "resource_id": "80cfca18-0452-4572-942a-e1c5c34faeaf",
+                      "version_id": "9c10f368-8044-4d18-b87e-d1bb2468476a",
+                      "content_hash": "da8047dd255101b8674401b0000070561d66ca94926c7546cf475c9685dbb6dc"
+                    }
+                  },
+                  {
+                    "state": "VALUE",
+                    "value": "91c24778-3e72-4092-96dd-adb07575b269",
+                    "label": "LocalAccount",
+                    "reference": {
+                      "resource_id": "91c24778-3e72-4092-96dd-adb07575b269",
+                      "version_id": "34c53e96-55ea-4f32-af47-6cd84591f0b2",
+                      "content_hash": "5d5679745632f73ba297dfc632d64a5b34755612e45f9435874f32cf45e631b1"
+                    }
+                  }
+                ]
+              },
+              {
+                "key": "debit_movement",
+                "label": "Accepted debit movement",
+                "kind": "decimal",
+                "role": "ATTRIBUTE",
+                "unit": "GEL",
+                "unit_reference": {
+                  "resource_id": "07e89369-3bde-4173-b8c0-603a24f4783d",
+                  "version_id": "d3863e33-138c-4377-a9a7-40cc2b014f16",
+                  "content_hash": "9875b9ced1e15d8e9f2881aee1c5937d490d4024fb061a57fdc90de517f468d2"
+                },
+                "definition": {
+                  "resource_id": "239c004f-88e3-413e-806c-e4b50bdb4d1a",
+                  "version_id": "c3bec2c6-ba35-48ac-a075-ea55751d93bb",
+                  "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+                },
+                "field_id": null,
+                "semantic_id": null,
+                "filterable": false,
+                "groupable": false,
+                "aggregation": "NONE",
+                "options": []
+              },
+              {
+                "key": "credit_movement",
+                "label": "Accepted credit movement",
+                "kind": "decimal",
+                "role": "ATTRIBUTE",
+                "unit": "GEL",
+                "unit_reference": {
+                  "resource_id": "07e89369-3bde-4173-b8c0-603a24f4783d",
+                  "version_id": "d3863e33-138c-4377-a9a7-40cc2b014f16",
+                  "content_hash": "9875b9ced1e15d8e9f2881aee1c5937d490d4024fb061a57fdc90de517f468d2"
+                },
+                "definition": {
+                  "resource_id": "239c004f-88e3-413e-806c-e4b50bdb4d1a",
+                  "version_id": "c3bec2c6-ba35-48ac-a075-ea55751d93bb",
+                  "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+                },
+                "field_id": null,
+                "semantic_id": null,
+                "filterable": false,
+                "groupable": false,
+                "aggregation": "NONE",
+                "options": []
+              },
+              {
+                "key": "net_movement",
+                "label": "Accepted net movement",
+                "kind": "decimal",
+                "role": "ATTRIBUTE",
+                "unit": "GEL",
+                "unit_reference": {
+                  "resource_id": "07e89369-3bde-4173-b8c0-603a24f4783d",
+                  "version_id": "d3863e33-138c-4377-a9a7-40cc2b014f16",
+                  "content_hash": "9875b9ced1e15d8e9f2881aee1c5937d490d4024fb061a57fdc90de517f468d2"
+                },
+                "definition": {
+                  "resource_id": "239c004f-88e3-413e-806c-e4b50bdb4d1a",
+                  "version_id": "c3bec2c6-ba35-48ac-a075-ea55751d93bb",
+                  "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+                },
+                "field_id": null,
+                "semantic_id": null,
+                "filterable": false,
+                "groupable": false,
+                "aggregation": "NONE",
+                "options": []
+              }
+            ],
+            "measure": null,
+            "visual": "NONE",
+            "filtering": "RETAINED_GROUP_SELECTION",
+            "grouping": "RETAINED_ROWS_WITHOUT_AGGREGATION",
+            "authority": "Retained accepted journal movements; no current-use authority",
+            "coverage": [
+              {
+                "label": "Matched source coverage",
+                "value": "RECONCILED"
+              },
+              {
+                "label": "Accepted journals",
+                "value": "1"
+              },
+              {
+                "label": "Unmatched source rows",
+                "value": "0"
+              },
+              {
+                "label": "Excluded source rows",
+                "value": "0"
+              },
+              {
+                "label": "Ledger completeness",
+                "value": "UNESTABLISHED"
+              }
+            ],
+            "context": [
+              {
+                "label": "Ledger",
+                "value": "Currency"
+              },
+              {
+                "label": "Book",
+                "value": "Currency"
+              },
+              {
+                "label": "Period",
+                "value": "FiscalPeriod"
+              },
+              {
+                "label": "Currency",
+                "value": "Currency"
+              },
+              {
+                "label": "Journal observed at",
+                "value": "2026-09-08T00:00:00+00:00"
+              }
+            ],
+            "valid_at": "2026-09-08T00:00:00+00:00",
+            "known_at": "2026-09-08T00:00:00+00:00",
+            "recorded_at": "2026-09-08T00:00:00+00:00",
+            "definitions": [
+              {
+                "resource_id": "239c004f-88e3-413e-806c-e4b50bdb4d1a",
+                "version_id": "c3bec2c6-ba35-48ac-a075-ea55751d93bb",
+                "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+              },
+              {
+                "resource_id": "07e89369-3bde-4173-b8c0-603a24f4783d",
+                "version_id": "d3863e33-138c-4377-a9a7-40cc2b014f16",
+                "content_hash": "9875b9ced1e15d8e9f2881aee1c5937d490d4024fb061a57fdc90de517f468d2"
+              },
+              {
+                "resource_id": "cd96d595-eeb5-4be1-9da0-b3f42fec1db2",
+                "version_id": "722d9594-1602-478f-af16-b8914a4892c2",
+                "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+              },
+              {
+                "resource_id": "fc4f3ade-1a5f-4f90-8ab7-c63141c7f07d",
+                "version_id": "d29b464a-b780-4699-9daa-48ad7cbeae28",
+                "content_hash": "3a433e67d363a148388f65421f658d13f8d3ef3c65b02f6b72807b77460285ad"
+              },
+              {
+                "resource_id": "722f0d2f-2bbf-41c9-94c4-b324759ffe64",
+                "version_id": "3d4d9a25-67ff-44d6-bf90-0c1823fc4082",
+                "content_hash": "5e628394671b22d38ebc320ddcd40de2247647c3c34845f6b18b281709bd83ea"
+              },
+              {
+                "resource_id": "cc059297-2ee4-4766-a74f-2502dadfc15f",
+                "version_id": "0286de96-15a5-4f53-baee-1f6ca33b4986",
+                "content_hash": "43f9bab873b8d202ad5aadb48a20e7c978325fa99c332ed167166e119911ad66"
+              },
+              {
+                "resource_id": "b0e32377-276f-4fa3-ade8-b625d2d2852a",
+                "version_id": "a7854c24-d835-4b35-a969-641e4d0f269c",
+                "content_hash": "9195eb1d583d69104941e6f69e5d1ab3500e3279682d8dc6132579e2b9ce95c6"
+              },
+              {
+                "resource_id": "fe7bf8e9-82bb-449e-9ead-cb1e424f10a6",
+                "version_id": "87058e61-b38d-4c04-8908-ddee6a00415b",
+                "content_hash": "724d6d3607773e30e20b8d8b611323e3e6dc0c8c0e8b983b9af626e90ff3501c"
+              },
+              {
+                "resource_id": "a1097ec2-177b-4598-b200-ebfda4770c48",
+                "version_id": "d598b010-bdc4-4588-8646-bfc138c2fcfb",
+                "content_hash": "1ba42b9018f4e45aa4a2aaf8e6d6c359940ad16eb7158b33d8a7b3f806404a1d"
+              }
+            ],
+            "unavailable_operations": [
+              "Values are retained account movements; do not sum company and account hierarchy.",
+              "Opening balances, closing balances, financial statements and certification are unavailable.",
+              "Source and journal observation times are independent; reopening does not refresh either."
+            ],
+            "excluded_evidence": [],
+            "current_use_authorized": false,
+            "business_effect_authorized": false
+          },
+          "descriptor_sha256": "a515ee54430916cb09698fe27b31f4cc43d5ff044c13b146d0464ad4d76572e8",
+          "rows": [
+            {
+              "key": "row_424210f03c500614ae7ea9eed88d285f88e492c3196a054f4c276ef6266441e7",
+              "label": "LocalAccount",
+              "values": {
+                "account_code": {
+                  "state": "VALUE",
+                  "value": "3110",
+                  "label": null,
+                  "reference": null
+                },
+                "account": {
+                  "state": "VALUE",
+                  "value": "80cfca18-0452-4572-942a-e1c5c34faeaf",
+                  "label": "LocalAccount",
+                  "reference": {
+                    "resource_id": "80cfca18-0452-4572-942a-e1c5c34faeaf",
+                    "version_id": "9c10f368-8044-4d18-b87e-d1bb2468476a",
+                    "content_hash": "da8047dd255101b8674401b0000070561d66ca94926c7546cf475c9685dbb6dc"
+                  }
+                },
+                "debit_movement": {
+                  "state": "VALUE",
+                  "value": "0",
+                  "label": null,
+                  "reference": null
+                },
+                "credit_movement": {
+                  "state": "VALUE",
+                  "value": "731.97",
+                  "label": null,
+                  "reference": null
+                },
+                "net_movement": {
+                  "state": "VALUE",
+                  "value": "-731.97",
+                  "label": null,
+                  "reference": null
+                }
+              },
+              "contributor_count": 2,
+              "trace": {
+                "resource_id": "80cfca18-0452-4572-942a-e1c5c34faeaf",
+                "version_id": "9c10f368-8044-4d18-b87e-d1bb2468476a",
+                "content_hash": "da8047dd255101b8674401b0000070561d66ca94926c7546cf475c9685dbb6dc"
+              }
+            },
+            {
+              "key": "row_98db64cdf575c77cc11d4e9f2ea841e1ce0625daf187ce5d5788cbe625dc69d9",
+              "label": "LocalAccount",
+              "values": {
+                "account_code": {
+                  "state": "VALUE",
+                  "value": "0012.01",
+                  "label": null,
+                  "reference": null
+                },
+                "account": {
+                  "state": "VALUE",
+                  "value": "91c24778-3e72-4092-96dd-adb07575b269",
+                  "label": "LocalAccount",
+                  "reference": {
+                    "resource_id": "91c24778-3e72-4092-96dd-adb07575b269",
+                    "version_id": "34c53e96-55ea-4f32-af47-6cd84591f0b2",
+                    "content_hash": "5d5679745632f73ba297dfc632d64a5b34755612e45f9435874f32cf45e631b1"
+                  }
+                },
+                "debit_movement": {
+                  "state": "VALUE",
+                  "value": "731.97",
+                  "label": null,
+                  "reference": null
+                },
+                "credit_movement": {
+                  "state": "VALUE",
+                  "value": "0",
+                  "label": null,
+                  "reference": null
+                },
+                "net_movement": {
+                  "state": "VALUE",
+                  "value": "731.97",
+                  "label": null,
+                  "reference": null
+                }
+              },
+              "contributor_count": 2,
+              "trace": {
+                "resource_id": "91c24778-3e72-4092-96dd-adb07575b269",
+                "version_id": "34c53e96-55ea-4f32-af47-6cd84591f0b2",
+                "content_hash": "5d5679745632f73ba297dfc632d64a5b34755612e45f9435874f32cf45e631b1"
+              }
+            }
+          ],
+          "total_rows": 2,
+          "sections": [
+            {
+              "label": "Accepted journal movements",
+              "row_keys": [
+                "row_424210f03c500614ae7ea9eed88d285f88e492c3196a054f4c276ef6266441e7",
+                "row_98db64cdf575c77cc11d4e9f2ea841e1ce0625daf187ce5d5788cbe625dc69d9"
+              ]
+            }
+          ],
+          "selection": null,
+          "request": {
+            "invocation_id": "2039ab74-765f-4de6-b302-d59a217772a7",
+            "company_id": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+            "descriptor_sha256": "a515ee54430916cb09698fe27b31f4cc43d5ff044c13b146d0464ad4d76572e8",
+            "filters": [],
+            "group_by": null,
+            "selected_row": null,
+            "contributor_index": 0
+          }
+        },
+        "contributors": {
+          "row_424210f03c500614ae7ea9eed88d285f88e492c3196a054f4c276ef6266441e7": [
+            {
+              "label": "Base · row 2",
+              "reference": {
+                "resource_id": "cc059297-2ee4-4766-a74f-2502dadfc15f",
+                "version_id": "0286de96-15a5-4f53-baee-1f6ca33b4986",
+                "content_hash": "43f9bab873b8d202ad5aadb48a20e7c978325fa99c332ed167166e119911ad66"
+              },
+              "cells": [
+                {
+                  "label": "Base!A2",
+                  "value": "01.01.2025 0:00:00",
+                  "coordinate": "Base!A2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!C2",
+                  "value": "Recorder SEG001",
+                  "coordinate": "Base!C2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!D2",
+                  "value": "სოკარ ენერჯი ჯორჯია // Сокар Энерджи Джорджия",
+                  "coordinate": "Base!D2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!E2",
+                  "value": "0012.01",
+                  "coordinate": "Base!E2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!L2",
+                  "value": "3110",
+                  "coordinate": "Base!L2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!M2",
+                  "value": "LTD SOCAR Georgia Petroleum",
+                  "coordinate": "Base!M2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!P2",
+                  "value": "USD",
+                  "coordinate": "Base!P2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!AC2",
+                  "value": "Expense",
+                  "coordinate": "Base!AC2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!B2",
+                  "value": "1",
+                  "coordinate": "Base!B2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!J2",
+                  "value": "0",
+                  "coordinate": "Base!J2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!Q2",
+                  "value": "45",
+                  "coordinate": "Base!Q2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!S2",
+                  "value": "731.97",
+                  "coordinate": "Base!S2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!AD2",
+                  "value": "821.6600000000001",
+                  "coordinate": "Base!AD2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!AN2",
+                  "value": "89.69000000000005",
+                  "coordinate": "Base!AN2",
+                  "formula": "AD2-S2"
+                }
+              ],
+              "document_id": "ir_1111111111111111111111111111111111111111111111111111111111111111",
+              "source_sha256": "b277c7b1e1652b6514d1fb33d110b039d66adccb673ff837ab1971b5f187a1f4",
+              "sheet": "Base",
+              "coordinate": "Base!S2"
+            },
+            {
+              "label": "Accepted journal",
+              "reference": {
+                "resource_id": "9ca91e58-72f0-55ae-a98c-11e9816cabdc",
+                "version_id": "19497286-3b03-442d-8971-76388d657cc7",
+                "content_hash": "70b11ad03f3f266b7ea3522ef1dbb36bfaab5a569f04860d4cdc1a93903c08e7"
+              },
+              "cells": [
+                {
+                  "label": "Source coordinate",
+                  "value": "Base!S2",
+                  "coordinate": null,
+                  "formula": null
+                },
+                {
+                  "label": "Journal line",
+                  "value": "SYNTHETIC JournalLine",
+                  "coordinate": null,
+                  "formula": null,
+                  "reference": {
+                    "resource_id": "4d2581ee-35c7-589f-b4b5-3fc391e899ff",
+                    "version_id": "4a8361be-6808-4af3-89e5-9152b6a6aa70",
+                    "content_hash": "8eb2ee3f5a03160c73d1f0882babd45b791e6906c2c7a6bf5ed6af1b6ac33cba"
+                  }
+                },
+                {
+                  "label": "Journal line",
+                  "value": "SYNTHETIC JournalLine",
+                  "coordinate": null,
+                  "formula": null,
+                  "reference": {
+                    "resource_id": "2a9daf90-4662-597e-8e17-7931f3fb4561",
+                    "version_id": "b8b968d7-7f86-4ce5-bb2c-514c755b949a",
+                    "content_hash": "0fac3180a91e4dcebc910a2467bcedf0227722233e7c00b4baa32a84df7b6c51"
+                  }
+                },
+                {
+                  "label": "Dimension policy",
+                  "value": "SYNTHETIC AccountDimensionPolicy",
+                  "coordinate": null,
+                  "formula": null,
+                  "reference": {
+                    "resource_id": "e8db87c8-c17a-416f-b76d-1de0afe91a88",
+                    "version_id": "fa1e1f44-aebc-4113-aa14-c586bba18692",
+                    "content_hash": "507564a3a83f7ff74dd5b47caf26329126d7a4210fea16397749164d1f3e347e"
+                  }
+                },
+                {
+                  "label": "Dimension policy",
+                  "value": "SYNTHETIC AccountDimensionPolicy",
+                  "coordinate": null,
+                  "formula": null,
+                  "reference": {
+                    "resource_id": "a0ea1a2f-024a-41b0-a77a-35c916c0ca80",
+                    "version_id": "81e2ad3b-46db-4599-881f-319136a293ff",
+                    "content_hash": "fa3462ed1d9f271a497a9926d740b8277ffe60231c84903054abecd980fdf296"
+                  }
+                }
+              ],
+              "document_id": null,
+              "source_sha256": null,
+              "sheet": null,
+              "coordinate": null,
+              "basis": "CANONICAL_DEFINITION"
+            }
+          ],
+          "row_98db64cdf575c77cc11d4e9f2ea841e1ce0625daf187ce5d5788cbe625dc69d9": [
+            {
+              "label": "Base · row 2",
+              "reference": {
+                "resource_id": "cc059297-2ee4-4766-a74f-2502dadfc15f",
+                "version_id": "0286de96-15a5-4f53-baee-1f6ca33b4986",
+                "content_hash": "43f9bab873b8d202ad5aadb48a20e7c978325fa99c332ed167166e119911ad66"
+              },
+              "cells": [
+                {
+                  "label": "Base!A2",
+                  "value": "01.01.2025 0:00:00",
+                  "coordinate": "Base!A2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!C2",
+                  "value": "Recorder SEG001",
+                  "coordinate": "Base!C2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!D2",
+                  "value": "სოკარ ენერჯი ჯორჯია // Сокар Энерджи Джорджия",
+                  "coordinate": "Base!D2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!E2",
+                  "value": "0012.01",
+                  "coordinate": "Base!E2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!L2",
+                  "value": "3110",
+                  "coordinate": "Base!L2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!M2",
+                  "value": "LTD SOCAR Georgia Petroleum",
+                  "coordinate": "Base!M2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!P2",
+                  "value": "USD",
+                  "coordinate": "Base!P2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!AC2",
+                  "value": "Expense",
+                  "coordinate": "Base!AC2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!B2",
+                  "value": "1",
+                  "coordinate": "Base!B2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!J2",
+                  "value": "0",
+                  "coordinate": "Base!J2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!Q2",
+                  "value": "45",
+                  "coordinate": "Base!Q2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!S2",
+                  "value": "731.97",
+                  "coordinate": "Base!S2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!AD2",
+                  "value": "821.6600000000001",
+                  "coordinate": "Base!AD2",
+                  "formula": null
+                },
+                {
+                  "label": "Base!AN2",
+                  "value": "89.69000000000005",
+                  "coordinate": "Base!AN2",
+                  "formula": "AD2-S2"
+                }
+              ],
+              "document_id": "ir_1111111111111111111111111111111111111111111111111111111111111111",
+              "source_sha256": "b277c7b1e1652b6514d1fb33d110b039d66adccb673ff837ab1971b5f187a1f4",
+              "sheet": "Base",
+              "coordinate": "Base!S2"
+            },
+            {
+              "label": "Accepted journal",
+              "reference": {
+                "resource_id": "9ca91e58-72f0-55ae-a98c-11e9816cabdc",
+                "version_id": "19497286-3b03-442d-8971-76388d657cc7",
+                "content_hash": "70b11ad03f3f266b7ea3522ef1dbb36bfaab5a569f04860d4cdc1a93903c08e7"
+              },
+              "cells": [
+                {
+                  "label": "Source coordinate",
+                  "value": "Base!S2",
+                  "coordinate": null,
+                  "formula": null
+                },
+                {
+                  "label": "Journal line",
+                  "value": "SYNTHETIC JournalLine",
+                  "coordinate": null,
+                  "formula": null,
+                  "reference": {
+                    "resource_id": "4d2581ee-35c7-589f-b4b5-3fc391e899ff",
+                    "version_id": "4a8361be-6808-4af3-89e5-9152b6a6aa70",
+                    "content_hash": "8eb2ee3f5a03160c73d1f0882babd45b791e6906c2c7a6bf5ed6af1b6ac33cba"
+                  }
+                },
+                {
+                  "label": "Journal line",
+                  "value": "SYNTHETIC JournalLine",
+                  "coordinate": null,
+                  "formula": null,
+                  "reference": {
+                    "resource_id": "2a9daf90-4662-597e-8e17-7931f3fb4561",
+                    "version_id": "b8b968d7-7f86-4ce5-bb2c-514c755b949a",
+                    "content_hash": "0fac3180a91e4dcebc910a2467bcedf0227722233e7c00b4baa32a84df7b6c51"
+                  }
+                },
+                {
+                  "label": "Dimension policy",
+                  "value": "SYNTHETIC AccountDimensionPolicy",
+                  "coordinate": null,
+                  "formula": null,
+                  "reference": {
+                    "resource_id": "e8db87c8-c17a-416f-b76d-1de0afe91a88",
+                    "version_id": "fa1e1f44-aebc-4113-aa14-c586bba18692",
+                    "content_hash": "507564a3a83f7ff74dd5b47caf26329126d7a4210fea16397749164d1f3e347e"
+                  }
+                },
+                {
+                  "label": "Dimension policy",
+                  "value": "SYNTHETIC AccountDimensionPolicy",
+                  "coordinate": null,
+                  "formula": null,
+                  "reference": {
+                    "resource_id": "a0ea1a2f-024a-41b0-a77a-35c916c0ca80",
+                    "version_id": "81e2ad3b-46db-4599-881f-319136a293ff",
+                    "content_hash": "fa3462ed1d9f271a497a9926d740b8277ffe60231c84903054abecd980fdf296"
+                  }
+                }
+              ],
+              "document_id": null,
+              "source_sha256": null,
+              "sheet": null,
+              "coordinate": null,
+              "basis": "CANONICAL_DEFINITION"
+            }
+          ]
+        },
+        "authority_observation": {
+          "roots": [
+            {
+              "resource_id": "07e89369-3bde-4173-b8c0-603a24f4783d",
+              "version_id": "d3863e33-138c-4377-a9a7-40cc2b014f16",
+              "content_hash": "9875b9ced1e15d8e9f2881aee1c5937d490d4024fb061a57fdc90de517f468d2"
+            },
+            {
+              "resource_id": "239c004f-88e3-413e-806c-e4b50bdb4d1a",
+              "version_id": "c3bec2c6-ba35-48ac-a075-ea55751d93bb",
+              "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+            },
+            {
+              "resource_id": "26a5f2a2-0cf0-4ee5-83e9-ad803e5c7a93",
+              "version_id": "10b24719-9f81-4b28-b19f-2ca6d4dc0d82",
+              "content_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+            },
+            {
+              "resource_id": "2a9daf90-4662-597e-8e17-7931f3fb4561",
+              "version_id": "b8b968d7-7f86-4ce5-bb2c-514c755b949a",
+              "content_hash": "0fac3180a91e4dcebc910a2467bcedf0227722233e7c00b4baa32a84df7b6c51"
+            },
+            {
+              "resource_id": "4d2581ee-35c7-589f-b4b5-3fc391e899ff",
+              "version_id": "4a8361be-6808-4af3-89e5-9152b6a6aa70",
+              "content_hash": "8eb2ee3f5a03160c73d1f0882babd45b791e6906c2c7a6bf5ed6af1b6ac33cba"
+            },
+            {
+              "resource_id": "722f0d2f-2bbf-41c9-94c4-b324759ffe64",
+              "version_id": "3d4d9a25-67ff-44d6-bf90-0c1823fc4082",
+              "content_hash": "5e628394671b22d38ebc320ddcd40de2247647c3c34845f6b18b281709bd83ea"
+            },
+            {
+              "resource_id": "80cfca18-0452-4572-942a-e1c5c34faeaf",
+              "version_id": "9c10f368-8044-4d18-b87e-d1bb2468476a",
+              "content_hash": "da8047dd255101b8674401b0000070561d66ca94926c7546cf475c9685dbb6dc"
+            },
+            {
+              "resource_id": "91c24778-3e72-4092-96dd-adb07575b269",
+              "version_id": "34c53e96-55ea-4f32-af47-6cd84591f0b2",
+              "content_hash": "5d5679745632f73ba297dfc632d64a5b34755612e45f9435874f32cf45e631b1"
+            },
+            {
+              "resource_id": "9ca91e58-72f0-55ae-a98c-11e9816cabdc",
+              "version_id": "19497286-3b03-442d-8971-76388d657cc7",
+              "content_hash": "70b11ad03f3f266b7ea3522ef1dbb36bfaab5a569f04860d4cdc1a93903c08e7"
+            },
+            {
+              "resource_id": "a0ea1a2f-024a-41b0-a77a-35c916c0ca80",
+              "version_id": "81e2ad3b-46db-4599-881f-319136a293ff",
+              "content_hash": "fa3462ed1d9f271a497a9926d740b8277ffe60231c84903054abecd980fdf296"
+            },
+            {
+              "resource_id": "a1097ec2-177b-4598-b200-ebfda4770c48",
+              "version_id": "d598b010-bdc4-4588-8646-bfc138c2fcfb",
+              "content_hash": "1ba42b9018f4e45aa4a2aaf8e6d6c359940ad16eb7158b33d8a7b3f806404a1d"
+            },
+            {
+              "resource_id": "b0e32377-276f-4fa3-ade8-b625d2d2852a",
+              "version_id": "a7854c24-d835-4b35-a969-641e4d0f269c",
+              "content_hash": "9195eb1d583d69104941e6f69e5d1ab3500e3279682d8dc6132579e2b9ce95c6"
+            },
+            {
+              "resource_id": "cc059297-2ee4-4766-a74f-2502dadfc15f",
+              "version_id": "0286de96-15a5-4f53-baee-1f6ca33b4986",
+              "content_hash": "43f9bab873b8d202ad5aadb48a20e7c978325fa99c332ed167166e119911ad66"
+            },
+            {
+              "resource_id": "cd96d595-eeb5-4be1-9da0-b3f42fec1db2",
+              "version_id": "722d9594-1602-478f-af16-b8914a4892c2",
+              "content_hash": "a03d17a93ef19470ceb65db93892a86b2e0f9c0fc1edcc5a4aa081222b9bfbd5"
+            },
+            {
+              "resource_id": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "version_id": "63fccfb1-1f65-4af3-a575-4869acedd880",
+              "content_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+            },
+            {
+              "resource_id": "e8db87c8-c17a-416f-b76d-1de0afe91a88",
+              "version_id": "fa1e1f44-aebc-4113-aa14-c586bba18692",
+              "content_hash": "507564a3a83f7ff74dd5b47caf26329126d7a4210fea16397749164d1f3e347e"
+            },
+            {
+              "resource_id": "fc4f3ade-1a5f-4f90-8ab7-c63141c7f07d",
+              "version_id": "d29b464a-b780-4699-9daa-48ad7cbeae28",
+              "content_hash": "3a433e67d363a148388f65421f658d13f8d3ef3c65b02f6b72807b77460285ad"
+            },
+            {
+              "resource_id": "fe7bf8e9-82bb-449e-9ead-cb1e424f10a6",
+              "version_id": "87058e61-b38d-4c04-8908-ddee6a00415b",
+              "content_hash": "724d6d3607773e30e20b8d8b611323e3e6dc0c8c0e8b983b9af626e90ff3501c"
+            }
+          ],
+          "upstream": [
+            {
+              "resource_id": "03f3e612-e17d-4892-889e-824a704ab7e7",
+              "version_id": "fdd70e48-f113-4256-9495-ad529bdec153",
+              "content_hash": "e80e3d9331224fa306c26ec3f85a857651059469cc413edc10f68219335ad888",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "838144d1-52a8-52c6-8ed7-92cf1623ab4c",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "07e89369-3bde-4173-b8c0-603a24f4783d",
+              "version_id": "d3863e33-138c-4377-a9a7-40cc2b014f16",
+              "content_hash": "9875b9ced1e15d8e9f2881aee1c5937d490d4024fb061a57fdc90de517f468d2",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "be2df391-c117-50c5-8b0a-374604340d4c",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "26a5f2a2-0cf0-4ee5-83e9-ad803e5c7a93",
+              "version_id": "10b24719-9f81-4b28-b19f-2ca6d4dc0d82",
+              "content_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "aada423f-e0d6-5888-806d-404cbca20515",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "379fae5d-b711-48d9-b820-1cad3d7d402d",
+              "version_id": "a5ab447f-e682-412c-bc1c-4915d56111ef",
+              "content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "9a73d234-1aef-59f6-bc36-a72c49579f7a",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "722f0d2f-2bbf-41c9-94c4-b324759ffe64",
+              "version_id": "3d4d9a25-67ff-44d6-bf90-0c1823fc4082",
+              "content_hash": "5e628394671b22d38ebc320ddcd40de2247647c3c34845f6b18b281709bd83ea",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "73f5d7a0-bd45-5d68-b336-b330f150c15c",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "80cfca18-0452-4572-942a-e1c5c34faeaf",
+              "version_id": "9c10f368-8044-4d18-b87e-d1bb2468476a",
+              "content_hash": "da8047dd255101b8674401b0000070561d66ca94926c7546cf475c9685dbb6dc",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "aba730cb-dc64-59ca-afa5-8efebace4df5",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "91c24778-3e72-4092-96dd-adb07575b269",
+              "version_id": "34c53e96-55ea-4f32-af47-6cd84591f0b2",
+              "content_hash": "5d5679745632f73ba297dfc632d64a5b34755612e45f9435874f32cf45e631b1",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "2616c8ed-a29a-5665-ae17-847a856baede",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "9ca91e58-72f0-55ae-a98c-11e9816cabdc",
+              "version_id": "19497286-3b03-442d-8971-76388d657cc7",
+              "content_hash": "70b11ad03f3f266b7ea3522ef1dbb36bfaab5a569f04860d4cdc1a93903c08e7",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "f60868ad-c043-51af-8d49-c8f504f6ed0a",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "a0ea1a2f-024a-41b0-a77a-35c916c0ca80",
+              "version_id": "81e2ad3b-46db-4599-881f-319136a293ff",
+              "content_hash": "fa3462ed1d9f271a497a9926d740b8277ffe60231c84903054abecd980fdf296",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "21e635e0-74cc-5aed-8dbb-3476635aac1e",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "a1097ec2-177b-4598-b200-ebfda4770c48",
+              "version_id": "d598b010-bdc4-4588-8646-bfc138c2fcfb",
+              "content_hash": "1ba42b9018f4e45aa4a2aaf8e6d6c359940ad16eb7158b33d8a7b3f806404a1d",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "0a37afd7-c8d5-542e-9908-0eb76db2d35f",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "a9e0f84c-a339-413f-a247-f8792599949f",
+              "version_id": "1da3f53a-b475-4c62-a0a8-bc3fd9c0a7f0",
+              "content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "935208a5-d517-5724-a29d-3db10e1490a6",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "b0e32377-276f-4fa3-ade8-b625d2d2852a",
+              "version_id": "a7854c24-d835-4b35-a969-641e4d0f269c",
+              "content_hash": "9195eb1d583d69104941e6f69e5d1ab3500e3279682d8dc6132579e2b9ce95c6",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "d2f2e729-2e26-5026-b5c7-b837f94d7dc2",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "cc059297-2ee4-4766-a74f-2502dadfc15f",
+              "version_id": "0286de96-15a5-4f53-baee-1f6ca33b4986",
+              "content_hash": "43f9bab873b8d202ad5aadb48a20e7c978325fa99c332ed167166e119911ad66",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "e560c4d2-a9cd-5740-8a11-e8c49cdf94ff",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "version_id": "63fccfb1-1f65-4af3-a575-4869acedd880",
+              "content_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "904d3e48-d5a0-5e2a-b25c-8c9829909b95",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "e8db87c8-c17a-416f-b76d-1de0afe91a88",
+              "version_id": "fa1e1f44-aebc-4113-aa14-c586bba18692",
+              "content_hash": "507564a3a83f7ff74dd5b47caf26329126d7a4210fea16397749164d1f3e347e",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "6878311b-0267-5718-8aa1-79b945f2553f",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "fc4f3ade-1a5f-4f90-8ab7-c63141c7f07d",
+              "version_id": "d29b464a-b780-4699-9daa-48ad7cbeae28",
+              "content_hash": "3a433e67d363a148388f65421f658d13f8d3ef3c65b02f6b72807b77460285ad",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "ec8a2cee-76e3-5ad8-9c9e-a4d556473a2b",
+              "lineage_use": "ACTIVE"
+            },
+            {
+              "resource_id": "fe7bf8e9-82bb-449e-9ead-cb1e424f10a6",
+              "version_id": "87058e61-b38d-4c04-8908-ddee6a00415b",
+              "content_hash": "724d6d3607773e30e20b8d8b611323e3e6dc0c8c0e8b983b9af626e90ff3501c",
+              "access_entity": "e6fc9ace-d385-4dfd-9940-601deccae52d",
+              "event_id": "2c231c42-f447-5af8-bc59-f490037bbece",
+              "lineage_use": "ACTIVE"
+            }
+          ]
+        },
+        "current_use_authorized": false,
+        "business_effect_authorized": false
+      }
+    ],
+    "current_use_authorized": false,
+    "business_effect_authorized": false
+  },
+  "snapshot_sha256": "b9e4c2d7b38226edaac79bcbbca227dee0ad16232bf0767db3f6d7d37a6e5bf0"
+}

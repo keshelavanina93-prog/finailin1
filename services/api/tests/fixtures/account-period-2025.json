@@ -1,0 +1,24 @@
+{
+  "contract": "account-period-fixture/1",
+  "fixture_id": "SANITIZED-2025-MULTI-PERIOD",
+  "authority": "TEST_ONLY",
+  "source_family": "1C_ACCOUNT_PERIOD",
+  "periods": [
+    {"period": "2025-01", "opening": "100.00", "turnover": "10.00", "closing": "110.00"},
+    {"period": "2025-02", "opening": "110.00", "turnover": "20.00", "closing": "130.00"},
+    {"period": "2025-03", "opening": "130.00", "turnover": "30.00", "closing": "160.00"},
+    {"period": "2025-04", "opening": "160.00", "turnover": "40.00", "closing": "200.00"},
+    {"period": "2025-05", "opening": "200.00", "turnover": "50.00", "closing": "250.00"},
+    {"period": "2025-06", "opening": "250.00", "turnover": "60.00", "closing": "310.00"},
+    {"period": "2025-07", "opening": "310.00", "turnover": "70.00", "closing": "380.00"},
+    {"period": "2025-08", "opening": "380.00", "turnover": "80.00", "closing": "460.00"},
+    {"period": "2025-09", "opening": "460.00", "turnover": "90.00", "closing": "550.00"},
+    {"period": "2025-10", "opening": "550.00", "turnover": "100.00", "closing": "650.00"},
+    {"period": "2025-11", "opening": "650.00", "turnover": "110.00", "closing": "760.00"},
+    {"period": "2025-12", "opening": "760.00", "turnover": "120.00", "closing": "880.00"}
+  ],
+  "rows": [
+    {"source_row": 7, "account_code": "6110", "subkonto": ""},
+    {"source_row": 8, "account_code": "9999", "subkonto": "Unconfigured analytic"}
+  ]
+}

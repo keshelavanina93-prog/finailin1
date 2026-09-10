@@ -4,12 +4,12 @@ import { useState } from "react";
 import type { IngestReceipt, Principal, ReceiptDetail } from "@finai/contracts";
 import SourceInspection from "./source-inspection";
 
-type Props = { detail: ReceiptDetail; principal: Principal; onClose: () => void; onExport: (format: "source" | "export") => void };
+type Props = { detail: ReceiptDetail; token: string; principal: Principal; onClose: () => void; onExport: (format: "source" | "export") => void };
 type Row = IngestReceipt["candidates"][number];
 const amount = (value?: string) => !value ? "—" : Number.isFinite(Number(value)) ? Number(value).toLocaleString("en-US", { maximumFractionDigits: 6 }) : value;
 const rowName = (row: Row) => row.values.analytic_label || row.values.source_account_name || row.values.cell_D || "Unlabelled source row";
 
-export default function TrialBalanceReview({ detail, principal, onClose, onExport }: Props) {
+export default function TrialBalanceReview({ detail, token, principal, onClose, onExport }: Props) {
   const { receipt } = detail;
   const [tab, setTab] = useState("data");
   const [kind, setKind] = useState("accounts");
@@ -32,7 +32,7 @@ export default function TrialBalanceReview({ detail, principal, onClose, onExpor
       {selected && <aside className="tb-inspector" aria-label="Source row details"><button className="quiet" onClick={() => setSelected(null)}>Close details ×</button><h3>{selected.values.source_account_code || "Source row"}</h3><p>{rowName(selected)}</p><p className="tb-caption">{selected.values.source_sheet} · Row {selected.source_row}</p>{["opening", "turnover", "closing"].map(group => <div key={group}><h4>{group === "turnover" ? "Monthly activity" : `${group} balances`}</h4><dl><dt>Debit</dt><dd>{amount(selected.values[`${group}_debit`])}</dd><dt>Credit</dt><dd>{amount(selected.values[`${group}_credit`])}</dd></dl></div>)}<p className="tb-caption">Original source values. A dash means no value was supplied.</p></aside>}</div>
       <div className="tb-pagination"><span>Page {page + 1} of {pageCount}</span><button className="quiet" disabled={page === 0} onClick={() => setPage(page - 1)}>Previous</button><button className="quiet" disabled={page + 1 >= pageCount} onClick={() => setPage(page + 1)}>Next</button></div></>}
     {tab === "checks" && <div className="tb-checks"><article><span className="tb-check-label">Saved</span><h3>Original file preserved</h3><p>You can download the original workbook and trace each displayed value to its source row.</p></article><article><span className="tb-check-label tb-amber">Needs review</span><h3>Company and currency</h3><p>The company name and month are observations from the file. They do not establish an approved company mapping. The source header does not explicitly identify a currency.</p></article><article><span className="tb-check-label tb-amber">Needs review</span><h3>Account hierarchy and repeated rows</h3><p>Account groups, individual accounts and analytical breakdowns overlap. Repeated codes need review before selecting reportable balances.</p><button className="quiet" onClick={() => { setKind("all"); setPage(0); setTab("data"); }}>Inspect all source rows</button></article><article><span className="tb-check-label tb-amber">Not available yet</span><h3>Use in financial reports</h3><p>Financial mapping for this XLS is not available yet. This upload retains source evidence; it does not create journals or populate management reports.</p></article>{receipt.rejects.map(item => <p className="warning" key={item}>{item}</p>)}</div>}
-    {tab === "aggregation" && <SourceInspection receipt={receipt} decision={detail.decision} />}
+    {tab === "aggregation" && <SourceInspection receipt={receipt} decision={detail.decision} token={token} />}
     {tab === "history" && <div className="tb-history"><h3>Source retained</h3><p>{new Date(detail.ingested_at).toLocaleString()} · {detail.filename}</p><p>{receipt.source_storage?.byte_length.toLocaleString() || "Unknown"} bytes · {receipt.candidates[0]?.values.source_sheet || "Original workbook"}</p><details><summary>Technical provenance</summary><p>Source fingerprint</p><code>{receipt.source_sha256}</code><p>Reader contract: {receipt.authority_contract_version}</p><p>Recorded processing plan: {receipt.plan.join(" → ")}</p><p>This plan lists processing steps; it is not a live progress timeline.</p>{principal.permissions.includes("export") && <button className="quiet" onClick={() => onExport("export")}>Download evidence bundle</button>}</details></div>}
   </section>;
 }

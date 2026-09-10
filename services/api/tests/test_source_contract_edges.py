@@ -129,9 +129,10 @@ def test_compiler_retains_observations_and_refuses_period_and_posting_authority(
     wrong_period = source.model_copy(
         update={"scope": source.scope.model_copy(update={"period": "2025-01"})}
     )
-    assert compile_xls(wrong_period).rejects == (
-        "Source period 2024-02 differs from selected period 2025-01",
-    )
+    period_observation = compile_xls(wrong_period)
+    assert not period_observation.rejects
+    assert period_observation.observed_bindings["period"] == "2024-02"
+    assert any("observed heading wins" in warning for warning in period_observation.warnings)
     assert not compile_xls(
         wrong_period.model_copy(update={"source_use": "HISTORICAL_REFERENCE"})
     ).rejects

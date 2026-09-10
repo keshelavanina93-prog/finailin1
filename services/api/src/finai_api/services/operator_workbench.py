@@ -9,6 +9,58 @@ from finai_api.domain.review import Principal
 from finai_api.security import require_permission
 from finai_api.services import report_workflows as records
 from finai_api.services import resources
+from finai_api.services.workspace import WorkspaceError
+
+
+def company_binding(payload: dict[str, Any]) -> tuple[str | None, str]:
+    definition = payload.get("definition", {})
+    if definition.get("kind") != "SOURCE_EXCEPTION_INVESTIGATION":
+        company = payload.get("invocation", {}).get("company_id")
+        return company, "EXPLICIT_INVOCATION" if company else "UNBOUND"
+    # This binding is server-prepared from immutable exception evidence, not a UI label.
+    company = definition.get("company_id")
+    proposal = payload.get("prepared_proposal", {})
+    mutations = proposal.get("mutations", [])
+    try:
+        UUID(company)
+        if (
+            proposal.get("access_entity") != company
+            or len(mutations) != 2
+            or {m["object_type"] for m in mutations} != {"Finding", "Investigation"}
+            or any(m["attributes"].get("legal_entity_id") != company for m in mutations)
+            or any(
+                m["attributes"]["definition"].get("exception_run_id")
+                != definition.get("exception_run_id") for m in mutations
+            )
+        ):
+            raise ValueError("Company differs from prepared exception proposal")
+        finding = next(m for m in mutations if m["object_type"] == "Finding")
+        if finding["attributes"]["definition"]["evidence"]["company"]["resource_id"] != company:
+            raise ValueError("Company differs from retained exception evidence")
+        if definition.get("operation") == "RESOLVE":
+            proofs = [m["attributes"]["definition"]["resolution"] for m in mutations]
+            proof = proofs[0]
+            if (
+                proofs[1] != proof
+                or proof["unmatched_exception_run_id"] != definition["exception_run_id"]
+                or proof["matched_exception_run_id"] != definition["matched_exception_run_id"]
+                or proof["unmatched_evidence"]["company"]["resource_id"] != company
+                or proof["matched_evidence"]["company"]["resource_id"] != company
+                or any(m["attributes"]["definition"]["state"] != "RESOLVED" for m in mutations)
+            ):
+                raise ValueError("Resolution proof differs from retained company work")
+            for mutation in mutations:
+                prior_key = "prior_" + mutation["object_type"].lower()
+                prior = proof[prior_key]
+                if (
+                    prior != definition[prior_key]
+                    or prior["resource_id"] != mutation["resource_id"]
+                    or prior["version_id"] != mutation["expected_version_id"]
+                ):
+                    raise ValueError("Resolution differs from its prior canonical pair")
+    except (KeyError, TypeError, ValueError, AttributeError) as exc:
+        raise WorkspaceError(409, "Retained investigation company binding is invalid") from exc
+    return company, "EXPLICIT_RETAINED_EXCEPTION"
 
 
 def summarize(
@@ -16,11 +68,12 @@ def summarize(
 ) -> dict[str, Any]:
     version = payload.get("definition", {}).get("version", "")
     company = None
+    basis = "UNBOUND"
     build = {}
     if version == "ontology-action/1":
         family = "ontology"
         title = payload.get("prepared_proposal", {}).get("title", "Review business change")
-        company = payload.get("invocation", {}).get("company_id")
+        company, basis = company_binding(payload)
     elif version == "regulatory-source-monitor/1":
         family, title = "monitor", payload.get("name", "Regulatory source monitoring")
     elif version == "transformation-functions/1":
@@ -47,7 +100,7 @@ def summarize(
         "created_at": created_at,
         "period": payload.get("report", {}).get("period"),
         "currency": payload.get("report", {}).get("currency"),
-        "company_binding": "EXPLICIT_INVOCATION" if company else "UNBOUND",
+        "company_binding": basis,
     }
 
 
@@ -61,8 +114,13 @@ def listing(principal: Principal, company_id: UUID | None, include_unbound: bool
         rows = conn.execute(
             "SELECT workflow_id,payload,created_at FROM workflow_requests "
             "WHERE tenant_id=%s AND exact_scope=%s "
-            "AND (%s::text IS NULL OR payload->'invocation'->>'company_id'=%s "
-            "OR (%s AND payload->'invocation'->>'company_id' IS NULL)) "
+            "AND definition_version<>'ontology-action-intent/1' "
+            "AND (%s::text IS NULL OR (CASE WHEN "
+            "payload->'definition'->>'kind'='SOURCE_EXCEPTION_INVESTIGATION' "
+            "THEN payload->'definition'->>'company_id' "
+            "ELSE payload->'invocation'->>'company_id' END)=%s "
+            "OR (%s AND payload->'invocation'->>'company_id' IS NULL "
+            "AND payload->'definition'->>'company_id' IS NULL)) "
             "AND (%s OR definition_version NOT IN "
             "('ontology-action/1','transformation-functions/1')) "
             "ORDER BY created_at DESC,workflow_id LIMIT 101",

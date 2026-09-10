@@ -1,8 +1,10 @@
 "use client";
 
 import type { IngestReceipt, ReviewDecision } from "@finai/contracts";
+import OperationalBindingReview from "./operational-binding-review";
+import OperationalPromotionPreview from "./operational-promotion-preview";
 
-export default function SourceInspection({ receipt, decision }: { receipt: IngestReceipt; decision?: ReviewDecision | null }) {
+export default function SourceInspection({ receipt, decision, token }: { receipt: IngestReceipt; decision?: ReviewDecision | null; token: string }) {
   const profile = receipt.source_profile;
   const proof = (profile as unknown as { aggregation_proof?: {
     state: string; selected_rows: number[]; account_totals: Record<string, string>;
@@ -10,7 +12,18 @@ export default function SourceInspection({ receipt, decision }: { receipt: Inges
     hierarchy_checks: Array<{ parent_row: number; state: string; residuals: Record<string, string> }>;
     policy: string;
   } } | undefined)?.aggregation_proof;
+  const structural = profile?.validation;
   return <section aria-label="Source analysis and persisted process">
+    <OperationalBindingReview token={token} receiptId={receipt.receipt_id} profile={typeof profile?.profile === "string" ? profile.profile : undefined} />
+    <OperationalPromotionPreview token={token} receiptId={receipt.receipt_id} profile={typeof profile?.profile === "string" ? profile.profile : undefined} />
+    {structural && <section aria-label="Operational structural grain validation" className="source-detail">
+      <h3>Structural and measurement-grain validation</h3>
+      <p><strong>{structural.status}</strong> · {structural.grain ?? profile?.grain ?? "Declared source grain unavailable"}</p>
+      <p>Rows are retained as source observations. Structural validity does not establish semantic binding or canonical authority.</p>
+      <div className="source-table"><table><thead><tr><th>Source row</th><th>Row state</th><th>Validation findings</th></tr></thead><tbody>
+        {structural.rows.map(row => <tr key={row.source_row}><th scope="row">{row.source_row}</th><td>{row.status}</td><td>{row.reasons.length ? row.reasons.join(", ") : "No structural findings"}</td></tr>)}
+      </tbody></table></div>
+    </section>}
     <h3>Upload process</h3>
     <p>Recorded execution and retained review state. Financial report generation remains unavailable until its source contracts are approved.</p>
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>

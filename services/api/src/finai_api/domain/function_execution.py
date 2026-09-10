@@ -114,12 +114,44 @@ class PostedMovementsImplementation(BaseModel):
         return []
 
 
+class AcceptedMovementsImplementation(BaseModel):
+    company: VersionReference
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    implementation_id: Literal["finance.accepted-journal-movements/v1"]
+    determinism: Literal["DETERMINISTIC_FOR_PINNED_INPUTS"]
+    code_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    dependency_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+    @property
+    def derived_property_ids(self) -> list[UUID]:
+        return []
+
+
+class AcceptedMovementsInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    source_invocation_id: UUID
+    company_id: UUID
+    journal_snapshot_at: datetime
+    expected_reconciliation_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    expected_result_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+    @field_validator("journal_snapshot_at")
+    @classmethod
+    def aware_snapshot(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("Journal snapshot must include a timezone")
+        return value
+
+
 class FunctionDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     object_set_id: UUID | None = None
-    definition: FunctionImplementation | WorksheetImplementation | PostedMovementsImplementation = (
-        Field(discriminator="implementation_id")
-    )
+    definition: (
+        FunctionImplementation
+        | WorksheetImplementation
+        | PostedMovementsImplementation
+        | AcceptedMovementsImplementation
+    ) = Field(discriminator="implementation_id")
     evidence_id: UUID | None = None
     accounting_binding_id: UUID | None = Field(default=None, exclude_if=lambda value: value is None)
     source_scope_id: UUID | None = Field(default=None, exclude_if=lambda value: value is None)
@@ -129,7 +161,18 @@ class FunctionDefinition(BaseModel):
 
     @model_validator(mode="after")
     def adapter_inputs(self) -> "FunctionDefinition":
-        if isinstance(self.definition, PostedMovementsImplementation):
+        if isinstance(self.definition, AcceptedMovementsImplementation):
+            if any(
+                (
+                    self.object_set_id,
+                    self.evidence_id,
+                    self.accounting_binding_id,
+                    self.source_scope_id,
+                    self.minimum_authority_state,
+                )
+            ):
+                raise ValueError("Accepted movements require only a typed invocation input")
+        elif isinstance(self.definition, PostedMovementsImplementation):
             if (
                 self.object_set_id is not None
                 or self.evidence_id is None
@@ -167,8 +210,19 @@ class FunctionInvocation(BaseModel):
         default=None, exclude_if=lambda value: value is None
     )
 
+    accepted_movements: AcceptedMovementsInput | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+
     @model_validator(mode="after")
     def complete_input_page(self) -> "FunctionInvocation":
+        if self.accepted_movements is not None:
+            if self.input_result is not None or self.offset != 0 or self.limit != 50:
+                raise ValueError(
+                    "Accepted movements require a complete exclusive input with limit 50"
+                )
+            if self.accepted_movements.source_invocation_id == self.request_id:
+                raise ValueError("Function cannot consume its own result")
         if self.input_result is not None and self.offset != 0:
             raise ValueError("Retained input consumes the complete page; offset must be zero")
         if self.input_result is not None and self.input_result.invocation_id == self.request_id:

@@ -56,6 +56,38 @@ function Test-ManagedReadiness($Record) {
     if ($Record.service -eq 'observer') { return Test-Owned $Record }
     return Test-Health $Record.healthUrl
 }
+function Try-AdoptExactProcess($Spec) {
+    if ($Spec.port -le 0) { return $null }
+    $connections = @(Get-NetTCPConnection -State Listen -LocalPort $Spec.port -ErrorAction SilentlyContinue)
+    foreach ($connection in $connections) {
+        $identity = Get-ProcessIdentity $connection.OwningProcess
+        if ($null -eq $identity) { continue }
+        $expectedCommand = '"' + $Spec.executable + '" ' + $Spec.arguments
+        $executableMatches = $identity.ExecutablePath -eq $Spec.executable
+        if ($Spec.name -in @('api', 'observer') -and
+            $identity.ExecutablePath.StartsWith((Join-Path $env:FINAI_RUNTIME_ROOT 'python\'), [StringComparison]::OrdinalIgnoreCase)) {
+            $executableMatches = $true
+        }
+        if (-not $executableMatches -or $identity.CommandLine -ne $expectedCommand) {
+            continue
+        }
+        $record = [pscustomobject]@{
+            service = $Spec.name
+            processId = $identity.ProcessId
+            createdAt = $identity.CreationDate.ToUniversalTime().ToString('o')
+            executable = $identity.ExecutablePath
+            commandLine = $identity.CommandLine
+            port = $Spec.port
+            healthUrl = $Spec.url
+            stdout = $null
+            stderr = $null
+        }
+        if ($Spec.name -eq 'observer') { $record | Add-Member -NotePropertyName observerConfig -NotePropertyValue $Spec.observerConfig }
+        if (-not (Test-ManagedReadiness $record)) { return $null }
+        return $record
+    }
+    return $null
+}
 function Stop-Owned($Record) {
     if (-not (Test-Owned $Record)) { throw "Cannot verify ownership of $($Record.service); no process was stopped." }
     # Snapshot descendants while the verified parent is alive. Never stop by port/name.
@@ -108,7 +140,7 @@ try {
             if (-not (Test-Path -LiteralPath $required)) { throw 'Runtime dependencies/build missing; run bootstrap-local.ps1 and pnpm build first.' }
         }
         $specs = @(
-            @{ name = 'api'; port = $ApiPort; url = "http://127.0.0.1:$ApiPort/ready"; executable = $python; arguments = "-m uvicorn finai_api.main:app --host 127.0.0.1 --port $ApiPort" },
+            @{ name = 'api'; port = $ApiPort; url = "http://127.0.0.1:$ApiPort/ready"; executable = $python; arguments = "-m finai_api.main --host 127.0.0.1 --port $ApiPort" },
             @{ name = 'web'; port = $WebPort; url = "http://127.0.0.1:$WebPort"; executable = $node; arguments = ('"' + $server + '"') }
         )
         $observerConfigured = $DesiredResource -ne [guid]::Empty -and $DesiredVersion -ne [guid]::Empty -and $ObserverActor
@@ -137,6 +169,12 @@ try {
                 if ($existing[0].port -ne $spec.port) { throw 'Managed runtime uses different ports. Stop it explicitly before changing ports.' }
                 if ($spec.name -eq 'observer' -and $existing[0].observerConfig -ne $spec.observerConfig) { throw 'Managed observer configuration differs. Stop it before changing the reviewed target.' }
                 if (-not (Test-ManagedReadiness $existing[0])) { throw "Managed $($spec.name) is unhealthy; inspect its logs." }
+                continue
+            }
+            $adopted = Try-AdoptExactProcess $spec
+            if ($null -ne $adopted) {
+                $script:records = @($script:records | Where-Object { $_.service -ne $spec.name }) + $adopted
+                Write-State
                 continue
             }
             if ($spec.port -gt 0 -and (Get-NetTCPConnection -State Listen -LocalPort $spec.port -ErrorAction SilentlyContinue)) {
@@ -168,9 +206,11 @@ try {
                         $env:MINIO_BROWSER = 'off'
                         $env:MINIO_UPDATE = 'off'
                     }
+                    if ($spec.name -eq 'web') { $env:NEXT_PUBLIC_FINAI_LOCAL_LOGIN = 'true' }
                     $process = Start-Process -FilePath $spec.executable -ArgumentList $spec.arguments -WorkingDirectory $repositoryRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
                 } finally {
                     if ($spec.name -eq 'minio') { Remove-Item Env:MINIO_ROOT_USER,Env:MINIO_ROOT_PASSWORD -ErrorAction SilentlyContinue }
+                    if ($spec.name -eq 'web') { Remove-Item Env:NEXT_PUBLIC_FINAI_LOCAL_LOGIN -ErrorAction SilentlyContinue }
                 }
                 $identity = Get-ProcessIdentity $process.Id
                 if ($null -eq $identity) { throw "$($spec.name) exited during launch; inspect logs in $controlRoot." }

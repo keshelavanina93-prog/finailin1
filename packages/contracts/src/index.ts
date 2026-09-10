@@ -1,3 +1,4 @@
+export type {ReportSectionReference,ReportComposition,ReportSectionResult,RetainedReportSnapshot,ReportPreview,SaveRetainedReport,ReportVersionReference,ReportArtifactMetadata,RetainedReport,RetainedReportListItem,RetainedReportPage} from "./retained-reports.js";
 export type { HistorySearchResult } from "./history-search.js";
 export type {
   ObjectSetFilter, FilterExpression, ObjectSetTraversal, ObjectSetQuery, ObjectSetSchemaVersion,
@@ -8,6 +9,7 @@ export type {
 } from "./object-sets.js";
 export type { AccountDimensionPolicyResponse, AccountDimensionPolicyProposalRequest, AccountDimensionPolicyProposalResponse, JournalDimensionReadback, JournalDimensionProvenance } from "./account-dimension-policy.js";
 export type { CompanyJournalListResponse, CompanyJournalDetailResponse, JournalSelection, JournalPin } from "./company-journals.js";
+export type { FinancialMetricKey, FinancialMetricRequest, FinancialMetricRecipe, FinancialMetricValue, FinancialMetricNode, FinancialMetricResult } from "./company-financial-metrics.js";
 export type { PeriodControlResponse, PeriodControlProposalRequest, PeriodControlProposalResponse } from "./period-control.js";
 export type { CertificationDefinition, CertificationContract, CertificationEvaluationRequest, DefinitionConformanceReceipt } from "./certification.js";
 export type { ProposalQueuePage, ProposalQueueCursor } from "./proposal-queue.js";
@@ -26,6 +28,7 @@ export interface IngestRequest {
   scope: ExactScope;
   filename: string;
   csv_text?: string;
+  json_text?: string;
   xls_base64?: string;
   xlsx_base64?: string;
   source_use?: "ACTUAL_INPUT" | "HISTORICAL_REFERENCE" | "REPORT_TEMPLATE" | "MAPPING_REFERENCE";
@@ -62,7 +65,17 @@ export interface IngestReceipt {
   } | null;
   scope: ExactScope;
   source_class: "TRIAL_BALANCE" | "UNFAMILIAR_TABULAR" | "WORKBOOK_PACKAGE";
-  source_profile?: {
+    source_profile?: {
+    profile?: string;
+    grain?: string;
+    source_system?: string;
+    validation?: {
+      status: "VALID" | "REVIEW_REQUIRED" | "REJECTED";
+      grain?: string;
+      rows: Array<{source_row: number; status: string; reasons: string[]; promotion_eligible: boolean}>;
+      promotion_eligible: false;
+      binding_status: "UNRESOLVED";
+    };
     account_catalogs?: Array<{ sheet: string; account_count: number; company_binding: string; policy: string;
       findings: Array<{ code: string; coordinates: string[] }>;
       accounts: Array<{ account_code: string; source_name: string; coordinate: string;
@@ -92,6 +105,56 @@ export interface IngestReceipt {
   used_fields: string[];
   unused_fields: string[];
   functions_executed: string[];
+}
+
+export interface TrialBalancePackageMonth {
+  filename: string;
+  period: string;
+  source_sha256: string;
+  row_count: number;
+  selected_root_rows: number;
+  source_total_rows: number[];
+  totals: Record<string, string>;
+  pair_deltas: Record<string, string>;
+  hierarchy_check_count: number;
+  hierarchy_breaks: number;
+  equality: Record<string, "PASS" | "BREAK">;
+  equality_state: "PASS" | "BREAK";
+  mapping_state: "REQUIRED" | "APPROVED";
+  receipt_id: string | null;
+}
+
+export interface TrialBalancePackageReport {
+  package_id: string;
+  entity_label: string;
+  year: 2025;
+  currency: string;
+  workbook_count: number;
+  row_count: number;
+  expected_row_count: number;
+  row_count_state: "PASS" | "BREAK";
+  periods: string[];
+  months: TrialBalancePackageMonth[];
+  carryforward: Array<{
+    from_period: string | null;
+    to_period: string;
+    opening_debit: string | null;
+    prior_closing_debit: string | null;
+    debit_delta: string | null;
+    opening_credit: string | null;
+    prior_closing_credit: string | null;
+    credit_delta: string | null;
+    state: "NOT_APPLICABLE" | "PASS" | "BREAK";
+  }>;
+  carryforward_breaks: number;
+  hierarchy_breaks: number;
+  package_evidence_state: "SOURCE_PROOF_PASSED" | "SOURCE_REVIEW_REQUIRED";
+  mapping_state: "REQUIRED" | "APPROVED";
+  finance_locked: boolean;
+  planning_locked: boolean;
+  reporting_locked: boolean;
+  historical_scope_guard: Record<string, string | boolean>;
+  account_codes: string[];
 }
 
 export interface Principal {
@@ -247,3 +310,23 @@ export interface SourcePreview {
   sha256:string; byte_length:number; integrity:"VERIFIED"; value_semantics:"SOURCE_TEXT";
 }
 export type {AnalysisScalar,AnalysisPin,AnalysisDecimalPresentation,AnalysisValue,AnalysisFilter,AnalysisRequest,AnalysisField,AnalysisRow,AnalysisContributor,AnalysisDescriptor,AnalysisProjection} from "./semantic-analysis.js";
+export type {SourceExceptionRequest,SourceExceptionObservation,RetainedSourceException,InvestigationActionRequest,InvestigationOperation,InvestigationResolutionRequest,InvestigationResolutionOperation} from "./source-exceptions.js";
+
+export type {CompanyHomeDescriptor} from "./company-home.js";
+export type {CompanyConditionDescriptor,CompanyConditionConnection,CompanyConditionResourceGroup,CompanyConditionWorkItem,CompanyJournalReviewItem,CompanyJournalReviews} from "./company-condition.js";
+
+export type {CompanyChangesRequest,CompanyChangesDescriptor,CompanyContextChange} from "./company-changes.js";
+export type {CompanyRegulationPage} from "./regulatory-context.js";
+
+export type {RetainedAnalysisReference,RetainedAnalysisPage} from "./retained-analyses.js";
+export type { MetricPin, MetricUnit, MetricSelector, MetricDefinition, MetricOutput, MetricObservationRequest, MetricObservation } from "./metric-observations.js";
+export type { AcceptedMovementFunctionInvocation } from "./accepted-movement-function.js";
+export type { MetricCatalogItem, MetricCatalog, MetricCatalogRequest } from "./metric-observations.js";
+export type { MetricDefinitionSnapshot } from "./metric-observations.js";
+export type {CompanyFinancialResults} from "./company-financial-results.js";
+export type {OperationalMeasurementGrain, OperationalValidationStage, OperationalBindingRow, OperationalBindingValidation, OperationalPromotionPreview} from "./operational-intake.js";
+export type {OutcomeDimensionRow, OutcomeMeasurement, MultiBaselineOutcome, LearningEvaluation, RetainedOutcomeMeasurement, OutcomeMeasurementTimeline, LearningCandidateEvent, LearningCandidateTimeline} from "./outcomes.js";
+export type {PetroleumControl, PetroleumVariance, PetroleumVarianceCollection, PetroleumVarianceDetail, PetroleumVarianceStatus} from "./petroleum-variance.js";
+export type {ExecutableRequirement, ExecutableFunction, ExecutableFinding, ExecutablePreflight, ExecutableFunctionRegistry, ExecutablePreflightResponse} from "./executable-enterprise.js";
+export type {CalculationCompilePlan, CalculationCompileResponse} from "./calculation-runtime.js";
+export * from "./workspace-projections.js";

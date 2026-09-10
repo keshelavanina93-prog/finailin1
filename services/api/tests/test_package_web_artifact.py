@@ -16,6 +16,21 @@ builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
 
 
+@pytest.fixture(autouse=True)
+def allow_disposable_host_paths(monkeypatch):
+    # These tests target web inventory/topology integrity. D:-only artifact
+    # admission is verified by test_packaging_host_policy; pytest's disposable
+    # fixtures may remain on the Windows user temp volume here.
+    monkeypatch.setattr(builder.source_artifact, "check_path", lambda _path: None)
+    def disposable_resolved(path):
+        value = str(path)
+        if os.name == "nt" and not value.startswith("\\\\?\\"):
+            value = "\\\\?\\" + value
+        return Path(value).resolve(strict=True)
+
+    monkeypatch.setattr(builder, "resolved_path", disposable_resolved)
+
+
 @pytest.fixture
 def source(tmp_path):
     root = tmp_path / "source"

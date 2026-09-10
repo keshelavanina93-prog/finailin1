@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-08T11:22:20.312544+00:00",
+  "state": "FROZEN_GREEN_CODE_REFERENCE_NOT_PRODUCT_ACCEPTED",
+  "worktree": "D:\\FinAI\\g8-nin59-route-native",
+  "branch": "development/nin59-route-native-workspace",
+  "base_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+  "code_sha": "34eb71fda524fcfbdd4d9a3b29f468a7ab0a2a42",
+  "tree_sha": "2e10ce40cd92ef41c42029fb61dfd3e18c3f8e79",
+  "issues": [
+    "NIN-59",
+    "NIN-46",
+    "NIN-63"
+  ],
+  "previous_candidate": {
+    "code_sha": "57395d82e9a21dc6425d718f230d164d1fb47f71",
+    "manifest": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\docs\\development\\evidence\\nin59-product-57395d8.json",
+      "sha256": "20f182d12852bcc9168a23ee5df062948661bc3d9838337838ecd15595a4d578"
+    },
+    "inherited_evidence": "Prior evidence retains its original code/API SHA. No fresh native or browser acceptance inferred."
+  },
+  "historical_manifest": {
+    "path": "D:\\FinAI\\g8-nin59-route-native\\docs\\development\\evidence\\nin59-viewport-candidate.json",
+    "sha256": "da00ddbff9d8101dc00a71713151cd83d508d4d7c0e74d1dbb499341410da3ad",
+    "modified": false,
+    "acceptance_reused": false
+  },
+  "implementation": [
+    "Company/Home map exploration uses a single session-scoped origin entry, preserving the mounted company snapshot, compact map state, filters and invoking scroll/focus on Return and browser Back/Forward.",
+    "Full map changes retain their own requested time, viewport, area filter and selected resource. Highlighting and connection drill require the exact returned resource version/content hash and both map cutoffs.",
+    "NYX connections command stays inside the verified company map or invokes the mounted compact map with an exact selected-reference check. Narrow overlay closes before focus; pending detail reads are invalidated on return.",
+    "Company360 regulatory exploration uses the same origin mechanism and existing company/rule handoff guards. Rule category/selection/page preferences are keyed by actor/scope and exact company snapshot; current scenario and monitoring times remain separate.",
+    "Product retained-assessment reads always send selected legal_entity_id. The API checks both retained company identity fields after existing scope/hash/permission checks and returns generic404 on mismatch; legacy unscoped API callers remain compatible.",
+    "Frontend assessment verification binds retained run, company/version, scenario activity/count and exact cutoffs, rejects non-retained/incomplete/accounting-effect results and foreign rule rows, and suppresses stale requests.",
+    "Historical assessment IDs and company version references are under Advanced. No new financial statements, live telemetry, legal compliance or business-effect authority."
+  ],
+  "candidate_ci": {
+    "run": 34219291012,
+    "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34219291012",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "api",
+        "conclusion": "success"
+      },
+      {
+        "name": "web-and-contracts",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "focused_verification": {
+    "map_origin": "12 map/common-origin tests plus 7 map snapshot/connection tests passed before map commit; counts describe distinct focused bundles.",
+    "regulation_origin": "20 regulation/map/common-origin tests passed; this overlaps earlier origin checks.",
+    "assessment_scope": "14 backend scoped-read/runtime-contract checks and four frontend assessment guard checks passed.",
+    "types_lint": "Changed Ruff/mypy, web lint and full TypeScript passed.",
+    "production_build": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\.finai\\tmp\\company-regulation-return-build.log",
+      "sha256": "cf9fbcc0670e5ca0de94c9b87d120cc697cd79205b089f01498f40add52930af"
+    },
+    "map_build": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\.finai\\tmp\\company-map-return-build.log",
+      "sha256": "3e4adb5d04b979b61b5d7325584c714c29ceb75790f97fef2486beb73bae2c30"
+    },
+    "independent_review": "Bounded component, shell, temporal origin and assessment reviews found no concrete blocker. Focus/scroll tests use element-method models, not browser observations."
+  },
+  "superseded_map_checkpoint": {
+    "code_sha": "bf378727f713abdcd1101fe06a77dce783477b70",
+    "ci_run": 34218545901,
+    "ci_state": "CANCELLED_BY_SUCCESSOR",
+    "web_job": "SUCCESS",
+    "api_job": "CANCELLED",
+    "acceptance_claim": "Map code and local build passed. Exact green successor includes these changes; cancelled full CI is not counted as a pass."
+  },
+  "native_verification": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "performed": false,
+    "reason": "Existing isolated PostgreSQL at127.0.0.1:55439 unavailable. No runtime restart, assessment execution or fresh native readback."
+  },
+  "browser": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "exact_candidate_mounted": false,
+    "reason": "Automatic approval review rejected isolated preview starts as blocked by policy. No retry or bypass.",
+    "viewports": [
+      {
+        "requested_width": 1920,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1440,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1280,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 820,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 768,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      }
+    ]
+  },
+  "canonical_integration": {
+    "performed": false,
+    "branch": "development/enterprise-hydration-foundation",
+    "last_rechecked_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+    "runtime_changed": false,
+    "business_data_changed": false
+  },
+  "open_gates": [
+    "Native integrated company map and regulatory assessment proof",
+    "Responsive browser operation and exact scroll/focus restoration",
+    "Independent NIN-50 acceptance and canonical integration",
+    "Full financial, live operations and intelligence authorities",
+    "Full NIN-59/46/63 and release acceptance"
+  ],
+  "changed_files_since_previous_candidate": [
+    {
+      "path": "apps/web/app/company-condition.tsx",
+      "sha256_git_blob": "e58b23f1faf10b1b8bca5e92730c55d3ba82c5d3044cbf8970009b6edbc46473"
+    },
+    {
+      "path": "apps/web/app/company-home.tsx",
+      "sha256_git_blob": "144b5f16fef1d797d3193ef669f8936a5349d39fa997e62bcd4e2159bcaf1cea"
+    },
+    {
+      "path": "apps/web/app/company-map-handoff.ts",
+      "sha256_git_blob": "1d398ddfe339411321a5e3783e2561d88761645ffb42c5794d12277381e2fea4"
+    },
+    {
+      "path": "apps/web/app/company-regulation-handoff.ts",
+      "sha256_git_blob": "6403cc3ef7b96ddb58cacc279d9b08b4fe9ce91d8ecfb5da37242690583c61eb"
+    },
+    {
+      "path": "apps/web/app/company-workspace.tsx",
+      "sha256_git_blob": "ad7486ef9206549689dbd35b8b97bae545d5abc62b86709a350a08420c3eb633"
+    },
+    {
+      "path": "apps/web/app/g8-workspace.tsx",
+      "sha256_git_blob": "85ac7eb6c5131cf6e78ae3c600fb206068d566cd4bc6165e5d9cc25e37e627e3"
+    },
+    {
+      "path": "apps/web/app/journal-review-handoff.ts",
+      "sha256_git_blob": "ea9fe5b917bcdeaf1bcabe8b2776fed6d321d1db06b23edf63b17e0ecc6af4f4"
+    },
+    {
+      "path": "apps/web/app/operations-canvas.tsx",
+      "sha256_git_blob": "fefde8c23d66146c9d7513e81a9a7bdb0329b5150f5946fec1de8b5794af0158"
+    },
+    {
+      "path": "apps/web/app/operations-connections.tsx",
+      "sha256_git_blob": "6922263637a7c6b25e017ab38958a41fa9fa3a717f397bb0fb596e1c67476d99"
+    },
+    {
+      "path": "apps/web/app/operations-map.tsx",
+      "sha256_git_blob": "b07da06def121bd834390a8e69d21785b53f56f278cda85a594ad5dbcf4ea452"
+    },
+    {
+      "path": "apps/web/app/operations-model.ts",
+      "sha256_git_blob": "13361b9e5f06d5a1a33e70741577234e6a4c2aef7ed8445d553bd5c1b3c879eb"
+    },
+    {
+      "path": "apps/web/app/operations-snapshot-state.ts",
+      "sha256_git_blob": "6912e00fa50b918f2ba4ba1cca1b19064a9246ad8a188aee2cc4d41ddf176d2f"
+    },
+    {
+      "path": "apps/web/app/regulation-workspace.tsx",
+      "sha256_git_blob": "d010e52ed25867775f1fa9df8bdcc82557a2140ac503646fa977c1ce6e8ff41e"
+    },
+    {
+      "path": "apps/web/app/regulatory-assessment-state.ts",
+      "sha256_git_blob": "5a3970bdcc0a87ce0793cb60a27597b02fcaf7b0105020ea943b7bded55f3f54"
+    },
+    {
+      "path": "apps/web/tests/company-map-handoff.test.mjs",
+      "sha256_git_blob": "7b95a7b63a6e1c7a323eb45cca0c475305702faff876586e4bed167e8a313820"
+    },
+    {
+      "path": "apps/web/tests/company-regulation-handoff.test.mjs",
+      "sha256_git_blob": "5bb9748d142d4199ee24d8edff36217b4605cae3d9c9f73ed196bc002ee4452d"
+    },
+    {
+      "path": "apps/web/tests/operations-snapshot-state.test.mjs",
+      "sha256_git_blob": "8d997198506c47a4dcfe2056c7d59ebf819ff5003a66b32dee76212f5879797f"
+    },
+    {
+      "path": "apps/web/tests/regulatory-assessment-state.test.mjs",
+      "sha256_git_blob": "ba089d4f2e5f3ea8a93072c754671c6f25a0bb04856cdb5096287db784f8e1a5"
+    },
+    {
+      "path": "docs/development/evidence/nin59-product-57395d8.json",
+      "sha256_git_blob": "0dd909e9026eae7639c533b5626a18e4664b78adad2447f3a6b00e5bc8c6d262"
+    },
+    {
+      "path": "services/api/src/finai_api/api/regulation_routes.py",
+      "sha256_git_blob": "20dd36438ddaf0faf10b6f114ccd32d849ecf6d46fb4ee4211bb2b1bba8d0a5c"
+    },
+    {
+      "path": "services/api/tests/test_regulation_assessment_company.py",
+      "sha256_git_blob": "8ef065c72399afa15b46e5fc289fad4e61e4a1dc416f12eda9aafe6d31b8070b"
+    }
+  ],
+  "continuation": "Preserve the original mounted Home snapshot and financial/source view while exploring existing exact accounting controls, with guarded Return and browser Back/Forward."
+}

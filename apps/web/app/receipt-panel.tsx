@@ -8,6 +8,7 @@ import TrialBalanceReview from "./trial-balance-review";
 
 type Props = {
   detail: ReceiptDetail;
+  token: string;
   principal: Principal;
   busy: boolean;
   onDecision: (decision: "APPROVED" | "REJECTED", reason: string, key: string) => Promise<void>;
@@ -16,7 +17,7 @@ type Props = {
   onClose: () => void;
 };
 
-export default function ReceiptPanel({ detail, principal, busy, onDecision, onExport, onObjects, onClose }: Props) {
+export default function ReceiptPanel({ detail, token, principal, busy, onDecision, onExport, onObjects, onClose }: Props) {
   const [reason, setReason] = useState("");
   const [candidatePage, setCandidatePage] = useState(0);
   const [stage, setStage] = useState("candidates");
@@ -30,7 +31,7 @@ export default function ReceiptPanel({ detail, principal, busy, onDecision, onEx
     await onDecision(value, reason, intent.current.key);
   }
 
-  if (receipt.authority_contract_version === "1c-tb-observations/1") return <TrialBalanceReview detail={detail} principal={principal} onClose={onClose} onExport={onExport} />;
+  if (receipt.authority_contract_version === "1c-tb-observations/1") return <TrialBalanceReview detail={detail} token={token} principal={principal} onClose={onClose} onExport={onExport} />;
   return <section className="construction" aria-label="Construction review">
     <div className="section-heading"><div><p className="overline">CONSTRUCTION REVIEW</p><h2>{detail.filename}</h2></div>
       <button className="quiet" onClick={onClose}>Close review</button></div>
@@ -40,7 +41,7 @@ export default function ReceiptPanel({ detail, principal, busy, onDecision, onEx
           <span>{receipt.source_class.replaceAll("_", " ")}</span><span>{receipt.candidates.length} proposed objects</span></div>
         <p className="muted">{receipt.binding_state === "CANONICAL_BOUND" ? "Shared identity bound · financial certification remains separate" : "Source-only construction · canonical accounting identity unavailable"}</p>
         <CanonicalTrace references={receipt.canonical_references} />
-        <SourceInspection receipt={receipt} decision={decision} />
+        <SourceInspection receipt={receipt} decision={decision} token={token} />
         <nav className="pipeline-nav" aria-label="Compilation stages">
           {receipt.plan.map((name, index) => <button aria-pressed={stage === name} className={stage === name ? "selected" : ""}
             onClick={() => setStage(name)} key={name}><small>{String(index + 1).padStart(2, "0")}</small>{name}</button>)}

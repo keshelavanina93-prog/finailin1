@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type { CanonicalDetail, CanonicalResource, Principal, ProposalSummary, ResourceMutation, ResourceProposalDetail, SchemaField } from "@finai/contracts";
+import OntologyConnections, { type OntologyConnection, type OntologySourceConnection } from "./ontology-connections";
 import PromotionReadiness from "./promotion-readiness";
 import IdentityHistory from "./identity-history";
 import ObjectSets from "./object-sets";
@@ -12,9 +13,12 @@ const label = (value: string) => value.replaceAll("_", " ").replace(/([a-z])([A-
 const message = (error: unknown) => error instanceof Error ? error.message : "Request failed";
 type Draft = { type: string; current?: CanonicalResource; attributes: Record<string, unknown>; name: string };
 
-export default function OntologyWorkspace({ token, principal, initialProposalId }: { token: string; principal: Principal; initialProposalId?: string }) {
+export default function OntologyWorkspace({ token, principal, initialProposalId, onOpenObjectWorkspace }: { token: string; principal: Principal; initialProposalId?: string; onOpenObjectWorkspace?: () => void }) {
   const [catalog, setCatalog] = useState<CanonicalResource[]>([]);
   const [nodes, setNodes] = useState<CanonicalResource[]>([]);
+  const [edges, setEdges] = useState<OntologyConnection[]>([]);
+  const [sourceEdges, setSourceEdges] = useState<OntologySourceConnection[]>([]);
+  const [connectionStale, setConnectionStale] = useState(false);
   const [queue, setQueue] = useState<ProposalSummary[]>([]);
   const [tab, setTab] = useState<"graph" | "resources" | "review" | "registry" | "object_sets">("graph");
   const [detail, setDetail] = useState<CanonicalDetail | null>(null);
@@ -42,8 +46,8 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
   useEffect(() => {
     let cancelled = false;
     const selectionRef = selection;
-    Promise.all([api<CanonicalResource[]>("catalog"), api<{ resources: CanonicalResource[]; bounded: boolean }>("graph"), api<ProposalSummary[]>("proposals")])
-      .then(([definitions, graph, proposals]) => { if (!cancelled) { setCatalog(definitions); setNodes(graph.resources); setBounded(graph.bounded); setQueue(proposals); } })
+    Promise.all([api<CanonicalResource[]>("catalog"), api<{ resources: CanonicalResource[]; connections: OntologyConnection[]; source_connections: OntologySourceConnection[]; bounded: boolean }>("graph"), api<ProposalSummary[]>("proposals")])
+      .then(([definitions, graph, proposals]) => { if (!cancelled) { setCatalog(definitions); setNodes(graph.resources); setEdges(graph.connections ?? []); setSourceEdges(graph.source_connections ?? []); setBounded(graph.bounded); setQueue(proposals); } })
       .catch(error => { if (!cancelled) setError(message(error)); }).finally(() => { if (!cancelled) setBusy(false); });
     return () => { cancelled = true; selectionRef.current++; };
   }, [api, revision]);
@@ -55,14 +59,25 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
       .catch(error => { if (!cancelled) setError(message(error)); });
     return () => { cancelled = true; };
   }, [api, initialProposalId]);
+  useEffect(() => {
+    if (tab !== "graph") return;
+    let cancelled = false;
+    let pending = false;
+    const timer = setInterval(() => {
+      if (document.hidden || pending) return;
+      pending = true;
+      api<{ resources: CanonicalResource[]; connections: OntologyConnection[]; source_connections: OntologySourceConnection[]; bounded: boolean }>("graph")
+        .then(graph => { if (!cancelled) { setNodes(graph.resources); setEdges(graph.connections ?? []); setSourceEdges(graph.source_connections ?? []); setBounded(graph.bounded); setConnectionStale(false); } })
+        .catch(() => { if (!cancelled) setConnectionStale(true); })
+        .finally(() => { pending = false; });
+    }, 15000);
+    return () => { cancelled = true; clearInterval(timer); };
+  }, [api, tab]);
   const names = new Map([...catalog, ...nodes].map(node => [node.resource_id, node.display_name]));
   const schemas = catalog.filter(node => node.object_type === "SchemaDefinition");
   const fields = draft ? schemas.find(schema => schema.identity_key === draft.type)?.attributes.fields as Record<string, SchemaField> | undefined : undefined;
   const visible = (tab === "registry" ? catalog : nodes.filter(node => !metadata.has(node.object_type)))
     .filter(node => (!kind || node.object_type === kind) && `${node.display_name} ${node.identity_key}`.toLowerCase().includes(search.toLowerCase()));
-  const graphNodes = nodes.filter(node => !metadata.has(node.object_type) && !["Relationship", "Alias", "IdentityResolution", "SemanticBinding", "ContextBinding"].includes(node.object_type));
-  const positions = new Map(graphNodes.map((node, index) => [node.resource_id, { x: 24 + index % 3 * 270, y: 30 + Math.floor(index / 3) * 150 }]));
-
   async function inspect(id: string) {
     const request = ++selection.current; setError("");
     try { const result = await api<CanonicalDetail>(`resources/${id}`); if (selection.current === request) { setDetail(result); setDraft(null); setProposal(null); } }
@@ -125,17 +140,14 @@ export default function OntologyWorkspace({ token, principal, initialProposalId 
 
   return <section className="ontology-workspace">
     <div className="section-heading"><div><p className="overline">SHARED ENTERPRISE RESOURCES</p><h1>Enterprise & ontology</h1><p className="muted">Explore typed relationships, govern identity and review changes to shared business meaning.</p></div><button className="quiet" disabled={busy} onClick={() => setRevision(value => value + 1)}>Refresh</button></div>
-    <div className="ontology-tabs">{(["graph", "object_sets", "resources", "review", "registry"] as const).map(id => <button className={tab === id ? "active" : "quiet"} key={id} onClick={() => { setTab(id); setKind(""); }}>{id === "graph" ? "Enterprise graph" : id === "review" ? `Change review (${queue.filter(row => row.decision === "PENDING").length})` : label(id)}</button>)}</div>
+    <div className="ontology-tabs">{(["graph", "object_sets", "resources", "review", "registry"] as const).map(id => <button className={tab === id ? "active" : "quiet"} key={id} onClick={() => { setTab(id); setKind(""); }}>{id === "graph" ? "Enterprise graph" : id === "review" ? `Change review (${queue.filter(row => row.decision === "PENDING").length})` : label(id)}</button>)}{onOpenObjectWorkspace && <button className="quiet" onClick={onOpenObjectWorkspace}>Open object workspace</button>}</div>
     {error && <p className="error-banner" role="alert">{error}</p>}{notice && <p className="success-banner" role="status">{notice}</p>}
     {bounded && <p className="error-banner">This graph is limited to 1,000 visible resources. It is not a complete enterprise inventory.</p>}
     <div className="ontology-layout"><div>
       {tab === "object_sets" && <ObjectSets token={token} catalog={catalog} />}
       {tab === "graph" && <section className="data-panel"><div className="toolbar"><div><h2>Enterprise relationships</h2><p className="muted">Legal ownership, operating domains and participation remain distinct.</p></div>{admin && canPropose && <button className="quiet" disabled={busy} onClick={() => void referenceProposal()}>Propose SOCAR reference graph</button>}</div>
-        {!graphNodes.length ? <div className="empty-state"><h3>No accepted enterprise resources</h3><p>Create resources and typed relationships, then approve them with an independent reviewer. The SOCAR template is explicitly hypothetical reference data.</p></div> : <div className="enterprise-graph"><svg role="img" aria-label="Accepted enterprise relationship graph" viewBox={`0 0 840 ${Math.max(300, Math.ceil(graphNodes.length / 3) * 150)}`}>
-          <defs><marker id="relation-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="#49757a" /></marker></defs>
-          {nodes.filter(node => node.object_type === "Relationship").map(edge => { const from = positions.get(String(edge.attributes.source_id)), to = positions.get(String(edge.attributes.target_id)); return from && to ? <g key={edge.resource_id}><path d={`M${from.x + 110},${from.y + 86} Q${from.x + 245},${to.y + 120} ${to.x + 110},${to.y}`} stroke="#49757a" fill="none" strokeWidth="1.5" markerEnd="url(#relation-arrow)" /><title>{edge.display_name}</title></g> : null; })}
-          {graphNodes.map(node => { const pos = positions.get(node.resource_id)!; return <foreignObject key={node.resource_id} x={pos.x} y={pos.y} width="235" height="106"><button className="graph-node" onClick={() => void inspect(node.resource_id)}><small>{label(node.object_type)}</small><strong>{node.display_name}</strong><span>{node.evidence_class === "REFERENCE_TEMPLATE" ? "Reference example" : label(node.evidence_class)}</span></button></foreignObject>; })}
-        </svg></div>}
+        <p className="muted">Connections refresh every 15 seconds while this view is visible. {connectionStale ? "Refresh unavailable; displaying the last loaded graph." : "Select a connection to explore the related object."}</p>
+        <OntologyConnections nodes={nodes} connections={edges} sourceConnections={sourceEdges} onInspect={id => void inspect(id)} />
       </section>}
       {(tab === "resources" || tab === "registry") && <section className="data-panel"><div className="toolbar"><input aria-label="Find resource" placeholder="Find a resource" value={search} onChange={event => setSearch(event.target.value)} /><select aria-label="Resource type" value={kind} onChange={event => setKind(event.target.value)}><option value="">All types</option>{(tab === "registry" ? [...metadata] : schemas.map(schema => schema.identity_key)).map(type => <option key={type}>{type}</option>)}</select></div>
         <div className="data-scroll"><table><thead><tr><th>Resource</th><th>Type</th><th>Evidence</th></tr></thead><tbody>{visible.map(node => <tr key={node.resource_id}><td><button className="text-link" onClick={() => void inspect(node.resource_id)}>{node.display_name}</button></td><td>{label(node.object_type)}</td><td>{label(node.evidence_class)}</td></tr>)}</tbody></table>{!visible.length && <p className="empty-state">No resources match this view.</p>}</div></section>}

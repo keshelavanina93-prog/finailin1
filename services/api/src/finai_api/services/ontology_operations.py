@@ -34,6 +34,11 @@ def digest(value):
     return sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def proposal_effect(proposal: ResourceProposal):
+    """Return the semantic proposal effect, excluding request metadata and prose."""
+    return proposal.model_dump(mode="json", exclude={"proposal_id", "title", "rationale"})
+
+
 def recent(principal, document_id: str | None = None, binding_id: UUID | None = None):
     require_permission(principal, "ontology_read")
     if bool(document_id) == bool(binding_id):
@@ -151,6 +156,97 @@ def invoke(principal, request: BindingAction | LicenceAction):
                 ),
             )
     return resume(principal, identity)
+
+
+def invoke_prepared(principal, request, prepare):
+    """Freeze a server-prepared proposal through the shared ontology authority."""
+    require_permission(principal, "ontology_read")
+    require_permission(principal, "ontology_propose")
+    scope = principal.scope.model_dump(mode="json")
+    invocation = request.model_dump(mode="json")
+    request_hash = digest(invocation)
+    intent_id = "opi_" + digest([scope, principal.actor_id, str(request.request_id)])
+    with report_workflows.scope_connection(principal) as conn:
+        report_workflows.set_scope(conn, principal)
+        conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s,0))", (intent_id,))
+        existing = conn.execute(
+            "SELECT payload FROM workflow_requests WHERE tenant_id=%s "
+            "AND workflow_id=%s AND exact_scope=%s",
+            (principal.scope.tenant_id, intent_id, Jsonb(scope)),
+        ).fetchone()
+        if existing:
+            if existing[0].get("request_hash") != request_hash:
+                raise WorkspaceError(409, "Operation request ID was reused for different content")
+            identity = existing[0]["operation_id"]
+        else:
+            prepared, contract = prepare(principal, request)
+            if prepared.access_entity != principal.scope.legal_entity_id:
+                raise WorkspaceError(409, "Prepared effect differs from selected company")
+            semantic = proposal_effect(prepared)
+            identity = "opa_" + digest([scope, "CANONICAL_RESOURCE_PROPOSAL", semantic])
+            prepared = prepared.model_copy(
+                update={"proposal_id": uuid5(principal.scope.tenant_id, identity)}
+            )
+            _retain_prepared_record(
+                conn,
+                principal,
+                identity,
+                scope,
+                {
+                    "request_hash": request_hash,
+                    "invocation": invocation,
+                    "prepared_proposal": prepared.model_dump(mode="json"),
+                    "effect_sha256": digest(semantic),
+                    "definition": {
+                        "version": "ontology-action/1",
+                        **contract,
+                        "effect": "CANONICAL_RESOURCE_PROPOSAL",
+                        "publication": "EXISTING_RESOURCE_REVIEW",
+                    },
+                },
+            )
+            _retain_prepared_record(
+                conn,
+                principal,
+                intent_id,
+                scope,
+                {
+                    "request_hash": request_hash,
+                    "invocation": invocation,
+                    "operation_id": identity,
+                    "definition": {"version": "ontology-action-intent/1"},
+                },
+            )
+    return {
+        **resume(principal, identity),
+        "intent_id": intent_id,
+        # Preserve the caller's exact intent on replay.  The shared effect is
+        # intentionally deduplicated, but each actor/request still has its own
+        # rationale and request identity for audit and investigation replay.
+        "intent_request": invocation,
+    }
+
+
+def _retain_prepared_record(conn, principal, identity, scope, payload):
+    existing = conn.execute(
+        "SELECT payload FROM workflow_requests WHERE tenant_id=%s AND workflow_id=%s "
+        "AND exact_scope=%s",
+        (principal.scope.tenant_id, identity, Jsonb(scope)),
+    ).fetchone()
+    if existing:
+        return
+    conn.execute(
+        "INSERT INTO workflow_requests(tenant_id,workflow_id,exact_scope,actor_id,"
+        "definition_version,payload) VALUES(%s,%s,%s,%s,%s,%s)",
+        (
+            principal.scope.tenant_id,
+            identity,
+            Jsonb(scope),
+            principal.actor_id,
+            payload["definition"]["version"],
+            Jsonb(payload),
+        ),
+    )
 
 
 def resume(principal, identity):

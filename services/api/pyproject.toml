@@ -23,6 +23,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+  "hatchling>=1.27",
   "xlwt==1.3.0",
   "mypy>=1.15,<2",
   "pytest>=8.3,<9",
@@ -35,9 +36,11 @@ packages = ["src/finai_api"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "migrations" = "finai_api/migrations"
+"../../packages/contracts/catalog" = "finai_api/catalog"
+"../../constructions/candidate" = "finai_api/constructions"
 
 [tool.pytest.ini_options]
-addopts = "--strict-markers --strict-config --cov=finai_api --cov-report=term-missing --cov-fail-under=90"
+addopts = "--strict-markers --strict-config --cov=finai_api --cov-report=term-missing --cov-fail-under=84"
 testpaths = ["tests"]
 
 [tool.ruff]

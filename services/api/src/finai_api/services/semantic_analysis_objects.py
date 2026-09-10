@@ -9,6 +9,7 @@ from finai_api.domain.semantic_analysis import (
     Row,
     Value,
 )
+from finai_api.read_budget import remaining_ms
 from finai_api.services.resources import _check_scalar
 from finai_api.services.semantic_analysis_support import field_label, pin, row_key, value_options
 from finai_api.services.workspace import WorkspaceError
@@ -110,7 +111,8 @@ def _evidence(resolver, obj):
     return result
 
 
-def build(history, plan, resolver, company_id):
+def subject(history, plan, resolver, company_id):
+    """Exact retained subject checks shared with discovery; no evidence hydration."""
     output = history["output"]
     if plan.get("group_count") or plan.get("derived_properties") or output.get("derived_values"):
         raise WorkspaceError(422, "Calculated outputs require their analytical capability contract")
@@ -134,6 +136,7 @@ def build(history, plan, resolver, company_id):
         raise WorkspaceError(409, "Retained objects differ from their exact Function declaration")
     schemas, companies, canonical = {}, {}, []
     for retained in objects:
+        remaining_ms()
         obj = resolver.version(retained)
         if (
             obj["attributes"] != retained["attributes"]
@@ -154,6 +157,12 @@ def build(history, plan, resolver, company_id):
             409, "Mixed object schemas or company revisions require explicit interpretation"
         )
     company, schema = next(iter(companies.values())), next(iter(schemas.values()))
+    return function, company, schema, canonical
+
+
+def build(history, plan, resolver, company_id):
+    function, company, schema, canonical = subject(history, plan, resolver, company_id)
+    output = history["output"]
     specs = schema["attributes"]["fields"]
     definitions = {str(row["version_id"]): pin(row) for row in (function, schema, company)}
     if "__resource" in specs:

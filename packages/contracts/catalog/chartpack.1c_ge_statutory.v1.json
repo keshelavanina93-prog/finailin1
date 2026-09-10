@@ -1,0 +1,251 @@
+{
+  "contract": "chartpack/1",
+  "pack_id": "chartpack.1c_ge_statutory.v1",
+  "version": 1,
+  "display_name": "Georgian 1C statutory chart proposal",
+  "jurisdiction": "GE",
+  "source_classes": [
+    "1C_TURNOVER_TRIAL_BALANCE"
+  ],
+  "mapping_status": "proposed",
+  "authority": "CANDIDATE_ONLY",
+  "currency_status": "UNREVIEWED",
+  "rules": [
+    {
+      "key": "cash_and_equivalents_1110",
+      "account_pattern": "^1110$",
+      "local_account_class": "cash_and_equivalents",
+      "statement_line": "cash_and_equivalents",
+      "balance_measure": "closing_debit",
+      "analytic_policy": null,
+      "operating": true,
+      "priority": 100,
+      "rationale": "Propose the exact 1110 statutory code as a cash balance class."
+    },
+    {
+      "key": "cash_in_transit_129x",
+      "account_pattern": "^129[0-9]$",
+      "local_account_class": "cash_in_transit",
+      "statement_line": "cash_in_transit",
+      "balance_measure": "closing_debit",
+      "analytic_policy": null,
+      "operating": true,
+      "priority": 95,
+      "rationale": "Propose 129X as cash in transit pending independent review."
+    },
+    {
+      "key": "cash_in_transit_12xx",
+      "account_pattern": "^12[0-9]{2}$",
+      "local_account_class": "cash_in_transit",
+      "statement_line": "cash_in_transit",
+      "balance_measure": "closing_debit",
+      "analytic_policy": null,
+      "operating": true,
+      "priority": 80,
+      "rationale": "Propose the remaining 12XX statutory cash range as transit."
+    },
+    {
+      "key": "trade_receivables_141x",
+      "account_pattern": "^141[0-9](?:\\..*)?$",
+      "local_account_class": "trade_receivables",
+      "statement_line": "trade_receivables",
+      "balance_measure": "closing_debit",
+      "analytic_policy": "receivables_analytic",
+      "operating": true,
+      "priority": 80,
+      "rationale": "Propose 141X balances as receivables while retaining observed analytics."
+    },
+    {
+      "key": "goods_in_transit_1605",
+      "account_pattern": "^1605(?:\\..*)?$",
+      "local_account_class": "goods_in_transit",
+      "statement_line": "inventory_value",
+      "balance_measure": "closing_debit",
+      "operating": true,
+      "priority": 90,
+      "rationale": "Propose 1605 as goods in transit from the statutory account code."
+    },
+    {
+      "key": "merchandise_inventory_1610",
+      "account_pattern": "^1610(?:\\..*)?$",
+      "local_account_class": "merchandise_inventory",
+      "statement_line": "inventory_value",
+      "balance_measure": "closing_debit",
+      "flow_measure": "turnover_debit",
+      "operating": true,
+      "priority": 90,
+      "rationale": "Propose 1610 as merchandise inventory with source-period turnover."
+    },
+    {
+      "key": "trade_payables_3110",
+      "account_pattern": "^3110(?:\\..*)?$",
+      "local_account_class": "trade_payables",
+      "statement_line": "trade_payables",
+      "balance_measure": "closing_credit",
+      "analytic_policy": "payables_analytic",
+      "operating": true,
+      "priority": 90,
+      "rationale": "Propose 3110 as trade payables without inventing invoice evidence."
+    },
+    {
+      "key": "short_term_debt_32xx",
+      "account_pattern": "^32[0-9]{2}(?:\\..*)?$",
+      "local_account_class": "short_term_debt",
+      "statement_line": "short_term_debt",
+      "balance_measure": "closing_credit",
+      "operating": true,
+      "priority": 70,
+      "rationale": "Propose 32XX as short-term debt pending review of the local chart."
+    },
+    {
+      "key": "equity_5150",
+      "account_pattern": "^5150(?:\\..*)?$",
+      "local_account_class": "equity",
+      "statement_line": "equity",
+      "balance_measure": "closing_credit",
+      "operating": true,
+      "priority": 90,
+      "rationale": "Propose 5150 as equity from the observed statutory account code."
+    },
+    {
+      "key": "equity_53xx",
+      "account_pattern": "^53[0-9]{2}(?:\\..*)?$",
+      "local_account_class": "equity",
+      "statement_line": "equity",
+      "balance_measure": "closing_credit",
+      "operating": true,
+      "priority": 70,
+      "rationale": "Propose 53XX as equity pending independent chart review."
+    },
+    {
+      "key": "revenue_6110",
+      "account_pattern": "^6110(?:\\..*)?$",
+      "local_account_class": "revenue",
+      "statement_line": "revenue",
+      "flow_measure": "turnover_credit",
+      "operating": true,
+      "priority": 100,
+      "rationale": "Use January 6110 credit turnover as revenue_month in a draft."
+    },
+    {
+      "key": "revenue_61xx",
+      "account_pattern": "^61[0-9]{2}(?:\\..*)?$",
+      "local_account_class": "revenue",
+      "statement_line": "revenue",
+      "flow_measure": "turnover_credit",
+      "operating": true,
+      "priority": 80,
+      "rationale": "Propose the remaining 61XX range as revenue by credit turnover."
+    },
+    {
+      "key": "cogs_7110",
+      "account_pattern": "^7110(?:\\..*)?$",
+      "local_account_class": "cost_of_goods_sold",
+      "statement_line": "cogs",
+      "flow_measure": "turnover_debit",
+      "operating": true,
+      "priority": 100,
+      "rationale": "Use 7110 debit turnover as cogs_month in a draft."
+    },
+    {
+      "key": "selling_expense_7310",
+      "account_pattern": "^7310(?:\\..*)?$",
+      "local_account_class": "selling_expense",
+      "statement_line": "selling_expense",
+      "flow_measure": "turnover_debit",
+      "operating": true,
+      "priority": 90,
+      "rationale": "Propose 7310 movement as selling expense subject to dimensions."
+    },
+    {
+      "key": "administrative_expense_7410",
+      "account_pattern": "^7410(?:\\..*)?$",
+      "local_account_class": "administrative_expense",
+      "statement_line": "admin_expense",
+      "flow_measure": "turnover_debit",
+      "analytic_policy": "expense_analytic",
+      "operating": true,
+      "priority": 90,
+      "rationale": "Propose 7410 movement while preserving non-additive source rows."
+    },
+    {
+      "key": "other_income_8110",
+      "account_pattern": "^8110(?:\\..*)?$",
+      "local_account_class": "other_income",
+      "statement_line": "other_income",
+      "flow_measure": "turnover_credit",
+      "operating": false,
+      "priority": 90,
+      "rationale": "Propose 8110 as other income outside operating revenue."
+    },
+    {
+      "key": "other_expense_8220",
+      "account_pattern": "^8220(?:\\..*)?$",
+      "local_account_class": "other_expense",
+      "statement_line": "other_expense",
+      "flow_measure": "turnover_debit",
+      "operating": false,
+      "priority": 90,
+      "rationale": "Propose 8220 as other expense outside operating cost."
+    },
+    {
+      "key": "shortage_8230",
+      "account_pattern": "^8230(?:\\..*)?$",
+      "local_account_class": "shortage",
+      "statement_line": "shortage",
+      "flow_measure": "turnover_debit",
+      "operating": false,
+      "priority": 90,
+      "rationale": "Propose 8230 as shortage without inferring physical loss."
+    },
+    {
+      "key": "other_pl_9210",
+      "account_pattern": "^9210(?:\\..*)?$",
+      "local_account_class": "other_pl",
+      "statement_line": "other_pl",
+      "flow_measure": "turnover_debit",
+      "operating": false,
+      "priority": 90,
+      "rationale": "Propose 9210 as non-operating other P&L."
+    }
+  ],
+  "analytic_policies": [
+    {
+      "key": "receivables_analytic",
+      "source_field": "subkonto",
+      "rules": [
+        {
+          "key": "site_numeric_analytic",
+          "source_pattern": "^\\d{7}$",
+          "dimension": "site_analytic",
+          "priority": 100,
+          "rationale": "A seven-digit observed analytic is a site candidate only."
+        },
+        {
+          "key": "site_known_prefix_analytic",
+          "source_pattern": "^(?:111111\\d|1410\\d+|1420\\d+)$",
+          "dimension": "site_analytic",
+          "priority": 90,
+          "rationale": "Known observed prefixes remain site candidates only."
+        }
+      ],
+      "default_dimension": "counterparty_analytic",
+      "rationale": "Observed labels split receivables candidates; they do not create aging."
+    },
+    {
+      "key": "payables_analytic",
+      "source_field": "subkonto",
+      "rules": [],
+      "default_dimension": "counterparty_analytic",
+      "rationale": "Payable analytics remain observed counterparties pending review."
+    },
+    {
+      "key": "expense_analytic",
+      "source_field": "subkonto",
+      "rules": [],
+      "default_dimension": "observed_expense_analytic",
+      "rationale": "Expense labels are retained as observations, not posting authority."
+    }
+  ],
+  "rationale": "Reusable Georgian 1C chart proposal library; mapping acceptance requires independent review tied to source hashes."
+}

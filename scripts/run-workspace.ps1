@@ -6,7 +6,7 @@ $PSNativeCommandUseErrorActionPreference = $true
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $repositoryRoot
 if ($Service -eq 'api') {
-    & "$env:VIRTUAL_ENV\Scripts\python.exe" -m uvicorn finai_api.main:app --host 127.0.0.1 --port $ApiPort
+    & "$env:VIRTUAL_ENV\Scripts\python.exe" -m finai_api.main --host 127.0.0.1 --port $ApiPort
 } else {
     $env:FINAI_API_URL = "http://127.0.0.1:$ApiPort"
     $standalone = Join-Path $repositoryRoot 'apps\web\.next\standalone\apps\web'

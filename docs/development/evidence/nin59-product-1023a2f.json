@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-08T10:28:47.422366+00:00",
+  "state": "FROZEN_GREEN_CODE_REFERENCE_NOT_PRODUCT_ACCEPTED",
+  "worktree": "D:\\FinAI\\g8-nin59-route-native",
+  "branch": "development/nin59-route-native-workspace",
+  "base_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+  "code_sha": "1023a2f96345318464c9ffb541849ad38e5a11e7",
+  "tree_sha": "c3587773f754def1600192b56db6bd558f087548",
+  "issues": [
+    "NIN-59",
+    "NIN-46",
+    "NIN-63"
+  ],
+  "previous_candidate": {
+    "code_sha": "96f11b528aa191218a59c888422a6ec1019be8f7",
+    "manifest": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\docs\\development\\evidence\\nin59-product-96f11b5.json",
+      "sha256": "dd2a2b5273ded7924004b4feaab0edb5633eefdd921dac4ca4ed81e891c73639"
+    },
+    "inherited_evidence": "Earlier evidence remains attributed to its exact code and API SHA; no browser promotion."
+  },
+  "historical_manifest": {
+    "path": "D:\\FinAI\\g8-nin59-route-native\\docs\\development\\evidence\\nin59-viewport-candidate.json",
+    "sha256": "da00ddbff9d8101dc00a71713151cd83d508d4d7c0e74d1dbb499341410da3ad",
+    "modified": false,
+    "acceptance_reused": false
+  },
+  "implementation": [
+    "Home and Company360 canonical resource inspection uses an independent contextual pane instead of forcing NYX open or replacing its full context tab.",
+    "The original company surface stays mounted. Exact company version/content and valid/known time bind the selected resource version/content and its separate knowledge cutoff.",
+    "The shared existing resource inspector preserves authority inspection, dependent resources, Trace, History and available accounting depth. Raw identities remain under Advanced.",
+    "Closing the contextual pane preserves independent Trace/History and NYX state, returning invoking focus with preventScroll. The pane overlays the right edge of the work canvas when insufficient width remains.",
+    "Request-owned cancellation clears obsolete loading state and rejects late resource responses on navigation, replacement and close without clearing a newer work request.",
+    "Source-review, workflow review and other existing inspection consumers preserve their prior behavior. No new canonical authority, Function execution or financial calculation."
+  ],
+  "candidate_ci": {
+    "run": 34214307087,
+    "url": "https://github.com/keshelavanina93-prog/finailin1/actions/runs/34214307087",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "web-and-contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "api",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "focused_verification": {
+    "resource_reference_and_cancellation": "Five tests passed: exact company/resource/version/hash/microsecond pin, historical-only authority, scoped stale reference refusal, focus visibility and owned-versus-superseded cancellation.",
+    "types_lint": "PASS",
+    "production_build": {
+      "path": "D:\\FinAI\\g8-nin59-route-native\\.finai\\tmp\\company-resource-inspection-build-final.log",
+      "sha256": "a27b70d0cf07eb09802a2a0722257093f27f8896de56ef30d676063747c16e30"
+    },
+    "builder_review": "Bounded read-only review plus root integration review; root cancellation defect repaired before commit. Model checks do not prove browser behavior."
+  },
+  "native_inspector_readback": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "observed_at": "2026-09-08T10:04:33Z",
+    "attempted_api_code_sha": "96f11b528aa191218a59c888422a6ec1019be8f7",
+    "scope": "Read-only in-process exact resource inspection compatibility check",
+    "result": "No response or acceptance result recorded",
+    "reason": "Verification exceeded 80 seconds; only its verified Python processes were stopped. A subsequent listener inventory found no PostgreSQL listener on local port 55439.",
+    "server_started": false,
+    "runtime_restart_attempted": false,
+    "business_mutations_requested": false,
+    "continuation": "Product implementation and focused contract checks continue. No retry against the unavailable native runtime."
+  },
+  "browser": {
+    "state": "ENVIRONMENT_BLOCKED",
+    "exact_candidate_mounted": false,
+    "reason": "Automatic approval review rejected isolated preview starts as blocked by policy. No retry or bypass.",
+    "viewports": [
+      {
+        "requested_width": 1920,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1440,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 1280,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 820,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      },
+      {
+        "requested_width": 768,
+        "inner_width": null,
+        "document_width": null,
+        "device_pixel_ratio": null,
+        "navigation_state": null,
+        "nyx_state": null,
+        "evidence_trace_state": null,
+        "selected_row_cell": null,
+        "scroll_focus_restoration": "NOT_OBSERVED",
+        "capture": null
+      }
+    ]
+  },
+  "canonical_integration": {
+    "performed": false,
+    "branch": "development/enterprise-hydration-foundation",
+    "last_rechecked_sha": "0212bc4d8b7b23bd6f327c1b77e3a085d8b5d64e",
+    "runtime_changed": false,
+    "business_data_changed": false
+  },
+  "open_gates": [
+    "Responsive browser operation and real focus/scroll restoration",
+    "Independent NIN-50 acceptance and canonical integration",
+    "Fresh native inspector readback when the existing runtime is available",
+    "Full financial statement/Metric authority and populated live operations",
+    "Full NIN-59/46/63 and release acceptance"
+  ],
+  "changed_files_since_previous_candidate": [
+    {
+      "path": "apps/web/app/company-resource-inspection-pane.tsx",
+      "sha256_git_blob": "3f966ae812ce7cb7b852708530e1ac46a97af9a88b87aceb49d787adb5e86b2a"
+    },
+    {
+      "path": "apps/web/app/company-resource-inspection.css",
+      "sha256_git_blob": "ed07ec86e6e5bb96ee70485de37709d8e4e225741d2498b6b185c0df46df30dd"
+    },
+    {
+      "path": "apps/web/app/company-resource-inspection.ts",
+      "sha256_git_blob": "8444a3a091c8687df06d9535bb833ed5f043d94028ad7e2704421f84755a583e"
+    },
+    {
+      "path": "apps/web/app/g8-workspace.tsx",
+      "sha256_git_blob": "eb359c3e92c079c4cd07d43c254ea5e2b506ab9722c3740e21c381152c8c6ead"
+    },
+    {
+      "path": "apps/web/app/resource-inspection.tsx",
+      "sha256_git_blob": "b7c9799ce7dd018d17c36519a384e087e633ba17514d9b61c2422384708c027e"
+    },
+    {
+      "path": "apps/web/tests/company-resource-inspection.test.mjs",
+      "sha256_git_blob": "c01ef51178d29d4b083cf610bff768dc09955359753941d90ea41bab7441cf55"
+    },
+    {
+      "path": "docs/development/evidence/nin59-product-96f11b5.json",
+      "sha256_git_blob": "39bed4db4d2e1a6d24b1d35be17b5051d3f9329e8da83b19f6ac34d4dd79202a"
+    }
+  ],
+  "continuation": "Build bounded company source-analysis discovery from retained invocation receipts and shared canonical company ownership preflight. Explicit selection opens the existing source-review projection and pins its descriptor; no device pin prerequisite or new truth registry."
+}

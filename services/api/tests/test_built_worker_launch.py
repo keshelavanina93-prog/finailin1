@@ -37,6 +37,7 @@ def test_bad_wheel_never_reaches_installed_package_probe(tmp_path, monkeypatch):
         "verify_installed",
         lambda *_: pytest.fail("Unverified artifact probe"),
     )
+    monkeypatch.setattr(prepare_worker.paths, "check_path", lambda _path: None)
     with pytest.raises(ValueError, match="integrity"):
         prepare_worker.prepare(
             receipt, tmp_path / "python.exe", "g8-candidate-test", tmp_path / "launches"
@@ -86,4 +87,5 @@ def test_d_interpreter_location_evidence_retained(tmp_path, monkeypatch):
         "run",
         lambda *_args, **_kwargs: SimpleNamespace(stdout=json.dumps(expected)),
     )
+    monkeypatch.setattr(prepare_worker.paths, "check_path", lambda _path: None)
     assert prepare_worker.verify_interpreter(tmp_path / "python.exe", tmp_path) == expected

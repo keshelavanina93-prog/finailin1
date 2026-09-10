@@ -6,6 +6,7 @@ from uuid import UUID
 from psycopg.rows import dict_row
 
 from finai_api.domain.resources import CanonicalResource
+from finai_api.services.company_directory import project as project_directory
 from finai_api.services.resources import resource_connection
 from finai_api.services.workspace import WorkspaceError
 
@@ -119,6 +120,7 @@ def project(nodes, pins, company_id=None, pinned_scopes=()):
                 }
             )
     result = {
+        "company_directory": project_directory(nodes, pins),
         "workspaces": workspaces,
         "context": None,
         "source_companies": list(source_companies.values()),

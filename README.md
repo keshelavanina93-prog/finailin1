@@ -153,9 +153,29 @@ Run the services directly:
 
 ```powershell
 .\scripts\load-local.ps1
-.\.venv\Scripts\python.exe -m uvicorn finai_api.main:app --app-dir services\api\src --host 127.0.0.1 --port 8000
+$env:FINAI_API_PORT = '8000'
+.\.venv\Scripts\python.exe -m finai_api.main
 pnpm --filter @finai/web dev
 ```
+
+For the complete local NYXCore stack (PostgreSQL, retained storage, Temporal,
+workers, API and web shell), use `scripts\start-nyxcore-local.ps1`. The first
+run can also create the desktop shortcut with
+`-CreateShortcut`. Local credentials are fixed for this checkout and stored in
+the ignored `.finai\local.json`; they are only accepted when the API runs in
+the local environment.
+
+The same complete stack is also available from the Python composition root:
+
+```powershell
+.\.venv\Scripts\python.exe -m finai_api.main --stack
+```
+
+`python -m finai_api.main` without `--stack` remains the API-only mode used by
+the supervisor and container image. `--stack` is the explicit local-development
+mode; it delegates to the canonical D:-resident supervisor so the web shell,
+worker, Temporal, MinIO and PostgreSQL are started with the same ownership and
+health checks.
 
 The local PostgreSQL cluster binds to `127.0.0.1:55439`, uses SCRAM credentials,
 and stores all data beneath `.finai/data/postgres-native`. Configuration and the

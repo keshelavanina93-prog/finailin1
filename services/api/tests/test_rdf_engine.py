@@ -28,10 +28,17 @@ def artifact(iri=A, text=None, imports=(), namespaces=None, format="TURTLE"):
 
 
 def run(tmp_path, artifacts, **kwargs):
+    work_dir = tmp_path
+    if os.name == "nt":
+        # Production RDF workers are intentionally D:-resident. Keep the
+        # disposable test work directory on the same volume while retaining
+        # the explicit C:-drive refusal test below.
+        work_dir = Path(r"D:\FinAI\finailinear1\.finai\tmp\rdf-tests")
+        work_dir.mkdir(parents=True, exist_ok=True)
     return canonicalize_rdf(
         artifacts,
         root_iris=kwargs.pop("root_iris", [artifacts[0].artifact_iri]),
-        work_dir=tmp_path,
+        work_dir=work_dir,
         **kwargs,
     )
 

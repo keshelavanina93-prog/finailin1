@@ -26,7 +26,13 @@ from finai_api.domain.regulation import RegulatoryDefinition, assess_rule
 from finai_api.domain.resources import ResourceMutation, ResourceProposal
 from finai_api.regulatory_workflow import RegulatorySourceCheck
 from finai_api.security import require_permission
-from finai_api.services import regulatory_impact, regulatory_monitors, regulatory_sources, resources
+from finai_api.services import (
+    operator_inspection,
+    regulatory_impact,
+    regulatory_monitors,
+    regulatory_sources,
+    resources,
+)
 from finai_api.services import report_workflows as records
 from finai_api.services.fact_runs import read_run, retain_run
 from finai_api.services.regulatory_licence_context import bind_assessment, licence_bindings
@@ -241,7 +247,7 @@ def rules(
     at, known_at = at or datetime.now(UTC), known_at or datetime.now(UTC)
     if at.tzinfo is None or known_at.tzinfo is None:
         raise WorkspaceError(422, "Assessment timestamps require a timezone")
-    entity = resources.get_resource(principal, legal_entity_id)["resource"]
+    entity = _company_at(principal, legal_entity_id, at, known_at)
     if entity["object_type"] != "LegalEntity":
         raise WorkspaceError(422, "Regulatory scope requires a legal entity")
     # Registry valid time describes the interpretation's availability, not the legal period.
@@ -280,6 +286,24 @@ def rules(
         "accounting_effects_created": False,
         "next_offset": offset + 100 if len(page) == 100 else None,
     }
+
+
+def _company_at(principal: User, identity: UUID, at: datetime, known_at: datetime):
+    """Bind scenario scope to its exact accepted historical company, never a current head."""
+    resolved = resources.resolve_identity(principal, identity, known_at=known_at, valid_at=at)
+    if resolved["canonical_id"] != str(identity):
+        raise WorkspaceError(409, "Company identity changed at this snapshot; select it explicitly")
+    entity = operator_inspection.inspect(
+        principal, identity, version_id=UUID(resolved["version_id"]), known_at=known_at
+    )["resource"]
+    if (
+        str(entity["resource_id"]) != str(identity)
+        or str(entity["version_id"]) != resolved["version_id"]
+        or entity["authority_state"] != "APPROVED"
+        or entity["evidence_class"] == "REFERENCE_TEMPLATE"
+    ):
+        raise WorkspaceError(409, "Company resource differs from the accepted historical snapshot")
+    return entity
 
 
 class AssessmentRequest(BaseModel):
@@ -326,8 +350,19 @@ def retain_assessment(principal: User, request: AssessmentRequest):
 
 
 @router.get("/assessments/{run_id}")
-def read_assessment(principal: User, run_id: str):
+def read_assessment(principal: User, run_id: str, legal_entity_id: UUID | None = None):
     result = read_run(principal, run_id)
     if result.get("contract") != "regulatory-assessment/1":
         raise WorkspaceError(404, "Regulatory assessment unavailable")
+    if legal_entity_id is not None:
+        company, context = result.get("company"), result.get("assessment_context")
+        if (
+            not isinstance(company, dict)
+            or not isinstance(context, dict)
+            or str(company.get("resource_id")) != str(legal_entity_id)
+            or str(context.get("legal_entity_id")) != str(legal_entity_id)
+        ):
+            raise WorkspaceError(404, "Regulatory assessment unavailable")
+    # Historical evidence keeps its original company version and scenario times.
+    # Omitted company preserves the existing exact-scope historical API contract.
     return result

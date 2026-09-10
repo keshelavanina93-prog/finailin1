@@ -13,6 +13,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from finai_api.domain.authority import canonical_sha256
+from finai_api.domain.field_constraints import matches_constraints
 from finai_api.domain.resources import (
     CanonicalResource,
     ProposalDetail,
@@ -20,6 +21,7 @@ from finai_api.domain.resources import (
     ResourceReview,
 )
 from finai_api.domain.review import Principal
+from finai_api.services import dependency_impact
 from finai_api.services.dependency_impact import downstream_impact, impact_fingerprint
 from finai_api.services.proposal_evaluation import record_evaluation, require_evaluation
 from finai_api.services.schema_compatibility import SchemaCompatibilityError, schema_compatibility
@@ -33,6 +35,23 @@ HEAD_SELECT = (
     "resource_versions v USING(tenant_id,resource_id,version_id) "
     "JOIN canonical_identities i USING(tenant_id,resource_id) "
 )
+
+PLATFORM_PUBLIC_TYPES = {
+    "SchemaDefinition",
+    "SemanticContract",
+    "LinkType",
+    "ObjectInterface",
+    "ObjectTypeGroup",
+    "ObjectTypeImplementation",
+    "ObjectSetDefinition",
+    "ObjectBinding",
+    "DerivedProperty",
+    "FactContract",
+    "FinanceCapabilityDefinition",
+    "FinanceClassificationPolicy",
+    "FinanceProjectionDefinition",
+    "CertificationContract",
+}
 
 
 @contextmanager
@@ -241,7 +260,9 @@ def _check_scalar(kind: str, value: Any) -> bool:
 
 
 def _validate(
-    conn: psycopg.Connection[Any], principal: Principal, proposal: ResourceProposal,
+    conn: psycopg.Connection[Any],
+    principal: Principal,
+    proposal: ResourceProposal,
     external_proofs: dict[UUID, str] | None = None,
 ) -> dict[str, Any]:
     from finai_api.services.external_ontology_validation import validate_boundaries
@@ -268,6 +289,7 @@ def _validate(
         raise WorkspaceError(403, "Resource policy overrides require a tenant-restricted proposal")
     resolved: dict[str, dict[str, Any]] = {}
     dependencies: dict[str, list[dict[str, str]]] = {key: [] for key in mutations}
+    co_publication_constraints: list[dict[str, str]] = []
     external_heads: dict[str, str] = {}
     schema_versions: dict[str, str | None] = {}
     impact: list[dict[str, Any]] = []
@@ -321,8 +343,12 @@ def _validate(
                 and relation.startswith("EXTERNAL_ONTOLOGY_SOURCE:")
             )
             if not (
-                exact_query or exact_property or exact_function_input
-                or exact_binding_property or exact_calculated_binding or exact_external_source
+                exact_query
+                or exact_property
+                or exact_function_input
+                or exact_binding_property
+                or exact_calculated_binding
+                or exact_external_source
             ):
                 raise WorkspaceError(422, "Exact ontology dependency is not supported here")
             head = _get(conn, tenant, UUID(identifier))
@@ -368,8 +394,9 @@ def _validate(
                 resolved[identifier] = _get(conn, tenant, UUID(identifier))
             result = resolved[identifier]
             external_heads[identifier] = str(result["version_id"])
-        if (source_item.object_type == "ObjectSetDefinition"
-            and relation.startswith("TRAVERSAL_CANDIDATE:")):
+        if source_item.object_type == "ObjectSetDefinition" and relation.startswith(
+            "TRAVERSAL_CANDIDATE:"
+        ):
             # Discovery reads remain RLS-visible, temporally resolved and head-fenced.
             # Only matching endpoints are subsequently bound as DEFINITION_TYPE;
             # unrelated inspected schemas are not semantic inputs to this query.
@@ -383,6 +410,35 @@ def _validate(
             raise WorkspaceError(
                 403, "A resource cannot discard a dependency's entity access boundary"
             )
+        if relation == "RESOLUTION_PAIRED_MUTATION":
+            counterpart = mutations.get(identifier)
+            pair = (source_item, counterpart)
+            contracts = {"Finding": "source-finding/2", "Investigation": "source-investigation/2"}
+            if (
+                counterpart is None
+                or {source_item.object_type, counterpart.object_type} != set(contracts)
+                or any(
+                    item is None
+                    or item.expected_version_id is None
+                    or not isinstance(item.attributes.get("definition"), dict)
+                    or item.attributes["definition"].get("contract") != contracts[item.object_type]
+                    or item.attributes["definition"].get("state") != "RESOLVED"
+                    for item in pair
+                )
+            ):
+                raise WorkspaceError(409, "Both resolution mutations must be reviewed together")
+            # The resolution validator rederives both exact mutations and prior heads.
+            # Atomic co-publication is not reciprocal causal lineage. FIELD:finding_id
+            # and every evidence/journal dependency still enter the dependency graph.
+            co_publication_constraints.append(
+                {
+                    "source_resource_id": source,
+                    "target_resource_id": identifier,
+                    "relation": relation,
+                    "expected_version_id": str(counterpart.expected_version_id),
+                }
+            )
+            return result
         dependencies[source].append(
             {
                 "resource_id": identifier,
@@ -429,9 +485,7 @@ def _validate(
             raise WorkspaceError(
                 403, "Schema, semantic and link definitions belong to the shared platform registry"
             )
-        if access_entity == "__PLATFORM__" and item.object_type not in (
-            meta_types | {"CertificationContract"}
-        ):
+        if access_entity == "__PLATFORM__" and item.object_type not in PLATFORM_PUBLIC_TYPES:
             raise WorkspaceError(403, "Enterprise facts cannot use platform-public policy")
         with conn.cursor(row_factory=dict_row) as cursor:
             previous = cursor.execute(
@@ -511,7 +565,13 @@ def _validate(
                         raise WorkspaceError(422, f"{item.display_name}: missing {name}")
                     continue
                 value = item.attributes[name]
-                if not _check_scalar(spec["kind"], value):
+                array = (
+                    spec["kind"] == "definition"
+                    and spec.get("constraints", {}).get("type") == "array"
+                )
+                if (
+                    not array and not _check_scalar(spec["kind"], value)
+                ) or not matches_constraints(value, spec.get("constraints", {})):
                     raise WorkspaceError(
                         422, f"{item.display_name}: invalid {name} ({spec['kind']})"
                     )
@@ -525,10 +585,12 @@ def _validate(
                         raise WorkspaceError(422, "Money requires a canonical Currency")
             from finai_api.services.ontology_definition_validation import validate_definition
 
-            validate_definition(item, schema_by_name, link_by_name, target)
+            validate_definition(item, schema_by_name, link_by_name, target, principal=principal)
             if item.object_type in {
-                "ExternalOntologySource", "ExternalOntologyRelease",
-                "ExternalOntologyModule", "OntologyImportRun",
+                "ExternalOntologySource",
+                "ExternalOntologyRelease",
+                "ExternalOntologyModule",
+                "OntologyImportRun",
             }:
                 from finai_api.services.external_ontology_validation import (
                     validate as validate_external,
@@ -612,6 +674,23 @@ def _validate(
                     from finai_api.services.journal_dimensions import validate_line
 
                     validate_line(conn, principal, item, target, proposal, validation_time)
+            if item.object_type == "SourceJournalCompatibility":
+                from finai_api.services.source_journal_compatibility import (
+                    validate as validate_compatibility,
+                )
+
+                validate_compatibility(item, target)
+                from finai_api.services.accounting_promotion import validate_current_binding
+
+                validate_current_binding(
+                    conn,
+                    principal,
+                    target(
+                        item.attributes["accounting_binding_id"],
+                        identifier,
+                        "COMPATIBILITY_MATERIAL_BINDING",
+                    ),
+                )
             if item.object_type == "AccountDimensionPolicy":
                 from finai_api.services.journal_dimensions import (
                     validate_policy as validate_dimension_policy,
@@ -925,11 +1004,23 @@ def _validate(
                 raise WorkspaceError(409, "Identity merge would introduce a cycle")
             visited.add(current)
             current = redirects[current]
+    impact_limit = dependency_impact.MAX_RESOURCES
+    if proposal.access_entity == "__PLATFORM__" and "restricted_read" in principal.permissions:
+        # A reviewed steward grant permits a complete, still-bounded platform
+        # impact walk. The normal tenant proposal bound remains unchanged.
+        impact_limit = dependency_impact.PLATFORM_MAX_RESOURCES
     return {
         "impact": impact,
-        "downstream_impact": downstream_impact(conn, principal, proposal, dependencies),
+        "downstream_impact": downstream_impact(
+            conn,
+            principal,
+            proposal,
+            dependencies,
+            max_resources=impact_limit,
+        ),
         "dependency_heads": external_heads,
         "dependencies": dependencies,
+        "co_publication_constraints": co_publication_constraints,
         "schema_versions": schema_versions,
         "resource_scopes": mutation_scopes,
         "compatibility": "PASS",
@@ -1113,8 +1204,11 @@ def promotion_check(principal: Principal, proposal_id: UUID) -> dict[str, Any]:
     detail = proposal_detail(principal, proposal_id)
     external_proofs = {}
     preflight_error = None
-    if (detail.decision is None and "ontology_review" in principal.permissions
-            and detail.submitted_by != principal.actor_id):
+    if (
+        detail.decision is None
+        and "ontology_review" in principal.permissions
+        and detail.submitted_by != principal.actor_id
+    ):
         try:
             external_proofs = preflight(principal, detail.proposal)
         except (WorkspaceError, ValueError, KeyError) as exc:
@@ -1176,9 +1270,12 @@ def review(principal: Principal, proposal_id: UUID, request: ResourceReview) -> 
 
     before = proposal_detail(principal, proposal_id)
     external_proofs = {}
-    if (request.decision == "APPROVED" and before.decision is None
-            and "ontology_review" in principal.permissions
-            and before.submitted_by != principal.actor_id):
+    if (
+        request.decision == "APPROVED"
+        and before.decision is None
+        and "ontology_review" in principal.permissions
+        and before.submitted_by != principal.actor_id
+    ):
         external_proofs = preflight(principal, before.proposal)
     with resource_connection(principal) as conn, conn.cursor(row_factory=dict_row) as cursor:
         tenant = principal.scope.tenant_id

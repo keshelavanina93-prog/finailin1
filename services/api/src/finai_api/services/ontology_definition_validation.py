@@ -17,6 +17,7 @@ from finai_api.domain.ontology_definitions import (
     InterfaceDefinition,
 )
 from finai_api.domain.regulation import RegulatoryDefinition
+from finai_api.domain.resource_metadata import metadata_spec
 from finai_api.domain.resources import ResourceMutation
 from finai_api.services.object_filter_contract import filter_leaves, validate_filters
 from finai_api.services.temporal_definition_dependency import TemporalDependencyUnavailable
@@ -28,7 +29,30 @@ def validate_definition(
     schemas: dict[str, str],
     links: dict[str, str],
     target: Callable[..., dict[str, Any]],
+    *,
+    principal=None,
 ) -> None:
+    if item.object_type in ("Finding", "Investigation"):
+        from finai_api.services.investigation_actions import (
+            validate_publication as validate_investigation_publication,
+        )
+
+        validate_investigation_publication(item, target, principal)
+        return
+    if item.object_type == "MetricDefinition":
+        from finai_api.services.metric_execution import (
+            validate_publication as validate_metric_publication,
+        )
+
+        validate_metric_publication(item, target)
+        return
+    if item.object_type == "DomainPack":
+        # Normal resource validation captures typed, exact FIELD dependency pins.
+        # A pack chooses one executable membership basis; it cannot union two
+        # independently governed definitions by implication.
+        if {"membership_group_id", "membership_interface_id"}.issubset(item.attributes):
+            raise WorkspaceError(422, "DomainPack membership requires at most one definition")
+        return
     model = DEFINITION_MODELS.get(item.object_type)
     if model is None:
         return
@@ -37,6 +61,21 @@ def validate_definition(
     except (ValidationError, KeyError) as exc:
         raise WorkspaceError(422, f"Invalid {item.object_type} definition: {exc}") from exc
     source = str(item.resource_id)
+
+    if item.object_type == "FinanceClassificationPolicy":
+        from finai_api.services.finance_classification import validate_policy
+
+        validate_policy(item, target)
+        return
+
+    if item.object_type == "FinanceProjectionDefinition":
+        from finai_api.services.finance_execution import validate_projection
+
+        validate_projection(item, target)
+        return
+
+    if item.object_type == "FinanceCapabilityDefinition":
+        return
 
     if item.object_type == "RegulatoryRule":
         assert isinstance(definition, RegulatoryDefinition)
@@ -234,7 +273,7 @@ def validate_definition(
         if set(mapping) != set(required):
             raise WorkspaceError(422, "Implementation must map every declared interface property")
         for name, field in mapping.items():
-            spec = fields.get(field)
+            spec = metadata_spec(field) or fields.get(field)
             if not spec or spec["kind"] != required[name]["kind"]:
                 raise WorkspaceError(422, f"Interface property {name} has an incompatible mapping")
             if required[name]["required"] and not spec["required"]:

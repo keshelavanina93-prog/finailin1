@@ -1,0 +1,49 @@
+.shell { display: grid; gap: 18px; }
+.intro { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
+.eyebrow { margin: 0 0 5px; color: #53747a; font-size: 11px; letter-spacing: .13em; font-weight: 700; }
+.intro h2 { margin: 0; font-size: 22px; }
+.muted { color: #687b80; margin: 6px 0 0; max-width: 720px; }
+.status { padding: 12px 14px; border: 1px solid #d7e2e3; border-radius: 10px; background: #f8fbfb; color: #35565c; white-space: nowrap; }
+.status strong { display: block; margin-top: 3px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.wide { grid-column: 1 / -1; }
+.card { background: #fff; border: 1px solid #dce6e7; border-radius: 12px; padding: 16px; min-width: 0; }
+.card h3 { margin: 0 0 6px; font-size: 15px; }
+.card p { color: #687b80; font-size: 13px; line-height: 1.45; }
+.cardHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.cardHeading p { margin-bottom: 0; }
+.badge, .notCertified { display: inline-flex; align-items: center; border: 1px solid #e4b9a7; border-radius: 999px; padding: 5px 8px; color: #8d4b3c; background: #fff8f5; font-size: 10px; font-weight: 800; letter-spacing: .06em; white-space: nowrap; }
+.authority { display: grid; grid-template-columns: auto auto 1fr; align-items: baseline; gap: 8px 12px; margin: 14px 0; padding: 10px 12px; border-left: 3px solid #175d63; background: #f4f9f8; color: #35565c; font-size: 12px; }
+.authority strong { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.authority span { font-weight: 800; }
+.authority small { color: #687b80; }
+.observed { color: #175d63; font-weight: 800; }
+.draftResult { margin-top: 14px; border-top: 1px solid #e0e9e9; padding-top: 14px; }
+.draftHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.draftHeader strong, .draftHeader small { display: block; }
+.draftHeader small { margin-top: 4px; color: #687b80; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; overflow-wrap: anywhere; }
+.notCertified { border-color: #dbb678; color: #835e1b; background: #fff9e8; }
+.warning { padding: 9px 11px; border-radius: 7px; background: #fff8e8; color: #73551d !important; }
+.draftResult details { margin-top: 10px; color: #46666c; font-size: 12px; }
+.draftResult details p { margin: 6px 0; font-size: 12px; }
+.phaseList { display: grid; gap: 6px; margin: 12px 0 0; }
+.phase { display: flex; justify-content: space-between; gap: 10px; padding: 7px 9px; border-radius: 7px; background: #f5f9f9; font-size: 12px; }
+.phase b { color: #8d4b3c; }
+.form { display: grid; gap: 9px; }
+.form label { display: grid; gap: 4px; color: #46666c; font-size: 12px; font-weight: 600; }
+.form input, .form select, .form textarea { width: 100%; box-sizing: border-box; border: 1px solid #c9d8da; border-radius: 7px; padding: 8px 9px; font: inherit; font-size: 12px; background: #fff; }
+.form textarea { min-height: 58px; resize: vertical; }
+.form button, .button { border: 0; border-radius: 7px; padding: 9px 12px; background: #175d63; color: #fff; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.form button:disabled, .button:disabled { opacity: .5; cursor: default; }
+.secondary { background: #edf4f4; color: #175d63; }
+.row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.notice { border-radius: 8px; padding: 10px 12px; background: #edf7ef; color: #29603b; font-size: 13px; }
+.error { border-radius: 8px; padding: 10px 12px; background: #fff1ef; color: #8d3b2d; font-size: 13px; }
+.table { overflow: auto; max-height: 330px; border: 1px solid #e0e9e9; border-radius: 8px; }
+.table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.table th, .table td { padding: 8px 9px; text-align: left; border-bottom: 1px solid #e9eeee; vertical-align: top; }
+.table th { position: sticky; top: 0; background: #f5f9f9; color: #53747a; }
+.hash { color: #597479; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; overflow-wrap: anywhere; }
+.result { margin-top: 12px; padding: 11px; background: #f7faf9; border-radius: 8px; max-height: 260px; overflow: auto; }
+.result pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11px; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .wide { grid-column: auto; } .intro { display: block; } .status { margin-top: 10px; white-space: normal; } .cardHeading, .draftHeader { display: block; } .badge, .notCertified { margin-top: 10px; } .authority { grid-template-columns: 1fr; gap: 4px; } }

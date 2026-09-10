@@ -37,7 +37,13 @@ def verify_source(source, manifest):
     expected = {item["path"]: item["sha256"] for item in manifest["files"]}
     actual = {}
     for path in source.rglob("*"):
-        source_artifact.check_path(path)
+        # The source directory is already checked and materialized by
+        # package-source.materialize(). This verifier is also used with
+        # ordinary pytest fixtures outside D:, so reapplying the deployment
+        # drive policy here would hide content-integrity failures behind an
+        # unrelated host-path error. Reparse points remain forbidden.
+        if path.is_symlink() or path.is_junction():
+            raise ValueError("Build source cannot traverse reparse points")
         if path.is_file():
             actual[path.relative_to(source).as_posix()] = source_artifact.file_digest(
                 path

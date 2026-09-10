@@ -14,6 +14,7 @@ from uuid import UUID
 from psycopg.rows import dict_row
 
 from finai_api.domain.function_execution import (
+    AcceptedMovementsImplementation,
     FunctionDefinition,
     FunctionImplementation,
     FunctionInvocation,
@@ -31,6 +32,7 @@ from finai_api.services.workspace import WorkspaceError
 
 IMPLEMENTATION_ID = "ontology.object-set-derived/v1"
 WORKSHEET_IMPLEMENTATION_ID = "source.retained-xls-worksheet/v1"
+ACCEPTED_MOVEMENTS_IMPLEMENTATION_ID = "finance.accepted-journal-movements/v1"
 POSTED_MOVEMENTS_IMPLEMENTATION_ID = "accounting.retained-posted-movements/v1"
 
 
@@ -152,9 +154,23 @@ def manifest(implementation_id: str = IMPLEMENTATION_ID) -> dict[str, Any]:
         IMPLEMENTATION_ID,
         WORKSHEET_IMPLEMENTATION_ID,
         POSTED_MOVEMENTS_IMPLEMENTATION_ID,
+        ACCEPTED_MOVEMENTS_IMPLEMENTATION_ID,
     ):
         raise WorkspaceError(422, "Function implementation is not installed")
     result = deepcopy(_STARTUP_MANIFEST)
+    if implementation_id == ACCEPTED_MOVEMENTS_IMPLEMENTATION_ID:
+        result.update(
+            implementation_id=implementation_id,
+            maximum_rows=3,
+            maximum_properties=0,
+            capabilities={
+                "accepted_journal_movements": True,
+                "caller_amounts": False,
+                "financial_statements": False,
+                "business_effects": False,
+                "snapshot_semantics": "PINNED_SOURCE_TIMES_AND_SEPARATE_JOURNAL_OBSERVATION",
+            },
+        )
     if implementation_id == POSTED_MOVEMENTS_IMPLEMENTATION_ID:
         result.update(
             implementation_id=implementation_id,
@@ -215,6 +231,18 @@ def _check_implementation(spec: FunctionDefinition) -> dict:
 def validate_function(item: ResourceMutation, target: Callable[..., dict]) -> None:
     spec = FunctionDefinition.model_validate(item.attributes)
     _check_implementation(spec)
+    if isinstance(spec.definition, AcceptedMovementsImplementation):
+        company = target(
+            str(spec.definition.company.resource_id),
+            str(item.resource_id),
+            "ACCEPTED_MOVEMENT_COMPANY",
+        )
+        if company["object_type"] != "LegalEntity" or any(
+            str(company[key]) != str(getattr(spec.definition.company, key))
+            for key in ("resource_id", "version_id")
+        ):
+            raise WorkspaceError(409, "Accepted movements require an exact company dependency")
+        return
     if isinstance(spec.definition, PostedMovementsImplementation):
         from finai_api.services.posted_movements_function import validate_definition
 
@@ -341,7 +369,22 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
         by_id = {str(row["resource_id"]): row for row in pins}
         selected = by_id.get(str(spec.object_set_id))
         source = None
-        if isinstance(spec.definition, PostedMovementsImplementation):
+        accepted = isinstance(spec.definition, AcceptedMovementsImplementation)
+        if accepted != (request.accepted_movements is not None):
+            raise WorkspaceError(422, "Accepted movements input must match its Function adapter")
+        if isinstance(spec.definition, AcceptedMovementsImplementation):
+            company = by_id.get(str(spec.definition.company.resource_id))
+            if (
+                company is None
+                or company["object_type"] != "LegalEntity"
+                or any(
+                    str(company[key]) != str(getattr(spec.definition.company, key))
+                    for key in ("resource_id", "version_id")
+                )
+                or str(company["resource_id"]) != str(p.scope.legal_entity_id)
+            ):
+                raise WorkspaceError(409, "Accepted movement company dependency differs")
+        elif isinstance(spec.definition, PostedMovementsImplementation):
             from finai_api.services.posted_movements_function import source_plan
 
             source = source_plan(p, request, spec, by_id)
@@ -429,6 +472,11 @@ def plan(p: Principal, request: FunctionInvocation, *, defer_input: bool = False
             raise WorkspaceError(409, "Retained input requires the ontology Object Set adapter")
         if not defer_input:
             _retained_input(p, request, result)
+    if accepted:
+        from finai_api.services.accepted_movements_function import input_plan
+
+        assert company is not None
+        result["accepted_movements"] = input_plan(p, request, _pin(company))
     result["plan_hash"] = _digest(result)
     return result
 
@@ -718,6 +766,10 @@ def execute_plan(p: Principal, retained_plan: dict) -> dict:
         raise WorkspaceError(
             409, "Function plan no longer matches installed implementation and exact context"
         )
+    if retained_plan["implementation"]["implementation_id"] == ACCEPTED_MOVEMENTS_IMPLEMENTATION_ID:
+        from finai_api.services.accepted_movements_function import execute
+
+        return execute(p, request, retained_plan)
     if retained_plan["implementation"]["implementation_id"] == POSTED_MOVEMENTS_IMPLEMENTATION_ID:
         from finai_api.services.posted_movements_function import execute
 

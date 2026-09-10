@@ -1,0 +1,9 @@
+.home-journal-discovery{display:grid;gap:.55rem;padding:.85rem 0;border-block:1px solid var(--g8-border, #273647);min-width:0}
+.home-journal-discovery header{display:flex;align-items:baseline;justify-content:space-between;gap:.5rem 1rem;flex-wrap:wrap}
+.home-journal-discovery h3,.home-journal-discovery p{margin:0}
+.home-journal-discovery>small,.home-journal-discovery header small{color:var(--g8-muted, #9cabbc);line-height:1.5}
+.home-journal-discovery label{display:grid;gap:.3rem;min-width:0}
+.home-journal-discovery select{width:100%;max-width:44rem;min-width:0;padding:.5rem;background:var(--g8-surface, #111b27);color:inherit;border:1px solid var(--g8-border, #273647);border-radius:.3rem}
+.home-journal-discovery .posted-journal-review{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem}
+.home-journal-discovery .posted-journal-review button{max-width:100%;white-space:normal}
+.home-journal-discovery p,.home-journal-discovery small{overflow-wrap:anywhere}

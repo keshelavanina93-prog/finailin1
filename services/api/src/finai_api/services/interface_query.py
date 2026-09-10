@@ -7,6 +7,7 @@ from psycopg.rows import dict_row
 
 from finai_api.domain.object_sets import InterfaceRoot
 from finai_api.domain.ontology_definitions import ImplementationDefinition, InterfaceDefinition
+from finai_api.domain.resource_metadata import interface_value
 from finai_api.services.workspace import WorkspaceError
 
 
@@ -156,7 +157,7 @@ def values(binding, objects):
                 "schema_version_id": implementation["schema"]["version_id"],
                 "status": "AVAILABLE" if compatible else "SCHEMA_CHANGED",
                 "values": {
-                    name: obj["attributes"].get(field)
+                    name: interface_value(obj, field)
                     for name, field in implementation["fields"].items()
                 }
                 if compatible
