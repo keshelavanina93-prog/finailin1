@@ -36,7 +36,7 @@ def test_projection_catalog_is_server_owned_and_read_only() -> None:
     assert statuses["formatted-table"] == "IMPLEMENTED"
     assert statuses["chart-bubble"] == "IMPLEMENTED"
     assert statuses["field-input"] == "PARTIAL"
-    assert statuses["action-control"] == "REGISTERED"
+    assert statuses["action-control"] == "PARTIAL"
 
 
 def test_selection_preserves_exact_cross_projection_dimensions() -> None:
@@ -104,6 +104,22 @@ def test_field_projection_returns_exact_selection_context_without_mutation() -> 
     assert {row["field"] for row in body["rows"]} >= {
         "company_id", "facility_id", "tank_id", "product_id", "period"
     }
+
+
+def test_action_projection_exposes_boundary_without_execution() -> None:
+    selection = WorkspaceSelection(company_id="sgp", selected_object_id="workflow-1")
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post(
+            "/v1/workspace/projections/data",
+            json={"projection_id": "action-control", "selection": selection.model_dump()},
+        )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data_state"] == "CONTEXT_ONLY"
+    assert body["authority_effect"] == "NONE"
+    values = {row["field"]: row["value"] for row in body["rows"]}
+    assert values["approval_state"] == "APPROVAL_REQUIRED"
+    assert values["execution"] == "NOT_PERMITTED_FROM_PROJECTION"
 
 
 def test_projection_rows_expose_typed_coordinate_measure_and_evidence_envelope() -> None:

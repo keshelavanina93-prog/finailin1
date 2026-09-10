@@ -85,7 +85,10 @@ export default function ProjectionDataRenderer({ data }: { data: WorkspaceProjec
       return <div className="g8-projection-result"><h4>{data.projection.label} · {data.data_state}</h4><p>Accepted geometry only · authority effect: {data.authority_effect}.</p><div className="g8-projection-chart" role="img" aria-label="Accepted operational assets for the exact selected context"><svg viewBox="0 0 720 280" preserveAspectRatio="none">{pointsForMap.map((point, index) => { const x = 30 + ((point.x - minX) / (maxX - minX || 1)) * 660; const y = 250 - ((point.y - minY) / (maxY - minY || 1)) * 220; return <g key={`${point.label}:${index}`} onClick={() => publishProjectionSelection(data, { selected_object_id: (data.normalized_rows ?? [])[index]?.row_id ?? null })}><circle cx={x} cy={y} r="5" /><title>{point.label}</title></g>; })}</svg></div><p>{pointsForMap.length} accepted point geometries returned. Non-point and unmapped assets remain in the operations map&apos;s governed evidence view.</p></div>;
     }
   }
-  if (["FIELD", "IMAGE", "ACTION"].includes(data.projection.kind)) {
+  if (data.projection.kind === "ACTION" && data.data_state === "CONTEXT_ONLY") {
+    return <div className="g8-projection-result"><h4>{data.projection.label} · governed capability</h4><p>Read-only action status for the exact selected scope · authority effect: {data.authority_effect}.</p><dl>{data.rows.filter(row => typeof row.field === "string").map(row => <div key={String(row.field)}><dt>{String(row.label ?? row.field)}</dt><dd>{String(row.value ?? "Not recorded")}</dd></div>)}</dl><p role="status">This projection cannot execute an action. Use the governed workflow workbench for maker/checker approval, adapter execution, and external readback.</p></div>;
+  }
+  if (["IMAGE", "ACTION"].includes(data.projection.kind)) {
     return <div className="g8-projection-result"><h4>{data.projection.label}</h4><p role="status">This projection is registered for the exact context, but its authoritative payload is not available in this read-only data contract. No input mutation, image substitution, or business action was performed.</p><strong>{data.data_state}</strong></div>;
   }
   if (data.projection.kind === "TEXT") {

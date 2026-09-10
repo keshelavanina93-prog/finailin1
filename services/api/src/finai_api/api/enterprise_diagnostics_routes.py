@@ -265,6 +265,51 @@ def projection_data(
             "authority_effect": "NONE",
         }
 
+    if request.projection_id == "action-control":
+        action_rows = [
+            {
+                "row_id": "action:scope",
+                "label": "Action scope",
+                "field": "scope",
+                "value": request.selection.selected_object_id or "No selected workflow",
+                "authority_state": "ACTION_CONTEXT",
+            },
+            {
+                "row_id": "action:approval",
+                "label": "Approval state",
+                "field": "approval_state",
+                "value": "APPROVAL_REQUIRED",
+                "authority_state": "ACTION_CONTEXT",
+            },
+            {
+                "row_id": "action:execution",
+                "label": "External execution",
+                "field": "execution",
+                "value": "NOT_PERMITTED_FROM_PROJECTION",
+                "authority_state": "ACTION_CONTEXT",
+            },
+            {
+                "row_id": "action:readback",
+                "label": "Readback",
+                "field": "readback",
+                "value": "REQUIRED_AFTER_APPROVED_ACTION",
+                "authority_state": "ACTION_CONTEXT",
+            },
+        ]
+        return {
+            "contract": "workspace-projection-data/1",
+            "projection": projection,
+            "selection": request.selection.model_dump(mode="json"),
+            "data_state": "CONTEXT_ONLY",
+            "rows": action_rows,
+            "normalized_rows": [
+                item.model_dump(mode="json") for item in normalize_projection_rows(action_rows)
+            ],
+            "coverage": "workflow/control",
+            "scope": {"company_id": request.selection.company_id},
+            "authority_effect": "NONE",
+        }
+
     if request.projection_id == "operations-map":
         try:
             map_result = operations_map.map_view(
@@ -356,7 +401,7 @@ def projection_data(
             "coverage": comparison["coverage"],
             "authority_effect": "NONE",
         }
-    if request.projection_id in {"image-evidence", "action-control", "nyx-context"}:
+    if request.projection_id in {"image-evidence", "nyx-context"}:
         return {
             "contract": "workspace-projection-data/1",
             "projection": projection,
