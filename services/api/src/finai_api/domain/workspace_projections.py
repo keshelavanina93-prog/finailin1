@@ -194,7 +194,7 @@ def _projection(
 
 PROJECTIONS: tuple[ProjectionDefinition, ...] = (
     _projection("executive-kpi", "KPI", "Executive KPI", ("COMMAND_EXECUTIVE", "REPORT"), ("company_id", "period", "scenario_id", "comparison_baseline"), ("planning-catalog/1", "planning-comparison/1"), "PARTIAL"),  # noqa: E501
-    _projection("variance-waterfall", "WATERFALL", "Variance waterfall", ("BRIDGE_FIRST", "REPORT"), ("company_id", "product_id", "station_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "WATERFALL"),  # noqa: E501
+    _projection("variance-waterfall", "WATERFALL", "Variance waterfall", ("BRIDGE_FIRST", "REPORT"), ("company_id", "product_id", "station_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "WATERFALL"),  # noqa: E501
     _projection("planning-grid", "GRID", "Planning grid", ("TABLE_FIRST", "REPORT"), ("company_id", "period", "scenario_id", "version_id"), ("planning-catalog/1",), "IMPLEMENTED"),  # noqa: E501
     _projection("hierarchy-drilldown", "HIERARCHY", "Hierarchy drill-down", ("TABLE_FIRST", "GRAPH_FIRST"), ("company_id", "selected_object_id"), ("operations-map/1",), "PARTIAL"),  # noqa: E501
     _projection("movement-network", "NETWORK", "Movement network", ("GRAPH_FIRST", "TIMELINE_FIRST"), ("company_id", "selected_object_id"), ("operations-map/1",), "PARTIAL"),  # noqa: E501
@@ -204,17 +204,17 @@ PROJECTIONS: tuple[ProjectionDefinition, ...] = (
     _projection("field-input", "FIELD", "Governed field input", ("TABLE_FIRST", "BRIDGE_FIRST"), ("company_id", "selected_object_id", "scenario_id", "version_id"), ("workspace-selection/1",), "REGISTERED"),  # noqa: E501
     _projection("image-evidence", "IMAGE", "Evidence image", ("REPORT", "COMMAND_EXECUTIVE"), ("company_id", "selected_object_id", "replay_as_of"), ("workspace/constructions",), "REGISTERED"),  # noqa: E501
     _projection("action-control", "ACTION", "Governed action control", ("COMMAND_EXECUTIVE", "REPORT"), ("company_id", "selected_object_id", "scenario_id", "version_id"), ("workflow/control",), "REGISTERED"),  # noqa: E501
-    _projection("formatted-table", "TABLE", "Formatted report table", ("REPORT",), ("company_id", "period", "scenario_id", "version_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED"),  # noqa: E501
-    _projection("chart-area", "CHART", "Area chart", ("REPORT", "TIMELINE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "AREA"),  # noqa: E501
-    _projection("chart-bar", "CHART", "Bar chart", ("REPORT", "BRIDGE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "BAR"),  # noqa: E501
-    _projection("chart-column", "CHART", "Column chart", ("REPORT", "BRIDGE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "COLUMN"),  # noqa: E501
-    _projection("chart-combination", "CHART", "Combination chart", ("REPORT", "BRIDGE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "COMBINATION"),  # noqa: E501
-    _projection("chart-dot", "CHART", "Dot chart", ("REPORT", "GRAPH_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "DOT"),  # noqa: E501
-    _projection("chart-gantt", "CHART", "Gantt timeline", ("REPORT", "TIMELINE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "GANTT"),  # noqa: E501
-    _projection("chart-line", "CHART", "Line chart", ("REPORT", "TIMELINE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "LINE"),  # noqa: E501
-    _projection("chart-pie", "CHART", "Pie chart", ("REPORT", "COMMAND_EXECUTIVE"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "PIE"),  # noqa: E501
-    _projection("chart-scatter", "CHART", "Scatter plot", ("REPORT", "GRAPH_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "SCATTER"),  # noqa: E501
-    _projection("chart-bubble", "CHART", "Bubble chart", ("REPORT", "GRAPH_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "BUBBLE"),  # noqa: E501
+    _projection("formatted-table", "TABLE", "Formatted report table", ("REPORT",), ("company_id", "period", "scenario_id", "version_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED"),  # noqa: E501
+    _projection("chart-area", "CHART", "Area chart", ("REPORT", "TIMELINE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "AREA"),  # noqa: E501
+    _projection("chart-bar", "CHART", "Bar chart", ("REPORT", "BRIDGE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "BAR"),  # noqa: E501
+    _projection("chart-column", "CHART", "Column chart", ("REPORT", "BRIDGE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "COLUMN"),  # noqa: E501
+    _projection("chart-combination", "CHART", "Combination chart", ("REPORT", "BRIDGE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "COMBINATION"),  # noqa: E501
+    _projection("chart-dot", "CHART", "Dot chart", ("REPORT", "GRAPH_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "DOT"),  # noqa: E501
+    _projection("chart-gantt", "CHART", "Gantt timeline", ("REPORT", "TIMELINE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "GANTT"),  # noqa: E501
+    _projection("chart-line", "CHART", "Line chart", ("REPORT", "TIMELINE_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "LINE"),  # noqa: E501
+    _projection("chart-pie", "CHART", "Pie chart", ("REPORT", "COMMAND_EXECUTIVE"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "PIE"),  # noqa: E501
+    _projection("chart-scatter", "CHART", "Scatter plot", ("REPORT", "GRAPH_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "SCATTER"),  # noqa: E501
+    _projection("chart-bubble", "CHART", "Bubble chart", ("REPORT", "GRAPH_FIRST"), ("company_id", "product_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED", "BUBBLE"),  # noqa: E501
 )
 
 

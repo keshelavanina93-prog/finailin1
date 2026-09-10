@@ -29,6 +29,11 @@ def test_projection_catalog_is_server_owned_and_read_only() -> None:
     }
     assert all(item["authority_effect"] == "NONE" for item in catalog)
     assert all(item["synchronization_group"] == "WORKSPACE_SELECTION" for item in catalog)
+    statuses = {item["projection_id"]: item["status"] for item in catalog}
+    assert statuses["variance-waterfall"] == "IMPLEMENTED"
+    assert statuses["formatted-table"] == "IMPLEMENTED"
+    assert statuses["chart-bubble"] == "IMPLEMENTED"
+    assert statuses["action-control"] == "REGISTERED"
 
 
 def test_selection_preserves_exact_cross_projection_dimensions() -> None:
