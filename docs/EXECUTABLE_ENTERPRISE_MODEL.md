@@ -614,6 +614,9 @@ minimum shared endpoints are:
 POST /v1/ontology/executable/resolve
 GET  /v1/ontology/executable/resolutions/{resolution_id}
 GET  /v1/ontology/executable/functions
+GET  /v1/workspace/executable-functions
+POST /v1/workspace/executable-preflight
+POST /v1/workspace/calculation/compile
 POST /v1/ontology/planning/snapshots
 POST /v1/ontology/planning/comparison-sets
 POST /v1/ontology/planning/outcomes/measure

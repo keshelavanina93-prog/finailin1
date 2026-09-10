@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 from collections import defaultdict, deque
 from collections.abc import Callable, Mapping
+from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 from hashlib import sha256
@@ -152,6 +153,29 @@ class DimensionMapping(BaseModel):
     mapping_id: str = Field(min_length=1)
     rules: tuple[DimensionMappingRule, ...] = ()
     shape: CalculationShape = CalculationShape.ONE_TO_ONE
+
+
+class HierarchyDefinition(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    hierarchy_id: str = Field(min_length=1)
+    version: str = Field(min_length=1)
+    child_dimension: str = Field(min_length=1)
+    parent_dimension: str = Field(min_length=1)
+    valid_from: str
+    valid_to: str | None = None
+    known_at: str
+
+
+class HierarchyMembership(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    hierarchy_id: str = Field(min_length=1)
+    child_value: str = Field(min_length=1)
+    parent_value: str = Field(min_length=1)
+    valid_from: str
+    valid_to: str | None = None
+    known_at: str
 
 
 class TransformDefinition(BaseModel):
@@ -402,6 +426,68 @@ def aggregate_sparse_values(
     return {Coordinate(values=key): value for key, value in sorted(grouped.items())}
 
 
+def execute_transform(
+    transform: TransformDefinition,
+    cells: Mapping[Coordinate, Decimal],
+    *,
+    mapping: DimensionMapping | None = None,
+    target_dimensions: frozenset[str] | None = None,
+) -> dict[Coordinate, Decimal]:
+    """Execute safe transforms with explicit refusal for unregistered operators."""
+
+    if transform.transform_type is TransformType.DIRECT:
+        return dict(cells)
+    if transform.transform_type in {TransformType.MAP, TransformType.LOOKUP}:
+        if mapping is None:
+            raise ValueError("Dimension mapping is required for this transform")
+        return {map_coordinate(coordinate, mapping): value for coordinate, value in cells.items()}
+    if transform.transform_type is TransformType.AGGREGATE:
+        if target_dimensions is None:
+            raise ValueError("Target dimensions are required for aggregation")
+        return aggregate_sparse_values(cells, target_dimensions)
+    raise ValueError(
+        f"Transform implementation is not registered: {transform.transform_type.value}"
+    )
+
+
+def resolve_hierarchy_parent(
+    hierarchy: HierarchyDefinition,
+    memberships: tuple[HierarchyMembership, ...],
+    child_value: str,
+    *,
+    valid_at: str,
+    replay_as_of: str,
+) -> str:
+    """Resolve a parent using both economic time and knowledge cut-off."""
+
+    target_time = _parse_time(valid_at)
+    as_of = _parse_time(replay_as_of)
+    candidates = [
+        item
+        for item in memberships
+        if item.hierarchy_id == hierarchy.hierarchy_id
+        and item.child_value == child_value
+        and _parse_time(item.known_at) <= as_of
+        and _parse_time(item.valid_from) <= target_time
+        and (item.valid_to is None or target_time < _parse_time(item.valid_to))
+    ]
+    if not candidates:
+        raise ValueError("No hierarchy membership is valid at the requested replay point")
+    latest_known = max(_parse_time(item.known_at) for item in candidates)
+    resolved = [item for item in candidates if _parse_time(item.known_at) == latest_known]
+    parents = {item.parent_value for item in resolved}
+    if len(parents) != 1:
+        raise ValueError("Hierarchy membership is ambiguous at the requested replay point")
+    return next(iter(parents))
+
+
+def _parse_time(value: str) -> datetime:
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("Temporal runtime values must be ISO timestamps") from exc
+
+
 def _graph_plan(graph: CalculationGraph, changed_nodes: tuple[str, ...]) -> tuple[str, ...] | None:
     nodes = {node.node_id: node for node in graph.nodes}
     if len(nodes) != len(graph.nodes) or any(
@@ -578,6 +664,8 @@ __all__: Final = [
     "DimensionMapping",
     "DimensionMappingRule",
     "DimensionalSignature",
+    "HierarchyDefinition",
+    "HierarchyMembership",
     "IntersectionSet",
     "RuntimeState",
     "SparseCalculationResult",
@@ -587,5 +675,7 @@ __all__: Final = [
     "aggregate_sparse_values",
     "compile_sparse_plan",
     "execute_sparse_decimal_plan",
+    "execute_transform",
     "map_coordinate",
+    "resolve_hierarchy_parent",
 ]

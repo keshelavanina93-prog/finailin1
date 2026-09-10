@@ -46,6 +46,7 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
       "/api/workspace/constructions/* -> /v1/workspace/constructions/*",
       "/api/workspace/executable-preflight -> /v1/workspace/executable-preflight",
       "/api/workspace/executable-functions -> /v1/workspace/executable-functions",
+      "/api/workspace/calculation/compile -> /v1/workspace/calculation/compile",
     ],
     ["forecast authoring/calculation, liquidity, and release certification"],
   ),

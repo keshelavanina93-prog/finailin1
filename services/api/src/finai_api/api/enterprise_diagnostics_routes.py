@@ -3,15 +3,36 @@
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Response
+from pydantic import BaseModel, ConfigDict
 
+from finai_api.domain.calculation_graph import CalculationGraph
 from finai_api.domain.enterprise_diagnostics import DiagnosticRequest
 from finai_api.domain.executable_enterprise_model import (
     ExecutablePreflightRequest,
     resolve_function,
 )
+from finai_api.domain.multidimensional_runtime import (
+    CalculationBlock,
+    Coordinate,
+    DimensionalSignature,
+    IntersectionSet,
+    compile_sparse_plan,
+)
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import enterprise_diagnostics, executable_function_registry
+
+
+class CalculationCompileRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    graph: CalculationGraph
+    signatures: tuple[DimensionalSignature, ...] = ()
+    blocks: tuple[CalculationBlock, ...] = ()
+    intersections: tuple[IntersectionSet, ...] = ()
+    changed_nodes: tuple[str, ...] = ()
+    changed_coordinates: tuple[Coordinate, ...] = ()
+
 
 router = APIRouter(prefix="/v1/workspace", tags=["enterprise diagnostics"])
 
@@ -89,4 +110,27 @@ def executable_functions(principal: ReadUser, response: Response) -> dict[str, o
             for item in executable_function_registry.list_registered_functions()
         ],
         "authority_effect": "NONE",
+    }
+
+
+@router.post("/calculation/compile")
+def compile_calculation(
+    request: CalculationCompileRequest, principal: ReadUser, response: Response
+) -> dict[str, object]:
+    """Compile a sparse physical plan without executing or promoting values."""
+
+    response.headers["Cache-Control"] = "no-store"
+    plan = compile_sparse_plan(
+        request.graph,
+        request.signatures,
+        request.blocks,
+        request.intersections,
+        request.changed_nodes,
+        request.changed_coordinates,
+    )
+    return {
+        "contract": "calculation-compile/1",
+        "plan": plan.model_dump(mode="json"),
+        "authority_effect": "NONE",
+        "execution_performed": False,
     }

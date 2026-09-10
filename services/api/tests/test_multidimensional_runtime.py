@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from fastapi.testclient import TestClient
+
 from finai_api.domain.calculation_graph import CalculationGraph, CalculationNode
 from finai_api.domain.multidimensional_runtime import (
     CalculationBlock,
@@ -7,13 +9,20 @@ from finai_api.domain.multidimensional_runtime import (
     DimensionalSignature,
     DimensionMapping,
     DimensionMappingRule,
+    HierarchyDefinition,
+    HierarchyMembership,
     IntersectionSet,
     RuntimeState,
+    TransformDefinition,
+    TransformType,
     aggregate_sparse_values,
     compile_sparse_plan,
     execute_sparse_decimal_plan,
+    execute_transform,
     map_coordinate,
+    resolve_hierarchy_parent,
 )
+from finai_api.main import app
 
 
 def coordinate(station: str) -> Coordinate:
@@ -134,3 +143,105 @@ def test_mapping_and_sum_aggregation_are_explicit_and_deterministic() -> None:
         frozenset({"region"}),
     )
     assert aggregated[Coordinate(values=(("region", "TBILISI"),))] == Decimal("14.15")
+
+
+def test_transform_dispatch_refuses_unregistered_execution_and_supports_mapping() -> None:
+    source = {Coordinate(values=(("station", "024"),)): Decimal("10")}
+    transform = TransformDefinition(
+        transform_id="map-station-region",
+        transform_type=TransformType.MAP,
+        source_signature_id="station",
+        target_signature_id="region",
+        implementation_id="trusted.map.v1",
+    )
+    result = execute_transform(
+        transform,
+        source,
+        mapping=DimensionMapping(
+            mapping_id="station-region",
+            rules=(
+                DimensionMappingRule(
+                    source_dimension="station",
+                    target_dimension="region",
+                    value_map=(("024", "TBILISI"),),
+                ),
+            ),
+        ),
+    )
+    assert result == {Coordinate(values=(("region", "TBILISI"),)): Decimal("10")}
+    unsupported = transform.model_copy(update={"transform_type": TransformType.LAG})
+    try:
+        execute_transform(unsupported, source)
+    except ValueError as error:
+        assert "not registered" in str(error)
+    else:
+        raise AssertionError("Unregistered transform unexpectedly executed")
+
+
+def test_hierarchy_replay_uses_valid_and_known_time() -> None:
+    hierarchy = HierarchyDefinition(
+        hierarchy_id="station-region",
+        version="2",
+        child_dimension="station",
+        parent_dimension="region",
+        valid_from="2026-01-01T00:00:00+00:00",
+        known_at="2026-01-01T00:00:00+00:00",
+    )
+    memberships = (
+        HierarchyMembership(
+            hierarchy_id="station-region",
+            child_value="024",
+            parent_value="OLD",
+            valid_from="2026-01-01T00:00:00+00:00",
+            valid_to="2026-09-01T00:00:00+00:00",
+            known_at="2026-01-01T00:00:00+00:00",
+        ),
+        HierarchyMembership(
+            hierarchy_id="station-region",
+            child_value="024",
+            parent_value="NEW",
+            valid_from="2026-09-01T00:00:00+00:00",
+            known_at="2026-09-02T00:00:00+00:00",
+        ),
+    )
+    assert (
+        resolve_hierarchy_parent(
+            hierarchy,
+            memberships,
+            "024",
+            valid_at="2026-08-31T00:00:00+00:00",
+            replay_as_of="2026-09-01T00:00:00+00:00",
+        )
+        == "OLD"
+    )
+    assert (
+        resolve_hierarchy_parent(
+            hierarchy,
+            memberships,
+            "024",
+            valid_at="2026-09-10T00:00:00+00:00",
+            replay_as_of="2026-09-10T00:00:00+00:00",
+        )
+        == "NEW"
+    )
+
+
+def test_compile_endpoint_returns_read_only_sparse_plan() -> None:
+    graph, signatures, blocks, intersections = runtime_fixture()
+    payload = {
+        "graph": graph.model_dump(mode="json"),
+        "signatures": [item.model_dump(mode="json") for item in signatures],
+        "blocks": [item.model_dump(mode="json") for item in blocks],
+        "intersections": [item.model_dump(mode="json") for item in intersections],
+        "changed_nodes": ["revenue"],
+        "changed_coordinates": [coordinate("024").model_dump(mode="json")],
+    }
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post("/v1/workspace/calculation/compile", json=payload)
+    assert response.status_code == 200
+    body = response.json()
+    assert body["contract"] == "calculation-compile/1"
+    assert body["plan"]["selected_node_ids"] == ["revenue", "margin"]
+    assert body["plan"]["affected_coordinates"] == [coordinate("024").model_dump(mode="json")]
+    assert body["authority_effect"] == "NONE"
+    assert body["execution_performed"] is False
