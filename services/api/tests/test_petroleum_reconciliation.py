@@ -89,6 +89,32 @@ def test_variance_is_full_scope_bitemporal_and_partial_bridge(monkeypatch):
     assert row["time"]["replay_as_of"] is None
 
 
+def test_variance_detail_returns_evidence_packet_and_lineage(monkeypatch):
+    principal = _principal()
+    entity = str(principal.scope.legal_entity_id)
+    rows = {
+        "InventoryBalance": [FakeResource(UUID("30000000-0000-0000-0000-000000000011"), {
+            "legal_entity_id": entity, "facility_id": "depot-1", "tank_id": "T-04",
+            "product_id": "diesel", "period_id": "2025-04", "unit": "L",
+            "opening_quantity": "100", "receipts": "20", "dispatches": "18",
+            "losses": "1", "closing_quantity": "99", "source_sha256": "b" * 64,
+            "tank_dip_id": "dip-1",
+        })], "PhysicalMovement": [], "PhysicalMeasurement": [], "RetailSale": [],
+        "ProductCost": [],
+    }
+    monkeypatch.setattr(petroleum_reconciliation.resources, "list_resources",
+                        lambda _p, kind, _s, _o, limit=1000: rows.get(kind, []))
+    monkeypatch.setattr(petroleum_reconciliation, "lineage",
+                        lambda _p, resource_id, _company_id=None: {"root_resource_id": str(resource_id)})
+    variance = petroleum_reconciliation.variances(principal)["rows"][0]
+    detail = petroleum_reconciliation.variance_detail(principal, variance["variance_id"])
+    assert detail["contract"] == "petroleum-variance-detail/1"
+    assert detail["evidence_packet"]["tank_dip_ids"] == ["dip-1"]
+    assert detail["evidence_packet"]["source_hashes"] == ["b" * 64]
+    assert detail["accounting_effect"] == "NOT_YET_AUTHORITATIVE"
+    assert detail["lineage"]
+
+
 def test_reconcile_replay_excludes_evidence_known_after_cutoff(monkeypatch):
     entity = str(_principal().scope.legal_entity_id)
     rows = {

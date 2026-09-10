@@ -65,6 +65,19 @@ def petroleum_variances_view(
     return petroleum_reconciliation.variances(principal, company_id, valid_at, known_at)
 
 
+@router.get("/petroleum/variances/{variance_id}")
+def petroleum_variance_detail(
+    principal: User,
+    variance_id: str,
+    company_id: UUID | None = None,
+    valid_at: datetime | None = None,
+    known_at: datetime | None = None,
+) -> dict[str, Any]:
+    return petroleum_reconciliation.variance_detail(
+        principal, variance_id, company_id, valid_at, known_at
+    )
+
+
 @router.post("/petroleum/variances/investigations")
 def petroleum_investigation(
     principal: User, request: petroleum_control.InvestigationRequest

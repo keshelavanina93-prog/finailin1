@@ -77,6 +77,7 @@ export const BACKEND_WIRING_INVENTORY: readonly BackendRouteFamily[] = [
       "/api/operations/import-proposal -> /v1/operations/import-proposal",
       "/api/operations/petroleum/reconciliation -> /v1/operations/petroleum/reconciliation",
       "/api/operations/petroleum/variances -> /v1/operations/petroleum/variances",
+      "/api/operations/petroleum/variances/{variance_id} -> /v1/operations/petroleum/variances/{variance_id}",
       "/api/operations/petroleum/variances/investigations -> /v1/operations/petroleum/variances/investigations",
       "/api/operations/petroleum/variances/investigations/{control_id} -> /v1/operations/petroleum/variances/investigations/{control_id}",
       "/api/operations/petroleum/variances/investigations/{control_id}/decision -> /v1/operations/petroleum/variances/investigations/{control_id}/decision",

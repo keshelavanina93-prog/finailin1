@@ -271,6 +271,35 @@ def variances(
             "bitemporal": True, "action_execution": "GOVERNED_ADAPTER_REQUIRED"}
 
 
+def variance_detail(
+    principal: Principal,
+    variance_id: str,
+    company_id: UUID | None = None,
+    valid_at: datetime | None = None,
+    known_at: datetime | None = None,
+) -> dict[str, Any]:
+    """Return one variance with its bounded evidence and lineage packet."""
+    require_permission(principal, "ontology_read")
+    collection = variances(principal, company_id, valid_at, known_at)
+    row = next((item for item in collection["rows"] if item["variance_id"] == variance_id), None)
+    if row is None:
+        raise WorkspaceError(404, "Petroleum variance unavailable in authorized scope")
+    lineage_packets: list[dict[str, Any]] = []
+    for source_id in row["evidence"].get("source_resource_ids", []):
+        try:
+            lineage_packets.append(lineage(principal, UUID(str(source_id)), company_id))
+        except (ValueError, WorkspaceError):
+            continue
+    return {
+        "contract": "petroleum-variance-detail/1",
+        "variance": row,
+        "evidence_packet": row["evidence"],
+        "lineage": lineage_packets,
+        "authority": row["authority"],
+        "accounting_effect": "NOT_YET_AUTHORITATIVE",
+    }
+
+
 def _valuation_candidate(row: dict[str, Any], costs: list[Any]) -> dict[str, Any]:
     dimensions = row["dimensions"]
     matches = []
