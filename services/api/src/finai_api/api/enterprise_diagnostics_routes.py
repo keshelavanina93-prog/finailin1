@@ -22,6 +22,8 @@ from finai_api.domain.multidimensional_runtime import (
     compile_sparse_plan,
     execute_sparse_decimal_plan,
 )
+from finai_api.domain.nyx_reasoning import ReasonRequest
+from finai_api.domain.resource_lifecycle import VersionReference
 from finai_api.domain.review import Principal
 from finai_api.domain.workspace_projections import (
     WorkspaceSelection,
@@ -34,6 +36,7 @@ from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import (
     enterprise_diagnostics,
     executable_function_registry,
+    nyx_reasoning,
     operations_map,
     planning,
 )
@@ -310,6 +313,78 @@ def projection_data(
             "authority_effect": "NONE",
         }
 
+    if request.projection_id == "nyx-context":
+        if not request.selection.selected_object_id or not request.selection.version_id:
+            return {
+                "contract": "workspace-projection-data/1",
+                "projection": projection,
+                "selection": request.selection.model_dump(mode="json"),
+                "data_state": "UNAVAILABLE_REQUIRED_CONTEXT",
+                "rows": [],
+                "authority_effect": "NONE",
+            }
+        try:
+            selected = VersionReference(
+                resource_id=UUID(request.selection.selected_object_id),
+                version_id=UUID(request.selection.version_id),
+            )
+        except ValueError:
+            return {
+                "contract": "workspace-projection-data/1",
+                "projection": projection,
+                "selection": request.selection.model_dump(mode="json"),
+                "data_state": "UNAVAILABLE_REQUIRED_CONTEXT",
+                "rows": [],
+                "authority_effect": "NONE",
+            }
+        explanation = nyx_reasoning.reason(
+            principal,
+            ReasonRequest(
+                question="Explain the selected evidence and its authority boundary.",
+                selected=selected,
+                known_at=replay_as_of,
+            ),
+        )
+        rows = [
+            {
+                "row_id": "nyx:answer",
+                "label": "NYX explanation",
+                "field": "answer",
+                "value": explanation["answer"],
+                "authority_state": explanation["state"],
+            },
+            {
+                "row_id": "nyx:state",
+                "label": "Reasoning state",
+                "field": "state",
+                "value": explanation["state"],
+                "authority_state": explanation["state"],
+            },
+        ]
+        if explanation.get("refusal_code"):
+            rows.append(
+                {
+                    "row_id": "nyx:refusal",
+                    "label": "Refusal code",
+                    "field": "refusal_code",
+                    "value": explanation["refusal_code"],
+                    "authority_state": explanation["state"],
+                }
+            )
+        return {
+            "contract": "workspace-projection-data/1",
+            "projection": projection,
+            "selection": request.selection.model_dump(mode="json"),
+            "data_state": "CONTEXT_ONLY",
+            "rows": rows,
+            "normalized_rows": [
+                item.model_dump(mode="json") for item in normalize_projection_rows(rows)
+            ],
+            "coverage": explanation["contract"],
+            "scope": {"company_id": request.selection.company_id},
+            "authority_effect": "NONE",
+        }
+
     if request.projection_id == "operations-map":
         try:
             map_result = operations_map.map_view(
@@ -401,7 +476,7 @@ def projection_data(
             "coverage": comparison["coverage"],
             "authority_effect": "NONE",
         }
-    if request.projection_id in {"image-evidence", "nyx-context"}:
+    if request.projection_id in {"image-evidence"}:
         return {
             "contract": "workspace-projection-data/1",
             "projection": projection,

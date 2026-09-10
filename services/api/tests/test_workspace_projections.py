@@ -122,6 +122,27 @@ def test_action_projection_exposes_boundary_without_execution() -> None:
     assert values["execution"] == "NOT_PERMITTED_FROM_PROJECTION"
 
 
+def test_nyx_projection_refuses_without_valid_exact_resource_ids() -> None:
+    selection = WorkspaceSelection(
+        company_id="sgp",
+        selected_object_id="not-a-resource-id",
+        period="2026-09",
+        scenario_id="actual",
+        version_id="not-a-version-id",
+        replay_as_of="2026-09-10T12:00:00Z",
+    )
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post(
+            "/v1/workspace/projections/data",
+            json={"projection_id": "nyx-context", "selection": selection.model_dump()},
+        )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data_state"] == "UNAVAILABLE_REQUIRED_CONTEXT"
+    assert body["authority_effect"] == "NONE"
+    assert body["rows"] == []
+
+
 def test_projection_rows_expose_typed_coordinate_measure_and_evidence_envelope() -> None:
     rows = normalize_projection_rows([{
         "resource_id": "row-1",

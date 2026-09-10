@@ -92,6 +92,8 @@ export default function ProjectionDataRenderer({ data }: { data: WorkspaceProjec
     return <div className="g8-projection-result"><h4>{data.projection.label}</h4><p role="status">This projection is registered for the exact context, but its authoritative payload is not available in this read-only data contract. No input mutation, image substitution, or business action was performed.</p><strong>{data.data_state}</strong></div>;
   }
   if (data.projection.kind === "TEXT") {
+    const explanation = data.rows.find(row => row.field === "answer");
+    if (explanation) return <div className="g8-projection-result"><h4>{data.projection.label} · {data.data_state}</h4><p>{String(explanation.value)}</p><dl>{data.rows.filter(row => row.field !== "answer").map(row => <div key={String(row.field)}><dt>{String(row.label ?? row.field)}</dt><dd>{String(row.value ?? "Not recorded")}</dd></div>)}</dl><p role="status">Citation-bound explanation only. This response does not establish financial authority or permission to act.</p></div>;
     return <div className="g8-projection-result"><h4>{data.projection.label}</h4><p>Governed narrative projection for the selected company and object.</p><dl><dt>Data state</dt><dd>{data.data_state}</dd><dt>Authority effect</dt><dd>{data.authority_effect}</dd><dt>Synchronization</dt><dd>{data.projection.synchronization_group}</dd></dl><p>NYX narrative generation remains citation-bound to the returned evidence and is not inferred by this renderer.</p></div>;
   }
   if (data.projection.kind === "FIELD") {
