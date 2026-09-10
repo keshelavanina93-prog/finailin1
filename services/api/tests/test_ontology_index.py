@@ -26,7 +26,9 @@ def dataset(tmp_path, request):
     # The RDF engine's production worker is D:-only on Windows. Use a unique
     # D:-resident disposable fixture there; Linux CI keeps pytest's temp path.
     if os.name == "nt":
-        scratch = Path(tempfile.mkdtemp(prefix="ontology-", dir=r"D:\FinAI\finailinear1\.finai\tmp"))
+        scratch = Path(
+            tempfile.mkdtemp(prefix="ontology-", dir=r"D:\FinAI\finailinear1\.finai\tmp")
+        )
         request.addfinalizer(lambda: shutil.rmtree(scratch, ignore_errors=True))
     else:
         scratch = tmp_path

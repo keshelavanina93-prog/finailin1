@@ -1,9 +1,9 @@
-from typing import Any
-
 import json
 import secrets
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Any
+
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, ConfigDict, Field
 
 from finai_api.config import get_settings
 from finai_api.domain.authority import ExactScope
@@ -28,9 +28,11 @@ def local_login(request: LocalLoginRequest) -> dict[str, Any]:
     settings = get_settings()
     if settings.environment.lower() != "local" or not settings.dev_login_enabled:
         raise HTTPException(404, "Local development login is disabled")
-    if not secrets.compare_digest(request.username, settings.dev_username) or not secrets.compare_digest(
+    username_matches = secrets.compare_digest(request.username, settings.dev_username)
+    password_matches = secrets.compare_digest(
         request.password, settings.dev_password.get_secret_value()
-    ):
+    )
+    if not username_matches or not password_matches:
         raise HTTPException(401, "Invalid local development credentials")
 
     token = settings.dev_access_token.get_secret_value()
