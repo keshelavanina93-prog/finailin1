@@ -2,7 +2,7 @@
 
 import type { WorkspaceProjectionData, WorkspaceSelection } from "@finai/contracts";
 
-type Point = { label: string; value: number };
+type Point = { label: string; value: number; row_id?: string };
 
 type Edge = { source_id: string; target_id: string; relation?: string };
 
@@ -20,7 +20,7 @@ function points(data: WorkspaceProjectionData): Point[] {
     const attributes = typeof row.attributes === "object" && row.attributes !== null ? row.attributes as Record<string, unknown> : {};
     const candidate = row.delta ?? row.amount ?? row.scenario_b ?? row.value ?? attributes.amount;
     const value = typeof candidate === "number" ? candidate : Number(candidate);
-    return Number.isFinite(value) ? [{ label: String(row.label ?? row.period_id ?? attributes.period_id ?? row.dimension ?? `Row ${index + 1}`), value }] : [];
+    return Number.isFinite(value) ? [{ label: String(row.label ?? row.period_id ?? attributes.period_id ?? row.dimension ?? `Row ${index + 1}`), value, row_id: typeof row.row_id === "string" ? row.row_id : undefined }] : [];
   }).slice(0, 24);
 }
 
@@ -32,8 +32,8 @@ function features(data: WorkspaceProjectionData): Feature[] {
   return data.rows.filter((row): row is Feature => typeof row.geometry === "object" && row.geometry !== null).slice(0, 100);
 }
 
-function NumericTable({ values }: { values: Point[] }) {
-  return <div className="g8-table-scroll"><table><caption>Governed values used by this projection</caption><thead><tr><th>Coordinate</th><th>Value</th></tr></thead><tbody>{values.map(point => <tr key={`${point.label}:${point.value}`}><th>{point.label}</th><td>{point.value}</td></tr>)}</tbody></table></div>;
+function NumericTable({ data, values }: { data: WorkspaceProjectionData; values: Point[] }) {
+  return <div className="g8-table-scroll"><table><caption>Governed values used by this projection</caption><thead><tr><th>Coordinate</th><th>Value</th></tr></thead><tbody>{values.map(point => <tr key={`${point.label}:${point.value}`} onClick={() => point.row_id && publishProjectionSelection(data, { selected_object_id: point.row_id })}><th>{point.label}</th><td>{point.value}</td></tr>)}</tbody></table></div>;
 }
 
 function ChartFigure({ data, values }: { data: WorkspaceProjectionData; values: Point[] }) {
@@ -83,5 +83,5 @@ export default function ProjectionDataRenderer({ data }: { data: WorkspaceProjec
   }
   if (!values.length) return <p role="status">This exact projection returned no numeric governed rows; no visual has been inferred.</p>;
   const isChart = data.projection.kind === "CHART" || data.projection.kind === "WATERFALL";
-  return <div className="g8-projection-result"><h4>{data.projection.label} · {data.data_state}</h4><p>Read-only projection · authority effect: {data.authority_effect} · synchronization: {data.projection.synchronization_group}</p>{data.projection.kind === "KPI" && <div className="g8-facts"><div><strong>{values.length}</strong><small>Governed rows</small></div><div><strong>{values.reduce((sum, point) => sum + point.value, 0).toFixed(2)}</strong><small>Deterministic total</small></div></div>}{isChart && <div className="g8-projection-chart"><ChartFigure data={data} values={values} /></div>}{data.projection.kind !== "KPI" && <NumericTable values={values} />}</div>;
+  return <div className="g8-projection-result"><h4>{data.projection.label} · {data.data_state}</h4><p>Read-only projection · authority effect: {data.authority_effect} · synchronization: {data.projection.synchronization_group}</p>{data.projection.kind === "KPI" && <div className="g8-facts"><div><strong>{values.length}</strong><small>Governed rows</small></div><div><strong>{values.reduce((sum, point) => sum + point.value, 0).toFixed(2)}</strong><small>Deterministic total</small></div></div>}{isChart && <div className="g8-projection-chart"><ChartFigure data={data} values={values} /></div>}{data.projection.kind !== "KPI" && <NumericTable data={data} values={values} />}</div>;
 }
