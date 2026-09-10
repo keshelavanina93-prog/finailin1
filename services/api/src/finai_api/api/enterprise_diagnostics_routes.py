@@ -23,6 +23,7 @@ from finai_api.domain.review import Principal
 from finai_api.domain.workspace_projections import (
     WorkspaceSelection,
     eligible_projections,
+    normalize_projection_rows,
     projection_catalog,
     replay_timestamp,
 )
@@ -200,6 +201,9 @@ def projection_data(
             "selection": request.selection.model_dump(mode="json"),
             "data_state": "ACCEPTED_CANONICAL",
             "rows": rows,
+            "normalized_rows": [
+                item.model_dump(mode="json") for item in normalize_projection_rows(rows)
+            ],
             "scope": {"company_id": company_id},
             "authority_effect": "NONE",
         }
@@ -224,6 +228,10 @@ def projection_data(
             "selection": request.selection.model_dump(mode="json"),
             "data_state": "ACCEPTED_CANONICAL",
             "rows": map_result.get("features", []),
+            "normalized_rows": [
+                item.model_dump(mode="json")
+                for item in normalize_projection_rows(map_result.get("features", []))
+            ],
             "coverage": map_result.get("contract", "operations-map/1"),
             "scope": {"company_id": request.selection.company_id},
             "authority_effect": "NONE",
@@ -258,6 +266,10 @@ def projection_data(
             "selection": request.selection.model_dump(mode="json"),
             "data_state": "ACCEPTED_CANONICAL",
             "rows": network_result.get("edges", []),
+            "normalized_rows": [
+                item.model_dump(mode="json")
+                for item in normalize_projection_rows(network_result.get("edges", []))
+            ],
             "coverage": network_result.get("contract", "operations-connections/1"),
             "scope": {"company_id": request.selection.company_id},
             "authority_effect": "NONE",
@@ -280,6 +292,10 @@ def projection_data(
             "selection": request.selection.model_dump(mode="json"),
             "data_state": "ACCEPTED_DETERMINISTIC_COMPARISON",
             "rows": comparison["rows"],
+            "normalized_rows": [
+                item.model_dump(mode="json")
+                for item in normalize_projection_rows(comparison["rows"])
+            ],
             "coverage": comparison["coverage"],
             "authority_effect": "NONE",
         }

@@ -9,7 +9,8 @@ type Edge = { source_id: string; target_id: string; relation?: string };
 type Feature = { geometry?: { type?: string; coordinates?: unknown }; properties?: { resource?: { display_name?: string; object_type?: string } } };
 
 function points(data: WorkspaceProjectionData): Point[] {
-  return data.rows.flatMap((row, index) => {
+  const sourceRows = data.normalized_rows?.map(row => ({ ...row.labels, ...row.measures, ...row.coordinates })) ?? data.rows;
+  return sourceRows.flatMap((row, index) => {
     const attributes = typeof row.attributes === "object" && row.attributes !== null ? row.attributes as Record<string, unknown> : {};
     const candidate = row.delta ?? row.amount ?? row.scenario_b ?? row.value ?? attributes.amount;
     const value = typeof candidate === "number" ? candidate : Number(candidate);

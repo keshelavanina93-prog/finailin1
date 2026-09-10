@@ -1,7 +1,7 @@
 """Server-owned projection taxonomy and exact cross-canvas selection contract."""
 
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -51,6 +51,78 @@ class WorkspaceSelection(Model):
     comparison_baseline: str | None = Field(default=None, min_length=1, max_length=256)
     replay_as_of: str | None = Field(default=None, min_length=1, max_length=128)
     workspace: WorkspaceKind | None = None
+
+
+class ProjectionRow(Model):
+    """Stable typed envelope shared by every projection renderer."""
+
+    row_id: str
+    coordinates: dict[str, str] = Field(default_factory=dict)
+    measures: dict[str, str | float | int | None] = Field(default_factory=dict)
+    labels: dict[str, str] = Field(default_factory=dict)
+    authority_state: str = "UNSPECIFIED"
+    evidence_refs: tuple[str, ...] = ()
+    valid_at: str | None = None
+    known_at: str | None = None
+
+
+def normalize_projection_rows(rows: list[dict[str, Any]]) -> list[ProjectionRow]:
+    """Expose stable coordinates/measures without discarding source-shaped rows."""
+
+    result: list[ProjectionRow] = []
+    for index, row in enumerate(rows):
+        attributes = row.get("attributes") if isinstance(row.get("attributes"), dict) else {}
+        dimension = row.get("dimension")
+        coordinates = {
+            key: str(value)
+            for key, value in row.items()
+            if key.endswith("_id")
+            and key not in {"evidence_id", "source_record_id", "resource_id"}
+            and isinstance(value, (str, int))
+        }
+        if isinstance(dimension, dict):
+            coordinates.update(
+                {str(key): str(value) for key, value in dimension.items() if value is not None}
+            )
+        if isinstance(attributes, dict):
+            coordinates.update(
+                {
+                    key: str(value)
+                    for key, value in attributes.items()
+                    if key.endswith("_id") and value is not None
+                }
+            )
+        measures = {
+            key: row.get(key)
+            for key in ("value", "amount", "delta", "scenario_a", "scenario_b")
+            if row.get(key) is not None
+        }
+        if (
+            isinstance(attributes, dict)
+            and attributes.get("amount") is not None
+            and "amount" not in measures
+        ):
+            measures["amount"] = attributes["amount"]
+        evidence_refs = tuple(
+            str(row[key])
+            for key in ("evidence_id", "source_record_id", "resource_id")
+            if row.get(key) is not None
+        )
+        result.append(ProjectionRow(
+            row_id=str(row.get("row_id") or row.get("id") or row.get("resource_id") or index),
+            coordinates=coordinates,
+            measures=measures,
+            labels={
+                key: str(row[key])
+                for key in ("label", "period_id", "relation")
+                if row.get(key) is not None
+            },
+            authority_state=str(row.get("authority_state") or "UNSPECIFIED"),
+            evidence_refs=evidence_refs,
+            valid_at=str(row["valid_at"]) if row.get("valid_at") is not None else None,
+            known_at=str(row["known_at"]) if row.get("known_at") is not None else None,
+        ))
+    return result
 
 
 def replay_timestamp(selection: WorkspaceSelection) -> datetime | None:

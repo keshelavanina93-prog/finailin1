@@ -4,6 +4,7 @@ from pydantic import ValidationError
 from finai_api.domain.workspace_projections import (
     WorkspaceSelection,
     eligible_projections,
+    normalize_projection_rows,
     projection_catalog,
     replay_timestamp,
 )
@@ -69,3 +70,16 @@ def test_invalid_replay_timestamp_is_refused() -> None:
     selection = WorkspaceSelection(company_id="company", replay_as_of="not-a-time")
     with pytest.raises(ValueError, match="ISO-8601"):
         replay_timestamp(selection)
+
+
+def test_projection_rows_expose_typed_coordinate_measure_and_evidence_envelope() -> None:
+    rows = normalize_projection_rows([{
+        "resource_id": "row-1",
+        "dimension": {"company_id": "sgp", "period": "2026-09"},
+        "amount": "12.50",
+        "authority_state": "APPROVED_CANONICAL",
+        "evidence_id": "evidence-1",
+    }])
+    assert rows[0].coordinates == {"company_id": "sgp", "period": "2026-09"}
+    assert rows[0].measures == {"amount": "12.50"}
+    assert rows[0].evidence_refs == ("evidence-1", "row-1")
