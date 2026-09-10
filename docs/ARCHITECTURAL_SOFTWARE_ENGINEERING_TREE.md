@@ -519,7 +519,10 @@ revenue/volume/COGS/margin bridge.
 1C movement-register physical grain is now retained before journal reconciliation; the canonical checkout now exposes an accepted-resource movement-to-JournalLine reconciliation contract and operations panel with explicit match, missing, quantity-unavailable and mismatch states. Platform ontology seeds now include the operational entity and event schemas required by governed proposal validation. The unified hydration boundary accepts bounded structured JSON as well as CSV/workbooks and sends operational records through the same retained-evidence and grain-validation path.
 Canonical operational publication still requires the independent review/promotion gate; proposal submission is now wired. Accepted physical measurements now have a typed telemetry-series projection with basis and gap states. The remaining decision/action planes
 are not. The NYX citation/refusal boundary is implemented, but it is not
-model-backed reasoning or consequential action execution. The worktree family and
+model-backed reasoning or consequential action execution. Operational promotion
+now carries a retained SourceEvidence dependency and enters the shared
+independent-review/canonical-publication path; authentic connector and external
+readback proof remain open. The worktree family and
 distributed implementation history must therefore be treated as source
 material converging into the canonical checkout, not as proof that every
 architectural dimension is complete.
