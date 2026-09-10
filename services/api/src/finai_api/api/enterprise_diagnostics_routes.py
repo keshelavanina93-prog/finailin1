@@ -227,6 +227,44 @@ def projection_data(
             "authority_effect": "NONE",
         }
 
+    if request.projection_id == "field-input":
+        field_labels = {
+            "company_id": "Company",
+            "facility_id": "Facility",
+            "tank_id": "Tank",
+            "product_id": "Product",
+            "station_id": "Station",
+            "period": "Period",
+            "scenario_id": "Scenario",
+            "version_id": "Version",
+            "comparison_baseline": "Comparison baseline",
+            "replay_as_of": "Replay as of",
+        }
+        rows = [
+            {
+                "row_id": f"selection:{field}",
+                "label": label,
+                "field": field,
+                "value": value,
+                "authority_state": "SELECTION_CONTEXT",
+            }
+            for field, label in field_labels.items()
+            if (value := request.selection.model_dump().get(field)) is not None
+        ]
+        return {
+            "contract": "workspace-projection-data/1",
+            "projection": projection,
+            "selection": request.selection.model_dump(mode="json"),
+            "data_state": "ACCEPTED_CANONICAL",
+            "rows": rows,
+            "normalized_rows": [
+                item.model_dump(mode="json") for item in normalize_projection_rows(rows)
+            ],
+            "coverage": "workspace-selection/1",
+            "scope": {"company_id": request.selection.company_id},
+            "authority_effect": "NONE",
+        }
+
     if request.projection_id == "operations-map":
         try:
             map_result = operations_map.map_view(
@@ -318,7 +356,7 @@ def projection_data(
             "coverage": comparison["coverage"],
             "authority_effect": "NONE",
         }
-    if request.projection_id in {"field-input", "image-evidence", "action-control", "nyx-context"}:
+    if request.projection_id in {"image-evidence", "action-control", "nyx-context"}:
         return {
             "contract": "workspace-projection-data/1",
             "projection": projection,

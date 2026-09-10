@@ -201,7 +201,7 @@ PROJECTIONS: tuple[ProjectionDefinition, ...] = (
     _projection("operations-map", "MAP", "Operations map", ("GRAPH_FIRST", "TIMELINE_FIRST"), ("company_id",), ("operations-map/1",), "IMPLEMENTED"),  # noqa: E501
     _projection("evidence-table", "TABLE", "Evidence and lineage table", ("TABLE_FIRST", "REPORT"), ("company_id", "selected_object_id", "replay_as_of"), ("workspace/constructions",), "IMPLEMENTED"),  # noqa: E501
     _projection("nyx-context", "TEXT", "NYX governed explanation", ("COMMAND_EXECUTIVE", "REPORT"), ("company_id", "selected_object_id", "period", "scenario_id", "version_id", "replay_as_of"), ("nyx/context",), "PARTIAL"),  # noqa: E501
-    _projection("field-input", "FIELD", "Governed field input", ("TABLE_FIRST", "BRIDGE_FIRST"), ("company_id", "selected_object_id", "scenario_id", "version_id"), ("workspace-selection/1",), "REGISTERED"),  # noqa: E501
+    _projection("field-input", "FIELD", "Governed field input", ("TABLE_FIRST", "BRIDGE_FIRST"), ("company_id",), ("workspace-selection/1",), "PARTIAL"),  # noqa: E501
     _projection("image-evidence", "IMAGE", "Evidence image", ("REPORT", "COMMAND_EXECUTIVE"), ("company_id", "selected_object_id", "replay_as_of"), ("workspace/constructions",), "REGISTERED"),  # noqa: E501
     _projection("action-control", "ACTION", "Governed action control", ("COMMAND_EXECUTIVE", "REPORT"), ("company_id", "selected_object_id", "scenario_id", "version_id"), ("workflow/control",), "REGISTERED"),  # noqa: E501
     _projection("formatted-table", "TABLE", "Formatted report table", ("REPORT",), ("company_id", "period", "scenario_id", "version_id", "comparison_baseline"), ("planning-comparison/1",), "IMPLEMENTED"),  # noqa: E501

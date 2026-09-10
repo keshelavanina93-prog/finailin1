@@ -1,4 +1,5 @@
 import pytest
+from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from finai_api.domain.workspace_projections import (
@@ -8,6 +9,7 @@ from finai_api.domain.workspace_projections import (
     projection_catalog,
     replay_timestamp,
 )
+from finai_api.main import app
 
 
 def test_projection_catalog_is_server_owned_and_read_only() -> None:
@@ -33,6 +35,7 @@ def test_projection_catalog_is_server_owned_and_read_only() -> None:
     assert statuses["variance-waterfall"] == "IMPLEMENTED"
     assert statuses["formatted-table"] == "IMPLEMENTED"
     assert statuses["chart-bubble"] == "IMPLEMENTED"
+    assert statuses["field-input"] == "PARTIAL"
     assert statuses["action-control"] == "REGISTERED"
 
 
@@ -79,6 +82,28 @@ def test_invalid_replay_timestamp_is_refused() -> None:
     selection = WorkspaceSelection(company_id="company", replay_as_of="not-a-time")
     with pytest.raises(ValueError, match="ISO-8601"):
         replay_timestamp(selection)
+
+
+def test_field_projection_returns_exact_selection_context_without_mutation() -> None:
+    selection = WorkspaceSelection(
+        company_id="sgp",
+        facility_id="tbilisi-depot",
+        tank_id="T-04",
+        product_id="diesel-en590",
+        period="2026-09",
+    )
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post(
+            "/v1/workspace/projections/data",
+            json={"projection_id": "field-input", "selection": selection.model_dump()},
+        )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["coverage"] == "workspace-selection/1"
+    assert body["authority_effect"] == "NONE"
+    assert {row["field"] for row in body["rows"]} >= {
+        "company_id", "facility_id", "tank_id", "product_id", "period"
+    }
 
 
 def test_projection_rows_expose_typed_coordinate_measure_and_evidence_envelope() -> None:
