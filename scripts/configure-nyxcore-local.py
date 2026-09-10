@@ -16,6 +16,7 @@ config.update({
     "FINAI_DEV_USERNAME": "nyxcore.local",
     "FINAI_DEV_PASSWORD": "NYXcore-local-2026!",
     "FINAI_DEV_ACCESS_TOKEN": token,
+    "FINAI_PETROLEUM_ACTION_ADAPTER": "local",
     "NEXT_PUBLIC_FINAI_LOCAL_LOGIN": "true",
 })
 config_path.write_text(json.dumps(config, indent=2) + "\n")

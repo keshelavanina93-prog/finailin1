@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     temporal_task_queue: str = Field(
         default="g8-report-source-v1", pattern=r"^[a-z][a-z0-9-]{0,95}$"
     )
+    petroleum_action_adapter: str = "none"
 
 
 @lru_cache

@@ -6,12 +6,14 @@ execution is refused until a configured adapter can provide readback.
 """
 
 import json
+from collections.abc import Callable
 from hashlib import sha256
-from typing import Any
+from typing import Any, Literal
 
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel, ConfigDict, Field
 
+from finai_api.config import get_settings
 from finai_api.domain.review import Principal
 from finai_api.security import require_permission
 from finai_api.services import petroleum_reconciliation, report_workflows
@@ -30,6 +32,20 @@ class ControlDecisionRequest(BaseModel):
         pattern=r"^(ACCEPT_EXPLANATION|REJECT_EXPLANATION|PROPOSE_ACTION|APPROVE_ACTION)$"
     )
     rationale: str = Field(min_length=10, max_length=2000)
+
+
+class ActionReadback(BaseModel):
+    """Typed adapter receipt; it never grants accounting authority."""
+
+    contract: Literal["petroleum-action-readback/1"] = "petroleum-action-readback/1"
+    adapter_id: str = Field(min_length=1, max_length=128)
+    external_action_id: str = Field(min_length=1, max_length=256)
+    readback_id: str = Field(min_length=1, max_length=256)
+    readback_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
+    status: Literal["VERIFIED"] = "VERIFIED"
+
+
+ActionAdapter = Callable[[Principal, str, dict[str, Any]], ActionReadback]
 
 
 def _identity(principal: Principal, variance: dict[str, Any], rationale: str) -> str:
@@ -53,6 +69,32 @@ def _find(principal: Principal, variance_id: str) -> dict[str, Any]:
         if row["variance_id"] == variance_id:
             return row
     raise WorkspaceError(404, "Petroleum variance is unavailable in the authorized company scope")
+
+
+def _local_action_adapter(
+    _principal: Principal, control_id: str, current: dict[str, Any]
+) -> ActionReadback:
+    """A deterministic local-dev adapter with explicit non-production identity."""
+    digest = sha256(
+        json.dumps(
+            {"control_id": control_id, "variance": current["variance"]},
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    ).hexdigest()
+    return ActionReadback(
+        adapter_id="LOCAL_SIMULATION_ONLY",
+        external_action_id=f"local-action-{digest[:32]}",
+        readback_id=f"local-readback-{digest[32:]}",
+        readback_hash=digest,
+    )
+
+
+def _adapter_for(_principal: Principal, _current: dict[str, Any]) -> ActionAdapter | None:
+    settings = get_settings()
+    if settings.environment == "local" and settings.petroleum_action_adapter == "local":
+        return _local_action_adapter
+    return None
 
 
 def start(principal: Principal, request: InvestigationRequest) -> dict[str, Any]:
@@ -101,16 +143,22 @@ def read(principal: Principal, control_id: str) -> dict[str, Any]:
     request = record["request"]
     events = record["events"]
     state = request.get("state", "INVESTIGATION_OPEN")
+    execution = "REFUSED_NO_EXTERNAL_ADAPTER"
+    readback: dict[str, Any] | None = None
     for event in events:
         if event.get("state") in {
             "EXPLANATION_ACCEPTED", "EXPLANATION_REJECTED", "ACTION_PROPOSED",
-            "APPROVED", "REFUSED",
+            "APPROVED", "REFUSED", "READBACK_VERIFIED",
         }:
             state = event["state"]
+        if event.get("execution"):
+            execution = str(event["execution"])
+        if event.get("readback"):
+            readback = event["readback"]
     return {"contract": "petroleum-control/1", "control_id": control_id,
             "variance": request["variance"], "state": state, "events": events,
             "initiator_actor_id": request["initiator_actor_id"],
-            "execution": "REFUSED_NO_EXTERNAL_ADAPTER", "readback": None,
+            "execution": execution, "readback": readback,
             "accounting_authorized": False, "business_effect_authorized": False}
 
 
@@ -141,11 +189,26 @@ def execute(principal: Principal, control_id: str) -> dict[str, Any]:
     current = read(principal, control_id)
     if current["state"] != "APPROVED":
         raise WorkspaceError(409, "Only an independently approved action can execute")
-    report_workflows.event(principal, control_id, "execution-refused", {
-        "state": "REFUSED",
-        "reason": "No configured external petroleum adapter can provide readback",
+    adapter = _adapter_for(principal, current)
+    if adapter is None:
+        report_workflows.event(principal, control_id, "execution-refused", {
+            "state": "REFUSED",
+            "reason": "No configured external petroleum adapter can provide readback",
+        })
+        raise WorkspaceError(
+            409,
+            "External petroleum action adapter is not configured; no action was executed",
+        )
+    try:
+        receipt = adapter(principal, control_id, current)
+    except (ValueError, TypeError) as exc:
+        raise WorkspaceError(409, "Petroleum action adapter returned an invalid receipt") from exc
+    report_workflows.event(principal, control_id, "execution-readback", {
+        "state": "READBACK_VERIFIED",
+        "execution": "LOCAL_READBACK_VERIFIED"
+        if receipt.adapter_id == "LOCAL_SIMULATION_ONLY"
+        else "EXTERNAL_READBACK_VERIFIED",
+        "external_action_id": receipt.external_action_id,
+        "readback": receipt.model_dump(mode="json"),
     })
-    raise WorkspaceError(
-        409,
-        "External petroleum action adapter is not configured; no action was executed",
-    )
+    return read(principal, control_id)

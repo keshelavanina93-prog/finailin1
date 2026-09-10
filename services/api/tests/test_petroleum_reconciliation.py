@@ -174,6 +174,46 @@ def test_petroleum_control_finds_variance_for_named_legal_entity(monkeypatch):
     assert calls == [principal]
 
 
+def test_petroleum_local_adapter_persists_typed_readback(monkeypatch):
+    principal = _principal()
+    principal.actor_id = "checker"
+    principal.permissions = ["ontology_read", "ontology_propose"]
+    current = {
+        "state": "APPROVED",
+        "variance": {"variance_id": "petroleum-variance:local"},
+        "initiator_actor_id": "maker",
+    }
+    verified = {
+        **current,
+        "state": "READBACK_VERIFIED",
+        "execution": "LOCAL_READBACK_VERIFIED",
+        "readback": {"contract": "petroleum-action-readback/1"},
+    }
+    events = []
+    monkeypatch.setattr(
+        petroleum_control,
+        "_adapter_for",
+        lambda *_: petroleum_control._local_action_adapter,
+    )
+    monkeypatch.setattr(
+        petroleum_control.report_workflows,
+        "event",
+        lambda *args: events.append(args),
+    )
+    monkeypatch.setattr(
+        petroleum_control,
+        "read",
+        lambda *_: verified if events else current,
+    )
+
+    result = petroleum_control.execute(principal, "pvc_local")
+
+    assert result["state"] == "READBACK_VERIFIED"
+    assert result["execution"] == "LOCAL_READBACK_VERIFIED"
+    assert events[0][2] == "execution-readback"
+    assert events[0][3]["readback"]["status"] == "VERIFIED"
+
+
 def test_variance_valuation_is_candidate_only_when_product_cost_is_accepted(monkeypatch):
     entity = str(_principal().scope.legal_entity_id)
     rows = {
