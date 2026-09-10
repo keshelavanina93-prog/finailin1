@@ -64,12 +64,21 @@ class ProjectionRow(Model):
     evidence_refs: tuple[str, ...] = ()
     valid_at: str | None = None
     known_at: str | None = None
+    interval_start: str | None = None
+    interval_end: str | None = None
 
 
 def normalize_projection_rows(rows: list[dict[str, Any]]) -> list[ProjectionRow]:
     """Expose stable coordinates/measures without discarding source-shaped rows."""
 
     result: list[ProjectionRow] = []
+    def first_value(sources: tuple[dict[str, Any], ...], keys: tuple[str, ...]) -> str | None:
+        for source in sources:
+            for key in keys:
+                if source.get(key) is not None:
+                    return str(source[key])
+        return None
+
     for index, row in enumerate(rows):
         attributes = row.get("attributes") if isinstance(row.get("attributes"), dict) else {}
         dimension = row.get("dimension")
@@ -121,6 +130,12 @@ def normalize_projection_rows(rows: list[dict[str, Any]]) -> list[ProjectionRow]
             evidence_refs=evidence_refs,
             valid_at=str(row["valid_at"]) if row.get("valid_at") is not None else None,
             known_at=str(row["known_at"]) if row.get("known_at") is not None else None,
+            interval_start=first_value(
+                (row, attributes), ("interval_start", "start_at", "period_starts_on")
+            ),
+            interval_end=first_value(
+                (row, attributes), ("interval_end", "end_at", "period_ends_on")
+            ),
         ))
     return result
 

@@ -79,7 +79,11 @@ def test_projection_rows_expose_typed_coordinate_measure_and_evidence_envelope()
         "amount": "12.50",
         "authority_state": "APPROVED_CANONICAL",
         "evidence_id": "evidence-1",
+        "period_starts_on": "2026-09-01",
+        "period_ends_on": "2026-09-30",
     }])
     assert rows[0].coordinates == {"company_id": "sgp", "period": "2026-09"}
     assert rows[0].measures == {"amount": "12.50"}
     assert rows[0].evidence_refs == ("evidence-1", "row-1")
+    assert rows[0].interval_start == "2026-09-01"
+    assert rows[0].interval_end == "2026-09-30"
