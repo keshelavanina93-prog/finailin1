@@ -61,6 +61,23 @@ function Test-TemporalReachability {
   return [bool]($pending.Wait(1500) -and $connection.Connected)
  } catch {return $false} finally {$connection.Dispose()}
 }
+function Find-ExactWorkflowProcess($Spec) {
+ $expectedCommand = '"' + $Spec.exe + '" ' + $Spec.args
+ $candidates = if($Spec.name -eq 'temporal') {
+  @(Get-NetTCPConnection -LocalPort 7233 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Get-WorkflowProcess @{pid=$_.OwningProcess} })
+ } else {
+  @(Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -eq $expectedCommand })
+ }
+ $matches=@()
+ foreach($candidate in $candidates){
+  if($null -eq $candidate -or $candidate.CommandLine -ne $expectedCommand){continue}
+  $executableMatches=$candidate.ExecutablePath -eq $Spec.exe
+  if($Spec.name -eq 'worker' -and $candidate.ExecutablePath.StartsWith((Join-Path $env:FINAI_RUNTIME_ROOT 'python\'), [StringComparison]::OrdinalIgnoreCase)){$executableMatches=$true}
+  if($executableMatches){$matches += $candidate}
+ }
+ if($matches.Count -gt 1){throw "Multiple exact $($Spec.name) processes found; refusing adoption."}
+ return $matches | Select-Object -First 1
+}
 function Write-WorkflowStatus($Records) {
  foreach($name in @('temporal','worker') | Where-Object {$Service -eq 'all' -or $_ -eq $Service}){
   $record=@($Records | Where-Object name -eq $name) | Select-Object -First 1
@@ -96,8 +113,17 @@ try {
  )
  foreach($spec in $specs | Where-Object {$Service -eq 'all' -or $_.name -eq $Service}){
   $record=$records | Where-Object name -eq $spec.name | Select-Object -First 1
-  $process=Get-WorkflowProcess $record
+ $process=Get-WorkflowProcess $record
   $owned=Test-WorkflowOwnership $record $process
+  if($Action -eq 'start' -and -not $owned){
+   $adopted=Find-ExactWorkflowProcess $spec
+   if($null -ne $adopted){
+    $record=@{name=$spec.name;pid=$adopted.ProcessId;exe=$adopted.ExecutablePath;command=$adopted.CommandLine;created=$adopted.CreationDate.ToUniversalTime().ToString('o');log=$null}
+    $records=@($records | Where-Object name -ne $spec.name)+$record
+    $process=$adopted
+    $owned=$true
+   }
+  }
   if($process -and -not $owned){throw 'Workflow process ownership changed; refusing mutation'}
   if($Action -eq 'stop'){
    if($owned){Stop-WorkflowTree $record}
