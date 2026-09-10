@@ -835,10 +835,14 @@ coordinates, measures, labels, authority state, evidence references, and
 valid/known timestamps. Projection interactions publish the typed
 `workspace-selection-event/1` contract so chart, timeline, map, network, table,
 and grid selections can update the same company-scoped context.
+The retained-evidence Image projection follows the same selection fabric. It
+accepts only exact retained `doc_`/`ir_` identities, requires an image MIME type
+and bounded payload, carries source SHA-256, and renders only after browser-side
+integrity verification; it has no authority effect.
 
 ### Verification snapshot — 2026-09-10
 
-The latest implementation head at the time of this snapshot was `a906882` on the converged implementation
+The latest implementation head at the time of this snapshot was `d61e74e` on the converged implementation
 branches. Frontend lint,
 typecheck, tests and build pass; API Ruff and mypy pass. The GitHub API test job
 previously failed four tests. The packaging, cross-actor investigation action,
@@ -866,7 +870,7 @@ A citation-first NYX refusal/explanation boundary is now wired at
 NYX model-backed reasoning and proposal/action handoff execution remain open. The latest API coverage result was 83.73% against
 the aligned 84% gate. The protected
 `development/enterprise-hydration-foundation` branch remains separate from the
-pushed review head `a906882`, so this head is not the canonical merged release.
+pushed review head `d61e74e`, so this head is not the canonical merged release.
 This is a substantial converged
 slice, not completion of the full architecture.
 

@@ -516,7 +516,7 @@ FULLY_DEVELOPED_AND_PROVEN_FINANCIAL_AGI
 
 ## 6. Verification snapshot — 2026-09-10
 
-The canonical checkout snapshot was clean at `a906882`; that implementation
+The canonical checkout snapshot was clean at `d61e74e`; that implementation
 head is published on the pushed review branch. The repository is not
 fully merged or release-accepted:
 the protected branch remains separate from the pushed review head, and the
@@ -599,3 +599,7 @@ The projection renderer consumes normalized coordinates/measures and emits the
 typed `workspace-selection-event/1` contract from chart points, timeline bars,
 map points, network nodes, and table rows; replay pins are passed into the
 Operations snapshot as `known_at`.
+The Image card now follows the retained-source path for exact `doc_`/`ir_`
+identities, with MIME/size refusal and client-side SHA-256 verification before
+display. This is a retained evidence projection, not an authority-bearing
+business image or mutation surface.

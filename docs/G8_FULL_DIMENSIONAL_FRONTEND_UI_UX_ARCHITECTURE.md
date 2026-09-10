@@ -1990,7 +1990,7 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest implementation head at the time of this snapshot was `a906882`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, known telemetry quality/basis states and inferred series-gap review, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, retained outcome timeline, and governed cross-projection card/chart rendering represented in the unified workspaces.
+latest implementation head at the time of this snapshot was `d61e74e`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, known telemetry quality/basis states and inferred series-gap review, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, retained outcome timeline, and governed cross-projection card/chart rendering represented in the unified workspaces.
 The previous API CI job failed four tests; three are fixed locally in this head,
 while the database-backed object-set materialization path is still under CI
 verification. Planning now has real catalog/comparison, forecast, liquidity,
@@ -2059,6 +2059,11 @@ The mounted Planning surface shows the registry and validation result. It is a
 real wiring seam, not a claim that all card families are complete; each
 projection remains explicitly `IMPLEMENTED`, `PARTIAL`, or `REGISTERED` until
 its backend data, evidence, authority, browser, restart, and release gates pass.
+The Image projection is implemented for retained `doc_` and `ir_` evidence:
+the backend validates retained-source MIME type and bounded size, returns a
+typed hash-bearing media envelope, and the browser verifies SHA-256 before
+displaying a local blob. Non-image or oversized evidence remains explicit
+unavailable state rather than being substituted or treated as a visual fact.
 
 The frontend must consume the retained resolver contract specified in
 [`EXECUTABLE_ENTERPRISE_MODEL.md`](EXECUTABLE_ENTERPRISE_MODEL.md). A target
