@@ -329,3 +329,4 @@ export type {OutcomeDimensionRow, OutcomeMeasurement, MultiBaselineOutcome, Lear
 export type {PetroleumControl, PetroleumVariance, PetroleumVarianceCollection, PetroleumVarianceDetail, PetroleumVarianceStatus} from "./petroleum-variance.js";
 export type {ExecutableRequirement, ExecutableFunction, ExecutableFinding, ExecutablePreflight, ExecutableFunctionRegistry, ExecutablePreflightResponse} from "./executable-enterprise.js";
 export type {CalculationCompilePlan, CalculationCompileResponse} from "./calculation-runtime.js";
+export * from "./workspace-projections.js";

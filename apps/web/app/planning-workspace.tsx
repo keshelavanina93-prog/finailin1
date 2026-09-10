@@ -5,6 +5,7 @@ import OutcomeMeasurementPanel from "./outcome-measurement-panel";
 import LiquidityProjectionPanel from "./liquidity-projection-panel";
 import ScenarioProposalPanel from "./scenario-proposal-panel";
 import ExecutableModelPanel from "./executable-model-panel";
+import ProjectionControlSurface from "./projection-control-surface";
 
 type Node = { resource_id: string; version_id: string; display_name: string; authority_state: string; evidence_class: string; attributes: Record<string, unknown> };
 type Catalog = { contract: "planning-catalog/1"; scenarios: Node[]; cells: Node[]; authority: string; forecast_calculation_available: false };
@@ -54,5 +55,6 @@ export default function PlanningWorkspace({ token, companyName, companyId, canPr
     <LiquidityProjectionPanel token={token} scenarioId={a} />
     <ScenarioProposalPanel token={token} companyId={companyId} enabled={canPropose} />
     <ExecutableModelPanel token={token} />
+    <ProjectionControlSurface token={token} companyId={companyId} />
   </section>;
 }

@@ -2038,6 +2038,18 @@ readback identity. This is a physical outcome projection, not an accounting
 adjustment; broader outcome-learning and external-adapter gates remain open.
 ## Executable dependency UX contract
 
+## Cross-projection selection contract
+
+Every card family and workspace projection must inherit one exact
+`WorkspaceSelection`: company, product, station, period, scenario, version,
+comparison baseline, selected object, and `replay_as_of`. The current checkout
+implements the server-owned projection registry and exact-selection validation
+at `/api/workspace/projections/catalog` and `/api/workspace/projections/selection`.
+The mounted Planning surface shows the registry and validation result. It is a
+real wiring seam, not a claim that all card families are complete; each
+projection remains explicitly `IMPLEMENTED`, `PARTIAL`, or `REGISTERED` until
+its backend data, evidence, authority, browser, restart, and release gates pass.
+
 The frontend must consume the retained resolver contract specified in
 [`EXECUTABLE_ENTERPRISE_MODEL.md`](EXECUTABLE_ENTERPRISE_MODEL.md). A target
 surface must render the selected function version, required inputs and

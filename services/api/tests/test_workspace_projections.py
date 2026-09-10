@@ -1,0 +1,36 @@
+import pytest
+from pydantic import ValidationError
+
+from finai_api.domain.workspace_projections import WorkspaceSelection, projection_catalog
+
+
+def test_projection_catalog_is_server_owned_and_read_only() -> None:
+    catalog = projection_catalog()
+    assert {item["projection_id"] for item in catalog} >= {
+        "operations-map",
+        "movement-network",
+        "variance-waterfall",
+        "evidence-table",
+        "nyx-context",
+    }
+    assert all(item["authority_effect"] == "NONE" for item in catalog)
+
+
+def test_selection_preserves_exact_cross_projection_dimensions() -> None:
+    selection = WorkspaceSelection(
+        company_id="sgp",
+        product_id="diesel-en590",
+        station_id="024",
+        period="2026-09",
+        scenario_id="forecast-v3",
+        version_id="v3",
+        comparison_baseline="budget-2026",
+        replay_as_of="2026-09-10T12:00:00Z",
+    )
+    assert selection.model_dump()["company_id"] == "sgp"
+    assert selection.model_dump()["replay_as_of"] == "2026-09-10T12:00:00Z"
+
+
+def test_selection_rejects_empty_company_scope() -> None:
+    with pytest.raises(ValidationError):
+        WorkspaceSelection(company_id="")

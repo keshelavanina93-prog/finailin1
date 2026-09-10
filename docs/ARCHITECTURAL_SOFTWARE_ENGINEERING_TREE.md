@@ -575,3 +575,14 @@ Planning workspace through the registered-function catalog and preflight
 proxy. This remains a convergence slice: durable calculation persistence,
 domain evaluator registration, external adapters and release evidence are not
 complete.
+
+## Cross-projection fabric
+
+`services/api/src/finai_api/domain/workspace_projections.py` is the server-owned
+registry for card families and workspace projections. The exact
+`WorkspaceSelection` contract is exposed through the workspace API and typed in
+`packages/contracts/src/workspace-projections.ts`; the Planning surface mounts
+`apps/web/app/projection-control-surface.tsx`. This synchronizes selection
+context without granting authority and deliberately reports each projection as
+implemented, partial, or registered until its real data, lineage, browser,
+restart, and release gates are proven.

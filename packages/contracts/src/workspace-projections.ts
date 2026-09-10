@@ -1,0 +1,6 @@
+export type ProjectionKind = "ACTION" | "CHART" | "FIELD" | "GRID" | "HIERARCHY" | "IMAGE" | "KPI" | "MAP" | "NETWORK" | "TABLE" | "TEXT" | "WATERFALL";
+export type ProjectionStatus = "IMPLEMENTED" | "PARTIAL" | "REGISTERED";
+export type WorkspaceSelection = { selected_object_id?: string | null; company_id: string; product_id?: string | null; station_id?: string | null; period?: string | null; scenario_id?: string | null; version_id?: string | null; comparison_baseline?: string | null; replay_as_of?: string | null };
+export type ProjectionDefinition = { projection_id: string; kind: ProjectionKind; label: string; workspaces: string[]; selection_fields: string[]; backend_contracts: string[]; status: ProjectionStatus; authority_effect: "NONE" };
+export type ProjectionCatalog = { contract: "workspace-projection-catalog/1"; projections: ProjectionDefinition[]; authority_effect: "NONE" };
+export type WorkspaceSelectionResponse = { contract: "workspace-selection/1"; selection: WorkspaceSelection; scope_state: "EXACT_CONTEXT_REQUIRED"; authority_effect: "NONE" };

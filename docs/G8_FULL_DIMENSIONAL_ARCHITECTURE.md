@@ -814,6 +814,16 @@ release candidate and pass the independent evidence gates. A green unit test,
 local service, bounded browser slice or feature worktree does not by itself prove
 authentic-source, generalization, production-runtime, scale or release acceptance.
 
+### Cross-projection execution contract
+
+The unified application now has a server-owned projection registry and exact
+selection validation. Projection consumers inherit company, product, station,
+period, scenario/version, comparison baseline, selected object, and replay time
+through `WorkspaceSelection`; the selection endpoint has no authority effect.
+This is the cross-canvas seam for table, grid, KPI, map, network, hierarchy,
+waterfall, evidence, and NYX projections. Registry status remains explicit so
+partial or registered projections cannot be mistaken for release completion.
+
 ### Verification snapshot — 2026-09-10
 
 The latest implementation head at the time of this snapshot was `b35fe70` on the converged implementation

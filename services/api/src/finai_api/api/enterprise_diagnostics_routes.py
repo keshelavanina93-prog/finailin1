@@ -19,6 +19,7 @@ from finai_api.domain.multidimensional_runtime import (
     compile_sparse_plan,
 )
 from finai_api.domain.review import Principal
+from finai_api.domain.workspace_projections import WorkspaceSelection, projection_catalog
 from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import enterprise_diagnostics, executable_function_registry
 
@@ -109,6 +110,33 @@ def executable_functions(principal: ReadUser, response: Response) -> dict[str, o
             item.model_dump(mode="json")
             for item in executable_function_registry.list_registered_functions()
         ],
+        "authority_effect": "NONE",
+    }
+
+
+@router.get("/projections/catalog")
+def projections_catalog(principal: ReadUser, response: Response) -> dict[str, object]:
+    """Return the server-owned projection registry; no projection executes here."""
+
+    response.headers["Cache-Control"] = "no-store"
+    return {
+        "contract": "workspace-projection-catalog/1",
+        "projections": projection_catalog(),
+        "authority_effect": "NONE",
+    }
+
+
+@router.post("/projections/selection")
+def project_selection(
+    selection: WorkspaceSelection, principal: ReadUser, response: Response
+) -> dict[str, object]:
+    """Validate and echo an exact selection for downstream projection requests."""
+
+    response.headers["Cache-Control"] = "no-store"
+    return {
+        "contract": "workspace-selection/1",
+        "selection": selection.model_dump(mode="json"),
+        "scope_state": "EXACT_CONTEXT_REQUIRED",
         "authority_effect": "NONE",
     }
 

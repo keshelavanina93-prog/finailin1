@@ -663,6 +663,22 @@ Available alternative: pre-tax return metric, clearly labeled non-ROIC.
 Accounting impact: none. Action: none permitted.
 ```
 
+## 12.1 Cross-projection selection and card registry
+
+The unified frontend uses one server-validated `WorkspaceSelection` for every
+projection. The selection carries company, product, station, period,
+scenario/version, comparison baseline, selected object, and replay time. It is
+context propagation only: `authority_effect` is always `NONE`.
+
+The server-owned registry currently exposes the card and workspace taxonomy
+through `GET /v1/workspace/projections/catalog`, and validates the exact
+selection through `POST /v1/workspace/projections/selection`. Registered
+projections are explicitly marked `IMPLEMENTED`, `PARTIAL`, or `REGISTERED`;
+registration is not completion. This prevents the UI from presenting a map,
+waterfall, network, hierarchy, evidence, KPI, or NYX projection as fully wired
+before its real data contract, lineage, authority state, and acceptance gates
+exist.
+
 ## 13. State machines
 
 ### Function lifecycle
