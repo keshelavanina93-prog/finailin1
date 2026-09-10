@@ -20,6 +20,17 @@ export default function ProjectionControlSurface({ token, companyId, initialWork
   const [data, setData] = useState<WorkspaceProjectionData | null>(null);
   function updateSelection(next: WorkspaceSelection) { setSelection(next); setValidated(null); setData(null); }
   useEffect(() => { window.sessionStorage.setItem("g8-workspace-selection", JSON.stringify(selection)); }, [selection]);
+  useEffect(() => {
+    const receiveSelection = (event: Event) => {
+      const detail = (event as CustomEvent<Partial<WorkspaceSelection>>).detail;
+      if (!detail || detail.company_id !== companyId) return;
+      setSelection(current => ({ ...current, ...detail, company_id: companyId }));
+      setValidated(null);
+      setData(null);
+    };
+    window.addEventListener("g8-workspace-selection", receiveSelection);
+    return () => window.removeEventListener("g8-workspace-selection", receiveSelection);
+  }, [companyId]);
   useEffect(() => { const controller = new AbortController(); void fetch("/api/workspace/projections/catalog", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store", signal: controller.signal }).then(async response => { const data = await response.json() as ProjectionCatalog & { detail?: string }; if (!response.ok) throw new Error(data.detail ?? "Projection registry unavailable"); setCatalog(data); }).catch(failure => { if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : "Projection registry unavailable"); }); return () => controller.abort(); }, [token]);
   async function validate() { setError(""); try { const response = await fetch("/api/workspace/projections/selection", { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(selection), cache: "no-store" }); const data = await response.json() as WorkspaceSelectionResponse & { detail?: string }; if (!response.ok) throw new Error(data.detail ?? "Selection refused"); setValidated(data); } catch (failure) { setError(failure instanceof Error ? failure.message : "Selection refused"); } }
   async function loadProjection(projection_id: string) { setError(""); try { const response = await fetch("/api/workspace/projections/data", { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ projection_id, selection }), cache: "no-store" }); const result = await response.json() as WorkspaceProjectionData & { detail?: string }; if (!response.ok) throw new Error(result.detail ?? "Projection data unavailable"); setData(result); } catch (failure) { setError(failure instanceof Error ? failure.message : "Projection data unavailable"); } }
