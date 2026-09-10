@@ -856,3 +856,8 @@ conservation equation, evidence gaps, replay timestamps, lifecycle state, and
 an explicit `FINANCIAL_BRIDGE_PARTIAL` authority boundary. Authentic
 connectors, durable correction history, investigation/action adapters,
 external readback, browser proof and release acceptance remain open gates.
+
+The durable petroleum control workflow is now also wired through
+`/v1/operations/petroleum/variances/investigations`: it retains the exact
+variance snapshot, records investigation and independent decisions, and
+refuses execution when no external adapter can provide readback.

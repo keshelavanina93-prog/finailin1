@@ -532,3 +532,9 @@ Variance contract. The frontend Operations panel consumes the typed collection
 through the Next proxy. This is a real backend-to-frontend wiring step, not a
 release-complete claim: authentic connectors, durable investigation/action
 readback and independent browser/restart evidence remain open.
+
+The next backend branch is the durable `petroleum-control/1` workflow in
+`services/api/.../petroleum_control.py`, backed by the shared scoped workflow
+request/event store and exposed by the Operations proxy. It records
+investigation, checker decisions and adapter refusal without mutating accounting
+truth.

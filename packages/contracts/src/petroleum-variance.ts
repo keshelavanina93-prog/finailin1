@@ -10,3 +10,4 @@ export type PetroleumVariance = {
   authority:{observed:true;validated:boolean;accounting_authorized:false;business_effect_authorized:false;canonical_adjustment_created:false};
 };
 export type PetroleumVarianceCollection = {contract:"petroleum-variance-collection/1";company_id:string|null;rows:PetroleumVariance[];bitemporal:true;action_execution:"GOVERNED_ADAPTER_REQUIRED"};
+export type PetroleumControl = {contract:"petroleum-control/1";control_id:string;variance:PetroleumVariance;state:"INVESTIGATION_OPEN"|"EXPLANATION_ACCEPTED"|"EXPLANATION_REJECTED"|"ACTION_PROPOSED"|"APPROVED"|"REFUSED";events:Array<Record<string,unknown>>;initiator_actor_id:string;execution:"REFUSED_NO_EXTERNAL_ADAPTER";readback:null;accounting_authorized:false;business_effect_authorized:false};

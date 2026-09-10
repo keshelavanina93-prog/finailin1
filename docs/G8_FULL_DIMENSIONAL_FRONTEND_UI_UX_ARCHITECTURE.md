@@ -2011,3 +2011,9 @@ lifecycle, bitemporal replay fields and `FINANCIAL_BRIDGE_PARTIAL`. The map is
 only one projection of the object. Evidence/lineage inspection,
 investigation/approval/action/readback screens, restart persistence,
 authenticated browser proof and independent acceptance remain required.
+
+The Operations control row now has a governed “Open investigation” entry point
+through `/api/operations/petroleum/variances/investigations`; the returned
+control state is retained and displayed. Approval and external execution remain
+permissioned workflow surfaces, with missing adapters rendered as refusal rather
+than simulated success.

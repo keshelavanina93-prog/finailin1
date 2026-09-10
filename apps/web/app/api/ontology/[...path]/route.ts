@@ -26,7 +26,7 @@ async function forward(request: NextRequest, context: Context) {
   const companyCondition=request.method==="GET"&&route==="company-condition";
   const sourceExceptions=(request.method==="POST"&&route==="source-exceptions")||(request.method==="GET"&&/^source-exceptions\/fcr_[a-f0-9]{64}$/.test(route));
   const investigationActions=request.method==="POST"&&(route==="operations/investigations"||route==="operations/investigation-resolutions");
- const petroleumReconciliation=request.method==="GET"&&/^operations\/petroleum\/(?:reconciliation|variances|lineage\/[a-fA-F0-9-]+|intake\/[a-zA-Z0-9_-]{1,128}\/validation)$/.test(route);
+ const petroleumReconciliation=/^operations\/petroleum\/(?:reconciliation|variances(?:\/investigations(?:\/[a-zA-Z0-9_-]{1,128}(?:\/(?:decision|execute))?)?)?|lineage\/[a-fA-F0-9-]+|intake\/[a-zA-Z0-9_-]{1,128}\/validation)$/.test(route);
   const sourceJournalReconciliation=request.method==="GET"&&/^company-journals\/reconciliation\/source\/[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$/.test(route);
   const sourceAdoption=request.method==="POST"&&/^source-adoption\/(?:(?:families|transitions)\/(?:inspect|proposal)|successor)$/.test(route);
   const periodControl = (request.method === "GET" && route === "period-control") || (request.method === "POST" && route === "period-control/proposal");

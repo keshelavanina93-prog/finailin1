@@ -10,6 +10,7 @@ from finai_api.security import require_permission
 from finai_api.services import (
     operational_binding_validation,
     operations_map,
+    petroleum_control,
     petroleum_reconciliation,
 )
 from finai_api.services.spatial_import import SpatialImportRequest
@@ -62,6 +63,30 @@ def petroleum_variances_view(
     known_at: datetime | None = None,
 ) -> dict[str, Any]:
     return petroleum_reconciliation.variances(principal, company_id, valid_at, known_at)
+
+
+@router.post("/petroleum/variances/investigations")
+def petroleum_investigation(
+    principal: User, request: petroleum_control.InvestigationRequest
+) -> dict[str, Any]:
+    return petroleum_control.start(principal, request)
+
+
+@router.get("/petroleum/variances/investigations/{control_id}")
+def petroleum_investigation_read(principal: User, control_id: str) -> dict[str, Any]:
+    return petroleum_control.read(principal, control_id)
+
+
+@router.post("/petroleum/variances/investigations/{control_id}/decision")
+def petroleum_investigation_decision(
+    principal: User, control_id: str, request: petroleum_control.ControlDecisionRequest
+) -> dict[str, Any]:
+    return petroleum_control.decide(principal, control_id, request)
+
+
+@router.post("/petroleum/variances/investigations/{control_id}/execute")
+def petroleum_action_execute(principal: User, control_id: str) -> dict[str, Any]:
+    return petroleum_control.execute(principal, control_id)
 
 
 @router.get("/petroleum/margin")

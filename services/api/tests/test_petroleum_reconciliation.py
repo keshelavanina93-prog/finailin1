@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from finai_api.services import petroleum_reconciliation
+from finai_api.services import petroleum_control, petroleum_reconciliation
 
 
 class FakeResource:
@@ -82,6 +82,26 @@ def test_variance_is_full_scope_bitemporal_and_partial_bridge(monkeypatch):
     assert row["financial"]["status"] == "FINANCIAL_BRIDGE_PARTIAL"
     assert row["authority"]["accounting_authorized"] is False
     assert row["time"]["replay_as_of"] is None
+
+
+def test_petroleum_control_requires_independent_checker(monkeypatch):
+    principal = _principal()
+    principal.actor_id = "maker"
+    principal.permissions = ["ontology_read", "ontology_review"]
+    monkeypatch.setattr(petroleum_control, "read", lambda _p, _id: {
+        "state": "ACTION_PROPOSED", "initiator_actor_id": "maker"
+    })
+    try:
+        petroleum_control.decide(
+            principal, "pvc_test",
+            petroleum_control.ControlDecisionRequest(
+                decision="APPROVE_ACTION", rationale="Independent approval is required"
+            ),
+        )
+    except Exception as exc:
+        assert "independent reviewer" in str(exc)
+    else:
+        raise AssertionError("maker must not approve its own petroleum action")
 
 
 def test_lineage_returns_only_referenced_accepted_resources(monkeypatch):
