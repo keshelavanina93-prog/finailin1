@@ -15,6 +15,14 @@ artifact = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(artifact)
 
 
+@pytest.fixture(autouse=True)
+def allow_disposable_host_paths(monkeypatch):
+    # Source provenance/content tests use pytest's disposable C: Git repo.
+    # Host-drive admission is tested separately and remains enforced in the
+    # production packaging functions.
+    monkeypatch.setattr(artifact, "check_path", lambda _path: None)
+
+
 @pytest.fixture
 def repository(tmp_path):
     root = tmp_path / "source"

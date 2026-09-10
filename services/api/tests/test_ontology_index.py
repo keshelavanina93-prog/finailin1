@@ -3,7 +3,11 @@
 import base64
 import hashlib
 import json
+import os
+import shutil
+import tempfile
 from dataclasses import asdict, replace
+from pathlib import Path
 from uuid import uuid4
 
 import pyoxigraph as ox
@@ -18,7 +22,14 @@ P = "https://example.test/p"
 
 
 @pytest.fixture
-def dataset(tmp_path):
+def dataset(tmp_path, request):
+    # The RDF engine's production worker is D:-only on Windows. Use a unique
+    # D:-resident disposable fixture there; Linux CI keeps pytest's temp path.
+    if os.name == "nt":
+        scratch = Path(tempfile.mkdtemp(prefix="ontology-", dir=r"D:\FinAI\finailinear1\.finai\tmp"))
+        request.addfinalizer(lambda: shutil.rmtree(scratch, ignore_errors=True))
+    else:
+        scratch = tmp_path
     result = canonicalize_rdf(
         [
             RdfArtifact(
@@ -30,7 +41,7 @@ def dataset(tmp_path):
             RdfArtifact(B, "TURTLE", f'<{B}#s> <{P}> "second" .'.encode(), (B + "#",)),
         ],
         root_iris=[A, B],
-        work_dir=tmp_path / "engine",
+        work_dir=scratch / "engine",
     )
     scope = index.OntologyIndexScope(
         "tenant-public-test",
@@ -40,7 +51,7 @@ def dataset(tmp_path):
         "a" * 64,
         result.canonical_sha256,
     )
-    return scope, result.canonical_nquads, tmp_path / "indexes"
+    return scope, result.canonical_nquads, scratch / "indexes"
 
 
 def published(root, manifest):

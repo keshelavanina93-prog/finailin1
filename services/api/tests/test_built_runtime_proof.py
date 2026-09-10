@@ -17,7 +17,11 @@ spec.loader.exec_module(proof)
 
 
 @pytest.mark.parametrize("change", [None, "extra", "hash", "escape"])
-def test_web_extraction_matches_exact_receipt(tmp_path, change):
+def test_web_extraction_matches_exact_receipt(tmp_path, change, monkeypatch):
+    # This test exercises receipt/member integrity. The production host-path
+    # policy is covered independently; pytest fixtures live under the Windows
+    # user temp directory rather than the D:-only runtime root.
+    monkeypatch.setattr(proof.source_tools, "check_path", lambda _path: None)
     path = tmp_path / "web.zip"
     name = "../escape.js" if change == "escape" else "apps/web/server.js"
     data = b"console.log('synthetic artifact only')"
