@@ -273,7 +273,7 @@ def projection_data(
         }
 
     if request.projection_id == "action-control":
-        action_rows = [
+        action_rows: list[dict[str, object]] = [
             {
                 "row_id": "action:scope",
                 "label": "Action scope",
@@ -304,13 +304,16 @@ def projection_data(
             },
         ]
         workflow_rows: list[dict[str, object]] = []
+        selected_company_id: UUID | None
         try:
-            company_id = UUID(request.selection.company_id)
+            selected_company_id = UUID(request.selection.company_id)
         except ValueError:
-            company_id = None
-        if company_id is not None:
-            workbench = operator_workbench.listing(principal, company_id, include_unbound=False)
-            items = workbench.get("items", [])
+            selected_company_id = None
+        if selected_company_id is not None:
+            workbench = operator_workbench.listing(
+                principal, selected_company_id, include_unbound=False
+            )
+            items: list[dict[str, Any]] = list(workbench.get("items", []))
             if request.selection.selected_object_id:
                 items = [
                     item for item in items
