@@ -105,6 +105,15 @@ class ResolutionResult(BaseModel):
     cycle_path: tuple[str, ...] = ()
 
 
+class ExecutablePreflightRequest(BaseModel):
+    """Read-only preview input; it cannot promote or persist any supplied fact."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    function: ExecutableFunctionDefinition
+    available: tuple[InputCoverage, ...] = ()
+
+
 def resolve_function(
     function: ExecutableFunctionDefinition,
     available: tuple[InputCoverage, ...] = (),

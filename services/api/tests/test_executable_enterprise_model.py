@@ -1,3 +1,5 @@
+from fastapi.testclient import TestClient
+
 from finai_api.domain.executable_enterprise_model import (
     CoverageState,
     DependencyRequirement,
@@ -7,6 +9,7 @@ from finai_api.domain.executable_enterprise_model import (
     ResolutionState,
     resolve_function,
 )
+from finai_api.main import app
 
 
 def fact(name: str, **kwargs: object) -> InputCoverage:
@@ -107,3 +110,22 @@ def test_cycle_is_blocked() -> None:
         function_id="cyclic", domain="test", version="1", requirements=(cyclic,)
     )
     assert resolve_function(function).state is ResolutionState.BLOCKED
+
+
+def test_executable_preflight_route_is_read_only() -> None:
+    payload = {
+        "function": {
+            "function_id": "calculate_tax",
+            "domain": "tax",
+            "version": "1",
+            "requirements": [
+                {"requirement_id": "ledger", "fact_type": "tax_ledger"},
+            ],
+        },
+        "available": [],
+    }
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post("/v1/workspace/executable-preflight", json=payload)
+    assert response.status_code == 200
+    assert response.json()["preflight"]["state"] == "BLOCKED"
+    assert response.json()["authority_effect"] == "NONE"
