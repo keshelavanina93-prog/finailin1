@@ -1,6 +1,6 @@
 "use client";
 
-import type { WorkspaceProjectionData, WorkspaceSelection } from "@finai/contracts";
+import type { ProjectionSelectionEvent, WorkspaceProjectionData, WorkspaceSelection } from "@finai/contracts";
 
 type Point = { label: string; value: number; row_id?: string };
 
@@ -9,8 +9,13 @@ type Edge = { source_id: string; target_id: string; relation?: string };
 type Feature = { geometry?: { type?: string; coordinates?: unknown }; properties?: { resource?: { display_name?: string; object_type?: string } } };
 
 function publishProjectionSelection(data: WorkspaceProjectionData, patch: Partial<WorkspaceSelection>) {
-  window.dispatchEvent(new CustomEvent<Partial<WorkspaceSelection>>("g8-workspace-selection", {
-    detail: { ...patch, company_id: data.selection.company_id },
+  window.dispatchEvent(new CustomEvent<ProjectionSelectionEvent>("g8-workspace-selection", {
+    detail: {
+      contract: "workspace-selection-event/1",
+      source_projection_id: data.projection.projection_id,
+      source_row_id: patch.selected_object_id,
+      selection: { ...patch, company_id: data.selection.company_id },
+    },
   }));
 }
 

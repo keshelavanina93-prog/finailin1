@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ProjectionCatalog, WorkspaceProjectionData, WorkspaceSelection, WorkspaceSelectionResponse } from "@finai/contracts";
+import type { ProjectionCatalog, ProjectionSelectionEvent, WorkspaceProjectionData, WorkspaceSelection, WorkspaceSelectionResponse } from "@finai/contracts";
 import ProjectionDataRenderer from "./projection-data-renderer";
 
 export default function ProjectionControlSurface({ token, companyId, initialWorkspace }: { token: string; companyId: string; initialWorkspace?: WorkspaceSelection["workspace"] }) {
@@ -22,9 +22,9 @@ export default function ProjectionControlSurface({ token, companyId, initialWork
   useEffect(() => { window.sessionStorage.setItem("g8-workspace-selection", JSON.stringify(selection)); }, [selection]);
   useEffect(() => {
     const receiveSelection = (event: Event) => {
-      const detail = (event as CustomEvent<Partial<WorkspaceSelection>>).detail;
-      if (!detail || detail.company_id !== companyId) return;
-      setSelection(current => ({ ...current, ...detail, company_id: companyId }));
+      const detail = (event as CustomEvent<ProjectionSelectionEvent>).detail;
+      if (!detail || detail.contract !== "workspace-selection-event/1" || detail.selection.company_id !== companyId) return;
+      setSelection(current => ({ ...current, ...detail.selection, company_id: companyId }));
       setValidated(null);
       setData(null);
     };
