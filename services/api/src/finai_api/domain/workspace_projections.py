@@ -80,7 +80,9 @@ def normalize_projection_rows(rows: list[dict[str, Any]]) -> list[ProjectionRow]
         return None
 
     for index, row in enumerate(rows):
-        attributes = row.get("attributes") if isinstance(row.get("attributes"), dict) else {}
+        attributes: dict[str, Any] = (
+            row["attributes"] if isinstance(row.get("attributes"), dict) else {}
+        )
         dimension = row.get("dimension")
         coordinates = {
             key: str(value)
