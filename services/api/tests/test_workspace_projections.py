@@ -25,7 +25,7 @@ def test_projection_catalog_is_server_owned_and_read_only() -> None:
     }
     assert {item["chart_type"] for item in catalog if item["chart_type"]} >= {
         "AREA", "BAR", "COLUMN", "COMBINATION", "DOT", "GANTT", "LINE",
-        "PIE", "SCATTER", "BUBBLE",
+        "PIE", "SCATTER", "BUBBLE", "WATERFALL",
     }
     assert all(item["authority_effect"] == "NONE" for item in catalog)
     assert all(item["synchronization_group"] == "WORKSPACE_SELECTION" for item in catalog)

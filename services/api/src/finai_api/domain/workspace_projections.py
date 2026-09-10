@@ -175,7 +175,7 @@ def _projection(
 
 PROJECTIONS: tuple[ProjectionDefinition, ...] = (
     _projection("executive-kpi", "KPI", "Executive KPI", ("COMMAND_EXECUTIVE", "REPORT"), ("company_id", "period", "scenario_id", "comparison_baseline"), ("planning-catalog/1", "planning-comparison/1"), "PARTIAL"),  # noqa: E501
-    _projection("variance-waterfall", "WATERFALL", "Variance waterfall", ("BRIDGE_FIRST", "REPORT"), ("company_id", "product_id", "station_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED"),  # noqa: E501
+    _projection("variance-waterfall", "WATERFALL", "Variance waterfall", ("BRIDGE_FIRST", "REPORT"), ("company_id", "product_id", "station_id", "period", "scenario_id", "comparison_baseline"), ("planning-comparison/1",), "REGISTERED", "WATERFALL"),  # noqa: E501
     _projection("planning-grid", "GRID", "Planning grid", ("TABLE_FIRST", "REPORT"), ("company_id", "period", "scenario_id", "version_id"), ("planning-catalog/1",), "IMPLEMENTED"),  # noqa: E501
     _projection("hierarchy-drilldown", "HIERARCHY", "Hierarchy drill-down", ("TABLE_FIRST", "GRAPH_FIRST"), ("company_id", "selected_object_id"), ("operations-map/1",), "PARTIAL"),  # noqa: E501
     _projection("movement-network", "NETWORK", "Movement network", ("GRAPH_FIRST", "TIMELINE_FIRST"), ("company_id", "selected_object_id"), ("operations-map/1",), "PARTIAL"),  # noqa: E501
