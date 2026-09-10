@@ -2012,6 +2012,10 @@ only one projection of the object. Evidence/lineage inspection,
 investigation/approval/action/readback screens, restart persistence,
 authenticated browser proof and independent acceptance remain required.
 
+The control table receives typed evidence buckets for waybills, tank dips,
+retail sales, telemetry and source hashes and displays their gaps at the same
+scope as the physical variance.
+
 The Operations control row now has a governed “Open investigation” entry point
 through `/api/operations/petroleum/variances/investigations`; the returned
 control state is retained and displayed. Approval and external execution remain

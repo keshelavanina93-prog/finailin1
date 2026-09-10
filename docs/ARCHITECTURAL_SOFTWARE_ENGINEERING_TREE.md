@@ -542,3 +542,7 @@ truth.
 The reconciliation projection now enforces those replay cutoffs before grouping
 resources, so corrected evidence can be compared without changing the original
 accepted snapshot.
+
+The petroleum service also preserves typed waybill, tank-dip, retail-sale,
+telemetry and source-hash evidence categories so lineage gaps remain explicit
+through the backend-to-frontend contract.

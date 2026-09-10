@@ -71,6 +71,7 @@ def test_variance_is_full_scope_bitemporal_and_partial_bridge(monkeypatch):
             "station_id": "024", "product_id": "diesel", "period_id": "2025-04",
             "unit": "L", "measurement_basis": "15C", "opening_quantity": "100",
             "receipts": "20", "dispatches": "18", "losses": "1", "closing_quantity": "99",
+            "waybill_id": "wb-1", "tank_dip_id": "dip-1", "source_sha256": "a" * 64,
         })], "PhysicalMovement": [], "PhysicalMeasurement": [], "RetailSale": [],
     }
     monkeypatch.setattr(petroleum_reconciliation.resources, "list_resources",
@@ -82,6 +83,9 @@ def test_variance_is_full_scope_bitemporal_and_partial_bridge(monkeypatch):
     assert row["physical"]["variance_quantity"] == "-2"
     assert row["financial"]["status"] == "FINANCIAL_BRIDGE_PARTIAL"
     assert row["authority"]["accounting_authorized"] is False
+    assert row["evidence"]["waybill_ids"] == ["wb-1"]
+    assert row["evidence"]["tank_dip_ids"] == ["dip-1"]
+    assert row["evidence"]["source_hashes"] == ["a" * 64]
     assert row["time"]["replay_as_of"] is None
 
 

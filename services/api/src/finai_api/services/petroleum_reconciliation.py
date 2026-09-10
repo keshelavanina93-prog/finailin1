@@ -90,6 +90,23 @@ def reconcile(
                 },
             )
             bucket.setdefault("source_resource_ids", []).append(str(resource.resource_id))
+            evidence = bucket.setdefault(
+                "evidence",
+                {"waybill_ids": [], "tank_dip_ids": [], "retail_sale_ids": [],
+                 "telemetry_ids": [], "source_hashes": []},
+            )
+            for field, target in (
+                ("waybill_id", "waybill_ids"), ("tank_dip_id", "tank_dip_ids"),
+                ("sale_id", "retail_sale_ids"), ("measurement_id", "telemetry_ids"),
+                ("source_hash", "source_hashes"), ("source_sha256", "source_hashes"),
+            ):
+                value = attrs.get(field)
+                if value not in (None, "") and str(value) not in evidence[target]:
+                    evidence[target].append(str(value))
+            if object_type == "RetailSale":
+                evidence["retail_sale_ids"].append(str(resource.resource_id))
+            elif object_type == "PhysicalMeasurement":
+                evidence["telemetry_ids"].append(str(resource.resource_id))
             if object_type == "InventoryBalance":
                 bucket["opening"] += _quantity(attrs, ("opening_quantity", "opening"))
                 bucket["receipts"] += _quantity(
@@ -119,12 +136,13 @@ def reconcile(
                 **{
                     name: format(value, "f")
                     for name, value in values.items()
-                    if name != "source_resource_ids"
+                    if name not in {"source_resource_ids", "evidence"}
                 },
                 "expected_closing": format(expected, "f"),
                 "variance": format(variance, "f"),
                 "status": "RECONCILED" if variance == 0 else "REVIEW_REQUIRED",
                 "source_resource_ids": values.get("source_resource_ids", []),
+                "evidence": values.get("evidence", {}),
             }
         )
     return {
@@ -181,6 +199,7 @@ def variances(
     for row in result["rows"]:
         dimensions = row["dimensions"]
         source_ids = list(row.get("source_resource_ids", []))
+        evidence = dict(row.get("evidence", {}))
         missing: list[str] = []
         if not dimensions.get("unit"):
             missing.append("UNKNOWN_UNIT")
@@ -192,6 +211,10 @@ def variances(
             missing.append("MISSING_MOVEMENT_EVIDENCE")
         if row["closing"] == "0" and row["opening"] != "0":
             missing.append("MISSING_CLOSING_MEASUREMENT")
+        if row["receipts"] != "0" and not evidence.get("waybill_ids"):
+            missing.append("MISSING_WAYBILL")
+        if row["closing"] != "0" and not evidence.get("tank_dip_ids"):
+            missing.append("MISSING_TANK_DIP")
         physical_status = "EVIDENCE_MISSING" if missing else row["status"]
         if physical_status == "RECONCILED":
             lifecycle = "CONSERVATION_CHECKED"
@@ -214,7 +237,7 @@ def variances(
                 ),
                 "equation": "opening + receipts - dispatches - losses = expected_closing",
             },
-            "evidence": {"source_resource_ids": source_ids, "gaps": missing},
+            "evidence": {"source_resource_ids": source_ids, **evidence, "gaps": missing},
             "time": {
                 "valid_at": valid_at.isoformat()
                 if valid_at

@@ -862,6 +862,11 @@ The durable petroleum control workflow is now also wired through
 variance snapshot, records investigation and independent decisions, and
 refuses execution when no external adapter can provide readback.
 
+Variance evidence now retains distinct waybill, tank-dip, retail-sale,
+telemetry and source-hash references, so a control object can expose lineage
+coverage and missing evidence by type rather than a single undifferentiated ID
+list.
+
 Replay requests apply the supplied `valid_at` and `known_at` cutoffs while
 selecting accepted evidence, and control identity is derived from governed
 scope rather than row position.
