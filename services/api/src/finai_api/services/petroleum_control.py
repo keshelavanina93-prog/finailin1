@@ -8,6 +8,7 @@ execution is refused until a configured adapter can provide readback.
 import json
 from hashlib import sha256
 from typing import Any
+from uuid import UUID
 
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel, ConfigDict, Field
@@ -45,7 +46,9 @@ def _identity(principal: Principal, variance: dict[str, Any], rationale: str) ->
 
 
 def _find(principal: Principal, variance_id: str) -> dict[str, Any]:
-    result = petroleum_reconciliation.variances(principal, principal.scope.legal_entity_id)
+    result = petroleum_reconciliation.variances(
+        principal, UUID(principal.scope.legal_entity_id)
+    )
     for row in result["rows"]:
         if row["variance_id"] == variance_id:
             return row
