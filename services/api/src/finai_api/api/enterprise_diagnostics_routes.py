@@ -11,7 +11,7 @@ from finai_api.domain.executable_enterprise_model import (
 )
 from finai_api.domain.review import Principal
 from finai_api.security import authenticated_principal, require_permission
-from finai_api.services import enterprise_diagnostics
+from finai_api.services import enterprise_diagnostics, executable_function_registry
 
 router = APIRouter(prefix="/v1/workspace", tags=["enterprise diagnostics"])
 
@@ -58,5 +58,35 @@ def executable_preflight(
     """Evaluate an executable dependency contract without changing enterprise state."""
 
     response.headers["Cache-Control"] = "no-store"
-    result = resolve_function(request.function, request.available)
-    return {"preflight": result.model_dump(mode="json"), "authority_effect": "NONE"}
+    function = (
+        executable_function_registry.get_registered_function(request.function_id)
+        if request.function_id is not None
+        else request.function
+    )
+    assert function is not None
+    result = resolve_function(function, request.available)
+    return {
+        "preflight": result.model_dump(mode="json"),
+        "function": function.model_dump(mode="json"),
+        "registry_state": (
+            "AUTHORITATIVE_REGISTERED"
+            if request.function_id is not None
+            else "REQUEST_SUPPLIED_CONTRACT"
+        ),
+        "authority_effect": "NONE",
+    }
+
+
+@router.get("/executable-functions")
+def executable_functions(principal: ReadUser, response: Response) -> dict[str, object]:
+    """List server-registered executable verbs without executing any verb."""
+
+    response.headers["Cache-Control"] = "no-store"
+    return {
+        "contract": "executable-function-registry/1",
+        "functions": [
+            item.model_dump(mode="json")
+            for item in executable_function_registry.list_registered_functions()
+        ],
+        "authority_effect": "NONE",
+    }

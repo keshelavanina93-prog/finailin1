@@ -894,4 +894,9 @@ verbs, dependency composition, grain/time/authority/evidence eligibility, and
 readiness states are a shared platform capability; they are not module-local
 preflight logic. The current checkout contains the first pure resolver slice
 and its focused proof, while domain registration, durable API integration,
-and production acceptance remain open.
+and production acceptance remain open. The current implementation also contains
+the typed sparse compiler/runtime in
+`services/api/src/finai_api/domain/multidimensional_runtime.py`, including
+populated intersections, deterministic stages, coordinate-level invalidation
+selection and derived-candidate result envelopes. Durable persistence,
+operator dispatch and pricing reference-workload proof remain open.

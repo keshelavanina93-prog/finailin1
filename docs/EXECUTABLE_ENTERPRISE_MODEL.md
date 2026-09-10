@@ -537,6 +537,42 @@ eligibility integration, and production-scale execution before the related
 capability can be marked release-accepted. Focused regression coverage lives
 in `services/api/tests/test_calculation_graph.py`.
 
+### Multidimensional sparse runtime foundation (implemented)
+
+The physical seam is implemented in
+`services/api/src/finai_api/domain/multidimensional_runtime.py`. It compiles
+the semantic graph into a sparse plan containing:
+
+```text
+DimensionalSignature
+CalculationBlock → IntersectionSet (populated coordinates only)
+DimensionMapping / TransformDefinition
+        ↓
+deterministic execution stages
+        ↓
+coordinate-level affected closure
+        ↓
+trusted Decimal evaluation
+        ↓
+SparseCalculationResult
+```
+
+The implementation validates signature/intersection compatibility, preserves
+explicit dimension/value mappings, aggregates only to a declared target grain,
+groups independent nodes into deterministic stages, and intersects changed
+coordinates with populated intersections. It returns separate runtime
+freshness (`CALCULATION_FRESH`, `DIRTY`, `BLOCKED`) and authority fields; every
+successful result is a `DERIVED_CANDIDATE` with accounting and business-effect
+authority set to false. Results carry graph plan hashes, input pins,
+`valid_at`, `known_at`, exact coordinates, and a reproducibility hash.
+
+This is now a semantic-to-physical execution chain, but it is not yet a
+production calculation fabric. Transform dispatch for currency/unit/time,
+versioned hierarchy lookup, durable calculation runs/results, invalidation
+event persistence, broad domain evaluator registration, parallel workers,
+restart proof, and the pricing reference workload remain required before
+release acceptance.
+
 ## 10. Persistence and invalidation
 
 The current PostgreSQL resource/version and dependency tables remain the
@@ -554,6 +590,14 @@ dependency_resolutions
 outcome_measurements
 forecast_evaluations
 sensitivity_runs
+dimensional_signatures
+calculation_blocks
+intersection_sets
+dimension_mappings
+transform_definitions
+calculation_invalidations
+calculation_runs
+calculation_results
 ```
 
 If a new retained evidence item, policy version, source correction, or

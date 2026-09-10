@@ -2043,4 +2043,6 @@ The frontend must consume the retained resolver contract specified in
 surface must render the selected function version, required inputs and
 alternatives, exact scope/grain/time checks, evidence and authority state, and
 the resulting `READY`, `PARTIAL`, `BLOCKED`, `REFUSED`, or `INCOMPARABLE`
-state. It must never turn a missing dependency into a guessed value.
+state. The Planning workspace now exposes the server-registered executable
+function catalog and read-only preflight drawer through the Next proxy. It
+must never turn a missing dependency into a guessed value.

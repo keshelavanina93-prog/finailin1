@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class RequirementKind(StrEnum):
@@ -110,8 +110,15 @@ class ExecutablePreflightRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    function: ExecutableFunctionDefinition
+    function: ExecutableFunctionDefinition | None = None
+    function_id: str | None = Field(default=None, min_length=1, max_length=160)
     available: tuple[InputCoverage, ...] = ()
+
+    @model_validator(mode="after")
+    def require_one_function_source(self) -> ExecutablePreflightRequest:
+        if (self.function is None) == (self.function_id is None):
+            raise ValueError("Provide exactly one of function or function_id")
+        return self
 
 
 def resolve_function(

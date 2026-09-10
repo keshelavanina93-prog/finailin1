@@ -327,3 +327,4 @@ export type {CompanyFinancialResults} from "./company-financial-results.js";
 export type {OperationalMeasurementGrain, OperationalValidationStage, OperationalBindingRow, OperationalBindingValidation, OperationalPromotionPreview} from "./operational-intake.js";
 export type {OutcomeDimensionRow, OutcomeMeasurement, MultiBaselineOutcome, LearningEvaluation, RetainedOutcomeMeasurement, OutcomeMeasurementTimeline, LearningCandidateEvent, LearningCandidateTimeline} from "./outcomes.js";
 export type {PetroleumControl, PetroleumVariance, PetroleumVarianceCollection, PetroleumVarianceDetail, PetroleumVarianceStatus} from "./petroleum-variance.js";
+export type {ExecutableRequirement, ExecutableFunction, ExecutableFinding, ExecutablePreflight, ExecutableFunctionRegistry, ExecutablePreflightResponse} from "./executable-enterprise.js";

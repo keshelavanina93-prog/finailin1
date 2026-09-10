@@ -569,5 +569,9 @@ foundation at
 `services/api/src/finai_api/domain/executable_enterprise_model.py`, tested by
 `services/api/tests/test_executable_enterprise_model.py` and specified in
 [`EXECUTABLE_ENTERPRISE_MODEL.md`](EXECUTABLE_ENTERPRISE_MODEL.md). This is a
-reusable resolver foundation, not a claim that every domain verb or external
-execution adapter is complete.
+reusable resolver foundation plus the sparse multidimensional runtime at
+`services/api/src/finai_api/domain/multidimensional_runtime.py`, exposed to the
+Planning workspace through the registered-function catalog and preflight
+proxy. This remains a convergence slice: durable calculation persistence,
+domain evaluator registration, external adapters and release evidence are not
+complete.

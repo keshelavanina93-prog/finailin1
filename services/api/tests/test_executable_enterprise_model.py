@@ -10,6 +10,7 @@ from finai_api.domain.executable_enterprise_model import (
     resolve_function,
 )
 from finai_api.main import app
+from finai_api.services.executable_function_registry import list_registered_functions
 
 
 def fact(name: str, **kwargs: object) -> InputCoverage:
@@ -129,3 +130,47 @@ def test_executable_preflight_route_is_read_only() -> None:
     assert response.status_code == 200
     assert response.json()["preflight"]["state"] == "BLOCKED"
     assert response.json()["authority_effect"] == "NONE"
+
+
+def test_registered_function_preflight_uses_server_contract() -> None:
+    payload = {
+        "function_id": "ReconcilePhysicalStock",
+        "available": [
+            {"fact_id": "OpeningInventoryBalance"},
+            {"fact_id": "PhysicalReceipt"},
+            {"fact_id": "PhysicalDispatch"},
+            {"fact_id": "ClosingInventoryMeasurement"},
+        ],
+    }
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post("/v1/workspace/executable-preflight", json=payload)
+    assert response.status_code == 200
+    body = response.json()
+    assert body["registry_state"] == "AUTHORITATIVE_REGISTERED"
+    assert body["function"]["function_id"] == "ReconcilePhysicalStock"
+    assert body["preflight"]["state"] == "READY"
+    assert body["authority_effect"] == "NONE"
+
+
+def test_registered_function_catalog_is_versioned_and_read_only() -> None:
+    assert len(list_registered_functions()) >= 7
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.get("/v1/workspace/executable-functions")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["contract"] == "executable-function-registry/1"
+    assert {item["function_id"] for item in body["functions"]} >= {
+        "ConsolidateGroup",
+        "CalculateROIC",
+        "ReconcilePhysicalStock",
+    }
+    assert body["authority_effect"] == "NONE"
+
+
+def test_unknown_registered_function_is_refused() -> None:
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post(
+            "/v1/workspace/executable-preflight",
+            json={"function_id": "PostUnapprovedJournal", "available": []},
+        )
+    assert response.status_code == 404
