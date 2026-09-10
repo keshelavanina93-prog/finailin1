@@ -877,3 +877,11 @@ accounting or business-effect authority.
 Replay requests apply the supplied `valid_at` and `known_at` cutoffs while
 selecting accepted evidence, and control identity is derived from governed
 scope rather than row position.
+
+After a verified action readback, the petroleum control now recomputes the same
+governed variance from fresh accepted evidence and retains an immutable
+baseline/current comparison. `MEASURED_RESOLVED` and `MEASURED_UNRESOLVED` are
+physical outcome states only; source hashes, exact scope and readback identity
+are retained without granting accounting or business-effect authority. The
+workflow event survives restart. Authentic sources, external adapters, browser
+proof and release acceptance remain separate open gates.

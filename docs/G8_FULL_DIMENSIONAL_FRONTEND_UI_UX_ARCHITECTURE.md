@@ -1984,7 +1984,7 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest implementation head at the time of this snapshot was `0061b51`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, known telemetry quality/basis states and inferred series-gap review, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, and retained outcome timeline represented in the unified workspaces.
+latest implementation head at the time of this snapshot was `5b786b9`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, known telemetry quality/basis states and inferred series-gap review, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, and retained outcome timeline represented in the unified workspaces.
 The previous API CI job failed four tests; three are fixed locally in this head,
 while the database-backed object-set materialization path is still under CI
 verification. Planning now has real catalog/comparison, forecast, liquidity,
@@ -2027,3 +2027,10 @@ through `/api/operations/petroleum/variances/investigations`; the returned
 control state is retained and displayed. Approval and external execution remain
 permissioned workflow surfaces, with missing adapters rendered as refusal rather
 than simulated success.
+
+After `READBACK_VERIFIED`, the row exposes “Measure outcome” through the
+authenticated operations proxy. The backend recomputes current accepted
+evidence, compares it with the retained baseline, and displays
+`MEASURED_RESOLVED` or `MEASURED_UNRESOLVED` with baseline/current quantity and
+readback identity. This is a physical outcome projection, not an accounting
+adjustment; broader outcome-learning and external-adapter gates remain open.

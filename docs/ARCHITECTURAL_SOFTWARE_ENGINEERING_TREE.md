@@ -477,6 +477,14 @@ Connect source
 → feed measured result into evaluation and learning
 ```
 
+The petroleum implementation now materializes the local readback-to-outcome
+edge: a verified control readback authorizes neither accounting nor business
+effect, and measurement re-queries accepted evidence for the exact variance
+coordinate. It persists a hashed baseline/current result with source hashes,
+scope and readback identity. Missing current evidence is blocked rather than
+interpreted as resolution. External connectors, external readback, browser
+acceptance and release evidence remain separate gates.
+
 ## 5. Truthful status rule
 
 The architecture is broader than the currently integrated software. Existing
