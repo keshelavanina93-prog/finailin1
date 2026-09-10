@@ -43,6 +43,8 @@ class WorkspaceSelection(Model):
 
     selected_object_id: str | None = Field(default=None, min_length=1, max_length=256)
     company_id: str = Field(min_length=1, max_length=256)
+    facility_id: str | None = Field(default=None, min_length=1, max_length=256)
+    tank_id: str | None = Field(default=None, min_length=1, max_length=256)
     product_id: str | None = Field(default=None, min_length=1, max_length=256)
     station_id: str | None = Field(default=None, min_length=1, max_length=256)
     period: str | None = Field(default=None, min_length=1, max_length=64)

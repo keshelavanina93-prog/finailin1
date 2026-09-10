@@ -8,7 +8,7 @@ type Edge = { source_id: string; target_id: string; relation?: string };
 
 type Feature = { geometry?: { type?: string; coordinates?: unknown }; properties?: { resource?: { display_name?: string; object_type?: string } } };
 
-const selectionDimensions = ["product_id", "station_id", "period", "scenario_id", "version_id", "comparison_baseline", "replay_as_of"] as const;
+const selectionDimensions = ["facility_id", "tank_id", "product_id", "station_id", "period", "scenario_id", "version_id", "comparison_baseline", "replay_as_of"] as const;
 
 function publishProjectionSelection(data: WorkspaceProjectionData, patch: Partial<WorkspaceSelection>) {
   const sourceRow = data.normalized_rows?.find(row => row.row_id === patch.selected_object_id);

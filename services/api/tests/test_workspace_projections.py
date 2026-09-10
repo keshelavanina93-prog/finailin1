@@ -34,6 +34,8 @@ def test_projection_catalog_is_server_owned_and_read_only() -> None:
 def test_selection_preserves_exact_cross_projection_dimensions() -> None:
     selection = WorkspaceSelection(
         company_id="sgp",
+        facility_id="tbilisi-depot",
+        tank_id="T-04",
         product_id="diesel-en590",
         station_id="024",
         period="2026-09",
@@ -43,6 +45,8 @@ def test_selection_preserves_exact_cross_projection_dimensions() -> None:
         replay_as_of="2026-09-10T12:00:00Z",
     )
     assert selection.model_dump()["company_id"] == "sgp"
+    assert selection.model_dump()["facility_id"] == "tbilisi-depot"
+    assert selection.model_dump()["tank_id"] == "T-04"
     assert selection.model_dump()["replay_as_of"] == "2026-09-10T12:00:00Z"
 
 
