@@ -32,5 +32,10 @@ config_file.write_text(json.dumps({
     "FINAI_DATABASE_URL": make_conninfo(database_admin, user="finai_runtime", password=password),
     "FINAI_MIGRATION_DATABASE_URL": database_admin,
     "FINAI_ACCESS_TOKENS": json.dumps({token: scope}),
+    "FINAI_DEV_LOGIN_ENABLED": "true",
+    "FINAI_DEV_USERNAME": "nyxcore.local",
+    "FINAI_DEV_PASSWORD": "NYXcore-local-2026!",
+    "FINAI_DEV_ACCESS_TOKEN": token,
+    "NEXT_PUBLIC_FINAI_LOCAL_LOGIN": "true",
 }, indent=2))
 print("Provisioned finai_dev with restricted runtime role. Configuration: .finai/local.json")

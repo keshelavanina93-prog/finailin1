@@ -77,6 +77,7 @@ const navigation = [
  {id:"actions",label:"Workflows & Actions",hint:undefined,icon:FlowArrow,available:true},
 ];
 const tone = (state: string) => state === "APPROVED" || state === "ready" ? "good" : state === "REJECTED" || state === "REVOKED" ? "bad" : state === "PENDING" ? "warning" : "neutral";
+const localLoginEnabled = process.env.NEXT_PUBLIC_FINAI_LOCAL_LOGIN === "true";
 const date = (value: string) => new Date(value).toLocaleDateString(undefined,{month:"short",day:"numeric"});
 async function get<T>(path: string, token: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(`/api/${path}`,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",signal});
@@ -92,14 +93,26 @@ export default function G8Workspace() {
   const [error,setError] = useState(""); const [busy,setBusy] = useState(false);
   async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError("");
-    const token = String(new FormData(event.currentTarget).get("token") ?? "").trim();
-    try {const principal = await get<Principal>("workspace/session",token); setSession({token,principal});}
+    const values = new FormData(event.currentTarget);
+    const username = String(values.get("username") ?? "").trim();
+    const password = String(values.get("password") ?? "");
+    const token = String(values.get("token") ?? "").trim();
+    try {
+      if (localLoginEnabled) {
+        const response = await fetch("/api/auth/local-login", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,password}),cache:"no-store"});
+        const data = await response.json() as {access_token?:string;principal?:Principal;detail?:string};
+        if (!response.ok || !data.access_token || !data.principal) throw new Error(data.detail ?? `Sign-in unavailable (${response.status})`);
+        setSession({token:data.access_token,principal:data.principal});
+      } else {
+        const principal = await get<Principal>("workspace/session",token); setSession({token,principal});
+      }
+    }
     catch (failure) {setError(failure instanceof Error ? failure.message : "Sign-in unavailable");}
     finally {setBusy(false);}
   }
   if(sourceReviewRouteRefused(pathname))return <main id="g8-main"><section role="alert" aria-label="Source review reference refused"><Brand/><h1>Source review reference unavailable</h1><p>This link does not identify a valid company, retained result and, where required, an exact journal snapshot. No saved company or result has been substituted.</p><button onClick={()=>{const url=new URL(location.href);url.pathname="/";url.searchParams.delete("analysis_view");window.history.pushState(null,"",url);}}>Return to workspace</button></section></main>;
   if (session) return <SignedIn key={session.principal.actor_id} {...session} onSignOut={() => setSession(null)} />;
-  return <main className="g8-login"><section className="g8-login-story"><Brand /><div><p className="overline">ENTERPRISE INTELLIGENCE</p><h1>From source evidence<br />to reviewed enterprise state.</h1><p>One workspace for your companies, retained sources and governed decisions.</p><div className="g8-principles"><span>Exact context<small>Company and version stay bound.</small></span><span>Visible evidence<small>Trace every accepted change.</small></span><span>Controlled action<small>Independent review is preserved.</small></span></div></div><Image className="g8-brand-banner" src="/brand/g8-login-art.png" alt="G8 cognition emblem with connected data ribbons" width={2172} height={724} priority /></section><section className="g8-login-form"><form onSubmit={signIn}><ShieldCheck size={30} /><p className="overline">G8 WORKSPACE ACCESS</p><h2>Sign in to your workspace</h2><p>Your identity determines the company access, evidence and actions available to you.</p><label>Workspace access key<input name="token" type="password" required autoComplete="off" autoFocus /></label><button disabled={busy}>{busy ? "Connecting…" : "Continue securely"}<ArrowRight size={18} /></button>{error && <p role="alert" className="error-banner">{error}</p>}<small>Use your organization-issued access key. It stays in memory for this session.</small></form></section></main>;
+  return <main className="g8-login"><section className="g8-login-story"><Brand /><div><p className="overline">ENTERPRISE INTELLIGENCE</p><h1>From source evidence<br />to reviewed enterprise state.</h1><p>One workspace for your companies, retained sources and governed decisions.</p><div className="g8-principles"><span>Exact context<small>Company and version stay bound.</small></span><span>Visible evidence<small>Trace every accepted change.</small></span><span>Controlled action<small>Independent review is preserved.</small></span></div></div><Image className="g8-brand-banner" src="/brand/g8-login-art.png" alt="G8 cognition emblem with connected data ribbons" width={2172} height={724} priority /></section><section className="g8-login-form"><form onSubmit={signIn}><ShieldCheck size={30} /><p className="overline">G8 WORKSPACE ACCESS</p><h2>Sign in to your workspace</h2><p>Your identity determines the company access, evidence and actions available to you.</p>{localLoginEnabled ? <><label>Local username<input name="username" type="text" required autoComplete="username" autoFocus /></label><label>Local password<input name="password" type="password" required autoComplete="current-password" /></label></> : <label>Workspace access key<input name="token" type="password" required autoComplete="off" autoFocus /></label>}<button disabled={busy}>{busy ? "Connecting…" : "Continue securely"}<ArrowRight size={18} /></button>{error && <p role="alert" className="error-banner">{error}</p>}<small>{localLoginEnabled ? "Local development credentials are stored only in this checkout's ignored runtime state." : "Use your organization-issued access key. It stays in memory for this session."}</small></form></section></main>;
 }
 
 function SignedIn({token,principal,onSignOut}: {token:string;principal:Principal;onSignOut:()=>void}) {

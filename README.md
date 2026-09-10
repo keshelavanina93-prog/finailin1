@@ -157,6 +157,13 @@ Run the services directly:
 pnpm --filter @finai/web dev
 ```
 
+For the complete local NYXCore stack (PostgreSQL, retained storage, Temporal,
+workers, API and web shell), use `scripts\start-nyxcore-local.ps1`. The first
+run can also create the desktop shortcut with
+`-CreateShortcut`. Local credentials are fixed for this checkout and stored in
+the ignored `.finai\local.json`; they are only accepted when the API runs in
+the local environment.
+
 The local PostgreSQL cluster binds to `127.0.0.1:55439`, uses SCRAM credentials,
 and stores all data beneath `.finai/data/postgres-native`. Configuration and the
 generated exact-scope access token are in ignored `.finai/local.json`. Use its
