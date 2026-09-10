@@ -13,7 +13,16 @@ def test_projection_catalog_is_server_owned_and_read_only() -> None:
         "evidence-table",
         "nyx-context",
     }
+    assert {item["kind"] for item in catalog} >= {
+        "ACTION", "CHART", "FIELD", "GRID", "HIERARCHY", "IMAGE", "KPI",
+        "MAP", "NETWORK", "TABLE", "TEXT", "WATERFALL",
+    }
+    assert {item["chart_type"] for item in catalog if item["chart_type"]} >= {
+        "AREA", "BAR", "COLUMN", "COMBINATION", "DOT", "GANTT", "LINE",
+        "PIE", "SCATTER", "BUBBLE",
+    }
     assert all(item["authority_effect"] == "NONE" for item in catalog)
+    assert all(item["synchronization_group"] == "WORKSPACE_SELECTION" for item in catalog)
 
 
 def test_selection_preserves_exact_cross_projection_dimensions() -> None:

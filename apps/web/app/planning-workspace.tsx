@@ -55,6 +55,6 @@ export default function PlanningWorkspace({ token, companyName, companyId, canPr
     <LiquidityProjectionPanel token={token} scenarioId={a} />
     <ScenarioProposalPanel token={token} companyId={companyId} enabled={canPropose} />
     <ExecutableModelPanel token={token} />
-    <ProjectionControlSurface token={token} companyId={companyId} />
+    <ProjectionControlSurface key={`${token}:${companyId}`} token={token} companyId={companyId} />
   </section>;
 }
