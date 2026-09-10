@@ -1,7 +1,11 @@
 import pytest
 from pydantic import ValidationError
 
-from finai_api.domain.workspace_projections import WorkspaceSelection, projection_catalog
+from finai_api.domain.workspace_projections import (
+    WorkspaceSelection,
+    eligible_projections,
+    projection_catalog,
+)
 
 
 def test_projection_catalog_is_server_owned_and_read_only() -> None:
@@ -43,3 +47,11 @@ def test_selection_preserves_exact_cross_projection_dimensions() -> None:
 def test_selection_rejects_empty_company_scope() -> None:
     with pytest.raises(ValidationError):
         WorkspaceSelection(company_id="")
+
+
+def test_projection_eligibility_does_not_invent_missing_context() -> None:
+    selection = WorkspaceSelection(company_id="sgp", workspace="BRIDGE_FIRST")
+    eligible = {item["projection_id"] for item in eligible_projections(selection)}
+    assert "variance-waterfall" not in eligible
+    assert "executive-kpi" not in eligible
+    assert "action-control" not in eligible

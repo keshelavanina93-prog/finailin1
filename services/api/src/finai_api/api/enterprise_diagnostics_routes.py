@@ -19,7 +19,11 @@ from finai_api.domain.multidimensional_runtime import (
     compile_sparse_plan,
 )
 from finai_api.domain.review import Principal
-from finai_api.domain.workspace_projections import WorkspaceSelection, projection_catalog
+from finai_api.domain.workspace_projections import (
+    WorkspaceSelection,
+    eligible_projections,
+    projection_catalog,
+)
 from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import enterprise_diagnostics, executable_function_registry
 
@@ -137,6 +141,7 @@ def project_selection(
         "contract": "workspace-selection/1",
         "selection": selection.model_dump(mode="json"),
         "scope_state": "EXACT_CONTEXT_REQUIRED",
+        "eligible_projections": eligible_projections(selection),
         "authority_effect": "NONE",
     }
 

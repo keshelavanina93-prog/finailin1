@@ -49,6 +49,7 @@ class WorkspaceSelection(Model):
     version_id: str | None = Field(default=None, min_length=1, max_length=256)
     comparison_baseline: str | None = Field(default=None, min_length=1, max_length=256)
     replay_as_of: str | None = Field(default=None, min_length=1, max_length=128)
+    workspace: WorkspaceKind | None = None
 
 
 class ProjectionDefinition(Model):
@@ -114,3 +115,16 @@ PROJECTIONS: tuple[ProjectionDefinition, ...] = (
 
 def projection_catalog() -> list[dict[str, object]]:
     return [item.model_dump(mode="json") for item in PROJECTIONS]
+
+
+def eligible_projections(selection: WorkspaceSelection) -> list[dict[str, object]]:
+    """Return projections whose declared context is present in the selection."""
+
+    values = selection.model_dump(exclude_none=True)
+    result: list[dict[str, object]] = []
+    for item in PROJECTIONS:
+        if selection.workspace is not None and selection.workspace not in item.workspaces:
+            continue
+        if all(field in values for field in item.selection_fields):
+            result.append(item.model_dump(mode="json"))
+    return result
