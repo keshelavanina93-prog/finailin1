@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- verified retained evidence is rendered from an authenticated local blob. */
+import { useEffect, useState } from "react";
 import type { ProjectionSelectionEvent, WorkspaceProjectionData, WorkspaceSelection } from "@finai/contracts";
 
 type Point = { label: string; value: number; row_id?: string };
@@ -71,7 +73,27 @@ function ChartFigure({ data, values }: { data: WorkspaceProjectionData; values: 
   return <svg viewBox="0 0 720 240" preserveAspectRatio="none" aria-label={`${chartType} projection`}><line x1="16" y1="220" x2="704" y2="220" stroke="currentColor" opacity=".35" />{values.map((point, index) => { const width = Math.max(8, 680 / values.length - 6); const height = Math.max(2, Math.abs(point.value) / maximum * 180); const x = 20 + index * (680 / values.length); const y = point.value < 0 ? 220 : 220 - height; return <rect key={`${point.label}:${index}`} x={x} y={y} width={width} height={height} rx="3" data-value={point.value} onClick={() => publishProjectionSelection(data, { selected_object_id: (data.normalized_rows ?? [])[index]?.row_id ?? null })}><title>{point.label}: {point.value}</title></rect>; })}</svg>;
 }
 
-export default function ProjectionDataRenderer({ data }: { data: WorkspaceProjectionData }) {
+export default function ProjectionDataRenderer({ data, token }: { data: WorkspaceProjectionData; token?: string }) {
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [imageKey, setImageKey] = useState<string | null>(null);
+  const [imageError, setImageError] = useState("");
+  useEffect(() => {
+    let objectUrl: string | null = null;
+    if (data.projection.kind !== "IMAGE" || !data.media) return () => undefined;
+    const controller = new AbortController();
+    void fetch(data.media.data_url, { cache: "no-store", signal: controller.signal })
+      .then(async response => {
+        if (!response.ok) throw new Error("Retained image unavailable in the exact source scope");
+        const bytes = await response.arrayBuffer();
+        const digest = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), value => value.toString(16).padStart(2, "0")).join("");
+        if (digest !== data.media?.sha256) throw new Error("Image integrity check failed; display withheld");
+        objectUrl = URL.createObjectURL(new Blob([bytes], { type: data.media?.media_type }));
+        setImageSrc(objectUrl);
+        setImageKey(data.media?.data_url ?? null);
+      })
+      .catch(error => { if (!controller.signal.aborted) setImageError(error instanceof Error ? error.message : "Retained image unavailable"); });
+    return () => { controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [data.media, data.projection.kind, token]);
   const values = points(data);
   const graph = edges(data);
   const mapFeatures = features(data);
@@ -88,7 +110,11 @@ export default function ProjectionDataRenderer({ data }: { data: WorkspaceProjec
   if (data.projection.kind === "ACTION" && data.data_state === "CONTEXT_ONLY") {
     return <div className="g8-projection-result"><h4>{data.projection.label} · governed capability</h4><p>Read-only action status for the exact selected scope · authority effect: {data.authority_effect}.</p><dl>{data.rows.filter(row => typeof row.field === "string").map(row => <div key={String(row.field)}><dt>{String(row.label ?? row.field)}</dt><dd>{String(row.value ?? "Not recorded")}</dd></div>)}</dl><p role="status">This projection cannot execute an action. Use the governed workflow workbench for maker/checker approval, adapter execution, and external readback.</p></div>;
   }
-  if (["IMAGE", "ACTION"].includes(data.projection.kind)) {
+  if (data.projection.kind === "IMAGE") {
+    if (imageSrc && imageKey === data.media?.data_url) return <div className="g8-projection-result"><h4>{data.projection.label} · {data.data_state}</h4><figure>{/* The source is a verified local blob URL, not an external image host. */}<img src={imageSrc} alt="Retained evidence source" style={{ maxWidth: "100%", maxHeight: 520 }} /><figcaption>Integrity-verified retained evidence · {data.media?.media_type} · SHA-256 {data.media?.sha256}</figcaption></figure><p role="status">Image is displayed as retained evidence only. It cannot change canonical facts or authority.</p></div>;
+    return <div className="g8-projection-result"><h4>{data.projection.label}</h4><p role="status">{imageError || "Loading integrity-verified retained image…"}</p><strong>{data.data_state}</strong></div>;
+  }
+  if (data.projection.kind === "ACTION") {
     return <div className="g8-projection-result"><h4>{data.projection.label}</h4><p role="status">This projection is registered for the exact context, but its authoritative payload is not available in this read-only data contract. No input mutation, image substitution, or business action was performed.</p><strong>{data.data_state}</strong></div>;
   }
   if (data.projection.kind === "TEXT") {

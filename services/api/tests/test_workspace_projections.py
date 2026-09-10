@@ -37,6 +37,7 @@ def test_projection_catalog_is_server_owned_and_read_only() -> None:
     assert statuses["chart-bubble"] == "IMPLEMENTED"
     assert statuses["field-input"] == "PARTIAL"
     assert statuses["action-control"] == "PARTIAL"
+    assert statuses["image-evidence"] == "IMPLEMENTED"
 
 
 def test_selection_preserves_exact_cross_projection_dimensions() -> None:

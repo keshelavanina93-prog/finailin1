@@ -1,7 +1,9 @@
 """Read-only enterprise target diagnosis over the caller's authorized resource graph."""
 
+import base64
 from collections.abc import Callable
 from decimal import Decimal
+from mimetypes import guess_type
 from typing import Annotated, Any
 from uuid import UUID
 
@@ -34,6 +36,7 @@ from finai_api.domain.workspace_projections import (
 )
 from finai_api.security import authenticated_principal, require_permission
 from finai_api.services import (
+    accounting_source_document,
     enterprise_diagnostics,
     executable_function_registry,
     nyx_reasoning,
@@ -476,13 +479,61 @@ def projection_data(
             "coverage": comparison["coverage"],
             "authority_effect": "NONE",
         }
-    if request.projection_id in {"image-evidence"}:
+    if request.projection_id == "image-evidence":
+        identity = request.selection.selected_object_id
+        if not identity or not (identity.startswith("doc_") or identity.startswith("ir_")):
+            return {
+                "contract": "workspace-projection-data/1",
+                "projection": projection,
+                "selection": request.selection.model_dump(mode="json"),
+                "data_state": "UNAVAILABLE_REQUIRED_CONTEXT",
+                "rows": [],
+                "authority_effect": "NONE",
+            }
+        metadata, content = accounting_source_document.read_source(principal, identity)
+        filename = str(metadata.get("filename", ""))
+        media_type = guess_type(filename)[0] or "application/octet-stream"
+        if not media_type.startswith("image/") or len(content) > 5_000_000:
+            return {
+                "contract": "workspace-projection-data/1",
+                "projection": projection,
+                "selection": request.selection.model_dump(mode="json"),
+                "data_state": "UNAVAILABLE_AUTHORITY_PAYLOAD",
+                "rows": [],
+                "authority_effect": "NONE",
+            }
+        rows = [
+            {
+                "row_id": f"image:{identity}",
+                "label": "Retained evidence image",
+                "field": "filename",
+                "value": filename,
+                "authority_state": "RETAINED_EVIDENCE",
+            },
+            {
+                "row_id": f"image-hash:{identity}",
+                "label": "Source SHA-256",
+                "field": "sha256",
+                "value": metadata.get("source_sha256"),
+                "authority_state": "RETAINED_EVIDENCE",
+            },
+        ]
         return {
             "contract": "workspace-projection-data/1",
             "projection": projection,
             "selection": request.selection.model_dump(mode="json"),
-            "data_state": "UNAVAILABLE_AUTHORITY_PAYLOAD",
-            "rows": [],
+            "data_state": "ACCEPTED_CANONICAL",
+            "rows": rows,
+            "normalized_rows": [
+                item.model_dump(mode="json") for item in normalize_projection_rows(rows)
+            ],
+            "media": {
+                "data_url": f"data:{media_type};base64,{base64.b64encode(content).decode('ascii')}",
+                "media_type": media_type,
+                "sha256": metadata.get("source_sha256"),
+            },
+            "coverage": "retained-image/1",
+            "scope": {"company_id": request.selection.company_id},
             "authority_effect": "NONE",
         }
     return {
