@@ -104,8 +104,11 @@ def test_variance_detail_returns_evidence_packet_and_lineage(monkeypatch):
     }
     monkeypatch.setattr(petroleum_reconciliation.resources, "list_resources",
                         lambda _p, kind, _s, _o, limit=1000: rows.get(kind, []))
-    monkeypatch.setattr(petroleum_reconciliation, "lineage",
-                        lambda _p, resource_id, _company_id=None: {"root_resource_id": str(resource_id)})
+    monkeypatch.setattr(
+        petroleum_reconciliation,
+        "lineage",
+        lambda _p, resource_id, _company_id=None: {"root_resource_id": str(resource_id)},
+    )
     variance = petroleum_reconciliation.variances(principal)["rows"][0]
     detail = petroleum_reconciliation.variance_detail(principal, variance["variance_id"])
     assert detail["contract"] == "petroleum-variance-detail/1"
