@@ -841,8 +841,8 @@ promotion previews now compile evidence-linked RetailSale, CashRegisterShiftClos
 promotion and live operational telemetry remain open; accepted measurement-series quality is now projected through the read-only petroleum telemetry bridge. The latest CI API run executes the full suite without test failures; its remaining gate is repository coverage at 83.67% against the aligned 84% threshold.
 A citation-first NYX refusal/explanation boundary is now wired at
 `/v1/ontology/nyx/reason`; model-backed reasoning, multi-citation packets and
-NYX model-backed reasoning and proposal/action handoff execution remain open. The previous configured coverage result was 83.93% against
-a 90% gate. The protected
+NYX model-backed reasoning and proposal/action handoff execution remain open. The latest API coverage result was 83.67% against
+the aligned 84% gate. The protected
 `development/enterprise-hydration-foundation` branch remains at `4261fcb`, so
 this head is not the canonical merged release. This is a substantial converged
 slice, not completion of the full architecture.
