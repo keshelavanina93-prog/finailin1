@@ -1,5 +1,6 @@
 """Read-only enterprise target diagnosis over the caller's authorized resource graph."""
 
+from decimal import Decimal
 from typing import Annotated, Any
 from uuid import UUID
 
@@ -18,6 +19,7 @@ from finai_api.domain.multidimensional_runtime import (
     DimensionalSignature,
     IntersectionSet,
     compile_sparse_plan,
+    execute_sparse_decimal_plan,
 )
 from finai_api.domain.review import Principal
 from finai_api.domain.workspace_projections import (
@@ -46,6 +48,22 @@ class CalculationCompileRequest(BaseModel):
     intersections: tuple[IntersectionSet, ...] = ()
     changed_nodes: tuple[str, ...] = ()
     changed_coordinates: tuple[Coordinate, ...] = ()
+
+
+class SparseValueInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    node_id: str
+    coordinate: Coordinate
+    value: Decimal
+
+
+class CalculationExecuteRequest(CalculationCompileRequest):
+    values: tuple[SparseValueInput, ...] = ()
+    target: str = "UNSPECIFIED"
+    input_pins: tuple[str, ...] = ()
+    valid_at: str | None = None
+    known_at: str | None = None
 
 
 class ProjectionDataRequest(BaseModel):
@@ -339,3 +357,75 @@ def compile_calculation(
         "authority_effect": "NONE",
         "execution_performed": False,
     }
+
+
+@router.post("/calculation/execute")
+def execute_calculation(
+    request: CalculationExecuteRequest, principal: ReadUser, response: Response
+) -> dict[str, object]:
+    """Execute a compiled sparse plan with owner-registered Decimal operators.
+
+    The request carries values and graph metadata only. It cannot provide a
+    formula or callable; the closed registry below is the only executable
+    surface. Results remain derived candidates and never mutate authority.
+    """
+
+    response.headers["Cache-Control"] = "no-store"
+    plan = compile_sparse_plan(
+        request.graph,
+        request.signatures,
+        request.blocks,
+        request.intersections,
+        request.changed_nodes,
+        request.changed_coordinates,
+    )
+    values = {
+        (item.node_id, item.coordinate): item.value
+        for item in request.values
+    }
+    if len(values) != len(request.values):
+        plan = plan.model_copy(
+            update={"state": "BLOCKED", "refusal_reason": "Duplicate sparse value identity"}
+        )
+    result = execute_sparse_decimal_plan(
+        plan,
+        request.graph,
+        values,
+        _SAFE_DECIMAL_EVALUATORS,
+        target=request.target,
+        input_pins=request.input_pins,
+        valid_at=request.valid_at,
+        known_at=request.known_at,
+    )
+    return {
+        "contract": "calculation-execute/1",
+        "result": result.model_dump(mode="json"),
+        "authority_effect": "NONE",
+        "execution_performed": result.state.value != "BLOCKED",
+    }
+
+
+def _decimal_add(*values: Decimal) -> Decimal:
+    return sum(values, Decimal(0))
+
+
+def _decimal_subtract(left: Decimal, right: Decimal) -> Decimal:
+    return left - right
+
+
+def _decimal_multiply(left: Decimal, right: Decimal) -> Decimal:
+    return left * right
+
+
+def _decimal_divide(left: Decimal, right: Decimal) -> Decimal:
+    if right == 0:
+        raise ValueError("Division by zero")
+    return left / right
+
+
+_SAFE_DECIMAL_EVALUATORS = {
+    "add": _decimal_add,
+    "subtract": _decimal_subtract,
+    "multiply": _decimal_multiply,
+    "divide": _decimal_divide,
+}

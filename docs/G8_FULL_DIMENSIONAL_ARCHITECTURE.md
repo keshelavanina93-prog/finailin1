@@ -2,6 +2,13 @@
 
 Status: `FULL TARGET MODEL / IMPLEMENTATION MAPPING REQUIRED`
 
+Current execution seam: `POST /v1/workspace/calculation/execute` consumes a
+compiled sparse plan and typed Decimal input cells, runs only the closed
+owner-registered operator registry, and returns exact coordinates with
+freshness, authority, time pins and a reproducibility hash. It is read-only:
+results remain `DERIVED_CANDIDATE` and cannot mutate accounting or external
+business state.
+
 This is the full working architecture for G8 by NYXCore. It is intentionally
 multidimensional. A simple layer diagram is insufficient because the same
 business object, number, decision or action is simultaneously governed by

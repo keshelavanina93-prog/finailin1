@@ -16,3 +16,29 @@ export type CalculationCompileResponse = {
   authority_effect: "NONE";
   execution_performed: false;
 };
+
+export type SparseCalculationCell = {
+  node_id: string;
+  coordinate: {values: Array<[string, string]>};
+  value: string;
+};
+
+export type CalculationExecuteResponse = {
+  contract: "calculation-execute/1";
+  result: {
+    plan: CalculationCompilePlan;
+    cells: SparseCalculationCell[];
+    state: CalculationCompilePlan["state"];
+    target: string;
+    input_pins: string[];
+    valid_at: string | null;
+    known_at: string | null;
+    authority_state: "DERIVED_CANDIDATE";
+    accounting_authorized: false;
+    business_effect_authorized: false;
+    reproducibility_hash: string;
+    refusal_reason: string | null;
+  };
+  authority_effect: "NONE";
+  execution_performed: boolean;
+};

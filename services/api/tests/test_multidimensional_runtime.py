@@ -309,3 +309,68 @@ def test_compile_endpoint_returns_read_only_sparse_plan() -> None:
     assert body["plan"]["affected_coordinates"] == [coordinate("024").model_dump(mode="json")]
     assert body["authority_effect"] == "NONE"
     assert body["execution_performed"] is False
+
+
+def test_execute_endpoint_runs_only_closed_decimal_operators() -> None:
+    graph, signatures, blocks, intersections = runtime_fixture()
+    payload = {
+        "graph": graph.model_dump(mode="json"),
+        "signatures": [item.model_dump(mode="json") for item in signatures],
+        "blocks": [item.model_dump(mode="json") for item in blocks],
+        "intersections": [item.model_dump(mode="json") for item in intersections],
+        "values": [
+            {
+                "node_id": "revenue",
+                "coordinate": coordinate("024").model_dump(mode="json"),
+                "value": "100",
+            },
+            {
+                "node_id": "cogs",
+                "coordinate": coordinate("024").model_dump(mode="json"),
+                "value": "40",
+            },
+        ],
+        "target": "GrossMargin",
+        "input_pins": ["fixture:1"],
+        "valid_at": "2026-09-30T23:59:59+00:00",
+        "known_at": "2026-10-01T08:00:00+00:00",
+    }
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post("/v1/workspace/calculation/execute", json=payload)
+    assert response.status_code == 200
+    body = response.json()
+    assert body["contract"] == "calculation-execute/1"
+    assert body["execution_performed"] is True
+    assert body["result"]["state"] == "CALCULATION_FRESH"
+    assert body["result"]["authority_state"] == "DERIVED_CANDIDATE"
+    assert body["result"]["accounting_authorized"] is False
+    assert any(
+        cell["node_id"] == "margin" and cell["value"] == "60"
+        for cell in body["result"]["cells"]
+    )
+
+
+def test_execute_endpoint_refuses_unregistered_formula_operator() -> None:
+    graph, signatures, blocks, intersections = runtime_fixture()
+    graph = graph.model_copy(
+        update={
+            "nodes": (
+                graph.nodes[0].model_copy(update={"function_id": "caller_formula"}),
+                *graph.nodes[1:],
+            )
+        }
+    )
+    payload = {
+        "graph": graph.model_dump(mode="json"),
+        "signatures": [item.model_dump(mode="json") for item in signatures],
+        "blocks": [item.model_dump(mode="json") for item in blocks],
+        "intersections": [item.model_dump(mode="json") for item in intersections],
+        "values": [],
+    }
+    with TestClient(app, headers={"Authorization": "Bearer test-token"}) as client:
+        response = client.post("/v1/workspace/calculation/execute", json=payload)
+    assert response.status_code == 200
+    body = response.json()
+    assert body["execution_performed"] is False
+    assert body["result"]["state"] == "BLOCKED"
+    assert "No evaluator registered" in body["result"]["refusal_reason"]

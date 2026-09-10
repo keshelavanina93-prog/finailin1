@@ -2,6 +2,15 @@
 
 Status: `MULTIDIMENSIONAL TARGET ARCHITECTURE + CURRENT REPOSITORY MAP`
 
+The calculation runtime is implemented in
+`services/api/src/finai_api/domain/multidimensional_runtime.py`; compile and
+read-only execute routes are in
+`services/api/src/finai_api/api/enterprise_diagnostics_routes.py`, with the
+browser contract in `packages/contracts/src/calculation-runtime.ts`. The
+current closed operator registry is deterministic; durable runs/results,
+parallel workers, broad domain registration and restart evidence remain open
+engineering gates.
+
 This document separates three things that must not be conflated:
 
 1. the product architecture G8 is intended to become;

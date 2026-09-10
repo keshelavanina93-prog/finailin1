@@ -569,6 +569,15 @@ successful result is a `DERIVED_CANDIDATE` with accounting and business-effect
 authority set to false. Results carry graph plan hashes, input pins,
 `valid_at`, `known_at`, exact coordinates, and a reproducibility hash.
 
+The read-only API seam is exposed at
+`POST /v1/workspace/calculation/execute`, alongside
+`POST /v1/workspace/calculation/compile`. Execution accepts typed sparse input
+cells and uses only the owner-registered closed Decimal operator registry
+(`add`, `subtract`, `multiply`, `divide`); caller-provided formulas and code
+are not accepted. The `calculation-execute/1` response carries sparse cells,
+execution state, authority flags, input pins and a reproducibility hash.
+Duplicate cell identities and unknown operators are explicitly blocked.
+
 This is now a semantic-to-physical execution chain, but it is not yet a
 production calculation fabric. Transform dispatch for currency/unit/time,
 versioned hierarchy lookup, durable calculation runs/results, invalidation

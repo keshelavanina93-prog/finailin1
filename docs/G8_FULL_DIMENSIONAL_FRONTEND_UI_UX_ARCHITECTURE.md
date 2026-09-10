@@ -2,6 +2,12 @@
 
 Status: `TARGET FRONTEND ARCHITECTURE / IMPLEMENTATION MAPPING REQUIRED`
 
+Calculation surfaces use the typed `calculation-execute/1` result packet as a
+read-only projection. They display sparse cells, exact coordinates, stages,
+input pins and refusal/freshness state, while preserving the
+`DERIVED_CANDIDATE` authority boundary. Formula text and invented
+intersections are never accepted from the browser.
+
 This document translates the full dimensional G8 architecture into the frontend
 and operator experience architecture. It is not a visual mockup. It defines the
 UI system, navigation model, workspace model, state model, authority indicators,
