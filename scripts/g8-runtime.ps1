@@ -206,9 +206,11 @@ try {
                         $env:MINIO_BROWSER = 'off'
                         $env:MINIO_UPDATE = 'off'
                     }
+                    if ($spec.name -eq 'web') { $env:NEXT_PUBLIC_FINAI_LOCAL_LOGIN = 'true' }
                     $process = Start-Process -FilePath $spec.executable -ArgumentList $spec.arguments -WorkingDirectory $repositoryRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
                 } finally {
                     if ($spec.name -eq 'minio') { Remove-Item Env:MINIO_ROOT_USER,Env:MINIO_ROOT_PASSWORD -ErrorAction SilentlyContinue }
+                    if ($spec.name -eq 'web') { Remove-Item Env:NEXT_PUBLIC_FINAI_LOCAL_LOGIN -ErrorAction SilentlyContinue }
                 }
                 $identity = Get-ProcessIdentity $process.Id
                 if ($null -eq $identity) { throw "$($spec.name) exited during launch; inspect logs in $controlRoot." }

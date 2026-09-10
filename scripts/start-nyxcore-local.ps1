@@ -22,9 +22,15 @@ if (-not (Test-Path -LiteralPath "$PostgresBin\pg_ctl.exe")) {
 # Build-time public configuration is local-only and contains no secret.
 $env:NEXT_PUBLIC_FINAI_LOCAL_LOGIN = 'true'
 $standaloneServer = Join-Path $repositoryRoot 'apps\web\.next\standalone\apps\web\server.js'
-if (-not (Test-Path -LiteralPath $standaloneServer)) {
+$localLoginMarker = Join-Path $repositoryRoot 'apps\web\.next\local-login-enabled'
+$localLoginBuildReady = Test-Path -LiteralPath $localLoginMarker -and
+    (Get-Content -Raw -LiteralPath $localLoginMarker -ErrorAction SilentlyContinue).Trim() -eq 'true'
+if (-not (Test-Path -LiteralPath $standaloneServer) -or -not $localLoginBuildReady) {
     Push-Location $repositoryRoot
-    try { pnpm --filter @finai/web build }
+    try {
+        pnpm --filter @finai/web build
+        'true' | Set-Content -LiteralPath $localLoginMarker -Encoding ascii
+    }
     finally { Pop-Location }
 }
 
