@@ -10,9 +10,10 @@ type Feature = { geometry?: { type?: string; coordinates?: unknown }; properties
 
 function points(data: WorkspaceProjectionData): Point[] {
   return data.rows.flatMap((row, index) => {
-    const candidate = row.delta ?? row.amount ?? row.scenario_b ?? row.value;
+    const attributes = typeof row.attributes === "object" && row.attributes !== null ? row.attributes as Record<string, unknown> : {};
+    const candidate = row.delta ?? row.amount ?? row.scenario_b ?? row.value ?? attributes.amount;
     const value = typeof candidate === "number" ? candidate : Number(candidate);
-    return Number.isFinite(value) ? [{ label: String(row.label ?? row.period_id ?? row.dimension ?? `Row ${index + 1}`), value }] : [];
+    return Number.isFinite(value) ? [{ label: String(row.label ?? row.period_id ?? attributes.period_id ?? row.dimension ?? `Row ${index + 1}`), value }] : [];
   }).slice(0, 24);
 }
 
