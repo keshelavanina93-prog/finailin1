@@ -546,3 +546,7 @@ accepted snapshot.
 The petroleum service also preserves typed waybill, tank-dip, retail-sale,
 telemetry and source-hash evidence categories so lineage gaps remain explicit
 through the backend-to-frontend contract.
+
+The service resolves accepted ProductCost layers only on matching governed
+dimensions and calculates candidate value with Decimal arithmetic; no cost
+layer means an explicit partial bridge.

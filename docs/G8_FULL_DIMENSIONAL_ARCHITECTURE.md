@@ -867,6 +867,11 @@ telemetry and source-hash references, so a control object can expose lineage
 coverage and missing evidence by type rather than a single undifferentiated ID
 list.
 
+When an accepted ProductCost layer matches the full operating coordinate, the
+variance now emits a deterministic valuation/COGS/margin candidate; without
+that evidence it remains `FINANCIAL_BRIDGE_PARTIAL`. Neither state grants
+accounting or business-effect authority.
+
 Replay requests apply the supplied `valid_at` and `known_at` cutoffs while
 selecting accepted evidence, and control identity is derived from governed
 scope rather than row position.

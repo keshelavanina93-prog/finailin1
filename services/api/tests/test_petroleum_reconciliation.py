@@ -129,6 +129,29 @@ def test_petroleum_control_requires_independent_checker(monkeypatch):
         raise AssertionError("maker must not approve its own petroleum action")
 
 
+def test_variance_valuation_is_candidate_only_when_product_cost_is_accepted(monkeypatch):
+    entity = str(_principal().scope.legal_entity_id)
+    rows = {
+        "InventoryBalance": [FakeResource(UUID("30000000-0000-0000-0000-000000000011"), {
+            "legal_entity_id": entity, "facility_id": "depot-1", "tank_id": "T-04",
+            "product_id": "diesel", "period_id": "2025-04", "unit": "L",
+            "opening_quantity": "100", "receipts": "0", "dispatches": "0",
+            "losses": "0", "closing_quantity": "90",
+        })], "PhysicalMovement": [], "PhysicalMeasurement": [], "RetailSale": [],
+        "ProductCost": [FakeResource(UUID("60000000-0000-0000-0000-000000000011"), {
+            "legal_entity_id": entity, "facility_id": "depot-1", "tank_id": "T-04",
+            "product_id": "diesel", "period_id": "2025-04", "unit": "L",
+            "unit_cost": "3.5", "valuation_basis": "WEIGHTED_AVERAGE",
+        })],
+    }
+    monkeypatch.setattr(petroleum_reconciliation.resources, "list_resources",
+                        lambda _p, kind, _s, _o, limit=1000: rows[kind])
+    row = petroleum_reconciliation.variances(_principal())["rows"][0]
+    assert row["financial"]["status"] == "FINANCIAL_BRIDGED"
+    assert row["financial"]["estimated_value"] == "35.0"
+    assert row["authority"]["accounting_authorized"] is False
+
+
 def test_lineage_returns_only_referenced_accepted_resources(monkeypatch):
     root = UUID("30000000-0000-0000-0000-000000000001")
     child = UUID("40000000-0000-0000-0000-000000000001")

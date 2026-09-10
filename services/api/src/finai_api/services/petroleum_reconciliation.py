@@ -195,6 +195,18 @@ def variances(
     adjustment or executes an operational action.
     """
     result = reconcile(principal, company_id, valid_at, known_at)
+    costs: list[Any] = []
+    try:
+        costs = resources.list_resources(principal, "ProductCost", "", 0, limit=1000)
+    except (KeyError, WorkspaceError):
+        costs = []
+    if company_id is not None:
+        costs = [
+            item for item in costs
+            if any(str(item.attributes.get(key)) == str(company_id)
+                   for key in ("legal_entity_id", "company_id"))
+            and _in_snapshot(item.attributes, valid_at, known_at)
+        ]
     rows: list[dict[str, Any]] = []
     for row in result["rows"]:
         dimensions = row["dimensions"]
@@ -220,6 +232,7 @@ def variances(
             lifecycle = "CONSERVATION_CHECKED"
         else:
             lifecycle = "VARIANCE_FLAGGED"
+        valuation = _valuation_candidate(row, costs)
         rows.append({
             "variance_id": "petroleum-variance:" + sha256(
                 "|".join(f"{key}={value}" for key, value in dimensions.items()).encode()
@@ -249,15 +262,43 @@ def variances(
             "review": {"status": physical_status, "lifecycle": lifecycle,
                        "investigation": "NOT_OPEN", "action": "NOT_PROPOSED",
                        "readback": "NOT_APPLICABLE"},
-            "financial": {"status": "FINANCIAL_BRIDGE_PARTIAL",
-                          "estimated_value": None, "valuation_basis": None,
-                          "cogs_effect_candidate": None, "margin_effect_candidate": None},
+            "financial": valuation,
             "authority": {"observed": True, "validated": not bool(missing),
                           "accounting_authorized": False, "business_effect_authorized": False,
                           "canonical_adjustment_created": False},
         })
     return {**result, "contract": "petroleum-variance-collection/1", "rows": rows,
             "bitemporal": True, "action_execution": "GOVERNED_ADAPTER_REQUIRED"}
+
+
+def _valuation_candidate(row: dict[str, Any], costs: list[Any]) -> dict[str, Any]:
+    dimensions = row["dimensions"]
+    matches = []
+    for item in costs:
+        attrs = item.attributes
+        if all(not dimensions.get(field) or not attrs.get(field)
+               or str(dimensions[field]) == str(attrs[field])
+               for field in ("legal_entity_id", "facility_id", "tank_id", "station_id",
+                             "product_id", "period_id", "unit")):
+            matches.append(attrs)
+    if not matches:
+        return {"status": "FINANCIAL_BRIDGE_PARTIAL", "estimated_value": None,
+                "valuation_basis": None, "cogs_effect_candidate": None,
+                "margin_effect_candidate": None}
+    cost = matches[0]
+    unit_cost = _quantity(cost, ("unit_cost", "cost_per_unit"))
+    if unit_cost == 0:
+        quantity = _quantity(cost, ("quantity", "volume"))
+        total = _quantity(cost, ("cost_amount", "valuation_amount"))
+        unit_cost = total / quantity if quantity else Decimal(0)
+    estimated = abs(Decimal(row["variance"])) * unit_cost
+    signed = Decimal(row["variance"]) * unit_cost
+    return {"status": "FINANCIAL_BRIDGED" if unit_cost else "FINANCIAL_BRIDGE_PARTIAL",
+            "estimated_value": format(estimated, "f") if unit_cost else None,
+            "valuation_basis": str(cost.get("valuation_basis", "ACCEPTED_PRODUCT_COST"))
+            if unit_cost else None,
+            "cogs_effect_candidate": format(signed, "f") if unit_cost else None,
+            "margin_effect_candidate": format(-signed, "f") if unit_cost else None}
 
 
 def margin(principal: Principal, company_id: UUID | None = None) -> dict[str, Any]:

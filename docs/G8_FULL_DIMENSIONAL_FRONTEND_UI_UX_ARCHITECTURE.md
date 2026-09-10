@@ -2016,6 +2016,10 @@ The control table receives typed evidence buckets for waybills, tank dips,
 retail sales, telemetry and source hashes and displays their gaps at the same
 scope as the physical variance.
 
+The financial column distinguishes `FINANCIAL_BRIDGED` candidates from
+`FINANCIAL_BRIDGE_PARTIAL`; candidate values are visibly non-authoritative and
+cannot be mistaken for a posted accounting adjustment.
+
 The Operations control row now has a governed “Open investigation” entry point
 through `/api/operations/petroleum/variances/investigations`; the returned
 control state is retained and displayed. Approval and external execution remain

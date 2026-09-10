@@ -6,7 +6,7 @@ export type PetroleumVariance = {
   evidence:{source_resource_ids:string[];waybill_ids:string[];tank_dip_ids:string[];retail_sale_ids:string[];telemetry_ids:string[];source_hashes:string[];gaps:string[]};
   time:{valid_at:string|null;known_at:string|null;recorded_at:string|null;approved_at:string|null;corrected_at:string|null;replay_as_of:string|null};
   review:{status:PetroleumVarianceStatus;lifecycle:string;investigation:string;action:string;readback:string};
-  financial:{status:"FINANCIAL_BRIDGE_PARTIAL";estimated_value:string|null;valuation_basis:string|null;cogs_effect_candidate:string|null;margin_effect_candidate:string|null};
+  financial:{status:"FINANCIAL_BRIDGED"|"FINANCIAL_BRIDGE_PARTIAL";estimated_value:string|null;valuation_basis:string|null;cogs_effect_candidate:string|null;margin_effect_candidate:string|null};
   authority:{observed:true;validated:boolean;accounting_authorized:false;business_effect_authorized:false;canonical_adjustment_created:false};
 };
 export type PetroleumVarianceCollection = {contract:"petroleum-variance-collection/1";company_id:string|null;rows:PetroleumVariance[];bitemporal:true;action_execution:"GOVERNED_ADAPTER_REQUIRED"};
