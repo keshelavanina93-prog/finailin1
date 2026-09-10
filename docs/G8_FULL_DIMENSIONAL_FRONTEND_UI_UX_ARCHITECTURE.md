@@ -2036,3 +2036,11 @@ evidence, compares it with the retained baseline, and displays
 `MEASURED_RESOLVED` or `MEASURED_UNRESOLVED` with baseline/current quantity and
 readback identity. This is a physical outcome projection, not an accounting
 adjustment; broader outcome-learning and external-adapter gates remain open.
+## Executable dependency UX contract
+
+The frontend must consume the retained resolver contract specified in
+[`EXECUTABLE_ENTERPRISE_MODEL.md`](EXECUTABLE_ENTERPRISE_MODEL.md). A target
+surface must render the selected function version, required inputs and
+alternatives, exact scope/grain/time checks, evidence and authority state, and
+the resulting `READY`, `PARTIAL`, `BLOCKED`, `REFUSED`, or `INCOMPARABLE`
+state. It must never turn a missing dependency into a guessed value.

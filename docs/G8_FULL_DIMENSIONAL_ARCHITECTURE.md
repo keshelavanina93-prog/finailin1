@@ -886,3 +886,12 @@ physical outcome states only; source hashes, exact scope and readback identity
 are retained without granting accounting or business-effect authority. The
 workflow event survives restart. Authentic sources, external adapters, browser
 proof and release acceptance remain separate open gates.
+## Executable enterprise model
+
+The noun graph is extended by the executable computational ontology defined in
+[`EXECUTABLE_ENTERPRISE_MODEL.md`](EXECUTABLE_ENTERPRISE_MODEL.md). Governed
+verbs, dependency composition, grain/time/authority/evidence eligibility, and
+readiness states are a shared platform capability; they are not module-local
+preflight logic. The current checkout contains the first pure resolver slice
+and its focused proof, while domain registration, durable API integration,
+and production acceptance remain open.

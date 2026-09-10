@@ -562,3 +562,12 @@ through the backend-to-frontend contract.
 The service resolves accepted ProductCost layers only on matching governed
 dimensions and calculates candidate value with Decimal arithmetic; no cost
 layer means an explicit partial bridge.
+## Executable enterprise model branch
+
+The shared engineering tree now includes the typed computational-ontology
+foundation at
+`services/api/src/finai_api/domain/executable_enterprise_model.py`, tested by
+`services/api/tests/test_executable_enterprise_model.py` and specified in
+[`EXECUTABLE_ENTERPRISE_MODEL.md`](EXECUTABLE_ENTERPRISE_MODEL.md). This is a
+reusable resolver foundation, not a claim that every domain verb or external
+execution adapter is complete.
