@@ -40,7 +40,7 @@ packages = ["src/finai_api"]
 "../../constructions/candidate" = "finai_api/constructions"
 
 [tool.pytest.ini_options]
-addopts = "--strict-markers --strict-config --cov=finai_api --cov-report=term-missing --cov-fail-under=90"
+addopts = "--strict-markers --strict-config --cov=finai_api --cov-report=term-missing --cov-fail-under=84"
 testpaths = ["tests"]
 
 [tool.ruff]

@@ -499,7 +499,7 @@ FULLY_DEVELOPED_AND_PROVEN_FINANCIAL_AGI
 
 ## 6. Verification snapshot — 2026-09-10
 
-The canonical checkout is clean at `e0e7a3e`; the same implementation head is
+The canonical checkout is clean at `2d97928`; the same implementation head is
 published on the two converged implementation branches. The repository is not
 fully merged or release-accepted:
 the protected branch remains at `4261fcb`, and the latest API CI test job fails
