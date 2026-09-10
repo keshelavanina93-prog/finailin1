@@ -516,11 +516,11 @@ FULLY_DEVELOPED_AND_PROVEN_FINANCIAL_AGI
 
 ## 6. Verification snapshot — 2026-09-10
 
-The canonical checkout snapshot was clean at `7a2e1a5`; that implementation
+The canonical checkout snapshot was clean at `cb39066`; that implementation
 head is published on the pushed review branch. The repository is not
 fully merged or release-accepted:
 the protected branch remains separate from the pushed review head, and the
-latest GitHub CI runs for this head are pending. Frontend
+latest GitHub CI runs for this head are in progress. Frontend
 lint/typecheck/tests/build and API Ruff/mypy pass locally. The planning catalog,
 scenario comparison, forecast, liquidity, scenario authoring, outcome
 measurement, petroleum conservation and petroleum lineage projections plus

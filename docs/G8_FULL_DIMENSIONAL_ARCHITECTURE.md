@@ -842,12 +842,12 @@ integrity verification; it has no authority effect.
 
 ### Verification snapshot — 2026-09-10
 
-The latest implementation head at the time of this snapshot was `7a2e1a5` on the converged implementation
+The latest implementation head at the time of this snapshot was `cb39066` on the converged implementation
 branches. Frontend lint,
 typecheck, tests and build pass; API Ruff and mypy pass. The focused projection
 suite has 15 passing tests, including complete card-family/chart-variant and
 full-selection round-trip coverage. The latest GitHub CI runs for this head are
-pending. The accepted ScenarioVersion/PlanningCellFact catalog and
+in progress for both pushed review branches. The accepted ScenarioVersion/PlanningCellFact catalog and
 deterministic exact-scope scenario comparison are now wired through
 `/v1/ontology/planning` and the frontend Planning workspace; forecast
 calculation, scenario authoring, liquidity projection and outcome measurement
@@ -869,7 +869,7 @@ A citation-first NYX refusal/explanation boundary is now wired at
 NYX model-backed reasoning and proposal/action handoff execution remain open. The latest API coverage result was 83.73% against
 the aligned 84% gate. The protected
 `development/enterprise-hydration-foundation` branch remains separate from the
-pushed review head `7a2e1a5`, so this head is not the canonical merged release.
+pushed review head `cb39066`, so this head is not the canonical merged release.
 This is a substantial converged
 slice, not completion of the full architecture.
 
