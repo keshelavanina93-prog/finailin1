@@ -25,6 +25,19 @@ if (Test-Path -LiteralPath "$PostgresBin\pg_isready.exe") {
 }
 $PSNativeCommandUseErrorActionPreference = $true
 if ($ready) { $running = $true }
+if ($running -and -not $ready) {
+    $pidPath = Join-Path $cluster 'postmaster.pid'
+    $serverPid = $null
+    if (Test-Path -LiteralPath $pidPath) {
+        $serverPid = [int](Get-Content -LiteralPath $pidPath -TotalCount 1)
+    }
+    if ($null -eq (Get-Process -Id $serverPid -ErrorAction SilentlyContinue)) {
+        # pg_ctl can report the retained PID file as running after an interrupted
+        # local process. Remove only this checkout's proven-stale PID marker.
+        Remove-Item -LiteralPath $pidPath -Force
+        $running = $false
+    }
+}
 if ($running) {
     $activePort = (Get-Content -LiteralPath (Join-Path $cluster 'postmaster.pid'))[3]
     if ($activePort -ne [string]$Port) {
