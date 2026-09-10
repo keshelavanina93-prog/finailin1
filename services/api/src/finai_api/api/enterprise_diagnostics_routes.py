@@ -231,7 +231,7 @@ def projection_data(
                 "contract": "workspace-projection-data/1",
                 "projection": projection,
                 "selection": request.selection.model_dump(mode="json"),
-                "data_state": "UNAVAILABLE_REQUIRED_COMPARISON_CONTEXT",
+                "data_state": "UNAVAILABLE_REQUIRED_CONTEXT",
                 "rows": [],
                 "authority_effect": "NONE",
             }
@@ -277,6 +277,15 @@ def projection_data(
             "data_state": "ACCEPTED_DETERMINISTIC_COMPARISON",
             "rows": comparison["rows"],
             "coverage": comparison["coverage"],
+            "authority_effect": "NONE",
+        }
+    if request.projection_id in {"field-input", "image-evidence", "action-control", "nyx-context"}:
+        return {
+            "contract": "workspace-projection-data/1",
+            "projection": projection,
+            "selection": request.selection.model_dump(mode="json"),
+            "data_state": "UNAVAILABLE_AUTHORITY_PAYLOAD",
+            "rows": [],
             "authority_effect": "NONE",
         }
     return {
