@@ -153,7 +153,8 @@ Run the services directly:
 
 ```powershell
 .\scripts\load-local.ps1
-.\.venv\Scripts\python.exe -m uvicorn finai_api.main:app --app-dir services\api\src --host 127.0.0.1 --port 8000
+$env:FINAI_API_PORT = '8000'
+.\.venv\Scripts\python.exe -m finai_api.main
 pnpm --filter @finai/web dev
 ```
 

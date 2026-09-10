@@ -108,7 +108,7 @@ try {
             if (-not (Test-Path -LiteralPath $required)) { throw 'Runtime dependencies/build missing; run bootstrap-local.ps1 and pnpm build first.' }
         }
         $specs = @(
-            @{ name = 'api'; port = $ApiPort; url = "http://127.0.0.1:$ApiPort/ready"; executable = $python; arguments = "-m uvicorn finai_api.main:app --host 127.0.0.1 --port $ApiPort" },
+            @{ name = 'api'; port = $ApiPort; url = "http://127.0.0.1:$ApiPort/ready"; executable = $python; arguments = "-m finai_api.main --host 127.0.0.1 --port $ApiPort" },
             @{ name = 'web'; port = $WebPort; url = "http://127.0.0.1:$WebPort"; executable = $node; arguments = ('"' + $server + '"') }
         )
         $observerConfigured = $DesiredResource -ne [guid]::Empty -and $DesiredVersion -ne [guid]::Empty -and $ObserverActor

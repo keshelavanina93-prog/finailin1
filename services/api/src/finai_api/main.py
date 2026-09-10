@@ -52,6 +52,9 @@ from finai_api.api.workspace_routes import router as workspace_router
 from finai_api.evidence_objects import EvidenceStoreUnavailable
 from finai_api.services.workspace import WorkspaceError
 
+DEFAULT_HOST = "127.0.0.1"
+DEFAULT_PORT = 8061
+
 app = FastAPI(
     title="G8 by NYXCore API",
     summary="Evidence-native enterprise operating platform",
@@ -139,3 +142,32 @@ async def evidence_store_error(_request: Request, _exc: EvidenceStoreUnavailable
             "detail": "Retained evidence storage is unavailable or failed integrity verification"
         },
     )
+
+
+def run() -> None:
+    """Run this API composition root as a standalone local process.
+
+    The complete G8 local product is supervised by ``g8-system.ps1``. This
+    entrypoint is the API process used by that supervisor, packaging, and
+    direct local development, so those paths all execute the same app object.
+    """
+    import argparse
+    import os
+
+    import uvicorn
+
+    parser = argparse.ArgumentParser(description="Run the G8 by NYXCore API")
+    parser.add_argument("--host", default=os.environ.get("FINAI_API_HOST", DEFAULT_HOST))
+    parser.add_argument(
+        "--port", type=int, default=int(os.environ.get("FINAI_API_PORT", DEFAULT_PORT))
+    )
+    args = parser.parse_args()
+    host = args.host
+    port = args.port
+    if not 1024 <= port <= 65535:
+        raise SystemExit(f"FINAI_API_PORT must be between 1024 and 65535, got {port}")
+    uvicorn.run(app, host=host, port=port)
+
+
+if __name__ == "__main__":
+    run()
