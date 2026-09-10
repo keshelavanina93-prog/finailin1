@@ -1,6 +1,8 @@
 from datetime import UTC, datetime
 from uuid import UUID
 
+import pytest
+
 from finai_api.services import petroleum_control, petroleum_reconciliation
 
 
@@ -172,6 +174,26 @@ def test_petroleum_control_finds_variance_for_named_legal_entity(monkeypatch):
 
     assert petroleum_control._find(principal, target["variance_id"]) == target
     assert calls == [principal]
+
+
+def test_petroleum_control_refuses_variance_from_another_company(monkeypatch):
+    principal = _principal()
+    principal.scope.legal_entity_id = "SOCAR_PETROLEUM_GEORGIA"
+    target = {
+        "variance_id": "petroleum-variance:other-company",
+        "dimensions": {"legal_entity_id": "SEG_WHOLESALE"},
+    }
+    monkeypatch.setattr(
+        petroleum_control.petroleum_reconciliation,
+        "variances",
+        lambda _actor: {"rows": [target]},
+    )
+
+    from finai_api.services.workspace import WorkspaceError
+
+    with pytest.raises(WorkspaceError) as error:
+        petroleum_control._find(principal, target["variance_id"])
+    assert error.value.status == 404
 
 
 def test_petroleum_local_adapter_persists_typed_readback(monkeypatch):

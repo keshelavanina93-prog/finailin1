@@ -65,8 +65,13 @@ def _find(principal: Principal, variance_id: str) -> dict[str, Any]:
     # legal_entity_id is a governed business identifier and is not required to
     # be UUID-shaped (for example, SOCAR_PETROLEUM_GEORGIA).
     result = petroleum_reconciliation.variances(principal)
+    company = str(principal.scope.legal_entity_id)
     for row in result["rows"]:
-        if row["variance_id"] == variance_id:
+        dimensions = row.get("dimensions", {})
+        if (
+            row["variance_id"] == variance_id
+            and str(dimensions.get("legal_entity_id", company)) == company
+        ):
             return row
     raise WorkspaceError(404, "Petroleum variance is unavailable in the authorized company scope")
 
