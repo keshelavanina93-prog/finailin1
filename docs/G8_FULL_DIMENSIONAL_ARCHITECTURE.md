@@ -854,8 +854,10 @@ object through `/v1/operations/petroleum/variances`. Its deterministic output
 contains expanded enterprise/facility/tank/station/product/movement scope, the
 conservation equation, evidence gaps, replay timestamps, lifecycle state, and
 an explicit `FINANCIAL_BRIDGE_PARTIAL` authority boundary. Authentic
-connectors, durable correction history, investigation/action adapters,
-external readback, browser proof and release acceptance remain open gates.
+connectors, durable correction history, authentic investigation/action
+adapters, external readback, browser proof and release acceptance remain open
+gates. A local-only deterministic readback adapter exists for local development
+and is not production or external-system evidence.
 
 The durable petroleum control workflow is now also wired through
 `/v1/operations/petroleum/variances/investigations`: it retains the exact

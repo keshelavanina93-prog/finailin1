@@ -1999,7 +1999,9 @@ connectors, external readback and live telemetry remain open. The Operations sur
 The latest API coverage result was
 83.67% versus the aligned 84% gate. NYX now calls a citation-first governed
 reasoning boundary for exact selected resources; model-backed reasoning and
-proposal/action handoff remain open.
+proposal/action handoff remain open. Local development can display a typed
+deterministic readback receipt; this does not satisfy authentic external
+adapter or production execution evidence.
 Therefore the UI is not certified as fully wired,
 persisted, browser-accepted or release-accepted. Planning, complete reporting,
 governed NYX reasoning, external action/readback, outcome learning, and

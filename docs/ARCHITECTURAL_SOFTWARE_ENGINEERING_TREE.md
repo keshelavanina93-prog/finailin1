@@ -522,7 +522,8 @@ are not. The NYX citation/refusal boundary is implemented, but it is not
 model-backed reasoning or consequential action execution. Operational promotion
 now carries a retained SourceEvidence dependency and enters the shared
 independent-review/canonical-publication path; authentic connector and external
-readback proof remain open. The worktree family and
+readback proof remain open. Local development has a typed deterministic
+simulation receipt only; it is not external-system readback. The worktree family and
 distributed implementation history must therefore be treated as source
 material converging into the canonical checkout, not as proof that every
 architectural dimension is complete.
