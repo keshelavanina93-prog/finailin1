@@ -1984,7 +1984,7 @@ Anything less is a partial frontend architecture.
 
 The current checkout contains the dimensional shell, context model, proxy
 topology and implemented finance/ontology/diagnostics/reporting surfaces. The
-latest implementation head at the time of this snapshot was `f4330fa`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, known telemetry quality/basis states and inferred series-gap review, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, and retained outcome timeline represented in the unified workspaces.
+latest implementation head at the time of this snapshot was `b35fe70`; frontend lint and typecheck pass for the changed surfaces, with learning shadow evaluation and governed candidate timeline, petroleum conservation/lineage, source-family operational validation, explicit measurement-grain declarations, semantic-binding readback, known telemetry quality/basis states and inferred series-gap review, shared operational intake contracts, typed outcome/learning readback, corrected NYX/outcome wiring registers, the home-to-reporting entry point, exact outcome readback, and retained outcome timeline represented in the unified workspaces.
 The previous API CI job failed four tests; three are fixed locally in this head,
 while the database-backed object-set materialization path is still under CI
 verification. Planning now has real catalog/comparison, forecast, liquidity,
@@ -1997,7 +1997,9 @@ bindings, explicit reasons, non-monotonic series findings and the distinction
 between governed-promotion eligibility and the retained-evidence promotion gate. Retail cash-register shift-close intake is represented as a wired, partially implemented source family with Z-report identity, fiscal-close review evidence, Store/CashRegister semantic-binding readback and a proposal preview with an independent-review submission action. Operations also presents the accepted-resource revenue/volume/COGS/margin bridge with explicit COGS gaps and a movement-to-journal coverage panel with matched and unresolved states. 1C movement-register intake is represented with physical movement grain and evidence-linked proposal preview plus governed proposal submission. Canonical operational object schemas are now included in the platform seed so the handoff is validated by the same ontology schema/dependency gate as other proposals. Canonical publication is wired through independent review and canonical SourceEvidence dependencies. Retained source
 connectors, external readback and live telemetry remain open. The Operations surface now includes accepted measurement-series windows, basis completeness, invalid readings and inferred gap review states.
 The latest API coverage result was
-83.67% versus the aligned 84% gate. NYX now calls a citation-first governed
+83.73% versus the aligned 84% gate, with one database-backed object-set
+materialization failure in the latest completed run and a failed-job rerun in
+progress. NYX now calls a citation-first governed
 reasoning boundary for exact selected resources; model-backed reasoning and
 proposal/action handoff remain open. Local development can display a typed
 deterministic readback receipt; this does not satisfy authentic external

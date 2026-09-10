@@ -816,7 +816,7 @@ authentic-source, generalization, production-runtime, scale or release acceptanc
 
 ### Verification snapshot — 2026-09-10
 
-The latest implementation head at the time of this snapshot was `f4330fa` on the converged implementation
+The latest implementation head at the time of this snapshot was `b35fe70` on the converged implementation
 branches. Frontend lint,
 typecheck, tests and build pass; API Ruff and mypy pass. The GitHub API test job
 previously failed four tests. The packaging, cross-actor investigation action,
@@ -838,13 +838,14 @@ mutating canonical truth; gas series also flag non-monotonic meter timestamps
 for review. Fully bound rows are eligible for a governed mapping/promotion
 proposal, and canonical operational mutation proceeds only through the shared retained-evidence and independent-review promotion gate. Retail cash-register shift-close rows now have a typed retained-review contract including Z-report identity and fiscal-close state; reopened or unconfirmed closes remain review-required. Accepted Store/CashRegister semantic binding validation is now wired; authentic Retail/ORPAK connector readback remains open. Canonical operational
 promotion previews now compile evidence-linked RetailSale, CashRegisterShiftClose, PhysicalMovement and PhysicalMeasurement candidates without persisting them. The platform seed now declares canonical operational schemas for stations, dispensers, nozzles, meters, assets, stores, cash registers, movements, measurements, retail sales and shift closes. Eligible operational rows can now be submitted as a deterministic SOURCE_BOUND ResourceProposal for independent review; canonical publication still remains behind the existing reviewer and promotion gates. A read-only revenue/volume/COGS/margin bridge is now exposed by exact operating dimensions; missing ProductCost remains explicitly unavailable. 1C movement-register intake now enforces one physical movement document-line grain before that bridge, and accepted movements now expose read-only movement-to-JournalLine reconciliation with matched, missing, unavailable-quantity and mismatch states.
-promotion is now reviewer-gated and live operational telemetry remains open; accepted measurement-series quality is now projected through the read-only petroleum telemetry bridge, including known quality states, measurement-basis checks and inferred series-gap review. The latest CI API run executes the full suite without test failures; its remaining gate is repository coverage at 83.67% against the aligned 84% threshold.
+promotion is now reviewer-gated and live operational telemetry remains open; accepted measurement-series quality is now projected through the read-only petroleum telemetry bridge, including known quality states, measurement-basis checks and inferred series-gap review. The latest completed CI API run had one database-backed object-set materialization test failure and repository coverage at 83.73% against the aligned 84% threshold. A failed-job rerun is in progress; this is not yet a green API gate.
 A citation-first NYX refusal/explanation boundary is now wired at
 `/v1/ontology/nyx/reason`; model-backed reasoning, multi-citation packets and
-NYX model-backed reasoning and proposal/action handoff execution remain open. The latest API coverage result was 83.67% against
+NYX model-backed reasoning and proposal/action handoff execution remain open. The latest API coverage result was 83.73% against
 the aligned 84% gate. The protected
-`development/enterprise-hydration-foundation` branch remains at `4261fcb`, so
-this head is not the canonical merged release. This is a substantial converged
+`development/enterprise-hydration-foundation` branch remains separate from the
+pushed review head `b35fe70`, so this head is not the canonical merged release.
+This is a substantial converged
 slice, not completion of the full architecture.
 
 ### Implementation synchronization — petroleum variance control

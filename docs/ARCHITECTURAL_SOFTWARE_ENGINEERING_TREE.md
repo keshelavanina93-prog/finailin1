@@ -507,13 +507,13 @@ FULLY_DEVELOPED_AND_PROVEN_FINANCIAL_AGI
 
 ## 6. Verification snapshot — 2026-09-10
 
-The canonical checkout snapshot was clean at `0061b51`; the same implementation head was
-published on the two converged implementation branches. The repository is not
+The canonical checkout snapshot was clean at `b35fe70`; that implementation
+head is published on the pushed review branch. The repository is not
 fully merged or release-accepted:
-the protected branch remains at `4261fcb`, and the latest API CI test job fails
-previously failed four tests; three are fixed in `1e1ed74`, while the
-database-backed object-set materialization path and the coverage threshold are
-still under verification. Frontend
+the protected branch remains separate from the pushed review head, and the
+latest completed API CI test job failed one database-backed object-set
+materialization test with coverage at 83.73% against the 84% threshold; a
+failed-job rerun is under verification. Frontend
 lint/typecheck/tests/build and API Ruff/mypy pass. The planning catalog,
 scenario comparison, forecast, liquidity, scenario authoring, outcome
 measurement, petroleum conservation and petroleum lineage projections plus
