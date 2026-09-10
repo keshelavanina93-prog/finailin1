@@ -575,15 +575,20 @@ The read-only API seam is exposed at
 cells and uses only the owner-registered closed Decimal operator registry
 (`add`, `subtract`, `multiply`, `divide`); caller-provided formulas and code
 are not accepted. The `calculation-execute/1` response carries sparse cells,
-execution state, authority flags, input pins and a reproducibility hash.
-Duplicate cell identities and unknown operators are explicitly blocked.
+execution state, authority flags, input/evidence pins, deterministic stages,
+executed/skipped coordinates, intersection counts, and a reproducibility hash.
+Duplicate cell identities and unknown operators are explicitly blocked. A
+cross-grain invalidation must declare a `CoordinateDependency` and an explicit
+`DimensionMapping`; the runtime will not broadcast a changed FX/rate/input
+coordinate across a consumer block without that mapping. Sparse execution
+skips populated coordinates whose required source cells are not present and
+reports them as skipped rather than manufacturing zero values.
 
-This is now a semantic-to-physical execution chain, but it is not yet a
-production calculation fabric. Transform dispatch for currency/unit/time,
-versioned hierarchy lookup, durable calculation runs/results, invalidation
-event persistence, broad domain evaluator registration, parallel workers,
-restart proof, and the pricing reference workload remain required before
-release acceptance.
+This is now a semantic-to-physical execution chain with mapping-aware sparse
+impact selection, but it is not yet a production calculation fabric. Durable
+calculation runs/results, invalidation event persistence, broad domain
+evaluator registration, parallel workers, restart proof, and the pricing
+reference workload remain required before release acceptance.
 
 ## 10. Persistence and invalidation
 

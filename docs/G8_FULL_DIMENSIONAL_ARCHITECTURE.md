@@ -923,5 +923,8 @@ and production acceptance remain open. The current implementation also contains
 the typed sparse compiler/runtime in
 `services/api/src/finai_api/domain/multidimensional_runtime.py`, including
 populated intersections, deterministic stages, coordinate-level invalidation
-selection and derived-candidate result envelopes. Durable persistence,
-operator dispatch and pricing reference-workload proof remain open.
+selection and derived-candidate result envelopes. The invalidation path now
+requires an explicit coordinate dependency and dimension mapping for cross-grain
+impact, and execution returns executed/skipped coordinates, stage order,
+input/evidence pins and reproducibility metadata. Durable persistence,
+operator registration and pricing reference-workload proof remain open.

@@ -19,7 +19,9 @@ from finai_api.domain.executable_enterprise_model import (
 from finai_api.domain.multidimensional_runtime import (
     CalculationBlock,
     Coordinate,
+    CoordinateDependency,
     DimensionalSignature,
+    DimensionMapping,
     IntersectionSet,
     compile_sparse_plan,
     execute_sparse_decimal_plan,
@@ -54,6 +56,8 @@ class CalculationCompileRequest(BaseModel):
     signatures: tuple[DimensionalSignature, ...] = ()
     blocks: tuple[CalculationBlock, ...] = ()
     intersections: tuple[IntersectionSet, ...] = ()
+    mappings: tuple[DimensionMapping, ...] = ()
+    coordinate_dependencies: tuple[CoordinateDependency, ...] = ()
     changed_nodes: tuple[str, ...] = ()
     changed_coordinates: tuple[Coordinate, ...] = ()
 
@@ -70,6 +74,7 @@ class CalculationExecuteRequest(CalculationCompileRequest):
     values: tuple[SparseValueInput, ...] = ()
     target: str = "UNSPECIFIED"
     input_pins: tuple[str, ...] = ()
+    evidence_pins: tuple[str, ...] = ()
     valid_at: str | None = None
     known_at: str | None = None
 
@@ -595,6 +600,8 @@ def compile_calculation(
         request.intersections,
         request.changed_nodes,
         request.changed_coordinates,
+        request.mappings,
+        request.coordinate_dependencies,
     )
     return {
         "contract": "calculation-compile/1",
@@ -623,6 +630,8 @@ def execute_calculation(
         request.intersections,
         request.changed_nodes,
         request.changed_coordinates,
+        request.mappings,
+        request.coordinate_dependencies,
     )
     values = {
         (item.node_id, item.coordinate): item.value
@@ -641,6 +650,7 @@ def execute_calculation(
         input_pins=request.input_pins,
         valid_at=request.valid_at,
         known_at=request.known_at,
+        evidence_pins=request.evidence_pins,
     )
     return {
         "contract": "calculation-execute/1",

@@ -155,6 +155,16 @@ class DimensionMapping(BaseModel):
     shape: CalculationShape = CalculationShape.ONE_TO_ONE
 
 
+class CoordinateDependency(BaseModel):
+    """Cross-grain dependency used for coordinate-level invalidation."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    source_node_id: str = Field(min_length=1)
+    target_node_id: str = Field(min_length=1)
+    mapping_id: str | None = None
+
+
 class HierarchyDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -219,8 +229,11 @@ class CompiledCalculationPlan(BaseModel):
     stages: tuple[tuple[str, ...], ...]
     affected_coordinates: tuple[Coordinate, ...]
     block_ids: tuple[str, ...]
+    dimensional_signatures: tuple[str, ...] = ()
+    intersection_counts: tuple[tuple[str, int], ...] = ()
     state: RuntimeState
     plan_hash: str
+    skipped_coordinates: tuple[Coordinate, ...] = ()
     refusal_reason: str | None = None
 
 
@@ -245,6 +258,14 @@ class SparseCalculationResult(BaseModel):
     authority_state: str = "DERIVED_CANDIDATE"
     accounting_authorized: bool = False
     business_effect_authorized: bool = False
+    dimensional_signatures: tuple[str, ...] = ()
+    intersection_counts: tuple[tuple[str, int], ...] = ()
+    execution_stages: tuple[tuple[str, ...], ...] = ()
+    executed_coordinates: tuple[Coordinate, ...] = ()
+    skipped_coordinates: tuple[Coordinate, ...] = ()
+    missing_requirements: tuple[str, ...] = ()
+    incompatible_requirements: tuple[str, ...] = ()
+    evidence_pins: tuple[str, ...] = ()
     reproducibility_hash: str
     refusal_reason: str | None = None
 
@@ -256,15 +277,19 @@ def compile_sparse_plan(
     intersections: tuple[IntersectionSet, ...],
     changed_nodes: tuple[str, ...] = (),
     changed_coordinates: tuple[Coordinate, ...] = (),
+    mappings: tuple[DimensionMapping, ...] = (),
+    coordinate_dependencies: tuple[CoordinateDependency, ...] = (),
 ) -> CompiledCalculationPlan:
     """Compile graph stages and exact affected sparse coordinates."""
 
     signature_by_id = {item.signature_id: item for item in signatures}
     intersection_by_id = {item.intersection_set_id: item for item in intersections}
+    mapping_by_id = {item.mapping_id: item for item in mappings}
     if (
         len(signature_by_id) != len(signatures)
         or len(intersection_by_id) != len(intersections)
         or len({item.block_id for item in blocks}) != len(blocks)
+        or len(mapping_by_id) != len(mappings)
     ):
         return _refused_plan(graph, "Duplicate dimensional identity")
     for block in blocks:
@@ -286,7 +311,26 @@ def compile_sparse_plan(
         for block in sorted(blocks, key=lambda item: item.block_id)
         if selected_set & set(block.calculation_node_ids)
     )
-    coordinates = _affected_coordinates(selected_blocks, intersection_by_id, changed_coordinates)
+    coordinates = _affected_coordinates(
+        selected_blocks,
+        intersection_by_id,
+        changed_coordinates,
+        changed_nodes=changed_nodes,
+        mappings=mapping_by_id,
+        coordinate_dependencies=coordinate_dependencies,
+    )
+    all_coordinates = tuple(
+        sorted(
+            {
+                coordinate
+                for block in selected_blocks
+                for coordinate in intersection_by_id[
+                    block.sparse_intersection_set_id
+                ].populated_coordinates
+            },
+            key=lambda item: item.values,
+        )
+    )
     stages = _stages(graph.nodes, selected)
     return CompiledCalculationPlan(
         graph_id=graph.graph_id,
@@ -295,6 +339,16 @@ def compile_sparse_plan(
         stages=stages,
         affected_coordinates=coordinates,
         block_ids=tuple(block.block_id for block in selected_blocks),
+        dimensional_signatures=tuple(
+            block.dimensional_signature_id for block in selected_blocks
+        ),
+        intersection_counts=tuple(
+            (
+                block.sparse_intersection_set_id,
+                len(intersection_by_id[block.sparse_intersection_set_id].populated_coordinates),
+            )
+            for block in selected_blocks
+        ),
         state=RuntimeState.DIRTY
         if changed_nodes or changed_coordinates
         else RuntimeState.RECALCULATING,
@@ -306,6 +360,7 @@ def compile_sparse_plan(
             coordinates,
             tuple(block.block_id for block in selected_blocks),
         ),
+        skipped_coordinates=tuple(item for item in all_coordinates if item not in coordinates),
     )
 
 
@@ -319,6 +374,7 @@ def execute_sparse_decimal_plan(
     input_pins: tuple[str, ...] = (),
     valid_at: str | None = None,
     known_at: str | None = None,
+    evidence_pins: tuple[str, ...] = (),
 ) -> SparseCalculationResult:
     """Execute a compiled plan over populated coordinates using trusted callables."""
 
@@ -331,12 +387,48 @@ def execute_sparse_decimal_plan(
             input_pins=input_pins,
             valid_at=valid_at,
             known_at=known_at,
+            execution_stages=plan.stages,
+            dimensional_signatures=plan.dimensional_signatures,
+            intersection_counts=plan.intersection_counts,
+            skipped_coordinates=plan.skipped_coordinates,
+            evidence_pins=evidence_pins,
             reproducibility_hash=_result_hash(plan, target, input_pins, valid_at, known_at, values),
             refusal_reason=plan.refusal_reason,
         )
     nodes = {node.node_id: node for node in graph.nodes}
     result = dict(values)
-    coordinates = plan.affected_coordinates
+    source_nodes = tuple(node.node_id for node in graph.nodes if not node.depends_on)
+    if source_nodes and not any(
+        (node_id, coordinate) in result
+        for node_id in source_nodes
+        for coordinate in plan.affected_coordinates
+    ):
+        missing_evaluator = next(
+            (
+                nodes[node_id].function_id
+                for node_id in source_nodes
+                if nodes[node_id].function_id not in evaluators
+            ),
+            None,
+        )
+        if missing_evaluator is not None:
+            return _execution_refusal(
+                plan,
+                result,
+                f"No evaluator registered: {missing_evaluator}",
+                target=target,
+                input_pins=input_pins,
+                valid_at=valid_at,
+                known_at=known_at,
+            )
+    coordinates = tuple(
+        coordinate
+        for coordinate in plan.affected_coordinates
+        if all((node_id, coordinate) in result for node_id in source_nodes)
+    )
+    skipped_coordinates = tuple(
+        coordinate for coordinate in plan.affected_coordinates if coordinate not in coordinates
+    )
     for stage in plan.stages:
         for node_id in stage:
             node = nodes[node_id]
@@ -390,6 +482,17 @@ def execute_sparse_decimal_plan(
         input_pins=input_pins,
         valid_at=valid_at,
         known_at=known_at,
+        execution_stages=finished.stages,
+        dimensional_signatures=finished.dimensional_signatures,
+        intersection_counts=finished.intersection_counts,
+        executed_coordinates=coordinates,
+        skipped_coordinates=tuple(
+            sorted(
+                set(finished.skipped_coordinates) | set(skipped_coordinates),
+                key=lambda item: item.values,
+            )
+        ),
+        evidence_pins=evidence_pins,
         reproducibility_hash=_result_hash(finished, target, input_pins, valid_at, known_at, result),
     )
 
@@ -649,12 +752,37 @@ def _affected_coordinates(
     blocks: tuple[CalculationBlock, ...],
     intersections: Mapping[str, IntersectionSet],
     changed: tuple[Coordinate, ...],
+    *,
+    changed_nodes: tuple[str, ...] = (),
+    mappings: Mapping[str, DimensionMapping] | None = None,
+    coordinate_dependencies: tuple[CoordinateDependency, ...] = (),
 ) -> tuple[Coordinate, ...]:
+    if not changed:
+        return tuple(
+            sorted(
+                {
+                    coordinate
+                    for block in blocks
+                    for coordinate in intersections[
+                        block.sparse_intersection_set_id
+                    ].populated_coordinates
+                },
+                key=lambda item: item.values,
+            )
+        )
+    mappings = mappings or {}
+    mapped_changes: list[Coordinate] = list(changed)
+    for edge in coordinate_dependencies:
+        if edge.source_node_id not in changed_nodes or not edge.mapping_id:
+            continue
+        mapping = mappings.get(edge.mapping_id)
+        if mapping is not None:
+            mapped_changes.extend(map_coordinate(item, mapping) for item in changed)
     coordinates = {
         coordinate
         for block in blocks
         for coordinate in intersections[block.sparse_intersection_set_id].populated_coordinates
-        if not changed or any(_coordinate_intersects(coordinate, item) for item in changed)
+        if any(_coordinate_intersects(coordinate, item) for item in mapped_changes)
     }
     return tuple(sorted(coordinates, key=lambda item: item.values))
 
@@ -762,6 +890,7 @@ __all__: Final = [
     "CalculationShape",
     "CompiledCalculationPlan",
     "Coordinate",
+    "CoordinateDependency",
     "DimensionMapping",
     "DimensionMappingRule",
     "DimensionalSignature",

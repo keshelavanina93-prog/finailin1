@@ -7,6 +7,7 @@ from finai_api.domain.multidimensional_runtime import (
     AggregationPolicy,
     CalculationBlock,
     Coordinate,
+    CoordinateDependency,
     DimensionalSignature,
     DimensionMapping,
     DimensionMappingRule,
@@ -240,6 +241,81 @@ def test_transform_dispatch_refuses_unregistered_execution_and_supports_mapping(
         assert "not registered" in str(error)
     else:
         raise AssertionError("Unregistered transform unexpectedly executed")
+
+
+def test_cross_grain_invalidation_follows_explicit_mapping_only() -> None:
+    graph = CalculationGraph(
+        graph_id="landed-cost",
+        version="1",
+        nodes=(
+            CalculationNode(node_id="fx", function_id="source"),
+            CalculationNode(node_id="landed", function_id="multiply", depends_on=("fx",)),
+        ),
+    )
+    signature = DimensionalSignature(
+        signature_id="landed-grain",
+        required_dimensions=("currency_pair", "period", "product"),
+        ordered_execution_dimensions=("currency_pair", "period", "product"),
+    )
+    coordinates = (
+        Coordinate(
+            values=(
+                ("currency_pair", "USD/GEL"),
+                ("period", "2026-09-10"),
+                ("product", "DIESEL"),
+            )
+        ),
+        Coordinate(
+            values=(
+                ("currency_pair", "EUR/GEL"),
+                ("period", "2026-09-10"),
+                ("product", "DIESEL"),
+            )
+        ),
+    )
+    intersection = IntersectionSet(
+        intersection_set_id="landed-cells",
+        dimensional_signature_id=signature.signature_id,
+        populated_coordinates=coordinates,
+        generation_source="accepted-cost-facts",
+        generation_reason="Only observed cost cells",
+    )
+    block = CalculationBlock(
+        block_id="landed-cost-block",
+        dimensional_signature_id=signature.signature_id,
+        calculation_node_ids=("fx", "landed"),
+        sparse_intersection_set_id=intersection.intersection_set_id,
+    )
+    usd = Coordinate(values=(("currency_pair", "USD/GEL"), ("period", "2026-09-10")))
+    plan = compile_sparse_plan(
+        graph,
+        (signature,),
+        (block,),
+        (intersection,),
+        changed_nodes=("fx",),
+        changed_coordinates=(usd,),
+        mappings=(
+            DimensionMapping(
+                mapping_id="fx-to-landed",
+                rules=(
+                    DimensionMappingRule(
+                        source_dimension="currency_pair",
+                        target_dimension="currency_pair",
+                        value_map=(("USD/GEL", "USD/GEL"),),
+                    ),
+                ),
+            ),
+        ),
+        coordinate_dependencies=(
+            CoordinateDependency(
+                source_node_id="fx",
+                target_node_id="landed",
+                mapping_id="fx-to-landed",
+            ),
+        ),
+    )
+    assert plan.affected_coordinates == (coordinates[0],)
+    assert plan.skipped_coordinates == (coordinates[1],)
 
 
 def test_hierarchy_replay_uses_valid_and_known_time() -> None:

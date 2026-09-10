@@ -579,9 +579,13 @@ foundation at
 reusable resolver foundation plus the sparse multidimensional runtime at
 `services/api/src/finai_api/domain/multidimensional_runtime.py`, exposed to the
 Planning workspace through the registered-function catalog and preflight
-proxy. This remains a convergence slice: durable calculation persistence,
-domain evaluator registration, external adapters and release evidence are not
-complete.
+proxy. The runtime now returns a typed execution packet with deterministic
+stage order, sparse executed/skipped coordinates, input/evidence pins and
+reproducibility hashes. Cross-grain invalidation requires an explicit
+`CoordinateDependency` plus `DimensionMapping`; missing mappings do not
+broadcast a changed input into an unrelated block. This remains a convergence
+slice: durable calculation persistence, domain evaluator registration,
+external adapters and release evidence are not complete.
 
 ## Cross-projection fabric
 
