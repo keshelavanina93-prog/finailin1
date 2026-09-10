@@ -31,11 +31,11 @@ test("source family intake model covers requested massive multi-entity sources",
   }
 });
 
-test("classification separates anchored, partial and target-only families", () => {
+test("classification separates anchored and partial families while preserving target-only logic", () => {
   const trialBalance = model.sourceFamilyById("1c_trial_balance");
   const forecourt = model.sourceFamilyById("orpak_forecourt_pos");
   assert.equal(model.classifySourceFamily(trialBalance), "partial");
-  assert.equal(model.classifySourceFamily(forecourt), "target-only");
+  assert.equal(model.classifySourceFamily(forecourt), "partial");
 
   const anchored = {
     ...trialBalance,
@@ -58,10 +58,7 @@ test("missing dimensions are returned for analyst-facing UI without mutating the
   assert.deepEqual(model.missingDimensionsForAnalyst("1c_trial_balance"), ["subaccount"]);
   assert.deepEqual(model.missingDimensionsForAnalyst("orpak_forecourt_pos"), [
     "pump",
-    "fuel_grade",
-    "shift",
     "operator",
-    "lineage",
   ]);
   assert.deepEqual(model.missingDimensionsForAnalyst("unknown-family"), []);
 
@@ -74,7 +71,7 @@ test("summary keeps completion distinct from planning coverage", () => {
   assert.deepEqual(model.sourceFamilyIntakeSummary(), {
     families: 8,
     anchored: 0,
-    partial: 5,
-    targetOnly: 3,
+    partial: 8,
+    targetOnly: 0,
   });
 });

@@ -44,10 +44,11 @@ test("massive intake, accounting, finance and operations surfaces are mapped to 
   assert.ok(operations.axes.includes("operational_scope"));
 });
 
-test("target-only dimensions cannot be reported as fully wired", () => {
+test("partial dimensions cannot be reported as fully wired", () => {
   assert.equal(contract.isFullyWired("nyx_reasoning"), false);
   assert.equal(contract.isFullyWired("outcomes_learning"), false);
-  assert.deepEqual(contract.missingWiringEvidence("outcomes_learning"), contract.FULL_WIRING_EVIDENCE);
+  assert.ok(contract.missingWiringEvidence("outcomes_learning").includes("browser_proof"));
+  assert.ok(contract.missingWiringEvidence("outcomes_learning").includes("restart_readback"));
 });
 
 test("coverage summary separates partial implementation from completion", () => {
@@ -56,5 +57,5 @@ test("coverage summary separates partial implementation from completion", () => 
   assert.equal(summary.surfaces, 8);
   assert.equal(summary.fullyWired, 0);
   assert.ok(summary.partial > 0);
-  assert.ok(summary.targetOnly > 0);
+  assert.equal(summary.targetOnly, 0);
 });

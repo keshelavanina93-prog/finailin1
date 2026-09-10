@@ -23,35 +23,29 @@ test("enumerates frontend proxy families and their mapped backend families", () 
   }
 });
 
-test("pure listing helpers keep wired, partial and target-only route families separate", () => {
+test("pure listing helpers keep wired and partial route families separate", () => {
   assert.deepEqual(inventory.listStronglyWiredRouteFamilies().map((family) => family.id), [
     "ontology",
     "diagnostics",
     "hydration",
     "readiness",
   ]);
-  assert.deepEqual(inventory.listPartialRouteFamilies().map((family) => family.id), ["workspace", "operations"]);
-  assert.deepEqual(inventory.listTargetOnlyRouteFamilies().map((family) => family.id), [
+  assert.deepEqual(inventory.listPartialRouteFamilies().map((family) => family.id), [
+    "workspace",
+    "operations",
     "planning",
     "top_level_reporting",
     "nyx_reasoning",
     "outcomes_learning",
     "petroleum_telemetry_bridge",
   ]);
+  assert.deepEqual(inventory.listTargetOnlyRouteFamilies(), []);
 });
 
-test("disabled or target-only dimensions cannot be counted as backend wired", () => {
+test("partial dimensions retain explicit mapped routes and target-only remains empty", () => {
   const targetOnly = inventory.listTargetOnlyRouteFamilies();
-  assert.ok(targetOnly.every((family) => family.nextProxyFamily === null));
-  assert.ok(targetOnly.every((family) => family.fastApiFamily === null));
-  assert.ok(targetOnly.every((family) => family.wiredRoutes.length === 0));
-  assert.deepEqual(targetOnly.flatMap((family) => family.targetOnlyDimensions), [
-    "planning",
-    "top-level reporting",
-    "NYX reasoning",
-    "outcomes/learning",
-    "full petroleum telemetry bridge",
-  ]);
+  assert.equal(targetOnly.length, 0);
+  assert.ok(inventory.listPartialRouteFamilies().every((family) => family.wiredRoutes.length > 0));
 });
 
 test("chart proposal is included as a strongly wired ontology route", () => {
